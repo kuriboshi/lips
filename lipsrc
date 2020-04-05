@@ -1,0 +1,17 @@
+# %M% -- global initialization file
+# Last edit: %E%
+
+# (load "/usr/mina/exjobb/krijo/src/lips/lipscode/list")
+(load "/home/krijo/src/lips/lipscode/let")
+(load "/home/krijo/src/lips/lipscode/dirstack")
+(load "/home/krijo/src/lips/lipscode/alias")
+
+(de autoload (file which)
+    (mapc which
+          (lambda (x)
+            (putprop x 'autoload file))))
+
+(autoload "/home/krijo/src/lips/lipscode/pretty"
+          '(pprint pp))
+(autoload "/home/krijo/src/lips/lipscode/edit" '(edit))
+(autoload "/home/krijo/src/lips/lipscode/misc" '(foreach))

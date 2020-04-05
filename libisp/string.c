@@ -1,0 +1,128 @@
+/*
+ * Lips, lisp shell.
+ * Copyright 1988, Krister Joas
+ *
+ * $Id$
+ */
+#include <string.h>
+#include "lisp.h"
+
+#ifndef lint
+static char rcsid[] = "$Id$";
+#endif
+
+/* Return symbols print name as a string. */
+PRIMITIVE symstr(sym)
+  LISPT sym;
+{
+  CHECK(sym,SYMBOL);
+  return mkstring(SYMVAL(sym).pname);
+}
+
+/* T if s is a string, NIL otherwise. */
+PRIMITIVE stringp(s)
+  LISPT s;
+{
+  if (TYPEOF(s) == STRING)
+    return C_T;
+  else
+    return C_NIL;
+}
+
+/* T if both strings are equal */
+PRIMITIVE streq(s1, s2)
+  LISPT s1, s2;
+{
+  CHECK(s1, STRING);
+  CHECK(s2, STRING);
+  if (!strcmp(STRINGVAL(s1), STRINGVAL(s2)))
+    return C_T;
+  else
+    return C_NIL;
+}
+
+PRIMITIVE strcomp(s1, s2)
+  LISPT s1, s2;
+{
+  CHECK(s1, STRING);
+  CHECK(s2, STRING);
+  return mknumber(strcmp(STRINGVAL(s1), STRINGVAL(s2)));
+}
+
+/* Concatenate arbitrary many strings to
+   to one string */
+PRIMITIVE concat(strlist)
+  LISPT strlist;
+{
+  LISPT sl;
+  register int size;
+  register char *ns;
+
+  size = 0;
+  for (sl = strlist; !ISNIL(sl); sl = CDR(sl))
+    {
+      CHECK(CAR(sl),STRING);
+      size += strlen(STRINGVAL(CAR(sl)));
+    }
+  ns = (char *) safemalloc((unsigned)size + 1);
+  if (ns == NULL) return error(OUT_OF_MEMORY, C_NIL);
+  ns[0] = '\0';
+  while (!ISNIL(strlist))
+    {
+      (void) strcat(ns,STRINGVAL(CAR(strlist)));
+      strlist = CDR(strlist);
+    }
+  return mkstring (ns);
+}
+
+/* Return string length of s */
+PRIMITIVE xstrlen(s)
+  LISPT s;
+{
+  CHECK(s,STRING);
+  return mknumber((long)strlen(STRINGVAL(s)));
+}
+
+/* Extract a substring from start to end.
+   If start or end is out of bounds, return
+   NIL. If end is one less than start the
+   zero length string is returned. end equal
+   to zero if start is equal to one is accepted. */
+PRIMITIVE substr(str, start, end)
+  LISPT str, start, end;
+{
+  register size;
+  register s, e;
+  register char *ns;
+  LISPT sl;
+
+  CHECK(str,STRING);
+  CHECK(start,INTEGER);
+  CHECK(end,INTEGER);
+  s = INTVAL(start);
+  e = INTVAL(end);
+  size = e - s + 1;
+  if (size < 0 || s > strlen(STRINGVAL(str)) ||
+      e > strlen(STRINGVAL(str)) || s <= 0 || e < 0)
+    return C_NIL;
+  ns = (char *) safemalloc((unsigned)size + 1);
+  if (ns == NULL) return error(OUT_OF_MEMORY, C_NIL);
+  ns[size] = '\0';
+  for (size = 0; s<=e; s++, size++)
+    {
+      ns[size] = *(STRINGVAL(str)+s-1);
+    }
+  return mkstring (ns);
+}
+
+public void
+init_string()
+{
+  mkprim(PN_STRINGP, stringp,  1, SUBR);
+  mkprim(PN_STREQ,   streq,    2, SUBR);
+  mkprim(PN_CONCAT,  concat,  -1, SUBR);
+  mkprim(PN_STRLEN,  xstrlen,  1, SUBR);
+  mkprim(PN_SUBSTR,  substr,   3, SUBR);
+  mkprim(PN_SYMSTR,  symstr,   1, SUBR);
+  mkprim(PN_STRCMP,  strcomp,  2, SUBR);
+}

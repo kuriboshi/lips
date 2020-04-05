@@ -1,0 +1,305 @@
+*** lips.man.ingwa	Tue Sep  5 21:26:24 1989
+--- lips.man	Wed Sep  6 15:15:54 1989
+***************
+*** 32,38 ****
+  .I lips
+  offers functionality to make it work as a command shell.
+  It includes functions for
+! tool combination through pipes and input, output redirection.
+  .I lips
+  makes use of read macros to make the input
+  syntax resemble the standard shells.
+--- 32,39 ----
+  .I lips
+  offers functionality to make it work as a command shell.
+  It includes functions for
+! tool combination with pipes and input,
+! output redirection.
+  .I lips
+  makes use of read macros to make the input
+  syntax resemble the standard shells.
+***************
+*** 40,46 ****
+  This document will give a brief overview over
+  .IR lips ,
+  and should be adequate for getting started.
+! See the
+  .SM FUNCTIONS
+  for a complete list of functions provided.
+  .PP
+--- 41,47 ----
+  This document will give a brief overview over
+  .IR lips ,
+  and should be adequate for getting started.
+! See
+  .SM FUNCTIONS
+  for a complete list of functions provided.
+  .PP
+***************
+*** 67,73 ****
+  prompts with the current history number followed by an underscore.
+  All commands are saved on the history list,
+  and may be recalled at any time.
+! However, a maximum number of events saved on the history
+  list is limited to the value of
+  .IR histmax .
+  This variable may be set by the user to any value.
+--- 68,75 ----
+  prompts with the current history number followed by an underscore.
+  All commands are saved on the history list,
+  and may be recalled at any time.
+! However,
+! a maximum number of events saved on the history
+  list is limited to the value of
+  .IR histmax .
+  This variable may be set by the user to any value.
+***************
+*** 121,136 ****
+  .I lips
+  expression, followed by a dot, `.', another expression and
+  terminated with a right parenthesis. 
+! (a . b) is an example of a dotted pair. Note that
+  the blanks around the dot are necessary, the dot is not a break character.
+  The dot is recognized in this special way only if it occurs
+  as the second element from the end of a list.
+  In other cases it is treated as an ordinary atom.
+! The list (. . . .) is a list with three elements
+  ending in a dotted pair.
+  .PP
+  A list is just a special case of dotted pairs.
+! (a . (b . nil)) is equivalent to (a b).
+  The second format is just a convenience since
+  lists are so common.
+  .PP
+--- 123,138 ----
+  .I lips
+  expression, followed by a dot, `.', another expression and
+  terminated with a right parenthesis. 
+! (a\ .\ b) is an example of a dotted pair. Note that
+  the blanks around the dot are necessary, the dot is not a break character.
+  The dot is recognized in this special way only if it occurs
+  as the second element from the end of a list.
+  In other cases it is treated as an ordinary atom.
+! The list (.\ .\ .\ .) is a list with three elements
+  ending in a dotted pair.
+  .PP
+  A list is just a special case of dotted pairs.
+! (a\ .\ (b\ .\ nil)) is equivalent to (a\ b).
+  The second format is just a convenience since
+  lists are so common.
+  .PP
+***************
+*** 160,166 ****
+  1.0/float
+  1e5/float
+  1e/literal atom
+! .e4/literal atom
+  1.4./literal atom
+  .TE
+  .fi
+--- 162,168 ----
+  1.0/float
+  1e5/float
+  1e/literal atom
+! \&.e4/literal atom
+  1.4./literal atom
+  .TE
+  .fi
+***************
+*** 171,177 ****
+  treated as lists.
+  This means that 
+  .I lips
+! supplies an extra pair of
+  parenthesis around all expressions.
+  If the first expression of a line is an atom,
+  and not a list,
+--- 173,179 ----
+  treated as lists.
+  This means that 
+  .I lips
+! supplies an extra pair of matching
+  parenthesis around all expressions.
+  If the first expression of a line is an atom,
+  and not a list,
+***************
+*** 178,184 ****
+  input terminates with either a return
+  (providing that parenthesis in subexpressions match),
+  or an extra right parenthesis.
+! In the first case, a matchin pair of
+  parenthesis are added surrounding the line,
+  in the second case an extra left parenthesis is added
+  as the first character.
+--- 180,186 ----
+  input terminates with either a return
+  (providing that parenthesis in subexpressions match),
+  or an extra right parenthesis.
+! In the first case, a matching pair of
+  parenthesis are added surrounding the line,
+  in the second case an extra left parenthesis is added
+  as the first character.
+***************
+*** 435,441 ****
+  .TP
+  (progn e1 e2 ...)
+  the forms e1, e2,... are evaluated one by one and the
+! value of the last e\fIn\fR i returned.
+  .TP
+  (prog1 e1 e2 ...)
+  same as progn but e1 is returned as value.
+--- 437,443 ----
+  .TP
+  (progn e1 e2 ...)
+  the forms e1, e2,... are evaluated one by one and the
+! value of the last, e\fIn\fR, is returned.
+  .TP
+  (prog1 e1 e2 ...)
+  same as progn but e1 is returned as value.
+***************
+*** 449,475 ****
+  .SS Control functions
+  '\"
+  .TP 15
+! (cond (p1 e1) (p2 e2) ...)
+! the predicates p\fIn\fR are evaluated and whenever any of them
+! is evaluated to 
+! .BR t , 
+! e\fIn\fR
+! is evaluated and returned as value of the cond.
+! If no predicate evaluates to 
+! .BR t , 
+! .B nil
+! is returned.
+  .TP
+  (while p e ...)
+! as long as p evaluates to 
+! .B t , 
+! e is evaluated.
+! while always returns 
+  .BR nil .
+  .TP
+  (if p e1 e2 ...)
+! If the expression p is evaluated to non-nil,
+! evaluates expression e1.
+  Otherwise evaluate e2 to e\fIn\fR and return the
+  value of e\fIn\fR as in progn.
+  '\"
+--- 451,473 ----
+  .SS Control functions
+  '\"
+  .TP 15
+! (cond (p1 e1 ...) (p2 e2 ...) ...)
+! the predicates p\fIn\fR are evaluated in order
+! and the first that is evaluated to anything other than \fBnil\fR,
+! the expressions after that predicate is evaluated.
+! The last expression evaluated is returned as in progn.
+! If no predicate evaluates to non-\fBnil\fR,
+! \fBnil\fR is returned.
+  .TP
+  (while p e ...)
+! as long as p evaluates to a value other than \fBnil\fR,
+! the expressions following the predicate are evaluated in order.
+! While always returns
+  .BR nil .
+  .TP
+  (if p e1 e2 ...)
+! If the expression p is evaluated to non-\fBnil\fR,
+! the expression e1 is evaluated.
+  Otherwise evaluate e2 to e\fIn\fR and return the
+  value of e\fIn\fR as in progn.
+  '\"
+***************
+*** 552,573 ****
+  '\"
+  .TP 15
+  (and x1 x2 ...)
+! returns 
+! .B t 
+! if all arguments evaluates to 
+! .BR t ,
+! otherwise and returns 
+! .B nil 
+  as soon as any argument evaluates
+  to 
+  .BR nil .
+  .TP
+  (or x1 x2 ...)
+! returns 
+! .B t 
+! as soon as any argument is evaluated to 
+! .BR t ,
+! otherwise 
+  .BR nil .
+  .TP
+  (not x)
+--- 550,566 ----
+  '\"
+  .TP 15
+  (and x1 x2 ...)
+! returns the last argument
+! if all arguments evaluates to non-\fBnil\fR,
+! otherwise it returns
+! .B nil
+  as soon as any argument evaluates
+  to 
+  .BR nil .
+  .TP
+  (or x1 x2 ...)
+! returns the first argument that is evaluated to a non-\fBnil\fR value,
+! otherwise it returns
+  .BR nil .
+  .TP
+  (not x)
+***************
+*** 821,832 ****
+  .TP
+  (setplist a b)
+  sets the property list of a to b.
+! putprop, getprop and remprop depends on using the correct
+  representation.
+! Avoiding these function inorder to use a different
+! representation doesn't garantuee
+  .I lips
+! works properly since properties
+  are used internally.
+  '\"
+  .SS Miscellaneous Functions
+--- 814,827 ----
+  .TP
+  (setplist a b)
+  sets the property list of a to b.
+! putprop, getprop and remprop as well as
+! .I lips
+! itself depends on using the correct
+  representation.
+! Using setplist to implement a different representation
+! of properties doesn't guarantee
+  .I lips
+! working properly since properties
+  are used internally.
+  '\"
+  .SS Miscellaneous Functions
+***************
+*** 955,960 ****
+--- 950,958 ----
+  '\"
+  .SS Unix Related Functions
+  '\"
++ Unless otherwise noted these functions returns
++ the same value as the corresponding Unix function
++ as documented in section 2 of the Unix manual.
+  .TP 15
+  (errno)
+  returns the latest unix error.
+***************
+*** 984,989 ****
+--- 982,989 ----
+  exits 
+  .I lips
+  with exit status s.
++ If s is \fBnil\fR,
++ zero is used.
+  .TP
+  (getuid)
+  returns user id.

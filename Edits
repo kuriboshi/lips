@@ -1,0 +1,742 @@
+*** Revision 0.3(999) *** `date` by `name`
+
+130	Wed Jan 29 00:11:55 1992  Krister Joas  (krijo@rplaca)
+	Separated the stuff private to libisp into lisp.h and put the
+	definition of LISPT in a new file, libisp.h, to be included
+	by libisp clients.  Some small modifications in lips.
+
+129	Tue Jan 28 22:11:16 1992  Krister Joas  (krijo@rplaca)
+	Moved the library-to-be, libisp, to a separate directory and
+	moved term.c to the lips source dir.  The makefile now uses
+	'makedepend' to generate header file dependencies.  Created
+	a top level makefile.
+
+128	Tue Jan 28 22:09:28 1992  Krister Joas  (krijo@rplaca)
+	Pointers to functions may not be assigned to variables of type
+	pointer to void and back (ANSI).
+
+127	Sun Jan 26 19:38:55 1992  Krister Joas  (krijo@rplaca)
+	Changed the representation of a lisp object to a pointer to union.
+
+126	Thu Jan 23 22:58:38 1992  Krister Joas  (krijo@rplaca)
+	First free LISPT object wasn't marked FREE, and if it cointained
+	a c-pointer it wasn't freed.  Thus a small memory leak.
+
+125	Wed Jan 22 01:01:44 1992  Krister Joas  (krijo@rplaca)
+	The control stack was treated incorrectly by the garbage
+	collector.  Move the loading of the init files so that the
+	fancy signal handling is available during init file loading.
+
+124	Tue Jan 21 23:28:58 1992  Krister Joas  (krijo@rplaca)
+	Lisp function xwhile() returned undefined value.
+
+123	Tue Jan 21 17:53:59 1992  Krister Joas  (krijo@rplaca)
+	Use the FD_* macros for select arguments.  A PBD discovered
+	in getuser() where a call to fprintf had its argument outside
+	the parens.
+
+122	Tue Jan 21 01:10:11 1992  Krister Joas  (krijo@rplaca)
+	The LISPT type is now a union to be more portable.  This was
+	easier said than done and this version isn't working properly
+	yet.  Some questionable constructs were corrected.  Hopefully
+	it will become a little but more cleaner design.  Renamed the
+	library to libisp so that it will become -lisp when linking.
+	The SARGASSO version has been dropped.
+
+121	Sun Jun  9 09:32:19 1991  Krister Joas  (krijo@usagi)
+	Everything was put into RCS.
+
+120	Sun Dec 17 16:25:18 1989  Krister Joas  (krijo@tsgrim)
+	In walkfiles(), when a match is discovered the variable
+	result wasn't set.  This was also a Sun386 (SunOS 4.0)
+	difference.  It has now been tested on Sun3/SunOS{3.5,4.0}
+	and Sun386i/SunOS4.0.  It worked under SysV up to version 44.
+	It also has been tested--and an early version actually
+	worked--on a PDP11/70/BSD2.10.  In order to get this to work
+	ok it need to allocate memory more efficiently.  The lisp
+	part has been also been ported to TOPS-20.  This port
+	may be dropped in the future due to limited 20 access.
+
+119	Sat Dec 16 00:01:40 1989  Krister Joas  (krijo@tsgrim)
+	An out of bounds reference during key map initialization
+	put a nul byte int the first position of the tcap array.
+	This was discovered on the Sun386i, and did not appear
+	on other Sun's tested.  The '\a' character was exchanged
+	for the constant BELL.
+
+*** Revision 0.2(118) ***
+
+118	Tue Jun 27 05:16:33 1989  Krister Joas  (krijo@mina)
+	Changed globbing to build an array instead of a list. The array is
+	not sorted until after globbing. If the new variable GLOBSORT is
+	NIL, globbing doesn't sort.
+
+117	Mon Jun 26 00:50:50 1989  Krister Joas  (krijo@tragicomix)
+	The GO command never actually worked correctly, or it might have
+	broken at some point. The break routines are now separated from
+	eval and are now in misc.c. break0() takes one argument, the
+	faulty expression, and returns the possibly modified expression.
+
+116	Sun Jun 25 04:36:12 1989  Krister Joas  (krijo@teorix)
+	Added noeval version of eval (E). Arguments to external commands
+	are evaluated if within parenthesis.
+
+115	Sun Jun 25 01:32:18 1989  Krister Joas  (krijo@teorix)
+	Changed the error message "[in ...]" to always print the name of
+	the function the error occured in. Backslashes can now be used for
+	quoting shell meta characters but they must be typed twice like
+	"echo \\*".
+
+114	Thu May 25 03:56:34 1989  Krister Joas  (krijo@mystefix)
+	Inserted tests for out of memory on all mallocs.
+
+113	Wed May 24 04:59:17 1989  Krister Joas  (krijo@comix)
+	Ported to 2.10BSD. Some trouble with int-is-long removed.
+	PDP11 needs overlays to get all the code to fit. Some of the
+	stacks and global arrays where a bit too big for the data segment.
+	There was a problem with ifexec() in exec.c where a large
+	character array allocated on the stack damaged the return address
+	on the stack; changed it to static. Lips is too big for the PDP
+	and need to be cut down to fit.
+
+112	Mon May  1 14:18:25 1989  Krister Joas  (KVACK@ELINOR)
+	Lisp part now works under TOPS-20 whith the Sargasso C-compiler.
+	Updated the config.h file. Changes to term.c for systems
+	without termcap (such as TOPS). The Sargasso compiler doesn't
+	handle different structures with same structure members so that
+	was fixed. shortc.h makes external symbols unique to six letters.
+	Most of the changes was	in main.c, term.c and top.c. Also made
+	some minor fixes.
+
+111	Thu Apr 13 20:59:24 1989  Krister Joas  (krijo@troubadix)
+	PROG1 and PROG2 did not evaluate their arguments.
+
+110	Thu Mar 23 06:56:07 1989  Krister Joas  (krijo@mina)
+        FG did not start jobs that where run in the background and then
+        stopped for some reason (TTOU for example).
+
+109	Tue Mar 21 06:45:52 1989  Krister Joas  (krijo@mina)
+        prin0() didn't print escapes correctly. Blinking handled escapes
+        and strings incorrectly. Pipe and redirect is no longer done with
+        read macros. Instead the expression read is passed to a
+        transformation function that transforms it to a form suitable for
+        evaluation. The expression is stored on the history list before
+        transformation.  Redo recalls the command just as it was typed in,
+        without stripping parenthesis. Echoing commands after history
+        substitution with top level of parens stripped. Variable
+        INTERACTIVE is T if lips runs interactively. Variable VERSION
+        contains the version string. Pipe and redirect characters are no
+        longer break characters.
+
+108	Sun Mar 19 06:01:04 1989  Krister Joas  (krijo@mina)
+        term.c reorganized a bit. It now uses a table to decide what
+        actions should be taken on various key strokes. Instead of using
+        nd term cap blink prints the actual characters instead since nd on
+        a vt100 for example is three characters long. getline() uses read
+        instead of stdio buffering. It also returns EOF whenever an error
+        occurs in read. This is not very wise since it would make all lips
+        jobs exit if something funny happens in a subshell. At least no
+        process is left hanging when I exit X. dest could be uninitialized
+        in gc in which case lips dumped core. Ran out of file descriptors
+        after a while.
+
+107	Fri Mar 17 02:48:48 1989  Krister Joas  (krijo@mina)
+        Changed prompt processing. The variable promptform is evaluated as
+        before, but it should not print anything. After promptform has
+        been evaluated the string in the variable prompt (or brkprompt if
+        in a break) is written. An exclamation mark in prompt is converted
+        to the current history number. This allows for a nicer terminal
+        user interface which include proper retyping and parenthesis
+        matching. Echoes funny characters in commands or symbols correctly,
+        in uparrow format.
+
+106	Mon Mar 13 01:11:48 1989  Krister Joas  (krijo@mina)
+        APPLY on unbound symbol (that should either autoload or execute)
+        failed to do the correct thing. Some missplaced braces in
+        findalias(). Function ifexec returned incorrect result. New and
+        improved editor. NTHD.
+
+105	Sun Mar 12 03:58:50 1989  Krister Joas  (krijo@mina)
+        An else bound to wrong if statement caused strings to be
+        disallowed in makeexec. Uses execve for program execution instead
+        of execvp. Hopefully a bit faster. ZEROP never returns an error,
+        instead it returns nil if not integer or zero. New function ABS.
+        ATTACH now return (cons obj) if list is nil. Lispread failed to
+        check for eof everywhere. SETENV couldn't handle new environment
+        variables. 
+
+104	Fri Mar 10 19:47:37 1989  Krister Joas  (krijo@mina)
+        print printed nothing for 0 and negative arguments.
+        In evclosure the variable env was stacked but not unstacked. The
+        two top elements had to be switched. CD takes an extra argument,
+        and if its non-nil nil is returned instead of an error. Directory
+        stack routines, PUSHD, POPD, DIRS in lisp. Alias expansion is done
+        in eval, but a global list of names already expanded in the
+        current command is kept. Cleaned up eval.c a bit. Error
+        handling is a bit cleaner. Fixed a few bugs in PRETTY.
+        
+103     890309  krijo
+        All error messages uses a constant defined in error.h
+        as the error message. The constant also defines whether
+        the second argument to error should be printed.
+        BG, SETENV, GETENV new functions. Alias expansion is now
+        done in exec.c in all functions calling exec. Filename
+        expansion works again by ugly patch. If a program is
+        stopped within a lisp expression or function the expression
+        is broken (don't know if it works though). Strange
+        behaviour in pipecmd(); program locked in call to sigpause()
+        in spite of exiting processes. Removed sigpause() temporarily.
+        Added a waitfork() after second fork in pipecmd().
+        SIGCHLD is blocked in critical regions, other signals
+        should probably also be blocked. extilde() printed error
+        messages when it shouldn't. Missing nul character when
+        searching for user messed things up. Some functions declared
+        incorrectly. Unnecessary directory argument in EXPAND.
+        If lips process is in a fork it exits gracefully on
+        exceptional conditions (leaving a core if appropriate).
+        Changed option -f to -n to confirm with {c}sh. Incorrect
+        goto in lispread(). Filename expansion for tilde dirs
+        works. ^D echos ^D when not first character on line (dumped
+        core before).
+
+102     890305  krijo
+        All error messages are accessed by an integer specifying
+        the error and whether the argument should be printed or not.
+        TCONC, ATTACH some useful destructive functions. New version
+        of integerp that also handles conversion to int. New print
+        routine for ints that doesn't need sprintf. Variable BASE
+        specifies current conversion base for integer output. OR
+        was not correct. SETQQ defined using SET. New readmacro
+        type, splice: splices the return value into list under
+        contruction. Readmacro ! uses this implementing a better
+        redo facility, se read.c for details.
+
+101     890304  krijo
+        Job control. REMPROP returned funny value if property not
+        found. Nicer retype and delete for multiline lisp expressions.
+        SET never prints a message. CPPRINT handles half/no-spread.
+
+100     890301  krijo
+        Now correctly aborts subprocesses. New functions REHASH and
+        HASHSTAT. Alias loop error not handled correctly, this is
+        now printed in eval, by ABORT. SAVE, UNSAVE and USESAVE
+        macros for gc-saves. All error messages know print on
+        primerr. Timeout with default answer to core dump signals.
+        Problems in match for directories and strings ending with
+        wildcard '*' fixed temporarly. Hashtable is used to quickly
+        determine nonexisting programs. Error handling during
+        file-name expansion somewhat better.
+
+99	890227	krijo
+	Don't mark symbols, but traverse plist and value in reclaim().
+        ENVGET more useful. New function DEFINE, a lambda function
+	that takes two args, a symbol and a lambda definition. Save
+	old variable values under property OLDVAL.
+
+98      890227  krijo
+        Added an argument TO class of functions, specifying which
+        file descriptor to redirect. Signals not handled correctly
+        in subprocesses, shouldn't have been handled at all. APPLY
+        pushed registers in incorrect order. Subprocesses aborted
+        a bit early (now a trifle late). Gc-save of temporaries in
+        functions calling cons.
+
+97      890226  krijo
+        mark() didn't mark symbols leading to symbols having symbols
+        as values made mark() loop forever.
+
+96      890224  krijo
+        In peval[12] the default case was very likely to end up
+        in a loop if findalias couldn't find an alias.
+        STRCMP.
+        Beware of lines close to or longer than 80 characters,
+        they confuse up CPPRINT. Files opened by CPPRINT was not
+        closed. The function BAKTRACE prints a backtrace of the
+        control stack, not useful for the uninitiated.
+
+95      890222  krijo
+        IF only executed true if exp was T, it should be not NIL.
+        SET checked if a variable was changed with EQ not EQUAL.
+
+94      890221  krijo
+        CPPRINT prints the c-function bound to the atomic argument.
+        peval() no longer pushes a special mark on the control stack,
+        the pointer to ev0 is used for stack searches instead.
+
+93      890220  krijo
+        Some functions didn't return the same thing as Interlisp.
+        SPACES now always returns NIL. LITATOM returns NIL for NIL
+        and T, as opposed to Interlisp. PP can print superparens.
+        printwhere() searches for the latest call to eval on the
+        control stack.
+
+92      890214  krijo
+        Subprocesses failed to exit. walkfiles() didn't initialize
+        a pointer.
+
+91      881222  krijo
+        Normalized.
+
+90      881028  krijo
+        All printnames in file defs.h. IF. PROG{,1,2,N} was of type SUBR,
+        should be FSUBR.
+
+89      881027  krijo
+        Blocks SIGINT when freeing arg vector in makeexec. If interrupted
+        at this moment, some arguments may be freed an extra time.
+        Background processes competed for terminal.
+
+88      881027  krijo
+        Pipe to less for example ended prematurely. preparefork() wasn't
+        called for all children. findalias() is now called during evaluation
+        when car of form is unbound or illegal.
+        Unalias didn't unalias.
+        Made cd an internal C function.
+
+87      881019  krijo
+        RECLAIM takes an integer as argument meaning a number of pages
+        to allocate. If arg is nil allocate page if needed. Process
+        groups didn't work. If an error occured in a sub shell that
+        process was stopped. Changed it to print an error on primerr
+        and exit.
+
+86      881018  krijo
+        Wildcard matching works (again).
+
+85      881015  krijo
+        DE and DF didn't accept a single atom as parameter. APPLY and
+        APPLY* ok, which makes map functions work too.
+
+84      881009  krijo
+        Comment. Redirect to existing file appending output.
+
+83      881008  krijo
+        Expands alias as much as possible. Detects alias loops.
+        Break command RETURN dumped without arguments.
+
+82      881007  krijo
+        PROMPTFORM did not change until after the first error(!). If
+        PROMPTFORM is in error lips looped. Always forks at redirection.
+        BRKPROMPT wasn't marked. Alias mechanism with alias property.
+
+81      881004  krijo
+        redo redid commands with parens incorrectly.
+
+80      880811  krijo
+        Absolute paths always started a shell, took out the property
+        junk in execcommand. History numbers were not correct.
+
+79      880719  krijo
+        execcommand used up directory pointers by not closing
+        directories with closedir.
+
+78      880718  krijo
+        print can convert (pipe x y) to their equivalent (x | y).
+
+77      880717  krijo
+        Prompting is done with the variable promptform wich is
+        (if its a list) evaluated before reading next command.
+
+76	880715	krijo
+	If the wrong file is specified as the autoload property
+	of an atom, then lips loops. Garbage collect c-variables.
+
+75	880715	krijo
+	Expand ~ to home directory and ~user to home directory
+	of user.
+
+74      880714	krijo
+	Wildcard expansion handles directories.
+
+73      880714	krijo
+	Generic product was not initialized to 1.
+
+72      880713	krijo
+	Absolute pathnames and pathnames relative to ".".
+
+71	880712	krijo
+	Fetch path from environment variable PATH at start time.
+
+70      880710  krijo
+        HISTLIST HISTNUM. These two variables are available to the lisp
+        programmer.
+
+69      880710  krijo
+        Removed the DEFINE[Q] cruft from lipsrc and defined the functions
+        DE and DF in C instead. Rewrote all lisp functions to confirm with
+        this. PUTPROP was broken, did not update plists correctly.
+
+68      880710  krijo
+        Implemented cvariable pointers as a new type. References
+        through this type of variables refers to cvariables that
+        contain lisp type values. VERBOSEFLG, for instance, is
+        now such a variable thus making the function VERBOSE obsolete.
+
+67      880710  krijo
+        Fixed a bug in read, entering a single character (including
+        eof) was ignored. A check for newline in state head should
+        not have been there.
+
+66      880709  krijo
+        Each function that does a fork (and maybe an exec) waits for
+        its own process.      
+
+65      880708  krijo
+        Full implementation of internal readmacros.
+
+64      880706  krijo
+        Added "intelligent" handling of dots in (now renamed) lispread.
+        A dot as the last element becomes an atom. The only trouble
+        is four dots in a row; they become four atoms instead of
+        three (with the last one as the cdr).
+
+63      880705  krijo
+        The handling of controlling terminal and process groups did not
+        work properly. It is now done with sigchld: lips pauses
+        (with sigause) until it receives a sigchld. It then does
+        a wait to gather status from the child. A global variable
+        subforks holds the number of processes to wait for, thus
+        when this variable becomes zero, all processes are dead.
+
+62      880705  krijo
+        The macros BREAK and ABORT in eval.h did not have braces, this
+        was not a good idea. CTRL-C before the call to setjmp crashed
+        the program, of course.
+
+61      880704  krijo
+        ABORT in eval.c did not unwind the stack.
+
+60      880703  krijo
+        TO FROM PIPE. Input and output redirection with the functions
+        TO and FROM. Piping is done with the function PIPE. error()
+        now prints in what function the error occured. Handle process
+        groups and controlling terminal.
+
+59      880701  krijo
+        VERBOSE. Addhist added commands even when reading from file.
+        History saves did not seperate commands with or without
+        parens. Now uses getopt. Integers as commands and/or args
+        are converted to strings. Added verboseflg to mean set[q]
+        doesn't print (FOO RESET). VERBOSE changes verboseflg's value.
+        expand() expanded files beginning with a dot. expand()
+        now returns result in alphabetic order.
+        All functions are now treated as commands to be executed if
+        their value is unbound. The only difference when typing
+        with or without parens is that the return value isn't printed
+        when parens are left out.
+
+*** Revision 0.1(58) Alpha ***
+
+58      880625  krijo
+        Naive readmacros. Option -n skips init files. Globbing of
+        filenames in exec.
+
+57      880614  krijo
+        Added argument doconsargs to reclaim() to remove ugly
+        CE_NIL references. Incorporated float.c into arith.c.
+        Generic arithmetic for +, -, *, / and ZEROP.
+        Bogus shift expression in mark() in alloc.c.
+        Rudimentary readtables in read.c. Read() looks at characters,
+        not atoms, after '(', ')', etc.
+        (gcc made program dump core when fsum was assigned 0.0)
+
+56      880609  krijo
+        Break on ^B by setting brkflg. Removed the ^C code
+        and made ^C just do an abort. Move call to execcommand
+        to toploop so that any line that isn't within parens
+        is considered a command (if its unbound). This meant
+        changing domacro to return an atom only if it is unbound.
+
+55      880608  krijo
+        EXPAND EXEC. EXPAND enumerates files matching a wildcard pattern.
+        EXEC forks and execs a program.
+
+54      880529  krijo
+        MAP MAPC MAPLIST MAPCAR GETPROP PURPROP
+        GCHOOK1 GCHOOK2 (variables)
+        Updated naming of arithmetic functions. The map functions doesn't
+        work yet.
+
+53      880521  krijo
+        READLINE. Break in lookup continued to peval which filled up
+        the stack, changed to lookup. toploop() now handles all user
+        command handling, even in break. The toploop reads input with
+        readline() that gets a list of all exressions on the line.
+        Thus
+                PP FOO and (PP FOO) and PP FOO)
+        are all the same.
+        history() isreplaced with the more general domacro()
+        that will handle user defined macros and aliases.
+                (SIGNAL 28 '(CHANGEWINDOW))
+
+52      880520  krijo
+        ALARM SIGNAL. Close now returns T or NIL if the close was a
+        success or not. New type FILET contains a file pointer.
+        OPEN returns a file pointer instead of an integer.
+        Signal handlers may be installed, call SIGNAL with arguments
+        signal number and expression to be evaluated when that signal
+        is received. For example:
+
+51      880518  krijo
+        The code finding the broken function when a subr breaks
+        was broken. Abort, break and continue after interrupt.
+        PROGN dumped core with NIL argument. Adjusted atom
+        hash table size.
+
+50      880518  krijo
+        A single dot was treated as the foating point number 0.0.
+        Several changes to pass lint more gracefully.
+
+49      880515  krijo
+        Added datatype float. LOAD didn't close the file afterwards.
+
+48      880513  krijo
+        Removed special forms and made them ordinary primitives.
+
+47      880511  krijo
+        Reset in a break did a long jump without unwinding the stack.
+        This caused local variables to cover global values after the
+        return to top level. Lisp process may be stopped with ^Z.
+
+46      880510  krijo
+        Block allocation of cons cells. Initialized to 1000. If less
+        than 2000 conses since last gc: allocate a new block and
+        link it in. RECLAIM takes an argument; if nil, allocates a
+        new block only if needed, if non-nil, always allocates a new
+        block.
+
+45	880509	krijo
+	Deleting parens in strings goofed up, as did ^u.
+	PUT and GET in lisp.
+
+44	880502	Krister Joas (kvack@dizzy)
+	Greeting message. mkatom() instead of intern in read so that intern
+	may use argument string and doesn't have to copy it. Deleting
+	string quotes lost paren count. A single right paren couldn't
+	be read due to two level prosessing.
+
+43	880416	Krister Joas (kvack@dizzy)
+	Made destblock an ordinary array. Escaped parens as well as
+	parens inside strings were not handled correctly by getline.
+	parcount in getline remained negative after only a single
+	right paren was typed in, causing premature return on right
+	paren. SUBSTR didn't slice argument string correctly nor
+	practically. STRLEN didn't check type of argument.
+
+42	880415	Krister Joas (kvack@dizzy)
+	If file won't open in load, try file name with extension ".ul" added.
+	Handle signals SEGV, ILL, QUIT and BUS with option to dump core.
+	Private io in CBREAK mode, personal line editor with immediate
+	action on matching right parenthesis.
+
+41	880412	Krister Joas (kvack@dizzy)
+	Reasonable pretty printer. Editor copies the structure to be edited.
+
+40	880411	Krister Joas (kvack@dizzy)
+	NTH. Removed the backtrace facility because it costed too much.
+	History mechanism saves the last ten commands given. Just typing
+	nil or () doesn't save. Functions addhist(), history(). NTH gets
+	the nth car of a list or nil if out of bounds. Function eoln()
+	is true if about to read over newline. setplist and spaces didn't
+	have return statements. Started profiling to search for bottle-necks.
+
+39	880410	Krister Joas (kvack@dizzy)
+	SPACES. Simple editor and a pretty printer in lisp. eval() is
+	now a function that can be called from any c function. A backtrace
+	facility for function calls. Changed control to be simple array
+	since the linking wasn't used.
+
+38	880409	Krister Joas (kvack@dizzy)
+	PRIN1 SYMSTR. Typecheck in rplac.(). Changed to all lower case.
+	thisplevel was never decremented.
+
+37	880408	Krister Joas (kvack@dizzy)
+	C...R. Recursive loads now possible and recognition of end of
+	file condition. No malloced object were free()d, used up memory
+	completely. Dumped a 700k core.
+
+36	880408	Krister Joas (kvack@dizzy)
+	destblocklist->used was never initialized after an error
+	and the final call to dfree was always skipped, thus every
+	turn around toploop caused the dest stack to be used up a litte.
+	Finally it would lead to disaster.
+
+35	880408	Krister Joas (kvack@dizzy)
+	Changed LISPT type to int. Hopefully better code. cons() for
+	example was shortened by 40%. This is because of the non-optimal
+	code generated with bitfields and that ints can be stored in
+	registers. No significant speed improvement though.
+
+34	880406	Krister Joas (kvack@dizzy)
+	Changed parameter type of intern to char * instead of LISPT.
+	Will eliminate some unnecessary consing during initialization
+	and during read. Added break command RESET.
+
+33	880406	Krister Joas (kvack@dizzy)
+	Ugh! Unbelievable bug in sweep(), the control stack was not
+	examined at all! A stupid semicolon was responsible for it.
+	How could anything have worked at all? Well, the bugs are
+	harder and harder to get rid of, unfortunately they appear
+	at the same frequency as before. Forgot to mark the indirect
+	cons cell used for closures.
+
+32	880405	Krister Joas (kvack@dizzy)
+	PRINTLEVEL. Print only print the printlevel number of levels.
+	Changed the printout of objects to more informative.
+
+31	880405	Krister Joas (kvack@dizzy)
+	The complete destblock area is scanned for marking, wich
+	requires that dalloc() clear the car as well as cdr part of
+	the new dest block. mark() failed to mark first conscell and
+	because the sweeper only looks at the car of the conscells
+	the first conscell was always freed.
+
+30	880405	Krister Joas (kvack@dizzy)
+	New non-recursive read routine that can be garbage collected.
+	Is this the end of gc bugs? No, the next edit will probably
+	address the postponed problem with uncompleted dest blocks
+	during gc.
+
+29	880403	Krister Joas (kvack@dizzy)
+	Garbage collection when creating an object that referenced
+	through a cons cell crashed when consing up the special
+	cons cell. Remedy: cons NIL and NIL first and then change
+	the cdr part of the cell. I discovered this before I had any
+	problems with it, but it would have crashed.
+
+28	880403	Krister Joas (kvack@dizzy)
+	Closures creates an indirect pointers to the value so
+	that a creating a new closure with symbols already in a closure
+	on the same level of binding refers to the same variable. This
+	makes it possible to declare local functions that refer to
+	the same static variable, changing it in one function
+	it changes in the other too. Closures and lambda objects
+	refer through cons cells as with strings so they can
+	be collected when not active.
+
+27	880403	Krister Joas (kvack@dizzy)
+	STREQ CONCAT STRLEN STRINGP SUBSTR. Made strings refer through
+	a cons cell so that gc can free unreferenced strings. In fact
+	gc can free any malloc'ed object if they are made to refer
+	through cons cells. Some useful string functions defined.
+
+26	880403	Krister Joas (kvack@dizzy)
+	Modified mark() to mark only elements in the array conscells.
+	Thus unmarking can be done during the sweep phase, making
+	the special unmarking process redundant. This speeds up gc
+	somewhat, but makes some superfluous marking recursions.
+
+25	880402	Krister Joas (kvack@dizzy)
+	CLOSURE. Static binding with the CLOSURE construct.
+
+24	880402	Krister Joas (kvack@dizzy)
+	Type number 6 is not used in licp.h.
+
+23	880401	Krister Joas (kvack@dizzy)
+	Moved SETQ to eval.c, removed SETQQ from licprc.
+
+22	880331	Krister Joas (kvack@dizzy)
+	SETPLIST GETPLIST BOUNDP. Redefine check in DEFINE.
+
+21	880331	Krister Joas (kvack@dizzy)
+	WHILE. Removed DE and DF, replaced with DEFINE defined in
+	licprc, together with DEFINEQ. Several useful functions
+	are defined in licprc: SETQ SETQQ REVERSE APPEND2 INTERSECTION
+	SUBST SUBLIS ASSOC FLATTEN MAPCAR AND OR.
+
+20	880331	Krister Joas (kvack@dizzy)
+	Wrong number of arguments specified for PRINT and PRIN1 (one
+	instead of two).
+
+19	880328	Krister Joas (kvack@dizzy)
+	Forgot about nlambdas during garbage collection.
+
+18	880325	Krister Joas (kvack@dizzy)
+	Environments where not handled correctly during garbage
+	collection. The wrong size was used (the size of the next
+	block instead of the current).
+
+17	880325	Krister Joas (kvack@dizzy)
+	TERPRI PRIN2. Changed read and print routines to pass explicit
+	file argument. Changed escape character to backslash. Bug in
+	cons: when freelist was updated type CONS was assumed. This
+	lead to a cons object with null pointer when freelist ran
+	out. Thus core dump every time it should have collected.
+
+16	880325	Krister Joas (kvack@dizzy)
+	Wrong continuation in evcond. Removed linked structure of
+	deststorage, increased its size instead. If the destblocks
+	expand beyond the maximum size it will probably crash.
+	Noeval nospread lambda evaluated its arguments.
+
+15	880324	Krister Joas (kvack@dizzy)
+	ACCESS ALARM CHDIR CHMOD CLOSE CREAT DUP EXIT GETUID GETEUID
+	GETGID GETEGID GETPID KILL LINK NICE OPEN SETUID SETGID
+        UNLINK. All these functions are unix system calls.
+	Changed value exctractors slightly to "improve" the code
+	somewhat due to exceptionally bad code generated when bit-
+	fields are referenced.
+
+14	880323	Krister Joas (kvack@dizzy)
+	The error handling improved with the possibilty of error
+	checking in primitives. The primitive returns the ERROR object
+	(by calling the function error()) to eval which cause a break.
+	The primitive can not however restart, yet. In addition a new
+	special object ENDOFFILE takes care of the end of file condition;
+	this is not used yet.
+
+13	880322	Krister Joas (kvack@dizzy)
+	ADD1 EQP MINUSP GREATERP C..R SUB1 ZEROP MINUS DF LESSP.
+	And the functions PLUS and TIMES takes any number of parameters.
+
+12	880322	Krister Joas (kvack@dizzy)
+	A simple break feature that catches undefined functions and
+	unbound variables.
+
+11	880322	Krister Joas (kvack@dizzy)
+	LENGTH. Implemented nospread and halfspread.
+
+10	880322	Krister Joas (kvack@dizzy)
+	EQUAL MEMB LISTP NLISTP NEQ NUMBERP DE GETREP READ PRINT.
+	prin0() prints TRUE as T.
+
+9	880322	Krister Joas (kvack@dizzy)
+	RECLAIM. dalloc() have to clear all cdr's so that default
+	arguments gets NIL value. Added data corruption check in peval
+	(actually not that useful).
+
+8	880321	Krister Joas (kvack@dizzy)
+	EVALTRACE. Spurious PUSH in cond1 with no corresponding POP.
+
+7	880321	Krister Joas (kvack@dizzy)
+	Removed some unnecessary PUSHing. Evaluate body of lambda
+	as a sequence.
+
+6	880320	Krister Joas (kvack@dizzy)
+	Environments and lambda functions were not scanned during
+	marking.
+
+5	880320	Krister Joas (kvack@dizzy)
+	Last object in freelist not NILified lead to circular lists
+	after gc under certain conditions.
+
+4	880320	Krister Joas (kvack@dizzy)
+	Single quote short hand in read (hard coded).
+
+3	880320	Krister Joas (kvack@dizzy)
+	OBARRAY. Debugging functions. Constants T and NIL.
+	No sign extend of integer bit fields, do it manually by shifting
+	eight steps to the left and back again. Not all marked objects
+	where unmarked during gc.
+
+2	880320	Krister Joas (kvack@dizzy)
+	dalloc(), dfree(). Handle allocation of destblocks with dalloc()
+	and dfree(). Full garbage collector for cons cells.
+
+1	880320	Krister Joas (kvack@dizzy)
+	SET. link() failed to save previous value of a variable.
+
+0	880319	Krister Joas (kvack@dizzy)
+	Core of licp ready. The most basic parts of eval.
+	read and print. A small set of primitives and a couple of
+	arithmetic functions.

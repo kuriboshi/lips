@@ -1,0 +1,132 @@
+
+
+
+
+
+
+
+
+
+                       LIPS Task List
+
+
+
+
+
+_M_o_r_e _I_m_p_o_r_t_a_n_t
+
+  *  Append to last atom after history substituition.
+
+  *  Make sure all local lisp variables are  protected  from
+     gc.
+
+  *  Interrupt is not reliable.  Commands inside lisp  loops
+     can't be interrupted.
+
+  *  Escaping is hardly useful in its present form.   It  is
+     only  possible  to  avoid read macro interpretaion with
+     it.
+
+  *  It isn't possible to put funny characters on  the  com-
+     mand line.
+
+  *  EXPAND includes .  and  ..  in  the  expansion.   These
+     should be included only if requested.
+
+  *  The functions CHDIR and CD should  parse  the  new  cwd
+     instead of using _g_e_t_w_d().
+
+  *  Globbing can't handle ranges.
+
+  *  The posibility to collect  output  from  commands,  the
+     backquote facility of /_b_i_n/_s_h.
+
+  *  Floating point numbers should be  a  run  time  option.
+     They  are  most  likely more seldom used than filenames
+     looking like floats.
+
+  *  Catch all failing system calls and report  with  proper
+     error message.
+
+  *  If _e_x_e_c_v_e() fails with a NOEXEC error, try /_b_i_n/_s_h.
+
+  *  Switches that look like integers should be  treated  as
+     switches.  Unary plus is forbidden and negative numbers
+     are converted to -n.
+
+_L_e_s_s _I_m_p_o_r_t_a_n_t
+
+  *  Arrays.
+
+
+
+
+                      26 June, 1989
+
+
+
+
+
+                           - 2 -
+
+
+  *  Some way  to  turn  the  end  of  file  character  off.
+     Perhaps by a hook that is run at the end of file condi-
+     tion.  Default would be exit.
+
+  *  A set of functions manipulating the stack.
+
+  *  User read macros.
+
+  *  Real command hashtables.
+
+  *  Emacs style line editing.
+
+  *  Errors in subshells are  not  handled  very  well.   It
+     would  be  nice  if  the failing process could tell the
+     main _l_i_p_s process that it failed and let the main  pro-
+     cess talk to the user.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      26 June, 1989
+
+

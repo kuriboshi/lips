@@ -1,0 +1,18 @@
+alloc.c
+arith.c		primitives
+eval.c
+file.c		primitives, loadfiles
+init.c
+logic.c		primitives
+low.c		primitives
+map.c		primitives
+misc.c
+os.c
+pred.c		primitives
+prim.c
+prop.c		primitives
+read.c
+string.c	primitives
+unix.c
+user.c
+version.c

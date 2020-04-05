@@ -1,0 +1,13 @@
+#!/bin/sh
+# release -- creates a new release
+# @(#)release 90/02/03
+
+: ${LIPSTOP:?}
+ver=`sed -n 1p < $LIPSTOP/Edits | awk '{print $1}'`
+date=`date +%d-%h-19%y`
+cat - > $LIPSTOP/src/version.c <<EOF
+/* version.c -- defines the current lips version
+ */
+char *VERSION = "Lips V$ver, $date";
+EOF
+echo V$ver $date >> $LIPSTOP/Revision

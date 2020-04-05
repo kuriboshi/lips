@@ -1,0 +1,416 @@
+From:	EDS::IN%"ingwa@isy.liu.se" 16-AUG-1991 15:05:40.71
+To:	KJO@ffvts1.ericsson.se
+CC:	
+Subj:	lips (numera klisp)
+
+Return-path: <driver.isy.liu.se!ingwa@isy.liu.se>
+Received: from ericom.ericsson.se by eds.ericsson.se with PMDF#10680; Mon, 12
+ Aug 1991 02:36 +0200
+Received: from isy.liu.se by ericom.ericsson.se (4.1/SMI-4.0-ERICOM1.5) id
+ AA25208; Mon, 12 Aug 91 02:35:33 +0200
+Received: from isy.liu.se by sunic.sunet.se (5.61+IDA/KTH/LTH/1.199) id
+ AAsunic04407; Mon, 12 Aug 91 02:32:30 +0200
+Received: from driver.isy.liu.se by isy.liu.se with SMTP (5.61-bind
+ 1.2+ida/IDA-1.2.8.2/LTH/LiTH) id AA18476; Mon, 12 Aug 91 02:32:22 +0200
+Received: by driver.isy.liu.se (4.1/SMI-4.1) id AA16581; Mon, 12 Aug 91
+ 02:32:49 +0200
+Date: Mon, 12 Aug 91 02:32:49 +0200
+From: ingwa@isy.liu.se (Inge Wallin)
+Subject: lips (numera klisp)
+In-reply-to: Krister Joas's message of Thu, 8 Aug 1991 19:41 +0200
+ <4058AFE2E060090F@eds.ericsson.se>
+To: KJO@ffvts1.ericsson.se
+Message-id: <9108120032.AA16581@driver.isy.liu.se>
+X-Envelope-to: KJO@ffvts1.ericsson.se
+
+Hej!
+
+Ta en titt p} det h{r och s{g vad du tycker.  Titta speciellt p} den
+delen som beskriver hur man l{gger till nya typer i lispen.  Jag sl}r
+vad om att du inte hade n}got s}nt i dina utvecklade varianter.  :-)
+
+P} samma g}ng s} fixade jag att man bara kunde ha 128 flyttal p} en
+g}ng. Det kom liksom p} k|pet.
+
+	/Inge
+
+                         O /         \ O
+------------------------- X snip snip X ------------------------------
+                         O \         / O
+		    The programmers guide to klisp
+		    ==============================
+
+
+  This is the programmers guide to klisp.  It will tell you how to use
+the klisp library to create your own program with an embedded lisp
+interpreter.  It does not document the klisp builtin functions as
+these are documented in the file `klisp' in the documentation
+directory of the library.
+
+  Please note that this manual is a draft and there might be things
+which are overlooked in it.  If you find such an item, please bring
+it to my knowledge, e.g. by sending an email to ingwa@isy.liu.se.
+This manual will be extended and converted into either texinfo or
+LaTeX at some date.
+
+The library itself is also in a beta test state, and if you find any
+library bugs, please report them to the same address.  I won't hang
+you if you also provide a fix, but a bug report only is also OK.
+
+
+
+1. What is klisp?
+
+  Klisp is an acronym for Krister's lisp or kvack-lisp.  Klisp was
+originially written in 1988 by Krister Joas, at the time an undergrad
+at Linkoping University, Sweden.  He didn't intend it as a lisp
+library but wanted to create a lisp shell, which he called `lips'.
+This shell will probably be included in a future release of the klisp
+library as an example application.
+
+  In summer 1991, Inge Wallin at the Dept. of EE at Linkoping
+University needed a portable and extensible lisp library for one of
+his projects.  Since he knew about Krister and that his lisp was
+relatively cleanly written, he figured this would be the easiest way
+to create the needed lisp.  He set about to separate the lisp part of
+lips from the shell part and what you read now is the documentation of
+the result of this effort.
+
+  The klisp package can be used in two different ways: As a (fairly
+complete) lisp to run, study and learn from or as a library to use
+when you want to enhance one of your programs with a lisp interpreter.
+
+  The library is intended to be easy to extend both with new functions
+and with new data types.  It is split into two parts: the basic
+library which contains a complete lisp with the basic functions
+present in almost any lisp and an extension part which contains a
+number of add-on packages which you can use if you wish.
+
+  The add-on packages are domain-specific in one way or another.  If
+you make new interesting add-ons which you want to share with others,
+send them to ingwa@isy.liu.se together with some documentation, and I
+will include them into future releases.
+
+
+
+2. Builtin types 
+
+  All data types for klisp are described in the file klisp.h which
+resides in the include directory.  A number of macros used in klisp
+are also defined here.  This file includes the other include files
+needed when writing extensions to klisp so klisp.h is the only file
+needed to be included in your program.  Klisp.h is sited in the
+directory klisp, so when including the file, use the line:
+#include <klisp/klisp.h>
+
+  The basic type for the entire klisp is LISPT.  This is a long split
+into two parts: 8 bits of tag information and 24 bit of data.  The tag
+part both determines what data type the data part represents as well
+as holds a bit used by the garbage collector.  The data part holds
+different data for each lisp data type.
+
+  Seven bits are reserved for the data type information.  This might
+seem to be a bit much by the most applications, and if more data bits
+are needed there is nothing preventing this.  The names BITS and TBITS
+(tag bits) are defined in klisp.h and could be changed at will.  Note
+that their sum should equal the size of a long int, though.  The name
+MASK should be a macro which is a numerical expression with the bits
+in the data part set to one and the bits in the tag part set to zero.
+
+  The following types are predefined in klisp.  This is a direct
+excerpt from klisp.h:
+
+#define NIL             0       /* so that NULL also becomes NIL */
+#define KLISP_TRUE      1       /* the truth object */
+#define INTEGER         2       /* 24 bit integer in same word */
+#define BIGNUM          3       /* bigger than longs (NYI) */
+#define FLOAT           4       /* a double */
+#define INDIRECT        5       /* used when a value is stored in a closure */
+#define LONG            6       /* a long i.e. 32 bits of integer data (NYI) */
+#define CONS            7       /* a pair */
+#define STRING          8       /* character strings */
+#define SUBR            9       /* eval type primitive function */
+#define FSUBR           10      /* noeval */
+#define LAMBDA          11      /* lambda function */
+#define NLAMBDA         12      /* noeval */
+#define CLOSURE         13      /* static binding object */
+#define UNBOUND         14      /* unbound indicator */
+#define ENVIRON         15      /* environment stack type for gc use */
+#define FILET           16      /* file pointer */
+#define SYMBOL          17      /* an atomic symbol */
+#define FREE            18      /* an object on the freelist, used for
+                                  consistency checks */
+#define ENDOFFILE       19      /* returned from read at end of file */
+#define ERROR           20      /* returned from primitive when an error
+                                   occured */
+#define CVARIABLE       21      /* is a pointer to c-variable */
+
+
+Forts{tt h{r... (f|rklara hur typerna {r implementerade).
+  - inbyggda typer
+
+
+
+3. Support functions
+
+  - toploopen
+  - main (init_term, init_klisp, exit_term)
+
+
+
+4. Extending the library
+
+  Klisp has been designed with the explicit goal of being easy to
+extend.  This goal was meant to apply to all aspects of the lisp, such
+as new primitives or new data types.
+
+
+4.1 New primitive functions
+
+
+4.1.1 What should they look like?
+
+  Each new function should have the following signature except for the
+number of arguments.  The return value as well as all arguments to the
+functions must be of type LISPT:
+
+LISPT
+function_name (arg1, arg2)
+    LISPT   arg1;
+    LISPT   arg2;
+{
+    code here...
+}
+
+
+  There are a number of useful macros defined in klisp.h to help in
+writing new primitives.  The following macros access the parts of a
+LISPT variables:
+
+TYPEOF(a)   	return the type of the LISPT a.
+UVAL(a)		The value of the LISPT a as an unsigned number. 
+VAL(a)		The value of a as a signed number. 
+STRINGVAL(s)	The value of s as a char *.  Should only be used when
+		s is of the type STRING. 
+INTVAL(i)       The value of i as a long.  Should only be used when s
+		is of the type INTEGER. 
+SYMVAL(s)	The value of s as a pointer to a SYMBOL.  Should only
+		be used when s is a SYMBOL.  
+CONSVAL(c)	The value of c as a pointer to CONST (a cons cell).
+		Should only be used when c is a CONS.
+SUBRVAL(s)	The value of s as a pointer to SUBRT (a primitive
+		function).  Should only be used when s is a SUBR or
+		FSUBR.
+LAMVAL(l)	The value of l as a pointer to LAMBDAT (a lambda
+		function).  Should only be used when l is a LAMBDA or
+		NLAMBDA.
+CLOSVAL(c)      The value of c as a pointer to CLOSURET (a closure).
+		Should only be used when c is a CLOSURE.
+FLOATVAL(f)     The value of f as a double.  Should only be used when
+		f is a FLOAT.
+FILEVAL(f)      The value of f as a pointer to FILE (a normal C FILE
+		pointer).  Should only be used when f is a FILET.
+CVARVAL(v)      The value of v as a pointer to LISPT.  Should only be
+		used when v is a CVARIABLE.  This type is used for
+		predefined C variables.
+
+IVAL(a)         The value of the LISPT a (the entire cell) as a
+		number.  Be careful when using this.
+
+
+  There are also a number of macros to set the various parts of a LISPT: 
+
+SETTYPE(a, t)	Set the type of a to be t.
+SETVAL(a, v)	Set the value of a to be v.
+SET(a, t, v)	Set a to be a LISPT with type t and value v.
+
+
+  The following macros access parts of other types than LISPT, or
+perform other operations than extraction of data:
+
+CAR(x)	        Get the `car' part of a cons cell.  This macro should
+		only be used when x is a CONS.
+CDR(x)		Get the `cdr part of a cons cell.  This macro should
+		only be used when x is a CONS.
+EQ(x, y)	Return 1 if x is eq to y in the lisp sence, otherwise
+		return 0.
+SETQ(x, y)	Set the value of x to y.  This should only be used if
+		x is a SYMBOL.
+VALUE(x)        Get the value of x.  This should only be used if x is
+		a SYMBOL. 
+
+
+  Sometimes a primitive wants to call other primitives.  During this
+call, there may be further calls to other functions and ultimately
+calls to cons or other functions requiring new memory.  If you have
+local LISPT variables in your own primitive function and a garbage
+collect is forced during this time, chance is that the value of those
+local variables are destroyed by the garbage collect.
+
+  To protect the lisp structures in your local variables from garbage
+collection, they must be protected during the call.  This can be done
+by calling the macro SAVE(v) which will save the variable v.  V can be
+removed from protection later by a call to UNSAVE(v).  SAVE and UNSAVE
+work like a stack, so a call to another primitive is typically made in
+the following way:
+
+    SAVE(v1);
+    SAVE(v2);
+    v3 = call_other_primitive(v1, v2);
+    UNSAVE(v2);
+    UNSAVE(v1);
+
+  Of course, if you now for sure that the call to the other primitive
+can never cause a garbage collection, you need not take these steps.
+However, as they say: Better safe than sorry.
+
+  If you have primitives in your file which uses SAVE and UNSAVE, you
+have to call the macro USESAVE without parameters in the beginning of
+your source file.  This will declare the necessary external variables
+so that the compiler will not complain.
+
+  Often there is need to set a variable to the lisp constants t or nil
+or compare a value to one of them.  There are two predefined macros to
+use in this case: C_NIL and C_T.  Use them as any other rvalue in your
+program.
+
+
+4.1.2 Initializing external functions and variables
+
+  You need to tell klisp about each new function and lisp variable you
+want the user to be able to access.  For each function you need to
+call the function mkprim() once.  Mkprim takes four parameters: 
+ - the print name in lisp
+ - a pointer to the C function
+ - the number of parameters the function takes
+ - an indication wether the function wants its parameters evaluated or
+   not. 
+
+  The second to last parameter can be either positive or negative, a
+negative value indicating that the function will be half-spread, i.e.
+the last formal parameter will be a list of the rest of the actual
+parameters.  This is, for instance, the case for the lisp function
+`while' which has an implicit progn in its body.
+
+  The last parameter can have either the value SUBR (a macro) which
+indicates that the actual parameters to the function should be
+evaluated, or FSUBR which indicates that the actual parameters should
+enter the function UNevaluated.
+
+  For example, the primitive lisp function `while' is entered into
+klisp with the following call:
+
+  mkprim("while",      xwhile,  -2, FSUBR);
+
+while the function `car' is entered like this:
+
+  mkprim("car",        car,      1, SUBR);
+
+
+  If you have a file global C variable which you want the user to
+access as lisp variables inside klisp, you must make a call to
+initcvar().  Initcvar takes three parameters:
+ - a pointer to the variable
+ - a pointer to the name
+ - a LISPT value which the variable will be initialized with at
+   startup time.
+
+  A call to initcvar can e.g. be used in the following manner:
+
+LISPT  lispvar;
+
+  initcvar(&lispvar, "name-of-lispvar", C_NIL);
+
+which will create a lisp variable with the name of `name-of-lispvar'
+whose initial value will be nil and whose storage will be the C
+variable `lispvar'.
+
+
+  The recommended way of entering your new functions into klisp is to
+have each C file, which contains primitive functions or variables,
+have its own init function which makes all the necessary calls to
+mkprim() and initcvar().  All these functions should be called in
+another init function with the name init_klisp_extern(), taking no
+arguments.  There is an empty version of init_klisp_extern() in the
+library, but if you provide your own, the one within the library will
+not be entered into your executable.
+
+An example of typical use:
+
+void
+init_klisp_extern()
+{
+   init_my_functions_1();
+   init_my_functions_2();
+   init_my_functions_3();
+}
+
+where init_my_functions_[123] are located in different files, each
+initializing the functions in its own file.
+
+
+4.2 New data types
+
+  To introduce a new data type into the lisp system, you have to call
+the function 
+
+int create_type(int size, int blocksize, int minfree, void (*printfun)())
+
+size       is the size in bytes for an element of the new type.
+blocksize  is the number of element which will be allocated each time
+	   a new block is created using malloc().
+minfree	   is the minimum number of available elements after a garbage 
+	   collection for a new block not to be allocated
+printfun   takes two parameters: a LISPT of the type and a file
+	   pointer.  printfun() must write the element to the file in
+	   any way at all, not necessarily readable for the reader.
+
+  The return value of the function is the type number which will have
+to be saved in a variable.  Each element of the new type will have a
+TYPEOF() with this value.
+
+  There is one support function for externally defined types:
+
+LISPT mktype(int type, void * element)
+
+  This function copies the element into an area controlled by klisp
+and returns a LISPT which points at the newly allocated area.  The
+element will be subject to garbage collection when the element is no
+longer referenced by anything.  If the pointer `element' is NULL, a
+non-initialized element will be returned.
+
+  We will give you an example of how to use this facility.  The
+builtin type `FLOAT' is implemented using this type system and the
+call to create_type looks like this:
+
+  float_type = create_type(sizeof(double), 256, 100, print_float);
+
+where `float_type' is an integer variable holding the type number of
+float.  The call means that floats will be allocated in blocks of 256
+doubles and if there are not at least 100 doubles left toghether in
+all blocks after a garbage collection, a new block will be allocated.
+The function print_float() is declared like this:
+
+void print_float(LISPT f, FILE * file)
+
+
+
+
+  - alla hookar (break, undef, eval)
+
+  - variabler: brkflg, interrupt, current_prompt, brkprompt,
+    interactive (finns inte {n)
+
+
+
+10. Porting Klisp to Other Operating Systems 
+
+  To port klisp to a new operating system, the only thing you have to
+do is to create a file containing the two functions `readchar()' and
+`file_exists()'.  There must also be an initializing function called
+`init_os()' which enters `file-exists' as a lisp function into the
+lisp name space.  See the file `unix.c' for details about the
+functions' parameters and return values.
+
+  You also have to set the variable OS_O in `library/Makefile' to the
+object file which is created from the source file mentioned above.

@@ -1,0 +1,31 @@
+#!/bin/sh
+# maketags -- builds the Tags file for the pretty printer
+# @(#)maketags 90/02/03
+# Copyright 1989, 1990 Krister Joas
+#
+# This file builds the Tags file used by the lips function
+# pprint to print internal c functions.
+#
+
+echo extract c names
+egrep mkprim.\*PN_.\* *.c |
+awk -F_ '{print $2}' |
+sort |
+awk -F, '{print $2}' > $$.1
+
+echo extract lips names
+grep PN defs.h |
+awk -F_ '{print $2}' |
+sort |
+awk -F\" '{print $2}' > $$.2
+
+echo combine
+paste $$.1 $$.2 |
+awk '{printf "%s\t%s\n",$2,$1}' |
+sort +1 -2 > $$.3
+
+echo make Tags file
+grep -n PRIMITIVE *.c | sort +1 -2 |
+paste $$.3 - > Tags
+
+/bin/rm $$.1 $$.2 $$.3

@@ -1,0 +1,9 @@
+#! /bin/sh
+for i in *.c~
+do
+  diff -c2 $i `basename $i .c~`.c >> DIFFS
+done
+for i in *.h~
+do
+  diff -c2 $i `basename $i .h~`.h >> DIFFS
+done

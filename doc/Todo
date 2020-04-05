@@ -1,0 +1,12 @@
+
+6.  Check for directly executable commands in pipe-cmd so that vfork may be
+    used.
+
+8.  File name expansion should be more effective by using internal data
+    structures instead of lists.
+
+9.  Automatic documentation, at least of the primitives.
+
+10. C-like backslash processing in strings.
+
+12. Produce a manual with stuff from config.h in it.

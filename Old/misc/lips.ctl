@@ -1,0 +1,34 @@
+! %M% -- builds a version of lips on a TOPS20 system
+! %Z%%M% %E%
+@NOERROR
+@DELETE *.REL
+@EXPUNGE
+@CC ALLOC
+@CC ARITH
+@CC DEBUG
+@CC EVAL
+! @CC EXEC		! Have to be rewritten
+@CC FILE
+! @CC GLOB		! This too
+@CC LOGIC
+@CC LOW
+@CC MAIN
+@CC MAP
+@CC PRED
+@CC PRIM
+@CC PROP
+@CC READ
+@CC STRING
+@CC TERM
+@CC TOP
+@CC UNIX
+@CC USER
+LINK::
+@ERROR
+@TAKE LIPS.CMD
+@IF (NOERROR) @SAVE LIPS
+@DELETE *.REL,
+@KEEP 1
+@
+! The end.
+

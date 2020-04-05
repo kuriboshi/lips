@@ -1,0 +1,375 @@
+Only in .: Edits
+Only in .: Edits~
+Only in .: MANIFEST.BAK
+diff -c ./Makefile v118/Makefile
+*** ./Makefile	Sun Dec 17 16:12:16 1989
+--- v118/Makefile	Tue Sep  5 21:19:55 1989
+***************
+*** 1,46 ****
+! # This file is automatically maintained.
+! # Make permanent changes to makefile.x.
+! 
+! # This makefile was generated on 16:12:15 Dec 12 1989
+! 
+  RM = /bin/rm
+  
+! DFLAGS = -g
+  
+! CC = cc
+! CFLAGS = $(DFLAGS)
+  
+! LDFLAGS = $(DFLAGS)
+  
+! LISPLIB = lisplib.a
+  
+! C1 = arith.c logic.c low.c map.c pred.c prim.c
+! C2 = misc.c string.c init.c user.c os.c file.c version.c
+! C3 = eval.c alloc.c
+! C4 = prop.c read.c term.c unix.c
+! CFILES = $(C1) $(C2) $(C3) $(C4)
+  
+! OFILES = $(CFILES:.c=.o)
+! AFILES = $(LISPLIB)($(OFILES))
+! 
+! C5 = top.c glob.c
+! C6 = main.c exec.c
+! CLIPS = $(C5) $(C6)
+! 
+! OLIPS = $(CLIPS:.c=.o)
+! 
+! LIBS = $(LISPLIB) -ltermcap
+! 
+! all:	lips $(LISPLIB)
+! 
+! $(LISPLIB):	$(AFILES)
+! 	ranlib $@
+! 
+! lips:	$(OLIPS) lisplib.a
+  	$(RM) -f $@
+! 
+! 	$(CC) $(CFLAGS) $(OLIPS) $(LDFLAGS) $(LIBS) -o $@
+! 
+  	chmod 755 $@
+  
+  lint:
+--- 1,59 ----
+! # Makefile for lips
+! #
+! # Change as needed
+! #
+! CC = gcc
+  RM = /bin/rm
++ # CFLAGS =
++ CFLAGS = -traditional
++ # LDFLAGS = -i -X
++ LDFLAGS =
++ DESTDIR = /usr/mina/exjobb/krijo/bin
++ CFILES = alloc.c \
++ 	 arith.c \
++ 	 eval.c \
++ 	 file.c \
++ 	 init.c \
++          logic.c \
++ 	 low.c \
++ 	 map.c \
++ 	 misc.c \
++ 	 os.c \
++ 	 pred.c \
++ 	 prim.c \
++ 	 prop.c \
++ 	 read.c \
++          string.c \
++ 	 term.c \
++ 	 user.c \
++ 	 version.c
+  
+! OV1 = arith.o logic.o low.o map.o pred.o prim.o
+! OV2 = misc.o string.o init.o user.o os.o file.o version.o
+! OV3 = eval.o alloc.o
+! OV4 = prop.o read.o term.o unix.o
+! OFILES = $(OV1) $(OV2) $(OV3) $(OV4)
+  
+! CLIPS = exec.c \
+! 	glob.c \
+! 	main.c \
+!         top.c \
+!         unix.c
+  
+! OV5 = top.o glob.o
+! OV6 = exec.o main.o
+! OLIPS = $(OV5) $(OV6)
+  
+! # LIBS = -ltermcap -lc
+! LIBS = -ltermcap
+  
+! all:	lips
+  
+! lips:	$(OFILES) $(OLIPS)
+  	$(RM) -f $@
+! #	ld $(LDFLAGS) /lib/crt0.o $(OV1) -Z $(OV2) -Z $(OV3) -Z $(OV4) \
+! #	   -Z $(OV5) -Y $(OV6) $(LIBS) -o $@
+! 	$(CC) $(CFLAGS) $(OFILES) $(OLIPS) $(LDFLAGS) $(LIBS) -o $@
+  	chmod 755 $@
+  
+  lint:
+***************
+*** 49,64 ****
+  tags:	$(CFILES) defs.h
+  	util/maketags
+  	touch tags
+- 
+  install:	lips tags
+! 	rm -f /usr/local/bin/lips
+! 	cp lips /usr/local/bin
+! 	strip /usr/local/bin/lips
+  	touch install
+  
+  clean:
+  	$(RM) -f *.o core lips
+  
+  alloc.o : alloc.c lisp.h config.h defs.h io.h control.h constants.h error.h \
+    func.h garb.h 
+  arith.o : arith.c lisp.h config.h defs.h io.h control.h constants.h error.h \
+--- 62,77 ----
+  tags:	$(CFILES) defs.h
+  	util/maketags
+  	touch tags
+  install:	lips tags
+! 	rm -f $(DESTDIR)/lips
+! 	cp lips $(DESTDIR)
+! 	strip $(DESTDIR)/lips
+  	touch install
+  
+  clean:
+  	$(RM) -f *.o core lips
+  
++ # Dependencies
+  alloc.o : alloc.c lisp.h config.h defs.h io.h control.h constants.h error.h \
+    func.h garb.h 
+  arith.o : arith.c lisp.h config.h defs.h io.h control.h constants.h error.h \
+Only in .: Makefile.old
+Only in .: Old
+Only in .: SCCS
+Only in v118: V118
+Only in .: V120
+diff -c ./config.h v118/config.h
+*** ./config.h	Sat Dec 16 00:06:51 1989
+--- v118/config.h	Tue Sep  5 21:19:58 1989
+***************
+*** 6,20 ****
+  /*
+   * Defines where the source is.
+   */
+! #define LIPSLIB "/home/krijo/src/lips"
+  /*
+   * File that is used to find source code for primitives.
+   */
+! #define TAGSFILE "/home/krijo/src/lips/Tags"
+  /*
+   * Global init file.
+   */
+! #define LIPSRC "/home/krijo/src/lips/lipsrc"
+  
+  /*
+   * Defining this will use the select call to handle
+--- 6,20 ----
+  /*
+   * Defines where the source is.
+   */
+! #define LIPSLIB "/usr/mina/exjobb/krijo/src/lips"
+  /*
+   * File that is used to find source code for primitives.
+   */
+! #define TAGSFILE "/usr/mina/exjobb/krijo/src/lips/Tags"
+  /*
+   * Global init file.
+   */
+! #define LIPSRC "/usr/mina/exjobb/krijo/src/lips/lipsrc"
+  
+  /*
+   * Defining this will use the select call to handle
+Only in .: depend
+Common subdirectories: ./doc and v118/doc
+diff -c ./exec.c v118/exec.c
+*** ./exec.c	Tue Sep  5 22:21:13 1989
+--- v118/exec.c	Tue Sep  5 21:21:24 1989
+***************
+*** 875,888 ****
+  PRIMITIVE getenviron(var)
+    LISPT var;
+  {
+-   char *s;
+- 
+    CHECK2(var, STRING, SYMBOL);
+!   s = getenv(GETSTR(var));
+!   if (s == NULL)
+!     return C_NIL;
+!   else
+!     return mkstring(s);
+  }
+  
+  PRIMITIVE cd(dir, emess)
+--- 875,882 ----
+  PRIMITIVE getenviron(var)
+    LISPT var;
+  {
+    CHECK2(var, STRING, SYMBOL);
+!   return mkstring(getenv(GETSTR(var)));
+  }
+  
+  PRIMITIVE cd(dir, emess)
+Only in .: exec.o
+diff -c ./glob.c v118/glob.c
+*** ./glob.c	Sun Dec 17 16:29:08 1989
+--- v118/glob.c	Tue Sep  5 21:20:46 1989
+***************
+*** 178,185 ****
+  
+  /* 
+   * walkfiles - walks through files as specified by WILD and builds an 
+!  *             unsorted array of character strings. Returns non-zero if
+!  *             any file matched the pattern, zero otherwise.
+   */
+  private int
+  walkfiles(wild, all, report)
+--- 178,185 ----
+  
+  /* 
+   * walkfiles - walks through files as specified by WILD and builds an 
+!  *             unsorted array of character strings. Returns non-zero if 
+!  *             all went ok, zero otherwise.
+   */
+  private int
+  walkfiles(wild, all, report)
+***************
+*** 205,211 ****
+        if ((all || rdir->d_name[0] != '.' || *w == '.') &&
+            match(rdir->d_name, w))
+          {
+- 	  result = 1;
+            pos = strlen(r);
+            if (pos != 0 && r[pos-1] != '/') (void) strcat(r, "/");
+            (void) strcat(r, rdir->d_name);
+--- 205,210 ----
+Only in .: glob.c~
+Only in .: glob.o
+Only in .: ingwa-kommentarer
+Only in .: install
+Only in .: lips
+Common subdirectories: ./lipscode and v118/lipscode
+diff -c ./lipsrc v118/lipsrc
+*** ./lipsrc	Sat Dec 16 00:09:03 1989
+--- v118/lipsrc	Tue Sep  5 21:20:21 1989
+***************
+*** 2,10 ****
+  # Last edit: Sat Mar 21
+  
+  # (load "/usr/mina/exjobb/krijo/src/lips/lipscode/list")
+! (load "/home/krijo/src/lips/lipscode/let")
+! (load "/home/krijo/src/lips/lipscode/dirstack")
+! (load "/home/krijo/src/lips/lipscode/alias")
+  
+  (de autoload (file which)
+      (mapc which
+--- 2,10 ----
+  # Last edit: Sat Mar 21
+  
+  # (load "/usr/mina/exjobb/krijo/src/lips/lipscode/list")
+! (load "/usr/mina/exjobb/krijo/src/lips/lipscode/let")
+! (load "/usr/mina/exjobb/krijo/src/lips/lipscode/dirstack")
+! (load "/usr/mina/exjobb/krijo/src/lips/lipscode/alias")
+  
+  (de autoload (file which)
+      (mapc which
+***************
+*** 11,17 ****
+            (lambda (x)
+              (putprop x 'autoload file))))
+  
+! (autoload "/home/krijo/src/lips/lipscode/pretty"
+            '(pprint pp))
+! (autoload "/home/krijo/src/lips/lipscode/edit" '(edit))
+! (autoload "/home/krijo/src/lips/lipscode/misc" '(foreach))
+--- 11,17 ----
+            (lambda (x)
+              (putprop x 'autoload file))))
+  
+! (autoload "/usr/mina/exjobb/krijo/src/lips/lipscode/pretty"
+            '(pprint pp))
+! (autoload "/usr/mina/exjobb/krijo/src/lips/lipscode/edit" '(edit))
+! (autoload "/usr/mina/exjobb/krijo/src/lips/lipscode/misc" '(foreach))
+Only in .: lisplib.a
+Only in .: main.o
+Only in .: makefile.x
+Common subdirectories: ./misc and v118/misc
+Only in .: mkmake
+diff -c ./term.c v118/term.c
+*** ./term.c	Sat Dec 16 00:46:12 1989
+--- v118/term.c	Tue Sep  5 21:21:27 1989
+***************
+*** 50,58 ****
+  
+  #define NUM_KEYS        256
+  #define COMMENTCHAR     '#'
+- #ifndef BELL
+- #define BELL '\007'
+- #endif
+  
+  /*
+   * Terminal functions.  Each constant stands for a function provided
+--- 50,55 ----
+***************
+*** 125,131 ****
+  {
+    int i;
+  
+!   for (i = NUM_KEYS - 1; i; i--)
+      key_tab[i] = T_INSERT;
+    key_tab[CERASE]  = T_ERASE;
+    key_tab[CTRL(h)] = T_ERASE;
+--- 122,128 ----
+  {
+    int i;
+  
+!   for (i = NUM_KEYS; i; i--)
+      key_tab[i] = T_INSERT;
+    key_tab[CERASE]  = T_ERASE;
+    key_tab[CTRL(h)] = T_ERASE;
+***************
+*** 777,783 ****
+            t = extilde(s, 0);
+            if (t == NULL)
+              {
+!               (void) putc(BELL, stdout);
+                break;
+              }
+            ex = expandfiles(t, 0, 0, 1);
+--- 774,780 ----
+            t = extilde(s, 0);
+            if (t == NULL)
+              {
+!               (void) putc('\a', stdout);
+                break;
+              }
+            ex = expandfiles(t, 0, 0, 1);
+***************
+*** 788,794 ****
+            else
+              {
+                if (TYPEOF(ex) == CONS) complete(ex);
+!               (void) putc(BELL, stdout);
+              }
+  #endif SARGASSO
+            break;
+--- 785,791 ----
+            else
+              {
+                if (TYPEOF(ex) == CONS) complete(ex);
+!               (void) putc('\a', stdout);
+              }
+  #endif SARGASSO
+            break;
+Only in .: top.o
+Common subdirectories: ./util and v118/util
+Only in .: v118
+Only in .: v118-120.diff

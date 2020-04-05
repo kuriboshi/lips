@@ -1,0 +1,912 @@
+/*
+ * Lips, lisp shell.
+ * Copyright 1988, Krister Joas
+ *
+ * $Id$
+ */
+/*
+ * This file contains all functions dealing with low level terminal
+ * and file i/o.  Terminal i/o uses its own buffering and line editing.
+ * It sets the terminal in cbreak and no echo mode.
+ */
+#ifdef SARGASSO
+#include <tops20.hdr>
+#undef SAVE
+#else
+#include <sgtty.h>
+#include <signal.h>
+#include <sys/time.h>
+#endif SARGASSO
+#include <string.h>
+#include "lips.h"
+
+#ifdef SARGASSO
+#define FFLUSH(file)
+#else
+#define FFLUSH(file)	(void) fflush(file)
+#endif SARGASSO
+
+/*
+ * Sargasso doesn't have these, so we define them.
+ */
+#ifdef SARGASSO
+#define CTRL(c) (c&037)
+#define CERASE 0177
+#define CRPRNT CTRL('r')
+#define CKILL CTRL('u')
+#define CEOF CTRL('d')
+#define BUFSIZ 1024
+#endif
+
+#ifndef lint
+static char rcsid[] = "$Id$";
+#endif
+
+extern int ungetc();
+extern char *index(), *getenv();
+#ifdef TERMCAP
+extern char *tgetstr();
+#endif TERMCAP
+extern void finish();
+
+#define NUM_KEYS        256
+#define COMMENTCHAR     '#'
+#ifndef BELL
+#define BELL '\007'
+#endif
+
+/*
+ * Terminal functions.  Each constant stands for a function provided
+ * by the line editor.
+ */
+#define T_INSERT        0
+#define T_ERASE         1
+#define T_RETYPE        2
+#define T_KILL          3
+#define T_EOF           4
+#define T_TAB           5
+#define T_LEFTPAR       6
+#define T_RIGHTPAR      7
+#define T_NEWLINE       8
+#define T_STRING        9
+#define T_ESCAPE        10
+
+/*
+ * Variables for terminal characteristics, old and new.
+ */
+#ifdef SARGASSO
+private int oldmode, newmode;
+#else
+private struct sgttyb newterm, oldterm;
+private struct tchars newtchars, oldtchars;
+private struct ltchars newltchars, oldltchars;
+private int ldis;
+#endif SARGASSO
+
+private char linebuffer[BUFSIZ];        /* Line buffer for terminal input.  */
+private int parcount = 0;               /* Counts paranthesis.  */
+private int linepos = 0;                /* End of line buffer.  */
+private int position = 0;               /* Current position in line buffer.  */
+private char key_tab[NUM_KEYS];         /* Table specifying key functions.  */
+
+#ifdef TERMCAP
+private char tcap[128];                 /* Buffer for terminal capabilties.  */
+private char *curup, *curfwd;           /* Various term cap strings.  */
+private char  *cleol, *curdn;
+private int nocap;                      /* Nonzero if insufficient term cap. */
+#endif TERMCAP
+
+public void
+cleanup()
+{
+  finish(0);
+}
+
+public void
+clearlbuf()
+{
+  linepos = 0;
+  parcount = 0;
+}
+
+public void
+loadbuf(str)
+  char *str;
+{
+  (void) strcpy(linebuffer, str);
+  (void) strcat(linebuffer, "\n");
+  linepos = strlen(linebuffer);
+}
+
+/*
+ * Set up keymap.
+ */
+void
+init_keymap()
+{
+  int i;
+
+  for (i = NUM_KEYS - 1; i; i--)
+    key_tab[i] = T_INSERT;
+  key_tab[CERASE]  = T_ERASE;
+  key_tab[CTRL('h')] = T_ERASE;
+  key_tab[CRPRNT]  = T_RETYPE;
+  key_tab[CKILL]   = T_KILL;
+  key_tab[CEOF]    = T_EOF;
+  key_tab[CTRL('i')] = T_TAB;
+  key_tab['(']     = T_LEFTPAR;
+  key_tab[')']     = T_RIGHTPAR;
+  key_tab['\n']    = T_NEWLINE;
+  key_tab['\\']    = T_ESCAPE;
+  key_tab['"']     = T_STRING;
+#ifdef SARGASSO
+  key_tab['\r']    = T_NEWLINE;
+  key_tab[CTRL('z')] = T_EOF;
+#endif SARGASSO
+}
+
+/* Init terminal to CBREAK and no ECHO.  */
+void
+init_term()
+{
+  static int initialized = 0;
+  char bp[1024];
+#ifdef TERMCAP
+  char *termc = tcap;
+  char *term;
+#endif TERMCAP
+  int ndis;
+
+  if (!initialized)
+    {
+#ifdef SARGASSO
+      (void) ejsys(RFMOD, _PRIIN);
+      oldmode = jsac[2];
+      newmode = oldmode & (~0776100);
+      newmode |= 0170000;
+#else
+      ndis = NTTYDISC;
+      (void) ioctl(0, TIOCGETP, &oldterm);
+      (void) ioctl(0, TIOCGETC, &oldtchars);
+      (void) ioctl(0, TIOCGLTC, &oldltchars);
+      (void) ioctl(0, TIOCGETD, &ldis);
+      (void) signal(SIGINT, cleanup); /* temporary handle */
+      (void) signal(SIGTERM, cleanup); /* exit gracefully */
+      newterm = oldterm;
+      newterm.sg_flags = newterm.sg_flags & ~ECHO | CBREAK;
+      newtchars = oldtchars;
+      newltchars = oldltchars;
+#endif SARGASSO
+#ifdef TERMCAP
+      curup = NULL;
+      curfwd = NULL;
+      if ((term = getenv("TERM")) != NULL)
+        if (tgetent(bp, term) == 1)
+          {
+            curup = tgetstr("up", &termc);
+            curdn = "\n";
+            curfwd = tgetstr("nd", &termc);
+            cleol = tgetstr("ce", &termc);
+            if (!curup || !curfwd || !cleol)
+              nocap = 1;
+            else
+              nocap = 0;
+          }
+#endif TERMCAP
+#ifndef SARGASSO
+      if (ldis != NTTYDISC)
+        (void) ioctl(0, TIOCSETD, &ndis);
+#endif SARGASSO
+      init_keymap();
+      initialized = 1;
+    }
+#ifdef SARGASSO
+  (void) ejsys(SFMOD, _PRIIN, newmode);
+#else
+  (void) ioctl(0, TIOCSETN, &newterm);
+  (void) ioctl(0, TIOCSETC, &newtchars);
+  (void) ioctl(0, TIOCSLTC, &newltchars);
+#endif SARGASSO
+}
+
+/* Reset terminal to previous value */
+void end_term()
+{
+#ifdef SARGASSO
+  (void) ejsys(SFMOD, _PRIIN, oldmode);
+#else
+  (void) ioctl(0, TIOCSETN, &oldterm);
+  (void) ioctl(0, TIOCSETC, &oldtchars);
+  (void) ioctl(0, TIOCSLTC, &oldltchars);
+#endif SARGASSO
+}
+
+/*
+ * Put a character on stdout prefixing it with a ^ if it's
+ * a control character.
+ */
+public void
+pputc(c, file)
+  int c;
+  FILE *file;
+{
+  if (c < 0x20 && c != '\n' && c != '\t')
+    {
+      (void) putc('^', file);
+      (void) putc(c + 0x40, file);
+    }
+  else (void) putc(c, file);
+}
+
+/*
+ * Put a character c, on stream file, escaping enabled if esc != 0.
+ */
+public void
+putch(c, file, esc)
+  int c;
+  FILE *file;
+  int esc;
+{
+  if ((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
+    pputc('\\', file);
+  pputc(c, file);
+}
+
+/*
+ * Get a character from stream file.  If it's from a
+ * terminal, buffer input with procedure getline, and get
+ * characters from linebuffer.  If it's not from a terminal
+ * do io the standard way.
+ */
+public int
+getch(file)
+  FILE *file;
+{
+  int c;
+
+#ifdef SARGASSO
+  if (file != stdin)
+#else
+  if (!isatty(fileno(file)))
+#endif SARGASSO
+    {
+      c = getc(file);
+      if (c == COMMENTCHAR)             /* Skip comments.  */
+        while((c = getc(file)) != '\n')
+          ;
+      return c;
+    }
+gotlin:
+  if (position < linepos)
+    return linebuffer[position++];
+  else
+    {
+      if (getline(file) == 0)
+        return EOF;
+      goto gotlin;
+    }
+}
+
+/*
+ * Unget a character.  If reading from a terminal, 
+ * just push it back in the buffer, if not, do an ungetc.
+ */
+ungetch(c, file)
+  int c;
+  FILE *file;
+{
+#ifdef SARGASSO
+  if (file == stdin)
+#else
+  if (isatty(fileno(file)))
+#endif SARGASSO
+    {
+      if (position > 0)
+        position--;
+    }
+  else
+    (void) ungetc(c, file);
+}
+
+/*
+ * Skips separators in the beginning of the line and returns 1 if
+ * the first non-separator character is a left parenthesis, zero
+ * otherwise.
+ */
+private int
+firstnotlp()
+{
+  int i;
+
+  for (i=1; i < position && issepr(linebuffer[i]); i++);
+  if (linebuffer[i] == '(') return 0;
+  else return 1;
+}
+
+/*
+ * Delete one character the easy way by sending backspace - space -
+ * backspace.  Do it twice if it was a control character.
+ */
+private void
+delonechar()
+{
+  linepos--;
+  (void) putc('\b', stdout);
+  (void) putc(' ', stdout);
+  (void) putc('\b', stdout);
+  if (linebuffer[linepos] < 0x20)
+    {
+      (void) putc('\b', stdout);
+      (void) putc(' ', stdout);
+      (void) putc('\b', stdout);
+    }
+}
+
+/*
+ * Returns zero if the line contains only separators.
+ */
+private int
+onlyblanks()
+{
+  int i = linepos;
+
+  while (i > 0)
+    {
+      if (!issepr(linebuffer[i]))
+        return 0;
+      i--;
+    }
+  return 1;
+}
+
+/*
+ * Output a character on stdout, used only in tputs.
+ */
+int
+outc(c)
+  int c;
+{
+  (void) putc(c, stdout);
+}
+
+/* 
+ * retype - If ALL is 0 then retype only current line.  If ALL is 1 then 
+ *          retype complete line, including prompt.  It ALL is 2 just 
+ *          delete all lines.  Used for ctrl-u kill.
+ */
+private void
+retype(all)
+  int all;
+{
+  int i;
+#ifdef TERMCAP
+  int nl = 0, l = 1;
+
+  if (!nocap)
+    {
+      l = 0;
+      for (i=1; i<linepos; i++)
+        if (linebuffer[i] == '\n') nl = i, l++;
+      for (l = all ? l : 1; l; l--)
+        {
+          if (all == 2)
+            {
+              putc('\r', stdout);
+              tputs(cleol, 1, outc);
+            }
+          tputs(curup, 1, outc);
+        }
+      putc('\r', stdout);
+      if (all) nl = 0;
+      if (nl == 0) fputs(current_prompt, stdout);
+      if (all != 2)
+	for (i=nl+1; i<linepos; i++)
+	  {
+	    if (linebuffer[i] == '\n')
+	      tputs(cleol, 1, outc);
+	    pputc(linebuffer[i], stdout);
+	  }
+      tputs(cleol, 1, outc);
+    }
+  else
+#endif TERMCAP
+    {
+      if (all == 0)
+	{
+	  putc('\r', stdout);
+	  for (i=linepos - 1; i>0 && linebuffer[i] != '\n'; i--) ;
+	  if (i == 0)
+	    fputs(current_prompt, stdout);
+	  for (i++; i<linepos; i++)
+	    pputc(linebuffer[i], stdout);
+	}
+      else if (all == 1)
+	{
+	  pputc(CRPRNT, stdout);
+	  pputc('\n', stdout);
+	  fputs(current_prompt, stdout);
+	  for (i=1; i<linepos; i++)
+	    pputc(linebuffer[i], stdout);
+	}
+      else
+	{
+	  pputc(CKILL, stdout);
+	  pputc('\n', stdout);
+	  fputs(current_prompt, stdout);
+	}
+    }
+}
+
+#ifndef SARGASSO        /* Skip completion for tops. */
+/*
+ * Stuff for file name completion.
+ */
+private char word[BUFSIZ];
+private char *last;
+
+char *mkexstr()
+{
+  int i = linepos - 1;
+
+  last = word + BUFSIZ - 1;
+  *last-- = '\0';
+  *last-- = '*';
+  while(!issepr(linebuffer[i]) && i >= 0)
+    *last-- = linebuffer[i--];
+  return ++last;
+}
+
+private void
+fillrest(word)
+  char *word;
+{
+  for(word += strlen(last) - 1; *word; word++)
+    {
+      pputc(*word, stdout);
+      linebuffer[linepos++] = *word;
+    }
+}
+
+private int
+checkchar(words, pos, c)
+  LISPT words;
+  int pos;
+  int *c;
+{
+  LISPT l;
+
+  l = words;
+  *c = (GETSTR(CAR(l)))[pos];
+  for (; !ISNIL(l); l = CDR(l))
+    {
+      if (*c != (GETSTR(CAR(l)))[pos])
+        return 0;
+    }
+  return 1;
+}
+
+private void
+complete(words)
+  LISPT words;
+{
+  int pos;
+  int c = 1;
+
+  pos = strlen(last) - 1;
+  while (c != '\0' && checkchar(words, pos++, &c))
+    {
+      pputc(c, stdout);
+      linebuffer[linepos++] = c;
+    }
+}
+
+private LISPT
+strip(files, prefix, suffix)
+  LISPT files;
+  char *prefix, *suffix;
+{
+  LISPT stripped;
+  char *s;
+
+  if (strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
+    return files;
+  for (stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = CDR(files))
+    {
+      s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
+      s[0] = '~';
+      (void) tconc(stripped, mkstring(s));
+    }
+  return CAR(stripped);
+}
+
+/*
+ * Routines for paren blinking.
+ */
+#define NORMAL          0
+#define INSTRING        1
+#define EXITSTRING      2
+#define STARTSTRING     3
+#define LEFTPAR         4
+#define RIGHTPAR        5  
+
+struct curpos {
+  int cpos;
+  int line;
+  char *line_start;
+};
+
+private struct curpos parpos;           /* Saves position of matching par.  */
+private struct curpos currentpos;       /* Current position.  */
+
+/*
+ * Scans backwards and tries to find a matching left parenthesis
+ * skipping strings and escapes.  It records its finding in parpos.
+ * It also updates where the cursor is now in currentpos, so it
+ * can find its way back.  BEGIN is the position in linebuffer from
+ * where to start searching.
+ */
+private void
+scan(begin)
+  int begin;
+{
+  int line, cpos;
+  int pos;
+  int escape;
+  int this;
+  int state;
+  int parcount, pars;
+
+  line = 0;
+  cpos = 0;
+  state = NORMAL;
+  parcount = 0;
+  pars = 0;
+  parpos.cpos = 0;
+  parpos.line = 0;
+  currentpos.cpos = 0;
+  currentpos.line = 0;
+  currentpos.line_start = NULL;
+  for (pos = begin; pos > 0; pos--)
+    {
+      this = linebuffer[pos];
+      cpos++;
+      escape = 0;
+      if (this == '"' && state == INSTRING)
+        state = EXITSTRING;
+      else if (this == '"' && state == NORMAL)
+        state = STARTSTRING;
+      else if (this == '(' && state != INSTRING && state != STARTSTRING)
+        state = LEFTPAR;
+      else if (this == ')' && state != INSTRING && state != STARTSTRING)
+        state = RIGHTPAR;
+      else if (this == '\n')
+        {
+          if (parpos.line == line)
+            {
+              parpos.cpos = cpos - parpos.cpos - 1;
+              parpos.line_start = &linebuffer[pos + 1];
+            }
+          if (currentpos.line_start == NULL)
+            currentpos.line_start = &linebuffer[pos + 1];
+          cpos = 0;
+          line++;
+        }
+      while (linebuffer[pos - 1] == '\\')
+        {
+          escape++;
+          pos--;
+          cpos++;
+        }
+      if ((escape % 2) == 1)
+        {
+          switch (state)
+            {
+            case EXITSTRING:
+              state = INSTRING;
+              break;
+            case STARTSTRING:
+              state = NORMAL;
+              break;
+            default:
+              break;
+            }
+        }
+      else
+        {
+          switch (state)
+            {
+            case EXITSTRING:
+              state = NORMAL;
+              break;
+            case STARTSTRING:
+              state = INSTRING;
+              break;
+            case LEFTPAR:
+              state = NORMAL;
+              parcount--;
+              break;
+            case RIGHTPAR:
+              state = NORMAL;
+              parcount++;
+              break;
+            default:
+              break;
+            }
+        }
+      if (!pars && parcount == 0)
+        {
+          parpos.line_start = &linebuffer[pos];
+          parpos.cpos = cpos;
+          parpos.line = line;
+          pars = 1;
+        }
+      if (line == 0)
+        currentpos.cpos++;
+    }
+  currentpos.line = line;
+  if (line == 0)
+    {
+      currentpos.cpos += strlen(current_prompt);
+      currentpos.line_start = linebuffer + 1;
+    }
+  parpos.line = line - parpos.line;
+  if (parpos.line == 0)
+    parpos.cpos = cpos - parpos.cpos + strlen(current_prompt);
+}
+
+/*
+ * Puts the string STR on stdout NTIM times using tputs.
+ */
+void
+nput(str, ntim)
+  char *str;
+  int ntim;
+{
+  for (; ntim > 0; ntim--)
+    tputs(str, 1, outc);
+}
+
+/*
+ * Blink matching paren.
+ */
+void
+blink()
+{
+  int ldiff;
+  int cdiff;
+  struct timeval timeout;
+  int rfds;
+  int i;
+
+  if (nocap) return;                    /* Sorry, no blink.  */
+  ldiff = currentpos.line - parpos.line;
+  cdiff = parpos.cpos - currentpos.cpos;
+  nput(curup, ldiff);
+  if (cdiff < 0)
+    {
+      if (-cdiff < parpos.cpos)
+        nput("\b", -cdiff);
+      else
+        {
+          putc('\r', stdout);
+          nput(curfwd, parpos.cpos);    /* This is realy silly.  */
+        }
+    }
+  else
+    nput(curfwd, cdiff);
+  (void) fflush(stdout);
+  timeout.tv_sec = 1L;
+  timeout.tv_usec = 0L;
+  rfds = 1;
+  (void) select(1, &rfds, (int *) NULL, (int *) NULL, &timeout);
+  nput(curdn, ldiff);                   /* Goes to beginning of line.  */
+  linebuffer[linepos] = '\0';
+  if (ldiff == 0)
+    {
+      for (i =0; parpos.line_start[i]; i++)
+        pputc(parpos.line_start[i], stdout);
+    }
+  else
+    {
+      if (currentpos.line == 0)
+        fputs(current_prompt, stdout);
+      for (i = 0; currentpos.line_start[i]; i++)
+        pputc(currentpos.line_start[i], stdout);
+    }
+  (void) fflush(stdout);
+}
+#endif SARGASSO
+
+/*
+ * Get a line from stdin.  Do line editing functions such as kill line, 
+ * retype line and delete character.  Count parethesis pairs and
+ * terminate line if matching right paren.  Typing just a return
+ * puts a right paren in the buffer as well as the newline.
+ * Returns zero if anything goes wrong.
+ */
+int
+getline(file)
+  FILE *file;
+{
+  char c;
+  char *s, *t;
+  int origpar;
+  int instring = 0;
+  int escaped = 0;
+  LISPT ex;
+  
+  if (options.command)
+    {
+      (void) fprintf(stderr, "Unbalanced parenthesis\n");
+      end_term();
+      exit(1);
+    }
+  position = 0;
+  linepos = 1;
+  origpar = parcount;
+  linebuffer[0] = ' ';
+  while (1)
+    {
+      if (escaped)
+        escaped--;
+      FFLUSH(stdout);
+      if (readchar(file, &c) == 0) return 0;
+      switch(key_tab[c])
+        {
+        case T_EOF:
+          if (linepos == 1)
+            {
+              linebuffer[linepos++] = EOF;
+              return 1;
+            }
+          pputc(c, stdout);
+          linebuffer[linepos++] = EOF;
+          break;
+        case T_KILL:
+          retype(2);
+          linepos = 1;
+          parcount = origpar;
+	  escaped = 0;
+	  instring = 0;
+          break;
+        case T_RETYPE:
+          retype(1);
+          break;
+        case T_TAB:
+#ifndef SARGASSO
+          s = mkexstr();
+          t = extilde(s, 0);
+          if (t == NULL)
+            {
+              (void) putc(BELL, stdout);
+              break;
+            }
+          ex = expandfiles(t, 0, 0, 1);
+          if (TYPEOF(ex) == CONS && strlen(s) > 1)
+            ex = strip(ex, t, s);
+          if (TYPEOF(ex) == CONS && ISNIL(CDR(ex)))
+            fillrest(GETSTR(CAR(ex)));
+          else
+            {
+              if (TYPEOF(ex) == CONS) complete(ex);
+              (void) putc(BELL, stdout);
+            }
+#endif SARGASSO
+          break;
+        case T_ERASE:
+          escaped = 0;
+          if (linepos>1 && linebuffer[linepos-1] == '\n')
+            {
+              linepos--;
+              retype(0);
+            }
+          else if (linepos>1)
+            {
+              delonechar();
+              if (linebuffer[linepos-1] == '\\')
+                escaped = 2;
+              else
+                {
+                  if (!instring && linebuffer[linepos] == '(')
+                    parcount--;
+                  if (!instring && linebuffer[linepos] == ')')
+                    parcount++;
+                  if (linebuffer[linepos] == '"')
+                    instring = !instring;
+                }
+            }
+          break;
+        case T_STRING:
+          linebuffer[linepos++] = c;
+          pputc(c, stdout);
+          if (!escaped)
+            instring = !instring;
+          break;
+        case T_ESCAPE:
+          linebuffer[linepos++] = c;
+          pputc(c, stdout);
+          if (!escaped)
+            escaped = 2;
+          break;
+        case T_LEFTPAR:
+          if (!instring && !escaped)
+            parcount++;
+          pputc(c, stdout);
+          linebuffer[linepos++] = c;
+          break;
+        case T_RIGHTPAR:
+          if (escaped || instring)
+            {
+              pputc(c, stdout);
+	      linebuffer[linepos++] = c;
+	      break;
+	    }
+          parcount--;
+          pputc(c, stdout);
+          linebuffer[linepos++] = c;
+          if (parcount <= 0)
+            {
+              if (parcount < 0)
+                {
+                  linebuffer[0] = '(';
+                  parcount = 0; /* in case it was negative */
+                }
+              else if (firstnotlp())
+                break;          /* paren expression not first (for readline) */
+              linebuffer[linepos++] = '\n';
+              pputc('\n', stdout);
+              return 1;
+            }
+#ifndef SARGASSO
+          else
+            {
+              scan(linepos - 1);
+              blink();
+            }
+#endif SARGASSO
+          break;
+        case T_NEWLINE:
+          pputc('\n', stdout);
+          if (linepos == 1 || onlyblanks())
+	    {
+	      linebuffer[0] = '(';
+              linebuffer[linepos++] = ')';
+	    }
+          linebuffer[linepos++] = '\n';
+          if (parcount <= 0 && !instring)
+            return 1;
+          break;
+        case T_INSERT:
+          pputc(c, stdout);
+          linebuffer[linepos++] = c;
+          break;
+        }
+    }
+}
+
+/*
+ * Return 1 if currently at end of line, or
+ * at end of line after skipping blanks.
+ */
+public int
+eoln(file)
+  FILE *file;
+{
+  int i;
+
+#ifdef SARGASSO
+  if (file != stdin)
+#else
+  if (!isatty(fileno(file)))
+#endif SARGASSO
+    return 0;
+  for (i=position; i<linepos; i++)
+    {
+      if (linebuffer[i] != ' ' && linebuffer[i] != '\t' &&
+          linebuffer[i] != '\n')
+        return 0;
+      if (linebuffer[i] == '\n')
+        return 1;
+    }
+  return 1;
+}
