@@ -1,26 +1,9 @@
 Lips -- lisp shell
 
-This is version 120 of lips (lisp shell) as of 90/02/02.
+Copyright (c) 1988-1989, 1992, 2020 Krister Joas.
+
+This is version 130 of lips (lisp shell) as of 1992-01-29.
 
 Change Makefile and config.h as needed and type make. If all went well,
 copy lipscode/example.lipsrc to your home directory and make your
 personal changes.
-
-Please send bug reports and comments to
-krijo@ida.liu.se or BUG-LIPS@ELINOR.LYSATOR.LIU.SE.
-
-	Copyright (c) 1988,1989, Krister Joas.
-	
-	This program is provided to you free of charge.	 Permission to
-	use, copy, modify, and distribute this software and its
-	documentation is hereby granted, provided that the above
-	copyright notice appear in all copies. The program
-	is provided ``as is'' with NO WARRANTY, eihter expressed or
-	implied, including, but not limited to, the warranties of
-	merchantability and fitness for a particular purpose.  The
-	author is not responsible for the consequences of use of this
-	program, even if they arise from flaws in it.
-	Altered versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-
-Krister Joas.
