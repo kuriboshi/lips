@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
@@ -11,6 +11,7 @@
 #include <sys/dir.h>
 #include <pwd.h>
 #include <string.h>
+#include <stdlib.h>
 #include "lips.h"
 
 #define TICKS		64
@@ -23,19 +24,17 @@ static char rcsid[] = "$Id$";
 extern struct passwd *getpwnam();
 extern char *getwd();
 extern char *index();
-extern char *malloc();
-extern char *realloc();
 
-private char r[MAXPATHLEN];
-private char **globarr;
-private char **globp;
-private char **globlimit;
+static char r[MAXPATHLEN];
+static char **globarr;
+static char **globp;
+static char **globlimit;
 
 /*
  * If *wild is a slash then str must be a directory to match
  * wild completely. Used by match.
  */
-private int
+static int
 dircheck(str, wild, ss)
   char *str, *wild, *ss;
 {
@@ -63,7 +62,7 @@ dircheck(str, wild, ss)
  * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
  * is a simple string with no slashes.
  */
-private int
+static int
 match(str, wild)
   char *str, *wild;
 {
@@ -107,7 +106,7 @@ match(str, wild)
 /*
  * Inserts element what in list where keeping alphabetic order.
  */
-private LISPT
+static LISPT
 orderinsert(what, where)
   LISPT what, where;
 {
@@ -142,7 +141,7 @@ orderinsert(what, where)
  * Expands tilde character in first position to home directory or
  * other users home directory.
  */
-public char *
+char *
 extilde(w, rep)
   char *w;
   int rep;
@@ -187,7 +186,7 @@ extilde(w, rep)
  *             unsorted array of character strings. Returns non-zero if
  *             any file matched the pattern, zero otherwise.
  */
-private int
+static int
 walkfiles(wild, all, report)
   char *wild;
   int all, report;
@@ -242,7 +241,7 @@ walkfiles(wild, all, report)
   return result;
 }
 
-private LISPT
+static LISPT
 buildlist()
 {
   char **r;
@@ -258,7 +257,7 @@ buildlist()
   return l;
 }
 
-private int
+static int
 comp(a, b)
   char **a, **b;
 {
@@ -266,7 +265,7 @@ comp(a, b)
   return -strcmp(*a, *b);
 }
 
-public LISPT
+LISPT
 expandfiles(wild, all, report, sort)
   char *wild;
   int all, report, sort;
@@ -303,7 +302,7 @@ PRIMITIVE expand(wild, rep, all)
   return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
 }
 
-public LISPT
+LISPT
 glob(wild)
   LISPT wild;
 {

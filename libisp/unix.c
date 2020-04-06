@@ -1,12 +1,15 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/errno.h>
 #include <signal.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "lisp.h"
 
 #define MAXFILES 8
@@ -15,10 +18,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-/* extern int (*signal())();*/
-extern int errno;
-
-public LISPT sighandler[NSIG-1];
+LISPT sighandler[NSIG-1];
 
 PRIMITIVE uxerrno()
 {
@@ -179,9 +179,8 @@ PRIMITIVE uxsetgid(gid)
 }
 
 /*ARGSUSED*/
-int sighandle(sig,code,scp)
-int sig, code;
-struct sigcontext *scp;
+void sighandle(sig)
+int sig;
 {
   (void)eval(sighandler[sig]);
 }
@@ -218,7 +217,7 @@ PRIMITIVE uxunlink(name)
   return mknumber((long)unlink(STRINGVAL(name)));
 }
 
-public void init_unix()
+void init_unix()
 {
   mkprim(PN_UXACCESS,uxaccess,2,SUBR);
   mkprim(PN_UXALARM,uxalarm,1,SUBR);

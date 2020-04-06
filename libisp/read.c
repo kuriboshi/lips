@@ -1,10 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
 #include <ctype.h>
+#include <stdlib.h>
 #include "lisp.h"
 
 #define NUL '\0'
@@ -15,11 +16,13 @@
                      rstack = CDR(rstack)
 
 #define CHECKEOF(c)  if ((c) == EOF) \
+                     { \
                        if (line || ISNIL(CAR(top))) \
                          return C_EOF; \
                        else \
-                         return error(UNEXPECTED_EOF, C_NIL)
- 
+                         return error(UNEXPECTED_EOF, C_NIL); \
+                     }
+
 #define GETCH(file)  do \
                        curc = getch(file); \
                      while (curc != EOF && issepr(curc)); \
@@ -29,27 +32,30 @@
 static char rcsid[] = "$Id$";
 #endif
 
+extern int getch();
+extern void ungetch();
+extern int eoln();
+extern void putch();
+
 extern LISPT history, currentbase;
 
 extern LISPT histget();
-extern double atof();
-extern long atol();
 
-private LISPT rmsquote();
-private LISPT rmredir();
-private LISPT rmpipe();
-/* private LISPT rmbg(); */
-private LISPT rmdquote();
-private LISPT rmexcl();
-forward LISPT prin0();
-private LISPT rmuser();         /* Installed for user read macros. */
+static LISPT rmsquote();
+static LISPT rmredir();
+static LISPT rmpipe();
+/* static LISPT rmbg(); */
+static LISPT rmdquote();
+static LISPT rmexcl();
+LISPT prin0();
+static LISPT rmuser();         /* Installed for user read macros. */
 
-public LISPT top;               /* used for threading the input structure */
-public LISPT rstack;            /* partially built structure read stack */
-public long printlevel = 0;     /* maximum print level */
-public long thisplevel;         /* during print, print level */
-public int echoline;            /* is 1 if ! has been used */
-public struct rtinfo currentrt = 
+LISPT top;               /* used for threading the input structure */
+LISPT rstack;            /* partially built structure read stack */
+long printlevel = 0;     /* maximum print level */
+long thisplevel;         /* during print, print level */
+int echoline;            /* is 1 if ! has been used */
+struct rtinfo currentrt = 
 {
   {
 /* NUL SOH STX ETX EOT ENQ ACK BEL */
@@ -94,18 +100,18 @@ public struct rtinfo currentrt =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-private LISPT userreadmacros[128];
-private char buf[MAXATOMSIZE];
+static LISPT userreadmacros[128];
+static char buf[MAXATOMSIZE];
 /*
  * This state table parses a floating point number.
  */
-private int nxtstate[4][10] = {
+static int nxtstate[4][10] = {
   { 1,-1,-1,-1,-1,-1,-1, 8,-1,-1}, 
   { 2, 2, 2, 4, 4, 6, 6, 9, 9, 9}, 
   {-1,-1, 7, 7, 7,-1, 7,-1,-1,-1}, 
   { 5, 5, 3,-1,-1,-1,-1,-1,-1,-1}
 };
-private digits[] = {
+static char digits[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
   'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
@@ -115,7 +121,7 @@ private digits[] = {
  * INTEGERP returns nonzero if the characters in buffer BUF
  * represents an integer, and the result as a long in res.
  */
-private int integerp(buf, res)
+static int integerp(buf, res)
   char *buf;
   long *res;
 {
@@ -137,7 +143,7 @@ private int integerp(buf, res)
 /*
  * Returns nonzero if buffer BUF is a floating point constant.
  */
-private int floatp(buf)
+static int floatp(buf)
   char *buf;
 {
 #ifdef FLOATING
@@ -172,16 +178,16 @@ private int floatp(buf)
     return 1;
   else
     return 0;
-#else !FLOATING
+#else
   return 0;
-#endif FLOATING
+#endif
 }
 
 /*
  * Find out if the buffer can be interpreted as numbers of
  * any kind.
  */
-private LISPT parsebuf(buf)
+static LISPT parsebuf(buf)
   char *buf;
 {
   long longval;
@@ -199,7 +205,7 @@ private LISPT parsebuf(buf)
 /*
  * Read an atom from FILE.
  */
-public LISPT
+LISPT
 ratom(file)
   FILE *file;
 {
@@ -252,7 +258,7 @@ ratom(file)
  * last cell of l with cdr set to original (cdr c).
  * If tailp is true, don't clobber car of c.
  */
-private LISPT
+static LISPT
 splice(c, l, tailp)
   LISPT c, l;
   int tailp;
@@ -287,7 +293,7 @@ splice(c, l, tailp)
 /*
  * If you don't like goto's, keep your eyes shut.
  */
-public LISPT
+LISPT
 lispread(file, line)
   FILE *file;
   int line;
@@ -450,7 +456,7 @@ insert:
  * others could be added easily.
  */
 /*ARGSUSED*/
-private LISPT rmexcl(file)
+static LISPT rmexcl(file)
   FILE *file;
 {
   int c;
@@ -514,7 +520,7 @@ private LISPT rmexcl(file)
  * Handles user macros.
  */
 /*ARGSUSED*/
-private LISPT rmuser(file, curr, curc)
+static LISPT rmuser(file, curr, curc)
   FILE *file;
   LISPT curr;
   char curc;
@@ -526,7 +532,7 @@ private LISPT rmuser(file, curr, curc)
 }
 
 /*ARGSUSED*/
-private LISPT rmdquote(file)
+static LISPT rmdquote(file)
   FILE *file;
 {
   char buf[MAXATOMSIZE];
@@ -547,7 +553,7 @@ private LISPT rmdquote(file)
 
 #ifdef COMMENT
 /*ARGSUSED*/
-private LISPT rmbg(file, curr, curc)
+static LISPT rmbg(file, curr, curc)
   FILE *file;
   LISPT curr;
   char curc;
@@ -558,7 +564,7 @@ private LISPT rmbg(file, curr, curc)
 }
 #endif
 
-private LISPT rmsquote(file)
+static LISPT rmsquote(file)
   FILE *file;
 {
   int c;
@@ -573,7 +579,7 @@ private LISPT rmsquote(file)
 }
 
 /*ARGSUSED*/
-private LISPT rmpipe(file, curr, curc)
+static LISPT rmpipe(file, curr, curc)
   FILE *file;
   LISPT curr;
   char curc;
@@ -589,7 +595,7 @@ private LISPT rmpipe(file, curr, curc)
 }
 
 /*ARGSUSED*/
-private LISPT rmredir(file, curr, curc)
+static LISPT rmredir(file, curr, curc)
   FILE *file;
   LISPT curr;
   char curc;
@@ -608,7 +614,7 @@ private LISPT rmredir(file, curr, curc)
   return t2;
 }
 
-public LISPT
+LISPT
 readline(file)
   FILE *file;
 {
@@ -621,7 +627,7 @@ readline(file)
 }
 
 /* print the string s, on stream file */
-private void ps(s, file, esc)
+static void ps(s, file, esc)
   char *s;
   FILE *file;
   int esc;
@@ -630,7 +636,7 @@ private void ps(s, file, esc)
     putch(*s++, file, esc);
 }
 
-private void pi(i, base, file)
+static void pi(i, base, file)
   long i;
   long base;
   FILE *file;
@@ -655,7 +661,7 @@ private void pi(i, base, file)
   ps(ss+j+1, file, 0);
 }
 
-private void pf(d, file)
+static void pf(d, file)
   double d;
   FILE *file;
 {
@@ -665,11 +671,11 @@ private void pf(d, file)
   (void) sprintf(ss, "%g", d);
 #else
   (void) sprintf(ss, "%#g", d);
-#endif SARGASSO
+#endif
   ps(ss, file, 0);
 }
 
-public LISPT
+LISPT
 patom(x, file, esc)
   LISPT x;
   FILE *file;
@@ -679,7 +685,7 @@ patom(x, file, esc)
   return x;
 }
 
-public LISPT
+LISPT
 terpri(file)
   FILE *file;
 {
@@ -687,7 +693,7 @@ terpri(file)
   return C_NIL;
 }
 
-public LISPT
+LISPT
 prinbody(x, file, esc)
   LISPT x;
   FILE *file;
@@ -715,7 +721,7 @@ nxtelt:
   return x;
 }
 
-public LISPT
+LISPT
 prin0(x, file, esc)
   LISPT x;
   FILE *file;
@@ -816,7 +822,7 @@ ppoint:
   return x;
 }
 
-public LISPT
+LISPT
 print(x, file)
   LISPT x;
   FILE *file;

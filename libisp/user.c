@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -10,7 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-private LISPT getargs(al)
+static LISPT getargs(al)
   LISPT al;
 {
   if (ISNIL(CDR(al)))
@@ -39,7 +39,7 @@ PRIMITIVE getrep(fun)
     return cons(C_NLAMBDA,cons(args,x->lambdarep));
 }
 
-public LISPT funeq(f1, f2)
+LISPT funeq(f1, f2)
   LISPT f1, f2;
 {
   LISPT t1, t2;
@@ -64,7 +64,7 @@ public LISPT funeq(f1, f2)
   return C_NIL;
 }
 
-private LISPT checkfn(name, lam)
+static LISPT checkfn(name, lam)
   LISPT name, lam;
 {
   LISPT t;
@@ -81,6 +81,7 @@ private LISPT checkfn(name, lam)
               (void) xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
           }
       }
+  return C_NIL;
 }
 
 PRIMITIVE define(name, lam)
@@ -93,7 +94,7 @@ PRIMITIVE define(name, lam)
   return name;
 }
 
-private LISPT def(name, pars, body, type)
+static LISPT def(name, pars, body, type)
   LISPT name, pars, body;
   int type;
 {
@@ -122,7 +123,7 @@ PRIMITIVE df(name, pars, body)
   return def(name, pars, body, NLAMBDA);
 }
 
-public void init_user()
+void init_user()
 {
   mkprim(PN_DEFINE, define,  2, SUBR);
   mkprim(PN_GETREP, getrep,  1, SUBR);

@@ -1,9 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas.
+ * Copyright 1989, 2020 Krister Joas.
  *
  * $Id$
  */
+#pragma once
+
 #define evclosure1 ev_closure1
 #define promptfun p_romptfun
 #define current_prompt curr_ent_prompt

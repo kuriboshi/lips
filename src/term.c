@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -15,8 +15,11 @@
 #else
 #include <sgtty.h>
 #include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <term.h>
 #include <sys/time.h>
-#endif SARGASSO
+#endif
 #include <string.h>
 #include "lips.h"
 
@@ -24,7 +27,7 @@
 #define FFLUSH(file)
 #else
 #define FFLUSH(file)	(void) fflush(file)
-#endif SARGASSO
+#endif
 
 /*
  * Sargasso doesn't have these, so we define them.
@@ -42,12 +45,12 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern int ungetc();
 extern char *index(), *getenv();
 #ifdef TERMCAP
 extern char *tgetstr();
-#endif TERMCAP
+#endif
 extern void finish();
+extern int readchar();
 
 #define NUM_KEYS        256
 #define COMMENTCHAR     '#'
@@ -75,41 +78,43 @@ extern void finish();
  * Variables for terminal characteristics, old and new.
  */
 #ifdef SARGASSO
-private int oldmode, newmode;
+static int oldmode, newmode;
 #else
-private struct sgttyb newterm, oldterm;
-private struct tchars newtchars, oldtchars;
-private struct ltchars newltchars, oldltchars;
-private int ldis;
-#endif SARGASSO
+static struct sgttyb newterm, oldterm;
+static struct tchars newtchars, oldtchars;
+static struct ltchars newltchars, oldltchars;
+static int ldis;
+#endif
 
-private char linebuffer[BUFSIZ];        /* Line buffer for terminal input.  */
-private int parcount = 0;               /* Counts paranthesis.  */
-private int linepos = 0;                /* End of line buffer.  */
-private int position = 0;               /* Current position in line buffer.  */
-private char key_tab[NUM_KEYS];         /* Table specifying key functions.  */
+static char linebuffer[BUFSIZ];        /* Line buffer for terminal input.  */
+static int parcount = 0;               /* Counts paranthesis.  */
+static int linepos = 0;                /* End of line buffer.  */
+static int position = 0;               /* Current position in line buffer.  */
+static char key_tab[NUM_KEYS];         /* Table specifying key functions.  */
 
 #ifdef TERMCAP
-private char tcap[128];                 /* Buffer for terminal capabilties.  */
-private char *curup, *curfwd;           /* Various term cap strings.  */
-private char  *cleol, *curdn;
-private int nocap;                      /* Nonzero if insufficient term cap. */
-#endif TERMCAP
+static char tcap[128];                 /* Buffer for terminal capabilties.  */
+static char *curup, *curfwd;           /* Various term cap strings.  */
+static char  *cleol, *curdn;
+static int nocap;                      /* Nonzero if insufficient term cap. */
+#endif
 
-public void
+int lips_getline();
+
+void
 cleanup()
 {
   finish(0);
 }
 
-public void
+void
 clearlbuf()
 {
   linepos = 0;
   parcount = 0;
 }
 
-public void
+void
 loadbuf(str)
   char *str;
 {
@@ -142,7 +147,7 @@ init_keymap()
 #ifdef SARGASSO
   key_tab['\r']    = T_NEWLINE;
   key_tab[CTRL('z')] = T_EOF;
-#endif SARGASSO
+#endif
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -154,7 +159,7 @@ init_term()
 #ifdef TERMCAP
   char *termc = tcap;
   char *term;
-#endif TERMCAP
+#endif
   int ndis;
 
   if (!initialized)
@@ -173,10 +178,10 @@ init_term()
       (void) signal(SIGINT, cleanup); /* temporary handle */
       (void) signal(SIGTERM, cleanup); /* exit gracefully */
       newterm = oldterm;
-      newterm.sg_flags = newterm.sg_flags & ~ECHO | CBREAK;
+      newterm.sg_flags = (newterm.sg_flags & ~ECHO) | CBREAK;
       newtchars = oldtchars;
       newltchars = oldltchars;
-#endif SARGASSO
+#endif
 #ifdef TERMCAP
       curup = NULL;
       curfwd = NULL;
@@ -192,11 +197,11 @@ init_term()
             else
               nocap = 0;
           }
-#endif TERMCAP
+#endif
 #ifndef SARGASSO
       if (ldis != NTTYDISC)
         (void) ioctl(0, TIOCSETD, &ndis);
-#endif SARGASSO
+#endif
       init_keymap();
       initialized = 1;
     }
@@ -206,7 +211,7 @@ init_term()
   (void) ioctl(0, TIOCSETN, &newterm);
   (void) ioctl(0, TIOCSETC, &newtchars);
   (void) ioctl(0, TIOCSLTC, &newltchars);
-#endif SARGASSO
+#endif
 }
 
 /* Reset terminal to previous value */
@@ -218,14 +223,14 @@ void end_term()
   (void) ioctl(0, TIOCSETN, &oldterm);
   (void) ioctl(0, TIOCSETC, &oldtchars);
   (void) ioctl(0, TIOCSLTC, &oldltchars);
-#endif SARGASSO
+#endif
 }
 
 /*
  * Put a character on stdout prefixing it with a ^ if it's
  * a control character.
  */
-public void
+void
 pputc(c, file)
   int c;
   FILE *file;
@@ -241,7 +246,7 @@ pputc(c, file)
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-public void
+void
 putch(c, file, esc)
   int c;
   FILE *file;
@@ -258,7 +263,7 @@ putch(c, file, esc)
  * characters from linebuffer.  If it's not from a terminal
  * do io the standard way.
  */
-public int
+int
 getch(file)
   FILE *file;
 {
@@ -268,7 +273,7 @@ getch(file)
   if (file != stdin)
 #else
   if (!isatty(fileno(file)))
-#endif SARGASSO
+#endif
     {
       c = getc(file);
       if (c == COMMENTCHAR)             /* Skip comments.  */
@@ -281,7 +286,7 @@ gotlin:
     return linebuffer[position++];
   else
     {
-      if (getline(file) == 0)
+      if (lips_getline(file) == 0)
         return EOF;
       goto gotlin;
     }
@@ -291,7 +296,7 @@ gotlin:
  * Unget a character.  If reading from a terminal, 
  * just push it back in the buffer, if not, do an ungetc.
  */
-ungetch(c, file)
+void ungetch(c, file)
   int c;
   FILE *file;
 {
@@ -299,7 +304,7 @@ ungetch(c, file)
   if (file == stdin)
 #else
   if (isatty(fileno(file)))
-#endif SARGASSO
+#endif
     {
       if (position > 0)
         position--;
@@ -313,7 +318,7 @@ ungetch(c, file)
  * the first non-separator character is a left parenthesis, zero
  * otherwise.
  */
-private int
+static int
 firstnotlp()
 {
   int i;
@@ -327,7 +332,7 @@ firstnotlp()
  * Delete one character the easy way by sending backspace - space -
  * backspace.  Do it twice if it was a control character.
  */
-private void
+static void
 delonechar()
 {
   linepos--;
@@ -345,7 +350,7 @@ delonechar()
 /*
  * Returns zero if the line contains only separators.
  */
-private int
+static int
 onlyblanks()
 {
   int i = linepos;
@@ -367,6 +372,7 @@ outc(c)
   int c;
 {
   (void) putc(c, stdout);
+  return c;
 }
 
 /* 
@@ -374,7 +380,7 @@ outc(c)
  *          retype complete line, including prompt.  It ALL is 2 just 
  *          delete all lines.  Used for ctrl-u kill.
  */
-private void
+static void
 retype(all)
   int all;
 {
@@ -409,7 +415,7 @@ retype(all)
       tputs(cleol, 1, outc);
     }
   else
-#endif TERMCAP
+#endif
     {
       if (all == 0)
 	{
@@ -441,8 +447,8 @@ retype(all)
 /*
  * Stuff for file name completion.
  */
-private char word[BUFSIZ];
-private char *last;
+static char word[BUFSIZ];
+static char *last;
 
 char *mkexstr()
 {
@@ -456,7 +462,7 @@ char *mkexstr()
   return ++last;
 }
 
-private void
+static void
 fillrest(word)
   char *word;
 {
@@ -467,7 +473,7 @@ fillrest(word)
     }
 }
 
-private int
+static int
 checkchar(words, pos, c)
   LISPT words;
   int pos;
@@ -485,7 +491,7 @@ checkchar(words, pos, c)
   return 1;
 }
 
-private void
+static void
 complete(words)
   LISPT words;
 {
@@ -500,7 +506,7 @@ complete(words)
     }
 }
 
-private LISPT
+static LISPT
 strip(files, prefix, suffix)
   LISPT files;
   char *prefix, *suffix;
@@ -535,8 +541,8 @@ struct curpos {
   char *line_start;
 };
 
-private struct curpos parpos;           /* Saves position of matching par.  */
-private struct curpos currentpos;       /* Current position.  */
+static struct curpos parpos;           /* Saves position of matching par.  */
+static struct curpos currentpos;       /* Current position.  */
 
 /*
  * Scans backwards and tries to find a matching left parenthesis
@@ -545,7 +551,7 @@ private struct curpos currentpos;       /* Current position.  */
  * can find its way back.  BEGIN is the position in linebuffer from
  * where to start searching.
  */
-private void
+static void
 scan(begin)
   int begin;
 {
@@ -675,7 +681,7 @@ blink()
   int ldiff;
   int cdiff;
   struct timeval timeout;
-  int rfds;
+  fd_set rfds;
   int i;
 
   if (nocap) return;                    /* Sorry, no blink.  */
@@ -697,8 +703,8 @@ blink()
   (void) fflush(stdout);
   timeout.tv_sec = 1L;
   timeout.tv_usec = 0L;
-  rfds = 1;
-  (void) select(1, &rfds, (int *) NULL, (int *) NULL, &timeout);
+  FD_SET(1, &rfds);
+  (void) select(1, &rfds, NULL, NULL, &timeout);
   nput(curdn, ldiff);                   /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
   if (ldiff == 0)
@@ -715,7 +721,7 @@ blink()
     }
   (void) fflush(stdout);
 }
-#endif SARGASSO
+#endif
 
 /*
  * Get a line from stdin.  Do line editing functions such as kill line, 
@@ -724,8 +730,7 @@ blink()
  * puts a right paren in the buffer as well as the newline.
  * Returns zero if anything goes wrong.
  */
-int
-getline(file)
+int lips_getline(file)
   FILE *file;
 {
   char c;
@@ -791,7 +796,7 @@ getline(file)
               if (TYPEOF(ex) == CONS) complete(ex);
               (void) putc(BELL, stdout);
             }
-#endif SARGASSO
+#endif
           break;
         case T_ERASE:
           escaped = 0;
@@ -863,7 +868,7 @@ getline(file)
               scan(linepos - 1);
               blink();
             }
-#endif SARGASSO
+#endif
           break;
         case T_NEWLINE:
           pputc('\n', stdout);
@@ -888,7 +893,7 @@ getline(file)
  * Return 1 if currently at end of line, or
  * at end of line after skipping blanks.
  */
-public int
+int
 eoln(file)
   FILE *file;
 {
@@ -898,7 +903,7 @@ eoln(file)
   if (file != stdin)
 #else
   if (!isatty(fileno(file)))
-#endif SARGASSO
+#endif
     return 0;
   for (i=position; i<linepos; i++)
     {

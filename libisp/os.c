@@ -1,13 +1,14 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
 #include <stdio.h>
+#include <unistd.h>
 #ifdef SARGASSO
 #include <tops20.h>
-#endif SARGASSO
+#endif
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -31,6 +32,6 @@ readchar(file, cp)
 #else
   i = read(fileno(file), cp, 1);
   if (i != 1) return 0;
-#endif SARGASSO
+#endif
   return 1;
 }

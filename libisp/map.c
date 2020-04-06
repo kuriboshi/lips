@@ -1,10 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
 #include "lisp.h"
+#include "func.h"
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -92,7 +93,7 @@ PRIMITIVE mapcar(obj, fn1, fn2)
   return rval;
 }
 
-public void init_map()
+void init_map()
 {
   mkprim(PN_MAP,     map,      3, SUBR);
   mkprim(PN_MAPC,    mapc,     3, SUBR);

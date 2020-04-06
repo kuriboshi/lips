@@ -1,12 +1,12 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
 #ifndef SARGASSO
 #include <sys/ioctl.h>
-#endif SARGASSO
+#endif
 #include <string.h>
 #include "lips.h"
 
@@ -16,17 +16,19 @@
 static char rcsid[] = "$Id$";
 #endif
 
-public char current_prompt[PROMPTLENGTH];
-public LISPT history;           /* Holds the history list. */
-public LISPT histnum;           /* Current event number. */
-public LISPT histmax;           /* Maximum number of events to save. */
-public LISPT input_exp;         /* The input expression. */
-public LISPT topexp;            /* Transformed expression to evaluate. */
-public LISPT alias_expanded;    /* For checking alias loops. */
-public LISPT (*transformhook)(); /* Applied on input if non-NULL. */
-public void (*beforeprompt)();	/* Called before the prompt is printed. */
+extern void pputc();
 
-private int printit;            /* If the result will be printed. */
+char current_prompt[PROMPTLENGTH];
+LISPT history;                  /* Holds the history list. */
+LISPT histnum;                  /* Current event number. */
+LISPT histmax;                  /* Maximum number of events to save. */
+LISPT input_exp;                /* The input expression. */
+LISPT topexp;                   /* Transformed expression to evaluate. */
+LISPT alias_expanded;           /* For checking alias loops. */
+LISPT (*transformhook)();       /* Applied on input if non-NULL. */
+void (*beforeprompt)();         /* Called before the prompt is printed. */
+
+static int printit;             /* If the result will be printed. */
 
 /*
  * History functions.
@@ -34,7 +36,7 @@ private int printit;            /* If the result will be printed. */
 /*
  * Print the history list.
  */
-private void
+static void
 phist()
 {
   LISPT hl;
@@ -50,7 +52,7 @@ phist()
 /*
  * Add event to history list.
  */
-private void
+static void
 addhist(what)
   LISPT what;
 {
@@ -61,7 +63,7 @@ addhist(what)
 /*
  * Remove last event from history list.
  */
-private void
+static void
 remhist()
 {
   history = CDR(history);
@@ -71,7 +73,7 @@ remhist()
 /*
  * Trim history list to keep it shorter than histmax.
  */
-private void
+static void
 trimhist()
 {
   LISPT hl;
@@ -87,7 +89,7 @@ trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-public LISPT
+LISPT
 histget(num, hlist)
   long num;
   LISPT hlist;
@@ -117,7 +119,7 @@ PRIMITIVE printhist()
   return C_NIL;
 }
 
-private LISPT
+static LISPT
 transform(list)
   LISPT list;
 {
@@ -134,7 +136,7 @@ transform(list)
  * on the list alias_expanded. One indirection is allowed in order
  * to permit 'alias ls ls -F'.
  */
-public LISPT
+LISPT
 findalias(exp)
   LISPT exp;
 {
@@ -194,10 +196,10 @@ promptprint(prompt)
         }
     }
   (void) printf("\r");
-  (void) printf(current_prompt);
+  (void) printf("%s", current_prompt);
 }
 
-public void
+void
 toploop(tprompt, macrofun)
   LISPT *tprompt;
   int (*macrofun)();
@@ -259,7 +261,7 @@ toploop(tprompt, macrofun)
     }
 }
 
-public void
+void
 init_hist()
 {
   initcvar(&history,     "history",     C_NIL);

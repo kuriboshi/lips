@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
@@ -14,6 +14,8 @@
 #include <sys/file.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
 #include <strings.h>
@@ -29,25 +31,22 @@ static char rcsid[] = "$Id$";
 
 extern int execve();
 extern int putenv();
-extern char *getenv(), *realloc(), *index();
+extern char *getenv(), *index();
 extern char *getwd();
-extern char *sys_siglist[];
-extern char *sys_errlist[];
 extern char **environ;
-extern int errno;
 extern DIR *opendir();
 extern struct direct *readdir();
 extern void init_term();
 extern void end_term();
-forward LISPT setenv();
+LISPT p_setenv();
 
 #define UNION_WAIT int
 
-public int insidefork = 0;      /* Is nonzero in the child after */
+int insidefork = 0;             /* Is nonzero in the child after */
                                 /* a fork */
 
-private BITS32 exechash[EXECHASH/32];       /* One bit set for each program */
-private int pgrp;                           /* Process group of current job */
+static BITS32 exechash[EXECHASH/32];       /* One bit set for each program */
+static int pgrp;                           /* Process group of current job */
 
 #ifdef JOB_CONTROL
 struct job
@@ -62,18 +61,18 @@ struct job
   int running;                  /* Nonzero if running */
 };
 
-private struct job *joblist = NULL;     /* List of jobs */
-private struct job *cjoblist = NULL;    /* List of collected jobs */
-#endif JOB_CONTROL
+static struct job *joblist = NULL;     /* List of jobs */
+static struct job *cjoblist = NULL;    /* List of collected jobs */
+#endif
 
 /* 
  * preparefork - Sets the processgroup to the group currently beeing built. 
  *               Resets signals to their default value.
  */
-private void
+static void
 preparefork()
 {
-  (void) setpgrp(0, pgrp);
+  (void) setpgid(0, pgrp);
   (void) signal(SIGHUP,  SIG_DFL);
   (void) signal(SIGINT,  SIG_DFL);
   (void) signal(SIGQUIT, SIG_DFL);
@@ -90,7 +89,7 @@ preparefork()
  *           Returns NULL if either STR is NULL or malloc fail to allocate 
  *           more memory.
  */
-public char *
+char *
 strsave(str)
   char *str;
 {
@@ -116,7 +115,7 @@ strsave(str)
  *            Status is Done if job has exited.
  */
 #ifdef JOB_CONTROL
-private void
+static void
 printjob(job)
   struct job *job;
 {
@@ -139,14 +138,14 @@ printjob(job)
   (void) fputs(buffer, primout);
   (void) xprint(job->exp, C_NIL);
 }
-#endif JOB_CONTROL
+#endif
 
 /* 
  * recordjob - register job with process id PID in the linked list of jobs. If 
  *             BG is non-zero, job is registered as running in background.
  *             Returns 0 if all went well, non-zero otherwise.
  */
-private int
+static int
 recordjob(pid, bg)
   int pid, bg;
 {
@@ -175,7 +174,7 @@ recordjob(pid, bg)
  * collectjob - updates job list with PID as process id, and STAT as exit 
  *              status.
  */
-private void
+static void
 collectjob(pid, stat)
   int pid;
   UNION_WAIT stat;
@@ -215,7 +214,7 @@ collectjob(pid, stat)
 }
 
 /* printdone - Sweeps CJOBLIST and prints each job it frees. */
-public void
+void
 printdone()
 {
 #ifdef JOB_CONTROL
@@ -234,7 +233,7 @@ printdone()
  *         also grabs the tty for the new process group. Mfork returns the 
  *         pid returned by fork.
  */
-private int
+static int
 mfork()
 {
   int pid;
@@ -264,7 +263,7 @@ mfork()
 }
 
 /* ltoa - Converts a long to its ascii representation. */
-public char *
+char *
 ltoa(v)
   long v;
 {
@@ -279,7 +278,7 @@ ltoa(v)
  *             meta characters in which case it returns true.
  *             It also strips off all quote-characters (backslash).
  */
-private int
+static int
 checkmeta(s)
   char *s;
 {
@@ -300,7 +299,7 @@ checkmeta(s)
  *            execve. Returns NULL if some error occured, like a no match 
  *            for wild cards. Returns pointers to globbed arguments.
  */
-private char **
+static char **
 makeexec(command)
   LISPT command;
 {
@@ -380,7 +379,7 @@ makeexec(command)
  *            status. If PID is 0 it means to wait for the first process 
  *            to exit.
  */
-private UNION_WAIT
+static UNION_WAIT
 waitfork(pid)
   int pid;
 {
@@ -401,7 +400,7 @@ waitfork(pid)
   return wstat;
 }
 
-public void
+void
 checkfork()
 {
   int wpid;
@@ -424,7 +423,7 @@ checkfork()
  *        return (using waitfork). Exec either returns T or ERROR depending
  *        success or failure for some reason.
  */
-private LISPT
+static LISPT
 exec(name, command)
   char *name;
   LISPT command;
@@ -461,7 +460,7 @@ exec(name, command)
  * ifexec - Returns non-zero if directory DIR contains a NAME that is
  *          executable.
  */
-private int
+static int
 ifexec(dir, name)
   char *dir, *name;
 {
@@ -478,7 +477,7 @@ ifexec(dir, name)
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */
-private BITS32
+static BITS32
 hashfun(str)
   register char *str;
 {
@@ -501,7 +500,7 @@ hashfun(str)
  *               the path, 1 if the command was successively run and -1 if 
  *               there was some error.
  */
-public int
+int
 execcommand(exp, res)
   LISPT exp;
   LISPT *res;
@@ -554,7 +553,7 @@ execcommand(exp, res)
  * setenviron - Set environmet variable VAR to VAL. No sorting of the 
  *              entries is done.
  */
-private void
+static void
 setenviron(var, val)
   char *var, *val;
 {
@@ -587,7 +586,7 @@ setenviron(var, val)
   (void) putenv(env);
 #else
   (void) setenv(var, val, 1);
-#endif PUTENV
+#endif
 }
 
 /* Primitives */
@@ -801,7 +800,8 @@ PRIMITIVE jobs()
 
   for (j = joblist; j; j = j->next)
     printjob(j);
-#endif JOB_CONTROL
+#endif
+  return C_NIL;
 }
 
 PRIMITIVE fg(job)
@@ -814,7 +814,7 @@ PRIMITIVE fg(job)
 
   if (ISNIL(job))
     {
-      for (j = joblist; j; j->next)
+      for (j = joblist; j; j = j->next)
         if (WIFSTOPPED(j->status)) break;
     }
   else
@@ -825,7 +825,7 @@ PRIMITIVE fg(job)
     }
   if (j)
     {
-      pgrp = getpgrp(j->procid);
+      pgrp = getpgid(j->procid);
       j->running = 1;
       printjob(j);
       end_term();
@@ -839,7 +839,7 @@ PRIMITIVE fg(job)
       return mknumber((long) _WSTATUS(status));
     }
   return error(NO_SUCH_JOB, job);
-#endif JOB_CONTROL
+#endif
 }
 
 PRIMITIVE bg(job)
@@ -851,7 +851,7 @@ PRIMITIVE bg(job)
 
   if (ISNIL(job))
     {
-      for (j = joblist; j; j->next)
+      for (j = joblist; j; j = j->next)
         if (!j->background) break;
     }
   else
@@ -862,7 +862,7 @@ PRIMITIVE bg(job)
     }
   if (j)
     {
-      pgrp = getpgrp(j->procid);
+      pgrp = getpgid(j->procid);
       j->status = 0;
       j->running = 1;
       printjob(j);
@@ -874,10 +874,10 @@ PRIMITIVE bg(job)
       return C_T;
     }
   return error(NO_SUCH_JOB, job);
-#endif JOB_CONTROL
+#endif
 }
 
-PRIMITIVE setenv(var, val)
+PRIMITIVE p_setenv(var, val)
   LISPT var, val;
 {
   CHECK2(var, STRING, SYMBOL);
@@ -950,7 +950,7 @@ PRIMITIVE doexec(cmd)
   return C_NIL;
 }
 
-public void
+void
 init_exec()
 {
   mkprim(PN_EXPAND,    expand,     3, SUBR);
@@ -965,7 +965,7 @@ init_exec()
   mkprim(PN_JOBS,      jobs,       0, FSUBR);
   mkprim(PN_FG,        fg,         1, FSUBR);
   mkprim(PN_BG,        bg,         1, FSUBR);
-  mkprim(PN_SETENV,    setenv,     2, FSUBR);
+  mkprim(PN_SETENV,    p_setenv,   2, FSUBR);
   mkprim(PN_GETENV,    getenviron, 1, FSUBR);
   mkprim(PN_EXEC,      doexec,    -1, FSUBR);
   (void) rehash();

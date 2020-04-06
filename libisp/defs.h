@@ -1,9 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
+#pragma once
+
 #define PN_RECLAIM	"reclaim"       /* initiate garbage collection */
 #define PN_CONS		"cons"          /* make a new cons cell */
 #define PN_PLUS		"+"             /* add */

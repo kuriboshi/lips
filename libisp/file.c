@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
@@ -14,15 +14,12 @@
 static char rcsid[] = "$Id$";
 #endif
 
-#ifdef SARGASSO
-public FILE *primin;
-public FILE *primout;
-public FILE *primerr;
-#else
-public FILE *primin = stdin;
-public FILE *primout = stdout;
-public FILE *primerr = stderr;
-#endif SARGASSO
+extern int getch();
+extern void putch();
+
+FILE *primin;
+FILE *primout;
+FILE *primerr;
 
 PRIMITIVE xratom(file)
   LISPT file;
@@ -68,7 +65,7 @@ PRIMITIVE xprint(x, file)
   return print(x, FILEVAL(file));
 }
 
-public int loadfile(lf)
+int loadfile(lf)
   char *lf;
 {
   FILE *foo;
@@ -147,7 +144,7 @@ PRIMITIVE plevel(newl)
 PRIMITIVE spaces(n,file)
   LISPT n,file;
 {
-  register i;
+  int i;
   FILE *f;
 
   CHECK(n,INTEGER);
@@ -256,7 +253,7 @@ PRIMITIVE cpprint(oname, file)
   return error(NOT_PRINTABLE, oname);
 }
 
-public void init_file()
+void init_file()
 {
   mkprim(PN_LOAD,     load , 1, SUBR);
   mkprim(PN_PRIN1,    prin1, 2, SUBR);
@@ -270,9 +267,7 @@ public void init_file()
   mkprim(PN_SPACES,   spaces, 2, SUBR);
   mkprim(PN_TERPRI,   xterpri, 1, SUBR);
   mkprim(PN_CPPRINT,  cpprint, 2, SUBR);
-#ifdef SARGASSO
   primin = stdin;
   primout = stdout;
   primerr = stderr;
-#endif SARGASSO
 }

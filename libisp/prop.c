@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -80,7 +80,7 @@ PRIMITIVE remprop(a, p)
   return r;
 }
 
-public void init_prop()
+void init_prop()
 {
   mkprim(PN_SETPLIST, setplist, 2, SUBR);
   mkprim(PN_GETPLIST, getplist, 1, SUBR);

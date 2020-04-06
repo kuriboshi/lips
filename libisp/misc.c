@@ -1,23 +1,22 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
+#include <errno.h>
 #include "lisp.h"
 
 #ifndef lint
 static char rcsid[] = "$Id$";
 #endif
 
-extern char *sys_errlist[];
-extern int errno;
+extern void toploop();
+long trace;
 
-public long trace;
-
-private char *messages[MAXMESSAGE];
+static char *messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
-private char *errmess[] = {
+static char *errmess[] = {
   "Not NIL",            "Not a symbol",
   "Not an integer",     "Not a bignum",
   "Not a float",        "Not indirect",
@@ -68,7 +67,7 @@ PRIMITIVE freecount()
   return mknumber((long) i);
 }
 
-public LISPT
+LISPT
 error(messnr, arg)
   int messnr;
   LISPT arg;
@@ -81,7 +80,7 @@ error(messnr, arg)
   return C_ERROR;
 }
 
-public LISPT
+LISPT
 syserr(fault)
   LISPT fault;
 {
@@ -94,15 +93,15 @@ syserr(fault)
   (void) fprintf(stderr, "system error");
 #else
   (void) fprintf(stderr, "%s", sys_errlist[errno]);
-#endif SARGASSO
+#endif
   return C_ERROR;
 }
 
 #include <setjmp.h>
-private LISPT pexp;
+static LISPT pexp;
 extern jmp_buf toplevel;
 
-private int
+static int
 dobreak(com)
   LISPT *com;
 {
@@ -135,7 +134,7 @@ dobreak(com)
   return 1;
 }
 
-public LISPT
+LISPT
 break0(exp)
   LISPT exp;
 {
@@ -144,7 +143,7 @@ break0(exp)
   return pexp;
 }
 
-public void
+void
 init_debug()
 {
   mkprim(PN_FREECOUNT, freecount, 0, SUBR);

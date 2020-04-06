@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -14,7 +14,7 @@ extern void finish();
 
 USESAVE
 
-private int count;
+static int count;
 
 /*
  * mkprim - Define the primitive with print name PNAME, to be the
@@ -22,7 +22,7 @@ private int count;
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-public void
+void
 mkprim(pname, fname, nrpar, type)
   char *pname;
   LISPT (*fname)();
@@ -43,7 +43,7 @@ mkprim(pname, fname, nrpar, type)
  * nth - Return the N'th element in the list LIST. If N is greater than 
  *       the length of LIST,  return NIL.
  */
-public LISPT
+LISPT
 nth(list, n)
   LISPT list;
   long n;
@@ -61,7 +61,7 @@ nth(list, n)
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
  *              indirect object,  return it.
  */
-private LISPT
+static LISPT
 mkindirect(obj)
   LISPT obj;
 {
@@ -86,7 +86,7 @@ mkindirect(obj)
  * closobj - builds a list of indirect pointers to the values of the 
  *           symbols in the list VARS. Used to construct a closure.
  */
-public LISPT
+LISPT
 closobj(vars)
   register LISPT vars;
 {
@@ -105,7 +105,7 @@ closobj(vars)
  *             nospread function. COUNT is set to the number of arguments
  *             and is negative if halfspread or nospread.
  */
-private LISPT
+static LISPT
 mkarglis(alist)
   LISPT alist;
 {
@@ -127,7 +127,7 @@ mkarglis(alist)
  * mklambda - Make a lambda object with the argument ARGS and definition 
  *            DEF and the type TYPE,  wich is LAMBDA or NLAMBDA.
  */
-public LISPT
+LISPT
 mklambda(args, def, type)
   LISPT args, def;
   int type;
@@ -501,7 +501,7 @@ PRIMITIVE uxexit(status)
   return C_NIL;
 }
 
-public void
+void
 init_prim()
 {
   mkprim(PN_ATOM,    atom,     1, SUBR);

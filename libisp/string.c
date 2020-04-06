@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -91,9 +91,9 @@ PRIMITIVE xstrlen(s)
 PRIMITIVE substr(str, start, end)
   LISPT str, start, end;
 {
-  register size;
-  register s, e;
-  register char *ns;
+  int size;
+  int s, e;
+  char *ns;
   LISPT sl;
 
   CHECK(str,STRING);
@@ -115,7 +115,7 @@ PRIMITIVE substr(str, start, end)
   return mkstring (ns);
 }
 
-public void
+void
 init_string()
 {
   mkprim(PN_STRINGP, stringp,  1, SUBR);

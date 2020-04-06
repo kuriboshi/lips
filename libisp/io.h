@@ -1,9 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
+#pragma once
+
 #define SEPR         001        /* seperator */
 #define BRK          002        /* break character */
 #define INSERT       004        /* insert read macro */

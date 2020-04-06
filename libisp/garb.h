@@ -1,11 +1,14 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
+#pragma once
 
-extern LISPT top, rstack, history, histnum, fun, exp;
+#include "func.h"
+
+extern LISPT top, rstack, history, histnum, fun, expression;
 extern LISPT args, path, home, verboseflg, promptform, brkprompt, topprompt;
 extern LISPT alias_expanded, interactive, version;
 
@@ -20,7 +23,7 @@ LISPT * markobjs[] =
   & history,
   & histnum,
   & fun,
-  & exp,
+  & expression,
   & args,
   & path,
   & home,

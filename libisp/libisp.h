@@ -1,9 +1,10 @@
 /*
  * Lips, lisp shell.
- * Copyright 1992, Krister Joas.
+ * Copyright 1992, 2020 Krister Joas.
  *
  * $Id$
  */
+#pragma once
 
 typedef struct lispt *LISPT;
 

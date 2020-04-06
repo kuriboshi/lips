@@ -1,12 +1,14 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
 /*
  * alloc.c
  */
+#pragma once
+
 /* variables */
 extern LISPT savearray[];
 extern int savept;
@@ -32,7 +34,7 @@ extern void init_arith();
  */
 /* variables */
 extern LISPT fun;
-extern LISPT exp;
+extern LISPT expression;
 extern LISPT args;
 extern struct destblock *env;
 extern struct destblock *dest;
@@ -51,7 +53,7 @@ extern FILE *primin;
 extern FILE *primout;
 extern FILE *primerr;
 /* functions */
-extern void init_file();
+/*extern void init_file();*/
 
 /*
  * init.c
@@ -67,7 +69,7 @@ extern LISPT version;
 extern void init_lisp();
 
 /*
- * logic.h
+ * logic.c
  */
 /* functions */
 extern void init_logic();

@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
@@ -400,7 +400,7 @@ PRIMITIVE minusp(x)
     return error(ILLEGAL_ARG, x);
 }
 
-public void
+void
 init_arith()
 {
   mkprim(PN_PLUS,        plus,        -1, SUBR);

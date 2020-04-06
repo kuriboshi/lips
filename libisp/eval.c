@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
@@ -16,39 +16,40 @@ extern jmp_buf toplevel;
 extern int brkflg;
 extern int interrupt;
 extern LISPT findalias();
+extern void pputc();
 
-public void (*breakhook)();	/* Called before going into break. */
-public int (*undefhook)();	/* Called in case of undefined function. */
+void (*breakhook)();            /* Called before going into break. */
+int (*undefhook)();             /* Called in case of undefined function. */
 
 /* 
  * These variables are really local to this file but are needed
  * by the garbage collector.
  */
-public LISPT fun;		/* Store current function beeing evaluated. */
-public LISPT exp;		/* Current expression. */
-public LISPT args;		/* Current arguments. */
-public struct destblock *env;	/* Current environment. */
-public struct destblock *dest;	/* Current destination beeing built. */
+LISPT fun;                      /* Store current function beeing evaluated. */
+LISPT expression;               /* Current expression. */
+LISPT args;                     /* Current arguments. */
+struct destblock *env;          /* Current environment. */
+struct destblock *dest;         /* Current destination beeing built. */
 
-public CONTROL control;		/* Control-stack. */
-public int toctrl;		/* Control-stack stack pointer. */
+CONTROL control;		/* Control-stack. */
+int toctrl;                     /* Control-stack stack pointer. */
 
-private int peval();
-private int peval1();
-private int peval2();
-private int ev0(), ev1(), ev2(), ev3(), ev4(), evlam1(), evlam0();
-private int ev9(), ev11(), ev3p();
-private int evalargs(), noevarg(), evlam(), spread();
-private int evlis(), evlis1(), evlis2(), evlis3(), evlis4();
-private int noev9();
-private int evsequence(), evseq1(), evseq3();
-private int evclosure(), evclosure1();
-private int eval0(), apply0();
-private int everr();
-private int lookup();
+static int peval();
+static int peval1();
+static int peval2();
+static int ev0(), ev1(), ev2(), ev3(), ev4(), evlam1(), evlam0();
+static int ev9(), ev11(), ev3p();
+static int evalargs(), noevarg(), evlam(), spread();
+static int evlis(), evlis1(), evlis2(), evlis3(), evlis4();
+static int noev9();
+static int evsequence(), evseq1(), evseq3();
+static int evclosure(), evclosure1();
+static int eval0(), apply0();
+static int everr();
+static int lookup();
 
-private int noeval;		/* Don't evaluate arguments. */
-private int (*cont)();		/* Current continuation. */
+static int noeval;		/* Don't evaluate arguments. */
+static int (*cont)();		/* Current continuation. */
 
 /*
  * This macro prints an error message, and sets up a call
@@ -125,7 +126,7 @@ private int (*cont)();		/* Current continuation. */
 /* Just a convenience macro. */
 #define CALL            (*(SUBRVAL(fun).function))
 
-private LISPT printwhere()
+static LISPT printwhere()
 {
   LISPT foo;
   int i;
@@ -152,7 +153,7 @@ out:
   return foo;
 }
 
-private overflow()
+static void overflow()
 { 
   ABORT(STACK_OVERFLOW, C_NIL);
 }
@@ -161,7 +162,7 @@ private overflow()
  * Make a call to the function in parameter `fun'.  It can handle
  * functions with up to three arguments.
  */
-private LISPT call(fun)
+static LISPT call(fun)
   LISPT fun;
 {
   register LISPT foo;
@@ -203,7 +204,7 @@ PRIMITIVE eval(expr)
    * Set the current expression to `expr' and push the current
    * destination onto the control stack.  (Why isn't `exp' pushed?)
    */
-  exp = expr;
+  expression = expr;
   PUSH_POINT(dest);
   /* 
    * The result of evalutating `expr' is stored in the destination,
@@ -232,7 +233,7 @@ PRIMITIVE eval(expr)
   return foo;
 }
 
-private eval0()
+static int eval0()
 {
   dfree(dest);
   return 1;
@@ -253,7 +254,7 @@ PRIMITIVE apply(f, a)
   fun = f;
   PUSH_LISP(args);
   args = a;
-  exp = cons(f, a);
+  expression = cons(f, a);
   PUSH_FUNC(apply0);
   cont = peval2;
   while (!(*cont)())
@@ -263,7 +264,7 @@ PRIMITIVE apply(f, a)
   return foo;
 }
 
-private apply0()
+static int apply0()
 {
   dfree(dest);
   args = POP_LISP;
@@ -271,7 +272,7 @@ private apply0()
   return 1;
 }
 
-private ev0()
+static int ev0()
 {
   /* 
    * Discard the top of stack (it's the previous expression, see
@@ -283,20 +284,20 @@ private ev0()
   return 0;
 }
 
-private peval()
+static int peval()
 {
 #ifdef TRACE
-  if (trace) xprint(exp, C_T);
+  if (trace) xprint(expression, C_T);
 #endif /* TRACE */
-  PUSH_LISP(exp);
+  PUSH_LISP(expression);
   PUSH_FUNC(ev0);
-  switch (TYPEOF(exp))
+  switch (TYPEOF(expression))
     {
     case CONS:
       PUSH_LISP(fun);
-      fun = CAR(exp);
+      fun = CAR(expression);
       PUSH_LISP(args);
-      args = CDR(exp);
+      args = CDR(expression);
       PUSH_FUNC(ev1);
       cont = peval1;
       break;
@@ -304,25 +305,25 @@ private peval()
       cont = lookup;
       break;
     case INDIRECT:
-      SEND(INDIRECTVAL(exp));
+      SEND(INDIRECTVAL(expression));
       cont = POP_FUNC;
       break;
     case CVARIABLE:
-      SEND(*CVARVAL(exp));
+      SEND(*CVARVAL(expression));
       cont = POP_FUNC;
       break;
     case FREE:
-      ABORT(CORRUPT_DATA, exp);
+      ABORT(CORRUPT_DATA, expression);
       break;
     default:
-      SEND(exp);
+      SEND(expression);
       cont = POP_FUNC;
       break;
     }
   return 0;
 }
 
-private ev1()
+static int ev1()
 {
   args = POP_LISP;
   fun = POP_LISP;
@@ -330,7 +331,7 @@ private ev1()
   return 0;
 }
 
-private int
+static int
 evalhook(exp)
   LISPT exp;
 {
@@ -364,38 +365,38 @@ do_unbound(continuation)
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
-  al = getprop(CAR(exp), C_AUTOLOAD);
+  al = getprop(CAR(expression), C_AUTOLOAD);
   if (!ISNIL(al))
     {
-      PUSH_LISP(exp);
+      PUSH_LISP(expression);
       PUSH_POINT(dest);
       (void) load(al);
       dest = (struct destblock *) POP_POINT;
-      exp = POP_LISP;
-      fun = SYMVALUE(CAR(exp));
+      expression = POP_LISP;
+      fun = SYMVALUE(CAR(expression));
       if (TYPEOF(fun) == UNBOUND)
 	{
-	  if (!evalhook(exp))
-	    BREAK(UNDEF_FUNCTION, CAR(exp), continuation);
+	  if (!evalhook(expression))
+	    BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
 	}
       else
         cont = continuation;
     }
   else
     {
-      exp = findalias(exp);
-      if (EQ(exp, C_ERROR))
+      expression = findalias(expression);
+      if (EQ(expression, C_ERROR))
         ABORT(NO_MESSAGE, C_NIL);
-      if (TYPEOF(exp) == CONS && TYPEOF(CAR(exp)) == SYMBOL
-	  && TYPEOF(SYMVALUE(CAR(exp))) == UNBOUND)
+      if (TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL
+	  && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
 	{
-	  if (!evalhook(exp))
-	    BREAK(UNDEF_FUNCTION, CAR(exp), continuation);
+	  if (!evalhook(expression))
+	    BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
         }
       else
         {
-          fun = CAR(exp);
-          args = CDR(exp);
+          fun = CAR(expression);
+          args = CDR(expression);
           cont = continuation;
         }
     }
@@ -404,22 +405,22 @@ do_unbound(continuation)
 int do_default(continuation)
   int (*continuation)();
 {
-  exp = findalias(exp);
-  if (EQ(exp, C_ERROR))
+  expression = findalias(expression);
+  if (EQ(expression, C_ERROR))
     ABORT(NO_MESSAGE, C_NIL);
-  if (TYPEOF(exp) == CONS && TYPEOF(CAR(exp)) == SYMBOL
-      && TYPEOF(SYMVALUE(CAR(exp))) == UNBOUND)
+  if (TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL
+      && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
     {
-      if (!evalhook(exp))
-	BREAK(UNDEF_FUNCTION, CAR(exp), continuation);
+      if (!evalhook(expression))
+	BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
       return 1;
     }
   else return 0;
 }
 
-private peval1()
+static int peval1()
 {
-  register foo;
+  register int foo;
 
   if (brkflg) BREAK(KBD_BREAK, fun, peval1)
   else if (interrupt)
@@ -471,7 +472,7 @@ private peval1()
       break;
     case CONS:
     case INDIRECT:
-      exp = fun;
+      expression = fun;
       PUSH_FUNC(ev3);
       cont = peval;
       break;
@@ -483,7 +484,7 @@ private peval1()
       do_unbound(peval1);
       break;
     case STRING:
-      if (!evalhook(exp))
+      if (!evalhook(expression))
 	BREAK(ILLEGAL_FUNCTION, fun, peval1);
       break;
     default:
@@ -494,9 +495,9 @@ private peval1()
   return 0;
 }
 
-private peval2()
+static int peval2()
 {
-  register foo;
+  register int foo;
 
   if (brkflg) BREAK(KBD_BREAK, fun, peval2)
   else switch(TYPEOF(fun))
@@ -528,7 +529,7 @@ private peval2()
       break;
     case CONS:
     case INDIRECT:
-      exp = fun;
+      expression = fun;
       PUSH_FUNC(ev3p);
       cont = peval;
       break;
@@ -540,7 +541,7 @@ private peval2()
       do_unbound(peval2);
       break;
     case STRING:
-      if (!evalhook(exp))
+      if (!evalhook(expression))
 	BREAK(ILLEGAL_FUNCTION, fun, peval2);
       break;
     default:
@@ -555,7 +556,7 @@ private peval2()
  * bt - Prints a backtrace of all expressions on the
  *    	stack.
  */
-public void
+void
 bt()
 {
   int op;
@@ -571,22 +572,22 @@ bt()
   printlevel = op;
 }
 
-private everr()
+static int everr()
 {
-  exp = break0(exp);
+  expression = break0(expression);
   cont = POP_FUNC;		/* Discard one continuation. */
   cont = POP_FUNC;
   return 0;
 }
 
-private noevarg()
+static int noevarg()
 {
   args = RECEIVE;
   cont = spread;
   return 0;
 }
 
-private evalargs()
+static int evalargs()
 {
   if (ISNIL(args))
     {
@@ -594,7 +595,7 @@ private evalargs()
     }
   else
     {
-      exp = CAR(args);
+      expression = CAR(args);
       if (noeval)
         cont = noev9;
       else
@@ -603,7 +604,7 @@ private evalargs()
   return 0;
 }
 
-private ev9()
+static int ev9()
 {
   if (ISNIL(CDR(args)))
     {
@@ -617,35 +618,35 @@ private ev9()
   return 0;
 }
 
-private ev11()
+static int ev11()
 {
   NEXT;
   args = CDR(args);
-  exp = CAR(args);
+  expression = CAR(args);
   cont = ev9;
   return 0;
 }
 
-private noev9()
+static int noev9()
 {
 nextarg:
   if (ISNIL(CDR(args)))
     {
-      SEND(exp);
+      SEND(expression);
       cont = POP_FUNC;
     }
   else
     {
-      SEND(exp);
+      SEND(expression);
       NEXT;
       args = CDR(args);
-      exp = CAR(args);
+      expression = CAR(args);
       goto nextarg;
     }
   return 0;
 }
 
-private evlis()
+static int evlis()
 {
   if (ISNIL(args))
     {
@@ -653,13 +654,13 @@ private evlis()
     }
   else
     {
-      exp = CAR(args);
+      expression = CAR(args);
       cont = evlis1;
     }
   return 0;
 }
 
-private evlis1()
+static int evlis1()
 {
   if (ISNIL(CDR(args)))
     {
@@ -674,7 +675,7 @@ private evlis1()
   return 0;
 }
 
-private evlis2()
+static int evlis2()
 {
   LISPT x;
   
@@ -684,18 +685,18 @@ private evlis2()
   return 0;
 }
 
-private evlis3()
+static int evlis3()
 {
   PUSH_POINT(dest);
   dest = MKDESTBLOCK(1);
   PUSH_FUNC(evlis4);
   args = CDR(args);
-  exp = CAR(args);
+  expression = CAR(args);
   cont = evlis1;
   return 0;
 }
 
-private evlis4()
+static int evlis4()
 {
   register LISPT x;
   
@@ -708,14 +709,14 @@ private evlis4()
   return 0;
 }
 
-private evlam()
+static int evlam()
 {
   register int i;
   register int ac;
   register int spr;
   register LISPT foo;
 
-  PUSH_LISP(exp);
+  PUSH_LISP(expression);
   PUSH_POINT(env);
   PUSH_POINT(dest);
   spr = 0;
@@ -744,7 +745,7 @@ private evlam()
   return 0;
 }
 
-private spread()
+static int spread()
 {
 respread:
   if (EQ(args, C_NIL))
@@ -766,7 +767,7 @@ respread:
   return 0;
 }
 
-private ev2()
+static int ev2()
 {
   register LISPT foo;
 
@@ -786,7 +787,7 @@ private ev2()
   return 0;
 }
 
-private ev3()
+static int ev3()
 {
   fun = RECEIVE;
   PUSH_FUNC(ev4);
@@ -794,7 +795,7 @@ private ev3()
   return 0;
 }
 
-private ev3p()
+static int ev3p()
 {
   fun = RECEIVE;
   PUSH_FUNC(ev4);
@@ -802,13 +803,13 @@ private ev3p()
   return 0;
 }
 
-private ev4()
+static int ev4()
 {
   cont = POP_FUNC;
   return 0;
 }
 
-private Link()
+static void Link()
 {
   register long i;
   register LISPT t;
@@ -824,7 +825,7 @@ private Link()
     }
 }
 
-private evlam1()
+static int evlam1()
 {
   Link();
   dest = (struct destblock *) POP_POINT;
@@ -834,7 +835,7 @@ private evlam1()
   return 0;
 }
 
-private  unLink()
+static void unLink()
 {
   register long i;
   register struct destblock *c;
@@ -844,16 +845,16 @@ private  unLink()
     SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
-private evlam0()
+static int evlam0()
 {
   unLink();
   UNLINK;
-  exp = POP_LISP;
+  expression = POP_LISP;
   cont = POP_FUNC;
   return 0;
 }
 
-public void unwind()
+void unwind()
 {
   while (env != NULL)
     {
@@ -862,15 +863,15 @@ public void unwind()
     }
 }
 
-private lookup()
+static int lookup()
 {
   register LISPT t;
 
-  t = SYMVALUE(exp);
+  t = SYMVALUE(expression);
   switch (TYPEOF(t))
     {
       case UNBOUND:
-        BREAK(UNBOUND_VARIABLE, exp, lookup);
+        BREAK(UNBOUND_VARIABLE, expression, lookup);
         return 0;
         break;
       case INDIRECT:
@@ -887,7 +888,7 @@ private lookup()
   return 0;
 }
 
-private evclosure()
+static int evclosure()
 {
   register LISPT foo;
   register int i;
@@ -914,7 +915,7 @@ private evclosure()
   return 0;
 }
 
-private evclosure1()
+static int evclosure1()
 {
   unLink();
   UNLINK;
@@ -922,7 +923,7 @@ private evclosure1()
   return 0;
 }
 
-private evsequence()
+static int evsequence()
 {
   if (EQ(args, C_NIL))
     {
@@ -930,13 +931,13 @@ private evsequence()
     }
   else
     {
-      exp = CAR(args);
+      expression = CAR(args);
       cont = evseq1;
     }
   return 0;
 }
 
-private evseq1()
+static int evseq1()
 {
   if (EQ(CDR(args), C_NIL))
     {
@@ -950,10 +951,10 @@ private evseq1()
   return 0;
 }
 
-private evseq3()
+static int evseq3()
 {
   args = CDR(args);
-  exp = CAR(args);
+  expression = CAR(args);
   cont = evseq1;
   return 0;
 }
@@ -1040,7 +1041,7 @@ PRIMITIVE baktrace()
   return C_NIL;
 }
 
-public void init_ev()
+void init_ev()
 {
   mkprim(PN_E,         eval,      1, FSUBR);
   mkprim(PN_EVAL,      eval,      1, SUBR);

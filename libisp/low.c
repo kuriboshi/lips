@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -10,7 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-public LISPT verboseflg;
+LISPT verboseflg;
 
 /*
 Dummy definition for cpprint.
@@ -106,10 +106,12 @@ PRIMITIVE prog2(a1, a2, la)
   return a2;
 }
 
+#if 0
 PRIMITIVE topofstack()
 {
   return env;
 }
+#endif
 
 PRIMITIVE envget(e, n)
   LISPT e, n;
@@ -133,7 +135,7 @@ PRIMITIVE envget(e, n)
 #endif
 }
 
-public void init_low()
+void init_low()
 {
   mkprim(PN_SET,        set,         2, SUBR);
   mkprim(PN_SETQ,       setq,        2, FSUBR);
@@ -143,7 +145,9 @@ public void init_low()
   mkprim(PN_PROGN,      progn,      -1, FSUBR);
   mkprim(PN_PROG1,      prog1,      -2, SUBR);
   mkprim(PN_PROG2,      prog2,      -3, SUBR);
+#if 0
   mkprim(PN_TOPOFSTACK, topofstack,  0, SUBR);
+#endif
   mkprim(PN_ENVGET,     envget,      2, SUBR);
   initcvar(&verboseflg, "verboseflg", C_NIL);
 }

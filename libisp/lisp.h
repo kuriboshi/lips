@@ -1,9 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
+#pragma once
+
 /* 
  * This header file is private to the libisp libray.  Applications using
  * libisp should only include libisp.h.
@@ -14,11 +16,8 @@
 
 #include <libisp.h>
 
-#define public
-#define forward
-#define private static
 /* This is used to recognize c-functions for cpprint */
-#define PRIMITIVE public LISPT
+#define PRIMITIVE LISPT
 
 enum lisp_type {
   NIL = 0,			/* so that NULL also becomes NIL */
@@ -52,7 +51,7 @@ enum lisp_type {
 
 #ifdef SHORT
 #include "shortc.h"
-#endif SHORT
+#endif
 
 /*
  * Some more or less helpfull macros.

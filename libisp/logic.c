@@ -1,10 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
 #include "lisp.h"
+#include "func.h"
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -63,7 +64,7 @@ PRIMITIVE xif(pred, true, false)
     return eval(true);
 }
 
-public void init_logic()
+void init_logic()
 {
   mkprim(PN_AND, and, -1, FSUBR);
   mkprim(PN_OR,  or,  -1, FSUBR);

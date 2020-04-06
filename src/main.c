@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -15,12 +15,14 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <sys/file.h>
-#endif SARGASSO
+#include <unistd.h>
+#include <stdlib.h>
+#endif
 #include "lips.h"
 #ifdef SELECT
 #include <sys/types.h>
 #include <sys/time.h>
-#endif SELECT
+#endif
 
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
@@ -30,24 +32,23 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern int fflush(), setjmp(), free();
-extern char *getenv();
 extern void init_term();
 extern void end_term();
 extern void clearlbuf();
+extern void loadbuf();
 
 extern int optind;              /* For getopt. */
 extern char *optarg;            /* This too. */
 
-public jmp_buf toplevel;       	/* Panic return point. */
-public char *progname;          /* Name of the game. */
-public int brkflg;              /* 1 means break at next call to peval1. */
-public int interrupt;
-public int mypgrp;              /* lips process group. */
-public struct options options;  /* Structure for all options. */
-public LISPT path;              /* Search path for executables. */
-public LISPT home;              /* Home directory. */
-public LISPT globsort;		/* To sort or not during globbing. */
+jmp_buf toplevel;       	/* Panic return point. */
+char *progname;          /* Name of the game. */
+int brkflg;              /* 1 means break at next call to peval1. */
+int interrupt;
+int mypgrp;              /* lips process group. */
+struct options options;  /* Structure for all options. */
+LISPT path;              /* Search path for executables. */
+LISPT home;              /* Home directory. */
+LISPT globsort;		/* To sort or not during globbing. */
 
 /* graceful death */
 void finish(stat)
@@ -57,7 +58,7 @@ void finish(stat)
 }
 
 #ifdef FANCY_SIGNALS
-private int getuser(f, def)
+static int getuser(f, def)
   FILE *f;
   int def;
 {
@@ -71,8 +72,8 @@ private int getuser(f, def)
   timeout.tv_usec = 0;
   FD_ZERO (&readfs);
   FD_SET (0, &readfs);
-  switch (select(FD_SETSIZE, (int *) &readfs,
-                 (int *) NULL, (int *) NULL, &timeout))
+  switch (select(FD_SETSIZE, &readfs,
+                 NULL, NULL, &timeout))
     {
     case -1:
       (void) fprintf(primerr, "(error in select %d) ", errno);
@@ -88,7 +89,7 @@ private int getuser(f, def)
   return c;
 #else
   return getc(f);
-#endif SELECT
+#endif
 }
 
 /*
@@ -105,7 +106,7 @@ void core(sig)
   if (insidefork)
     {
       (void) fprintf(primerr, " -- (in fork) core dumped\n");
-      (void) killpg(getpgrp(0), sig);
+      (void) killpg(getpgrp(), sig);
     }
   (void) fprintf(primerr, " -- Continue? ");
   (void) fflush(primerr);
@@ -143,18 +144,18 @@ void core(sig)
       longjmp(toplevel, 5);
     }
 }
-#endif FANCY_SIGNALS
+#endif
 
 #ifdef SARGASSO
 int onintr(ppc, pregs)
   int ppc[1], pregs[17];
 #else
 void onintr()
-#endif SARGASSO
+#endif
 {
 #ifndef SARGASSO
   if (insidefork) exit(0);
-#endif SARGASSO
+#endif
   (void) fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
@@ -190,7 +191,7 @@ void onhup()
 {
   exit(0);
 }
-#endif FANCY_SIGNALS
+#endif
 
 /*
  * The stop key means to break inside a lisp expression. The
@@ -201,12 +202,12 @@ void onstop()
   brkflg = 1;
 }
 
-private void fixpgrp()
+static void fixpgrp()
 {
 #ifndef SARGASSO
-  mypgrp = getpgrp(0);
+  mypgrp = getpgrp();
   (void) ioctl(0, TIOCSPGRP, (char *) &mypgrp);
-#endif SARGASSO
+#endif
 }
 
 /*
@@ -256,10 +257,10 @@ promptfun()
    */
   checkfork();
   printdone();
-#endif SARGASSO
+#endif
 }
 
-private LISPT
+static LISPT
 put_end(list, obj, conc)
   LISPT list, obj;
   int conc;
@@ -280,7 +281,7 @@ put_end(list, obj, conc)
   return list;
 }
 
-private LISPT
+static LISPT
 transform(list)
   LISPT list;
 {
@@ -361,7 +362,7 @@ transform(list)
   return res;
 }
 
-private void
+static void
 init()
 {
   init_term();
@@ -369,7 +370,7 @@ init()
 #ifndef SARGASSO
   (void) signal(SIGTTIN, SIG_IGN);
   (void) signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
-#endif SARGASSO
+#endif
 
   fixpgrp();
 
@@ -379,7 +380,7 @@ init()
 #ifndef SARGASSO
   initcvar(&path,     "path",     mungepath(getenv("PATH")));
   initcvar(&home,     "home",     mkstring(getenv("HOME")));
-#endif SARGASSO
+#endif
 
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;
@@ -388,13 +389,13 @@ init()
 
 #ifndef SARGASSO
   init_exec();
-#endif SARGASSO
+#endif
 }
 
 /*
  * Loads the file INITFILE.
  */
-private void loadinit(initfile)
+static void loadinit(initfile)
   char *initfile;
 {
   if (loadfile(initfile))
@@ -425,12 +426,12 @@ LISPT greet(who)
   (void) strcpy(loadf, pws->pw_dir);
   (void) strcat(loadf, "/.lipsrc");
   (void) loadfile(loadf);
-#endif SARGASSO
+#endif
   return C_T;
 }
 
 /*ARGSUSED*/
-main(argc, argv)
+int main(argc, argv)
   int argc;
   char **argv;
 {
@@ -443,7 +444,7 @@ main(argc, argv)
   options.interactive = 1;
 #else
   options.interactive = 0;
-#endif SARGASSO
+#endif
   options.command = 0;
 #ifndef SARGASSO
   while ((option = getopt(argc, argv, "c:fvid")) != EOF) 
@@ -475,7 +476,7 @@ main(argc, argv)
   if (!options.interactive && !options.command)
     options.interactive = isatty(0) ? 1 : 0;
   if (options.version)
-#endif SARGASSO
+#endif
     (void) printf("%s\n", VERSION);
   progname = argv[0];
 
@@ -502,8 +503,8 @@ main(argc, argv)
       (void) signal(SIGEMT, onill);
       (void) signal(SIGBUS, onbus);
       (void) signal(SIGSEGV, onsegv);
-#endif FANCY_SIGNALS
-#endif SARGASSO
+#endif
+#endif
     }
   if (!options.fast)
     {

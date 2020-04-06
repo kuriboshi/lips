@@ -1,9 +1,11 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+* Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
+#pragma once
+
 /*
  * Defines where the source is.
  */
@@ -56,9 +58,9 @@
 #define SHORT
 #else
 #define GENERIC
-#endif SARGASSO
+#endif
 
 #ifdef pdp11
 #define SMALL
 #define SHORT
-#endif pdp11
+#endif

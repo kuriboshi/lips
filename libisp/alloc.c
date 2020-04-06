@@ -1,11 +1,12 @@
 /*
  * Lips, lisp shell
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  *
  */
 #include <string.h>
+#include <stdlib.h>
 #include "lisp.h"
 
 #ifndef SMALL
@@ -18,39 +19,38 @@
 #define DESTBLOCKSIZE	1000
 #define MINCONSES	1000
 #define SAVEARRAYSIZE	500
-#endif SMALL
+#endif
 
 #define NOCONSARGS	0	/* Don't reclaim arguments of cons. */
 #define CONSARGS	1	/* Reclaim called from cons. */
-
-extern char *malloc();
 
 #ifndef lint
 static char rcsid[] = "$Id$";
 #endif
 
-public LISPT savearray[SAVEARRAYSIZE];	/* Gc save */
-public int savept = 0;
-public OBARRAY
-  *obarray[MAXHASH];		/* Array containing global symbols */
-public LISPT freelist;		/* List of free cells */
+LISPT savearray[SAVEARRAYSIZE];	/* Gc save */
+int savept = 0;
+OBARRAY *obarray[MAXHASH];      /* Array containing global symbols */
+LISPT freelist;                 /* List of free cells */
 
-private LISPT gcgag;		/* Nonnil means print gc message. */
-private LISPT *foo1, *foo2;     /* Protect arguments of cons when gc. */
+extern void finish();
+
+static LISPT gcgag;		/* Nonnil means print gc message. */
+static LISPT *foo1, *foo2;      /* Protect arguments of cons when gc. */
 struct conscells {
   struct lispt cells[CONSCELLS];
   struct conscells *next;
 };
-private struct conscells
+static struct conscells
   *conscells;			/* Cons cell storage */
-private int nrconses;           /* Number of conses since last gc. */
-private struct destblock
+static int nrconses;            /* Number of conses since last gc. */
+static struct destblock
   destblock[DESTBLOCKSIZE];	/* Destblock area */
-private int destblockused;	/* Index to last slot in destblock */
+static int destblockused;	/* Index to last slot in destblock */
 
 #ifdef FLOATING
-private unsigned short point = 31;
-private int p0 = 0;
+static unsigned short point = 31;
+static int p0 = 0;
 
 /*
  * The structure floats contains the data for floating point values.
@@ -59,7 +59,7 @@ private int p0 = 0;
  * set. Marks are also used during gc. Then next pointer is not used
  * currently so the number of floats is limited to 128.
  */
-private struct floats
+static struct floats
 {
   long marks[4];
   double fdata[128];
@@ -73,7 +73,7 @@ private struct floats
  * safemalloc is defined in terms of realmalloc depending on
  * whether the `lint' is defined or not.
  */
-public char *
+char *
 realmalloc(size)
   unsigned int size;
 {
@@ -92,7 +92,7 @@ realmalloc(size)
  * newpage - Allocates a new block of cons cells and links it into the 
  *           current list of blocks.
  */
-private struct conscells *
+static struct conscells *
 newpage()
 {
   struct conscells *newp;
@@ -108,7 +108,7 @@ newpage()
  *         space allocated by malloc. These objects has the type field set 
  *         to NIL, and the rest of the field is the pointer.
  */
-private int
+static int
 sweep()
 {
   register LISPT f;
@@ -158,7 +158,7 @@ sweep()
  * mark - Mark a cell and traverse car and cdr of cons cells and all other
  *        fields of type LISPT.
  */
-private void
+static void
 mark(x)
   register LISPT *x;
 {
@@ -214,7 +214,7 @@ mark(x)
  *	       sweep up garbage.  Argument doconsargs is nonzero
  *	       
  */
-private LISPT
+static LISPT
 doreclaim(doconsargs, incr)
   int doconsargs;
   long incr;
@@ -285,6 +285,7 @@ doreclaim(doconsargs, incr)
   nrconses = 0;
   if (ISNIL(gcgag))
     (void) fprintf(primerr, "%d cells freed\n", nrfreed);
+  return C_NIL;
 }
 
 /*
@@ -307,7 +308,7 @@ PRIMITIVE reclaim(incr)
   return C_NIL;
 }
 
-public LISPT
+LISPT
 getobject ()
 {
   register LISPT f;
@@ -345,7 +346,7 @@ PRIMITIVE cons(a, b)
  * mkstring - Strings are stored in a cons cell with car set to NIL and
  *            cdr is set to the string pointer.
  */
-public LISPT
+LISPT
 mkstring(str)
   char *str;
 {
@@ -361,7 +362,7 @@ mkstring(str)
   return s;
 }
 
-public LISPT
+LISPT
 mknumber(i)
   long i;
 {
@@ -376,7 +377,7 @@ mknumber(i)
 /*
  * Calculates hash value of string.
  */
-private int
+static int
 hash(str)
   char *str;
 {
@@ -391,7 +392,7 @@ hash(str)
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-private LISPT
+static LISPT
 buildatom(s, cpy)
   char *s;
   int cpy;
@@ -424,7 +425,7 @@ buildatom(s, cpy)
  *           If the atom is already in obarray, no new atom is created.
  *           Copy str if CPY is non-zero. Returns the atom.
  */
-private LISPT
+static LISPT
 puthash(str, obarray, cpy)
   char *str;
   OBARRAY *obarray[];
@@ -456,7 +457,7 @@ puthash(str, obarray, cpy)
  * intern - Make interned symbol in hasharray obarray. Str is not copied
  *          so this is only used with constant strings during init.
  */
-public LISPT
+LISPT
 intern(str)
   char *str;
 {
@@ -466,7 +467,7 @@ intern(str)
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-public LISPT
+LISPT
 mkatom(str)
   char *str;
 {
@@ -477,7 +478,7 @@ mkatom(str)
 /*
  * mkfloat - Make a floating point number.
  */
-public LISPT
+LISPT
 mkfloat(num)
   double num;
 {
@@ -515,7 +516,7 @@ mkfloat(num)
  * dalloc - Allocates a destination block of size size. Returns NULL if
  *          no more space available.
  */
-public struct destblock *
+struct destblock *
 dalloc(size)
   int size;
 {
@@ -540,7 +541,7 @@ dalloc(size)
  *         stored in the cdr of the first element. If it isn't, look
  *         elsewhere.
  */
-public void
+void
 dfree(ptr)
   struct destblock *ptr;
 {
@@ -550,13 +551,13 @@ dfree(ptr)
 /*
  * dzero - Frees all destination blocks.
  */
-public void
+void
 dzero()
 {
   destblockused = 0;
 }
 
-public void
+void
 init_alloc()
 {
   destblockused = 0;

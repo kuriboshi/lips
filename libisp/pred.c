@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, Krister Joas
+ * Copyright 1988, 2020 Krister Joas
  *
  * $Id$
  */
@@ -170,7 +170,7 @@ PRIMITIVE xtypeof(a)
   return C_NIL;
 }
 
-public void init_pred()
+void init_pred()
 {
   mkprim(PN_LISTP,   listp,    1, SUBR);
   mkprim(PN_NLISTP,  nlistp,   1, SUBR);

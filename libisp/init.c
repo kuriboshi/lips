@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1989, Krister Joas
+ * Copyright 1989, 2020 Krister Joas
  *
  * $Id$
  */
@@ -11,27 +11,28 @@ static char rcsid[] = "$Id$";
 #endif
 
 extern char *VERSION;
+extern void init_file();
 
 /*
  * All lisp constants needed internally.
  */
-public LISPT C_T;
-public LISPT CE_NIL, CE_T;
-public LISPT C_ALIAS, C_APPEND, C_AUTOLOAD, C_BACK, C_BIGNUM, C_BROKEN;
-public LISPT C_BT, C_CLOSURE, C_CONS, C_DOT, C_ENDOFFILE, C_ENVIRON;
-public LISPT C_EOF, C_ERROR, C_EXEC, C_EXCL, C_FILE, C_FLOAT, C_FREE;
-public LISPT C_FROM, C_FSUBR, C_GO, C_INDIRECT, C_INTEGER;
-public LISPT C_LAMBDA, C_NLAMBDA, C_OLDDEF, C_OLDVAL, C_PIPE;
-public LISPT C_QUOTE, C_READ, C_REDEFINED, C_RESET, C_RETURN, C_STRING;
-public LISPT C_SUBR, C_SYMBOL, C_TO, C_TOTO, C_UNBOUND, C_WRITE;
-public LISPT C_BAR, C_GT, C_GGT, C_LT, C_SEMI, C_PROGN, C_AMPER;
+LISPT C_T;
+LISPT CE_NIL, CE_T;
+LISPT C_ALIAS, C_APPEND, C_AUTOLOAD, C_BACK, C_BIGNUM, C_BROKEN;
+LISPT C_BT, C_CLOSURE, C_CONS, C_DOT, C_ENDOFFILE, C_ENVIRON;
+LISPT C_EOF, C_ERROR, C_EXEC, C_EXCL, C_FILE, C_FLOAT, C_FREE;
+LISPT C_FROM, C_FSUBR, C_GO, C_INDIRECT, C_INTEGER;
+LISPT C_LAMBDA, C_NLAMBDA, C_OLDDEF, C_OLDVAL, C_PIPE;
+LISPT C_QUOTE, C_READ, C_REDEFINED, C_RESET, C_RETURN, C_STRING;
+LISPT C_SUBR, C_SYMBOL, C_TO, C_TOTO, C_UNBOUND, C_WRITE;
+LISPT C_BAR, C_GT, C_GGT, C_LT, C_SEMI, C_PROGN, C_AMPER;
 
-public LISPT currentbase;       /* Conversion base for print of integer. */
-public LISPT topprompt;         /* Normal prompt. */
-public LISPT promptform;        /* Evaluated before printing the prompt. */
-public LISPT brkprompt;         /* Prompt in break. */
-public LISPT interactive;       /* Nonnil if interactive lips. */
-public LISPT version;           /* Is set to the version string. */
+LISPT currentbase;       /* Conversion base for print of integer. */
+LISPT topprompt;         /* Normal prompt. */
+LISPT promptform;        /* Evaluated before printing the prompt. */
+LISPT brkprompt;         /* Prompt in break. */
+LISPT interactive;       /* Nonnil if interactive lips. */
+LISPT version;           /* Is set to the version string. */
 
 /*
  * Initializes a lisp symbol with the pname NAME to contain the same
@@ -39,7 +40,7 @@ public LISPT version;           /* Is set to the version string. */
  * Whenever CVAR is changed the corresponding lisp variable changes
  * and vice versa.
  */
-public void
+void
 initcvar(cvar, name, val)
   LISPT *cvar;
   char *name;
@@ -53,7 +54,7 @@ initcvar(cvar, name, val)
   *cvar = val;
 }
 
-public void
+void
 init_lisp()
 {
   init_alloc();
