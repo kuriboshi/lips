@@ -26,7 +26,6 @@ target_sources(libisp PRIVATE
   prim.c
   prop.c
   read.c
-  shortc.h
   string.c
   unix.c
   user.c
