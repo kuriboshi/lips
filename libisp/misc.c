@@ -89,11 +89,7 @@ syserr(fault)
       (void) prin2(fault, C_T);
       (void) fprintf(stderr, ": ");
     }
-#ifdef SARGASSO
-  (void) fprintf(stderr, "system error");
-#else
   (void) fprintf(stderr, "%s", sys_errlist[errno]);
-#endif
   return C_ERROR;
 }
 

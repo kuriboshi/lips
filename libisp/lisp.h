@@ -49,10 +49,6 @@ enum lisp_type {
   USER,				/* user defined type */
 };
 
-#ifdef SHORT
-#include "shortc.h"
-#endif
-
 /*
  * Some more or less helpfull macros.
  */

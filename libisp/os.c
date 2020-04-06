@@ -6,9 +6,6 @@
  */
 #include <stdio.h>
 #include <unistd.h>
-#ifdef SARGASSO
-#include <tops20.h>
-#endif
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -26,12 +23,7 @@ readchar(file, cp)
 {
   int i;
 
-#ifdef SARGASSO
-  if (ejsys(BIN, _PRIIN)) return 0;
-  *c = jsac[2];
-#else
   i = read(fileno(file), cp, 1);
   if (i != 1) return 0;
-#endif
   return 1;
 }

@@ -4,9 +4,7 @@
  *
  * $Id$
  */
-#ifndef SARGASSO
 #include <sys/ioctl.h>
-#endif
 #include <string.h>
 #include "lips.h"
 

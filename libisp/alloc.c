@@ -9,17 +9,10 @@
 #include <stdlib.h>
 #include "lisp.h"
 
-#ifndef SMALL
 #define CONSCELLS       1000    /* Number of cells in each block */
 #define DESTBLOCKSIZE   3000    /* Size of destination block area */
 #define MINCONSES       2000    /* Minimum number of cells after gc */
 #define SAVEARRAYSIZE   1000    /* Size of gc save array */
-#else
-#define CONSCELLS	1000
-#define DESTBLOCKSIZE	1000
-#define MINCONSES	1000
-#define SAVEARRAYSIZE	500
-#endif
 
 #define NOCONSARGS	0	/* Don't reclaim arguments of cons. */
 #define CONSARGS	1	/* Reclaim called from cons. */

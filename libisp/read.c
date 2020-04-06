@@ -667,11 +667,7 @@ static void pf(d, file)
 {
   char ss[30];
 
-#ifdef SARGASSO
-  (void) sprintf(ss, "%g", d);
-#else
   (void) sprintf(ss, "%#g", d);
-#endif
   ps(ss, file, 0);
 }
 

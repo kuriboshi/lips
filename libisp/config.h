@@ -50,17 +50,3 @@
  * If this isn't defined you can't read floating point numbers.
  */
 /* #define FLOATING */
-
-/*
- * The rest is automatic...
- */
-#ifdef SARGASSO
-#define SHORT
-#else
-#define GENERIC
-#endif
-
-#ifdef pdp11
-#define SMALL
-#define SHORT
-#endif

@@ -6,10 +6,6 @@
  */
 #include <ctype.h>
 #include <string.h>
-#ifdef SARGASSO
-#include <tops20.hdr>		/* For jsys'es. */
-#undef SAVE			/* Defined elsewhere. */
-#else
 #include <signal.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
@@ -17,7 +13,6 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <stdlib.h>
-#endif
 #include "lips.h"
 #ifdef SELECT
 #include <sys/types.h>
@@ -146,16 +141,9 @@ void core(sig)
 }
 #endif
 
-#ifdef SARGASSO
-int onintr(ppc, pregs)
-  int ppc[1], pregs[17];
-#else
 void onintr()
-#endif
 {
-#ifndef SARGASSO
   if (insidefork) exit(0);
-#endif
   (void) fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
@@ -204,10 +192,8 @@ void onstop()
 
 static void fixpgrp()
 {
-#ifndef SARGASSO
   mypgrp = getpgrp();
   (void) ioctl(0, TIOCSPGRP, (char *) &mypgrp);
-#endif
 }
 
 /*
@@ -248,7 +234,6 @@ onbreak()
 void
 promptfun()
 {
-#ifndef SARGASSO
   (void) ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
   init_term();
   insidefork = 0;
@@ -257,7 +242,6 @@ promptfun()
    */
   checkfork();
   printdone();
-#endif
 }
 
 static LISPT
@@ -367,29 +351,23 @@ init()
 {
   init_term();
 
-#ifndef SARGASSO
   (void) signal(SIGTTIN, SIG_IGN);
   (void) signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
-#endif
 
   fixpgrp();
 
   init_lisp();
   init_hist();
 
-#ifndef SARGASSO
   initcvar(&path,     "path",     mungepath(getenv("PATH")));
   initcvar(&home,     "home",     mkstring(getenv("HOME")));
-#endif
 
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;
   beforeprompt = promptfun;
   breakhook = onbreak;
 
-#ifndef SARGASSO
   init_exec();
-#endif
 }
 
 /*
@@ -409,7 +387,6 @@ static void loadinit(initfile)
 LISPT greet(who)
   LISPT who;
 {
-#ifndef SARGASSO
   struct passwd *pws;
   struct passwd *getpwent();
   char loadf[256];
@@ -426,7 +403,6 @@ LISPT greet(who)
   (void) strcpy(loadf, pws->pw_dir);
   (void) strcat(loadf, "/.lipsrc");
   (void) loadfile(loadf);
-#endif
   return C_T;
 }
 
@@ -440,13 +416,8 @@ int main(argc, argv)
   options.debug = 0;
   options.version = 0;
   options.fast = 0;
-#ifdef SARGASSO
-  options.interactive = 1;
-#else
   options.interactive = 0;
-#endif
   options.command = 0;
-#ifndef SARGASSO
   while ((option = getopt(argc, argv, "c:fvid")) != EOF) 
     {
       switch(option)
@@ -476,7 +447,6 @@ int main(argc, argv)
   if (!options.interactive && !options.command)
     options.interactive = isatty(0) ? 1 : 0;
   if (options.version)
-#endif
     (void) printf("%s\n", VERSION);
   progname = argv[0];
 
@@ -487,13 +457,6 @@ int main(argc, argv)
   interactive = options.interactive ? C_T : C_NIL;
   if (!options.debug && options.interactive)
     {
-#ifdef SARGASSO
-/*
-      _action(1, onintr);
-      (void) ejsys(ATI, 3//1);
-      _enable(1, 0, 2)
- */
-#else
       (void) signal(SIGINT, onintr);
       (void) signal(SIGHUP, SIG_DFL);
       (void) signal(SIGTSTP, onstop);
@@ -503,7 +466,6 @@ int main(argc, argv)
       (void) signal(SIGEMT, onill);
       (void) signal(SIGBUS, onbus);
       (void) signal(SIGSEGV, onsegv);
-#endif
 #endif
     }
   if (!options.fast)

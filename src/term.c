@@ -9,37 +9,16 @@
  * and file i/o.  Terminal i/o uses its own buffering and line editing.
  * It sets the terminal in cbreak and no echo mode.
  */
-#ifdef SARGASSO
-#include <tops20.hdr>
-#undef SAVE
-#else
 #include <sgtty.h>
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <term.h>
 #include <sys/time.h>
-#endif
 #include <string.h>
 #include "lips.h"
 
-#ifdef SARGASSO
-#define FFLUSH(file)
-#else
 #define FFLUSH(file)	(void) fflush(file)
-#endif
-
-/*
- * Sargasso doesn't have these, so we define them.
- */
-#ifdef SARGASSO
-#define CTRL(c) (c&037)
-#define CERASE 0177
-#define CRPRNT CTRL('r')
-#define CKILL CTRL('u')
-#define CEOF CTRL('d')
-#define BUFSIZ 1024
-#endif
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -77,14 +56,10 @@ extern int readchar();
 /*
  * Variables for terminal characteristics, old and new.
  */
-#ifdef SARGASSO
-static int oldmode, newmode;
-#else
 static struct sgttyb newterm, oldterm;
 static struct tchars newtchars, oldtchars;
 static struct ltchars newltchars, oldltchars;
 static int ldis;
-#endif
 
 static char linebuffer[BUFSIZ];        /* Line buffer for terminal input.  */
 static int parcount = 0;               /* Counts paranthesis.  */
@@ -144,10 +119,6 @@ init_keymap()
   key_tab['\n']    = T_NEWLINE;
   key_tab['\\']    = T_ESCAPE;
   key_tab['"']     = T_STRING;
-#ifdef SARGASSO
-  key_tab['\r']    = T_NEWLINE;
-  key_tab[CTRL('z')] = T_EOF;
-#endif
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -164,12 +135,6 @@ init_term()
 
   if (!initialized)
     {
-#ifdef SARGASSO
-      (void) ejsys(RFMOD, _PRIIN);
-      oldmode = jsac[2];
-      newmode = oldmode & (~0776100);
-      newmode |= 0170000;
-#else
       ndis = NTTYDISC;
       (void) ioctl(0, TIOCGETP, &oldterm);
       (void) ioctl(0, TIOCGETC, &oldtchars);
@@ -181,7 +146,6 @@ init_term()
       newterm.sg_flags = (newterm.sg_flags & ~ECHO) | CBREAK;
       newtchars = oldtchars;
       newltchars = oldltchars;
-#endif
 #ifdef TERMCAP
       curup = NULL;
       curfwd = NULL;
@@ -198,32 +162,22 @@ init_term()
               nocap = 0;
           }
 #endif
-#ifndef SARGASSO
       if (ldis != NTTYDISC)
         (void) ioctl(0, TIOCSETD, &ndis);
-#endif
       init_keymap();
       initialized = 1;
     }
-#ifdef SARGASSO
-  (void) ejsys(SFMOD, _PRIIN, newmode);
-#else
   (void) ioctl(0, TIOCSETN, &newterm);
   (void) ioctl(0, TIOCSETC, &newtchars);
   (void) ioctl(0, TIOCSLTC, &newltchars);
-#endif
 }
 
 /* Reset terminal to previous value */
 void end_term()
 {
-#ifdef SARGASSO
-  (void) ejsys(SFMOD, _PRIIN, oldmode);
-#else
   (void) ioctl(0, TIOCSETN, &oldterm);
   (void) ioctl(0, TIOCSETC, &oldtchars);
   (void) ioctl(0, TIOCSLTC, &oldltchars);
-#endif
 }
 
 /*
@@ -269,11 +223,7 @@ getch(file)
 {
   int c;
 
-#ifdef SARGASSO
-  if (file != stdin)
-#else
   if (!isatty(fileno(file)))
-#endif
     {
       c = getc(file);
       if (c == COMMENTCHAR)             /* Skip comments.  */
@@ -300,11 +250,7 @@ void ungetch(c, file)
   int c;
   FILE *file;
 {
-#ifdef SARGASSO
-  if (file == stdin)
-#else
   if (isatty(fileno(file)))
-#endif
     {
       if (position > 0)
         position--;
@@ -443,7 +389,6 @@ retype(all)
     }
 }
 
-#ifndef SARGASSO        /* Skip completion for tops. */
 /*
  * Stuff for file name completion.
  */
@@ -721,7 +666,6 @@ blink()
     }
   (void) fflush(stdout);
 }
-#endif
 
 /*
  * Get a line from stdin.  Do line editing functions such as kill line, 
@@ -778,7 +722,6 @@ int lips_getline(file)
           retype(1);
           break;
         case T_TAB:
-#ifndef SARGASSO
           s = mkexstr();
           t = extilde(s, 0);
           if (t == NULL)
@@ -796,7 +739,6 @@ int lips_getline(file)
               if (TYPEOF(ex) == CONS) complete(ex);
               (void) putc(BELL, stdout);
             }
-#endif
           break;
         case T_ERASE:
           escaped = 0;
@@ -862,13 +804,11 @@ int lips_getline(file)
               pputc('\n', stdout);
               return 1;
             }
-#ifndef SARGASSO
           else
             {
               scan(linepos - 1);
               blink();
             }
-#endif
           break;
         case T_NEWLINE:
           pputc('\n', stdout);
@@ -899,11 +839,7 @@ eoln(file)
 {
   int i;
 
-#ifdef SARGASSO
-  if (file != stdin)
-#else
   if (!isatty(fileno(file)))
-#endif
     return 0;
   for (i=position; i<linepos; i++)
     {
