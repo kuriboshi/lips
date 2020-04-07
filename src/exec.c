@@ -517,35 +517,16 @@ int execcommand(LISPT exp, LISPT* res)
  */
 static void setenviron(char* var, char* val)
 {
-  int i;
-  char *env;
-
-  for (i = 0; environ[i]; i++)
-    {
-      if (!strncmp(var, environ[i], strlen(var)))
-        {
-          (void) free(environ[i]);
-          environ[i] = (char *) safemalloc((unsigned) strlen(var)
-					   + strlen(val) + 2);
-          if (environ[i] == NULL)
-	    {
-	      (void) error(OUT_OF_MEMORY, C_NIL);
-	      return;
-	    }
-          (void) strcpy(environ[i], var);
-          (void) strcat(environ[i], "=");
-          (void) strcat(environ[i], val);
-          return;
-        }
-    }
 #ifdef PUTENV
-  env = (char *) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
+  char *env = (char *) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
   (void) strcpy(env, var);
   (void) strcat(env, "=");
   (void) strcat(env, val);
   (void) putenv(env);
 #else
-  (void) setenv(var, val, 1);
+  char *var_ = (char *) safemalloc((unsigned) strlen(var) + 1);
+  char *val_ = (char *) safemalloc((unsigned) strlen(val) + 1);
+  (void) setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
 
