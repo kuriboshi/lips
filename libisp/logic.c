@@ -11,10 +11,9 @@
 static char rcsid[] = "$Id$";
 #endif
 
-PRIMITIVE and(l)
-register LISPT l;
+PRIMITIVE and(LISPT l)
 {
-  register LISPT foo;
+  LISPT foo;
   
   foo = C_T;
   while (!ISNIL(l))
@@ -27,10 +26,9 @@ register LISPT l;
   return foo;
 }
 
-PRIMITIVE or(l)
-  register LISPT l;
+PRIMITIVE or(LISPT l)
 {
-  register LISPT foo;
+  LISPT foo;
   
   foo = C_NIL;
   while (!ISNIL(l))
@@ -43,8 +41,7 @@ PRIMITIVE or(l)
   return foo;
 }
 
-PRIMITIVE not(x)
-  LISPT x;
+PRIMITIVE not(LISPT x)
 {
   if (ISNIL(x))
     return C_T;
@@ -52,22 +49,21 @@ PRIMITIVE not(x)
     return C_NIL;
 }
 
-PRIMITIVE xif(pred, true, false)
-  LISPT pred, true, false;
+PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo;
 
   foo = eval(pred);
   if (ISNIL(foo))
-    return progn(false);
+    return progn(false_expr);
   else
-    return eval(true);
+    return eval(true_expr);
 }
 
 void init_logic()
 {
-  mkprim(PN_AND, and, -1, FSUBR);
-  mkprim(PN_OR,  or,  -1, FSUBR);
-  mkprim(PN_NOT, not,  1, SUBR);
-  mkprim(PN_IF,  xif, -3, FSUBR);
+  mkprim1(PN_AND, and, -1, FSUBR);
+  mkprim1(PN_OR,  or,  -1, FSUBR);
+  mkprim1(PN_NOT, not,  1, SUBR);
+  mkprim3(PN_IF,  xif, -3, FSUBR);
 }

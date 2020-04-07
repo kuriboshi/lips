@@ -21,10 +21,6 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern struct passwd *getpwnam();
-extern char *getwd();
-extern char *index();
-
 static char r[MAXPATHLEN];
 static char **globarr;
 static char **globp;
@@ -34,9 +30,7 @@ static char **globlimit;
  * If *wild is a slash then str must be a directory to match
  * wild completely. Used by match.
  */
-static int
-dircheck(str, wild, ss)
-  char *str, *wild, *ss;
+static int dircheck(char* str, char* wild, char* ss)
 {
   struct stat sbuf;
   int pos;
@@ -62,9 +56,7 @@ dircheck(str, wild, ss)
  * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
  * is a simple string with no slashes.
  */
-static int
-match(str, wild)
-  char *str, *wild;
+static int match(char* str, char* wild)
 {
   int ok;
   char *ss = str;
@@ -106,9 +98,7 @@ match(str, wild)
 /*
  * Inserts element what in list where keeping alphabetic order.
  */
-static LISPT
-orderinsert(what, where)
-  LISPT what, where;
+static LISPT orderinsert(LISPT what, LISPT where)
 {
   LISPT p1, p2;
 
@@ -141,10 +131,7 @@ orderinsert(what, where)
  * Expands tilde character in first position to home directory or
  * other users home directory.
  */
-char *
-extilde(w, rep)
-  char *w;
-  int rep;
+char* extilde(char* w, int rep)
 {
   struct passwd *pw;
   static char s[NAMELEN];
@@ -186,10 +173,7 @@ extilde(w, rep)
  *             unsorted array of character strings. Returns non-zero if
  *             any file matched the pattern, zero otherwise.
  */
-static int
-walkfiles(wild, all, report)
-  char *wild;
-  int all, report;
+static int walkfiles(char* wild, int all, int report)
 {
   int result;
   int pos;
@@ -241,8 +225,7 @@ walkfiles(wild, all, report)
   return result;
 }
 
-static LISPT
-buildlist()
+static LISPT buildlist()
 {
   char **r;
   LISPT l;
@@ -257,18 +240,13 @@ buildlist()
   return l;
 }
 
-static int
-comp(a, b)
-  char **a, **b;
+static int comp(const void* a, const void *b)
 {
   /* Reverse sort. */
-  return -strcmp(*a, *b);
+  return -strcmp(*(char**)a, *(char**)b);
 }
 
-LISPT
-expandfiles(wild, all, report, sort)
-  char *wild;
-  int all, report, sort;
+LISPT expandfiles(char* wild, int all, int report, int sort)
 {
   if (*wild == '/' && *(wild + 1) == '\0')
     return cons(mkstring(wild), C_NIL);
@@ -289,8 +267,7 @@ expandfiles(wild, all, report, sort)
  * Lisp function expand. Expand all files matching wild
  * in directory dir.
  */
-PRIMITIVE expand(wild, rep, all)
-  LISPT wild, rep, all;
+PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
 {
   char *wstr;
   int r = 0;
@@ -302,9 +279,7 @@ PRIMITIVE expand(wild, rep, all)
   return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
 }
 
-LISPT
-glob(wild)
-  LISPT wild;
+LISPT glob(LISPT wild)
 {
   return expand(wild, 0, 0);
 }

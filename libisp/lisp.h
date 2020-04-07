@@ -107,14 +107,17 @@ typedef struct {		/* The cons cell */
 } CONST;
 
 typedef struct {
-  char *pname;			/* The printname of the atom */
+  char *pname;                  /* The printname of the atom */
   LISPT value;
   LISPT plist;			/* The property list */
   LISPT topval;			/* Holds top value (not used yet) */
 } SYMBOLT;
 
 typedef struct {		/* The type of internal c-functions */
-  LISPT (*function)();
+  LISPT (*function0)(void);
+  LISPT (*function1)(LISPT);
+  LISPT (*function2)(LISPT, LISPT);
+  LISPT (*function3)(LISPT, LISPT, LISPT);
   short argcount;		/* Negative argcount indicates that
 				   arguments should not be evaluated */
 } SUBRT;
@@ -182,7 +185,7 @@ enum control_type {
 struct control {
   enum control_type type;
   union {
-    int (*f_point)();
+    int (*f_point)(void);
     void *point;
     LISPT lisp;
   } u;

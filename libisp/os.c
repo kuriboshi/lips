@@ -16,10 +16,7 @@ static char rcsid[] = "$Id$";
  * no character was read.  The character is returned in
  * the single character buffer cp.
  */
-int
-readchar(file, cp)
-  FILE *file;
-  char *cp;
+int readchar(FILE* file, char* cp)
 {
   int i;
 

@@ -10,8 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-static LISPT getargs(al)
-  LISPT al;
+static LISPT getargs(LISPT al)
 {
   if (ISNIL(CDR(al)))
     return CAR(al);
@@ -19,8 +18,7 @@ static LISPT getargs(al)
     return cons(CAR(al), getargs(CDR(al)));
 }
 
-PRIMITIVE getrep(fun)
-  LISPT fun;
+PRIMITIVE getrep(LISPT fun)
 {
   LAMBDAT *x;
   LISPT args;
@@ -34,13 +32,12 @@ PRIMITIVE getrep(fun)
     args = getargs (x->arglist);
   else args = x->arglist;
   if (TYPEOF(fun) == LAMBDA)
-    return cons (C_LAMBDA, cons (args, x->lambdarep));
+    return cons(C_LAMBDA, cons(args, x->lambdarep));
   else
-    return cons(C_NLAMBDA,cons(args,x->lambdarep));
+    return cons(C_NLAMBDA, cons(args, x->lambdarep));
 }
 
-LISPT funeq(f1, f2)
-  LISPT f1, f2;
+LISPT funeq(LISPT f1, LISPT f2)
 {
   LISPT t1, t2;
   LISPT tmp;
@@ -56,7 +53,7 @@ LISPT funeq(f1, f2)
         {
           t1 = LAMVAL(f1).lambdarep;
           t2 = LAMVAL(f2).lambdarep;
-	  tmp = equal (t1, t2);
+	  tmp = equal(t1, t2);
 	  if (!ISNIL (tmp))
             return C_T;
         }
@@ -64,8 +61,7 @@ LISPT funeq(f1, f2)
   return C_NIL;
 }
 
-static LISPT checkfn(name, lam)
-  LISPT name, lam;
+static LISPT checkfn(LISPT name, LISPT lam)
 {
   LISPT t;
 
@@ -84,8 +80,7 @@ static LISPT checkfn(name, lam)
   return C_NIL;
 }
 
-PRIMITIVE define(name, lam)
-  LISPT name, lam;
+PRIMITIVE define(LISPT name, LISPT lam)
 {
   CHECK(name, SYMBOL);
   CHECK2(lam, LAMBDA, NLAMBDA);
@@ -94,9 +89,7 @@ PRIMITIVE define(name, lam)
   return name;
 }
 
-static LISPT def(name, pars, body, type)
-  LISPT name, pars, body;
-  int type;
+static LISPT def(LISPT name, LISPT pars, LISPT body, int type)
 {
   LISPT foo;
 
@@ -111,22 +104,20 @@ static LISPT def(name, pars, body, type)
   return cons(name, C_NIL);
 }
 
-PRIMITIVE de(name, pars, body)
-  LISPT name, pars, body;
+PRIMITIVE de(LISPT name, LISPT pars, LISPT body)
 {
   return def(name, pars, body, LAMBDA);
 }
 
-PRIMITIVE df(name, pars, body)
-  LISPT name, pars, body;
+PRIMITIVE df(LISPT name, LISPT pars, LISPT body)
 {
   return def(name, pars, body, NLAMBDA);
 }
 
 void init_user()
 {
-  mkprim(PN_DEFINE, define,  2, SUBR);
-  mkprim(PN_GETREP, getrep,  1, SUBR);
-  mkprim(PN_DE,     de,     -3, FSUBR);
-  mkprim(PN_DF,     df,     -3, FSUBR);
+  mkprim2(PN_DEFINE, define,  2, SUBR);
+  mkprim1(PN_GETREP, getrep,  1, SUBR);
+  mkprim3(PN_DE,     de,     -3, FSUBR);
+  mkprim3(PN_DF,     df,     -3, FSUBR);
 }

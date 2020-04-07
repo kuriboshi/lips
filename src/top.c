@@ -14,7 +14,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern void pputc();
+extern void pputc(char, FILE*);
 
 char current_prompt[PROMPTLENGTH];
 LISPT history;                  /* Holds the history list. */
@@ -23,8 +23,8 @@ LISPT histmax;                  /* Maximum number of events to save. */
 LISPT input_exp;                /* The input expression. */
 LISPT topexp;                   /* Transformed expression to evaluate. */
 LISPT alias_expanded;           /* For checking alias loops. */
-LISPT (*transformhook)();       /* Applied on input if non-NULL. */
-void (*beforeprompt)();         /* Called before the prompt is printed. */
+LISPT (*transformhook)(LISPT);  /* Applied on input if non-NULL. */
+void (*beforeprompt)(void);     /* Called before the prompt is printed. */
 
 static int printit;             /* If the result will be printed. */
 
@@ -34,8 +34,7 @@ static int printit;             /* If the result will be printed. */
 /*
  * Print the history list.
  */
-static void
-phist()
+static void phist()
 {
   LISPT hl;
 
@@ -50,9 +49,7 @@ phist()
 /*
  * Add event to history list.
  */
-static void
-addhist(what)
-  LISPT what;
+static void addhist(LISPT what)
 {
   history = cons(cons(histnum, what), history);
   histnum = add1(histnum);
@@ -61,8 +58,7 @@ addhist(what)
 /*
  * Remove last event from history list.
  */
-static void
-remhist()
+static void remhist()
 {
   history = CDR(history);
   histnum = sub1(histnum);
@@ -71,8 +67,7 @@ remhist()
 /*
  * Trim history list to keep it shorter than histmax.
  */
-static void
-trimhist()
+static void trimhist()
 {
   LISPT hl;
   long i;
@@ -80,17 +75,14 @@ trimhist()
   hl = history;
   for (i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl));
   if (!ISNIL(hl))
-    (void) rplacd(hl,C_NIL);
+    (void) rplacd(hl, C_NIL);
 }
 
 /*
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-LISPT
-histget(num, hlist)
-  long num;
-  LISPT hlist;
+LISPT histget(long num, LISPT hlist)
 {
   if (num < 0)
     {
@@ -117,9 +109,7 @@ PRIMITIVE printhist()
   return C_NIL;
 }
 
-static LISPT
-transform(list)
-  LISPT list;
+static LISPT transform(LISPT list)
 {
   if (transformhook != NULL)
     return (*transformhook)(list);
@@ -134,9 +124,7 @@ transform(list)
  * on the list alias_expanded. One indirection is allowed in order
  * to permit 'alias ls ls -F'.
  */
-LISPT
-findalias(exp)
-  LISPT exp;
+LISPT findalias(LISPT exp)
 {
   LISPT alias;
   LISPT rval;
@@ -164,9 +152,7 @@ findalias(exp)
   return transform(rval);
 }
 
-void
-promptprint(prompt)
-  LISPT prompt;
+void promptprint(LISPT prompt)
 {
   int i;
   char *s;
@@ -197,10 +183,7 @@ promptprint(prompt)
   (void) printf("%s", current_prompt);
 }
 
-void
-toploop(tprompt, macrofun)
-  LISPT *tprompt;
-  int (*macrofun)();
+void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
 {
   while (1)
     {
@@ -218,7 +201,7 @@ toploop(tprompt, macrofun)
           if (TYPEOF(eval(promptform)) == ERROR)
             {
               (void) xprint(mkstring("Error in promptform, reset to nil"),
-                            C_T);
+                C_T);
               promptform = C_NIL;
             }
           promptprint(*tprompt);
@@ -259,11 +242,10 @@ toploop(tprompt, macrofun)
     }
 }
 
-void
-init_hist()
+void init_hist()
 {
-  initcvar(&history,     "history",     C_NIL);
-  initcvar(&histnum,     "histnum",     mknumber(1L));
-  initcvar(&histmax,     "histmax",     mknumber(10L));
-  mkprim(PN_PRINTHIST, printhist,    0, FSUBR);
+  initcvar(&history,   "history",  C_NIL);
+  initcvar(&histnum,   "histnum",  mknumber(1L));
+  initcvar(&histmax,   "histmax",  mknumber(10L));
+  mkprim0(PN_PRINTHIST, printhist,  0, FSUBR);
 }

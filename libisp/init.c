@@ -11,8 +11,7 @@ static char rcsid[] = "$Id$";
 #endif
 
 extern char *VERSION;
-extern void init_file();
-
+extern void init_file(void);
 /*
  * All lisp constants needed internally.
  */
@@ -40,11 +39,7 @@ LISPT version;           /* Is set to the version string. */
  * Whenever CVAR is changed the corresponding lisp variable changes
  * and vice versa.
  */
-void
-initcvar(cvar, name, val)
-  LISPT *cvar;
-  char *name;
-  LISPT val;
+void initcvar(LISPT *cvar, char* name, LISPT val)
 {
   LISPT t;
 
@@ -54,8 +49,7 @@ initcvar(cvar, name, val)
   *cvar = val;
 }
 
-void
-init_lisp()
+void init_lisp()
 {
   init_alloc();
 

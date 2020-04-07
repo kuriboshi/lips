@@ -12,16 +12,14 @@ static char rcsid[] = "$Id$";
 #endif
 
 /* Return symbols print name as a string. */
-PRIMITIVE symstr(sym)
-  LISPT sym;
+PRIMITIVE symstr(LISPT sym)
 {
   CHECK(sym,SYMBOL);
   return mkstring(SYMVAL(sym).pname);
 }
 
 /* T if s is a string, NIL otherwise. */
-PRIMITIVE stringp(s)
-  LISPT s;
+PRIMITIVE stringp(LISPT s)
 {
   if (TYPEOF(s) == STRING)
     return C_T;
@@ -30,8 +28,7 @@ PRIMITIVE stringp(s)
 }
 
 /* T if both strings are equal */
-PRIMITIVE streq(s1, s2)
-  LISPT s1, s2;
+PRIMITIVE streq(LISPT s1, LISPT s2)
 {
   CHECK(s1, STRING);
   CHECK(s2, STRING);
@@ -41,8 +38,7 @@ PRIMITIVE streq(s1, s2)
     return C_NIL;
 }
 
-PRIMITIVE strcomp(s1, s2)
-  LISPT s1, s2;
+PRIMITIVE strcomp(LISPT s1, LISPT s2)
 {
   CHECK(s1, STRING);
   CHECK(s2, STRING);
@@ -51,12 +47,11 @@ PRIMITIVE strcomp(s1, s2)
 
 /* Concatenate arbitrary many strings to
    to one string */
-PRIMITIVE concat(strlist)
-  LISPT strlist;
+PRIMITIVE concat(LISPT strlist)
 {
   LISPT sl;
-  register int size;
-  register char *ns;
+  int size;
+  char *ns;
 
   size = 0;
   for (sl = strlist; !ISNIL(sl); sl = CDR(sl))
@@ -76,8 +71,7 @@ PRIMITIVE concat(strlist)
 }
 
 /* Return string length of s */
-PRIMITIVE xstrlen(s)
-  LISPT s;
+PRIMITIVE xstrlen(LISPT s)
 {
   CHECK(s,STRING);
   return mknumber((long)strlen(STRINGVAL(s)));
@@ -88,8 +82,7 @@ PRIMITIVE xstrlen(s)
    NIL. If end is one less than start the
    zero length string is returned. end equal
    to zero if start is equal to one is accepted. */
-PRIMITIVE substr(str, start, end)
-  LISPT str, start, end;
+PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
 {
   int size;
   int s, e;
@@ -115,14 +108,13 @@ PRIMITIVE substr(str, start, end)
   return mkstring (ns);
 }
 
-void
-init_string()
+void init_string()
 {
-  mkprim(PN_STRINGP, stringp,  1, SUBR);
-  mkprim(PN_STREQ,   streq,    2, SUBR);
-  mkprim(PN_CONCAT,  concat,  -1, SUBR);
-  mkprim(PN_STRLEN,  xstrlen,  1, SUBR);
-  mkprim(PN_SUBSTR,  substr,   3, SUBR);
-  mkprim(PN_SYMSTR,  symstr,   1, SUBR);
-  mkprim(PN_STRCMP,  strcomp,  2, SUBR);
+  mkprim1(PN_STRINGP, stringp,  1, SUBR);
+  mkprim2(PN_STREQ,   streq,    2, SUBR);
+  mkprim1(PN_CONCAT,  concat,  -1, SUBR);
+  mkprim1(PN_STRLEN,  xstrlen,  1, SUBR);
+  mkprim3(PN_SUBSTR,  substr,   3, SUBR);
+  mkprim1(PN_SYMSTR,  symstr,   1, SUBR);
+  mkprim2(PN_STRCMP,  strcomp,  2, SUBR);
 }

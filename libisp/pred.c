@@ -10,8 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-PRIMITIVE numberp(a)
-  LISPT a;
+PRIMITIVE numberp(LISPT a)
 {
   switch (TYPEOF(a))
     {
@@ -27,8 +26,7 @@ PRIMITIVE numberp(a)
     }
 }
 
-PRIMITIVE listp(a)
-  LISPT a;
+PRIMITIVE listp(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return a;
@@ -36,8 +34,7 @@ PRIMITIVE listp(a)
     return C_NIL;
 }
 
-PRIMITIVE memb(x,l)
-  LISPT x,l;
+PRIMITIVE memb(LISPT x, LISPT l)
 {
   while (!EQ(l,C_NIL))
     {
@@ -48,8 +45,7 @@ PRIMITIVE memb(x,l)
   return C_NIL;
 }
 
-PRIMITIVE equal(l1,l2)
-  LISPT l1,l2;
+PRIMITIVE equal(LISPT l1, LISPT l2)
 {
   LISPT x;
 
@@ -60,7 +56,7 @@ PRIMITIVE equal(l1,l2)
     case CONS:
       while (!EQ(l1,C_NIL) && !EQ(l2,C_NIL))
         {
-          x = equal(CAR(l1),CAR(l2));
+          x = equal(CAR(l1), CAR(l2));
           if (EQ(x,C_T))
             {
               l1 = CDR(l1);
@@ -83,8 +79,7 @@ PRIMITIVE equal(l1,l2)
   return C_NIL;
 }
 
-PRIMITIVE nlistp(a)
-  LISPT a;
+PRIMITIVE nlistp(LISPT a)
 {
   if (TYPEOF(a) != CONS)
     return a;
@@ -92,8 +87,7 @@ PRIMITIVE nlistp(a)
     return C_NIL;
 }
 
-PRIMITIVE neq(a,b)
-  LISPT a,b;
+PRIMITIVE neq(LISPT a, LISPT b)
 {
   if (!EQ(a,b))
     return C_T;
@@ -101,8 +95,7 @@ PRIMITIVE neq(a,b)
     return C_NIL;
 }
 
-PRIMITIVE boundp(a)
-  LISPT a;
+PRIMITIVE boundp(LISPT a)
 {
   if (TYPEOF(a) != SYMBOL)
     return C_NIL;
@@ -112,8 +105,7 @@ PRIMITIVE boundp(a)
     return C_NIL;
 }
 
-PRIMITIVE litatom(a)
-  LISPT a;
+PRIMITIVE litatom(LISPT a)
 {
   if (TYPEOF(a) == SYMBOL)
     return C_T;
@@ -121,8 +113,7 @@ PRIMITIVE litatom(a)
     return C_NIL;
 }
 
-PRIMITIVE xtypeof(a)
-  LISPT a;
+PRIMITIVE xtypeof(LISPT a)
 {
   switch(TYPEOF(a))
     {
@@ -172,13 +163,13 @@ PRIMITIVE xtypeof(a)
 
 void init_pred()
 {
-  mkprim(PN_LISTP,   listp,    1, SUBR);
-  mkprim(PN_NLISTP,  nlistp,   1, SUBR);
-  mkprim(PN_NEQ,     neq,      2, SUBR);
-  mkprim(PN_NUMBERP, numberp,  1, SUBR);
-  mkprim(PN_MEMB,    memb,     2, SUBR);
-  mkprim(PN_EQUAL,   equal,    2, SUBR);
-  mkprim(PN_BOUNDP,  boundp,   1, SUBR);
-  mkprim(PN_LITATOM, litatom,  1, SUBR);
-  mkprim(PN_TYPEOF, xtypeof,  1, SUBR);
+  mkprim1(PN_LISTP,   listp,    1, SUBR);
+  mkprim1(PN_NLISTP,  nlistp,   1, SUBR);
+  mkprim2(PN_NEQ,     neq,      2, SUBR);
+  mkprim1(PN_NUMBERP, numberp,  1, SUBR);
+  mkprim2(PN_MEMB,    memb,     2, SUBR);
+  mkprim2(PN_EQUAL,   equal,    2, SUBR);
+  mkprim1(PN_BOUNDP,  boundp,   1, SUBR);
+  mkprim1(PN_LITATOM, litatom,  1, SUBR);
+  mkprim1(PN_TYPEOF,  xtypeof,  1, SUBR);
 }

@@ -23,5 +23,5 @@
 struct rtinfo
 {
   unsigned char chclass[128];
-  LISPT (*rmacros[128])();
+  LISPT (*rmacros[128])(FILE*, LISPT, char);
 };

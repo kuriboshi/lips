@@ -19,8 +19,7 @@ static char rcsid[] = "$Id$";
  * float.
  */
 
-PRIMITIVE plus(l)
-  LISPT l;
+PRIMITIVE plus(LISPT l)
 {
   double fsum = 0.0;
   long sum = 0;
@@ -55,8 +54,7 @@ PRIMITIVE plus(l)
     return mknumber(sum);
 }
 
-PRIMITIVE iplus(l)
-  LISPT l;
+PRIMITIVE iplus(LISPT l)
 {
   long sum;
   
@@ -72,8 +70,7 @@ PRIMITIVE iplus(l)
   return mknumber(sum);
 }
 
-PRIMITIVE fplus(l)
-  LISPT l;
+PRIMITIVE fplus(LISPT l)
 {
   double sum;
   
@@ -89,8 +86,7 @@ PRIMITIVE fplus(l)
   return mkfloat(sum);
 }
 
-PRIMITIVE difference(a, b)
-  LISPT a, b;
+PRIMITIVE difference(LISPT a, LISPT b)
 {
   CHECK2(a, INTEGER, FLOAT);
   CHECK2(b, INTEGER, FLOAT);
@@ -107,24 +103,21 @@ PRIMITIVE difference(a, b)
   /*NOTREACHED*/
 }
 
-PRIMITIVE idifference(a, b)
-  LISPT a, b;
+PRIMITIVE idifference(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
   return mknumber(INTVAL(a) - INTVAL(b));
 }
 
-PRIMITIVE fdifference(a, b)
-  LISPT a, b;
+PRIMITIVE fdifference(LISPT a, LISPT b)
 {
   CHECK(a, FLOAT);
   CHECK(b, FLOAT);
   return mkfloat(FLOATVAL(a) - FLOATVAL(b));
 }
 
-PRIMITIVE ltimes(l)
-  LISPT l;
+PRIMITIVE ltimes(LISPT l)
 {
   double fprod = 1.0;
   long prod = 1;
@@ -159,8 +152,7 @@ PRIMITIVE ltimes(l)
     return mknumber(prod);
 }
 
-PRIMITIVE itimes(l)
-  LISPT l;
+PRIMITIVE itimes(LISPT l)
 {
   long prod;
   
@@ -176,8 +168,7 @@ PRIMITIVE itimes(l)
   return mknumber(prod);
 }
 
-PRIMITIVE ftimes(l)
-  LISPT l;
+PRIMITIVE ftimes(LISPT l)
 {
   double prod;
   
@@ -193,8 +184,7 @@ PRIMITIVE ftimes(l)
   return mkfloat(prod);
 }
   
-PRIMITIVE divide(a, b)
-  LISPT a, b;
+PRIMITIVE divide(LISPT a, LISPT b)
 {
   CHECK2(a, INTEGER, FLOAT);
   CHECK2(b, INTEGER, FLOAT);
@@ -211,8 +201,7 @@ PRIMITIVE divide(a, b)
   /*NOTREACHED*/
 }
 
-PRIMITIVE iquotient(a, b)
-  LISPT a, b;
+PRIMITIVE iquotient(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
@@ -221,8 +210,7 @@ PRIMITIVE iquotient(a, b)
   return mknumber(INTVAL(a) / INTVAL(b));
 }
 
-PRIMITIVE iremainder(a, b)
-  LISPT a, b;
+PRIMITIVE iremainder(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
@@ -231,8 +219,7 @@ PRIMITIVE iremainder(a, b)
   return mknumber(INTVAL(a) % INTVAL(b));
 }
 
-PRIMITIVE fdivide(a, b)
-  LISPT a, b;
+PRIMITIVE fdivide(LISPT a, LISPT b)
 {
   CHECK(a, FLOAT);
   CHECK(b, FLOAT);
@@ -241,8 +228,7 @@ PRIMITIVE fdivide(a, b)
   return mkfloat(FLOATVAL(a) / FLOATVAL(b));
 }
 
-PRIMITIVE minus(a)
-  LISPT a;
+PRIMITIVE minus(LISPT a)
 {
   CHECK2(a, FLOAT, INTEGER);
   if (TYPEOF(a) == INTEGER)
@@ -251,15 +237,13 @@ PRIMITIVE minus(a)
     return mkfloat(-FLOATVAL(a));
 }
 
-PRIMITIVE iminus(a)
-  LISPT a;
+PRIMITIVE iminus(LISPT a)
 {
   CHECK(a, INTEGER);
   return mknumber(-INTVAL(a));
 }
 
-PRIMITIVE absval(i)
-  LISPT i;
+PRIMITIVE absval(LISPT i)
 {
   int sign;
 
@@ -269,22 +253,19 @@ PRIMITIVE absval(i)
   return mknumber(INTVAL(i) * sign);
 }
 
-PRIMITIVE itof(i)
-  LISPT i;
+PRIMITIVE itof(LISPT i)
 {
   CHECK(i, INTEGER);
   return mkfloat((double) INTVAL(i));
 }
 
-PRIMITIVE add1(a)
-  LISPT a;
+PRIMITIVE add1(LISPT a)
 {
   CHECK(a, INTEGER);
   return mknumber(INTVAL(a) + 1);
 }
 
-PRIMITIVE sub1(a)
-  LISPT a;
+PRIMITIVE sub1(LISPT a)
 {
   CHECK(a, INTEGER);
   return mknumber(INTVAL(a) - 1);
@@ -338,44 +319,37 @@ PRIMITIVE sub1(a)
       return error(BUG, C_NIL); \
     }
 
-PRIMITIVE greaterp(x, y)
-  LISPT x, y;
+PRIMITIVE greaterp(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, >);
 }
 
-PRIMITIVE lessp(x, y)
-  LISPT x, y;
+PRIMITIVE lessp(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, <);
 }
 
-PRIMITIVE eqp(x, y)
-  LISPT x, y;
+PRIMITIVE eqp(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, ==);
 }
 
-PRIMITIVE geq(x, y)
-  LISPT x, y;
+PRIMITIVE geq(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, >=);
 }
 
-PRIMITIVE leq(x, y)
-  LISPT x, y;
+PRIMITIVE leq(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, <=);
 }
 
-PRIMITIVE neqp(x, y)
-  LISPT x, y;
+PRIMITIVE neqp(LISPT x, LISPT y)
 {
   NUMCHECK(x, y, !=);
 }
 
-PRIMITIVE zerop(x)
-  LISPT x;
+PRIMITIVE zerop(LISPT x)
 {
   if (TYPEOF(x) == INTEGER && INTVAL(x) == 0)
     return C_T;
@@ -383,8 +357,7 @@ PRIMITIVE zerop(x)
     return C_NIL;
 }
 
-PRIMITIVE minusp(x)
-  LISPT x;
+PRIMITIVE minusp(LISPT x)
 {
   if (TYPEOF(x) == FLOAT)
     if (FLOATVAL(x) < 0.0)
@@ -400,34 +373,33 @@ PRIMITIVE minusp(x)
     return error(ILLEGAL_ARG, x);
 }
 
-void
-init_arith()
+void init_arith()
 {
-  mkprim(PN_PLUS,        plus,        -1, SUBR);
-  mkprim(PN_DIFFERENCE,  difference,   2, SUBR);
-  mkprim(PN_TIMES,       ltimes,      -1, SUBR);
-  mkprim(PN_DIVIDE,      divide,       2, SUBR);
-  mkprim(PN_IPLUS,       iplus,       -1, SUBR);
-  mkprim(PN_IDIFFERENCE, idifference,  2, SUBR);
-  mkprim(PN_ITIMES,      itimes,      -1, SUBR);
-  mkprim(PN_IQUOTIENT,   iquotient,    2, SUBR);
-  mkprim(PN_IREMAINDER,  iremainder,   2, SUBR);
-  mkprim(PN_IMINUS,      iminus,       1, SUBR);
-  mkprim(PN_MINUS,       minus,        1, SUBR);
-  mkprim(PN_ADD1,        add1,         1, SUBR);
-  mkprim(PN_SUB1,        sub1,         1, SUBR);
-  mkprim(PN_FPLUS,       fplus,       -1, SUBR);
-  mkprim(PN_FDIFFERENCE, fdifference,  2, SUBR);
-  mkprim(PN_FTIMES,      ftimes,      -1, SUBR);
-  mkprim(PN_FDIVIDE,     fdivide,      2, SUBR);
-  mkprim(PN_ITOF,        itof,         1, SUBR);
-  mkprim(PN_GREATERP,    greaterp,     2, SUBR);
-  mkprim(PN_GEQ,         geq,          2, SUBR);
-  mkprim(PN_LESSP,       lessp,        2, SUBR);
-  mkprim(PN_LEQ,         leq,          2, SUBR);
-  mkprim(PN_ZEROP,       zerop,        1, SUBR);
-  mkprim(PN_EQP,         eqp,          2, SUBR);
-  mkprim(PN_NEQP,        neqp,         2, SUBR);
-  mkprim(PN_MINUSP,      minusp,       1, SUBR);
-  mkprim(PN_ABS,         absval,       1, SUBR);
+  mkprim1(PN_PLUS,        plus,        -1, SUBR);
+  mkprim2(PN_DIFFERENCE,  difference,   2, SUBR);
+  mkprim1(PN_TIMES,       ltimes,      -1, SUBR);
+  mkprim2(PN_DIVIDE,      divide,       2, SUBR);
+  mkprim1(PN_IPLUS,       iplus,       -1, SUBR);
+  mkprim2(PN_IDIFFERENCE, idifference,  2, SUBR);
+  mkprim1(PN_ITIMES,      itimes,      -1, SUBR);
+  mkprim2(PN_IQUOTIENT,   iquotient,    2, SUBR);
+  mkprim2(PN_IREMAINDER,  iremainder,   2, SUBR);
+  mkprim1(PN_IMINUS,      iminus,       1, SUBR);
+  mkprim1(PN_MINUS,       minus,        1, SUBR);
+  mkprim1(PN_ADD1,        add1,         1, SUBR);
+  mkprim1(PN_SUB1,        sub1,         1, SUBR);
+  mkprim1(PN_FPLUS,       fplus,       -1, SUBR);
+  mkprim2(PN_FDIFFERENCE, fdifference,  2, SUBR);
+  mkprim1(PN_FTIMES,      ftimes,      -1, SUBR);
+  mkprim2(PN_FDIVIDE,     fdivide,      2, SUBR);
+  mkprim1(PN_ITOF,        itof,         1, SUBR);
+  mkprim2(PN_GREATERP,    greaterp,     2, SUBR);
+  mkprim2(PN_GEQ,         geq,          2, SUBR);
+  mkprim2(PN_LESSP,       lessp,        2, SUBR);
+  mkprim2(PN_LEQ,         leq,          2, SUBR);
+  mkprim1(PN_ZEROP,       zerop,        1, SUBR);
+  mkprim2(PN_EQP,         eqp,          2, SUBR);
+  mkprim2(PN_NEQP,        neqp,         2, SUBR);
+  mkprim1(PN_MINUSP,      minusp,       1, SUBR);
+  mkprim1(PN_ABS,         absval,       1, SUBR);
 }

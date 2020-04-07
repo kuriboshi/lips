@@ -32,4 +32,4 @@ target_sources(libisp PRIVATE
   version.c
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(libisp PUBLIC -Werror)
+target_compile_options(libisp PUBLIC -Werror -Wstrict-prototypes)

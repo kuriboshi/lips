@@ -4,29 +4,29 @@
  *
  * $Id$
  */
-#include "lisp.h"
 #include <setjmp.h>
+#include "lisp.h"
 
 /*
  * exec.c
  */
 extern int insidefork;
 
-extern char *strsave();
-extern void printdone();
-extern char *ltoa();
-extern void checkfork();
-extern int execcommand();
-extern void init_exec();
+extern char *strsave(char *);
+extern void printdone(void);
+extern char *ltoa(long);
+extern void checkfork(void);
+extern int execcommand(LISPT, LISPT*);
+extern void init_exec(void);
 
 /*
  * glob.c
  */
-extern char *extilde();
-extern LISPT expandfiles();
-extern LISPT glob();
+extern char *extilde(char*, int);
+extern LISPT expandfiles(char*, int, int, int);
+extern LISPT glob(LISPT);
 
-extern LISPT expand();
+extern LISPT expand(LISPT, LISPT, LISPT);
 
 /*
  * main.c
@@ -59,13 +59,13 @@ extern LISPT histmax;
 extern LISPT input_exp;
 extern LISPT topexp;
 extern LISPT alias_expanded;
-extern LISPT (*transformhook)();
-extern void (*beforeprompt)();
+extern LISPT (*transformhook)(LISPT);
+extern void (*beforeprompt)(void);
 
-extern LISPT histget();
-extern LISPT findalias();
-extern void toploop();
-extern void init_hist();
+extern LISPT histget(long, LISPT);
+extern LISPT findalias(LISPT);
+extern void toploop(LISPT*, int(*)(LISPT*));
+extern void init_hist(void);
 
 /*
  * version.c

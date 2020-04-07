@@ -29,16 +29,10 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern int execve();
-extern int putenv();
-extern char *getenv(), *index();
-extern char *getwd();
 extern char **environ;
-extern DIR *opendir();
-extern struct direct *readdir();
-extern void init_term();
-extern void end_term();
-LISPT p_setenv();
+extern void init_term(void);
+extern void end_term(void);
+LISPT p_setenv(LISPT, LISPT);
 
 #define UNION_WAIT int
 
@@ -69,8 +63,7 @@ static struct job *cjoblist = NULL;    /* List of collected jobs */
  * preparefork - Sets the processgroup to the group currently beeing built. 
  *               Resets signals to their default value.
  */
-static void
-preparefork()
+static void preparefork()
 {
   (void) setpgid(0, pgrp);
   (void) signal(SIGHUP,  SIG_DFL);
@@ -89,9 +82,7 @@ preparefork()
  *           Returns NULL if either STR is NULL or malloc fail to allocate 
  *           more memory.
  */
-char *
-strsave(str)
-  char *str;
+char* strsave(char* str)
 {
   char *newstr;
 
@@ -115,9 +106,7 @@ strsave(str)
  *            Status is Done if job has exited.
  */
 #ifdef JOB_CONTROL
-static void
-printjob(job)
-  struct job *job;
+static void printjob(struct job* job)
 {
   char buffer[80];
 
@@ -145,9 +134,7 @@ printjob(job)
  *             BG is non-zero, job is registered as running in background.
  *             Returns 0 if all went well, non-zero otherwise.
  */
-static int
-recordjob(pid, bg)
-  int pid, bg;
+static int recordjob(int pid, int bg)
 {
 #ifdef JOB_CONTROL
   char wd[MAXPATHLEN];          /* Store working directory */
@@ -174,10 +161,7 @@ recordjob(pid, bg)
  * collectjob - updates job list with PID as process id, and STAT as exit 
  *              status.
  */
-static void
-collectjob(pid, stat)
-  int pid;
-  UNION_WAIT stat;
+static void collectjob(int pid, UNION_WAIT stat)
 {
 #ifdef JOB_CONTROL
   struct job *i, *j;
@@ -214,8 +198,7 @@ collectjob(pid, stat)
 }
 
 /* printdone - Sweeps CJOBLIST and prints each job it frees. */
-void
-printdone()
+void printdone()
 {
 #ifdef JOB_CONTROL
   for (; cjoblist; cjoblist = cjoblist->next)
@@ -233,8 +216,7 @@ printdone()
  *         also grabs the tty for the new process group. Mfork returns the 
  *         pid returned by fork.
  */
-static int
-mfork()
+static int mfork()
 {
   int pid;
 
@@ -263,9 +245,7 @@ mfork()
 }
 
 /* ltoa - Converts a long to its ascii representation. */
-char *
-ltoa(v)
-  long v;
+char* ltoa(long v)
 {
   static char buf[20];
 
@@ -278,9 +258,7 @@ ltoa(v)
  *             meta characters in which case it returns true.
  *             It also strips off all quote-characters (backslash).
  */
-static int
-checkmeta(s)
-  char *s;
+static int checkmeta(char* s)
 {
   int i;
 
@@ -299,9 +277,7 @@ checkmeta(s)
  *            execve. Returns NULL if some error occured, like a no match 
  *            for wild cards. Returns pointers to globbed arguments.
  */
-static char **
-makeexec(command)
-  LISPT command;
+static char** makeexec(LISPT command)
 {
   LISPT files, com; 
   int i, mask, ok;
@@ -379,9 +355,7 @@ makeexec(command)
  *            status. If PID is 0 it means to wait for the first process 
  *            to exit.
  */
-static UNION_WAIT
-waitfork(pid)
-  int pid;
+static UNION_WAIT waitfork(int pid)
 {
   int wpid;
   UNION_WAIT wstat;
@@ -400,8 +374,7 @@ waitfork(pid)
   return wstat;
 }
 
-void
-checkfork()
+void checkfork()
 {
   int wpid;
   UNION_WAIT wstat;
@@ -415,7 +388,6 @@ checkfork()
   while (wpid > 0);
 }
           
-
 /* 
  * exec - Forks (if not already in a fork, in which case it works as 
  *        execve, overlaying the current process), and execs NAME with
@@ -423,10 +395,7 @@ checkfork()
  *        return (using waitfork). Exec either returns T or ERROR depending
  *        success or failure for some reason.
  */
-static LISPT
-exec(name, command)
-  char *name;
-  LISPT command;
+static LISPT exec(char* name, LISPT command)
 {
   char **args;
   int pid;
@@ -460,9 +429,7 @@ exec(name, command)
  * ifexec - Returns non-zero if directory DIR contains a NAME that is
  *          executable.
  */
-static int
-ifexec(dir, name)
-  char *dir, *name;
+static int ifexec(char* dir, char* name)
 {
   static char path[MAXNAMLEN];
   struct stat buf;
@@ -477,9 +444,7 @@ ifexec(dir, name)
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */
-static BITS32
-hashfun(str)
-  register char *str;
+static BITS32 hashfun(char* str)
 {
   register long i;
   register int bc;
@@ -500,10 +465,7 @@ hashfun(str)
  *               the path, 1 if the command was successively run and -1 if 
  *               there was some error.
  */
-int
-execcommand(exp, res)
-  LISPT exp;
-  LISPT *res;
+int execcommand(LISPT exp, LISPT* res)
 {
   LISPT cdir;
   char *command;
@@ -553,9 +515,7 @@ execcommand(exp, res)
  * setenviron - Set environmet variable VAR to VAL. No sorting of the 
  *              entries is done.
  */
-static void
-setenviron(var, val)
-  char *var, *val;
+static void setenviron(char* var, char* val)
 {
   int i;
   char *env;
@@ -591,8 +551,7 @@ setenviron(var, val)
 
 /* Primitives */
 
-PRIMITIVE to(cmd, file, filed)
-  LISPT cmd, file, filed;
+PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -624,8 +583,7 @@ PRIMITIVE to(cmd, file, filed)
   return mknumber((long) WEXITSTATUS(status));
 }
 
-PRIMITIVE toto(cmd, file, filed)
-  LISPT cmd, file, filed;
+PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -657,8 +615,7 @@ PRIMITIVE toto(cmd, file, filed)
   return mknumber((long) WEXITSTATUS(status));
 }
 
-PRIMITIVE from(cmd, file, filed)
-  LISPT cmd, file, filed;
+PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -690,8 +647,7 @@ PRIMITIVE from(cmd, file, filed)
   return mknumber((long) WEXITSTATUS(status));
 }
 
-PRIMITIVE pipecmd(cmds)
-  LISPT cmds;
+PRIMITIVE pipecmd(LISPT cmds)
 {
   int pd[2];
   int pid;
@@ -734,8 +690,7 @@ PRIMITIVE pipecmd(cmds)
   return mknumber((long) WEXITSTATUS(status));
 }
 
-PRIMITIVE back(l)
-  LISPT l;
+PRIMITIVE back(LISPT l)
 {
   int pid;
 
@@ -804,8 +759,7 @@ PRIMITIVE jobs()
   return C_NIL;
 }
 
-PRIMITIVE fg(job)
-  LISPT job;
+PRIMITIVE fg(LISPT job)
 {
 #ifdef JOB_CONTROL
   struct job *j;
@@ -842,8 +796,7 @@ PRIMITIVE fg(job)
 #endif
 }
 
-PRIMITIVE bg(job)
-  LISPT job;
+PRIMITIVE bg(LISPT job)
 {
 #ifdef JOB_CONTROL
   struct job *j;
@@ -877,8 +830,7 @@ PRIMITIVE bg(job)
 #endif
 }
 
-PRIMITIVE p_setenv(var, val)
-  LISPT var, val;
+PRIMITIVE p_setenv(LISPT var, LISPT val)
 {
   CHECK2(var, STRING, SYMBOL);
   CHECK2(val, STRING, SYMBOL);
@@ -886,8 +838,7 @@ PRIMITIVE p_setenv(var, val)
   return var;
 }  
 
-PRIMITIVE getenviron(var)
-  LISPT var;
+PRIMITIVE getenviron(LISPT var)
 {
   char *s;
 
@@ -899,8 +850,7 @@ PRIMITIVE getenviron(var)
     return mkstring(s);
 }
 
-PRIMITIVE cd(dir, emess)
-  LISPT dir, emess;
+PRIMITIVE cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
   char wd[1024];
@@ -930,8 +880,7 @@ PRIMITIVE cd(dir, emess)
     }
 }
 
-PRIMITIVE doexec(cmd)
-  LISPT cmd;
+PRIMITIVE doexec(LISPT cmd)
 {
   LISPT res;
 
@@ -953,21 +902,21 @@ PRIMITIVE doexec(cmd)
 void
 init_exec()
 {
-  mkprim(PN_EXPAND,    expand,     3, SUBR);
-  mkprim(PN_TO,        to,         3, FSUBR);
-  mkprim(PN_FROM,      from,       3, FSUBR);
-  mkprim(PN_TOTO,      toto,       3, FSUBR);
-  mkprim(PN_PIPECMD,   pipecmd,   -1, FSUBR);
-  mkprim(PN_BACK,      back,      -1, FSUBR);
-  mkprim(PN_STOP,      stop,       0, FSUBR);
-  mkprim(PN_CD,        cd,         1, FSUBR);
-  mkprim(PN_REHASH,    rehash,     0, FSUBR);
-  mkprim(PN_JOBS,      jobs,       0, FSUBR);
-  mkprim(PN_FG,        fg,         1, FSUBR);
-  mkprim(PN_BG,        bg,         1, FSUBR);
-  mkprim(PN_SETENV,    p_setenv,   2, FSUBR);
-  mkprim(PN_GETENV,    getenviron, 1, FSUBR);
-  mkprim(PN_EXEC,      doexec,    -1, FSUBR);
+  mkprim3(PN_EXPAND,    expand,     3, SUBR);
+  mkprim3(PN_TO,        to,         3, FSUBR);
+  mkprim3(PN_FROM,      from,       3, FSUBR);
+  mkprim3(PN_TOTO,      toto,       3, FSUBR);
+  mkprim1(PN_PIPECMD,   pipecmd,   -1, FSUBR);
+  mkprim1(PN_BACK,      back,      -1, FSUBR);
+  mkprim0(PN_STOP,      stop,       0, FSUBR);
+  mkprim2(PN_CD,        cd,         2, FSUBR);
+  mkprim0(PN_REHASH,    rehash,     0, FSUBR);
+  mkprim0(PN_JOBS,      jobs,       0, FSUBR);
+  mkprim1(PN_FG,        fg,         1, FSUBR);
+  mkprim1(PN_BG,        bg,         1, FSUBR);
+  mkprim2(PN_SETENV,    p_setenv,   2, FSUBR);
+  mkprim1(PN_GETENV,    getenviron, 1, FSUBR);
+  mkprim1(PN_EXEC,      doexec,    -1, FSUBR);
   (void) rehash();
   undefhook = execcommand;
 }

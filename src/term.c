@@ -24,12 +24,8 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern char *index(), *getenv();
-#ifdef TERMCAP
-extern char *tgetstr();
-#endif
-extern void finish();
-extern int readchar();
+extern void finish(int);
+extern int readchar(FILE*, char*);
 
 #define NUM_KEYS        256
 #define COMMENTCHAR     '#'
@@ -74,24 +70,20 @@ static char  *cleol, *curdn;
 static int nocap;                      /* Nonzero if insufficient term cap. */
 #endif
 
-int lips_getline();
+int lips_getline(FILE*);
 
-void
-cleanup()
+void cleanup()
 {
   finish(0);
 }
 
-void
-clearlbuf()
+void clearlbuf()
 {
   linepos = 0;
   parcount = 0;
 }
 
-void
-loadbuf(str)
-  char *str;
+void loadbuf(char *str)
 {
   (void) strcpy(linebuffer, str);
   (void) strcat(linebuffer, "\n");
@@ -101,8 +93,7 @@ loadbuf(str)
 /*
  * Set up keymap.
  */
-void
-init_keymap()
+void init_keymap()
 {
   int i;
 
@@ -122,8 +113,7 @@ init_keymap()
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
-void
-init_term()
+void init_term()
 {
   static int initialized = 0;
   char bp[1024];
@@ -184,10 +174,7 @@ void end_term()
  * Put a character on stdout prefixing it with a ^ if it's
  * a control character.
  */
-void
-pputc(c, file)
-  int c;
-  FILE *file;
+void pputc(int c, FILE *file)
 {
   if (c < 0x20 && c != '\n' && c != '\t')
     {
@@ -200,11 +187,7 @@ pputc(c, file)
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-void
-putch(c, file, esc)
-  int c;
-  FILE *file;
-  int esc;
+void putch(int c, FILE *file, int esc)
 {
   if ((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -217,9 +200,7 @@ putch(c, file, esc)
  * characters from linebuffer.  If it's not from a terminal
  * do io the standard way.
  */
-int
-getch(file)
-  FILE *file;
+int getch(FILE *file)
 {
   int c;
 
@@ -246,9 +227,7 @@ gotlin:
  * Unget a character.  If reading from a terminal, 
  * just push it back in the buffer, if not, do an ungetc.
  */
-void ungetch(c, file)
-  int c;
-  FILE *file;
+void ungetch(int c, FILE *file)
 {
   if (isatty(fileno(file)))
     {
@@ -264,8 +243,7 @@ void ungetch(c, file)
  * the first non-separator character is a left parenthesis, zero
  * otherwise.
  */
-static int
-firstnotlp()
+static int firstnotlp()
 {
   int i;
 
@@ -278,8 +256,7 @@ firstnotlp()
  * Delete one character the easy way by sending backspace - space -
  * backspace.  Do it twice if it was a control character.
  */
-static void
-delonechar()
+static void delonechar()
 {
   linepos--;
   (void) putc('\b', stdout);
@@ -296,8 +273,7 @@ delonechar()
 /*
  * Returns zero if the line contains only separators.
  */
-static int
-onlyblanks()
+static int onlyblanks()
 {
   int i = linepos;
 
@@ -313,9 +289,7 @@ onlyblanks()
 /*
  * Output a character on stdout, used only in tputs.
  */
-int
-outc(c)
-  int c;
+int outc(int c)
 {
   (void) putc(c, stdout);
   return c;
@@ -326,9 +300,7 @@ outc(c)
  *          retype complete line, including prompt.  It ALL is 2 just 
  *          delete all lines.  Used for ctrl-u kill.
  */
-static void
-retype(all)
-  int all;
+static void retype(int all)
 {
   int i;
 #ifdef TERMCAP
@@ -407,9 +379,7 @@ char *mkexstr()
   return ++last;
 }
 
-static void
-fillrest(word)
-  char *word;
+static void fillrest(char *word)
 {
   for(word += strlen(last) - 1; *word; word++)
     {
@@ -418,11 +388,7 @@ fillrest(word)
     }
 }
 
-static int
-checkchar(words, pos, c)
-  LISPT words;
-  int pos;
-  int *c;
+static int checkchar(LISPT words, int pos, int *c)
 {
   LISPT l;
 
@@ -436,9 +402,7 @@ checkchar(words, pos, c)
   return 1;
 }
 
-static void
-complete(words)
-  LISPT words;
+static void complete(LISPT words)
 {
   int pos;
   int c = 1;
@@ -451,10 +415,7 @@ complete(words)
     }
 }
 
-static LISPT
-strip(files, prefix, suffix)
-  LISPT files;
-  char *prefix, *suffix;
+static LISPT strip(LISPT files, char *prefix, char *suffix)
 {
   LISPT stripped;
   char *s;
@@ -496,9 +457,7 @@ static struct curpos currentpos;       /* Current position.  */
  * can find its way back.  BEGIN is the position in linebuffer from
  * where to start searching.
  */
-static void
-scan(begin)
-  int begin;
+static void scan(int begin)
 {
   int line, cpos;
   int pos;
@@ -608,10 +567,7 @@ scan(begin)
 /*
  * Puts the string STR on stdout NTIM times using tputs.
  */
-void
-nput(str, ntim)
-  char *str;
-  int ntim;
+void nput(char *str, int ntim)
 {
   for (; ntim > 0; ntim--)
     tputs(str, 1, outc);
@@ -620,8 +576,7 @@ nput(str, ntim)
 /*
  * Blink matching paren.
  */
-void
-blink()
+void blink()
 {
   int ldiff;
   int cdiff;
@@ -674,8 +629,7 @@ blink()
  * puts a right paren in the buffer as well as the newline.
  * Returns zero if anything goes wrong.
  */
-int lips_getline(file)
-  FILE *file;
+int lips_getline(FILE *file)
 {
   char c;
   char *s, *t;
@@ -833,9 +787,7 @@ int lips_getline(file)
  * Return 1 if currently at end of line, or
  * at end of line after skipping blanks.
  */
-int
-eoln(file)
-  FILE *file;
+int eoln(FILE *file)
 {
   int i;
 

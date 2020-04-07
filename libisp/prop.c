@@ -10,23 +10,20 @@
 static char rcsid[] = "$Id$";
 #endif
 
-PRIMITIVE setplist(a, pl)
-  LISPT a, pl;
+PRIMITIVE setplist(LISPT a, LISPT pl)
 {
   CHECK(a, SYMBOL);
   SYMVAL(a).plist = pl;
   return pl;
 }
 
-PRIMITIVE getplist(a)
-  LISPT a;
+PRIMITIVE getplist(LISPT a)
 {
   CHECK(a, SYMBOL);
   return SYMVAL(a).plist;
 }
 
-PRIMITIVE putprop(a, p, v)
-  LISPT a, p, v;
+PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 {
   LISPT pl;
 
@@ -42,8 +39,7 @@ PRIMITIVE putprop(a, p, v)
   return v;
 }
 
-PRIMITIVE getprop(a, p)
-  LISPT a, p;
+PRIMITIVE getprop(LISPT a, LISPT p)
 {
   LISPT pl;
 
@@ -57,8 +53,7 @@ PRIMITIVE getprop(a, p)
   return C_NIL;
 }
 
-PRIMITIVE remprop(a, p)
-  LISPT a, p;
+PRIMITIVE remprop(LISPT a, LISPT p)
 {
   LISPT pl, pl2, r;
 
@@ -82,9 +77,9 @@ PRIMITIVE remprop(a, p)
 
 void init_prop()
 {
-  mkprim(PN_SETPLIST, setplist, 2, SUBR);
-  mkprim(PN_GETPLIST, getplist, 1, SUBR);
-  mkprim(PN_PUTPROP,  putprop,  3, SUBR);
-  mkprim(PN_GETPROP,  getprop,  2, SUBR);
-  mkprim(PN_REMPROP,  remprop,  2, SUBR);
+  mkprim2(PN_SETPLIST, setplist, 2, SUBR);
+  mkprim1(PN_GETPLIST, getplist, 1, SUBR);
+  mkprim3(PN_PUTPROP,  putprop,  3, SUBR);
+  mkprim2(PN_GETPROP,  getprop,  2, SUBR);
+  mkprim2(PN_REMPROP,  remprop,  2, SUBR);
 }

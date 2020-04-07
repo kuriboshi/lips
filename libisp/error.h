@@ -6,7 +6,7 @@
  */
 #pragma once
 
-extern LISPT error();
+extern LISPT error(int, LISPT);
 
 #define PRINT_ARG            (1<<8)
 #define NOT_A                (1<<9)

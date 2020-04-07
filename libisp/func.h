@@ -15,19 +15,19 @@ extern int savept;
 extern OBARRAY *obarray[];
 extern LISPT freelist;
 /* functions */
-extern LISPT intern();
-extern LISPT getobject ();
-extern struct destblock *dalloc();
-extern void dfree();
-extern void dzero();
-extern void init_alloc();
-extern char *realmalloc();
+extern LISPT intern(char*);
+extern LISPT getobject(void);
+extern struct destblock *dalloc(int);
+extern void dfree(struct destblock*);
+extern void dzero(void);
+extern void init_alloc(void);
+extern char *realmalloc(unsigned int);
 
 /*
  * arith.c
  */
 /* functions */
-extern void init_arith();
+extern void init_arith(void);
 
 /*
  * eval.c
@@ -41,9 +41,9 @@ extern struct destblock *dest;
 extern CONTROL control;
 extern int toctrl;
 /* functions */
-extern void unwind();
-extern void init_ev();
-extern void bt();
+extern void unwind(void);
+extern void init_ev(void);
+extern void bt(void);
 
 /*
  * file.c
@@ -66,13 +66,13 @@ extern LISPT brkprompt;
 extern LISPT interactive;
 extern LISPT version;
 /* functions */
-extern void init_lisp();
+extern void init_lisp(void);
 
 /*
  * logic.c
  */
 /* functions */
-extern void init_logic();
+extern void init_logic(void);
 
 /*
  * low.c
@@ -80,13 +80,13 @@ extern void init_logic();
 /* variables */
 extern LISPT verboseflg;
 /* functions */
-extern void init_low();
+extern void init_low(void);
 
 /*
  * map.c
  */
 /* functions */
-extern void init_map();
+extern void init_map(void);
 
 /*
  * misc.c
@@ -94,32 +94,36 @@ extern void init_map();
 /* variables */
 extern long trace;
 /* functions */
-extern LISPT error();
-extern LISPT syserr();
-extern LISPT break0();
-extern void init_debug();
+extern LISPT error(int, LISPT);
+extern LISPT syserr(LISPT);
+extern LISPT break0(LISPT);
+extern void init_debug(void);
 
 /*
  * pred.c
  */
 /* functions */
-extern void init_pred();
+extern void init_pred(void);
 
 /*
  * prim.c
  */
 /* functions */
-extern void mkprim();
-extern LISPT nth();
-extern LISPT closobj();
-extern LISPT mklambda();
-extern void init_prim();
+extern void mkprim(char*, LISPT(*fname)(LISPT, LISPT, LISPT), short, char);
+extern void mkprim0(char*, LISPT(*fname)(void), short, char);
+extern void mkprim1(char*, LISPT(*fname)(LISPT), short, char);
+extern void mkprim2(char*, LISPT(*fname)(LISPT, LISPT), short, char);
+extern void mkprim3(char*, LISPT(*fname)(LISPT, LISPT, LISPT), short, char);
+extern LISPT nth(LISPT list, long n);
+extern LISPT closobj(LISPT vars);
+extern LISPT mklambda(LISPT args, LISPT def, int type);
+extern void init_prim(void);
 
 /*
  * prop.c
  */
 /* functions */
-extern void init_prop();
+extern void init_prop(void);
 
 /*
  * read.c
@@ -132,24 +136,24 @@ extern long thisplevel;
 extern int echoline;
 extern struct rtinfo currentrt;
 /* functions */
-extern LISPT ratom();
-extern LISPT lispread();
-extern LISPT readline();
-extern LISPT patom();
-extern LISPT terpri();
-extern LISPT prinbody();
-extern LISPT prin0();
-extern LISPT print();
+extern LISPT ratom(FILE*);
+extern LISPT lispread(FILE*, int);
+extern LISPT readline(FILE*);
+extern LISPT patom(LISPT, FILE*, int);
+extern LISPT terpri(FILE*);
+extern LISPT prinbody(LISPT, FILE*, int);
+extern LISPT prin0(LISPT, FILE*, int);
+extern LISPT print(LISPT, FILE*);
 
 /*
  * string.c
  */
 /* functions */
-extern void init_string();
+extern void init_string(void);
 
 /*
  * user.c
  */
 /* functions */
-extern LISPT funeq();
-extern void init_user();
+extern LISPT funeq(LISPT, LISPT);
+extern void init_user(void);

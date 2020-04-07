@@ -14,15 +14,14 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern int getch();
-extern void putch();
+extern int getch(FILE*);
+extern void putch(char, FILE*, int);
 
 FILE *primin;
 FILE *primout;
 FILE *primerr;
 
-PRIMITIVE xratom(file)
-  LISPT file;
+PRIMITIVE xratom(LISPT file)
 {
   if (ISNIL(file))
     return ratom(primin);
@@ -32,8 +31,7 @@ PRIMITIVE xratom(file)
   return ratom(FILEVAL(file));
 }
 
-PRIMITIVE readc(file)
-  LISPT file;
+PRIMITIVE readc(LISPT file)
 {
   if (ISNIL(file))
     return mknumber((long) getch(primin));
@@ -43,8 +41,7 @@ PRIMITIVE readc(file)
   return mknumber((long) getch(FILEVAL(file)));
 }
   
-PRIMITIVE xread(file)
-  LISPT file;
+PRIMITIVE xread(LISPT file)
 {
   if (ISNIL(file))
     return lispread(primin, 0);
@@ -54,8 +51,7 @@ PRIMITIVE xread(file)
   return lispread(FILEVAL(file), 0);
 }
 
-PRIMITIVE xprint(x, file)
-  LISPT x, file;
+PRIMITIVE xprint(LISPT x, LISPT file)
 {
   if (ISNIL(file))
     return print(x, primout);
@@ -65,8 +61,7 @@ PRIMITIVE xprint(x, file)
   return print(x, FILEVAL(file));
 }
 
-int loadfile(lf)
-  char *lf;
+int loadfile(char* lf)
 {
   FILE *foo;
   LISPT rval;
@@ -82,8 +77,7 @@ int loadfile(lf)
   return 0;
 }
 
-PRIMITIVE load(f)
-  LISPT f;
+PRIMITIVE load(LISPT f)
 {
   CHECK2(f, STRING, SYMBOL);
   if (loadfile(GETSTR(f)))
@@ -92,8 +86,7 @@ PRIMITIVE load(f)
     return f;
 }
 
-PRIMITIVE xterpri(file)
-  LISPT file;
+PRIMITIVE xterpri(LISPT file)
 {
   if (ISNIL(file))
     return terpri(primout);
@@ -103,8 +96,7 @@ PRIMITIVE xterpri(file)
   return terpri(FILEVAL(file));
 }
 
-PRIMITIVE prin1(x, file)
-  LISPT x, file;
+PRIMITIVE prin1(LISPT x, LISPT file)
 {
   thisplevel = 0;
   if (ISNIL(file))
@@ -115,8 +107,7 @@ PRIMITIVE prin1(x, file)
   return prin0(x, FILEVAL(file), 0);
 }
 
-PRIMITIVE prin2(x, file)
-  LISPT x, file;
+PRIMITIVE prin2(LISPT x, LISPT file)
 {
   thisplevel = 0;
   if (ISNIL(file))
@@ -127,8 +118,7 @@ PRIMITIVE prin2(x, file)
   return prin0(x, FILEVAL(file), 0);
 }
 
-PRIMITIVE plevel(newl)
-  LISPT newl;
+PRIMITIVE plevel(LISPT newl)
 {
   long x;
 
@@ -141,8 +131,7 @@ PRIMITIVE plevel(newl)
   return mknumber(x);
 }
 
-PRIMITIVE spaces(n,file)
-  LISPT n,file;
+PRIMITIVE spaces(LISPT n, LISPT file)
 {
   int i;
   FILE *f;
@@ -160,8 +149,7 @@ PRIMITIVE spaces(n,file)
   return C_NIL;
 }
 
-PRIMITIVE xreadline(file)
-  LISPT file;
+PRIMITIVE xreadline(LISPT file)
 {
   FILE *f;
 
@@ -175,8 +163,7 @@ PRIMITIVE xreadline(file)
   return readline(f);
 }
 
-PRIMITIVE cpprint(oname, file)
-  LISPT oname, file; 
+PRIMITIVE cpprint(LISPT oname, LISPT file)
 {
   FILE *f, *tagsfile, *cfile;
   char buf[120];
@@ -255,18 +242,18 @@ PRIMITIVE cpprint(oname, file)
 
 void init_file()
 {
-  mkprim(PN_LOAD,     load , 1, SUBR);
-  mkprim(PN_PRIN1,    prin1, 2, SUBR);
-  mkprim(PN_PRIN2,    prin2, 2, SUBR);
-  mkprim(PN_PRINT,    xprint, 2, SUBR);
-  mkprim(PN_PLEVEL,   plevel, 1, SUBR);
-  mkprim(PN_RATOM,    xratom, 1, SUBR);
-  mkprim(PN_READ,     xread, 1, SUBR);
-  mkprim(PN_READC,    readc, 1, SUBR);
-  mkprim(PN_READLINE, xreadline, 1, SUBR);
-  mkprim(PN_SPACES,   spaces, 2, SUBR);
-  mkprim(PN_TERPRI,   xterpri, 1, SUBR);
-  mkprim(PN_CPPRINT,  cpprint, 2, SUBR);
+  mkprim1(PN_LOAD,     load,       1, SUBR);
+  mkprim2(PN_PRIN1,    prin1,      2, SUBR);
+  mkprim2(PN_PRIN2,    prin2,      2, SUBR);
+  mkprim2(PN_PRINT,    xprint,     2, SUBR);
+  mkprim1(PN_PLEVEL,   plevel,     1, SUBR);
+  mkprim1(PN_RATOM,    xratom,     1, SUBR);
+  mkprim1(PN_READ,     xread,      1, SUBR);
+  mkprim1(PN_READC,    readc,      1, SUBR);
+  mkprim1(PN_READLINE, xreadline,  1, SUBR);
+  mkprim2(PN_SPACES,   spaces,     2, SUBR);
+  mkprim1(PN_TERPRI,   xterpri,    1, SUBR);
+  mkprim2(PN_CPPRINT,  cpprint,    2, SUBR);
   primin = stdin;
   primout = stdout;
   primerr = stderr;

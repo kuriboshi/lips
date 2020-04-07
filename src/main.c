@@ -27,10 +27,10 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern void init_term();
-extern void end_term();
-extern void clearlbuf();
-extern void loadbuf();
+extern void init_term(void);
+extern void end_term(void);
+extern void clearlbuf(void);
+extern void loadbuf(char*);
 
 extern int optind;              /* For getopt. */
 extern char *optarg;            /* This too. */
@@ -46,16 +46,14 @@ LISPT home;              /* Home directory. */
 LISPT globsort;		/* To sort or not during globbing. */
 
 /* graceful death */
-void finish(stat)
+void finish(int stat)
 {
   end_term();
   exit(stat);
 }
 
 #ifdef FANCY_SIGNALS
-static int getuser(f, def)
-  FILE *f;
-  int def;
+static int getuser(FILE *f, int def)
 {
 #ifdef SELECT
   int c;
@@ -93,8 +91,7 @@ static int getuser(f, def)
  * dump a core. If continued there is no garantee anything will
  * work correctly.
  */
-void core(sig)
-  int sig;
+void core(int sig)
 {
   int c;
 
@@ -200,8 +197,7 @@ static void fixpgrp()
  * Processes the environment variable PATH and returns a list
  * of all directories in PATH.
  */
-LISPT mungepath(pstr)
-  char *pstr;
+LISPT mungepath(char *pstr)
 {
   char *ps, *s;
   LISPT p;
@@ -225,14 +221,12 @@ LISPT mungepath(pstr)
   return p;
 }
 
-void
-onbreak()
+void onbreak()
 {
   if (insidefork) exit(1);
 }
 
-void
-promptfun()
+void promptfun()
 {
   (void) ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
   init_term();
@@ -244,10 +238,7 @@ promptfun()
   printdone();
 }
 
-static LISPT
-put_end(list, obj, conc)
-  LISPT list, obj;
-  int conc;
+static LISPT put_end(LISPT list, LISPT obj, int conc)
 {
   LISPT t;
 
@@ -265,9 +256,7 @@ put_end(list, obj, conc)
   return list;
 }
 
-static LISPT
-transform(list)
-  LISPT list;
+static LISPT transform(LISPT list)
 {
   LISPT tl;
   LISPT res;
@@ -346,8 +335,7 @@ transform(list)
   return res;
 }
 
-static void
-init()
+static void init()
 {
   init_term();
 
@@ -373,8 +361,7 @@ init()
 /*
  * Loads the file INITFILE.
  */
-static void loadinit(initfile)
-  char *initfile;
+static void loadinit(char *initfile)
 {
   if (loadfile(initfile))
     (void) printf("Can't open file %s\n", initfile); /* System init file. */
@@ -384,11 +371,9 @@ static void loadinit(initfile)
  * Greet user who, or if who is nil, $USER. This means loading
  * the user's init file, .lipsrc.
  */
-LISPT greet(who)
-  LISPT who;
+LISPT greet(LISPT who)
 {
   struct passwd *pws;
-  struct passwd *getpwent();
   char loadf[256];
   char *s;
 
@@ -407,9 +392,7 @@ LISPT greet(who)
 }
 
 /*ARGSUSED*/
-int main(argc, argv)
-  int argc;
-  char **argv;
+int main(int argc, char* const* argv)
 {
   int option;
 
@@ -482,6 +465,6 @@ int main(argc, argv)
   fun = C_NIL;
   args = C_NIL;
   env = NULL;
-  toploop(&topprompt, (int (*)()) NULL);
+  toploop(&topprompt, (int (*)(LISPT*)) NULL);
   finish(0);
 }

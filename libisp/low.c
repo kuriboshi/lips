@@ -16,8 +16,7 @@ LISPT verboseflg;
 Dummy definition for cpprint.
 PRIMITIVE set(var, val)
 */
-PRIMITIVE set(var, val)
-  LISPT var, val;
+PRIMITIVE set(LISPT var, LISPT val)
 {
   CHECK(var, SYMBOL);
   if (EQ(var, CE_NIL) || EQ(var, CE_T))
@@ -31,14 +30,12 @@ PRIMITIVE set(var, val)
   return val;
 }
 
-PRIMITIVE setq(var, val)
-  LISPT var, val;
+PRIMITIVE setq(LISPT var, LISPT val)
 {
   return set(var, eval(val));
 }
 
-PRIMITIVE progn(lexp)
-  LISPT lexp;
+PRIMITIVE progn(LISPT lexp)
 {
   if (ISNIL(lexp))
     return C_NIL;
@@ -50,8 +47,7 @@ PRIMITIVE progn(lexp)
   return eval(CAR(lexp));
 }
 
-PRIMITIVE cond(args)
-  LISPT args;
+PRIMITIVE cond(LISPT args)
 {
   LISPT alt;
   LISPT res;
@@ -78,8 +74,7 @@ PRIMITIVE cond(args)
   return C_NIL;
 }
 
-PRIMITIVE xwhile(pred, exp)
-  LISPT pred, exp;
+PRIMITIVE xwhile(LISPT pred, LISPT exp)
 {
   LISPT res;
 
@@ -93,15 +88,13 @@ PRIMITIVE xwhile(pred, exp)
 }
 
 /*ARGSUSED*/
-PRIMITIVE prog1(a1, la)
-  LISPT a1, la;
+PRIMITIVE prog1(LISPT a1, LISPT la)
 {
   return a1;
 }
 
 /*ARGSUSED*/
-PRIMITIVE prog2(a1, a2, la)
-  LISPT a1, a2, la;
+PRIMITIVE prog2(LISPT a1, LISPT a2, LISPT la)
 {
   return a2;
 }
@@ -113,8 +106,7 @@ PRIMITIVE topofstack()
 }
 #endif
 
-PRIMITIVE envget(e, n)
-  LISPT e, n;
+PRIMITIVE envget(LISPT e, LISPT n)
 {
 #if 0
   LISPT foo;
@@ -137,17 +129,17 @@ PRIMITIVE envget(e, n)
 
 void init_low()
 {
-  mkprim(PN_SET,        set,         2, SUBR);
-  mkprim(PN_SETQ,       setq,        2, FSUBR);
-  mkprim(PN_SETQQ,      set,         2, FSUBR);
-  mkprim(PN_COND,       cond,       -1, FSUBR);
-  mkprim(PN_WHILE,      xwhile,     -2, FSUBR);
-  mkprim(PN_PROGN,      progn,      -1, FSUBR);
-  mkprim(PN_PROG1,      prog1,      -2, SUBR);
-  mkprim(PN_PROG2,      prog2,      -3, SUBR);
+  mkprim2(PN_SET,        set,         2, SUBR);
+  mkprim2(PN_SETQ,       setq,        2, FSUBR);
+  mkprim2(PN_SETQQ,      set,         2, FSUBR);
+  mkprim1(PN_COND,       cond,       -1, FSUBR);
+  mkprim2(PN_WHILE,      xwhile,     -2, FSUBR);
+  mkprim1(PN_PROGN,      progn,      -1, FSUBR);
+  mkprim2(PN_PROG1,      prog1,      -2, SUBR);
+  mkprim3(PN_PROG2,      prog2,      -3, SUBR);
 #if 0
-  mkprim(PN_TOPOFSTACK, topofstack,  0, SUBR);
+  mkprim0(PN_TOPOFSTACK, topofstack,  0, SUBR);
 #endif
-  mkprim(PN_ENVGET,     envget,      2, SUBR);
+  mkprim2(PN_ENVGET,     envget,      2, SUBR);
   initcvar(&verboseflg, "verboseflg", C_NIL);
 }

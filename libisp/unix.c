@@ -25,38 +25,33 @@ PRIMITIVE uxerrno()
   return mknumber((long)errno);
 }
 
-PRIMITIVE uxaccess(name,mode)
-  LISPT name,mode;
+PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
   CHECK(name,STRING);
   CHECK(mode,INTEGER);
   return mknumber((long)access(STRINGVAL(name),(int)INTVAL(mode)));
 }
 
-PRIMITIVE uxalarm(seconds)
-  LISPT seconds;
+PRIMITIVE uxalarm(LISPT seconds)
 {
   CHECK(seconds,INTEGER);
   return mknumber((long)alarm(INTVAL (seconds)));
 }
 
-PRIMITIVE uxchdir(dirname)
-  LISPT dirname;
+PRIMITIVE uxchdir(LISPT dirname)
 {
   CHECK(dirname,STRING);
   return mknumber((long)chdir(STRINGVAL(dirname)));
 }
   
-PRIMITIVE uxchmod(name,mode)
-  LISPT name,mode;
+PRIMITIVE uxchmod(LISPT name, LISPT mode)
 {
   CHECK(name,STRING);
   CHECK(mode,INTEGER);
   return mknumber((long)chmod(STRINGVAL(name),(int)INTVAL(mode)));
 }
 
-PRIMITIVE uxclose(fildes)
-  LISPT fildes;
+PRIMITIVE uxclose(LISPT fildes)
 {
   CHECK(fildes,FILET);
   if (fclose(FILEVAL(fildes)) == -1)
@@ -65,8 +60,7 @@ PRIMITIVE uxclose(fildes)
     return C_T;
 }
 
-PRIMITIVE uxcreat(name,mode)
-  LISPT name,mode;
+PRIMITIVE uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
@@ -79,8 +73,7 @@ PRIMITIVE uxcreat(name,mode)
     return mknumber((long)i);
 }
 
-PRIMITIVE uxdup(fildes)
-  LISPT fildes;
+PRIMITIVE uxdup(LISPT fildes)
 {
   CHECK(fildes,INTEGER);
   return mknumber((long)dup((int)INTVAL(fildes)));
@@ -111,31 +104,27 @@ PRIMITIVE uxgetpid()
   return mknumber((long)getpid());
 }
 
-PRIMITIVE uxkill(pid,sig)
-  LISPT pid,sig;
+PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
   CHECK(pid,INTEGER);
   CHECK(sig,INTEGER);
-  return mknumber((long)kill((int)INTVAL(pid),(int)INTVAL(sig)));
+  return mknumber((long)kill((int)INTVAL(pid), (int)INTVAL(sig)));
 }
 
-PRIMITIVE uxlink(name1,name2)
-  LISPT name1,name2;
+PRIMITIVE uxlink(LISPT name1, LISPT name2)
 {
   CHECK(name1,STRING);
   CHECK(name2,STRING);
   return mknumber((long)link(STRINGVAL(name1),STRINGVAL(name2)));
 }
 
-PRIMITIVE uxnice(incr)
-  LISPT incr;
+PRIMITIVE uxnice(LISPT incr)
 {
   CHECK(incr,INTEGER);
   return mknumber((long)nice((int)INTVAL(incr)));
 }
 
-PRIMITIVE uxopen(name,mode)
-  LISPT name,mode;
+PRIMITIVE uxopen(LISPT name, LISPT mode)
 {
   FILE *f;
   char *openmode;
@@ -164,29 +153,25 @@ PRIMITIVE uxopen(name,mode)
   return newfile;
 }
 
-PRIMITIVE uxsetuid(uid)
-  LISPT uid;
+PRIMITIVE uxsetuid(LISPT uid)
 {
   CHECK(uid,INTEGER);
   return mknumber((long)setuid((int)INTVAL(uid)));
 }
 
-PRIMITIVE uxsetgid(gid)
-  LISPT gid;
+PRIMITIVE uxsetgid(LISPT gid)
 {
   CHECK(gid,INTEGER);
   return mknumber((long)setgid((int)INTVAL(gid)));
 }
 
 /*ARGSUSED*/
-void sighandle(sig)
-int sig;
+void sighandle(int sig)
 {
   (void)eval(sighandler[sig]);
 }
 
-PRIMITIVE uxsignal(sig,fun)
-  LISPT sig,fun;
+PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 {
   CHECK(sig,INTEGER);
   
@@ -210,8 +195,7 @@ PRIMITIVE uxsignal(sig,fun)
   return C_T;
 }
 
-PRIMITIVE uxunlink(name)
-  LISPT name;
+PRIMITIVE uxunlink(LISPT name)
 {
   CHECK(name,STRING);
   return mknumber((long)unlink(STRINGVAL(name)));
@@ -219,25 +203,25 @@ PRIMITIVE uxunlink(name)
 
 void init_unix()
 {
-  mkprim(PN_UXACCESS,uxaccess,2,SUBR);
-  mkprim(PN_UXALARM,uxalarm,1,SUBR);
-  mkprim(PN_UXCHDIR,uxchdir,1,SUBR);
-  mkprim(PN_UXCHMOD,uxchmod,2,SUBR);
-  mkprim(PN_UXCLOSE,uxclose,1,SUBR);
-  mkprim(PN_UXCREAT,uxcreat,2,SUBR);
-  mkprim(PN_UXDUP,uxdup,1,SUBR);
-  mkprim(PN_UXERRNO,uxerrno,0,SUBR);
-  mkprim(PN_UXGETUID,uxgetuid,0,SUBR);
-  mkprim(PN_UXGETEUID,uxgeteuid,0,SUBR);
-  mkprim(PN_UXGETGID,uxgetgid,0,SUBR);
-  mkprim(PN_UXGETEGID,uxgetegid,0,SUBR);
-  mkprim(PN_UXGETPID,uxgetpid,0,SUBR);
-  mkprim(PN_UXKILL,uxkill,2,SUBR);
-  mkprim(PN_UXLINK,uxlink,2,SUBR);
-  mkprim(PN_UXNICE,uxnice,1,SUBR);
-  mkprim(PN_UXOPEN,uxopen,2,SUBR);
-  mkprim(PN_UXSETUID,uxsetuid,1,SUBR);
-  mkprim(PN_UXSETGID,uxsetgid,1,SUBR);
-  mkprim(PN_SIGNAL,uxsignal,2,SUBR);
-  mkprim(PN_UXUNLINK,uxunlink,1,SUBR);
+  mkprim2(PN_UXACCESS,  uxaccess,  2, SUBR);
+  mkprim1(PN_UXALARM,   uxalarm,   1, SUBR);
+  mkprim1(PN_UXCHDIR,   uxchdir,   1, SUBR);
+  mkprim2(PN_UXCHMOD,   uxchmod,   2, SUBR);
+  mkprim1(PN_UXCLOSE,   uxclose,   1, SUBR);
+  mkprim2(PN_UXCREAT,   uxcreat,   2, SUBR);
+  mkprim1(PN_UXDUP,     uxdup,     1, SUBR);
+  mkprim0(PN_UXERRNO,   uxerrno,   0, SUBR);
+  mkprim0(PN_UXGETUID,  uxgetuid,  0, SUBR);
+  mkprim0(PN_UXGETEUID, uxgeteuid, 0, SUBR);
+  mkprim0(PN_UXGETGID,  uxgetgid,  0, SUBR);
+  mkprim0(PN_UXGETEGID, uxgetegid, 0, SUBR);
+  mkprim0(PN_UXGETPID,  uxgetpid,  0, SUBR);
+  mkprim2(PN_UXKILL,    uxkill,    2, SUBR);
+  mkprim2(PN_UXLINK,    uxlink,    2, SUBR);
+  mkprim1(PN_UXNICE,    uxnice,    1, SUBR);
+  mkprim2(PN_UXOPEN,    uxopen,    2, SUBR);
+  mkprim1(PN_UXSETUID,  uxsetuid,  1, SUBR);
+  mkprim1(PN_UXSETGID,  uxsetgid,  1, SUBR);
+  mkprim2(PN_SIGNAL,    uxsignal,  2, SUBR);
+  mkprim1(PN_UXUNLINK,  uxunlink,  1, SUBR);
 }

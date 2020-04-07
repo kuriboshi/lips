@@ -5,13 +5,14 @@
  * $Id$
  */
 #include <errno.h>
+#include <setjmp.h>
 #include "lisp.h"
 
 #ifndef lint
 static char rcsid[] = "$Id$";
 #endif
 
-extern void toploop();
+extern void toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
 static char *messages[MAXMESSAGE];
@@ -39,12 +40,11 @@ PRIMITIVE xobarray()
   o = C_NIL;
   for (i=0; i<MAXHASH; i++)
     for (l=obarray[i]; l; l = l->onext)
-      o = cons(l->sym,o);
+      o = cons(l->sym, o);
   return o;
 }
 
-PRIMITIVE evaltrace(state)
-LISPT state;
+PRIMITIVE evaltrace(LISPT state)
 {
   long i = trace;
 
@@ -67,10 +67,7 @@ PRIMITIVE freecount()
   return mknumber((long) i);
 }
 
-LISPT
-error(messnr, arg)
-  int messnr;
-  LISPT arg;
+LISPT error(int messnr, LISPT arg)
 {
   if (NOT_A & messnr)
     (void) fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
@@ -80,9 +77,7 @@ error(messnr, arg)
   return C_ERROR;
 }
 
-LISPT
-syserr(fault)
-  LISPT fault;
+LISPT syserr(LISPT fault)
 {
   if (!ISNIL(fault))
     {
@@ -93,13 +88,10 @@ syserr(fault)
   return C_ERROR;
 }
 
-#include <setjmp.h>
 static LISPT pexp;
 extern jmp_buf toplevel;
 
-static int
-dobreak(com)
-  LISPT *com;
+static int dobreak(LISPT* com)
 {
 /* OK, EVAL, ^, ... */
   if (TYPEOF(*com) != CONS)
@@ -130,21 +122,18 @@ dobreak(com)
   return 1;
 }
 
-LISPT
-break0(exp)
-  LISPT exp;
+LISPT break0(LISPT exp)
 {
   pexp = exp;
   toploop(&brkprompt, dobreak);
   return pexp;
 }
 
-void
-init_debug()
+void init_debug()
 {
-  mkprim(PN_FREECOUNT, freecount, 0, SUBR);
-  mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
-  mkprim(PN_OBARRAY,   xobarray,  0, SUBR);
+  mkprim0(PN_FREECOUNT, freecount, 0, SUBR);
+  mkprim1(PN_EVALTRACE, evaltrace, 1, SUBR);
+  mkprim0(PN_OBARRAY,   xobarray,  0, SUBR);
   messages[ERRNO(NO_MESSAGE)] = "";
   messages[ERRNO(ILLEGAL_ARG)] = "Illegal argument";
   messages[ERRNO(DIVIDE_ZERO)] = "Divide by zero";

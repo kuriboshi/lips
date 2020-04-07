@@ -15,11 +15,11 @@ static char rcsid[] = "$Id$";
 extern jmp_buf toplevel;
 extern int brkflg;
 extern int interrupt;
-extern LISPT findalias();
-extern void pputc();
+extern LISPT findalias(LISPT);
+extern void pputc(char, FILE*);
 
-void (*breakhook)();            /* Called before going into break. */
-int (*undefhook)();             /* Called in case of undefined function. */
+void (*breakhook)(void);         /* Called before going into break. */
+int (*undefhook)(LISPT, LISPT*); /* Called in case of undefined function. */
 
 /* 
  * These variables are really local to this file but are needed
@@ -34,22 +34,22 @@ struct destblock *dest;         /* Current destination beeing built. */
 CONTROL control;		/* Control-stack. */
 int toctrl;                     /* Control-stack stack pointer. */
 
-static int peval();
-static int peval1();
-static int peval2();
-static int ev0(), ev1(), ev2(), ev3(), ev4(), evlam1(), evlam0();
-static int ev9(), ev11(), ev3p();
-static int evalargs(), noevarg(), evlam(), spread();
-static int evlis(), evlis1(), evlis2(), evlis3(), evlis4();
-static int noev9();
-static int evsequence(), evseq1(), evseq3();
-static int evclosure(), evclosure1();
-static int eval0(), apply0();
-static int everr();
-static int lookup();
+static int peval(void);
+static int peval1(void);
+static int peval2(void);
+static int ev0(void), ev1(void), ev2(void), ev3(void), ev4(void), evlam1(void), evlam0(void);
+static int ev9(void), ev11(void), ev3p(void);
+static int evalargs(void), noevarg(void), evlam(void), spread(void);
+static int evlis(void), evlis1(void), evlis2(void), evlis3(void), evlis4(void);
+static int noev9(void);
+static int evsequence(void), evseq1(void), evseq3(void);
+static int evclosure(void), evclosure1(void);
+static int eval0(void), apply0(void);
+static int everr(void);
+static int lookup(void);
 
 static int noeval;		/* Don't evaluate arguments. */
-static int (*cont)();		/* Current continuation. */
+static int (*cont)(void);       /* Current continuation. */
 
 /*
  * This macro prints an error message, and sets up a call
@@ -66,7 +66,7 @@ static int (*cont)();		/* Current continuation. */
 			  if (env == NULL) \
 			    longjmp(toplevel, 2); \
 			  (void) xprint(cons(fault, \
-					     cons(C_BROKEN, C_NIL)), C_T); \
+                            cons(C_BROKEN, C_NIL)), C_T); \
 			  PUSH_FUNC(next); \
 			  cont = everr; \
 			}
@@ -123,8 +123,11 @@ static int (*cont)();		/* Current continuation. */
 /* Use shallow binding. */
 #define SHALLOW
 
-/* Just a convenience macro. */
-#define CALL            (*(SUBRVAL(fun).function))
+/* Just some convenience macros. */
+#define CALL0           (*(SUBRVAL(fun).function0))
+#define CALL1           (*(SUBRVAL(fun).function1))
+#define CALL2           (*(SUBRVAL(fun).function2))
+#define CALL3           (*(SUBRVAL(fun).function3))
 
 static LISPT printwhere()
 {
@@ -162,24 +165,23 @@ static void overflow()
  * Make a call to the function in parameter `fun'.  It can handle
  * functions with up to three arguments.
  */
-static LISPT call(fun)
-  LISPT fun;
+static LISPT call(LISPT fun)
 {
-  register LISPT foo;
+  LISPT foo;
 
   switch(SUBRVAL(fun).argcount)
     {
     case 0:
-      foo = CALL();
+      foo = CALL0();
       break;
     case 1: case -1:
-      foo = CALL(dest[1].val.d_lisp);
+      foo = CALL1(dest[1].val.d_lisp);
       break;
     case 2: case -2:
-      foo = CALL(dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = CALL2(dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3: case -3:
-      foo = CALL(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = CALL3(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
@@ -193,12 +195,11 @@ static LISPT call(fun)
  */
 /*
 Dummy definition for the pretty printer.
-PRIMITIVE eval(expr)
+PRIMITIVE eval(LISPT expr)
 */
-PRIMITIVE eval(expr)
-  LISPT expr;
+PRIMITIVE eval(LISPT expr)
 {
-  register LISPT foo;
+  LISPT foo;
 
   /* 
    * Set the current expression to `expr' and push the current
@@ -243,10 +244,9 @@ static int eval0()
 Dummy definition for the pretty printer.
 PRIMITIVE apply(f, a)
 */
-PRIMITIVE apply(f, a)
-  LISPT f, a;
+PRIMITIVE apply(LISPT f, LISPT a)
 {
-  register LISPT foo;
+  LISPT foo;
 
   PUSH_POINT(dest);
   dest = MKDESTBLOCK(1);
@@ -331,9 +331,7 @@ static int ev1()
   return 0;
 }
 
-static int
-evalhook(exp)
-  LISPT exp;
+static int evalhook(LISPT exp)
 {
   LISPT res;
 
@@ -354,9 +352,7 @@ evalhook(exp)
   return 1;
 }
 
-void
-do_unbound(continuation)
-  int (*continuation)();
+void do_unbound(int (*continuation)(void))
 {
   LISPT al;
   
@@ -402,8 +398,7 @@ do_unbound(continuation)
     }
 }
 
-int do_default(continuation)
-  int (*continuation)();
+int do_default(int (*continuation)(void))
 {
   expression = findalias(expression);
   if (EQ(expression, C_ERROR))
@@ -420,7 +415,7 @@ int do_default(continuation)
 
 static int peval1()
 {
-  register int foo;
+  int foo;
 
   if (brkflg) BREAK(KBD_BREAK, fun, peval1)
   else if (interrupt)
@@ -497,7 +492,7 @@ static int peval1()
 
 static int peval2()
 {
-  register int foo;
+  int foo;
 
   if (brkflg) BREAK(KBD_BREAK, fun, peval2)
   else switch(TYPEOF(fun))
@@ -556,8 +551,7 @@ static int peval2()
  * bt - Prints a backtrace of all expressions on the
  *    	stack.
  */
-void
-bt()
+void bt()
 {
   int op;
   int i;
@@ -698,7 +692,7 @@ static int evlis3()
 
 static int evlis4()
 {
-  register LISPT x;
+  LISPT x;
   
   x = RECEIVE;
   dfree(dest);
@@ -711,10 +705,10 @@ static int evlis4()
 
 static int evlam()
 {
-  register int i;
-  register int ac;
-  register int spr;
-  register LISPT foo;
+  int i;
+  int ac;
+  int spr;
+  LISPT foo;
 
   PUSH_LISP(expression);
   PUSH_POINT(env);
@@ -769,7 +763,7 @@ respread:
 
 static int ev2()
 {
-  register LISPT foo;
+  LISPT foo;
 
   foo = call(fun);
   dfree(dest);
@@ -811,8 +805,8 @@ static int ev4()
 
 static void Link()
 {
-  register long i;
-  register LISPT t;
+  long i;
+  LISPT t;
 
   dest[0].var.d_environ = env;
   dest[0].type = 2;
@@ -837,8 +831,8 @@ static int evlam1()
 
 static void unLink()
 {
-  register long i;
-  register struct destblock *c;
+  long i;
+  struct destblock *c;
 
   c = env;
   for (i = c[0].val.d_integer; i>0; i--)
@@ -865,7 +859,7 @@ void unwind()
 
 static int lookup()
 {
-  register LISPT t;
+  LISPT t;
 
   t = SYMVALUE(expression);
   switch (TYPEOF(t))
@@ -890,9 +884,9 @@ static int lookup()
 
 static int evclosure()
 {
-  register LISPT foo;
-  register int i;
-  register struct destblock *envir;
+  LISPT foo;
+  int i;
+  struct destblock *envir;
 
   PUSH_POINT(env);
   PUSH_POINT(dest);
@@ -1043,9 +1037,9 @@ PRIMITIVE baktrace()
 
 void init_ev()
 {
-  mkprim(PN_E,         eval,      1, FSUBR);
-  mkprim(PN_EVAL,      eval,      1, SUBR);
-  mkprim(PN_APPLY,     apply,     2, SUBR);
-  mkprim(PN_APPLYSTAR, apply,    -2, SUBR);
-  mkprim(PN_BAKTRACE,  baktrace,  0, SUBR);
+  mkprim1(PN_E,         eval,      1, FSUBR);
+  mkprim1(PN_EVAL,      eval,      1, SUBR);
+  mkprim2(PN_APPLY,     apply,     2, SUBR);
+  mkprim2(PN_APPLYSTAR, apply,    -2, SUBR);
+  mkprim0(PN_BAKTRACE,  baktrace,  0, SUBR);
 }

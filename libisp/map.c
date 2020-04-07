@@ -13,8 +13,7 @@ static char rcsid[] = "$Id$";
 
 USESAVE
 
-PRIMITIVE map(obj, fn1, fn2)
-  LISPT obj, fn1, fn2;
+PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while (TYPEOF(obj) == CONS)
     {
@@ -27,8 +26,7 @@ PRIMITIVE map(obj, fn1, fn2)
   return C_NIL;
 }
 
-PRIMITIVE mapc(obj, fn1, fn2)
-  LISPT obj, fn1, fn2;
+PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while (TYPEOF(obj) == CONS)
     {
@@ -41,8 +39,7 @@ PRIMITIVE mapc(obj, fn1, fn2)
   return C_NIL;
 }
 
-PRIMITIVE maplist(obj, fn1, fn2)
-  LISPT obj, fn1, fn2;
+PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT rval, tmp;
 
@@ -67,8 +64,7 @@ PRIMITIVE maplist(obj, fn1, fn2)
   return rval;
 }
 
-PRIMITIVE mapcar(obj, fn1, fn2)
-  LISPT obj, fn1, fn2;
+PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT rval, tmp; 
 
@@ -95,8 +91,8 @@ PRIMITIVE mapcar(obj, fn1, fn2)
 
 void init_map()
 {
-  mkprim(PN_MAP,     map,      3, SUBR);
-  mkprim(PN_MAPC,    mapc,     3, SUBR);
-  mkprim(PN_MAPLIST, maplist,  3, SUBR);
-  mkprim(PN_MAPCAR,  mapcar,   3, SUBR);
+  mkprim3(PN_MAP,     map,      3, SUBR);
+  mkprim3(PN_MAPC,    mapc,     3, SUBR);
+  mkprim3(PN_MAPLIST, maplist,  3, SUBR);
+  mkprim3(PN_MAPCAR,  mapcar,   3, SUBR);
 }

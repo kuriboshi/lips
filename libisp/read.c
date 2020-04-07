@@ -32,23 +32,23 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern int getch();
-extern void ungetch();
-extern int eoln();
-extern void putch();
+extern int getch(FILE*);
+extern void ungetch(char, FILE*);
+extern int eoln(FILE*);
+extern void putch(char, FILE*, int);
 
 extern LISPT history, currentbase;
 
-extern LISPT histget();
+extern LISPT histget(long, LISPT);
 
-static LISPT rmsquote();
-static LISPT rmredir();
-static LISPT rmpipe();
+static LISPT rmsquote(FILE*, LISPT, char);
+static LISPT rmredir(FILE*, LISPT, char);
+static LISPT rmpipe(FILE*, LISPT, char);
 /* static LISPT rmbg(); */
-static LISPT rmdquote();
-static LISPT rmexcl();
-LISPT prin0();
-static LISPT rmuser();         /* Installed for user read macros. */
+static LISPT rmdquote(FILE*, LISPT, char);
+static LISPT rmexcl(FILE*, LISPT, char);
+LISPT prin0(LISPT, FILE*, int);
+static LISPT rmuser(FILE*, LISPT, char); /* Installed for user read macros. */
 
 LISPT top;               /* used for threading the input structure */
 LISPT rstack;            /* partially built structure read stack */
@@ -121,9 +121,7 @@ static char digits[] = {
  * INTEGERP returns nonzero if the characters in buffer BUF
  * represents an integer, and the result as a long in res.
  */
-static int integerp(buf, res)
-  char *buf;
-  long *res;
+static int integerp(char* buf, long* res)
 {
   int d = 0, sign = 1;
   
@@ -143,8 +141,7 @@ static int integerp(buf, res)
 /*
  * Returns nonzero if buffer BUF is a floating point constant.
  */
-static int floatp(buf)
-  char *buf;
+static int floatp(char* buf)
 {
 #ifdef FLOATING
   int state;
@@ -187,8 +184,7 @@ static int floatp(buf)
  * Find out if the buffer can be interpreted as numbers of
  * any kind.
  */
-static LISPT parsebuf(buf)
-  char *buf;
+static LISPT parsebuf(char* buf)
 {
   long longval;
 
@@ -205,9 +201,7 @@ static LISPT parsebuf(buf)
 /*
  * Read an atom from FILE.
  */
-LISPT
-ratom(file)
-  FILE *file;
+LISPT ratom(FILE* file)
 {
   int c;
   int pos = 0;
@@ -258,10 +252,7 @@ ratom(file)
  * last cell of l with cdr set to original (cdr c).
  * If tailp is true, don't clobber car of c.
  */
-static LISPT
-splice(c, l, tailp)
-  LISPT c, l;
-  int tailp;
+static LISPT splice(LISPT c, LISPT l, int tailp)
 {
   LISPT t, t2;
 
@@ -293,10 +284,7 @@ splice(c, l, tailp)
 /*
  * If you don't like goto's, keep your eyes shut.
  */
-LISPT
-lispread(file, line)
-  FILE *file;
-  int line;
+LISPT lispread(FILE *file, int line)
 {
   LISPT curr, temp, curatom;
   int curc;
@@ -312,14 +300,14 @@ head:
   if (isinsert(curc))
     {
       PUSHR(top);
-      (void) rplaca(curr, (*currentrt.rmacros[curc])(file));
+      (void) rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
       POPR(top);
       goto check;
     }
   else if (issplice(curc))
     {
       PUSHR(top);
-      temp = (*currentrt.rmacros[curc])(file);
+      temp = (*currentrt.rmacros[curc])(file, curr, curc);
       POPR(top);
       curr = splice(curr, temp, 0);
       goto check;
@@ -362,14 +350,14 @@ tail:
       (void) rplacd(curr, cons(C_NIL, temp));
       curr = CDR(curr);
       PUSHR(top);
-      (void) rplaca(curr, (*currentrt.rmacros[curc])(file));
+      (void) rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
       POPR(top);
       goto tail;
     }
   else if (issplice(curc))
     {
       PUSHR(top);
-      temp = (*currentrt.rmacros[curc])(file);
+      temp = (*currentrt.rmacros[curc])(file, curr, curc);
       POPR(top);
       curr = splice(curr, temp, 1);
       goto tail;
@@ -456,8 +444,7 @@ insert:
  * others could be added easily.
  */
 /*ARGSUSED*/
-static LISPT rmexcl(file)
-  FILE *file;
+static LISPT rmexcl(FILE *file, LISPT _0, char _1)
 {
   int c;
   LISPT tmp, at, l;
@@ -520,10 +507,7 @@ static LISPT rmexcl(file)
  * Handles user macros.
  */
 /*ARGSUSED*/
-static LISPT rmuser(file, curr, curc)
-  FILE *file;
-  LISPT curr;
-  char curc;
+static LISPT rmuser(FILE *file, LISPT curr, char curc)
 {
   if (ISNIL(userreadmacros[curc])) return curr;
   else
@@ -532,8 +516,7 @@ static LISPT rmuser(file, curr, curc)
 }
 
 /*ARGSUSED*/
-static LISPT rmdquote(file)
-  FILE *file;
+static LISPT rmdquote(FILE* file, LISPT _0, char _1)
 {
   char buf[MAXATOMSIZE];
   char c;
@@ -553,10 +536,7 @@ static LISPT rmdquote(file)
 
 #ifdef COMMENT
 /*ARGSUSED*/
-static LISPT rmbg(file, curr, curc)
-  FILE *file;
-  LISPT curr;
-  char curc;
+static LISPT rmbg(FILE* file, LISPT curr, char curc)
 {
   (void) rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
   (void) rplacd(curr, cons(C_NIL, CDR(curr)));
@@ -564,8 +544,7 @@ static LISPT rmbg(file, curr, curc)
 }
 #endif
 
-static LISPT rmsquote(file)
-  FILE *file;
+static LISPT rmsquote(FILE *file, LISPT _0, char _1)
 {
   int c;
 
@@ -579,26 +558,20 @@ static LISPT rmsquote(file)
 }
 
 /*ARGSUSED*/
-static LISPT rmpipe(file, curr, curc)
-  FILE *file;
-  LISPT curr;
-  char curc;
+static LISPT rmpipe(FILE *file, LISPT curr, char curc)
 {
   LISPT t1, t2;
 
   t1 = CDR(curr);
   (void) rplaca(t1, cons(C_PIPE, 
                          cons(CAR(CDR(curr)), 
-                              cons(t2 = cons(C_NIL, t1), C_NIL))));
+                           cons(t2 = cons(C_NIL, t1), C_NIL))));
   (void) rplacd(curr, C_NIL);
   return t2;
 }
 
 /*ARGSUSED*/
-static LISPT rmredir(file, curr, curc)
-  FILE *file;
-  LISPT curr;
-  char curc;
+static LISPT rmredir(FILE *file, LISPT curr, char curc)
 {
   LISPT t1, t2;
   char c;
@@ -608,17 +581,15 @@ static LISPT rmredir(file, curr, curc)
   (void) rplaca(t1, cons((curc == '<') ? C_FROM :
                          ((c == '>') ? C_TOTO : C_TO),
                          cons(CAR(CDR(curr)),
-                              t2 = cons(C_NIL, t1))));
+                           t2 = cons(C_NIL, t1))));
   if (!(c == '>' || curc == '>')) ungetch(c, file);
   (void) rplacd(curr, C_NIL);
   return t2;
 }
 
-LISPT
-readline(file)
-  FILE *file;
+LISPT readline(FILE* file)
 {
-  register LISPT rd;
+  LISPT rd;
 
   top = cons(C_NIL, C_NIL);     /* Init first paren level */
   (void) rplaca(top, cons(C_NIL, top));
@@ -627,19 +598,13 @@ readline(file)
 }
 
 /* print the string s, on stream file */
-static void ps(s, file, esc)
-  char *s;
-  FILE *file;
-  int esc;
+static void ps(char *s, FILE *file, int esc)
 {
   while (*s)
     putch(*s++, file, esc);
 }
 
-static void pi(i, base, file)
-  long i;
-  long base;
-  FILE *file;
+static void pi(long i, long base, FILE *file)
 {
   char ss[33];
   int sign;
@@ -661,9 +626,7 @@ static void pi(i, base, file)
   ps(ss+j+1, file, 0);
 }
 
-static void pf(d, file)
-  double d;
-  FILE *file;
+static void pf(double d, FILE *file)
 {
   char ss[30];
 
@@ -671,29 +634,19 @@ static void pf(d, file)
   ps(ss, file, 0);
 }
 
-LISPT
-patom(x, file, esc)
-  LISPT x;
-  FILE *file;
-  int esc;
+LISPT patom(LISPT x, FILE *file, int esc)
 {
   ps(SYMVAL(x).pname, file, esc);
   return x;
 }
 
-LISPT
-terpri(file)
-  FILE *file;
+LISPT terpri(FILE *file)
 {
   putch('\n', file, 0);
   return C_NIL;
 }
 
-LISPT
-prinbody(x, file, esc)
-  LISPT x;
-  FILE *file;
-  int esc;
+LISPT prinbody(LISPT x, FILE *file, int esc)
 {
   LISPT xx;
 
@@ -717,11 +670,7 @@ nxtelt:
   return x;
 }
 
-LISPT
-prin0(x, file, esc)
-  LISPT x;
-  FILE *file;
-  int esc;
+LISPT prin0(LISPT x, FILE *file, int esc)
 {
   switch (TYPEOF(x))
     {
@@ -818,10 +767,7 @@ ppoint:
   return x;
 }
 
-LISPT
-print(x, file)
-  LISPT x;
-  FILE *file;
+LISPT print(LISPT x, FILE *file)
 {
   thisplevel = 0;
   (void) prin0(x, file, 1);

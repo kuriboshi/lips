@@ -10,7 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern void finish();
+extern void finish(int);
 
 USESAVE
 
@@ -22,31 +22,42 @@ static int count;
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-void
-mkprim(pname, fname, nrpar, type)
-  char *pname;
-  LISPT (*fname)();
-  short nrpar;
-  char type;
+static LISPT mkprim_(char* pname, short nrpar, char type)
 {
   LISPT s;
   LISPT f;
-  
   f = intern(pname);
-  s = getobject ();
-  SUBRVAL(s).function = fname;
+  s = getobject();
   SUBRVAL(s).argcount = nrpar;
   SET(SYMVAL(f).value, type, s);
+  return s;
+}
+
+void mkprim0(char *pname, LISPT (*fname)(void), short nrpar, char type)
+{
+  SUBRVAL(mkprim_(pname, nrpar, type)).function0 = fname;
+}
+
+void mkprim1(char *pname, LISPT (*fname)(LISPT), short nrpar, char type)
+{
+  SUBRVAL(mkprim_(pname, nrpar, type)).function1 = fname;
+}
+
+void mkprim2(char *pname, LISPT (*fname)(LISPT, LISPT), short nrpar, char type)
+{
+  SUBRVAL(mkprim_(pname, nrpar, type)).function2 = fname;
+}
+
+void mkprim3(char *pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, char type)
+{
+  SUBRVAL(mkprim_(pname, nrpar, type)).function3 = fname;
 }
 
 /* 
  * nth - Return the N'th element in the list LIST. If N is greater than 
  *       the length of LIST,  return NIL.
  */
-LISPT
-nth(list, n)
-  LISPT list;
-  long n;
+LISPT nth(LISPT list, long n)
 {
   LISPT l;
 
@@ -61,9 +72,7 @@ nth(list, n)
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
  *              indirect object,  return it.
  */
-static LISPT
-mkindirect(obj)
-  LISPT obj;
+static LISPT mkindirect(LISPT obj)
 {
   LISPT iobj;
 
@@ -86,16 +95,14 @@ mkindirect(obj)
  * closobj - builds a list of indirect pointers to the values of the 
  *           symbols in the list VARS. Used to construct a closure.
  */
-LISPT
-closobj(vars)
-  register LISPT vars;
+LISPT closobj(LISPT vars)
 {
   if (ISNIL(vars))
     return C_NIL;
   CHECK(vars, CONS);
   CHECK(CAR(vars), SYMBOL);
   return cons(mkindirect(SYMVAL(CAR(vars)).value),
-              closobj(CDR(vars)));
+    closobj(CDR(vars)));
 }
 
 /* 
@@ -105,9 +112,7 @@ closobj(vars)
  *             nospread function. COUNT is set to the number of arguments
  *             and is negative if halfspread or nospread.
  */
-static LISPT
-mkarglis(alist)
-  LISPT alist;
+static LISPT mkarglis(LISPT alist)
 {
   if (TYPEOF(alist) == CONS)
     {
@@ -127,13 +132,10 @@ mkarglis(alist)
  * mklambda - Make a lambda object with the argument ARGS and definition 
  *            DEF and the type TYPE,  wich is LAMBDA or NLAMBDA.
  */
-LISPT
-mklambda(args, def, type)
-  LISPT args, def;
-  int type;
+LISPT mklambda(LISPT args, LISPT def, int type)
 {
-  register LISPT t;
-  register LISPT s;
+  LISPT t;
+  LISPT s;
 
   SAVE(args);
   SAVE(def);
@@ -148,8 +150,7 @@ mklambda(args, def, type)
   return t;
 }
 
-PRIMITIVE car(a)
-  LISPT a;
+PRIMITIVE car(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return CAR(a);
@@ -157,8 +158,7 @@ PRIMITIVE car(a)
     return C_NIL;
 }
 
-PRIMITIVE cdr(a)
-  LISPT a;
+PRIMITIVE cdr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return CDR(a);
@@ -166,8 +166,7 @@ PRIMITIVE cdr(a)
     return C_NIL;
 }
 
-PRIMITIVE cadr(a)
-  LISPT a;
+PRIMITIVE cadr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(CDR(a));
@@ -175,8 +174,7 @@ PRIMITIVE cadr(a)
     return C_NIL;
 }
 
-PRIMITIVE cdar(a)
-  LISPT a;
+PRIMITIVE cdar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(CAR(a));
@@ -184,8 +182,7 @@ PRIMITIVE cdar(a)
     return C_NIL;
 }
 
-PRIMITIVE caar(a)
-  LISPT a;
+PRIMITIVE caar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(CAR(a));
@@ -193,8 +190,7 @@ PRIMITIVE caar(a)
     return C_NIL;
 }
 
-PRIMITIVE cddr(a)
-  LISPT a;
+PRIMITIVE cddr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(CDR(a));
@@ -202,8 +198,7 @@ PRIMITIVE cddr(a)
     return C_NIL;
 }
 
-PRIMITIVE cdddr(a)
-  LISPT a;
+PRIMITIVE cdddr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(cdr(CDR(a)));
@@ -211,8 +206,7 @@ PRIMITIVE cdddr(a)
     return C_NIL;
 }
 
-PRIMITIVE caddr(a)
-  LISPT a;
+PRIMITIVE caddr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(cdr(CDR(a)));
@@ -220,8 +214,7 @@ PRIMITIVE caddr(a)
     return C_NIL;
 }
 
-PRIMITIVE cdadr(a)
-  LISPT a;
+PRIMITIVE cdadr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(car(CDR(a)));
@@ -229,8 +222,7 @@ PRIMITIVE cdadr(a)
     return C_NIL;
 }
 
-PRIMITIVE caadr(a)
-  LISPT a;
+PRIMITIVE caadr(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(car(CDR(a)));
@@ -238,8 +230,7 @@ PRIMITIVE caadr(a)
     return C_NIL;
 }
 
-PRIMITIVE cddar(a)
-  LISPT a;
+PRIMITIVE cddar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(cdr(CAR(a)));
@@ -247,8 +238,7 @@ PRIMITIVE cddar(a)
     return C_NIL;
 }
 
-PRIMITIVE cadar(a)
-  LISPT a;
+PRIMITIVE cadar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(cdr(CAR(a)));
@@ -256,8 +246,7 @@ PRIMITIVE cadar(a)
     return C_NIL;
 }
 
-PRIMITIVE cdaar(a)
-  LISPT a;
+PRIMITIVE cdaar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return cdr(car(CAR(a)));
@@ -265,8 +254,7 @@ PRIMITIVE cdaar(a)
     return C_NIL;
 }
 
-PRIMITIVE caaar(a)
-  LISPT a;
+PRIMITIVE caaar(LISPT a)
 {
   if (TYPEOF(a) == CONS)
     return car(car(CAR(a)));
@@ -274,24 +262,21 @@ PRIMITIVE caaar(a)
     return C_NIL;
 }
 
-PRIMITIVE rplaca(x, y)
-  LISPT x, y;
+PRIMITIVE rplaca(LISPT x, LISPT y)
 {
   CHECK(x, CONS);
   CAR(x) = y;
   return x;
 }
 
-PRIMITIVE rplacd(x, y)
-  LISPT x, y;
+PRIMITIVE rplacd(LISPT x, LISPT y)
 {
   CHECK(x, CONS);
   CDR(x) = y;
   return x;
 }
 
-PRIMITIVE eq(a, b)
-  LISPT a, b;
+PRIMITIVE eq(LISPT a, LISPT b)
 {
   if (EQ(a, b))
     return C_T;
@@ -299,8 +284,7 @@ PRIMITIVE eq(a, b)
     return C_NIL;
 }
 
-PRIMITIVE atom(a)
-  LISPT a;
+PRIMITIVE atom(LISPT a)
 {
   if (ISNIL(a) || IST(a) || TYPEOF(a) == SYMBOL
       || TYPEOF(a) == INTEGER || TYPEOF(a) == FLOAT)
@@ -309,8 +293,7 @@ PRIMITIVE atom(a)
     return C_NIL;
 }
 
-PRIMITIVE nconc(l)
-  LISPT l;
+PRIMITIVE nconc(LISPT l)
 {
   LISPT newl, curp;
   LISPT cl;
@@ -328,7 +311,7 @@ PRIMITIVE nconc(l)
               newl = curp;
             }
           else
-            (void) rplacd(curp,CAR(l));
+            (void) rplacd(curp, CAR(l));
           for (cl = CAR(l); !ISNIL(CDR(cl)); cl = CDR(cl))
             ;
           curp = cl;
@@ -337,8 +320,7 @@ PRIMITIVE nconc(l)
   return newl;
 }
 
-PRIMITIVE tconc(cell, obj)
-  LISPT cell, obj;
+PRIMITIVE tconc(LISPT cell, LISPT obj)
 {
   if (ISNIL(cell))
     {
@@ -355,8 +337,7 @@ PRIMITIVE tconc(cell, obj)
   return rplacd(cell, CDR(CDR(cell)));
 }
 
-PRIMITIVE attach(obj, list)
-  LISPT obj, list;
+PRIMITIVE attach(LISPT obj, LISPT list)
 {
   if (ISNIL(list)) return cons(obj, C_NIL);
   CHECK(list, CONS);
@@ -364,13 +345,12 @@ PRIMITIVE attach(obj, list)
   return rplaca(list, obj);
 }
 
-PRIMITIVE append(l)
-  LISPT l;
+PRIMITIVE append(LISPT l)
 {
   LISPT newl, curp;
   LISPT cl;
 
-  newl = cons(C_NIL,C_NIL);
+  newl = cons(C_NIL, C_NIL);
   SAVE(newl);
   curp = newl;
   for (; !ISNIL(l); l = CDR(l))
@@ -380,7 +360,7 @@ PRIMITIVE append(l)
           CHECK(CAR(l),CONS);
           for (cl = CAR(l); !ISNIL(cl); cl = CDR(cl))
             {
-              (void) rplacd(curp,cons(CAR(cl),C_NIL));
+              (void) rplacd(curp,cons(CAR(cl), C_NIL));
               curp = CDR(curp);
             }
         }
@@ -389,8 +369,7 @@ PRIMITIVE append(l)
   return CDR(newl);
 }
 
-PRIMITIVE null(a)
-  LISPT a;
+PRIMITIVE null(LISPT a)
 {
   if (EQ(a,C_NIL))
     return C_T;
@@ -398,32 +377,27 @@ PRIMITIVE null(a)
     return C_NIL;
 }
 
-PRIMITIVE quote(a)
-  LISPT a;
+PRIMITIVE quote(LISPT a)
 {
   return a;
 }
 
-PRIMITIVE lambda(a,f)
-  LISPT a,f;
+PRIMITIVE lambda(LISPT a, LISPT f)
 {
-  return mklambda(a,f,LAMBDA);
+  return mklambda(a, f, LAMBDA);
 }  
 
-PRIMITIVE nlambda(a,f)
-  LISPT a,f;
+PRIMITIVE nlambda(LISPT a, LISPT f)
 {
-  return mklambda(a,f,NLAMBDA);
+  return mklambda(a, f, NLAMBDA);
 }
 
-PRIMITIVE list(l)
-  LISPT l;
+PRIMITIVE list(LISPT l)
 {
   return l;
 }
 
-PRIMITIVE length(l)
-  LISPT l;
+PRIMITIVE length(LISPT l)
 {
   int i;
   
@@ -436,8 +410,7 @@ PRIMITIVE length(l)
   return mknumber((long)i);
 }
 
-PRIMITIVE closure(fun,vars)
-  LISPT fun,vars;
+PRIMITIVE closure(LISPT fun, LISPT vars)
 {
   LISPT clos;
   LISPT f;
@@ -458,8 +431,7 @@ PRIMITIVE closure(fun,vars)
   return clos;
 }
 
-PRIMITIVE xnth(l, p)
-  LISPT l, p;
+PRIMITIVE xnth(LISPT l, LISPT p)
 {
   CHECK(p, INTEGER);
   if (ISNIL(l))
@@ -468,8 +440,7 @@ PRIMITIVE xnth(l, p)
   return nth(l, INTVAL(p));
 }
 
-PRIMITIVE nthd(list, pos)
-  LISPT list, pos;
+PRIMITIVE nthd(LISPT list, LISPT pos)
 {
   LISPT l;
   int p;
@@ -484,15 +455,13 @@ PRIMITIVE nthd(list, pos)
   return l;
 }
 
-PRIMITIVE xerror(mess)
-  LISPT mess;
+PRIMITIVE xerror(LISPT mess)
 {
   CHECK(mess, STRING);
   return error(USER_ERROR, mess);
 }
 
-PRIMITIVE uxexit(status)
-  LISPT status;
+PRIMITIVE uxexit(LISPT status)
 {
   if (ISNIL(status))
     finish(0);
@@ -501,40 +470,39 @@ PRIMITIVE uxexit(status)
   return C_NIL;
 }
 
-void
-init_prim()
+void init_prim()
 {
-  mkprim(PN_ATOM,    atom,     1, SUBR);
-  mkprim(PN_ATTACH,  attach,   2, SUBR);
-  mkprim(PN_APPEND,  append,  -1, SUBR);
-  mkprim(PN_CAR,     car,      1, SUBR);
-  mkprim(PN_CDR,     cdr,      1, SUBR);
-  mkprim(PN_CADR,    cadr,     1, SUBR);
-  mkprim(PN_CDAR,    cdar,     1, SUBR);
-  mkprim(PN_CAAR,    caar,     1, SUBR);
-  mkprim(PN_CDDR,    cddr,     1, SUBR);
-  mkprim(PN_CDDDR,   cdddr,    1, SUBR);
-  mkprim(PN_CADDR,   caddr,    1, SUBR);
-  mkprim(PN_CDADR,   cdadr,    1, SUBR);
-  mkprim(PN_CAADR,   caadr,    1, SUBR);
-  mkprim(PN_CDDAR,   cddar,    1, SUBR);
-  mkprim(PN_CADAR,   cadar,    1, SUBR);
-  mkprim(PN_CDAAR,   cdaar,    1, SUBR);
-  mkprim(PN_CAAAR,   caaar,    1, SUBR);
-  mkprim(PN_CLOSURE, closure,  2, SUBR);
-  mkprim(PN_EQ,      eq,       2, SUBR);
-  mkprim(PN_ERROR,   xerror,  -1, SUBR);
-  mkprim(PN_EXIT,    uxexit,   1, SUBR);
-  mkprim(PN_LAMBDA,  lambda,  -2, FSUBR);
-  mkprim(PN_LENGTH,  length,   1, SUBR);
-  mkprim(PN_LIST,    list,    -1, SUBR);
-  mkprim(PN_NCONC,   nconc,   -1, SUBR);
-  mkprim(PN_NLAMBDA, nlambda, -2, FSUBR);
-  mkprim(PN_NTH,     xnth,     2, SUBR);
-  mkprim(PN_NULL,    null,     1, SUBR);
-  mkprim(PN_QUOTE,   quote,    1, FSUBR);
-  mkprim(PN_RPLACA,  rplaca,   2, SUBR);
-  mkprim(PN_RPLACD,  rplacd,   2, SUBR);
-  mkprim(PN_TCONC,   tconc,    2, SUBR);
-  mkprim(PN_NTHD,    nthd,     2, SUBR);
+  mkprim1(PN_ATOM,    atom,     1, SUBR);
+  mkprim2(PN_ATTACH,  attach,   2, SUBR);
+  mkprim1(PN_APPEND,  append,  -1, SUBR);
+  mkprim1(PN_CAR,     car,      1, SUBR);
+  mkprim1(PN_CDR,     cdr,      1, SUBR);
+  mkprim1(PN_CADR,    cadr,     1, SUBR);
+  mkprim1(PN_CDAR,    cdar,     1, SUBR);
+  mkprim1(PN_CAAR,    caar,     1, SUBR);
+  mkprim1(PN_CDDR,    cddr,     1, SUBR);
+  mkprim1(PN_CDDDR,   cdddr,    1, SUBR);
+  mkprim1(PN_CADDR,   caddr,    1, SUBR);
+  mkprim1(PN_CDADR,   cdadr,    1, SUBR);
+  mkprim1(PN_CAADR,   caadr,    1, SUBR);
+  mkprim1(PN_CDDAR,   cddar,    1, SUBR);
+  mkprim1(PN_CADAR,   cadar,    1, SUBR);
+  mkprim1(PN_CDAAR,   cdaar,    1, SUBR);
+  mkprim1(PN_CAAAR,   caaar,    1, SUBR);
+  mkprim2(PN_CLOSURE, closure,  2, SUBR);
+  mkprim2(PN_EQ,      eq,       2, SUBR);
+  mkprim1(PN_ERROR,   xerror,  -1, SUBR);
+  mkprim1(PN_EXIT,    uxexit,   1, SUBR);
+  mkprim2(PN_LAMBDA,  lambda,  -2, FSUBR);
+  mkprim1(PN_LENGTH,  length,   1, SUBR);
+  mkprim1(PN_LIST,    list,    -1, SUBR);
+  mkprim1(PN_NCONC,   nconc,   -1, SUBR);
+  mkprim2(PN_NLAMBDA, nlambda, -2, FSUBR);
+  mkprim2(PN_NTH,     xnth,     2, SUBR);
+  mkprim1(PN_NULL,    null,     1, SUBR);
+  mkprim1(PN_QUOTE,   quote,    1, FSUBR);
+  mkprim2(PN_RPLACA,  rplaca,   2, SUBR);
+  mkprim2(PN_RPLACD,  rplacd,   2, SUBR);
+  mkprim2(PN_TCONC,   tconc,    2, SUBR);
+  mkprim2(PN_NTHD,    nthd,     2, SUBR);
 }
