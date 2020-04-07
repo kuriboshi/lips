@@ -184,7 +184,7 @@ static int walkfiles(char* wild, int all, int report)
 
   if (*wild == '/') w = wild + 1;
   else w = wild;
-  if ((odir = opendir(r)) == NULL)
+  if ((odir = opendir(*r == '\0' ? "." : r)) == NULL)
     {
       if (report) error(NO_DIRECTORY, mkstring(r));
       return 0;
