@@ -17,9 +17,9 @@ static char rcsid[] = "$Id$";
 extern int getch(FILE*);
 extern void putch(char, FILE*, int);
 
-FILE *primin;
-FILE *primout;
-FILE *primerr;
+FILE* primin;
+FILE* primout;
+FILE* primerr;
 
 PRIMITIVE xratom(LISPT file)
 {
@@ -40,7 +40,7 @@ PRIMITIVE readc(LISPT file)
   CHECK(file, FILET);
   return mknumber((long) getch(FILEVAL(file)));
 }
-  
+
 PRIMITIVE xread(LISPT file)
 {
   if (ISNIL(file))
@@ -63,14 +63,13 @@ PRIMITIVE xprint(LISPT x, LISPT file)
 
 int loadfile(char* lf)
 {
-  FILE *foo;
+  FILE* foo;
   LISPT rval;
 
-  foo = fopen(lf,"r");
+  foo = fopen(lf, "r");
   if (foo == NULL)
     return 1;
-  for (rval = lispread(foo, 0);
-       TYPEOF(rval) != ENDOFFILE;
+  for (rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE;
        rval = lispread(foo, 0))
     rval = eval(rval);
   (void) fclose(foo);
@@ -125,7 +124,7 @@ PRIMITIVE plevel(LISPT newl)
   x = printlevel;
   if (!ISNIL(newl))
     {
-      CHECK(newl,INTEGER);
+      CHECK(newl, INTEGER);
       printlevel = INTVAL(newl);
     }
   return mknumber(x);
@@ -134,30 +133,33 @@ PRIMITIVE plevel(LISPT newl)
 PRIMITIVE spaces(LISPT n, LISPT file)
 {
   int i;
-  FILE *f;
+  FILE* f;
 
-  CHECK(n,INTEGER);
-  if (ISNIL(file)) f = primout;
-  else if (IST(file)) f = primerr;
+  CHECK(n, INTEGER);
+  if (ISNIL(file))
+    f = primout;
+  else if (IST(file))
+    f = primerr;
   else
     {
-      CHECK(file,FILET);
+      CHECK(file, FILET);
       f = FILEVAL(file);
     }
-  for(i=INTVAL(n); i>0; i--)
-    (void) putc(' ',f);
+  for (i = INTVAL(n); i > 0; i--) (void) putc(' ', f);
   return C_NIL;
 }
 
 PRIMITIVE xreadline(LISPT file)
 {
-  FILE *f;
+  FILE* f;
 
-  if (ISNIL(file)) f = primin;
-  else if (IST(file)) f = stdin;
+  if (ISNIL(file))
+    f = primin;
+  else if (IST(file))
+    f = stdin;
   else
     {
-      CHECK(file,FILET);
+      CHECK(file, FILET);
       f = FILEVAL(file);
     }
   return readline(f);
@@ -167,12 +169,14 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
 {
   FILE *f, *tagsfile, *cfile;
   char buf[120];
-  char *funn;
+  char* funn;
   char lname[20], cname[20], fname[20];
   int line, i, acnt;
 
-  if (ISNIL(file)) f = primout;
-  else if (IST(file)) f = primerr;
+  if (ISNIL(file))
+    f = primout;
+  else if (IST(file))
+    f = primerr;
   else
     {
       CHECK(file, FILET);
@@ -184,8 +188,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   if ((tagsfile = fopen(TAGSFILE, "r")) == NULL)
     return error(CANT_OPEN, mkstring(TAGSFILE));
   while (fgets(buf, 120, tagsfile) != NULL)
-    if (strncmp(buf, funn, strlen(funn)) == 0
-        && buf[strlen(funn)] == '\t')
+    if (strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
       {
         (void) sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
         (void) strcpy(buf, LIPSLIB);
@@ -200,13 +203,18 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
         (void) prin2(oname, file);
         putch(' ', f, 0);
         putch('(', f, 0);
-        if (TYPEOF(SYMVALUE(oname)) == SUBR) (void) prin1(C_SUBR, file);
-        else (void) prin1(C_FSUBR, file);
+        if (TYPEOF(SYMVALUE(oname)) == SUBR)
+          (void) prin1(C_SUBR, file);
+        else
+          (void) prin1(C_FSUBR, file);
         putch(' ', f, 0);
-        for (i=0; buf[i] != '(' && i < sizeof(buf); i++);
-        if ((acnt = SUBRVAL(SYMVAL(oname).value).argcount) == -1) i++;
+        for (i = 0; buf[i] != '(' && i < sizeof(buf); i++)
+          ;
+        if ((acnt = SUBRVAL(SYMVAL(oname).value).argcount) == -1)
+          i++;
         for (; buf[i] != ')' && i < sizeof(buf); i++)
-          if (buf[i] != ',') putch(buf[i], f, 0);
+          if (buf[i] != ',')
+            putch(buf[i], f, 0);
           else
             {
               acnt++;
@@ -217,7 +225,8 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
                   acnt++;
                 }
             }
-        if (acnt != -1) putch(')', f, 0);
+        if (acnt != -1)
+          putch(')', f, 0);
         putch('\n', f, 0);
         while (buf[0] != '{')
           {
@@ -242,18 +251,18 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
 
 void init_file()
 {
-  mkprim1(PN_LOAD,     load,       1, SUBR);
-  mkprim2(PN_PRIN1,    prin1,      2, SUBR);
-  mkprim2(PN_PRIN2,    prin2,      2, SUBR);
-  mkprim2(PN_PRINT,    xprint,     2, SUBR);
-  mkprim1(PN_PLEVEL,   plevel,     1, SUBR);
-  mkprim1(PN_RATOM,    xratom,     1, SUBR);
-  mkprim1(PN_READ,     xread,      1, SUBR);
-  mkprim1(PN_READC,    readc,      1, SUBR);
-  mkprim1(PN_READLINE, xreadline,  1, SUBR);
-  mkprim2(PN_SPACES,   spaces,     2, SUBR);
-  mkprim1(PN_TERPRI,   xterpri,    1, SUBR);
-  mkprim2(PN_CPPRINT,  cpprint,    2, SUBR);
+  mkprim1(PN_LOAD, load, 1, SUBR);
+  mkprim2(PN_PRIN1, prin1, 2, SUBR);
+  mkprim2(PN_PRIN2, prin2, 2, SUBR);
+  mkprim2(PN_PRINT, xprint, 2, SUBR);
+  mkprim1(PN_PLEVEL, plevel, 1, SUBR);
+  mkprim1(PN_RATOM, xratom, 1, SUBR);
+  mkprim1(PN_READ, xread, 1, SUBR);
+  mkprim1(PN_READC, readc, 1, SUBR);
+  mkprim1(PN_READLINE, xreadline, 1, SUBR);
+  mkprim2(PN_SPACES, spaces, 2, SUBR);
+  mkprim1(PN_TERPRI, xterpri, 1, SUBR);
+  mkprim2(PN_CPPRINT, cpprint, 2, SUBR);
   primin = stdin;
   primout = stdout;
   primerr = stderr;

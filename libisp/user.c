@@ -20,17 +20,18 @@ static LISPT getargs(LISPT al)
 
 PRIMITIVE getrep(LISPT fun)
 {
-  LAMBDAT *x;
+  LAMBDAT* x;
   LISPT args;
-  
-  if (TYPEOF(fun) != LAMBDA
-      && TYPEOF(fun) != NLAMBDA) return C_NIL;
+
+  if (TYPEOF(fun) != LAMBDA && TYPEOF(fun) != NLAMBDA)
+    return C_NIL;
   x = &LAMVAL(fun);
   if (x->argcnt == -1)
     args = CAR(x->arglist);
   else if (x->argcnt < 0)
-    args = getargs (x->arglist);
-  else args = x->arglist;
+    args = getargs(x->arglist);
+  else
+    args = x->arglist;
   if (TYPEOF(fun) == LAMBDA)
     return cons(C_LAMBDA, cons(args, x->lambdarep));
   else
@@ -44,17 +45,17 @@ LISPT funeq(LISPT f1, LISPT f2)
 
   if (EQ(f1, f2))
     return C_T;
-  if(LAMVAL(f1).argcnt == LAMVAL(f2).argcnt)
+  if (LAMVAL(f1).argcnt == LAMVAL(f2).argcnt)
     {
       t1 = LAMVAL(f1).arglist;
       t2 = LAMVAL(f2).arglist;
-      tmp = equal (t1, t2);
-      if (!ISNIL (tmp))
+      tmp = equal(t1, t2);
+      if (!ISNIL(tmp))
         {
           t1 = LAMVAL(f1).lambdarep;
           t2 = LAMVAL(f2).lambdarep;
-	  tmp = equal(t1, t2);
-	  if (!ISNIL (tmp))
+          tmp = equal(t1, t2);
+          if (!ISNIL(tmp))
             return C_T;
         }
     }
@@ -66,14 +67,13 @@ static LISPT checkfn(LISPT name, LISPT lam)
   LISPT t;
 
   if (TYPEOF(GETOPVAL(name)) != UNBOUND)
-    if (TYPEOF(GETOPVAL(name)) == LAMBDA
-        || TYPEOF(GETOPVAL(name)) == NLAMBDA)
+    if (TYPEOF(GETOPVAL(name)) == LAMBDA || TYPEOF(GETOPVAL(name)) == NLAMBDA)
       {
         t = funeq(GETOPVAL(name), lam);
         if (ISNIL(t))
           {
             (void) putprop(name, C_OLDDEF, GETOPVAL(name));
-            if (!ISNIL (verboseflg))
+            if (!ISNIL(verboseflg))
               (void) xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
           }
       }
@@ -116,8 +116,8 @@ PRIMITIVE df(LISPT name, LISPT pars, LISPT body)
 
 void init_user()
 {
-  mkprim2(PN_DEFINE, define,  2, SUBR);
-  mkprim1(PN_GETREP, getrep,  1, SUBR);
-  mkprim3(PN_DE,     de,     -3, FSUBR);
-  mkprim3(PN_DF,     df,     -3, FSUBR);
+  mkprim2(PN_DEFINE, define, 2, SUBR);
+  mkprim1(PN_GETREP, getrep, 1, SUBR);
+  mkprim3(PN_DE, de, -3, FSUBR);
+  mkprim3(PN_DF, df, -3, FSUBR);
 }

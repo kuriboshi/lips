@@ -6,7 +6,7 @@
  */
 #pragma once
 
-typedef struct lispt *LISPT;
+typedef struct lispt* LISPT;
 
 #define PP0(name) extern LISPT name(void)
 #define PP1(name) extern LISPT name(LISPT)
@@ -139,14 +139,14 @@ PP3(de);
 PP3(df);
 
 /* Other functions */
-extern LISPT mkstring(char *);
+extern LISPT mkstring(char*);
 extern LISPT mknumber(long);
-extern LISPT mkatom(char *);
+extern LISPT mkatom(char*);
 extern LISPT mkfloat(double);
 
-extern int loadfile(char *);
+extern int loadfile(char*);
 
-extern void initcvar(LISPT *, char *, LISPT);
+extern void initcvar(LISPT*, char*, LISPT);
 
 extern int (*undefhook)(LISPT, LISPT*);
 extern void (*breakhook)(void);

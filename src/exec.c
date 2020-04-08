@@ -21,42 +21,42 @@
 #include <strings.h>
 #include "lips.h"
 
-#define MAXARGS         256
-#define EXECHASH        1023    /* Hash table size for commands */
-#define DEFAULT_SHELL   "/bin/sh"
+#define MAXARGS 256
+#define EXECHASH 1023 /* Hash table size for commands */
+#define DEFAULT_SHELL "/bin/sh"
 
 #ifndef lint
 static char rcsid[] = "$Id$";
 #endif
 
-extern char **environ;
+extern char** environ;
 extern void init_term(void);
 extern void end_term(void);
 LISPT p_setenv(LISPT, LISPT);
 
 #define UNION_WAIT int
 
-int insidefork = 0;             /* Is nonzero in the child after */
-                                /* a fork */
+int insidefork = 0; /* Is nonzero in the child after */
+                    /* a fork */
 
-static BITS32 exechash[EXECHASH/32];       /* One bit set for each program */
-static int pgrp;                           /* Process group of current job */
+static BITS32 exechash[EXECHASH / 32]; /* One bit set for each program */
+static int pgrp;                       /* Process group of current job */
 
 #ifdef JOB_CONTROL
 struct job
 {
-  int jobnum;                   /* Job number */
-  int procid;                   /* Process id */
-  UNION_WAIT status;            /* Return value */
-  char *wdir;                   /* Working directory */
-  LISPT exp;                    /* Job expression */
-  struct job *next;             /* Pointer to next job */
-  int background;               /* Nonzero means job runs in bg */
-  int running;                  /* Nonzero if running */
+  int jobnum;        /* Job number */
+  int procid;        /* Process id */
+  UNION_WAIT status; /* Return value */
+  char* wdir;        /* Working directory */
+  LISPT exp;         /* Job expression */
+  struct job* next;  /* Pointer to next job */
+  int background;    /* Nonzero means job runs in bg */
+  int running;       /* Nonzero if running */
 };
 
-static struct job *joblist = NULL;     /* List of jobs */
-static struct job *cjoblist = NULL;    /* List of collected jobs */
+static struct job* joblist = NULL;  /* List of jobs */
+static struct job* cjoblist = NULL; /* List of collected jobs */
 #endif
 
 /* 
@@ -66,13 +66,13 @@ static struct job *cjoblist = NULL;    /* List of collected jobs */
 static void preparefork()
 {
   (void) setpgid(0, pgrp);
-  (void) signal(SIGHUP,  SIG_DFL);
-  (void) signal(SIGINT,  SIG_DFL);
+  (void) signal(SIGHUP, SIG_DFL);
+  (void) signal(SIGINT, SIG_DFL);
   (void) signal(SIGQUIT, SIG_DFL);
   (void) signal(SIGTSTP, SIG_DFL);
-  (void) signal(SIGILL,  SIG_DFL);
+  (void) signal(SIGILL, SIG_DFL);
   (void) signal(SIGSEGV, SIG_DFL);
-  (void) signal(SIGBUS,  SIG_DFL);
+  (void) signal(SIGBUS, SIG_DFL);
   (void) signal(SIGTTIN, SIG_DFL);
   (void) signal(SIGTTOU, SIG_DFL);
 }
@@ -84,11 +84,13 @@ static void preparefork()
  */
 char* strsave(char* str)
 {
-  char *newstr;
+  char* newstr;
 
-  if (str == NULL) return NULL;
-  newstr = (char *) safemalloc((unsigned) strlen(str) + 1);
-  if (newstr == NULL) return NULL;
+  if (str == NULL)
+    return NULL;
+  newstr = (char*) safemalloc((unsigned) strlen(str) + 1);
+  if (newstr == NULL)
+    return NULL;
   (void) strcpy(newstr, str);
   return newstr;
 }
@@ -137,14 +139,18 @@ static void printjob(struct job* job)
 static int recordjob(int pid, int bg)
 {
 #ifdef JOB_CONTROL
-  char wd[MAXPATHLEN];          /* Store working directory */
-  struct job *job;
+  char wd[MAXPATHLEN]; /* Store working directory */
+  struct job* job;
 
-  if (insidefork) return 0;     /* Skip this if in a fork. */
-  job = (struct job *) safemalloc(sizeof(struct job));
-  if (job == NULL) return 1;
-  if (joblist) job->jobnum = (joblist->jobnum) + 1;
-  else job->jobnum = 1;
+  if (insidefork)
+    return 0; /* Skip this if in a fork. */
+  job = (struct job*) safemalloc(sizeof(struct job));
+  if (job == NULL)
+    return 1;
+  if (joblist)
+    job->jobnum = (joblist->jobnum) + 1;
+  else
+    job->jobnum = 1;
   job->procid = pid;
   job->status = 0;
   job->wdir = strsave(getwd(wd)); /* Not a fatal error if NULL */
@@ -174,21 +180,22 @@ static void collectjob(int pid, UNION_WAIT stat)
         j->status = stat;
         if (!WIFSTOPPED(j->status))
           {
-            if (i) i->next = j->next;
-            else joblist = j->next;
-            if (j->background)          /* When running in background, */
-              {                         /* save on another list to be */
-                j->next = cjoblist;     /* collected when signaled with */
-                cjoblist = j;           /* SIGCHLD. */
+            if (i)
+              i->next = j->next;
+            else
+              joblist = j->next;
+            if (j->background)      /* When running in background, */
+              {                     /* save on another list to be */
+                j->next = cjoblist; /* collected when signaled with */
+                cjoblist = j;       /* SIGCHLD. */
               }
             else
               {
                 free(j->wdir);
-                free((char *)j);
+                free((char*) j);
               }
-            if (WIFSIGNALED(j->status)
-                && WTERMSIG(j->status) != SIGINT)
-              printjob(j);     /* Print if not interrupted. */
+            if (WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
+              printjob(j); /* Print if not interrupted. */
           }
         else
           printjob(j);
@@ -205,7 +212,7 @@ void printdone()
     {
       printjob(cjoblist);
       free(cjoblist->wdir);
-      free((char *)cjoblist);
+      free((char*) cjoblist);
     }
 #endif
 }
@@ -225,7 +232,7 @@ static int mfork()
       if (!insidefork)
         {
           pgrp = getpid();
-          (void) ioctl(0, TIOCSPGRP, (char *)&pgrp);
+          (void) ioctl(0, TIOCSPGRP, (char*) &pgrp);
           insidefork = 1;
           end_term();
         }
@@ -262,13 +269,14 @@ static int checkmeta(char* s)
 {
   int i;
 
-  for (i=0; s[i]; i++)
+  for (i = 0; s[i]; i++)
     if (s[i] == '\\')
       {
-	strcpy(s+i, s+i+1);
-	continue;
+        strcpy(s + i, s + i + 1);
+        continue;
       }
-    else if (index("*?[]", s[i])) return 1;
+    else if (index("*?[]", s[i]))
+      return 1;
   return 0;
 }
 
@@ -279,62 +287,63 @@ static int checkmeta(char* s)
  */
 static char** makeexec(LISPT command)
 {
-  LISPT files, com; 
+  LISPT files, com;
   int i, mask, ok;
-  static char *args[MAXARGS];
-  char **t;
+  static char* args[MAXARGS];
+  char** t;
 
   ok = 0;
   com = command;
-  mask = sigblock(sigmask(SIGINT));     /* Dangerous to interrupt here */
+  mask = sigblock(sigmask(SIGINT)); /* Dangerous to interrupt here */
   for (t = args; *t != NULL; t++)
     {
       (void) free(*t);
       *t = NULL;
     }
   (void) sigsetmask(mask);
-  for (i=0; TYPEOF(com) == CONS && i < (MAXARGS - 1);
-       com = CDR(com))
+  for (i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
     {
     again:
       if (TYPEOF(CAR(com)) == SYMBOL)
         {
-          char *c;
+          char* c;
 
-	  c = strsave(extilde(GETSTR(CAR(com)), 1));
-	  if (c == NULL) return NULL;
-	  if (!checkmeta(c))
-	    args[i++] = c;
-	  else
-	    {
-	      if (ok == 0) ok = 1;
-	      if (i == 0)
-		{
-		  (void) error(AMBIGUOUS, CAR(com));
-		  return NULL;
-		}
-	      files = expandfiles(c, 0, 0, 1);
-	      if (!ISNIL(files)) ok = 2;
-	      while (TYPEOF(files) == CONS)
-		{
-		  args[i++] = strsave(GETSTR(CAR(files)));
-		  files = CDR(files);
-		}
-	    }
-	}
+          c = strsave(extilde(GETSTR(CAR(com)), 1));
+          if (c == NULL)
+            return NULL;
+          if (!checkmeta(c))
+            args[i++] = c;
+          else
+            {
+              if (ok == 0)
+                ok = 1;
+              if (i == 0)
+                {
+                  (void) error(AMBIGUOUS, CAR(com));
+                  return NULL;
+                }
+              files = expandfiles(c, 0, 0, 1);
+              if (!ISNIL(files))
+                ok = 2;
+              while (TYPEOF(files) == CONS)
+                {
+                  args[i++] = strsave(GETSTR(CAR(files)));
+                  files = CDR(files);
+                }
+            }
+        }
       else if (TYPEOF(CAR(com)) == INTEGER)
         args[i++] = strsave(ltoa(INTVAL(CAR(com))));
       else if (TYPEOF(CAR(com)) == STRING)
         {
-          if ((args[i++]
-               = strsave(GETSTR(CAR(com)))) == NULL)
+          if ((args[i++] = strsave(GETSTR(CAR(com)))) == NULL)
             return NULL;
         }
       else if (TYPEOF(CAR(com)) == CONS)
-	{
-	  (void) rplaca(com, eval(CAR(com)));
-	  goto again;
-	}
+        {
+          (void) rplaca(com, eval(CAR(com)));
+          goto again;
+        }
       else
         {
           (void) error(ILLEGAL_ARG, CAR(com));
@@ -362,8 +371,9 @@ static UNION_WAIT waitfork(int pid)
 
   do
     {
-      wpid = wait3(&wstat, WUNTRACED, (struct rusage *) NULL);
-      if (wpid != -1 && !insidefork) collectjob(wpid, wstat);
+      wpid = wait3(&wstat, WUNTRACED, (struct rusage*) NULL);
+      if (wpid != -1 && !insidefork)
+        collectjob(wpid, wstat);
     }
   while (pid && pid != wpid && wpid != -1);
   if (WIFSIGNALED(wstat))
@@ -381,13 +391,13 @@ void checkfork()
 
   do
     {
-      wpid = wait3(&wstat, WUNTRACED | WNOHANG, (struct rusage *) NULL);
+      wpid = wait3(&wstat, WUNTRACED | WNOHANG, (struct rusage*) NULL);
       if (wpid > 0)
         collectjob(wpid, wstat);
     }
   while (wpid > 0);
 }
-          
+
 /* 
  * exec - Forks (if not already in a fork, in which case it works as 
  *        execve, overlaying the current process), and execs NAME with
@@ -397,7 +407,7 @@ void checkfork()
  */
 static LISPT exec(char* name, LISPT command)
 {
-  char **args;
+  char** args;
   int pid;
   UNION_WAIT status;
 
@@ -409,7 +419,7 @@ static LISPT exec(char* name, LISPT command)
       if (errno == ENOEXEC)
         (void) execvp(name, args);
       (void) fprintf(stderr, "%s\n", sys_errlist[errno]);
-      exit(1);                          /* No return */
+      exit(1); /* No return */
     }
   else if ((pid = mfork()) == 0)
     {
@@ -437,10 +447,12 @@ static int ifexec(char* dir, char* name)
   (void) strcpy(path, dir);
   (void) strcat(path, "/");
   (void) strcat(path, name);
-  if (stat(path, &buf) == -1) return 0;
+  if (stat(path, &buf) == -1)
+    return 0;
   if ((buf.st_mode & (S_IEXEC | S_IFREG)) == (S_IEXEC | S_IFREG))
     return 1;
-  else return 0;
+  else
+    return 0;
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */
@@ -468,22 +480,25 @@ static BITS32 hashfun(char* str)
 int execcommand(LISPT exp, LISPT* res)
 {
   LISPT cdir;
-  char *command;
+  char* command;
   char comdir[MAXPATHLEN];
   BITS32 i, possible;
   LISPT tmp;
 
   *res = C_T;
   command = extilde(GETSTR(CAR(exp)), 1);
-  if (command == NULL) return -1;
+  if (command == NULL)
+    return -1;
   if (*command == '/' || strpbrk(command, "/") != NULL)
     {
-      if (EQ(exec(command, exp), C_ERROR)) return -1;
-      else return 1;
+      if (EQ(exec(command, exp), C_ERROR))
+        return -1;
+      else
+        return 1;
     }
 
   i = hashfun(command);
-  possible = exechash[i/32]&(1<<(i%32));
+  possible = exechash[i / 32] & (1 << (i % 32));
 
   for (cdir = path; TYPEOF(cdir) == CONS; cdir = CDR(cdir))
     {
@@ -491,19 +506,21 @@ int execcommand(LISPT exp, LISPT* res)
         (void) strcpy(comdir, ".");
       else if (possible)
         {
-	  /* This isn't really necessary, is it? */
-	  if (TYPEOF (CAR (cdir)) != STRING
-	      && TYPEOF (CAR (cdir)) != SYMBOL)
-	    return -1;
+          /* This isn't really necessary, is it? */
+          if (TYPEOF(CAR(cdir)) != STRING && TYPEOF(CAR(cdir)) != SYMBOL)
+            return -1;
           (void) strcpy(comdir, GETSTR(CAR(cdir)));
         }
-      else continue;
+      else
+        continue;
       if (ifexec(comdir, command))
         {
           (void) strcat(comdir, "/");
           (void) strcat(comdir, command);
-          if (EQ(exec(comdir, exp), C_ERROR)) return -1;
-          else return 1;
+          if (EQ(exec(comdir, exp), C_ERROR))
+            return -1;
+          else
+            return 1;
         }
       else
         continue;
@@ -518,14 +535,14 @@ int execcommand(LISPT exp, LISPT* res)
 static void setenviron(char* var, char* val)
 {
 #ifdef PUTENV
-  char *env = (char *) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
+  char* env = (char*) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
   (void) strcpy(env, var);
   (void) strcat(env, "=");
   (void) strcat(env, val);
   (void) putenv(env);
 #else
-  char *var_ = (char *) safemalloc((unsigned) strlen(var) + 1);
-  char *val_ = (char *) safemalloc((unsigned) strlen(val) + 1);
+  char* var_ = (char*) safemalloc((unsigned) strlen(var) + 1);
+  char* val_ = (char*) safemalloc((unsigned) strlen(val) + 1);
   (void) setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
@@ -537,9 +554,11 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd)) return C_NIL;
+  if (ISNIL(cmd))
+    return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed)) oldfd = 1;
+  if (ISNIL(filed))
+    oldfd = 1;
   else
     {
       CHECK(filed, INTEGER);
@@ -569,15 +588,17 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd)) return C_NIL;
+  if (ISNIL(cmd))
+    return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed)) oldfd = 1;
+  if (ISNIL(filed))
+    oldfd = 1;
   else
     {
       CHECK(filed, INTEGER);
       oldfd = INTVAL(filed);
     }
-  if ((fd = open(GETSTR(file), O_WRONLY|O_CREAT|O_APPEND, 0644)) == -1)
+  if ((fd = open(GETSTR(file), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
     return syserr(file);
   if ((pid = mfork()) == 0)
     {
@@ -601,9 +622,11 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd)) return C_NIL; 
+  if (ISNIL(cmd))
+    return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed)) oldfd = 0;
+  if (ISNIL(filed))
+    oldfd = 0;
   else
     {
       CHECK(filed, INTEGER);
@@ -700,14 +723,13 @@ PRIMITIVE stop()
 
 PRIMITIVE rehash()
 {
-  DIR *odir;
-  struct direct *rdir;
-  char *sdir;
+  DIR* odir;
+  struct direct* rdir;
+  char* sdir;
   BITS32 i;
   LISPT p;
 
-  for (i = 0; i < EXECHASH / 32; i++)
-    exechash[i] = 0;
+  for (i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
   for (p = path; TYPEOF(p) == CONS; p = CDR(p))
     {
       if (ISNIL(CAR(p)))
@@ -732,10 +754,9 @@ PRIMITIVE rehash()
 PRIMITIVE jobs()
 {
 #ifdef JOB_CONTROL
-  struct job *j;
+  struct job* j;
 
-  for (j = joblist; j; j = j->next)
-    printjob(j);
+  for (j = joblist; j; j = j->next) printjob(j);
 #endif
   return C_NIL;
 }
@@ -743,20 +764,22 @@ PRIMITIVE jobs()
 PRIMITIVE fg(LISPT job)
 {
 #ifdef JOB_CONTROL
-  struct job *j;
+  struct job* j;
   int pgrp;
   UNION_WAIT status;
 
   if (ISNIL(job))
     {
       for (j = joblist; j; j = j->next)
-        if (WIFSTOPPED(j->status)) break;
+        if (WIFSTOPPED(j->status))
+          break;
     }
   else
     {
       CHECK(job, INTEGER);
       for (j = joblist; j; j = j->next)
-        if (j->jobnum == INTVAL(job)) break;
+        if (j->jobnum == INTVAL(job))
+          break;
     }
   if (j)
     {
@@ -764,10 +787,10 @@ PRIMITIVE fg(LISPT job)
       j->running = 1;
       printjob(j);
       end_term();
-      (void) ioctl(0, TIOCSPGRP, (char *)&pgrp);
+      (void) ioctl(0, TIOCSPGRP, (char*) &pgrp);
       if (WIFSTOPPED(j->status))
         if (killpg(pgrp, SIGCONT) < 0)
-          return syserr(mknumber((long)pgrp));
+          return syserr(mknumber((long) pgrp));
       j->status = 0;
       j->background = 0;
       status = waitfork(j->procid);
@@ -780,19 +803,21 @@ PRIMITIVE fg(LISPT job)
 PRIMITIVE bg(LISPT job)
 {
 #ifdef JOB_CONTROL
-  struct job *j;
+  struct job* j;
   int pgrp;
 
   if (ISNIL(job))
     {
       for (j = joblist; j; j = j->next)
-        if (!j->background) break;
+        if (!j->background)
+          break;
     }
   else
     {
       CHECK(job, INTEGER);
       for (j = joblist; j; j = j->next)
-        if (j->jobnum == INTVAL(job)) break;
+        if (j->jobnum == INTVAL(job))
+          break;
     }
   if (j)
     {
@@ -800,10 +825,10 @@ PRIMITIVE bg(LISPT job)
       j->status = 0;
       j->running = 1;
       printjob(j);
-      (void) ioctl(0, TIOCSPGRP, (char *)&pgrp);
+      (void) ioctl(0, TIOCSPGRP, (char*) &pgrp);
       if (!j->background)
         if (killpg(pgrp, SIGCONT) < 0)
-          return syserr(mknumber((long)pgrp));
+          return syserr(mknumber((long) pgrp));
       j->background = 1;
       return C_T;
     }
@@ -817,11 +842,11 @@ PRIMITIVE p_setenv(LISPT var, LISPT val)
   CHECK2(val, STRING, SYMBOL);
   setenviron(GETSTR(var), GETSTR(val));
   return var;
-}  
+}
 
 PRIMITIVE getenviron(LISPT var)
 {
-  char *s;
+  char* s;
 
   CHECK2(var, STRING, SYMBOL);
   s = getenv(GETSTR(var));
@@ -836,7 +861,8 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
   LISPT ndir;
   char wd[1024];
 
-  if (ISNIL(dir)) ndir = home;
+  if (ISNIL(dir))
+    ndir = home;
   else
     {
       ndir = glob(dir);
@@ -845,13 +871,17 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
     }
   if (ISNIL(ndir))
     {
-      if (ISNIL(emess)) return error(NO_MATCH, dir);
-      else return C_NIL;
+      if (ISNIL(emess))
+        return error(NO_MATCH, dir);
+      else
+        return C_NIL;
     }
   if (chdir(GETSTR(ndir)) == -1)
     {
-      if (ISNIL(emess)) return syserr(dir);
-      else return C_NIL;
+      if (ISNIL(emess))
+        return syserr(dir);
+      else
+        return C_NIL;
     }
   else
     {
@@ -865,7 +895,7 @@ PRIMITIVE doexec(LISPT cmd)
 {
   LISPT res;
 
-  insidefork = 1;                       /* Prevent exec from forking */
+  insidefork = 1; /* Prevent exec from forking */
   end_term();
   switch (execcommand(cmd, &res))
     {
@@ -874,30 +904,29 @@ PRIMITIVE doexec(LISPT cmd)
       return C_ERROR;
       break;
     default:
-      break;                            /* Never reached */
+      break; /* Never reached */
     }
   init_term();
   return C_NIL;
 }
 
-void
-init_exec()
+void init_exec()
 {
-  mkprim3(PN_EXPAND,    expand,     3, SUBR);
-  mkprim3(PN_TO,        to,         3, FSUBR);
-  mkprim3(PN_FROM,      from,       3, FSUBR);
-  mkprim3(PN_TOTO,      toto,       3, FSUBR);
-  mkprim1(PN_PIPECMD,   pipecmd,   -1, FSUBR);
-  mkprim1(PN_BACK,      back,      -1, FSUBR);
-  mkprim0(PN_STOP,      stop,       0, FSUBR);
-  mkprim2(PN_CD,        cd,         2, FSUBR);
-  mkprim0(PN_REHASH,    rehash,     0, FSUBR);
-  mkprim0(PN_JOBS,      jobs,       0, FSUBR);
-  mkprim1(PN_FG,        fg,         1, FSUBR);
-  mkprim1(PN_BG,        bg,         1, FSUBR);
-  mkprim2(PN_SETENV,    p_setenv,   2, FSUBR);
-  mkprim1(PN_GETENV,    getenviron, 1, FSUBR);
-  mkprim1(PN_EXEC,      doexec,    -1, FSUBR);
+  mkprim3(PN_EXPAND, expand, 3, SUBR);
+  mkprim3(PN_TO, to, 3, FSUBR);
+  mkprim3(PN_FROM, from, 3, FSUBR);
+  mkprim3(PN_TOTO, toto, 3, FSUBR);
+  mkprim1(PN_PIPECMD, pipecmd, -1, FSUBR);
+  mkprim1(PN_BACK, back, -1, FSUBR);
+  mkprim0(PN_STOP, stop, 0, FSUBR);
+  mkprim2(PN_CD, cd, 2, FSUBR);
+  mkprim0(PN_REHASH, rehash, 0, FSUBR);
+  mkprim0(PN_JOBS, jobs, 0, FSUBR);
+  mkprim1(PN_FG, fg, 1, FSUBR);
+  mkprim1(PN_BG, bg, 1, FSUBR);
+  mkprim2(PN_SETENV, p_setenv, 2, FSUBR);
+  mkprim1(PN_GETENV, getenviron, 1, FSUBR);
+  mkprim1(PN_EXEC, doexec, -1, FSUBR);
   (void) rehash();
   undefhook = execcommand;
 }

@@ -10,7 +10,7 @@
 static char rcsid[] = "$Id$";
 #endif
 
-extern char *VERSION;
+extern char* VERSION;
 extern void init_file(void);
 /*
  * All lisp constants needed internally.
@@ -26,12 +26,12 @@ LISPT C_QUOTE, C_READ, C_REDEFINED, C_RESET, C_RETURN, C_STRING;
 LISPT C_SUBR, C_SYMBOL, C_TO, C_TOTO, C_UNBOUND, C_WRITE;
 LISPT C_BAR, C_GT, C_GGT, C_LT, C_SEMI, C_PROGN, C_AMPER;
 
-LISPT currentbase;       /* Conversion base for print of integer. */
-LISPT topprompt;         /* Normal prompt. */
-LISPT promptform;        /* Evaluated before printing the prompt. */
-LISPT brkprompt;         /* Prompt in break. */
-LISPT interactive;       /* Nonnil if interactive lips. */
-LISPT version;           /* Is set to the version string. */
+LISPT currentbase; /* Conversion base for print of integer. */
+LISPT topprompt;   /* Normal prompt. */
+LISPT promptform;  /* Evaluated before printing the prompt. */
+LISPT brkprompt;   /* Prompt in break. */
+LISPT interactive; /* Nonnil if interactive lips. */
+LISPT version;     /* Is set to the version string. */
 
 /*
  * Initializes a lisp symbol with the pname NAME to contain the same
@@ -39,12 +39,12 @@ LISPT version;           /* Is set to the version string. */
  * Whenever CVAR is changed the corresponding lisp variable changes
  * and vice versa.
  */
-void initcvar(LISPT *cvar, char* name, LISPT val)
+void initcvar(LISPT* cvar, char* name, LISPT val)
 {
   LISPT t;
 
   t = intern(name);
-  SET(SYMVAL(t).value, CVARIABLE, getobject ());
+  SET(SYMVAL(t).value, CVARIABLE, getobject());
   CVARVAL(SYMVAL(t).value) = cvar;
   *cvar = val;
 }
@@ -53,69 +53,69 @@ void init_lisp()
 {
   init_alloc();
 
-  SET(C_T, TRUE, getobject ());
+  SET(C_T, TRUE, getobject());
 
-  CE_NIL      = intern ("nil");
-  CE_T        = intern ("t");
-  C_ALIAS     = intern ("alias");
-  C_APPEND    = intern (PN_APPEND);
-  C_AUTOLOAD  = intern ("autoload");
-  C_BACK      = intern (PN_BACK);
-  C_BIGNUM    = intern ("bignum");
-  C_BROKEN    = intern ("broken");
-  C_BT        = intern ("bt");
-  C_CLOSURE   = intern ("closure");
-  C_CONS      = intern (PN_CONS);
-  C_DOT       = intern (".");
-  C_ENDOFFILE = intern ("endoffile");
-  C_ENVIRON   = intern ("environ");
-  C_ERROR     = intern (PN_ERROR);
-  C_EXEC      = intern (PN_EXEC);
-  C_EXCL      = intern ("!");
-  C_FILE      = intern ("file");
-  C_FLOAT     = intern ("float");
-  C_FREE      = intern ("free");
-  C_FROM      = intern (PN_FROM);
-  C_FSUBR     = intern ("fsubr");
-  C_GO        = intern ("go");
-  C_INDIRECT  = intern ("indirect");
-  C_INTEGER   = intern ("integer");
-  C_LAMBDA    = intern (PN_LAMBDA);
-  C_NLAMBDA   = intern (PN_NLAMBDA);
-  C_OLDDEF    = intern ("olddef");
-  C_OLDVAL    = intern ("oldval");
-  C_PIPE      = intern (PN_PIPECMD);
-  C_QUOTE     = intern (PN_QUOTE);
-  C_READ      = intern (PN_READ);
-  C_REDEFINED = intern ("redefined");
-  C_RESET     = intern ("reset");
-  C_RETURN    = intern ("return");
-  C_STRING    = intern ("string");
-  C_SUBR      = intern ("subr");
-  C_SYMBOL    = intern ("symbol");
-  C_TO        = intern (PN_TO);
-  C_TOTO      = intern (PN_TOTO);
-  C_UNBOUND   = intern ("unbound");
-  C_WRITE     = intern ("write");
-  C_PROGN     = intern (PN_PROGN);
-  C_BAR       = intern ("|");
-  C_GT        = intern (">");
-  C_GGT       = intern (">>");
-  C_LT        = intern ("<");
-  C_SEMI      = intern (";");
-  C_AMPER     = intern ("&");
+  CE_NIL = intern("nil");
+  CE_T = intern("t");
+  C_ALIAS = intern("alias");
+  C_APPEND = intern(PN_APPEND);
+  C_AUTOLOAD = intern("autoload");
+  C_BACK = intern(PN_BACK);
+  C_BIGNUM = intern("bignum");
+  C_BROKEN = intern("broken");
+  C_BT = intern("bt");
+  C_CLOSURE = intern("closure");
+  C_CONS = intern(PN_CONS);
+  C_DOT = intern(".");
+  C_ENDOFFILE = intern("endoffile");
+  C_ENVIRON = intern("environ");
+  C_ERROR = intern(PN_ERROR);
+  C_EXEC = intern(PN_EXEC);
+  C_EXCL = intern("!");
+  C_FILE = intern("file");
+  C_FLOAT = intern("float");
+  C_FREE = intern("free");
+  C_FROM = intern(PN_FROM);
+  C_FSUBR = intern("fsubr");
+  C_GO = intern("go");
+  C_INDIRECT = intern("indirect");
+  C_INTEGER = intern("integer");
+  C_LAMBDA = intern(PN_LAMBDA);
+  C_NLAMBDA = intern(PN_NLAMBDA);
+  C_OLDDEF = intern("olddef");
+  C_OLDVAL = intern("oldval");
+  C_PIPE = intern(PN_PIPECMD);
+  C_QUOTE = intern(PN_QUOTE);
+  C_READ = intern(PN_READ);
+  C_REDEFINED = intern("redefined");
+  C_RESET = intern("reset");
+  C_RETURN = intern("return");
+  C_STRING = intern("string");
+  C_SUBR = intern("subr");
+  C_SYMBOL = intern("symbol");
+  C_TO = intern(PN_TO);
+  C_TOTO = intern(PN_TOTO);
+  C_UNBOUND = intern("unbound");
+  C_WRITE = intern("write");
+  C_PROGN = intern(PN_PROGN);
+  C_BAR = intern("|");
+  C_GT = intern(">");
+  C_GGT = intern(">>");
+  C_LT = intern("<");
+  C_SEMI = intern(";");
+  C_AMPER = intern("&");
 
   C_ERROR->type = ERROR;
-  SET(C_EOF, ENDOFFILE, getobject ());
+  SET(C_EOF, ENDOFFILE, getobject());
   SETQ(CE_NIL, C_NIL);
   SETQ(CE_T, C_T);
 
-  initcvar(&topprompt,   "prompt",      mkstring("!_"));
-  initcvar(&promptform,  "promptform",  C_NIL);
-  initcvar(&brkprompt,   "brkprompt",   mkstring("!:"));
-  initcvar(&currentbase, "base",        mknumber(10L));
+  initcvar(&topprompt, "prompt", mkstring("!_"));
+  initcvar(&promptform, "promptform", C_NIL);
+  initcvar(&brkprompt, "brkprompt", mkstring("!:"));
+  initcvar(&currentbase, "base", mknumber(10L));
   initcvar(&interactive, "interactive", C_NIL);
-  initcvar(&version,     "version",     mkstring(VERSION));
+  initcvar(&version, "version", mkstring(VERSION));
 
   rstack = C_NIL;
   top = C_NIL;
@@ -135,5 +135,4 @@ void init_lisp()
 
   undefhook = NULL;
   breakhook = NULL;
-
 }

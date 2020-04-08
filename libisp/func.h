@@ -12,16 +12,16 @@
 /* variables */
 extern LISPT savearray[];
 extern int savept;
-extern OBARRAY *obarray[];
+extern OBARRAY* obarray[];
 extern LISPT freelist;
 /* functions */
 extern LISPT intern(char*);
 extern LISPT getobject(void);
-extern struct destblock *dalloc(int);
+extern struct destblock* dalloc(int);
 extern void dfree(struct destblock*);
 extern void dzero(void);
 extern void init_alloc(void);
-extern char *realmalloc(unsigned int);
+extern char* realmalloc(unsigned int);
 
 /*
  * arith.c
@@ -36,8 +36,8 @@ extern void init_arith(void);
 extern LISPT fun;
 extern LISPT expression;
 extern LISPT args;
-extern struct destblock *env;
-extern struct destblock *dest;
+extern struct destblock* env;
+extern struct destblock* dest;
 extern CONTROL control;
 extern int toctrl;
 /* functions */
@@ -49,9 +49,9 @@ extern void bt(void);
  * file.c
  */
 /* variables */
-extern FILE *primin;
-extern FILE *primout;
-extern FILE *primerr;
+extern FILE* primin;
+extern FILE* primout;
+extern FILE* primerr;
 /* functions */
 /*extern void init_file();*/
 
@@ -109,11 +109,11 @@ extern void init_pred(void);
  * prim.c
  */
 /* functions */
-extern void mkprim(char*, LISPT(*fname)(LISPT, LISPT, LISPT), short, char);
-extern void mkprim0(char*, LISPT(*fname)(void), short, char);
-extern void mkprim1(char*, LISPT(*fname)(LISPT), short, char);
-extern void mkprim2(char*, LISPT(*fname)(LISPT, LISPT), short, char);
-extern void mkprim3(char*, LISPT(*fname)(LISPT, LISPT, LISPT), short, char);
+extern void mkprim(char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, char);
+extern void mkprim0(char*, LISPT (*fname)(void), short, char);
+extern void mkprim1(char*, LISPT (*fname)(LISPT), short, char);
+extern void mkprim2(char*, LISPT (*fname)(LISPT, LISPT), short, char);
+extern void mkprim3(char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, char);
 extern LISPT nth(LISPT list, long n);
 extern LISPT closobj(LISPT vars);
 extern LISPT mklambda(LISPT args, LISPT def, int type);

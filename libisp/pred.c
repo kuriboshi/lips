@@ -36,9 +36,9 @@ PRIMITIVE listp(LISPT a)
 
 PRIMITIVE memb(LISPT x, LISPT l)
 {
-  while (!EQ(l,C_NIL))
+  while (!EQ(l, C_NIL))
     {
-      if (EQ(x,CAR(l)))
+      if (EQ(x, CAR(l)))
         return l;
       l = CDR(l);
     }
@@ -49,25 +49,27 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
 {
   LISPT x;
 
-  if (TYPEOF(l1)!=TYPEOF(l2)) return C_NIL;
-  if (EQ(l1,l2)) return C_T;
+  if (TYPEOF(l1) != TYPEOF(l2))
+    return C_NIL;
+  if (EQ(l1, l2))
+    return C_T;
   switch (TYPEOF(l1))
     {
     case CONS:
-      while (!EQ(l1,C_NIL) && !EQ(l2,C_NIL))
+      while (!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
         {
           x = equal(CAR(l1), CAR(l2));
-          if (EQ(x,C_T))
+          if (EQ(x, C_T))
             {
               l1 = CDR(l1);
               l2 = CDR(l2);
             }
           else
             return C_NIL;
-        } 
+        }
       return x;
     case STRING:
-      return (!strcmp(STRINGVAL(l1),STRINGVAL(l2)))?C_T:C_NIL;
+      return (!strcmp(STRINGVAL(l1), STRINGVAL(l2))) ? C_T : C_NIL;
       break;
     case LAMBDA:
     case NLAMBDA:
@@ -89,7 +91,7 @@ PRIMITIVE nlistp(LISPT a)
 
 PRIMITIVE neq(LISPT a, LISPT b)
 {
-  if (!EQ(a,b))
+  if (!EQ(a, b))
     return C_T;
   else
     return C_NIL;
@@ -115,7 +117,7 @@ PRIMITIVE litatom(LISPT a)
 
 PRIMITIVE xtypeof(LISPT a)
 {
-  switch(TYPEOF(a))
+  switch (TYPEOF(a))
     {
     case NIL:
       return C_NIL;
@@ -163,13 +165,13 @@ PRIMITIVE xtypeof(LISPT a)
 
 void init_pred()
 {
-  mkprim1(PN_LISTP,   listp,    1, SUBR);
-  mkprim1(PN_NLISTP,  nlistp,   1, SUBR);
-  mkprim2(PN_NEQ,     neq,      2, SUBR);
-  mkprim1(PN_NUMBERP, numberp,  1, SUBR);
-  mkprim2(PN_MEMB,    memb,     2, SUBR);
-  mkprim2(PN_EQUAL,   equal,    2, SUBR);
-  mkprim1(PN_BOUNDP,  boundp,   1, SUBR);
-  mkprim1(PN_LITATOM, litatom,  1, SUBR);
-  mkprim1(PN_TYPEOF,  xtypeof,  1, SUBR);
+  mkprim1(PN_LISTP, listp, 1, SUBR);
+  mkprim1(PN_NLISTP, nlistp, 1, SUBR);
+  mkprim2(PN_NEQ, neq, 2, SUBR);
+  mkprim1(PN_NUMBERP, numberp, 1, SUBR);
+  mkprim2(PN_MEMB, memb, 2, SUBR);
+  mkprim2(PN_EQUAL, equal, 2, SUBR);
+  mkprim1(PN_BOUNDP, boundp, 1, SUBR);
+  mkprim1(PN_LITATOM, litatom, 1, SUBR);
+  mkprim1(PN_TYPEOF, xtypeof, 1, SUBR);
 }

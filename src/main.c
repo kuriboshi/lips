@@ -32,18 +32,18 @@ extern void end_term(void);
 extern void clearlbuf(void);
 extern void loadbuf(char*);
 
-extern int optind;              /* For getopt. */
-extern char *optarg;            /* This too. */
+extern int optind;   /* For getopt. */
+extern char* optarg; /* This too. */
 
-jmp_buf toplevel;       	/* Panic return point. */
-char *progname;          /* Name of the game. */
-int brkflg;              /* 1 means break at next call to peval1. */
+jmp_buf toplevel; /* Panic return point. */
+char* progname;   /* Name of the game. */
+int brkflg;       /* 1 means break at next call to peval1. */
 int interrupt;
-int mypgrp;              /* lips process group. */
-struct options options;  /* Structure for all options. */
-LISPT path;              /* Search path for executables. */
-LISPT home;              /* Home directory. */
-LISPT globsort;		/* To sort or not during globbing. */
+int mypgrp;             /* lips process group. */
+struct options options; /* Structure for all options. */
+LISPT path;             /* Search path for executables. */
+LISPT home;             /* Home directory. */
+LISPT globsort;         /* To sort or not during globbing. */
 
 /* graceful death */
 void finish(int stat)
@@ -53,7 +53,7 @@ void finish(int stat)
 }
 
 #ifdef FANCY_SIGNALS
-static int getuser(FILE *f, int def)
+static int getuser(FILE* f, int def)
 {
 #ifdef SELECT
   int c;
@@ -63,10 +63,9 @@ static int getuser(FILE *f, int def)
 
   timeout.tv_sec = 10;
   timeout.tv_usec = 0;
-  FD_ZERO (&readfs);
-  FD_SET (0, &readfs);
-  switch (select(FD_SETSIZE, &readfs,
-                 NULL, NULL, &timeout))
+  FD_ZERO(&readfs);
+  FD_SET(0, &readfs);
+  switch (select(FD_SETSIZE, &readfs, NULL, NULL, &timeout))
     {
     case -1:
       (void) fprintf(primerr, "(error in select %d) ", errno);
@@ -103,19 +102,19 @@ void core(int sig)
   (void) fprintf(primerr, " -- Continue? ");
   (void) fflush(primerr);
   c = getuser(stdin, 'y');
-  while ('y' != (islower(c)?c:tolower(c)) &&
-	 'n' != (islower(c)?c:tolower(c)))
+  while ('y' != (islower(c) ? c : tolower(c))
+    && 'n' != (islower(c) ? c : tolower(c)))
     c = getuser(stdin, 'y');
-  if ((islower(c)?c:tolower(c)) == 'n')
+  if ((islower(c) ? c : tolower(c)) == 'n')
     {
       (void) fprintf(primerr, "No\n");
       (void) fprintf(primerr, "Core dump? ");
       (void) fflush(primerr);
       c = getuser(stdin, 'y');
-      while ('y' != (islower(c)?c:tolower(c)) &&
-             'n' != (islower(c)?c:tolower(c)))
+      while ('y' != (islower(c) ? c : tolower(c))
+        && 'n' != (islower(c) ? c : tolower(c)))
         c = getuser(stdin, 'y');
-      if ((islower(c)?c:tolower(c)) == 'n')
+      if ((islower(c) ? c : tolower(c)) == 'n')
         {
           (void) fprintf(primerr, "No\n");
           finish(0);
@@ -140,7 +139,8 @@ void core(int sig)
 
 void onintr()
 {
-  if (insidefork) exit(0);
+  if (insidefork)
+    exit(0);
   (void) fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
@@ -190,19 +190,19 @@ void onstop()
 static void fixpgrp()
 {
   mypgrp = getpgrp();
-  (void) ioctl(0, TIOCSPGRP, (char *) &mypgrp);
+  (void) ioctl(0, TIOCSPGRP, (char*) &mypgrp);
 }
 
 /*
  * Processes the environment variable PATH and returns a list
  * of all directories in PATH.
  */
-LISPT mungepath(char *pstr)
+LISPT mungepath(char* pstr)
 {
   char *ps, *s;
   LISPT p;
 
-  ps = (char *) safemalloc((unsigned)(strlen(pstr) + 1));
+  ps = (char*) safemalloc((unsigned) (strlen(pstr) + 1));
   if (ps == NULL)
     {
       (void) fprintf(stderr, "No more memory, can't munge path.\n");
@@ -214,7 +214,8 @@ LISPT mungepath(char *pstr)
   while (s >= ps)
     {
       *s = '\0';
-      for (; s >= ps && *s != ':'; s--)  ;
+      for (; s >= ps && *s != ':'; s--)
+        ;
       p = cons(mkstring(s + 1), p);
     }
   (void) free(ps);
@@ -223,7 +224,8 @@ LISPT mungepath(char *pstr)
 
 void onbreak()
 {
-  if (insidefork) exit(1);
+  if (insidefork)
+    exit(1);
 }
 
 void promptfun()
@@ -248,7 +250,8 @@ static LISPT put_end(LISPT list, LISPT obj, int conc)
     else
       return cons(obj, C_NIL);
   else
-    for (t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t)) ;
+    for (t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t))
+      ;
   if (conc)
     (void) rplacd(t, obj);
   else
@@ -329,9 +332,8 @@ static LISPT transform(LISPT list)
     }
   if (ISNIL(res))
     return tl;
-  else
-    if (!ISNIL(tl))
-      res = put_end(res, tl, conc);
+  else if (!ISNIL(tl))
+    res = put_end(res, tl, conc);
   return res;
 }
 
@@ -347,8 +349,8 @@ static void init()
   init_lisp();
   init_hist();
 
-  initcvar(&path,     "path",     mungepath(getenv("PATH")));
-  initcvar(&home,     "home",     mkstring(getenv("HOME")));
+  initcvar(&path, "path", mungepath(getenv("PATH")));
+  initcvar(&home, "home", mkstring(getenv("HOME")));
 
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;
@@ -361,7 +363,7 @@ static void init()
 /*
  * Loads the file INITFILE.
  */
-static void loadinit(char *initfile)
+static void loadinit(char* initfile)
 {
   if (loadfile(initfile))
     (void) printf("Can't open file %s\n", initfile); /* System init file. */
@@ -373,15 +375,16 @@ static void loadinit(char *initfile)
  */
 LISPT greet(LISPT who)
 {
-  struct passwd *pws;
+  struct passwd* pws;
   char loadf[256];
-  char *s;
+  char* s;
 
   if (ISNIL(who))
     s = getenv("USER");
   else
     s = STRINGVAL(who);
-  if (s == NULL) return C_NIL;
+  if (s == NULL)
+    return C_NIL;
   pws = getpwnam(s);
   if (pws == NULL)
     return C_NIL;
@@ -401,9 +404,9 @@ int main(int argc, char* const* argv)
   options.fast = 0;
   options.interactive = 0;
   options.command = 0;
-  while ((option = getopt(argc, argv, "c:fvid")) != EOF) 
+  while ((option = getopt(argc, argv, "c:fvid")) != EOF)
     {
-      switch(option)
+      switch (option)
         {
         case 'c':
           options.command = 1;
@@ -453,13 +456,15 @@ int main(int argc, char* const* argv)
     }
   if (!options.fast)
     {
-      if (!setjmp(toplevel)) loadinit(LIPSRC);
-      if (!setjmp(toplevel)) (void) greet(C_NIL);
+      if (!setjmp(toplevel))
+        loadinit(LIPSRC);
+      if (!setjmp(toplevel))
+        (void) greet(C_NIL);
     }
   /*
    * Return here in case of trouble.
    */
-  (void) setjmp (toplevel);
+  (void) setjmp(toplevel);
   toctrl = 0;
   dzero();
   fun = C_NIL;

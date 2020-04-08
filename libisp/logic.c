@@ -11,10 +11,10 @@
 static char rcsid[] = "$Id$";
 #endif
 
-PRIMITIVE and(LISPT l)
+PRIMITIVE and (LISPT l)
 {
   LISPT foo;
-  
+
   foo = C_T;
   while (!ISNIL(l))
     {
@@ -26,10 +26,10 @@ PRIMITIVE and(LISPT l)
   return foo;
 }
 
-PRIMITIVE or(LISPT l)
+PRIMITIVE or (LISPT l)
 {
   LISPT foo;
-  
+
   foo = C_NIL;
   while (!ISNIL(l))
     {
@@ -63,7 +63,7 @@ PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 void init_logic()
 {
   mkprim1(PN_AND, and, -1, FSUBR);
-  mkprim1(PN_OR,  or,  -1, FSUBR);
-  mkprim1(PN_NOT, not,  1, SUBR);
-  mkprim3(PN_IF,  xif, -3, FSUBR);
+  mkprim1(PN_OR, or, -1, FSUBR);
+  mkprim1(PN_NOT, not, 1, SUBR);
+  mkprim3(PN_IF, xif, -3, FSUBR);
 }

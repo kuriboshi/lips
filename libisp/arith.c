@@ -24,7 +24,7 @@ PRIMITIVE plus(LISPT l)
   double fsum = 0.0;
   long sum = 0;
   int f = 0;
-  
+
   while (TYPEOF(l) == CONS)
     {
       if (f)
@@ -36,16 +36,15 @@ PRIMITIVE plus(LISPT l)
           else
             return error(ILLEGAL_ARG, CAR(l));
         }
+      else if (TYPEOF(CAR(l)) == INTEGER)
+        sum += INTVAL(CAR(l));
+      else if (TYPEOF(CAR(l)) == FLOAT)
+        {
+          f = 1;
+          fsum = FLOATVAL(CAR(l)) + (double) sum;
+        }
       else
-        if (TYPEOF(CAR(l)) == INTEGER)
-          sum += INTVAL(CAR(l));
-        else if (TYPEOF(CAR(l)) == FLOAT)
-          {
-            f = 1;
-            fsum = FLOATVAL(CAR(l)) + (double)sum;
-          }
-        else
-          return error(ILLEGAL_ARG, CAR(l));
+        return error(ILLEGAL_ARG, CAR(l));
       l = CDR(l);
     }
   if (f)
@@ -57,7 +56,7 @@ PRIMITIVE plus(LISPT l)
 PRIMITIVE iplus(LISPT l)
 {
   long sum;
-  
+
   CHECK(CAR(l), INTEGER);
   sum = INTVAL(CAR(l));
   l = CDR(l);
@@ -73,7 +72,7 @@ PRIMITIVE iplus(LISPT l)
 PRIMITIVE fplus(LISPT l)
 {
   double sum;
-  
+
   CHECK(CAR(l), FLOAT);
   sum = FLOATVAL(CAR(l));
   l = CDR(l);
@@ -94,12 +93,11 @@ PRIMITIVE difference(LISPT a, LISPT b)
     if (TYPEOF(b) == INTEGER)
       return mknumber(INTVAL(a) - INTVAL(b));
     else
-      return mkfloat((double)INTVAL(a) - FLOATVAL(b));
+      return mkfloat((double) INTVAL(a) - FLOATVAL(b));
+  else if (TYPEOF(b) == INTEGER)
+    return mkfloat(FLOATVAL(a) - (double) INTVAL(b));
   else
-    if (TYPEOF(b) == INTEGER)
-      return mkfloat(FLOATVAL(a) - (double)INTVAL(b));
-    else
-      return mkfloat(FLOATVAL(a) - FLOATVAL(b));
+    return mkfloat(FLOATVAL(a) - FLOATVAL(b));
   /*NOTREACHED*/
 }
 
@@ -122,7 +120,7 @@ PRIMITIVE ltimes(LISPT l)
   double fprod = 1.0;
   long prod = 1;
   int f = 0;
-  
+
   while (TYPEOF(l) == CONS)
     {
       if (f)
@@ -134,16 +132,15 @@ PRIMITIVE ltimes(LISPT l)
           else
             return error(ILLEGAL_ARG, CAR(l));
         }
+      else if (TYPEOF(CAR(l)) == INTEGER)
+        prod *= INTVAL(CAR(l));
+      else if (TYPEOF(CAR(l)) == FLOAT)
+        {
+          f = 1;
+          fprod = FLOATVAL(CAR(l)) * (double) prod;
+        }
       else
-        if (TYPEOF(CAR(l)) == INTEGER)
-          prod *= INTVAL(CAR(l));
-        else if (TYPEOF(CAR(l)) == FLOAT)
-          {
-            f = 1;
-            fprod = FLOATVAL(CAR(l)) * (double) prod;
-          }
-        else
-          return error(ILLEGAL_ARG, CAR(l));
+        return error(ILLEGAL_ARG, CAR(l));
       l = CDR(l);
     }
   if (f)
@@ -155,7 +152,7 @@ PRIMITIVE ltimes(LISPT l)
 PRIMITIVE itimes(LISPT l)
 {
   long prod;
-  
+
   CHECK(CAR(l), INTEGER);
   prod = INTVAL(CAR(l));
   l = CDR(l);
@@ -171,7 +168,7 @@ PRIMITIVE itimes(LISPT l)
 PRIMITIVE ftimes(LISPT l)
 {
   double prod;
-  
+
   CHECK(CAR(l), FLOAT);
   prod = FLOATVAL(CAR(l));
   l = CDR(l);
@@ -183,7 +180,7 @@ PRIMITIVE ftimes(LISPT l)
     }
   return mkfloat(prod);
 }
-  
+
 PRIMITIVE divide(LISPT a, LISPT b)
 {
   CHECK2(a, INTEGER, FLOAT);
@@ -192,12 +189,11 @@ PRIMITIVE divide(LISPT a, LISPT b)
     if (TYPEOF(b) == INTEGER)
       return mknumber(INTVAL(a) / INTVAL(b));
     else
-      return mkfloat((double)INTVAL(a) / FLOATVAL(b));
+      return mkfloat((double) INTVAL(a) / FLOATVAL(b));
+  else if (TYPEOF(b) == INTEGER)
+    return mkfloat(FLOATVAL(a) / (double) INTVAL(b));
   else
-    if (TYPEOF(b) == INTEGER)
-      return mkfloat(FLOATVAL(a) / (double)INTVAL(b));
-    else
-      return mkfloat(FLOATVAL(a) / FLOATVAL(b));
+    return mkfloat(FLOATVAL(a) / FLOATVAL(b));
   /*NOTREACHED*/
 }
 
@@ -248,8 +244,10 @@ PRIMITIVE absval(LISPT i)
   int sign;
 
   CHECK(i, INTEGER);
-  if (INTVAL(i) < 0) sign = -1;
-  else sign = 1;
+  if (INTVAL(i) < 0)
+    sign = -1;
+  else
+    sign = 1;
   return mknumber(INTVAL(i) * sign);
 }
 
@@ -271,12 +269,12 @@ PRIMITIVE sub1(LISPT a)
   return mknumber(INTVAL(a) - 1);
 }
 
-#define FLOATFLOAT 0                    /* Both arguments are float */
-#define FLOATINT   1                    /* One float and one int */
-#define INTFLOAT   2                    /* One int and one float */
-#define INTINT     3                    /* Both are ints */
-#define ILLEGAL1   4                    /* First argument is illegal */
-#define ILLEGAL2   5                    /* Second argument is illegal */
+#define FLOATFLOAT 0 /* Both arguments are float */
+#define FLOATINT 1   /* One float and one int */
+#define INTFLOAT 2   /* One int and one float */
+#define INTINT 3     /* Both are ints */
+#define ILLEGAL1 4   /* First argument is illegal */
+#define ILLEGAL2 5   /* Second argument is illegal */
 
 /* 
  * The result is one of the above constants depending on the types of the 
@@ -284,31 +282,30 @@ PRIMITIVE sub1(LISPT a)
  */
 #define NUMTYPE(x, y) \
   (TYPEOF(x) == FLOAT) \
-    ? ( (TYPEOF(y) == FLOAT) \
-      ? FLOATFLOAT \
-      : (TYPEOF(y) == INTEGER) ? FLOATINT : ILLEGAL2 ) \
+    ? ((TYPEOF(y) == FLOAT) ? FLOATFLOAT \
+                            : (TYPEOF(y) == INTEGER) ? FLOATINT : ILLEGAL2) \
     : (TYPEOF(x) == INTEGER) \
-      ? ( (TYPEOF(y) == FLOAT)\
-        ? INTFLOAT \
-        : (TYPEOF(y) == INTEGER) ? INTINT : ILLEGAL2 ) \
+      ? ((TYPEOF(y) == FLOAT) ? INTFLOAT \
+                              : (TYPEOF(y) == INTEGER) ? INTINT : ILLEGAL2) \
       : ILLEGAL1
 
 #define DOCHECK(x, y, cmp) \
-  if (x cmp y) return C_T; \
-  else return C_NIL; \
+  if (x cmp y) \
+    return C_T; \
+  else \
+    return C_NIL;
 
-#define ILLEGALRETURN(a) \
-  return error(ILLEGAL_ARG, a);
+#define ILLEGALRETURN(a) return error(ILLEGAL_ARG, a);
 
 #define NUMCHECK(x, y, cmp) \
-  switch(NUMTYPE(x, y)) \
+  switch (NUMTYPE(x, y)) \
     { \
     case FLOATFLOAT: \
       DOCHECK(FLOATVAL(x), FLOATVAL(y), cmp); \
     case FLOATINT: \
-      DOCHECK(FLOATVAL(x), (double)INTVAL(y), cmp); \
+      DOCHECK(FLOATVAL(x), (double) INTVAL(y), cmp); \
     case INTFLOAT: \
-      DOCHECK((double)INTVAL(x), FLOATVAL(y), cmp); \
+      DOCHECK((double) INTVAL(x), FLOATVAL(y), cmp); \
     case INTINT: \
       DOCHECK(INTVAL(x), INTVAL(y), cmp); \
     case ILLEGAL1: \
@@ -375,31 +372,31 @@ PRIMITIVE minusp(LISPT x)
 
 void init_arith()
 {
-  mkprim1(PN_PLUS,        plus,        -1, SUBR);
-  mkprim2(PN_DIFFERENCE,  difference,   2, SUBR);
-  mkprim1(PN_TIMES,       ltimes,      -1, SUBR);
-  mkprim2(PN_DIVIDE,      divide,       2, SUBR);
-  mkprim1(PN_IPLUS,       iplus,       -1, SUBR);
-  mkprim2(PN_IDIFFERENCE, idifference,  2, SUBR);
-  mkprim1(PN_ITIMES,      itimes,      -1, SUBR);
-  mkprim2(PN_IQUOTIENT,   iquotient,    2, SUBR);
-  mkprim2(PN_IREMAINDER,  iremainder,   2, SUBR);
-  mkprim1(PN_IMINUS,      iminus,       1, SUBR);
-  mkprim1(PN_MINUS,       minus,        1, SUBR);
-  mkprim1(PN_ADD1,        add1,         1, SUBR);
-  mkprim1(PN_SUB1,        sub1,         1, SUBR);
-  mkprim1(PN_FPLUS,       fplus,       -1, SUBR);
-  mkprim2(PN_FDIFFERENCE, fdifference,  2, SUBR);
-  mkprim1(PN_FTIMES,      ftimes,      -1, SUBR);
-  mkprim2(PN_FDIVIDE,     fdivide,      2, SUBR);
-  mkprim1(PN_ITOF,        itof,         1, SUBR);
-  mkprim2(PN_GREATERP,    greaterp,     2, SUBR);
-  mkprim2(PN_GEQ,         geq,          2, SUBR);
-  mkprim2(PN_LESSP,       lessp,        2, SUBR);
-  mkprim2(PN_LEQ,         leq,          2, SUBR);
-  mkprim1(PN_ZEROP,       zerop,        1, SUBR);
-  mkprim2(PN_EQP,         eqp,          2, SUBR);
-  mkprim2(PN_NEQP,        neqp,         2, SUBR);
-  mkprim1(PN_MINUSP,      minusp,       1, SUBR);
-  mkprim1(PN_ABS,         absval,       1, SUBR);
+  mkprim1(PN_PLUS, plus, -1, SUBR);
+  mkprim2(PN_DIFFERENCE, difference, 2, SUBR);
+  mkprim1(PN_TIMES, ltimes, -1, SUBR);
+  mkprim2(PN_DIVIDE, divide, 2, SUBR);
+  mkprim1(PN_IPLUS, iplus, -1, SUBR);
+  mkprim2(PN_IDIFFERENCE, idifference, 2, SUBR);
+  mkprim1(PN_ITIMES, itimes, -1, SUBR);
+  mkprim2(PN_IQUOTIENT, iquotient, 2, SUBR);
+  mkprim2(PN_IREMAINDER, iremainder, 2, SUBR);
+  mkprim1(PN_IMINUS, iminus, 1, SUBR);
+  mkprim1(PN_MINUS, minus, 1, SUBR);
+  mkprim1(PN_ADD1, add1, 1, SUBR);
+  mkprim1(PN_SUB1, sub1, 1, SUBR);
+  mkprim1(PN_FPLUS, fplus, -1, SUBR);
+  mkprim2(PN_FDIFFERENCE, fdifference, 2, SUBR);
+  mkprim1(PN_FTIMES, ftimes, -1, SUBR);
+  mkprim2(PN_FDIVIDE, fdivide, 2, SUBR);
+  mkprim1(PN_ITOF, itof, 1, SUBR);
+  mkprim2(PN_GREATERP, greaterp, 2, SUBR);
+  mkprim2(PN_GEQ, geq, 2, SUBR);
+  mkprim2(PN_LESSP, lessp, 2, SUBR);
+  mkprim2(PN_LEQ, leq, 2, SUBR);
+  mkprim1(PN_ZEROP, zerop, 1, SUBR);
+  mkprim2(PN_EQP, eqp, 2, SUBR);
+  mkprim2(PN_NEQP, neqp, 2, SUBR);
+  mkprim1(PN_MINUSP, minusp, 1, SUBR);
+  mkprim1(PN_ABS, absval, 1, SUBR);
 }

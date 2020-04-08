@@ -8,7 +8,7 @@
 #include <string.h>
 #include "lips.h"
 
-#define PROMPTLENGTH            80
+#define PROMPTLENGTH 80
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -17,16 +17,16 @@ static char rcsid[] = "$Id$";
 extern void pputc(char, FILE*);
 
 char current_prompt[PROMPTLENGTH];
-LISPT history;                  /* Holds the history list. */
-LISPT histnum;                  /* Current event number. */
-LISPT histmax;                  /* Maximum number of events to save. */
-LISPT input_exp;                /* The input expression. */
-LISPT topexp;                   /* Transformed expression to evaluate. */
-LISPT alias_expanded;           /* For checking alias loops. */
-LISPT (*transformhook)(LISPT);  /* Applied on input if non-NULL. */
-void (*beforeprompt)(void);     /* Called before the prompt is printed. */
+LISPT history;                 /* Holds the history list. */
+LISPT histnum;                 /* Current event number. */
+LISPT histmax;                 /* Maximum number of events to save. */
+LISPT input_exp;               /* The input expression. */
+LISPT topexp;                  /* Transformed expression to evaluate. */
+LISPT alias_expanded;          /* For checking alias loops. */
+LISPT (*transformhook)(LISPT); /* Applied on input if non-NULL. */
+void (*beforeprompt)(void);    /* Called before the prompt is printed. */
 
-static int printit;             /* If the result will be printed. */
+static int printit; /* If the result will be printed. */
 
 /*
  * History functions.
@@ -73,7 +73,8 @@ static void trimhist()
   long i;
 
   hl = history;
-  for (i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl));
+  for (i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl))
+    ;
   if (!ISNIL(hl))
     (void) rplacd(hl, C_NIL);
 }
@@ -86,25 +87,31 @@ LISPT histget(long num, LISPT hlist)
 {
   if (num < 0)
     {
-      for (; TYPEOF(hlist) == CONS && num < 0; hlist = CDR(hlist), num++);
-      if (ISNIL(hlist)) return C_NIL;
-      else return CDR(CAR(hlist));
+      for (; TYPEOF(hlist) == CONS && num < 0; hlist = CDR(hlist), num++)
+        ;
+      if (ISNIL(hlist))
+        return C_NIL;
+      else
+        return CDR(CAR(hlist));
     }
   else if (num > 0)
     {
       for (; TYPEOF(hlist) == CONS && num != INTVAL(CAR(CAR(hlist)));
-           hlist = CDR(hlist));
-      if (ISNIL(hlist)) return C_NIL;
-      else return CDR(CAR(hlist));
+           hlist = CDR(hlist))
+        ;
+      if (ISNIL(hlist))
+        return C_NIL;
+      else
+        return CDR(CAR(hlist));
     }
-  else
-    if (!ISNIL(hlist)) return CDR(CAR(hlist));
+  else if (!ISNIL(hlist))
+    return CDR(CAR(hlist));
   return C_NIL;
 }
 
 PRIMITIVE printhist()
 {
-  remhist();                    /* Removes itself from history. */
+  remhist(); /* Removes itself from history. */
   phist();
   return C_NIL;
 }
@@ -113,7 +120,8 @@ static LISPT transform(LISPT list)
 {
   if (transformhook != NULL)
     return (*transformhook)(list);
-  else return list;
+  else
+    return list;
 }
 
 /*
@@ -135,8 +143,8 @@ LISPT findalias(LISPT exp)
       if (TYPEOF(rval) == CONS && TYPEOF(CAR(rval)) == SYMBOL)
         {
           alias = getprop(CAR(rval), C_ALIAS);
-          if (!ISNIL(alias) && (ISNIL(alias_expanded)
-                                || !EQ(CAR(rval), CAR(alias_expanded))))
+          if (!ISNIL(alias)
+            && (ISNIL(alias_expanded) || !EQ(CAR(rval), CAR(alias_expanded))))
             {
               if (!ISNIL(memb(CAR(rval), alias_expanded)))
                 return error(ALIAS_LOOP, C_NIL);
@@ -155,7 +163,7 @@ LISPT findalias(LISPT exp)
 void promptprint(LISPT prompt)
 {
   int i;
-  char *s;
+  char* s;
   char buf[80];
 
   current_prompt[0] = '\0';
@@ -183,7 +191,7 @@ void promptprint(LISPT prompt)
   (void) printf("%s", current_prompt);
 }
 
-void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
+void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 {
   while (1)
     {
@@ -192,7 +200,7 @@ void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
       printit = 0;
       echoline = 0;
       if (beforeprompt != NULL)
-	(*beforeprompt)();
+        (*beforeprompt)();
       /*
        * Evaluate promptform and print prompt.
        */
@@ -200,8 +208,7 @@ void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
         {
           if (TYPEOF(eval(promptform)) == ERROR)
             {
-              (void) xprint(mkstring("Error in promptform, reset to nil"),
-                C_T);
+              (void) xprint(mkstring("Error in promptform, reset to nil"), C_T);
               promptform = C_NIL;
             }
           promptprint(*tprompt);
@@ -209,17 +216,17 @@ void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
       input_exp = xreadline(C_T);
       if (macrofun)
         switch ((*macrofun)(&input_exp))
-	  {
-	  case 0:
-	    return;
-	  case 1:
-	    break;
-	  case 2:
-	    continue;
-	  }
+          {
+          case 0:
+            return;
+          case 1:
+            break;
+          case 2:
+            continue;
+          }
       if (TYPEOF(input_exp) == ENDOFFILE)
         break;
-      if (EQ(CAR(input_exp),C_NIL))
+      if (EQ(CAR(input_exp), C_NIL))
         continue;
       addhist(input_exp);
       if (echoline)
@@ -235,7 +242,8 @@ void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
         }
       alias_expanded = C_NIL;
       topexp = eval(topexp);
-      if (printit) (void) xprint(topexp, C_T);
+      if (printit)
+        (void) xprint(topexp, C_T);
       if (!options.interactive && options.command)
         break;
       trimhist();
@@ -244,8 +252,8 @@ void toploop(LISPT *tprompt, int (*macrofun)(LISPT*))
 
 void init_hist()
 {
-  initcvar(&history,   "history",  C_NIL);
-  initcvar(&histnum,   "histnum",  mknumber(1L));
-  initcvar(&histmax,   "histmax",  mknumber(10L));
-  mkprim0(PN_PRINTHIST, printhist,  0, FSUBR);
+  initcvar(&history, "history", C_NIL);
+  initcvar(&histnum, "histnum", mknumber(1L));
+  initcvar(&histmax, "histmax", mknumber(10L));
+  mkprim0(PN_PRINTHIST, printhist, 0, FSUBR);
 }

@@ -18,7 +18,7 @@
 #include <string.h>
 #include "lips.h"
 
-#define FFLUSH(file)	(void) fflush(file)
+#define FFLUSH(file) (void) fflush(file)
 
 #ifndef lint
 static char rcsid[] = "$Id$";
@@ -27,8 +27,8 @@ static char rcsid[] = "$Id$";
 extern void finish(int);
 extern int readchar(FILE*, char*);
 
-#define NUM_KEYS        256
-#define COMMENTCHAR     '#'
+#define NUM_KEYS 256
+#define COMMENTCHAR '#'
 #ifndef BELL
 #define BELL '\007'
 #endif
@@ -37,17 +37,17 @@ extern int readchar(FILE*, char*);
  * Terminal functions.  Each constant stands for a function provided
  * by the line editor.
  */
-#define T_INSERT        0
-#define T_ERASE         1
-#define T_RETYPE        2
-#define T_KILL          3
-#define T_EOF           4
-#define T_TAB           5
-#define T_LEFTPAR       6
-#define T_RIGHTPAR      7
-#define T_NEWLINE       8
-#define T_STRING        9
-#define T_ESCAPE        10
+#define T_INSERT 0
+#define T_ERASE 1
+#define T_RETYPE 2
+#define T_KILL 3
+#define T_EOF 4
+#define T_TAB 5
+#define T_LEFTPAR 6
+#define T_RIGHTPAR 7
+#define T_NEWLINE 8
+#define T_STRING 9
+#define T_ESCAPE 10
 
 /*
  * Variables for terminal characteristics, old and new.
@@ -57,17 +57,17 @@ static struct tchars newtchars, oldtchars;
 static struct ltchars newltchars, oldltchars;
 static int ldis;
 
-static char linebuffer[BUFSIZ];        /* Line buffer for terminal input.  */
-static int parcount = 0;               /* Counts paranthesis.  */
-static int linepos = 0;                /* End of line buffer.  */
-static int position = 0;               /* Current position in line buffer.  */
-static char key_tab[NUM_KEYS];         /* Table specifying key functions.  */
+static char linebuffer[BUFSIZ]; /* Line buffer for terminal input.  */
+static int parcount = 0;        /* Counts paranthesis.  */
+static int linepos = 0;         /* End of line buffer.  */
+static int position = 0;        /* Current position in line buffer.  */
+static char key_tab[NUM_KEYS];  /* Table specifying key functions.  */
 
 #ifdef TERMCAP
-static char tcap[128];                 /* Buffer for terminal capabilties.  */
-static char *curup, *curfwd;           /* Various term cap strings.  */
-static char  *cleol, *curdn;
-static int nocap;                      /* Nonzero if insufficient term cap. */
+static char tcap[128];       /* Buffer for terminal capabilties.  */
+static char *curup, *curfwd; /* Various term cap strings.  */
+static char *cleol, *curdn;
+static int nocap; /* Nonzero if insufficient term cap. */
 #endif
 
 int lips_getline(FILE*);
@@ -83,7 +83,7 @@ void clearlbuf()
   parcount = 0;
 }
 
-void loadbuf(char *str)
+void loadbuf(char* str)
 {
   (void) strcpy(linebuffer, str);
   (void) strcat(linebuffer, "\n");
@@ -97,19 +97,18 @@ void init_keymap()
 {
   int i;
 
-  for (i = NUM_KEYS - 1; i; i--)
-    key_tab[i] = T_INSERT;
-  key_tab[CERASE]  = T_ERASE;
+  for (i = NUM_KEYS - 1; i; i--) key_tab[i] = T_INSERT;
+  key_tab[CERASE] = T_ERASE;
   key_tab[CTRL('h')] = T_ERASE;
-  key_tab[CRPRNT]  = T_RETYPE;
-  key_tab[CKILL]   = T_KILL;
-  key_tab[CEOF]    = T_EOF;
+  key_tab[CRPRNT] = T_RETYPE;
+  key_tab[CKILL] = T_KILL;
+  key_tab[CEOF] = T_EOF;
   key_tab[CTRL('i')] = T_TAB;
-  key_tab['(']     = T_LEFTPAR;
-  key_tab[')']     = T_RIGHTPAR;
-  key_tab['\n']    = T_NEWLINE;
-  key_tab['\\']    = T_ESCAPE;
-  key_tab['"']     = T_STRING;
+  key_tab['('] = T_LEFTPAR;
+  key_tab[')'] = T_RIGHTPAR;
+  key_tab['\n'] = T_NEWLINE;
+  key_tab['\\'] = T_ESCAPE;
+  key_tab['"'] = T_STRING;
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -118,8 +117,8 @@ void init_term()
   static int initialized = 0;
   char bp[1024];
 #ifdef TERMCAP
-  char *termc = tcap;
-  char *term;
+  char* termc = tcap;
+  char* term;
 #endif
   int ndis;
 
@@ -130,7 +129,7 @@ void init_term()
       (void) ioctl(0, TIOCGETC, &oldtchars);
       (void) ioctl(0, TIOCGLTC, &oldltchars);
       (void) ioctl(0, TIOCGETD, &ldis);
-      (void) signal(SIGINT, cleanup); /* temporary handle */
+      (void) signal(SIGINT, cleanup);  /* temporary handle */
       (void) signal(SIGTERM, cleanup); /* exit gracefully */
       newterm = oldterm;
       newterm.sg_flags = (newterm.sg_flags & ~ECHO) | CBREAK;
@@ -174,20 +173,21 @@ void end_term()
  * Put a character on stdout prefixing it with a ^ if it's
  * a control character.
  */
-void pputc(int c, FILE *file)
+void pputc(int c, FILE* file)
 {
   if (c < 0x20 && c != '\n' && c != '\t')
     {
       (void) putc('^', file);
       (void) putc(c + 0x40, file);
     }
-  else (void) putc(c, file);
+  else
+    (void) putc(c, file);
 }
 
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-void putch(int c, FILE *file, int esc)
+void putch(int c, FILE* file, int esc)
 {
   if ((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -200,15 +200,15 @@ void putch(int c, FILE *file, int esc)
  * characters from linebuffer.  If it's not from a terminal
  * do io the standard way.
  */
-int getch(FILE *file)
+int getch(FILE* file)
 {
   int c;
 
   if (!isatty(fileno(file)))
     {
       c = getc(file);
-      if (c == COMMENTCHAR)             /* Skip comments.  */
-        while((c = getc(file)) != '\n')
+      if (c == COMMENTCHAR) /* Skip comments.  */
+        while ((c = getc(file)) != '\n')
           ;
       return c;
     }
@@ -227,7 +227,7 @@ gotlin:
  * Unget a character.  If reading from a terminal, 
  * just push it back in the buffer, if not, do an ungetc.
  */
-void ungetch(int c, FILE *file)
+void ungetch(int c, FILE* file)
 {
   if (isatty(fileno(file)))
     {
@@ -247,9 +247,12 @@ static int firstnotlp()
 {
   int i;
 
-  for (i=1; i < position && issepr(linebuffer[i]); i++);
-  if (linebuffer[i] == '(') return 0;
-  else return 1;
+  for (i = 1; i < position && issepr(linebuffer[i]); i++)
+    ;
+  if (linebuffer[i] == '(')
+    return 0;
+  else
+    return 1;
 }
 
 /*
@@ -309,8 +312,9 @@ static void retype(int all)
   if (!nocap)
     {
       l = 0;
-      for (i=1; i<linepos; i++)
-        if (linebuffer[i] == '\n') nl = i, l++;
+      for (i = 1; i < linepos; i++)
+        if (linebuffer[i] == '\n')
+          nl = i, l++;
       for (l = all ? l : 1; l; l--)
         {
           if (all == 2)
@@ -321,43 +325,44 @@ static void retype(int all)
           tputs(curup, 1, outc);
         }
       putc('\r', stdout);
-      if (all) nl = 0;
-      if (nl == 0) fputs(current_prompt, stdout);
+      if (all)
+        nl = 0;
+      if (nl == 0)
+        fputs(current_prompt, stdout);
       if (all != 2)
-	for (i=nl+1; i<linepos; i++)
-	  {
-	    if (linebuffer[i] == '\n')
-	      tputs(cleol, 1, outc);
-	    pputc(linebuffer[i], stdout);
-	  }
+        for (i = nl + 1; i < linepos; i++)
+          {
+            if (linebuffer[i] == '\n')
+              tputs(cleol, 1, outc);
+            pputc(linebuffer[i], stdout);
+          }
       tputs(cleol, 1, outc);
     }
   else
 #endif
     {
       if (all == 0)
-	{
-	  putc('\r', stdout);
-	  for (i=linepos - 1; i>0 && linebuffer[i] != '\n'; i--) ;
-	  if (i == 0)
-	    fputs(current_prompt, stdout);
-	  for (i++; i<linepos; i++)
-	    pputc(linebuffer[i], stdout);
-	}
+        {
+          putc('\r', stdout);
+          for (i = linepos - 1; i > 0 && linebuffer[i] != '\n'; i--)
+            ;
+          if (i == 0)
+            fputs(current_prompt, stdout);
+          for (i++; i < linepos; i++) pputc(linebuffer[i], stdout);
+        }
       else if (all == 1)
-	{
-	  pputc(CRPRNT, stdout);
-	  pputc('\n', stdout);
-	  fputs(current_prompt, stdout);
-	  for (i=1; i<linepos; i++)
-	    pputc(linebuffer[i], stdout);
-	}
+        {
+          pputc(CRPRNT, stdout);
+          pputc('\n', stdout);
+          fputs(current_prompt, stdout);
+          for (i = 1; i < linepos; i++) pputc(linebuffer[i], stdout);
+        }
       else
-	{
-	  pputc(CKILL, stdout);
-	  pputc('\n', stdout);
-	  fputs(current_prompt, stdout);
-	}
+        {
+          pputc(CKILL, stdout);
+          pputc('\n', stdout);
+          fputs(current_prompt, stdout);
+        }
     }
 }
 
@@ -365,30 +370,29 @@ static void retype(int all)
  * Stuff for file name completion.
  */
 static char word[BUFSIZ];
-static char *last;
+static char* last;
 
-char *mkexstr()
+char* mkexstr()
 {
   int i = linepos - 1;
 
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!issepr(linebuffer[i]) && i >= 0)
-    *last-- = linebuffer[i--];
+  while (!issepr(linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
-static void fillrest(char *word)
+static void fillrest(char* word)
 {
-  for(word += strlen(last) - 1; *word; word++)
+  for (word += strlen(last) - 1; *word; word++)
     {
       pputc(*word, stdout);
       linebuffer[linepos++] = *word;
     }
 }
 
-static int checkchar(LISPT words, int pos, int *c)
+static int checkchar(LISPT words, int pos, int* c)
 {
   LISPT l;
 
@@ -415,10 +419,10 @@ static void complete(LISPT words)
     }
 }
 
-static LISPT strip(LISPT files, char *prefix, char *suffix)
+static LISPT strip(LISPT files, char* prefix, char* suffix)
 {
   LISPT stripped;
-  char *s;
+  char* s;
 
   if (strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
     return files;
@@ -434,21 +438,22 @@ static LISPT strip(LISPT files, char *prefix, char *suffix)
 /*
  * Routines for paren blinking.
  */
-#define NORMAL          0
-#define INSTRING        1
-#define EXITSTRING      2
-#define STARTSTRING     3
-#define LEFTPAR         4
-#define RIGHTPAR        5  
+#define NORMAL 0
+#define INSTRING 1
+#define EXITSTRING 2
+#define STARTSTRING 3
+#define LEFTPAR 4
+#define RIGHTPAR 5
 
-struct curpos {
+struct curpos
+{
   int cpos;
   int line;
-  char *line_start;
+  char* line_start;
 };
 
-static struct curpos parpos;           /* Saves position of matching par.  */
-static struct curpos currentpos;       /* Current position.  */
+static struct curpos parpos;     /* Saves position of matching par.  */
+static struct curpos currentpos; /* Current position.  */
 
 /*
  * Scans backwards and tries to find a matching left parenthesis
@@ -567,10 +572,9 @@ static void scan(int begin)
 /*
  * Puts the string STR on stdout NTIM times using tputs.
  */
-void nput(char *str, int ntim)
+void nput(char* str, int ntim)
 {
-  for (; ntim > 0; ntim--)
-    tputs(str, 1, outc);
+  for (; ntim > 0; ntim--) tputs(str, 1, outc);
 }
 
 /*
@@ -584,7 +588,8 @@ void blink()
   fd_set rfds;
   int i;
 
-  if (nocap) return;                    /* Sorry, no blink.  */
+  if (nocap)
+    return; /* Sorry, no blink.  */
   ldiff = currentpos.line - parpos.line;
   cdiff = parpos.cpos - currentpos.cpos;
   nput(curup, ldiff);
@@ -595,7 +600,7 @@ void blink()
       else
         {
           putc('\r', stdout);
-          nput(curfwd, parpos.cpos);    /* This is realy silly.  */
+          nput(curfwd, parpos.cpos); /* This is realy silly.  */
         }
     }
   else
@@ -605,11 +610,11 @@ void blink()
   timeout.tv_usec = 0L;
   FD_SET(1, &rfds);
   (void) select(1, &rfds, NULL, NULL, &timeout);
-  nput(curdn, ldiff);                   /* Goes to beginning of line.  */
+  nput(curdn, ldiff); /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
   if (ldiff == 0)
     {
-      for (i =0; parpos.line_start[i]; i++)
+      for (i = 0; parpos.line_start[i]; i++)
         pputc(parpos.line_start[i], stdout);
     }
   else
@@ -629,7 +634,7 @@ void blink()
  * puts a right paren in the buffer as well as the newline.
  * Returns zero if anything goes wrong.
  */
-int lips_getline(FILE *file)
+int lips_getline(FILE* file)
 {
   char c;
   char *s, *t;
@@ -637,7 +642,7 @@ int lips_getline(FILE *file)
   int instring = 0;
   int escaped = 0;
   LISPT ex;
-  
+
   if (options.command)
     {
       (void) fprintf(stderr, "Unbalanced parenthesis\n");
@@ -653,8 +658,9 @@ int lips_getline(FILE *file)
       if (escaped)
         escaped--;
       FFLUSH(stdout);
-      if (readchar(file, &c) == 0) return 0;
-      switch(key_tab[c])
+      if (readchar(file, &c) == 0)
+        return 0;
+      switch (key_tab[c])
         {
         case T_EOF:
           if (linepos == 1)
@@ -669,8 +675,8 @@ int lips_getline(FILE *file)
           retype(2);
           linepos = 1;
           parcount = origpar;
-	  escaped = 0;
-	  instring = 0;
+          escaped = 0;
+          instring = 0;
           break;
         case T_RETYPE:
           retype(1);
@@ -690,21 +696,22 @@ int lips_getline(FILE *file)
             fillrest(GETSTR(CAR(ex)));
           else
             {
-              if (TYPEOF(ex) == CONS) complete(ex);
+              if (TYPEOF(ex) == CONS)
+                complete(ex);
               (void) putc(BELL, stdout);
             }
           break;
         case T_ERASE:
           escaped = 0;
-          if (linepos>1 && linebuffer[linepos-1] == '\n')
+          if (linepos > 1 && linebuffer[linepos - 1] == '\n')
             {
               linepos--;
               retype(0);
             }
-          else if (linepos>1)
+          else if (linepos > 1)
             {
               delonechar();
-              if (linebuffer[linepos-1] == '\\')
+              if (linebuffer[linepos - 1] == '\\')
                 escaped = 2;
               else
                 {
@@ -739,9 +746,9 @@ int lips_getline(FILE *file)
           if (escaped || instring)
             {
               pputc(c, stdout);
-	      linebuffer[linepos++] = c;
-	      break;
-	    }
+              linebuffer[linepos++] = c;
+              break;
+            }
           parcount--;
           pputc(c, stdout);
           linebuffer[linepos++] = c;
@@ -753,7 +760,7 @@ int lips_getline(FILE *file)
                   parcount = 0; /* in case it was negative */
                 }
               else if (firstnotlp())
-                break;          /* paren expression not first (for readline) */
+                break; /* paren expression not first (for readline) */
               linebuffer[linepos++] = '\n';
               pputc('\n', stdout);
               return 1;
@@ -767,10 +774,10 @@ int lips_getline(FILE *file)
         case T_NEWLINE:
           pputc('\n', stdout);
           if (linepos == 1 || onlyblanks())
-	    {
-	      linebuffer[0] = '(';
+            {
+              linebuffer[0] = '(';
               linebuffer[linepos++] = ')';
-	    }
+            }
           linebuffer[linepos++] = '\n';
           if (parcount <= 0 && !instring)
             return 1;
@@ -787,16 +794,16 @@ int lips_getline(FILE *file)
  * Return 1 if currently at end of line, or
  * at end of line after skipping blanks.
  */
-int eoln(FILE *file)
+int eoln(FILE* file)
 {
   int i;
 
   if (!isatty(fileno(file)))
     return 0;
-  for (i=position; i<linepos; i++)
+  for (i = position; i < linepos; i++)
     {
-      if (linebuffer[i] != ' ' && linebuffer[i] != '\t' &&
-          linebuffer[i] != '\n')
+      if (linebuffer[i] != ' ' && linebuffer[i] != '\t'
+        && linebuffer[i] != '\n')
         return 0;
       if (linebuffer[i] == '\n')
         return 1;

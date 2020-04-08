@@ -41,7 +41,7 @@ PRIMITIVE progn(LISPT lexp)
     return C_NIL;
   while (!ISNIL(CDR(lexp)))
     {
-      (void)eval(CAR(lexp));
+      (void) eval(CAR(lexp));
       lexp = CDR(lexp);
     }
   return eval(CAR(lexp));
@@ -51,7 +51,7 @@ PRIMITIVE cond(LISPT args)
 {
   LISPT alt;
   LISPT res;
-  
+
   res = C_NIL;
   if (ISNIL(args))
     return C_NIL;
@@ -79,9 +79,9 @@ PRIMITIVE xwhile(LISPT pred, LISPT exp)
   LISPT res;
 
   res = eval(pred);
-  while(!ISNIL(res))
+  while (!ISNIL(res))
     {
-      (void)progn(exp);
+      (void) progn(exp);
       res = eval(pred);
     }
   return C_NIL;
@@ -129,17 +129,17 @@ PRIMITIVE envget(LISPT e, LISPT n)
 
 void init_low()
 {
-  mkprim2(PN_SET,        set,         2, SUBR);
-  mkprim2(PN_SETQ,       setq,        2, FSUBR);
-  mkprim2(PN_SETQQ,      set,         2, FSUBR);
-  mkprim1(PN_COND,       cond,       -1, FSUBR);
-  mkprim2(PN_WHILE,      xwhile,     -2, FSUBR);
-  mkprim1(PN_PROGN,      progn,      -1, FSUBR);
-  mkprim2(PN_PROG1,      prog1,      -2, SUBR);
-  mkprim3(PN_PROG2,      prog2,      -3, SUBR);
+  mkprim2(PN_SET, set, 2, SUBR);
+  mkprim2(PN_SETQ, setq, 2, FSUBR);
+  mkprim2(PN_SETQQ, set, 2, FSUBR);
+  mkprim1(PN_COND, cond, -1, FSUBR);
+  mkprim2(PN_WHILE, xwhile, -2, FSUBR);
+  mkprim1(PN_PROGN, progn, -1, FSUBR);
+  mkprim2(PN_PROG1, prog1, -2, SUBR);
+  mkprim3(PN_PROG2, prog2, -3, SUBR);
 #if 0
   mkprim0(PN_TOPOFSTACK, topofstack,  0, SUBR);
 #endif
-  mkprim2(PN_ENVGET,     envget,      2, SUBR);
+  mkprim2(PN_ENVGET, envget, 2, SUBR);
   initcvar(&verboseflg, "verboseflg", C_NIL);
 }

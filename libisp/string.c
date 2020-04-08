@@ -14,7 +14,7 @@ static char rcsid[] = "$Id$";
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
 {
-  CHECK(sym,SYMBOL);
+  CHECK(sym, SYMBOL);
   return mkstring(SYMVAL(sym).pname);
 }
 
@@ -51,30 +51,31 @@ PRIMITIVE concat(LISPT strlist)
 {
   LISPT sl;
   int size;
-  char *ns;
+  char* ns;
 
   size = 0;
   for (sl = strlist; !ISNIL(sl); sl = CDR(sl))
     {
-      CHECK(CAR(sl),STRING);
+      CHECK(CAR(sl), STRING);
       size += strlen(STRINGVAL(CAR(sl)));
     }
-  ns = (char *) safemalloc((unsigned)size + 1);
-  if (ns == NULL) return error(OUT_OF_MEMORY, C_NIL);
+  ns = (char*) safemalloc((unsigned) size + 1);
+  if (ns == NULL)
+    return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
   while (!ISNIL(strlist))
     {
-      (void) strcat(ns,STRINGVAL(CAR(strlist)));
+      (void) strcat(ns, STRINGVAL(CAR(strlist)));
       strlist = CDR(strlist);
     }
-  return mkstring (ns);
+  return mkstring(ns);
 }
 
 /* Return string length of s */
 PRIMITIVE xstrlen(LISPT s)
 {
-  CHECK(s,STRING);
-  return mknumber((long)strlen(STRINGVAL(s)));
+  CHECK(s, STRING);
+  return mknumber((long) strlen(STRINGVAL(s)));
 }
 
 /* Extract a substring from start to end.
@@ -86,35 +87,36 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
 {
   int size;
   int s, e;
-  char *ns;
+  char* ns;
   LISPT sl;
 
-  CHECK(str,STRING);
-  CHECK(start,INTEGER);
-  CHECK(end,INTEGER);
+  CHECK(str, STRING);
+  CHECK(start, INTEGER);
+  CHECK(end, INTEGER);
   s = INTVAL(start);
   e = INTVAL(end);
   size = e - s + 1;
-  if (size < 0 || s > strlen(STRINGVAL(str)) ||
-      e > strlen(STRINGVAL(str)) || s <= 0 || e < 0)
+  if (size < 0 || s > strlen(STRINGVAL(str)) || e > strlen(STRINGVAL(str))
+    || s <= 0 || e < 0)
     return C_NIL;
-  ns = (char *) safemalloc((unsigned)size + 1);
-  if (ns == NULL) return error(OUT_OF_MEMORY, C_NIL);
+  ns = (char*) safemalloc((unsigned) size + 1);
+  if (ns == NULL)
+    return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
-  for (size = 0; s<=e; s++, size++)
+  for (size = 0; s <= e; s++, size++)
     {
-      ns[size] = *(STRINGVAL(str)+s-1);
+      ns[size] = *(STRINGVAL(str) + s - 1);
     }
-  return mkstring (ns);
+  return mkstring(ns);
 }
 
 void init_string()
 {
-  mkprim1(PN_STRINGP, stringp,  1, SUBR);
-  mkprim2(PN_STREQ,   streq,    2, SUBR);
-  mkprim1(PN_CONCAT,  concat,  -1, SUBR);
-  mkprim1(PN_STRLEN,  xstrlen,  1, SUBR);
-  mkprim3(PN_SUBSTR,  substr,   3, SUBR);
-  mkprim1(PN_SYMSTR,  symstr,   1, SUBR);
-  mkprim2(PN_STRCMP,  strcomp,  2, SUBR);
+  mkprim1(PN_STRINGP, stringp, 1, SUBR);
+  mkprim2(PN_STREQ, streq, 2, SUBR);
+  mkprim1(PN_CONCAT, concat, -1, SUBR);
+  mkprim1(PN_STRLEN, xstrlen, 1, SUBR);
+  mkprim3(PN_SUBSTR, substr, 3, SUBR);
+  mkprim1(PN_SYMSTR, symstr, 1, SUBR);
+  mkprim2(PN_STRCMP, strcomp, 2, SUBR);
 }

@@ -30,9 +30,9 @@ PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
   for (pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
-    if(EQ(CAR(pl), p))
+    if (EQ(CAR(pl), p))
       {
-        (void)rplaca(CDR(pl), v);
+        (void) rplaca(CDR(pl), v);
         return v;
       }
   SYMVAL(a).plist = cons(p, cons(v, SYMVAL(a).plist));
@@ -79,7 +79,7 @@ void init_prop()
 {
   mkprim2(PN_SETPLIST, setplist, 2, SUBR);
   mkprim1(PN_GETPLIST, getplist, 1, SUBR);
-  mkprim3(PN_PUTPROP,  putprop,  3, SUBR);
-  mkprim2(PN_GETPROP,  getprop,  2, SUBR);
-  mkprim2(PN_REMPROP,  remprop,  2, SUBR);
+  mkprim3(PN_PUTPROP, putprop, 3, SUBR);
+  mkprim2(PN_GETPROP, getprop, 2, SUBR);
+  mkprim2(PN_REMPROP, remprop, 2, SUBR);
 }

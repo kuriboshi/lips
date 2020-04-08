@@ -15,32 +15,23 @@ static char rcsid[] = "$Id$";
 extern void toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
-static char *messages[MAXMESSAGE];
+static char* messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
-static char *errmess[] = {
-  "Not NIL",            "Not a symbol",
-  "Not an integer",     "Not a bignum",
-  "Not a float",        "Not indirect",
-  "Not a long",         "Not a list",
-  "Not a string",       "Not SUBR",
-  "Not FSUBR",          "Not LAMBDA",
-  "Not NLAMBDA",        "Not a closure",
-  "Not unbound",        "Not an environment",
-  "Not a file pointer", "Not T",
-  "Not free",           "Not EOF",
-  "Not an ERROR",       "Not a hash table"
-};
+static char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer",
+  "Not a bignum", "Not a float", "Not indirect", "Not a long", "Not a list",
+  "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
+  "Not a closure", "Not unbound", "Not an environment", "Not a file pointer",
+  "Not T", "Not free", "Not EOF", "Not an ERROR", "Not a hash table"};
 
 PRIMITIVE xobarray()
 {
   int i;
   LISPT o;
-  OBARRAY *l;
+  OBARRAY* l;
 
   o = C_NIL;
-  for (i=0; i<MAXHASH; i++)
-    for (l=obarray[i]; l; l = l->onext)
-      o = cons(l->sym, o);
+  for (i = 0; i < MAXHASH; i++)
+    for (l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
   return o;
 }
 
@@ -50,7 +41,7 @@ PRIMITIVE evaltrace(LISPT state)
 
   if (!ISNIL(state))
     {
-      CHECK(state,INTEGER);
+      CHECK(state, INTEGER);
       trace = INTVAL(state);
     }
   return mknumber(i);
@@ -60,10 +51,9 @@ PRIMITIVE freecount()
 {
   int i;
   LISPT l;
-  
+
   i = 0;
-  for (l = freelist; INTVAL(l); l = CDR(l))
-    i++;
+  for (l = freelist; INTVAL(l); l = CDR(l)) i++;
   return mknumber((long) i);
 }
 
@@ -73,7 +63,8 @@ LISPT error(int messnr, LISPT arg)
     (void) fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
   else
     (void) fprintf(primerr, "%s ", messages[ERRNO(messnr)]);
-  if (messnr & (PRINT_ARG | NOT_A)) (void) prin2(arg, C_T);
+  if (messnr & (PRINT_ARG | NOT_A))
+    (void) prin2(arg, C_T);
   return C_ERROR;
 }
 
@@ -93,7 +84,7 @@ extern jmp_buf toplevel;
 
 static int dobreak(LISPT* com)
 {
-/* OK, EVAL, ^, ... */
+  /* OK, EVAL, ^, ... */
   if (TYPEOF(*com) != CONS)
     {
       unwind();
@@ -133,7 +124,7 @@ void init_debug()
 {
   mkprim0(PN_FREECOUNT, freecount, 0, SUBR);
   mkprim1(PN_EVALTRACE, evaltrace, 1, SUBR);
-  mkprim0(PN_OBARRAY,   xobarray,  0, SUBR);
+  mkprim0(PN_OBARRAY, xobarray, 0, SUBR);
   messages[ERRNO(NO_MESSAGE)] = "";
   messages[ERRNO(ILLEGAL_ARG)] = "Illegal argument";
   messages[ERRNO(DIVIDE_ZERO)] = "Divide by zero";
