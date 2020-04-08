@@ -40,10 +40,10 @@ enum lisp_type
   FILET,     /* file pointer */
   TRUE,      /* the truth object */
   FREE,      /* an object on the freelist, used for
-				   consistency checks */
+                consistency checks */
   ENDOFFILE, /* returned from read at end of file */
   ERROR,     /* returned from primitive when an error
-                                   occured */
+                occured */
   HASHTAB,   /* contains hased data table */
   CVARIABLE, /* is a pointer to c-variable */
   CPOINTER,  /* general c pointer */
@@ -124,7 +124,7 @@ typedef struct
   LISPT (*function2)(LISPT, LISPT);
   LISPT (*function3)(LISPT, LISPT, LISPT);
   short argcount; /* Negative argcount indicates that
-				   arguments should not be evaluated */
+                     arguments should not be evaluated */
 } SUBRT;
 
 typedef struct

@@ -18,34 +18,32 @@ static int count;
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-static LISPT mkprim_(char* pname, short nrpar, char type)
+static LISPT mkprim_(char* pname, short nrpar, enum lisp_type type)
 {
-  LISPT s;
-  LISPT f;
-  f = intern(pname);
-  s = getobject();
+  LISPT s = getobject();
+  LISPT f = intern(pname);
   SUBRVAL(s).argcount = nrpar;
   SET(SYMVAL(f).value, type, s);
   return s;
 }
 
-void mkprim0(char* pname, LISPT (*fname)(void), short nrpar, char type)
+void mkprim0(char* pname, LISPT (*fname)(void), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function0 = fname;
 }
 
-void mkprim1(char* pname, LISPT (*fname)(LISPT), short nrpar, char type)
+void mkprim1(char* pname, LISPT (*fname)(LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function1 = fname;
 }
 
-void mkprim2(char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, char type)
+void mkprim2(char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function2 = fname;
 }
 
 void mkprim3(
-  char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, char type)
+  char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function3 = fname;
 }
