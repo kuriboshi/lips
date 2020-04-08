@@ -36,17 +36,20 @@ extern int readchar(FILE*, char*);
  * Terminal functions.  Each constant stands for a function provided
  * by the line editor.
  */
-#define T_INSERT 0
-#define T_ERASE 1
-#define T_RETYPE 2
-#define T_KILL 3
-#define T_EOF 4
-#define T_TAB 5
-#define T_LEFTPAR 6
-#define T_RIGHTPAR 7
-#define T_NEWLINE 8
-#define T_STRING 9
-#define T_ESCAPE 10
+enum term_fun
+{
+  T_INSERT = 0,
+  T_ERASE,
+  T_RETYPE,
+  T_KILL,
+  T_EOF,
+  T_TAB,
+  T_LEFTPAR,
+  T_RIGHTPAR,
+  T_NEWLINE,
+  T_STRING,
+  T_ESCAPE
+};
 
 /*
  * Variables for terminal characteristics, old and new.
@@ -56,11 +59,11 @@ static struct tchars newtchars, oldtchars;
 static struct ltchars newltchars, oldltchars;
 static int ldis;
 
-static char linebuffer[BUFSIZ]; /* Line buffer for terminal input.  */
-static int parcount = 0;        /* Counts paranthesis.  */
-static int linepos = 0;         /* End of line buffer.  */
-static int position = 0;        /* Current position in line buffer.  */
-static char key_tab[NUM_KEYS];  /* Table specifying key functions.  */
+static char linebuffer[BUFSIZ];         /* Line buffer for terminal input.  */
+static int parcount = 0;                /* Counts paranthesis.  */
+static int linepos = 0;                 /* End of line buffer.  */
+static int position = 0;                /* Current position in line buffer.  */
+static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 
 #ifdef TERMCAP
 static char tcap[128];       /* Buffer for terminal capabilties.  */
@@ -246,7 +249,7 @@ static int firstnotlp()
 {
   int i;
 
-  for (i = 1; i < position && issepr((int)linebuffer[i]); i++)
+  for (i = 1; i < position && issepr((int) linebuffer[i]); i++)
     ;
   if (linebuffer[i] == '(')
     return 0;
@@ -281,7 +284,7 @@ static int onlyblanks()
 
   while (i > 0)
     {
-      if (!issepr((int)linebuffer[i]))
+      if (!issepr((int) linebuffer[i]))
         return 0;
       i--;
     }
@@ -378,7 +381,7 @@ char* mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while (!issepr((int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while (!issepr((int) linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
@@ -659,7 +662,7 @@ int lips_getline(FILE* file)
       FFLUSH(stdout);
       if (readchar(file, &c) == 0)
         return 0;
-      switch (key_tab[(int)c])
+      switch (key_tab[(int) c])
         {
         case T_EOF:
           if (linepos == 1)
