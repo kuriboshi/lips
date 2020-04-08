@@ -10,10 +10,6 @@
 
 #define PROMPTLENGTH 80
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern void pputc(char, FILE*);
 
 char current_prompt[PROMPTLENGTH];
@@ -40,8 +36,8 @@ static void phist()
 
   for (hl = history; !ISNIL(hl); hl = CDR(hl))
     {
-      (void) printf("%D.\t", INTVAL(CAR(CAR(hl))));
-      (void) prinbody(CDR(CAR(hl)), stdout, 1);
+      printf("%D.\t", INTVAL(CAR(CAR(hl))));
+      prinbody(CDR(CAR(hl)), stdout, 1);
       pputc('\n', primout);
     }
 }
@@ -76,7 +72,7 @@ static void trimhist()
   for (i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl))
     ;
   if (!ISNIL(hl))
-    (void) rplacd(hl, C_NIL);
+    rplacd(hl, C_NIL);
 }
 
 /*
@@ -176,19 +172,19 @@ void promptprint(LISPT prompt)
         {
           if (s[i] == '!')
             {
-              (void) sprintf(buf, "%D", INTVAL(histnum));
-              (void) strcat(current_prompt, buf);
+              sprintf(buf, "%D", INTVAL(histnum));
+              strcat(current_prompt, buf);
               continue;
             }
           else if (s[i] == '\\')
             i++;
           buf[0] = s[i];
           buf[1] = '\0';
-          (void) strcat(current_prompt, buf);
+          strcat(current_prompt, buf);
         }
     }
-  (void) printf("\r");
-  (void) printf("%s", current_prompt);
+  printf("\r");
+  printf("%s", current_prompt);
 }
 
 void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
@@ -208,7 +204,7 @@ void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
         {
           if (TYPEOF(eval(promptform)) == ERROR)
             {
-              (void) xprint(mkstring("Error in promptform, reset to nil"), C_T);
+              xprint(mkstring("Error in promptform, reset to nil"), C_T);
               promptform = C_NIL;
             }
           promptprint(*tprompt);
@@ -231,7 +227,7 @@ void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       addhist(input_exp);
       if (echoline)
         {
-          (void) prinbody(input_exp, stdout, 1);
+          prinbody(input_exp, stdout, 1);
           pputc('\n', primout);
         }
       topexp = transform(input_exp);
@@ -243,7 +239,7 @@ void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       alias_expanded = C_NIL;
       topexp = eval(topexp);
       if (printit)
-        (void) xprint(topexp, C_T);
+        xprint(topexp, C_T);
       if (!options.interactive && options.command)
         break;
       trimhist();

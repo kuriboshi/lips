@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 LISPT verboseflg;
 
 /*
@@ -41,7 +37,7 @@ PRIMITIVE progn(LISPT lexp)
     return C_NIL;
   while (!ISNIL(CDR(lexp)))
     {
-      (void) eval(CAR(lexp));
+      eval(CAR(lexp));
       lexp = CDR(lexp);
     }
   return eval(CAR(lexp));
@@ -81,7 +77,7 @@ PRIMITIVE xwhile(LISPT pred, LISPT exp)
   res = eval(pred);
   while (!ISNIL(res))
     {
-      (void) progn(exp);
+      progn(exp);
       res = eval(pred);
     }
   return C_NIL;

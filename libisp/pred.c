@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 PRIMITIVE numberp(LISPT a)
 {
   switch (TYPEOF(a))

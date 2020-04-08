@@ -17,10 +17,6 @@
 #define NOCONSARGS 0 /* Don't reclaim arguments of cons. */
 #define CONSARGS 1   /* Reclaim called from cons. */
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 LISPT savearray[SAVEARRAYSIZE]; /* Gc save */
 int savept = 0;
 OBARRAY* obarray[MAXHASH]; /* Array containing global symbols */
@@ -72,7 +68,7 @@ char* realmalloc(unsigned int size)
   cp = malloc(size);
   if (cp == NULL)
     {
-      (void) error(OUT_OF_MEMORY, C_NIL);
+      error(OUT_OF_MEMORY, C_NIL);
       return NULL;
     }
   return cp;
@@ -209,7 +205,7 @@ static LISPT doreclaim(int doconsargs, long incr)
   int i;
 
   if (ISNIL(gcgag))
-    (void) fprintf(primerr, "garbage collecting\n");
+    fprintf(primerr, "garbage collecting\n");
 #ifdef FLOATING
   for (i = 0; i < 4; i++) floats.marks[i] = 0;
   point = 31;
@@ -268,7 +264,7 @@ static LISPT doreclaim(int doconsargs, long incr)
   nrfreed = sweep();
   nrconses = 0;
   if (ISNIL(gcgag))
-    (void) fprintf(primerr, "%d cells freed\n", nrfreed);
+    fprintf(primerr, "%d cells freed\n", nrfreed);
   return C_NIL;
 }
 
@@ -335,7 +331,7 @@ LISPT mkstring(char* str)
   c = (char*) safemalloc((unsigned) strlen(str) + 1);
   if (c == NULL)
     return C_ERROR;
-  (void) strcpy(c, str);
+  strcpy(c, str);
   s = getobject();
   STRINGVAL(s) = c;
   s->type = STRING;
@@ -383,7 +379,7 @@ static LISPT buildatom(char* s, int cpy)
       SYMVAL(newatom).pname = (char*) safemalloc((unsigned) strlen(s) + 1);
       if (SYMVAL(newatom).pname == NULL)
         return C_ERROR;
-      (void) strcpy(SYMVAL(newatom).pname, s);
+      strcpy(SYMVAL(newatom).pname, s);
     }
   else
     SYMVAL(newatom).pname = s;
@@ -523,10 +519,10 @@ void init_alloc()
   conscells = newpage(); /* Allocate one page of storage */
   if (conscells == NULL)
     {
-      (void) fprintf(stderr, "Sorry, no memory for cons cells\n");
+      fprintf(stderr, "Sorry, no memory for cons cells\n");
       finish(1);
     }
-  (void) sweep();
+  sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
   mkprim1(PN_RECLAIM, reclaim, 1, SUBR);
   mkprim2(PN_CONS, cons, 2, SUBR);

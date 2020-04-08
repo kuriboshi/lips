@@ -7,10 +7,6 @@
 #include <string.h>
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
 {
@@ -65,7 +61,7 @@ PRIMITIVE concat(LISPT strlist)
   ns[0] = '\0';
   while (!ISNIL(strlist))
     {
-      (void) strcat(ns, STRINGVAL(CAR(strlist)));
+      strcat(ns, STRINGVAL(CAR(strlist)));
       strlist = CDR(strlist);
     }
   return mkstring(ns);
@@ -88,7 +84,6 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   int size;
   int s, e;
   char* ns;
-  LISPT sl;
 
   CHECK(str, STRING);
   CHECK(start, INTEGER);

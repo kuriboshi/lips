@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern void finish(int);
 
 USESAVE
@@ -312,7 +308,7 @@ PRIMITIVE nconc(LISPT l)
               newl = curp;
             }
           else
-            (void) rplacd(curp, CAR(l));
+            rplacd(curp, CAR(l));
           for (cl = CAR(l); !ISNIL(CDR(cl)); cl = CDR(cl))
             ;
           curp = cl;
@@ -331,10 +327,10 @@ PRIMITIVE tconc(LISPT cell, LISPT obj)
   CHECK(cell, CONS);
   if (TYPEOF(CAR(cell)) != CONS)
     {
-      (void) rplacd(cell, cons(obj, C_NIL));
+      rplacd(cell, cons(obj, C_NIL));
       return rplaca(cell, CDR(cell));
     }
-  (void) rplacd(CDR(cell), cons(obj, C_NIL));
+  rplacd(CDR(cell), cons(obj, C_NIL));
   return rplacd(cell, CDR(CDR(cell)));
 }
 
@@ -343,7 +339,7 @@ PRIMITIVE attach(LISPT obj, LISPT list)
   if (ISNIL(list))
     return cons(obj, C_NIL);
   CHECK(list, CONS);
-  (void) rplacd(list, cons(CAR(list), CDR(list)));
+  rplacd(list, cons(CAR(list), CDR(list)));
   return rplaca(list, obj);
 }
 
@@ -362,7 +358,7 @@ PRIMITIVE append(LISPT l)
           CHECK(CAR(l), CONS);
           for (cl = CAR(l); !ISNIL(cl); cl = CDR(cl))
             {
-              (void) rplacd(curp, cons(CAR(cl), C_NIL));
+              rplacd(curp, cons(CAR(cl), C_NIL));
               curp = CDR(curp);
             }
         }

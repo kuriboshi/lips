@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern char* VERSION;
 extern void init_file(void);
 /*

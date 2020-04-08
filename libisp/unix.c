@@ -14,10 +14,6 @@
 
 #define MAXFILES 8
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 LISPT sighandler[NSIG - 1];
 
 PRIMITIVE uxerrno()
@@ -168,7 +164,7 @@ PRIMITIVE uxsetgid(LISPT gid)
 /*ARGSUSED*/
 void sighandle(int sig)
 {
-  (void) eval(sighandler[sig]);
+  eval(sighandler[sig]);
 }
 
 PRIMITIVE uxsignal(LISPT sig, LISPT fun)
@@ -179,18 +175,18 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
     return error(ILLEGAL_SIGNAL, sig);
   if (ISNIL(fun))
     {
-      (void) signal((int) INTVAL(sig), SIG_IGN);
+      signal((int) INTVAL(sig), SIG_IGN);
       sighandler[INTVAL(sig)] = C_NIL;
     }
   else if (IST(fun))
     {
-      (void) signal((int) INTVAL(sig), SIG_DFL);
+      signal((int) INTVAL(sig), SIG_DFL);
       sighandler[INTVAL(sig)] = C_NIL;
     }
   else
     {
       sighandler[INTVAL(sig)] = fun;
-      (void) signal((int) INTVAL(sig), sighandle);
+      signal((int) INTVAL(sig), sighandle);
     }
   return C_T;
 }

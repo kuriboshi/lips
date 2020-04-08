@@ -7,10 +7,6 @@
 #include "lisp.h"
 #include "func.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 PRIMITIVE and (LISPT l)
 {
   LISPT foo;

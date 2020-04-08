@@ -17,10 +17,6 @@
 #define TICKS 64
 #define NAMELEN 1024
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 static char r[MAXPATHLEN];
 static char** globarr;
 static char** globp;
@@ -41,9 +37,9 @@ static int dircheck(char* str, char* wild, char* ss)
         return 0;
       pos = strlen(r);
       if (pos != 0)
-        (void) strcat(r, "/");
-      (void) strcat(r, ss);
-      (void) stat(r, &sbuf);
+        strcat(r, "/");
+      strcat(r, ss);
+      stat(r, &sbuf);
       r[pos] = '\0';
       if (sbuf.st_mode & S_IFDIR)
         return 1;
@@ -105,6 +101,7 @@ static int match(char* str, char* wild)
   return dircheck(str, wild, ss);
 }
 
+#if 0
 /*
  * Inserts element what in list where keeping alphabetic order.
  */
@@ -120,8 +117,8 @@ static LISPT orderinsert(LISPT what, LISPT where)
         {
           if (!ISNIL(p1))
             {
-              (void) rplacd(p1, cons(what, C_NIL));
-              (void) rplacd(CDR(p1), p2);
+              rplacd(p1, cons(what, C_NIL));
+              rplacd(CDR(p1), p2);
             }
           else
             where = cons(what, where);
@@ -133,9 +130,10 @@ static LISPT orderinsert(LISPT what, LISPT where)
   if (ISNIL(where))
     where = cons(what, C_NIL);
   else if (ISNIL(p2))
-    (void) rplacd(p1, cons(what, C_NIL));
+    rplacd(p1, cons(what, C_NIL));
   return where;
 }
+#endif
 
 /*
  * Expands tilde character in first position to home directory or
@@ -150,13 +148,13 @@ char* extilde(char* w, int rep)
     return w;
   w++;
   if (*w == '/' || !*w)
-    (void) strcpy(s, GETSTR(home));
+    strcpy(s, GETSTR(home));
   else
     {
       if (index(w, '/') == NULL)
         {
           pw = getpwnam(w);
-          (void) strcpy(s, w);
+          strcpy(s, w);
           w = "";
         }
       else
@@ -170,12 +168,12 @@ char* extilde(char* w, int rep)
       if (pw == NULL)
         {
           if (rep)
-            (void) error(NO_USER, mkstring(s));
+            error(NO_USER, mkstring(s));
           return NULL;
         }
-      (void) strncpy(s, pw->pw_dir, MAXNAMLEN);
+      strncpy(s, pw->pw_dir, MAXNAMLEN);
     }
-  (void) strcat(s, w);
+  strcat(s, w);
   return s;
 }
 
@@ -211,8 +209,8 @@ static int walkfiles(char* wild, int all, int report)
           result = 1;
           pos = strlen(r);
           if (pos != 0 && r[pos - 1] != '/')
-            (void) strcat(r, "/");
-          (void) strcat(r, rdir->d_name);
+            strcat(r, "/");
+          strcat(r, rdir->d_name);
           for (sw = w; *sw && *sw != '/'; sw++)
             ;
           if (*sw && *(++sw))
@@ -237,7 +235,7 @@ static int walkfiles(char* wild, int all, int report)
     }
   closedir(odir);
   if (!result && report)
-    (void) error(NO_MATCH, mkstring(wild));
+    error(NO_MATCH, mkstring(wild));
   return result;
 }
 
@@ -267,9 +265,9 @@ LISPT expandfiles(char* wild, int all, int report, int sort)
   if (*wild == '/' && *(wild + 1) == '\0')
     return cons(mkstring(wild), C_NIL);
   if (*wild == '/')
-    (void) strcpy(r, "/");
+    strcpy(r, "/");
   else
-    (void) strcpy(r, "");
+    strcpy(r, "");
   globarr = (char**) malloc(TICKS * sizeof(char*));
   globp = globarr;
   globlimit = globarr + TICKS;

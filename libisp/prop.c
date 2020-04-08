@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
   CHECK(a, SYMBOL);
@@ -32,7 +28,7 @@ PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
   for (pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
     if (EQ(CAR(pl), p))
       {
-        (void) rplaca(CDR(pl), v);
+        rplaca(CDR(pl), v);
         return v;
       }
   SYMVAL(a).plist = cons(p, cons(v, SYMVAL(a).plist));
@@ -68,7 +64,7 @@ PRIMITIVE remprop(LISPT a, LISPT p)
           if (ISNIL(pl2))
             SYMVAL(a).plist = CDR(CDR(pl));
           else
-            (void) rplacd(pl2, CDR(CDR(pl)));
+            rplacd(pl2, CDR(CDR(pl)));
         }
       pl2 = CDR(pl);
     }

@@ -18,11 +18,7 @@
 #include <string.h>
 #include "lips.h"
 
-#define FFLUSH(file) (void) fflush(file)
-
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
+#define FFLUSH(file) fflush(file)
 
 extern void finish(int);
 extern int readchar(FILE*, char*);
@@ -85,8 +81,8 @@ void clearlbuf()
 
 void loadbuf(char* str)
 {
-  (void) strcpy(linebuffer, str);
-  (void) strcat(linebuffer, "\n");
+  strcpy(linebuffer, str);
+  strcat(linebuffer, "\n");
   linepos = strlen(linebuffer);
 }
 
@@ -125,12 +121,12 @@ void init_term()
   if (!initialized)
     {
       ndis = NTTYDISC;
-      (void) ioctl(0, TIOCGETP, &oldterm);
-      (void) ioctl(0, TIOCGETC, &oldtchars);
-      (void) ioctl(0, TIOCGLTC, &oldltchars);
-      (void) ioctl(0, TIOCGETD, &ldis);
-      (void) signal(SIGINT, cleanup);  /* temporary handle */
-      (void) signal(SIGTERM, cleanup); /* exit gracefully */
+      ioctl(0, TIOCGETP, &oldterm);
+      ioctl(0, TIOCGETC, &oldtchars);
+      ioctl(0, TIOCGLTC, &oldltchars);
+      ioctl(0, TIOCGETD, &ldis);
+      signal(SIGINT, cleanup);  /* temporary handle */
+      signal(SIGTERM, cleanup); /* exit gracefully */
       newterm = oldterm;
       newterm.sg_flags = (newterm.sg_flags & ~ECHO) | CBREAK;
       newtchars = oldtchars;
@@ -152,21 +148,21 @@ void init_term()
           }
 #endif
       if (ldis != NTTYDISC)
-        (void) ioctl(0, TIOCSETD, &ndis);
+        ioctl(0, TIOCSETD, &ndis);
       init_keymap();
       initialized = 1;
     }
-  (void) ioctl(0, TIOCSETN, &newterm);
-  (void) ioctl(0, TIOCSETC, &newtchars);
-  (void) ioctl(0, TIOCSLTC, &newltchars);
+  ioctl(0, TIOCSETN, &newterm);
+  ioctl(0, TIOCSETC, &newtchars);
+  ioctl(0, TIOCSLTC, &newltchars);
 }
 
 /* Reset terminal to previous value */
 void end_term()
 {
-  (void) ioctl(0, TIOCSETN, &oldterm);
-  (void) ioctl(0, TIOCSETC, &oldtchars);
-  (void) ioctl(0, TIOCSLTC, &oldltchars);
+  ioctl(0, TIOCSETN, &oldterm);
+  ioctl(0, TIOCSETC, &oldtchars);
+  ioctl(0, TIOCSLTC, &oldltchars);
 }
 
 /*
@@ -177,11 +173,11 @@ void pputc(int c, FILE* file)
 {
   if (c < 0x20 && c != '\n' && c != '\t')
     {
-      (void) putc('^', file);
-      (void) putc(c + 0x40, file);
+      putc('^', file);
+      putc(c + 0x40, file);
     }
   else
-    (void) putc(c, file);
+    putc(c, file);
 }
 
 /*
@@ -235,7 +231,7 @@ void ungetch(int c, FILE* file)
         position--;
     }
   else
-    (void) ungetc(c, file);
+    ungetc(c, file);
 }
 
 /*
@@ -247,7 +243,7 @@ static int firstnotlp()
 {
   int i;
 
-  for (i = 1; i < position && issepr(linebuffer[i]); i++)
+  for (i = 1; i < position && issepr((int)linebuffer[i]); i++)
     ;
   if (linebuffer[i] == '(')
     return 0;
@@ -262,14 +258,14 @@ static int firstnotlp()
 static void delonechar()
 {
   linepos--;
-  (void) putc('\b', stdout);
-  (void) putc(' ', stdout);
-  (void) putc('\b', stdout);
+  putc('\b', stdout);
+  putc(' ', stdout);
+  putc('\b', stdout);
   if (linebuffer[linepos] < 0x20)
     {
-      (void) putc('\b', stdout);
-      (void) putc(' ', stdout);
-      (void) putc('\b', stdout);
+      putc('\b', stdout);
+      putc(' ', stdout);
+      putc('\b', stdout);
     }
 }
 
@@ -282,7 +278,7 @@ static int onlyblanks()
 
   while (i > 0)
     {
-      if (!issepr(linebuffer[i]))
+      if (!issepr((int)linebuffer[i]))
         return 0;
       i--;
     }
@@ -294,7 +290,7 @@ static int onlyblanks()
  */
 int outc(int c)
 {
-  (void) putc(c, stdout);
+  putc(c, stdout);
   return c;
 }
 
@@ -379,7 +375,7 @@ char* mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while (!issepr(linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while (!issepr((int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
@@ -430,7 +426,7 @@ static LISPT strip(LISPT files, char* prefix, char* suffix)
     {
       s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
       s[0] = '~';
-      (void) tconc(stripped, mkstring(s));
+      tconc(stripped, mkstring(s));
     }
   return CAR(stripped);
 }
@@ -605,11 +601,11 @@ void blink()
     }
   else
     nput(curfwd, cdiff);
-  (void) fflush(stdout);
+  fflush(stdout);
   timeout.tv_sec = 1L;
   timeout.tv_usec = 0L;
   FD_SET(1, &rfds);
-  (void) select(1, &rfds, NULL, NULL, &timeout);
+  select(1, &rfds, NULL, NULL, &timeout);
   nput(curdn, ldiff); /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
   if (ldiff == 0)
@@ -624,7 +620,7 @@ void blink()
       for (i = 0; currentpos.line_start[i]; i++)
         pputc(currentpos.line_start[i], stdout);
     }
-  (void) fflush(stdout);
+  fflush(stdout);
 }
 
 /*
@@ -645,7 +641,7 @@ int lips_getline(FILE* file)
 
   if (options.command)
     {
-      (void) fprintf(stderr, "Unbalanced parenthesis\n");
+      fprintf(stderr, "Unbalanced parenthesis\n");
       end_term();
       exit(1);
     }
@@ -660,7 +656,7 @@ int lips_getline(FILE* file)
       FFLUSH(stdout);
       if (readchar(file, &c) == 0)
         return 0;
-      switch (key_tab[c])
+      switch (key_tab[(int)c])
         {
         case T_EOF:
           if (linepos == 1)
@@ -686,7 +682,7 @@ int lips_getline(FILE* file)
           t = extilde(s, 0);
           if (t == NULL)
             {
-              (void) putc(BELL, stdout);
+              putc(BELL, stdout);
               break;
             }
           ex = expandfiles(t, 0, 0, 1);
@@ -698,7 +694,7 @@ int lips_getline(FILE* file)
             {
               if (TYPEOF(ex) == CONS)
                 complete(ex);
-              (void) putc(BELL, stdout);
+              putc(BELL, stdout);
             }
           break;
         case T_ERASE:

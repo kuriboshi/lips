@@ -223,11 +223,7 @@ struct destblock
  * Just to avoid lint complaints about pointers returned by
  * `malloc' beeing unaligned.
  */
-#ifdef lint
-#define safemalloc(x) ((void) realmalloc(x), 0)
-#else
 #define safemalloc(x) realmalloc(x)
-#endif
 
 #define MAXHASH 255 /* The number of hash buckets */
 

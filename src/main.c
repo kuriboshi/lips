@@ -23,10 +23,6 @@
 #define LIPSRC "/usr/local/lib/lipsrc"
 #endif
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern void init_term(void);
 extern void end_term(void);
 extern void clearlbuf(void);
@@ -68,7 +64,7 @@ static int getuser(FILE* f, int def)
   switch (select(FD_SETSIZE, &readfs, NULL, NULL, &timeout))
     {
     case -1:
-      (void) fprintf(primerr, "(error in select %d) ", errno);
+      fprintf(primerr, "(error in select %d) ", errno);
       c = 'n';
       break;
     case 0:
@@ -96,42 +92,42 @@ void core(int sig)
 
   if (insidefork)
     {
-      (void) fprintf(primerr, " -- (in fork) core dumped\n");
-      (void) killpg(getpgrp(), sig);
+      fprintf(primerr, " -- (in fork) core dumped\n");
+      killpg(getpgrp(), sig);
     }
-  (void) fprintf(primerr, " -- Continue? ");
-  (void) fflush(primerr);
+  fprintf(primerr, " -- Continue? ");
+  fflush(primerr);
   c = getuser(stdin, 'y');
   while ('y' != (islower(c) ? c : tolower(c))
     && 'n' != (islower(c) ? c : tolower(c)))
     c = getuser(stdin, 'y');
   if ((islower(c) ? c : tolower(c)) == 'n')
     {
-      (void) fprintf(primerr, "No\n");
-      (void) fprintf(primerr, "Core dump? ");
-      (void) fflush(primerr);
+      fprintf(primerr, "No\n");
+      fprintf(primerr, "Core dump? ");
+      fflush(primerr);
       c = getuser(stdin, 'y');
       while ('y' != (islower(c) ? c : tolower(c))
         && 'n' != (islower(c) ? c : tolower(c)))
         c = getuser(stdin, 'y');
       if ((islower(c) ? c : tolower(c)) == 'n')
         {
-          (void) fprintf(primerr, "No\n");
+          fprintf(primerr, "No\n");
           finish(0);
         }
       else
         {
-          (void) signal(sig, SIG_DFL);
-          (void) printf("Yes\n");
+          signal(sig, SIG_DFL);
+          printf("Yes\n");
           end_term();
-          (void) killpg(mypgrp, sig);
+          killpg(mypgrp, sig);
         }
     }
   else
     {
-      (void) fprintf(primerr, "Yes\n");
-      (void) fprintf(primerr, "Warning: continued after signal %d.\n", sig);
-      (void) fprintf(primerr, "Save your work and exit.\n");
+      fprintf(primerr, "Yes\n");
+      fprintf(primerr, "Warning: continued after signal %d.\n", sig);
+      fprintf(primerr, "Save your work and exit.\n");
       longjmp(toplevel, 5);
     }
 }
@@ -141,7 +137,7 @@ void onintr()
 {
   if (insidefork)
     exit(0);
-  (void) fprintf(primerr, "^C\n");
+  fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
   longjmp(toplevel, 3);
@@ -150,25 +146,25 @@ void onintr()
 #ifdef FANCY_SIGNALS
 void onquit()
 {
-  (void) fprintf(primerr, "Quit!");
+  fprintf(primerr, "Quit!");
   core(SIGQUIT);
 }
 
 void onbus()
 {
-  (void) fprintf(primerr, "%s: Bus error!", progname);
+  fprintf(primerr, "%s: Bus error!", progname);
   core(SIGBUS);
 }
 
 void onsegv()
 {
-  (void) fprintf(primerr, "%s: Segmentation violation!", progname);
+  fprintf(primerr, "%s: Segmentation violation!", progname);
   core(SIGSEGV);
 }
 
 void onill()
 {
-  (void) fprintf(primerr, "%s: Illegal instruction!", progname);
+  fprintf(primerr, "%s: Illegal instruction!", progname);
   core(SIGILL);
 }
 
@@ -190,7 +186,7 @@ void onstop()
 static void fixpgrp()
 {
   mypgrp = getpgrp();
-  (void) ioctl(0, TIOCSPGRP, (char*) &mypgrp);
+  ioctl(0, TIOCSPGRP, (char*) &mypgrp);
 }
 
 /*
@@ -205,10 +201,10 @@ LISPT mungepath(char* pstr)
   ps = (char*) safemalloc((unsigned) (strlen(pstr) + 1));
   if (ps == NULL)
     {
-      (void) fprintf(stderr, "No more memory, can't munge path.\n");
+      fprintf(stderr, "No more memory, can't munge path.\n");
       finish(1);
     }
-  (void) strcpy(ps, pstr);
+  strcpy(ps, pstr);
   p = C_NIL;
   s = ps + strlen(ps);
   while (s >= ps)
@@ -218,7 +214,7 @@ LISPT mungepath(char* pstr)
         ;
       p = cons(mkstring(s + 1), p);
     }
-  (void) free(ps);
+  free(ps);
   return p;
 }
 
@@ -230,7 +226,7 @@ void onbreak()
 
 void promptfun()
 {
-  (void) ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
+  ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
   init_term();
   insidefork = 0;
   /*
@@ -253,9 +249,9 @@ static LISPT put_end(LISPT list, LISPT obj, int conc)
     for (t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t))
       ;
   if (conc)
-    (void) rplacd(t, obj);
+    rplacd(t, obj);
   else
-    (void) rplacd(t, cons(obj, C_NIL));
+    rplacd(t, cons(obj, C_NIL));
   return list;
 }
 
@@ -341,8 +337,8 @@ static void init()
 {
   init_term();
 
-  (void) signal(SIGTTIN, SIG_IGN);
-  (void) signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
+  signal(SIGTTIN, SIG_IGN);
+  signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
 
   fixpgrp();
 
@@ -366,7 +362,7 @@ static void init()
 static void loadinit(char* initfile)
 {
   if (loadfile(initfile))
-    (void) printf("Can't open file %s\n", initfile); /* System init file. */
+    printf("Can't open file %s\n", initfile); /* System init file. */
 }
 
 /*
@@ -388,9 +384,9 @@ LISPT greet(LISPT who)
   pws = getpwnam(s);
   if (pws == NULL)
     return C_NIL;
-  (void) strcpy(loadf, pws->pw_dir);
-  (void) strcat(loadf, "/.lipsrc");
-  (void) loadfile(loadf);
+  strcpy(loadf, pws->pw_dir);
+  strcat(loadf, "/.lipsrc");
+  loadfile(loadf);
   return C_T;
 }
 
@@ -425,7 +421,7 @@ int main(int argc, char* const* argv)
           options.debug = 1;
           break;
         default:
-          (void) fprintf(primerr, "usage: -fvic [arguments]\n");
+          fprintf(primerr, "usage: -fvic [arguments]\n");
           exit(1);
           break;
         }
@@ -433,7 +429,7 @@ int main(int argc, char* const* argv)
   if (!options.interactive && !options.command)
     options.interactive = isatty(0) ? 1 : 0;
   if (options.version)
-    (void) printf("%s\n", VERSION);
+    printf("%s\n", VERSION);
   progname = argv[0];
 
   /*
@@ -443,15 +439,15 @@ int main(int argc, char* const* argv)
   interactive = options.interactive ? C_T : C_NIL;
   if (!options.debug && options.interactive)
     {
-      (void) signal(SIGINT, onintr);
-      (void) signal(SIGHUP, SIG_DFL);
-      (void) signal(SIGTSTP, onstop);
+      signal(SIGINT, onintr);
+      signal(SIGHUP, SIG_DFL);
+      signal(SIGTSTP, onstop);
 #ifdef FANCY_SIGNALS
-      (void) signal(SIGQUIT, onquit);
-      (void) signal(SIGILL, onill);
-      (void) signal(SIGEMT, onill);
-      (void) signal(SIGBUS, onbus);
-      (void) signal(SIGSEGV, onsegv);
+      signal(SIGQUIT, onquit);
+      signal(SIGILL, onill);
+      signal(SIGEMT, onill);
+      signal(SIGBUS, onbus);
+      signal(SIGSEGV, onsegv);
 #endif
     }
   if (!options.fast)
@@ -459,12 +455,12 @@ int main(int argc, char* const* argv)
       if (!setjmp(toplevel))
         loadinit(LIPSRC);
       if (!setjmp(toplevel))
-        (void) greet(C_NIL);
+        greet(C_NIL);
     }
   /*
    * Return here in case of trouble.
    */
-  (void) setjmp(toplevel);
+  setjmp(toplevel);
   toctrl = 0;
   dzero();
   fun = C_NIL;

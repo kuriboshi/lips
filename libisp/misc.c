@@ -8,10 +8,6 @@
 #include <setjmp.h>
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern void toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
@@ -60,11 +56,11 @@ PRIMITIVE freecount()
 LISPT error(int messnr, LISPT arg)
 {
   if (NOT_A & messnr)
-    (void) fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
+    fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
   else
-    (void) fprintf(primerr, "%s ", messages[ERRNO(messnr)]);
+    fprintf(primerr, "%s ", messages[ERRNO(messnr)]);
   if (messnr & (PRINT_ARG | NOT_A))
-    (void) prin2(arg, C_T);
+    prin2(arg, C_T);
   return C_ERROR;
 }
 
@@ -72,10 +68,10 @@ LISPT syserr(LISPT fault)
 {
   if (!ISNIL(fault))
     {
-      (void) prin2(fault, C_T);
-      (void) fprintf(stderr, ": ");
+      prin2(fault, C_T);
+      fprintf(stderr, ": ");
     }
-  (void) fprintf(stderr, "%s", sys_errlist[errno]);
+  fprintf(stderr, "%s", sys_errlist[errno]);
   return C_ERROR;
 }
 

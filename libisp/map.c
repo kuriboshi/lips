@@ -7,17 +7,13 @@
 #include "lisp.h"
 #include "func.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 USESAVE
 
 PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while (TYPEOF(obj) == CONS)
     {
-      (void) apply(fn1, cons(obj, C_NIL));
+      apply(fn1, cons(obj, C_NIL));
       if (ISNIL(fn2))
         obj = CDR(obj);
       else
@@ -30,11 +26,11 @@ PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while (TYPEOF(obj) == CONS)
     {
-      (void) apply(fn1, cons(CAR(obj), C_NIL));
+      apply(fn1, cons(CAR(obj), C_NIL));
       if (ISNIL(fn2))
         obj = CDR(obj);
       else
-        (void) apply(fn2, cons(obj, C_NIL));
+        apply(fn2, cons(obj, C_NIL));
     }
   return C_NIL;
 }
@@ -53,7 +49,7 @@ PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
   SAVE(rval);
   while (TYPEOF(obj) == CONS)
     {
-      (void) rplacd(tmp, cons(apply(fn1, cons(obj, C_NIL)), C_NIL));
+      rplacd(tmp, cons(apply(fn1, cons(obj, C_NIL)), C_NIL));
       tmp = CDR(tmp);
       if (ISNIL(fn2))
         obj = CDR(obj);
@@ -78,12 +74,12 @@ PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   SAVE(rval);
   while (TYPEOF(obj) == CONS)
     {
-      (void) rplacd(tmp, cons(apply(fn1, cons(CAR(obj), C_NIL)), C_NIL));
+      rplacd(tmp, cons(apply(fn1, cons(CAR(obj), C_NIL)), C_NIL));
       tmp = CDR(tmp);
       if (ISNIL(fn2))
         obj = CDR(obj);
       else
-        (void) apply(fn2, cons(obj, C_NIL));
+        apply(fn2, cons(obj, C_NIL));
     }
   UNSAVE(rval);
   return rval;

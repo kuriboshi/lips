@@ -31,10 +31,6 @@
   while (curc != EOF && issepr(curc)); \
   CHECKEOF(curc);
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern int getch(FILE*);
 extern void ungetch(char, FILE*);
 extern int eoln(FILE*);
@@ -44,16 +40,22 @@ extern LISPT history, currentbase;
 
 extern LISPT histget(long, LISPT);
 
+#if 0
 static LISPT userreadmacros[128];
+#endif
 static char buf[MAXATOMSIZE];
 
 static LISPT rmsquote(FILE*, LISPT, char);
+#if 0
 static LISPT rmredir(FILE*, LISPT, char);
 static LISPT rmpipe(FILE*, LISPT, char);
+#endif
 /* static LISPT rmbg(); */
 static LISPT rmdquote(FILE*, LISPT, char);
 static LISPT rmexcl(FILE*, LISPT, char);
+#if 0
 static LISPT rmuser(FILE*, LISPT, char); /* Installed for user read macros. */
+#endif
 
 LISPT prin0(LISPT, FILE*, int);
 
@@ -112,12 +114,14 @@ struct rtinfo currentrt =
 /*
  * This state table parses a floating point number.
  */
+#if FLOATING
 static int nxtstate[4][10] = {
   { 1,-1,-1,-1,-1,-1,-1, 8,-1,-1}, 
   { 2, 2, 2, 4, 4, 6, 6, 9, 9, 9}, 
   {-1,-1, 7, 7, 7,-1, 7,-1,-1,-1}, 
   { 5, 5, 3,-1,-1,-1,-1,-1,-1,-1}
 };
+#endif
 static char digits[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
@@ -152,9 +156,9 @@ static int integerp(char* buf, long* res)
 /*
  * Returns nonzero if buffer BUF is a floating point constant.
  */
+#ifdef FLOATING
 static int floatp(char* buf)
 {
-#ifdef FLOATING
   int state;
 
   state = 0;
@@ -194,10 +198,8 @@ static int floatp(char* buf)
     return 1;
   else
     return 0;
-#else
-  return 0;
-#endif
 }
+#endif
 
 /*
  * Find out if the buffer can be interpreted as numbers of
@@ -280,19 +282,19 @@ static LISPT splice(LISPT c, LISPT l, int tailp)
   if (TYPEOF(l) != CONS)
     {
       if (tailp)
-        (void) rplacd(c, cons(l, t));
+        rplacd(c, cons(l, t));
       else
-        (void) rplaca(c, l);
+        rplaca(c, l);
       return c;
     }
   if (!tailp)
     {
-      (void) rplaca(c, CAR(l));
+      rplaca(c, CAR(l));
       l = CDR(l);
     }
   if (ISNIL(l))
     return c;
-  (void) rplacd(c, l);
+  rplacd(c, l);
   for (; TYPEOF(l) == CONS; l = CDR(l)) t2 = l;
   return rplacd(t2, t);
 }
@@ -324,7 +326,7 @@ head:
   if (isinsert(curc))
     {
       PUSHR(top);
-      (void) rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
+      rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
       POPR(top);
       goto check;
     }
@@ -339,22 +341,22 @@ head:
   else if (curc == '(')
     {
     head2:
-      (void) rplaca(curr, cons(C_NIL, C_NIL));
-      (void) rplacd(CAR(curr), curr);
+      rplaca(curr, cons(C_NIL, C_NIL));
+      rplacd(CAR(curr), curr);
       curr = CAR(curr);
       goto head;
     }
   else if (curc == ')')
     {
       curr = CDR(curr);
-      (void) rplaca(curr, C_NIL);
+      rplaca(curr, C_NIL);
       goto check;
     }
   else
     {
       ungetch(curc, file);
       curatom = ratom(file);
-      (void) rplaca(curr, curatom);
+      rplaca(curr, curatom);
     check:
       if (ISNIL(CDR(curr)))
         {
@@ -374,10 +376,10 @@ tail:
   if (isinsert(curc))
     {
       temp = CDR(curr);
-      (void) rplacd(curr, cons(C_NIL, temp));
+      rplacd(curr, cons(C_NIL, temp));
       curr = CDR(curr);
       PUSHR(top);
-      (void) rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
+      rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
       POPR(top);
       goto tail;
     }
@@ -398,16 +400,16 @@ tail:
     {
     addparen:
       temp = CDR(curr);
-      (void) rplacd(curr, C_NIL);
+      rplacd(curr, C_NIL);
       curr = temp;
       goto check;
     }
   else if (curc == '(')
     {
       temp = CDR(curr);
-      (void) rplacd(curr, cons(C_NIL, C_NIL));
+      rplacd(curr, cons(C_NIL, C_NIL));
       curr = CDR(curr);
-      (void) rplacd(curr, temp);
+      rplacd(curr, temp);
       goto head2;
     }
   else if (curc == '.')
@@ -433,12 +435,12 @@ tail:
       GETCH(file);
       if (curc != ')')
         {
-          (void) rplacd(curr, cons(C_DOT, cons(C_NIL, temp)));
+          rplacd(curr, cons(C_DOT, cons(C_NIL, temp)));
           curr = CDR(CDR(curr));
-          (void) rplaca(curr, curatom);
+          rplaca(curr, curatom);
           goto another;
         }
-      (void) rplacd(curr, curatom);
+      rplacd(curr, curatom);
       curr = temp;
       goto check;
     }
@@ -450,9 +452,9 @@ tail:
       curatom = ratom(file);
     insert:
       temp = CDR(curr);
-      (void) rplacd(curr, cons(C_NIL, temp));
+      rplacd(curr, cons(C_NIL, temp));
       curr = CDR(curr);
-      (void) rplaca(curr, curatom);
+      rplaca(curr, curatom);
       goto tail;
     }
 }
@@ -521,7 +523,7 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
         }
       else
         {
-          (void) error(EVENT_NOT_FOUND, at);
+          error(EVENT_NOT_FOUND, at);
           return C_NIL;
         }
     }
@@ -531,15 +533,17 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
 /*
  * Handles user macros.
  */
+#if 0
 /*ARGSUSED*/
 static LISPT rmuser(FILE* file, LISPT curr, char curc)
 {
-  if (ISNIL(userreadmacros[curc]))
+  if (ISNIL(userreadmacros[(int)curc]))
     return curr;
   else
-    curr = apply(userreadmacros[curc], curr);
+    curr = apply(userreadmacros[(int)curc], curr);
   return curr;
 }
+#endif
 
 /*ARGSUSED*/
 static LISPT rmdquote(FILE* file, LISPT _0, char _1)
@@ -564,8 +568,8 @@ static LISPT rmdquote(FILE* file, LISPT _0, char _1)
 /*ARGSUSED*/
 static LISPT rmbg(FILE* file, LISPT curr, char curc)
 {
-  (void) rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
-  (void) rplacd(curr, cons(C_NIL, CDR(curr)));
+  rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
+  rplacd(curr, cons(C_NIL, CDR(curr)));
   return CDR(curr);
 }
 #endif
@@ -583,18 +587,21 @@ static LISPT rmsquote(FILE* file, LISPT _0, char _1)
   return cons(C_QUOTE, cons(lispread(file, 0), C_NIL));
 }
 
+#if 0
 /*ARGSUSED*/
 static LISPT rmpipe(FILE* file, LISPT curr, char curc)
 {
   LISPT t1, t2;
 
   t1 = CDR(curr);
-  (void) rplaca(
+  rplaca(
     t1, cons(C_PIPE, cons(CAR(CDR(curr)), cons(t2 = cons(C_NIL, t1), C_NIL))));
-  (void) rplacd(curr, C_NIL);
+  rplacd(curr, C_NIL);
   return t2;
 }
+#endif
 
+#if 0
 /*ARGSUSED*/
 static LISPT rmredir(FILE* file, LISPT curr, char curc)
 {
@@ -603,21 +610,22 @@ static LISPT rmredir(FILE* file, LISPT curr, char curc)
 
   t1 = CDR(curr);
   c = getch(file);
-  (void) rplaca(t1,
+  rplaca(t1,
     cons((curc == '<') ? C_FROM : ((c == '>') ? C_TOTO : C_TO),
       cons(CAR(CDR(curr)), t2 = cons(C_NIL, t1))));
   if (!(c == '>' || curc == '>'))
     ungetch(c, file);
-  (void) rplacd(curr, C_NIL);
+  rplacd(curr, C_NIL);
   return t2;
 }
+#endif
 
 LISPT readline(FILE* file)
 {
   LISPT rd;
 
   top = cons(C_NIL, C_NIL); /* Init first paren level */
-  (void) rplaca(top, cons(C_NIL, top));
+  rplaca(top, cons(C_NIL, top));
   rd = lispread(file, 1);
   return rd;
 }
@@ -656,7 +664,7 @@ static void pf(double d, FILE* file)
 {
   char ss[30];
 
-  (void) sprintf(ss, "%#g", d);
+  sprintf(ss, "%#g", d);
   ps(ss, file, 0);
 }
 
@@ -678,7 +686,7 @@ LISPT prinbody(LISPT x, FILE* file, int esc)
 
   xx = x;
 nxtelt:
-  (void) prin0(CAR(xx), file, esc);
+  prin0(CAR(xx), file, esc);
   if (EQ(CDR(xx), C_NIL))
     ;
   else if (TYPEOF(CDR(xx)) == CONS)
@@ -692,7 +700,7 @@ nxtelt:
       putch(' ', file, 0);
       putch('.', file, 0);
       putch(' ', file, 0);
-      (void) prin0(CDR(xx), file, esc);
+      prin0(CDR(xx), file, esc);
     }
   return x;
 }
@@ -706,7 +714,7 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       if (thisplevel <= printlevel || printlevel <= 0)
         {
           putch('(', file, 0);
-          (void) prinbody(x, file, esc);
+          prinbody(x, file, esc);
           putch(')', file, 0);
         }
       else
@@ -797,7 +805,7 @@ LISPT prin0(LISPT x, FILE* file, int esc)
 LISPT print(LISPT x, FILE* file)
 {
   thisplevel = 0;
-  (void) prin0(x, file, 1);
-  (void) terpri(file);
+  prin0(x, file, 1);
+  terpri(file);
   return x;
 }

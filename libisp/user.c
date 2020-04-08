@@ -6,10 +6,6 @@
  */
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 static LISPT getargs(LISPT al)
 {
   if (ISNIL(CDR(al)))
@@ -72,9 +68,9 @@ static LISPT checkfn(LISPT name, LISPT lam)
         t = funeq(GETOPVAL(name), lam);
         if (ISNIL(t))
           {
-            (void) putprop(name, C_OLDDEF, GETOPVAL(name));
+            putprop(name, C_OLDDEF, GETOPVAL(name));
             if (!ISNIL(verboseflg))
-              (void) xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
+              xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
           }
       }
   return C_NIL;

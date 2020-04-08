@@ -10,10 +10,6 @@
 #include <string.h>
 #include "lisp.h"
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 extern int getch(FILE*);
 extern void putch(char, FILE*, int);
 
@@ -72,7 +68,7 @@ int loadfile(char* lf)
   for (rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE;
        rval = lispread(foo, 0))
     rval = eval(rval);
-  (void) fclose(foo);
+  fclose(foo);
   return 0;
 }
 
@@ -145,7 +141,7 @@ PRIMITIVE spaces(LISPT n, LISPT file)
       CHECK(file, FILET);
       f = FILEVAL(file);
     }
-  for (i = INTVAL(n); i > 0; i--) (void) putc(' ', f);
+  for (i = INTVAL(n); i > 0; i--) putc(' ', f);
   return C_NIL;
 }
 
@@ -190,23 +186,23 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   while (fgets(buf, 120, tagsfile) != NULL)
     if (strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
       {
-        (void) sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
-        (void) strcpy(buf, LIPSLIB);
-        (void) strcat(buf, "/");
-        (void) strcat(buf, fname);
-        (void) fclose(tagsfile);
+        sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
+        strcpy(buf, LIPSLIB);
+        strcat(buf, "/");
+        strcat(buf, fname);
+        fclose(tagsfile);
         if ((cfile = fopen(buf, "r")) == NULL)
           return error(CANT_OPEN, mkstring(buf));
-        for (; line > 1; line--) (void) fgets(buf, 120, cfile);
-        (void) fgets(buf, 120, cfile);
+        for (; line > 1; line--) fgets(buf, 120, cfile);
+        fgets(buf, 120, cfile);
         putch('(', f, 0);
-        (void) prin2(oname, file);
+        prin2(oname, file);
         putch(' ', f, 0);
         putch('(', f, 0);
         if (TYPEOF(SYMVALUE(oname)) == SUBR)
-          (void) prin1(C_SUBR, file);
+          prin1(C_SUBR, file);
         else
-          (void) prin1(C_FSUBR, file);
+          prin1(C_FSUBR, file);
         putch(' ', f, 0);
         for (i = 0; buf[i] != '(' && i < sizeof(buf); i++)
           ;
@@ -230,22 +226,22 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
         putch('\n', f, 0);
         while (buf[0] != '{')
           {
-            (void) fgets(buf, 120, cfile);
-            (void) fgets(buf, 120, cfile);
+            fgets(buf, 120, cfile);
+            fgets(buf, 120, cfile);
           }
         while (buf[0] != '}')
           {
             fputs(buf, f);
-            (void) fgets(buf, 120, cfile);
+            fgets(buf, 120, cfile);
           }
         putch('}', f, 0);
         putch(')', f, 0);
         putch(')', f, 0);
         putch('\n', f, 0);
-        (void) fclose(cfile);
+        fclose(cfile);
         return oname;
       }
-  (void) fclose(tagsfile);
+  fclose(tagsfile);
   return error(NOT_PRINTABLE, oname);
 }
 

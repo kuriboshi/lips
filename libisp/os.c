@@ -7,10 +7,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifndef lint
-static char rcsid[] = "$Id$";
-#endif
-
 /*
  * Read a characters from a terminal.  Returns 0 if
  * no character was read.  The character is returned in
