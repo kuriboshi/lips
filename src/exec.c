@@ -19,7 +19,10 @@
 #include <errno.h>
 #include <signal.h>
 #include <strings.h>
-#include "lips.h"
+#include "exec.h"
+#include "top.h"
+#include "glob.h"
+#include "main.h"
 
 #define MAXARGS 256
 #define EXECHASH 1023 /* Hash table size for commands */

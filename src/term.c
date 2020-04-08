@@ -16,7 +16,10 @@
 #include <term.h>
 #include <sys/time.h>
 #include <string.h>
-#include "lips.h"
+#include "term.h"
+#include "top.h"
+#include "main.h"
+#include "glob.h"
 
 #define FFLUSH(file) fflush(file)
 

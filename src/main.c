@@ -13,7 +13,9 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "lips.h"
+#include "main.h"
+#include "exec.h"
+#include "top.h"
 #ifdef SELECT
 #include <sys/types.h>
 #include <sys/time.h>
@@ -28,8 +30,7 @@ extern void end_term(void);
 extern void clearlbuf(void);
 extern void loadbuf(char*);
 
-extern int optind;   /* For getopt. */
-extern char* optarg; /* This too. */
+extern char* VERSION;
 
 jmp_buf toplevel; /* Panic return point. */
 char* progname;   /* Name of the game. */

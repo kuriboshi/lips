@@ -12,7 +12,9 @@
 #include <pwd.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lips.h"
+#include "main.h"
+#include "exec.h"
+#include "glob.h"
 
 #define TICKS 64
 #define NAMELEN 1024

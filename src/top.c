@@ -6,7 +6,7 @@
  */
 #include <sys/ioctl.h>
 #include <string.h>
-#include "lips.h"
+#include "main.h"
 
 #define PROMPTLENGTH 80
 
