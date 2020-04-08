@@ -71,6 +71,9 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
     case NLAMBDA:
       return funeq(l1, l2);
       break;
+    case INTEGER:
+      return (INTVAL(l1) == INTVAL(l2) ? C_T : C_NIL);
+      break;
     default:
       break;
     }
