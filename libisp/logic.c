@@ -7,7 +7,7 @@
 #include "lisp.h"
 #include "func.h"
 
-PRIMITIVE and (LISPT l)
+PRIMITIVE p_and(LISPT l)
 {
   LISPT foo;
 
@@ -22,7 +22,7 @@ PRIMITIVE and (LISPT l)
   return foo;
 }
 
-PRIMITIVE or (LISPT l)
+PRIMITIVE p_or(LISPT l)
 {
   LISPT foo;
 
@@ -58,8 +58,8 @@ PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 
 void init_logic()
 {
-  mkprim1(PN_AND, and, -1, FSUBR);
-  mkprim1(PN_OR, or, -1, FSUBR);
+  mkprim1(PN_AND, p_and, -1, FSUBR);
+  mkprim1(PN_OR, p_or, -1, FSUBR);
   mkprim1(PN_NOT, not, 1, SUBR);
   mkprim3(PN_IF, xif, -3, FSUBR);
 }
