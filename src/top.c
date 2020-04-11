@@ -4,8 +4,7 @@
  *
  * $Id$
  */
-#include <sys/ioctl.h>
-#include <string.h>
+#include <lisp.h>
 #include "main.h"
 
 #define PROMPTLENGTH 80
@@ -250,6 +249,6 @@ void init_hist()
 {
   initcvar(&history, "history", C_NIL);
   initcvar(&histnum, "histnum", mknumber(1L));
-  initcvar(&histmax, "histmax", mknumber(10L));
+  initcvar(&histmax, "histmax", mknumber(100L));
   mkprim0(PN_PRINTHIST, printhist, 0, FSUBR);
 }

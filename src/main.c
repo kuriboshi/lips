@@ -4,23 +4,20 @@
  *
  * $Id$
  */
+#include <sys/types.h>
+#ifdef SELECT
+#include <sys/select.h>
+#endif
 #include <ctype.h>
-#include <string.h>
 #include <signal.h>
 #include <pwd.h>
-#include <sys/ioctl.h>
-#include <sys/wait.h>
-#include <sys/file.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+
 #include "main.h"
 #include "exec.h"
 #include "top.h"
-#ifdef SELECT
-#include <sys/types.h>
-#include <sys/time.h>
-#endif
 
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
@@ -189,7 +186,7 @@ void onstop()
 static void fixpgrp()
 {
   mypgrp = getpgrp();
-  ioctl(0, TIOCSPGRP, (char*) &mypgrp);
+  tcsetpgrp(0, mypgrp);
 }
 
 /*
@@ -229,7 +226,7 @@ void onbreak()
 
 void promptfun()
 {
-  ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
+  tcsetpgrp(0, mypgrp); /* Get control of tty */
   insidefork = 0;
   /*
    * Check for jobs that are finished and print them.

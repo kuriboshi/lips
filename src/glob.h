@@ -4,8 +4,9 @@
  *
  * $Id$
  */
-
 #pragma once
+
+#include <lisp.h>
 
 extern char* extilde(char*, int);
 extern LISPT expandfiles(char*, int, int, int);

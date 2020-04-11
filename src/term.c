@@ -9,16 +9,15 @@
  * and file i/o.  Terminal i/o uses its own buffering and line editing.
  * It sets the terminal in cbreak and no echo mode.
  */
-#include <sgtty.h>
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <termios.h>
-#include <sys/time.h>
 #include <string.h>
 #ifdef TERMCAP
 #include <term.h>
 #endif
+
 #include "top.h"
 #include "main.h"
 #include "glob.h"

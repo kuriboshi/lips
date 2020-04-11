@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "lisp.h"
+#include <lisp.h>
 
 extern int insidefork;
 

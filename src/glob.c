@@ -5,13 +5,14 @@
  * $Id$
  *
  */
-#include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <sys/dir.h>
+#include <dirent.h>
 #include <pwd.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <lisp.h>
 #include "main.h"
 #include "exec.h"
 #include "glob.h"
@@ -188,7 +189,7 @@ static int walkfiles(char* wild, int all, int report)
 {
   int result;
   int pos;
-  struct direct* rdir;
+  struct dirent* rdir;
   DIR* odir;
   char* sw;
   char* w;

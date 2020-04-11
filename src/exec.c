@@ -5,19 +5,15 @@
  * $Id$
  *
  */
-#include <sys/types.h>
-#include <sys/dir.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <sys/resource.h>
-#include <sys/file.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <dirent.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
-#include <strings.h>
+
 #include "exec.h"
 #include "top.h"
 #include "glob.h"
@@ -719,7 +715,7 @@ PRIMITIVE stop()
 PRIMITIVE rehash()
 {
   DIR* odir;
-  struct direct* rdir;
+  struct dirent* rdir;
   char* sdir;
   BITS32 i;
   LISPT p;
