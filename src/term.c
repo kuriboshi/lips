@@ -128,7 +128,11 @@ void init_term()
       signal(SIGINT, cleanup);  /* temporary handle */
       signal(SIGTERM, cleanup); /* exit gracefully */
       newterm = oldterm;
-      newterm.c_lflag = (oldterm.c_lflag & (~ECHO | ~ICANON));
+      newterm.c_lflag &= (unsigned) ~ECHO;
+      newterm.c_lflag &= (unsigned) ~ICANON;
+      newterm.c_lflag |= ISIG;
+      newterm.c_cc[VMIN] = 1;
+      newterm.c_cc[VTIME] = 0;
 #ifdef TERMCAP
       curup = NULL;
       curfwd = NULL;
