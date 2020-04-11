@@ -460,8 +460,8 @@ static int ifexec(char* dir, char* name)
 /* hashfun - Calculates the hash function used in hashtable. */
 static BITS32 hashfun(char* str)
 {
-  register long i;
-  register int bc;
+  long i;
+  int bc;
 
   i = 0;
   bc = 0;
