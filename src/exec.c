@@ -182,6 +182,8 @@ static void collectjob(int pid, UNION_WAIT stat)
               i->next = j->next;
             else
               joblist = j->next;
+            if (WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
+              printjob(j); /* Print if not interrupted. */
             if (j->background)      /* When running in background, */
               {                     /* save on another list to be */
                 j->next = cjoblist; /* collected when signaled with */
@@ -192,8 +194,6 @@ static void collectjob(int pid, UNION_WAIT stat)
                 free(j->wdir);
                 free((char*) j);
               }
-            if (WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
-              printjob(j); /* Print if not interrupted. */
           }
         else
           printjob(j);
