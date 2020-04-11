@@ -29,14 +29,6 @@
  */
 #define JOB_CONTROL
 /*
- * If defined makes lips use termcap to retype line nicer.
- */
-#define TERMCAP
-/*
- * Define SHELL if you want to use it as a shell.
- */
-#define SHELL
-/*
  * Define TRACE if you want to be able to trace calls to peval.
  * Useful for debugging.
  */

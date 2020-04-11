@@ -27,7 +27,6 @@ enum lisp_type
   BIGNUM,    /* bigger than longs (NYI) */
   FLOAT,     /* a double */
   INDIRECT,  /* used when a value is stored in a closure */
-  LONG,      /* a long i.e. 32 bits of integer data (NYI) */
   CONS,      /* a pair */
   STRING,    /* character strings */
   SUBR,      /* eval type primitive function */

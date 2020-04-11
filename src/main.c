@@ -13,6 +13,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "main.h"
 #include "exec.h"
 #include "top.h"
@@ -56,7 +57,6 @@ static int getuser(FILE* f, int def)
   int c;
   fd_set readfs;
   struct timeval timeout;
-  extern int errno;
 
   timeout.tv_sec = 10;
   timeout.tv_usec = 0;
@@ -446,7 +446,9 @@ int main(int argc, char* const* argv)
 #ifdef FANCY_SIGNALS
       signal(SIGQUIT, onquit);
       signal(SIGILL, onill);
+#ifdef SIGEMT
       signal(SIGEMT, onill);
+#endif
       signal(SIGBUS, onbus);
       signal(SIGSEGV, onsegv);
 #endif

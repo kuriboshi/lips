@@ -71,7 +71,7 @@ LISPT syserr(LISPT fault)
       prin2(fault, C_T);
       fprintf(stderr, ": ");
     }
-  fprintf(stderr, "%s", sys_errlist[errno]);
+  fprintf(stderr, "%s", strerror(errno));
   return C_ERROR;
 }
 

@@ -15,4 +15,11 @@ target_sources(lips PRIVATE
   main.h
   top.h
 )
-target_link_libraries(lips libisp termcap)
+target_link_libraries(lips PRIVATE libisp)
+
+find_package(Curses)
+
+if(CURSES_FOUND)
+  target_compile_definitions(lips PRIVATE TERMCAP)
+  target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
+endif()

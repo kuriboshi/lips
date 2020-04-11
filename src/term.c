@@ -13,10 +13,12 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <term.h>
+#include <termios.h>
 #include <sys/time.h>
 #include <string.h>
-#include "term.h"
+#ifdef TERMCAP
+#include <term.h>
+#endif
 #include "top.h"
 #include "main.h"
 #include "glob.h"
@@ -54,10 +56,7 @@ enum term_fun
 /*
  * Variables for terminal characteristics, old and new.
  */
-static struct sgttyb newterm, oldterm;
-static struct tchars newtchars, oldtchars;
-static struct ltchars newltchars, oldltchars;
-static int ldis;
+static struct termios newterm, oldterm;
 
 static char linebuffer[BUFSIZ];         /* Line buffer for terminal input.  */
 static int parcount = 0;                /* Counts paranthesis.  */
@@ -69,7 +68,7 @@ static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 static char tcap[128];       /* Buffer for terminal capabilties.  */
 static char *curup, *curfwd; /* Various term cap strings.  */
 static char *cleol, *curdn;
-static int nocap; /* Nonzero if insufficient term cap. */
+static int nocap = 0; /* Nonzero if insufficient term cap. */
 #endif
 
 int lips_getline(FILE*);
@@ -117,26 +116,19 @@ void init_keymap()
 void init_term()
 {
   static int initialized = 0;
-  char bp[1024];
 #ifdef TERMCAP
+  char bp[1024];
   char* termc = tcap;
   char* term;
 #endif
-  int ndis;
 
   if (!initialized)
     {
-      ndis = NTTYDISC;
-      ioctl(0, TIOCGETP, &oldterm);
-      ioctl(0, TIOCGETC, &oldtchars);
-      ioctl(0, TIOCGLTC, &oldltchars);
-      ioctl(0, TIOCGETD, &ldis);
+      tcgetattr(0, &oldterm);
       signal(SIGINT, cleanup);  /* temporary handle */
       signal(SIGTERM, cleanup); /* exit gracefully */
       newterm = oldterm;
-      newterm.sg_flags = (newterm.sg_flags & ~ECHO) | CBREAK;
-      newtchars = oldtchars;
-      newltchars = oldltchars;
+      newterm.c_lflag = (oldterm.c_lflag & (~ECHO | ~ICANON));
 #ifdef TERMCAP
       curup = NULL;
       curfwd = NULL;
@@ -153,22 +145,16 @@ void init_term()
               nocap = 0;
           }
 #endif
-      if (ldis != NTTYDISC)
-        ioctl(0, TIOCSETD, &ndis);
       init_keymap();
       initialized = 1;
     }
-  ioctl(0, TIOCSETN, &newterm);
-  ioctl(0, TIOCSETC, &newtchars);
-  ioctl(0, TIOCSLTC, &newltchars);
+  tcsetattr(0, TCSANOW, &newterm);
 }
 
 /* Reset terminal to previous value */
 void end_term()
 {
-  ioctl(0, TIOCSETN, &oldterm);
-  ioctl(0, TIOCSETC, &oldtchars);
-  ioctl(0, TIOCSLTC, &oldltchars);
+  tcsetattr(0, TCSANOW, &oldterm);
 }
 
 /*
@@ -576,7 +562,9 @@ static void scan(int begin)
  */
 void nput(char* str, int ntim)
 {
+#ifdef TERMCAP
   for (; ntim > 0; ntim--) tputs(str, 1, outc);
+#endif
 }
 
 /*
@@ -584,6 +572,7 @@ void nput(char* str, int ntim)
  */
 void blink()
 {
+#ifdef TERMCAP
   int ldiff;
   int cdiff;
   struct timeval timeout;
@@ -627,6 +616,7 @@ void blink()
         pputc(currentpos.line_start[i], stdout);
     }
   fflush(stdout);
+#endif
 }
 
 /*

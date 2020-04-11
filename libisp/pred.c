@@ -158,6 +158,8 @@ PRIMITIVE xtypeof(LISPT a)
       return C_ERROR;
     case FILET:
       return C_FILE;
+    default:
+      return C_NIL;
     }
   return C_NIL;
 }

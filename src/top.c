@@ -36,7 +36,7 @@ static void phist()
 
   for (hl = history; !ISNIL(hl); hl = CDR(hl))
     {
-      printf("%D.\t", INTVAL(CAR(CAR(hl))));
+      printf("%d.\t", INTVAL(CAR(CAR(hl))));
       prinbody(CDR(CAR(hl)), stdout, 1);
       pputc('\n', primout);
     }
@@ -172,7 +172,7 @@ void promptprint(LISPT prompt)
         {
           if (s[i] == '!')
             {
-              sprintf(buf, "%D", INTVAL(histnum));
+              sprintf(buf, "%d", INTVAL(histnum));
               strcat(current_prompt, buf);
               continue;
             }

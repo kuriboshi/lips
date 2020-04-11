@@ -138,7 +138,6 @@ static void printjob(struct job* job)
 static int recordjob(int pid, int bg)
 {
 #ifdef JOB_CONTROL
-  char wd[MAXPATHLEN]; /* Store working directory */
   struct job* job;
 
   if (insidefork)
@@ -152,7 +151,7 @@ static int recordjob(int pid, int bg)
     job->jobnum = 1;
   job->procid = pid;
   job->status = 0;
-  job->wdir = strsave(getwd(wd)); /* Not a fatal error if NULL */
+  job->wdir = getcwd(NULL, 0); /* Not a fatal error if NULL */
   job->next = joblist;
   job->exp = input_exp;
   job->background = bg;
@@ -241,7 +240,7 @@ static int mfork()
   else if (pid < 0)
     {
       if (insidefork)
-        fprintf(stderr, "%s\n", sys_errlist[errno]);
+        fprintf(stderr, "%s\n", strerror(errno));
       else
         syserr(C_NIL);
       return pid;
@@ -287,19 +286,23 @@ static int checkmeta(char* s)
 static char** makeexec(LISPT command)
 {
   LISPT files, com;
-  int i, mask, ok;
+  int i, ok;
+  sigset_t new_mask;
+  sigset_t old_mask;
   static char* args[MAXARGS];
   char** t;
 
   ok = 0;
   com = command;
-  mask = sigblock(sigmask(SIGINT)); /* Dangerous to interrupt here */
+  sigemptyset(&new_mask);
+  sigaddset(&new_mask, SIGINT);
+  sigprocmask(SIG_BLOCK, &new_mask, &old_mask); /* Dangerous to interrupt here */
   for (t = args; *t != NULL; t++)
     {
       free(*t);
       *t = NULL;
     }
-  sigsetmask(mask);
+  sigprocmask(SIG_SETMASK, &old_mask, NULL);
   for (i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
     {
     again:
@@ -417,7 +420,7 @@ static LISPT exec(char* name, LISPT command)
       execve(name, args, environ);
       if (errno == ENOEXEC)
         execvp(name, args);
-      fprintf(stderr, "%s\n", sys_errlist[errno]);
+      fprintf(stderr, "%s\n", strerror(errno));
       exit(1); /* No return */
     }
   else if ((pid = mfork()) == 0)
@@ -425,7 +428,7 @@ static LISPT exec(char* name, LISPT command)
       execve(name, args, environ);
       if (errno == ENOEXEC)
         execvp(name, args);
-      fprintf(stderr, "%s\n", sys_errlist[errno]);
+      fprintf(stderr, "%s\n", strerror(errno));
       exit(1);
     }
   else if (pid < 0)
@@ -568,7 +571,7 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
     {
       if (dup2(fd, oldfd) < 0)
         {
-          fprintf(stderr, "%s\n", sys_errlist[errno]);
+          fprintf(stderr, "%s\n", strerror(errno));
           exit(1);
         }
       eval(cmd);
@@ -602,7 +605,7 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
     {
       if (dup2(fd, oldfd) < 0)
         {
-          fprintf(stderr, "%s\n", sys_errlist[errno]);
+          fprintf(stderr, "%s\n", strerror(errno));
           exit(1);
         }
       eval(cmd);
@@ -636,7 +639,7 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
     {
       if (dup2(fd, oldfd) < 0)
         {
-          fprintf(stderr, "%s\n", sys_errlist[errno]);
+          fprintf(stderr, "%s\n", strerror(errno));
           exit(1);
         }
       eval(cmd);
@@ -667,7 +670,7 @@ PRIMITIVE pipecmd(LISPT cmds)
           close(pd[0]);
           if (dup2(pd[1], 1) < 0)
             {
-              fprintf(stderr, "%s\n", sys_errlist[errno]);
+              fprintf(stderr, "%s\n", strerror(errno));
               exit(1);
             }
           eval(CAR(cmds));
@@ -679,7 +682,7 @@ PRIMITIVE pipecmd(LISPT cmds)
       close(pd[1]);
       if (dup2(pd[0], 0) < 0)
         {
-          fprintf(stderr, "%s\n", sys_errlist[errno]);
+          fprintf(stderr, "%s\n", strerror(errno));
           exit(1);
         }
       eval(CAR(cmds));
@@ -792,7 +795,7 @@ PRIMITIVE fg(LISPT job)
       j->status = 0;
       j->background = 0;
       status = waitfork(j->procid);
-      return mknumber((long) _WSTATUS(status));
+      return mknumber((long) WEXITSTATUS(status));
     }
   return error(NO_SUCH_JOB, job);
 #endif
@@ -857,7 +860,6 @@ PRIMITIVE getenviron(LISPT var)
 PRIMITIVE cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
-  char wd[1024];
 
   if (ISNIL(dir))
     ndir = home;
@@ -883,8 +885,9 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
     }
   else
     {
-      getwd(wd);
+      char* wd = getcwd(NULL, 0);
       setenviron("PWD", wd);
+      free(wd);
       return C_T;
     }
 }

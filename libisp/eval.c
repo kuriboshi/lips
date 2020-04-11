@@ -112,11 +112,13 @@ static int (*cont)(void); /* Current continuation. */
   dalloc((s) + 1); \
   dest[0].var.d_integer = (s); \
   dest[0].val.d_integer = (s); \
-  dest[0].type = dest[0].type = 0
+  dest[0].type = 0
 
-#define STOREVAR(v, i) \
+#define STOREVAR(v, i) { \
   dest[i].var.d_lisp = (v); \
-  dest[i].type = 1
+  dest[i].type = 1; \
+}
+
 #define UNLINK \
   dfree(env); \
   env = POP_POINT
