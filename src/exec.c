@@ -7,6 +7,7 @@
  */
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
