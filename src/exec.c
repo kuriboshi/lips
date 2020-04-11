@@ -58,7 +58,6 @@ static struct job* cjoblist = NULL; /* List of collected jobs */
  */
 static void preparefork()
 {
-  setpgid(0, pgrp);
   signal(SIGHUP, SIG_DFL);
   signal(SIGINT, SIG_DFL);
   signal(SIGQUIT, SIG_DFL);
@@ -221,13 +220,14 @@ static int mfork()
 
   if ((pid = fork()) == 0)
     {
-      preparefork();
+      pgrp = getpid();
       if (!insidefork)
         {
-          pgrp = getpid();
+          setpgid(1, pgrp);
           tcsetpgrp(1, pgrp);
           insidefork = 1;
         }
+      preparefork();
       return pid;
     }
   else if (pid < 0)
