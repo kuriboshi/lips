@@ -5,7 +5,6 @@
  * $Id$
  *
  */
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/dir.h>
 #include <sys/time.h>
@@ -29,8 +28,6 @@
 #define DEFAULT_SHELL "/bin/sh"
 
 extern char** environ;
-extern void init_term(void);
-extern void end_term(void);
 LISPT p_setenv(LISPT, LISPT);
 
 #define UNION_WAIT int
@@ -227,14 +224,13 @@ static int mfork()
 
   if ((pid = fork()) == 0)
     {
+      preparefork();
       if (!insidefork)
         {
           pgrp = getpid();
-          ioctl(0, TIOCSPGRP, (char*) &pgrp);
+          tcsetpgrp(1, pgrp);
           insidefork = 1;
-          end_term();
         }
-      preparefork();
       return pid;
     }
   else if (pid < 0)
@@ -716,9 +712,7 @@ PRIMITIVE back(LISPT l)
 
 PRIMITIVE stop()
 {
-  end_term();
   kill(0, SIGSTOP);
-  init_term();
   return C_T;
 }
 
@@ -787,8 +781,7 @@ PRIMITIVE fg(LISPT job)
       pgrp = getpgid(j->procid);
       j->running = 1;
       printjob(j);
-      end_term();
-      ioctl(0, TIOCSPGRP, (char*) &pgrp);
+      tcsetpgrp(1, pgrp);
       if (WIFSTOPPED(j->status))
         if (killpg(pgrp, SIGCONT) < 0)
           return syserr(mknumber((long) pgrp));
@@ -826,7 +819,7 @@ PRIMITIVE bg(LISPT job)
       j->status = 0;
       j->running = 1;
       printjob(j);
-      ioctl(0, TIOCSPGRP, (char*) &pgrp);
+      tcsetpgrp(1, pgrp);
       if (!j->background)
         if (killpg(pgrp, SIGCONT) < 0)
           return syserr(mknumber((long) pgrp));
@@ -897,17 +890,14 @@ PRIMITIVE doexec(LISPT cmd)
   LISPT res;
 
   insidefork = 1; /* Prevent exec from forking */
-  end_term();
   switch (execcommand(cmd, &res))
     {
     case -1:
-      init_term();
       return C_ERROR;
       break;
     default:
       break; /* Never reached */
     }
-  init_term();
   return C_NIL;
 }
 

@@ -91,6 +91,7 @@ void core(int sig)
 {
   int c;
 
+  init_term();
   if (insidefork)
     {
       fprintf(primerr, " -- (in fork) core dumped\n");
@@ -129,6 +130,7 @@ void core(int sig)
       fprintf(primerr, "Yes\n");
       fprintf(primerr, "Warning: continued after signal %d.\n", sig);
       fprintf(primerr, "Save your work and exit.\n");
+      end_term();
       longjmp(toplevel, 5);
     }
 }
@@ -228,7 +230,6 @@ void onbreak()
 void promptfun()
 {
   ioctl(0, TIOCSPGRP, &mypgrp); /* Get control of tty */
-  init_term();
   insidefork = 0;
   /*
    * Check for jobs that are finished and print them.
@@ -336,8 +337,6 @@ static LISPT transform(LISPT list)
 
 static void init()
 {
-  init_term();
-
   signal(SIGTTIN, SIG_IGN);
   signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
 

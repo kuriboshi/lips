@@ -209,8 +209,13 @@ gotlin:
     return linebuffer[position++];
   else
     {
+      init_term();
       if (lips_getline(file) == 0)
+      {
+        end_term();
         return EOF;
+      }
+      end_term();
       goto gotlin;
     }
 }
