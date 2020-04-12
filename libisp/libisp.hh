@@ -59,9 +59,9 @@ PP1(plevel);
 PP2(spaces);
 PP1(xreadline);
 PP2(cpprint);
-PP1(and);
-PP1(or);
-PP1(not);
+PP1(p_and);
+PP1(p_or);
+PP1(p_not);
 PP3(xif);
 PP2(set);
 PP2(set);
@@ -139,14 +139,14 @@ PP3(de);
 PP3(df);
 
 /* Other functions */
-extern LISPT mkstring(char*);
+extern LISPT mkstring(const char*);
 extern LISPT mknumber(long);
 extern LISPT mkatom(char*);
 extern LISPT mkfloat(double);
 
-extern int loadfile(char*);
+extern int loadfile(const char*);
 
-extern void initcvar(LISPT*, char*, LISPT);
+extern void initcvar(LISPT*, const char*, LISPT);
 
 extern int (*undefhook)(LISPT, LISPT*);
 extern void (*breakhook)(void);

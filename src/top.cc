@@ -4,12 +4,12 @@
  *
  * $Id$
  */
-#include <lisp.h>
-#include "main.h"
+#include <lisp.hh>
+#include "main.hh"
 
 #define PROMPTLENGTH 80
 
-extern void pputc(char, FILE*);
+extern void pputc(int, FILE*);
 
 char current_prompt[PROMPTLENGTH];
 LISPT history;                 /* Holds the history list. */
@@ -158,7 +158,7 @@ LISPT findalias(LISPT exp)
 void promptprint(LISPT prompt)
 {
   int i;
-  char* s;
+  const char* s;
   char buf[80];
 
   current_prompt[0] = '\0';

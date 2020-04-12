@@ -6,13 +6,13 @@
  *
  */
 #include <setjmp.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 extern jmp_buf toplevel;
 extern int brkflg;
 extern int interrupt;
 extern LISPT findalias(LISPT);
-extern void pputc(char, FILE*);
+extern void pputc(int, FILE*);
 
 void (*breakhook)(void);         /* Called before going into break. */
 int (*undefhook)(LISPT, LISPT*); /* Called in case of undefined function. */
@@ -121,7 +121,7 @@ static int (*cont)(void); /* Current continuation. */
 
 #define UNLINK \
   dfree(env); \
-  env = POP_POINT
+  env = (struct destblock*) POP_POINT
 
 #define SEND(a) \
   if (dest[0].var.d_integer > 0) \

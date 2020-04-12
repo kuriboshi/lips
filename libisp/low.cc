@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-#include "lisp.h"
+#include "lisp.hh"
 
 LISPT verboseflg;
 

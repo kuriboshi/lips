@@ -8,7 +8,7 @@
 #pragma once
 
 #include <setjmp.h>
-#include <lisp.h>
+#include <lisp.hh>
 
 extern jmp_buf toplevel;
 extern int interrupt;

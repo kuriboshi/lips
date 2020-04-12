@@ -4,8 +4,8 @@
  *
  * $Id$
  */
-#include "lisp.h"
-#include "func.h"
+#include "lisp.hh"
+#include "func.hh"
 
 PRIMITIVE p_and(LISPT l)
 {
@@ -37,7 +37,7 @@ PRIMITIVE p_or(LISPT l)
   return foo;
 }
 
-PRIMITIVE not(LISPT x)
+PRIMITIVE p_not(LISPT x)
 {
   if (ISNIL(x))
     return C_T;
@@ -60,6 +60,6 @@ void init_logic()
 {
   mkprim1(PN_AND, p_and, -1, FSUBR);
   mkprim1(PN_OR, p_or, -1, FSUBR);
-  mkprim1(PN_NOT, not, 1, SUBR);
+  mkprim1(PN_NOT, p_not, 1, SUBR);
   mkprim3(PN_IF, xif, -3, FSUBR);
 }

@@ -8,10 +8,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 extern int getch(FILE*);
-extern void putch(char, FILE*, int);
+extern void putch(int, FILE*, int);
 
 FILE* primin;
 FILE* primout;
@@ -57,7 +57,7 @@ PRIMITIVE xprint(LISPT x, LISPT file)
   return print(x, FILEVAL(file));
 }
 
-int loadfile(char* lf)
+int loadfile(const char* lf)
 {
   FILE* foo;
   LISPT rval;
@@ -165,7 +165,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
 {
   FILE *f, *tagsfile, *cfile;
   char buf[120];
-  char* funn;
+  const char* funn;
   char lname[20], cname[20], fname[20];
   int line, i, acnt;
 

@@ -18,9 +18,9 @@
 #include <term.h>
 #endif
 
-#include "top.h"
-#include "main.h"
-#include "glob.h"
+#include "top.hh"
+#include "main.hh"
+#include "glob.hh"
 
 #define FFLUSH(file) fflush(file)
 
@@ -65,14 +65,14 @@ static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 
 #ifdef TERMCAP
 static char tcap[128];       /* Buffer for terminal capabilties.  */
-static char *curup, *curfwd; /* Various term cap strings.  */
-static char *cleol, *curdn;
+static const char *curup, *curfwd; /* Various term cap strings.  */
+static const char *cleol, *curdn;
 static int nocap = 0; /* Nonzero if insufficient term cap. */
 #endif
 
 int lips_getline(FILE*);
 
-void cleanup()
+void cleanup(int)
 {
   finish(0);
 }
@@ -104,11 +104,11 @@ void init_keymap()
   key_tab[CKILL] = T_KILL;
   key_tab[CEOF] = T_EOF;
   key_tab[CTRL('i')] = T_TAB;
-  key_tab['('] = T_LEFTPAR;
-  key_tab[')'] = T_RIGHTPAR;
-  key_tab['\n'] = T_NEWLINE;
-  key_tab['\\'] = T_ESCAPE;
-  key_tab['"'] = T_STRING;
+  key_tab[(int)'('] = T_LEFTPAR;
+  key_tab[(int)')'] = T_RIGHTPAR;
+  key_tab[(int)'\n'] = T_NEWLINE;
+  key_tab[(int)'\\'] = T_ESCAPE;
+  key_tab[(int)'"'] = T_STRING;
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -138,10 +138,10 @@ void init_term()
       if ((term = getenv("TERM")) != NULL)
         if (tgetent(bp, term) == 1)
           {
-            curup = tgetstr("up", &termc);
+            curup = tgetstr(const_cast<char*>("up"), &termc);
             curdn = "\n";
-            curfwd = tgetstr("nd", &termc);
-            cleol = tgetstr("ce", &termc);
+            curfwd = tgetstr(const_cast<char*>("nd"), &termc);
+            cleol = tgetstr(const_cast<char*>("ce"), &termc);
             if (!curup || !curfwd || !cleol)
               nocap = 1;
             else
@@ -379,7 +379,7 @@ char* mkexstr()
   return ++last;
 }
 
-static void fillrest(char* word)
+static void fillrest(const char* word)
 {
   for (word += strlen(last) - 1; *word; word++)
     {
@@ -415,17 +415,17 @@ static void complete(LISPT words)
     }
 }
 
-static LISPT strip(LISPT files, char* prefix, char* suffix)
+static LISPT strip(LISPT files, const char* prefix, const char* suffix)
 {
   LISPT stripped;
-  char* s;
+  const char* s;
 
   if (strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
     return files;
   for (stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = CDR(files))
     {
       s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
-      s[0] = '~';
+      // s[0] = '~';
       tconc(stripped, mkstring(s));
     }
   return CAR(stripped);
@@ -463,7 +463,6 @@ static void scan(int begin)
   int line, cpos;
   int pos;
   int escape;
-  int this;
   int state;
   int parcount, pars;
 
@@ -479,18 +478,18 @@ static void scan(int begin)
   currentpos.line_start = NULL;
   for (pos = begin; pos > 0; pos--)
     {
-      this = linebuffer[pos];
+      int cur = linebuffer[pos];
       cpos++;
       escape = 0;
-      if (this == '"' && state == INSTRING)
+      if (cur == '"' && state == INSTRING)
         state = EXITSTRING;
-      else if (this == '"' && state == NORMAL)
+      else if (cur == '"' && state == NORMAL)
         state = STARTSTRING;
-      else if (this == '(' && state != INSTRING && state != STARTSTRING)
+      else if (cur == '(' && state != INSTRING && state != STARTSTRING)
         state = LEFTPAR;
-      else if (this == ')' && state != INSTRING && state != STARTSTRING)
+      else if (cur == ')' && state != INSTRING && state != STARTSTRING)
         state = RIGHTPAR;
-      else if (this == '\n')
+      else if (cur == '\n')
         {
           if (parpos.line == line)
             {
@@ -568,7 +567,7 @@ static void scan(int begin)
 /*
  * Puts the string STR on stdout NTIM times using tputs.
  */
-void nput(char* str, int ntim)
+void nput(const char* str, int ntim)
 {
 #ifdef TERMCAP
   for (; ntim > 0; ntim--) tputs(str, 1, outc);
@@ -637,7 +636,7 @@ void blink()
 int lips_getline(FILE* file)
 {
   char c;
-  char *s, *t;
+  const char *s, *t;
   int origpar;
   int instring = 0;
   int escaped = 0;

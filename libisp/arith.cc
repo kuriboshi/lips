@@ -5,7 +5,7 @@
  * $Id$
  *
  */
-#include "lisp.h"
+#include "lisp.hh"
 
 /*
  * Function with an i as a prefix are for integer arithmetic and those

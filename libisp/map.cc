@@ -4,8 +4,8 @@
  *
  * $Id$
  */
-#include "lisp.h"
-#include "func.h"
+#include "lisp.hh"
+#include "func.hh"
 
 USESAVE
 

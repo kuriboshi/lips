@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-#include "lisp.h"
+#include "lisp.hh"
 
 PRIMITIVE numberp(LISPT a)
 {

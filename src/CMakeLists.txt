@@ -3,17 +3,17 @@
 #
 add_executable(lips)
 target_sources(lips PRIVATE
-  exec.c
-  glob.c
-  main.c
-  term.c
-  top.c
+  exec.cc
+  glob.cc
+  main.cc
+  term.cc
+  top.cc
 )
 target_sources(lips PRIVATE
-  exec.h
-  glob.h
-  main.h
-  top.h
+  exec.hh
+  glob.hh
+  main.hh
+  top.hh
 )
 target_link_libraries(lips PRIVATE libisp)
 

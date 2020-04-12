@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-#include "lisp.h"
+#include "lisp.hh"
 
 extern char* VERSION;
 extern void init_file(void);
@@ -35,7 +35,7 @@ LISPT version;     /* Is set to the version string. */
  * Whenever CVAR is changed the corresponding lisp variable changes
  * and vice versa.
  */
-void initcvar(LISPT* cvar, char* name, LISPT val)
+void initcvar(LISPT* cvar, const char* name, LISPT val)
 {
   LISPT t;
 

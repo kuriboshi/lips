@@ -15,9 +15,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "main.h"
-#include "exec.h"
-#include "top.h"
+#include "main.hh"
+#include "exec.hh"
+#include "top.hh"
 
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
@@ -133,7 +133,7 @@ void core(int sig)
 }
 #endif
 
-void onintr()
+void onintr(int)
 {
   if (insidefork)
     exit(0);
@@ -144,25 +144,25 @@ void onintr()
 }
 
 #ifdef FANCY_SIGNALS
-void onquit()
+void onquit(int)
 {
   fprintf(primerr, "Quit!");
   core(SIGQUIT);
 }
 
-void onbus()
+void onbus(int)
 {
   fprintf(primerr, "%s: Bus error!", progname);
   core(SIGBUS);
 }
 
-void onsegv()
+void onsegv(int)
 {
   fprintf(primerr, "%s: Segmentation violation!", progname);
   core(SIGSEGV);
 }
 
-void onill()
+void onill(int)
 {
   fprintf(primerr, "%s: Illegal instruction!", progname);
   core(SIGILL);
@@ -178,7 +178,7 @@ void onhup()
  * The stop key means to break inside a lisp expression. The
  * brkflg is checked on every entry to eval.
  */
-void onstop()
+void onstop(int)
 {
   brkflg = 1;
 }
@@ -356,7 +356,7 @@ static void init()
 /*
  * Loads the file INITFILE.
  */
-static void loadinit(char* initfile)
+static void loadinit(const char* initfile)
 {
   if (loadfile(initfile))
     printf("Can't open file %s\n", initfile); /* System init file. */

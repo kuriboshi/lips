@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "lisp.h"
+#include "lisp.hh"
 
 extern char current_prompt[];
 extern LISPT history;

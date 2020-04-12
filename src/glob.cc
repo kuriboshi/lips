@@ -12,10 +12,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <lisp.h>
-#include "main.h"
-#include "exec.h"
-#include "glob.h"
+#include <lisp.hh>
+#include "main.hh"
+#include "exec.hh"
+#include "glob.hh"
 
 #define TICKS 64
 #define NAMELEN 1024
@@ -29,7 +29,7 @@ static char** globlimit;
  * If *wild is a slash then str must be a directory to match
  * wild completely. Used by match.
  */
-static int dircheck(char* str, char* wild, char* ss)
+static int dircheck(const char* str, const char* wild, const char* ss)
 {
   struct stat sbuf;
   int pos;
@@ -60,10 +60,10 @@ static int dircheck(char* str, char* wild, char* ss)
  * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
  * is a simple string with no slashes.
  */
-static int match(char* str, char* wild)
+static int match(const char* str, const char* wild)
 {
   int ok;
-  char* ss = str;
+  const char* ss = str;
 
   while (*wild && *str)
     {
@@ -142,7 +142,7 @@ static LISPT orderinsert(LISPT what, LISPT where)
  * Expands tilde character in first position to home directory or
  * other users home directory.
  */
-char* extilde(char* w, int rep)
+const char* extilde(const char* w, int rep)
 {
   struct passwd* pw;
   static char s[NAMELEN];
@@ -185,14 +185,14 @@ char* extilde(char* w, int rep)
  *             unsorted array of character strings. Returns non-zero if
  *             any file matched the pattern, zero otherwise.
  */
-static int walkfiles(char* wild, int all, int report)
+static int walkfiles(const char* wild, int all, int report)
 {
   int result;
   int pos;
   struct dirent* rdir;
   DIR* odir;
-  char* sw;
-  char* w;
+  const char* sw;
+  const char* w;
 
   if (*wild == '/')
     w = wild + 1;
@@ -263,7 +263,7 @@ static int comp(const void* a, const void* b)
   return -strcmp(*(char**) a, *(char**) b);
 }
 
-LISPT expandfiles(char* wild, int all, int report, int sort)
+LISPT expandfiles(const char* wild, int all, int report, int sort)
 {
   if (*wild == '/' && *(wild + 1) == '\0')
     return cons(mkstring(wild), C_NIL);
@@ -287,7 +287,7 @@ LISPT expandfiles(char* wild, int all, int report, int sort)
  */
 PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
 {
-  char* wstr;
+  const char* wstr;
   int r = 0;
 
   if (ISNIL(rep))

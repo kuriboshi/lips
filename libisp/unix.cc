@@ -10,7 +10,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 #define MAXFILES 8
 
@@ -123,7 +123,7 @@ PRIMITIVE uxnice(LISPT incr)
 PRIMITIVE uxopen(LISPT name, LISPT mode)
 {
   FILE* f;
-  char* openmode;
+  const char* openmode;
   LISPT newfile;
 
   CHECK(name, STRING);

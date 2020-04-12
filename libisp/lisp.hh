@@ -12,9 +12,8 @@
  */
 #include <stdio.h>
 #include <memory.h>
-#include "config.h"
-
-#include <libisp.h>
+#include "config.hh"
+#include "libisp.hh"
 
 /* This is used to recognize c-functions for cpprint */
 #define PRIMITIVE LISPT
@@ -110,7 +109,7 @@ typedef struct
 
 typedef struct
 {
-  char* pname; /* The printname of the atom */
+  const char* pname; /* The printname of the atom */
   LISPT value;
   LISPT plist;  /* The property list */
   LISPT topval; /* Holds top value (not used yet) */
@@ -226,8 +225,8 @@ struct destblock
 
 #define MAXHASH 255 /* The number of hash buckets */
 
-#include "defs.h"
-#include "io.h"
-#include "constants.h"
-#include "error.h"
-#include "func.h"
+#include "defs.hh"
+#include "io.hh"
+#include "constants.hh"
+#include "error.hh"
+#include "func.hh"

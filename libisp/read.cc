@@ -6,7 +6,7 @@
  */
 #include <ctype.h>
 #include <stdlib.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 #define NUL '\0'
 #define MAXATOMSIZE 128 /* max length of atom read can handle */
@@ -32,9 +32,9 @@
   CHECKEOF(curc);
 
 extern int getch(FILE*);
-extern void ungetch(char, FILE*);
+extern void ungetch(int, FILE*);
 extern int eoln(FILE*);
-extern void putch(char, FILE*, int);
+extern void putch(int, FILE*, int);
 
 extern LISPT history, currentbase;
 
@@ -631,7 +631,7 @@ LISPT readline(FILE* file)
 }
 
 /* print the string s, on stream file */
-static void ps(char* s, FILE* file, int esc)
+static void ps(const char* s, FILE* file, int esc)
 {
   while (*s) putch(*s++, file, esc);
 }

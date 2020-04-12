@@ -7,7 +7,7 @@
  */
 #include <string.h>
 #include <stdlib.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 #define CONSCELLS 1000     /* Number of cells in each block */
 #define DESTBLOCKSIZE 3000 /* Size of destination block area */
@@ -55,7 +55,7 @@ static struct floats
 } floats;
 #endif /* FLOATING */
 
-#include "garb.h"
+#include "garb.hh"
 
 /*
  * safemalloc is defined in terms of realmalloc depending on
@@ -63,9 +63,7 @@ static struct floats
  */
 char* realmalloc(unsigned int size)
 {
-  char* cp;
-
-  cp = malloc(size);
+  char* cp = (char*)malloc(size);
   if (cp == NULL)
     {
       error(OUT_OF_MEMORY, C_NIL);
@@ -323,7 +321,7 @@ PRIMITIVE cons(LISPT a, LISPT b)
  * mkstring - Strings are stored in a cons cell with car set to NIL and
  *            cdr is set to the string pointer.
  */
-LISPT mkstring(char* str)
+LISPT mkstring(const char* str)
 {
   LISPT s;
   char* c;
@@ -363,7 +361,7 @@ static int hash(const char* str)
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-static LISPT buildatom(char* s, int cpy)
+static LISPT buildatom(const char* s, int cpy)
 {
   LISPT newatom;
   LISPT l;
@@ -376,10 +374,10 @@ static LISPT buildatom(char* s, int cpy)
     return C_ERROR;
   if (cpy)
     {
-      SYMVAL(newatom).pname = (char*) safemalloc((unsigned) strlen(s) + 1);
-      if (SYMVAL(newatom).pname == NULL)
+      const char* pname = (const char*) safemalloc((unsigned) strlen(s) + 1);
+      if (pname == NULL)
         return C_ERROR;
-      strcpy(SYMVAL(newatom).pname, s);
+      SYMVAL(newatom).pname = pname;
     }
   else
     SYMVAL(newatom).pname = s;
@@ -394,7 +392,7 @@ static LISPT buildatom(char* s, int cpy)
  *           If the atom is already in obarray, no new atom is created.
  *           Copy str if CPY is non-zero. Returns the atom.
  */
-static LISPT puthash(char* str, OBARRAY* obarray[], int cpy)
+static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
 {
   int hv;
   OBARRAY* ob;
@@ -423,7 +421,7 @@ static LISPT puthash(char* str, OBARRAY* obarray[], int cpy)
  * intern - Make interned symbol in hasharray obarray. Str is not copied
  *          so this is only used with constant strings during init.
  */
-LISPT intern(char* str)
+LISPT intern(const char* str)
 {
   return puthash(str, obarray, 0);
 }

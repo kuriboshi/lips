@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "func.h"
+#include "func.hh"
 
 extern LISPT top, rstack, history, histnum, fun, expression;
 extern LISPT args, path, home, verboseflg, promptform, brkprompt, topprompt;

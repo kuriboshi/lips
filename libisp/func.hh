@@ -15,7 +15,7 @@ extern int savept;
 extern OBARRAY* obarray[];
 extern LISPT freelist;
 /* functions */
-extern LISPT intern(char*);
+extern LISPT intern(const char*);
 extern LISPT getobject(void);
 extern struct destblock* dalloc(int);
 extern void dfree(struct destblock*);
@@ -109,13 +109,13 @@ extern void init_pred(void);
  * prim.c
  */
 /* functions */
-extern void mkprim0(char*, LISPT (*fname)(void), short, enum lisp_type);
-extern void mkprim1(char*, LISPT (*fname)(LISPT), short, enum lisp_type);
-extern void mkprim2(char*, LISPT (*fname)(LISPT, LISPT), short, enum lisp_type);
-extern void mkprim3(char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, enum lisp_type);
+extern void mkprim0(const char*, LISPT (*fname)(void), short, enum lisp_type);
+extern void mkprim1(const char*, LISPT (*fname)(LISPT), short, enum lisp_type);
+extern void mkprim2(const char*, LISPT (*fname)(LISPT, LISPT), short, enum lisp_type);
+extern void mkprim3(const char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, enum lisp_type);
 extern LISPT nth(LISPT list, long n);
 extern LISPT closobj(LISPT vars);
-extern LISPT mklambda(LISPT args, LISPT def, int type);
+extern LISPT mklambda(LISPT args, LISPT def, enum lisp_type);
 extern void init_prim(void);
 
 /*

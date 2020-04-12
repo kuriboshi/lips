@@ -15,10 +15,10 @@
 #include <errno.h>
 #include <signal.h>
 
-#include "exec.h"
-#include "top.h"
-#include "glob.h"
-#include "main.h"
+#include "exec.hh"
+#include "top.hh"
+#include "glob.hh"
+#include "main.hh"
 
 #define MAXARGS 256
 #define EXECHASH 1023 /* Hash table size for commands */
@@ -74,7 +74,7 @@ static void preparefork()
  *           Returns NULL if either STR is NULL or malloc fail to allocate 
  *           more memory.
  */
-char* strsave(char* str)
+char* strsave(const char* str)
 {
   char* newstr;
 
@@ -301,9 +301,7 @@ static char** makeexec(LISPT command)
     again:
       if (TYPEOF(CAR(com)) == SYMBOL)
         {
-          char* c;
-
-          c = strsave(extilde(GETSTR(CAR(com)), 1));
+          char* c = strsave(extilde(GETSTR(CAR(com)), 1));
           if (c == NULL)
             return NULL;
           if (!checkmeta(c))
@@ -400,7 +398,7 @@ void checkfork()
  *        return (using waitfork). Exec either returns T or ERROR depending
  *        success or failure for some reason.
  */
-static LISPT exec(char* name, LISPT command)
+static LISPT exec(const char* name, LISPT command)
 {
   char** args;
   int pid;
@@ -434,7 +432,7 @@ static LISPT exec(char* name, LISPT command)
  * ifexec - Returns non-zero if directory DIR contains a NAME that is
  *          executable.
  */
-static int ifexec(char* dir, char* name)
+static int ifexec(const char* dir, const char* name)
 {
   static char path[MAXNAMLEN];
   struct stat buf;
@@ -451,7 +449,7 @@ static int ifexec(char* dir, char* name)
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */
-static BITS32 hashfun(char* str)
+static BITS32 hashfun(const char* str)
 {
   long i;
   int bc;
@@ -475,7 +473,7 @@ static BITS32 hashfun(char* str)
 int execcommand(LISPT exp, LISPT* res)
 {
   LISPT cdir;
-  char* command;
+  const char* command;
   char comdir[MAXPATHLEN];
   BITS32 i, possible;
 
@@ -526,7 +524,7 @@ int execcommand(LISPT exp, LISPT* res)
  * setenviron - Set environmet variable VAR to VAL. No sorting of the 
  *              entries is done.
  */
-static void setenviron(char* var, char* val)
+static void setenviron(const char* var, const char* val)
 {
 #ifdef PUTENV
   char* env = (char*) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
@@ -717,7 +715,7 @@ PRIMITIVE rehash()
 {
   DIR* odir;
   struct dirent* rdir;
-  char* sdir;
+  const char* sdir;
   BITS32 i;
   LISPT p;
 

@@ -6,14 +6,14 @@
  */
 #include <errno.h>
 #include <setjmp.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 extern void toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
-static char* messages[MAXMESSAGE];
+static const char* messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
-static char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer",
+static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer",
   "Not a bignum", "Not a float", "Not indirect", "Not a long", "Not a list",
   "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
   "Not a closure", "Not unbound", "Not an environment", "Not a file pointer",

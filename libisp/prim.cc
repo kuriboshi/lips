@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-#include "lisp.h"
+#include "lisp.hh"
 
 extern void finish(int);
 
@@ -18,7 +18,7 @@ static int count;
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-static LISPT mkprim_(char* pname, short nrpar, enum lisp_type type)
+static LISPT mkprim_(const char* pname, short nrpar, enum lisp_type type)
 {
   LISPT s = getobject();
   LISPT f = intern(pname);
@@ -27,23 +27,23 @@ static LISPT mkprim_(char* pname, short nrpar, enum lisp_type type)
   return s;
 }
 
-void mkprim0(char* pname, LISPT (*fname)(void), short nrpar, enum lisp_type type)
+void mkprim0(const char* pname, LISPT (*fname)(void), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function0 = fname;
 }
 
-void mkprim1(char* pname, LISPT (*fname)(LISPT), short nrpar, enum lisp_type type)
+void mkprim1(const char* pname, LISPT (*fname)(LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function1 = fname;
 }
 
-void mkprim2(char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, enum lisp_type type)
+void mkprim2(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function2 = fname;
 }
 
 void mkprim3(
-  char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, enum lisp_type type)
+  const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function3 = fname;
 }
@@ -127,7 +127,7 @@ static LISPT mkarglis(LISPT alist)
  * mklambda - Make a lambda object with the argument ARGS and definition 
  *            DEF and the type TYPE,  wich is LAMBDA or NLAMBDA.
  */
-LISPT mklambda(LISPT args, LISPT def, int type)
+LISPT mklambda(LISPT args, LISPT def, enum lisp_type type)
 {
   LISPT t;
   LISPT s;

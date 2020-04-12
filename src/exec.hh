@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <lisp.h>
+#include <lisp.hh>
 
 extern int insidefork;
 
-extern char* strsave(char*);
+extern char* strsave(const char*);
 extern void printdone(void);
 extern char* ltoa(long);
 extern void checkfork(void);

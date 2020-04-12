@@ -5,7 +5,7 @@
  * $Id$
  */
 #include <string.h>
-#include "lisp.h"
+#include "lisp.hh"
 
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)

@@ -3,35 +3,35 @@
 #
 add_library(libisp)
 target_sources(libisp PRIVATE
-  alloc.c
-  arith.c
-  eval.c
-  file.c
-  init.c
-  logic.c
-  low.c
-  map.c
-  misc.c
-  os.c
-  pred.c
-  prim.c
-  prop.c
-  read.c
-  string.c
-  unix.c
-  user.c
-  version.c
+  alloc.cc
+  arith.cc
+  eval.cc
+  file.cc
+  init.cc
+  logic.cc
+  low.cc
+  map.cc
+  misc.cc
+  os.cc
+  pred.cc
+  prim.cc
+  prop.cc
+  read.cc
+  string.cc
+  unix.cc
+  user.cc
+  version.cc
 )
 target_sources(libisp PRIVATE
-  config.h
-  constants.h
-  defs.h
-  error.h
-  func.h
-  garb.h
-  io.h
-  libisp.h
-  lisp.h
- )
+  config.hh
+  constants.hh
+  defs.hh
+  error.hh
+  func.hh
+  garb.hh
+  io.hh
+  libisp.hh
+  lisp.hh
+)
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(libisp PUBLIC -Wall -Werror)

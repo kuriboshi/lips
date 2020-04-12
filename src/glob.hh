@@ -6,10 +6,10 @@
  */
 #pragma once
 
-#include <lisp.h>
+#include <lisp.hh>
 
-extern char* extilde(char*, int);
-extern LISPT expandfiles(char*, int, int, int);
+extern const char* extilde(const char*, int);
+extern LISPT expandfiles(const char*, int, int, int);
 extern LISPT glob(LISPT);
 
 extern LISPT expand(LISPT, LISPT, LISPT);
