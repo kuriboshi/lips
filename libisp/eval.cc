@@ -5,10 +5,8 @@
  * $Id$
  *
  */
-#include <setjmp.h>
 #include "lisp.hh"
 
-extern jmp_buf toplevel;
 extern int brkflg;
 extern int interrupt;
 extern LISPT findalias(LISPT);
@@ -62,7 +60,7 @@ static int (*cont)(void); /* Current continuation. */
     if (breakhook != NULL) \
       (*breakhook)(); \
     if (env == NULL) \
-      longjmp(toplevel, 2); \
+      throw lips_error("break"); \
     xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T); \
     PUSH_FUNC(next); \
     cont = everr; \
@@ -77,7 +75,7 @@ static int (*cont)(void); /* Current continuation. */
     error(m, v); \
     printwhere(); \
     unwind(); \
-    longjmp(toplevel, 2); \
+    throw lips_error("abort"); \
   }
 
 /* 

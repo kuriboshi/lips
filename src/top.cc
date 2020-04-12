@@ -186,7 +186,7 @@ void promptprint(LISPT prompt)
   printf("%s", current_prompt);
 }
 
-void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
+bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 {
   while (1)
     {
@@ -213,14 +213,14 @@ void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
         switch ((*macrofun)(&input_exp))
           {
           case 0:
-            return;
+            return true;
           case 1:
             break;
           case 2:
             continue;
           }
       if (TYPEOF(input_exp) == ENDOFFILE)
-        break;
+        return true;
       if (EQ(CAR(input_exp), C_NIL))
         continue;
       addhist(input_exp);
@@ -240,7 +240,7 @@ void toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       if (printit)
         xprint(topexp, C_T);
       if (!options.interactive && options.command)
-        break;
+        return false;
       trimhist();
     }
 }

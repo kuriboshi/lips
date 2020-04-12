@@ -372,7 +372,7 @@ static UNION_WAIT waitfork(int pid)
   if (WIFSIGNALED(wstat))
     {
       unwind();
-      longjmp(toplevel, 6);
+      throw lips_error("waitfork");
     }
   return wstat;
 }

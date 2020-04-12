@@ -6,6 +6,8 @@
  */
 #pragma once
 
+#include "except.hh"
+
 extern LISPT error(int, LISPT);
 
 #define PRINT_ARG (1 << 8)

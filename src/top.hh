@@ -21,5 +21,5 @@ extern void (*beforeprompt)(void);
 
 extern LISPT histget(long, LISPT);
 extern LISPT findalias(LISPT);
-extern void toploop(LISPT*, int (*)(LISPT*));
+extern bool toploop(LISPT*, int (*)(LISPT*));
 extern void init_hist(void);

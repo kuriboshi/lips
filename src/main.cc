@@ -30,7 +30,6 @@ extern void loadbuf(char*);
 
 extern char* VERSION;
 
-jmp_buf toplevel; /* Panic return point. */
 char* progname;   /* Name of the game. */
 int brkflg;       /* 1 means break at next call to peval1. */
 int interrupt;
@@ -128,7 +127,7 @@ void core(int sig)
       fprintf(primerr, "Warning: continued after signal %d.\n", sig);
       fprintf(primerr, "Save your work and exit.\n");
       end_term();
-      longjmp(toplevel, 5);
+      throw lips_error("continue after signal");
     }
 }
 #endif
@@ -140,7 +139,7 @@ void onintr(int)
   fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
-  longjmp(toplevel, 3);
+  throw lips_error("onintr");
 }
 
 #ifdef FANCY_SIGNALS
@@ -451,20 +450,31 @@ int main(int argc, char* const* argv)
     }
   if (!options.fast)
     {
-      if (!setjmp(toplevel))
+      try
+      {
         loadinit(LIPSRC);
-      if (!setjmp(toplevel))
         greet(C_NIL);
+      }
+      catch (const lips_error& error)
+      {
+      }
     }
-  /*
-   * Return here in case of trouble.
-   */
-  setjmp(toplevel);
-  toctrl = 0;
-  dzero();
-  fun = C_NIL;
-  args = C_NIL;
-  env = NULL;
-  toploop(&topprompt, (int (*)(LISPT*)) NULL);
+  while (true)
+  {
+    try
+    {
+      toctrl = 0;
+      dzero();
+      fun = C_NIL;
+      args = C_NIL;
+      env = NULL;
+      if (toploop(&topprompt, (int (*)(LISPT*)) NULL))
+        break;
+    }
+    catch (const lips_error& error)
+    {
+      printf("error: %s\n", error.what());
+    }
+  }
   finish(0);
 }

@@ -5,10 +5,9 @@
  * $Id$
  */
 #include <errno.h>
-#include <setjmp.h>
 #include "lisp.hh"
 
-extern void toploop(LISPT*, int (*)(LISPT*));
+extern bool toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
 static const char* messages[MAXMESSAGE];
@@ -76,7 +75,6 @@ LISPT syserr(LISPT fault)
 }
 
 static LISPT pexp;
-extern jmp_buf toplevel;
 
 static int dobreak(LISPT* com)
 {
@@ -84,7 +82,7 @@ static int dobreak(LISPT* com)
   if (TYPEOF(*com) != CONS)
     {
       unwind();
-      longjmp(toplevel, 2);
+      throw lips_error("bad command");
     }
   else if (EQ(CAR(*com), C_GO))
     {
@@ -94,7 +92,7 @@ static int dobreak(LISPT* com)
   else if (EQ(CAR(*com), C_RESET))
     {
       unwind();
-      longjmp(toplevel, 2);
+      throw lips_error("reset");
     }
   else if (EQ(CAR(*com), C_BT))
     {
