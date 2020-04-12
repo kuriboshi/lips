@@ -290,11 +290,10 @@ PRIMITIVE atom(LISPT a)
 
 PRIMITIVE nconc(LISPT l)
 {
-  LISPT newl, curp;
   LISPT cl;
 
-  newl = C_NIL;
-  curp = newl;
+  LISPT newl = C_NIL;
+  LISPT curp = newl;
   for (; !ISNIL(l); l = CDR(l))
     {
       if (!ISNIL(CAR(l)))
@@ -343,12 +342,11 @@ PRIMITIVE attach(LISPT obj, LISPT list)
 
 PRIMITIVE append(LISPT l)
 {
-  LISPT newl, curp;
   LISPT cl;
 
-  newl = cons(C_NIL, C_NIL);
+  LISPT newl = cons(C_NIL, C_NIL);
   SAVE(newl);
-  curp = newl;
+  LISPT curp = newl;
   for (; !ISNIL(l); l = CDR(l))
     {
       if (!ISNIL(CAR(l)))
@@ -395,9 +393,7 @@ PRIMITIVE list(LISPT l)
 
 PRIMITIVE length(LISPT l)
 {
-  int i;
-
-  i = 0;
+  int i = 0;
   while (!ISNIL(l) && TYPEOF(l) == CONS)
     {
       l = CDR(l);
@@ -408,21 +404,18 @@ PRIMITIVE length(LISPT l)
 
 PRIMITIVE closure(LISPT fun, LISPT vars)
 {
-  LISPT clos;
-  LISPT f;
-  LISPT c;
-
   SAVE(fun);
   SAVE(vars);
-  c = getobject();
+  LISPT c = getobject();
   CLOSVAL(c).cfunction = fun;
   CLOSVAL(c).closed = vars;
-  f = length(vars);
+  LISPT f = length(vars);
   CLOSVAL(c).count = INTVAL(f);
   f = closobj(vars);
   if (TYPEOF(f) == ERROR)
     return f;
   CLOSVAL(c).cvalues = f;
+  LISPT clos;
   SET(clos, CLOSURE, c);
   return clos;
 }
@@ -438,14 +431,12 @@ PRIMITIVE xnth(LISPT l, LISPT p)
 
 PRIMITIVE nthd(LISPT list, LISPT pos)
 {
-  LISPT l;
-  int p;
-
   CHECK(pos, INTEGER);
-  p = INTVAL(pos);
+  int p = INTVAL(pos);
   if (ISNIL(list))
     return C_NIL;
   CHECK(list, CONS);
+  LISPT l;
   for (l = list; TYPEOF(l) == CONS && p > 1; l = CDR(l)) p--;
   return l;
 }
