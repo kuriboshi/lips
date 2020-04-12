@@ -374,9 +374,10 @@ static LISPT buildatom(const char* s, int cpy)
     return C_ERROR;
   if (cpy)
     {
-      const char* pname = (const char*) safemalloc((unsigned) strlen(s) + 1);
+      char* pname = safemalloc((unsigned) strlen(s) + 1);
       if (pname == NULL)
         return C_ERROR;
+      strcpy(pname, s);
       SYMVAL(newatom).pname = pname;
     }
   else
