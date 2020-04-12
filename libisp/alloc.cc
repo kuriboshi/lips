@@ -78,10 +78,8 @@ char* realmalloc(unsigned int size)
  */
 static struct conscells* newpage()
 {
-  struct conscells* newp;
-
-  newp = (struct conscells*) safemalloc(sizeof(struct conscells));
-  if (newp == NULL)
+  struct conscells* newp = new struct conscells;
+  if (newp == nullptr)
     return conscells;
   newp->next = conscells;
   return newp;
@@ -94,13 +92,10 @@ static struct conscells* newpage()
  */
 static int sweep()
 {
-  LISPT f;
-  int i;
-  int nrfreed;
   struct conscells* cc;
 
-  nrfreed = 0;
-  i = 0;
+  int nrfreed = 0;
+  int i = 0;
   for (cc = conscells; cc && cc->cells[i].gcmark; cc = cc->next, i = 0)
     {
       for (; i < CONSCELLS && cc->cells[i].gcmark; i++)
@@ -112,7 +107,7 @@ static int sweep()
     }
   SET(freelist, FREE, (LISPT) &cc->cells[i]);
   nrfreed++;
-  f = freelist;
+  LISPT f = freelist;
   if (TYPEOF(f) == CPOINTER)
     free(CPOINTVAL(f));
   i++; /* Check *next* cell */
@@ -198,8 +193,6 @@ static void mark(LISPT* x)
  */
 static LISPT doreclaim(int doconsargs, long incr)
 {
-  OBARRAY* l;
-  int nrfreed;
   int i;
 
   if (ISNIL(gcgag))
@@ -232,7 +225,7 @@ static LISPT doreclaim(int doconsargs, long incr)
       && TYPEOF(control[i].u.lisp) != ENVIRON)
       mark(&control[i].u.lisp);
   for (i = 0; i < MAXHASH; i++)
-    for (l = obarray[i]; l; l = l->onext)
+    for (auto* l = obarray[i]; l; l = l->onext)
       {
         MARK(l->sym);
         mark(&(SYMVAL(l->sym).value));
@@ -259,7 +252,7 @@ static LISPT doreclaim(int doconsargs, long incr)
         conscells = newpage();
       while (incr-- > 0); /* At least one page more */
     }
-  nrfreed = sweep();
+  int nrfreed = sweep();
   nrconses = 0;
   if (ISNIL(gcgag))
     fprintf(primerr, "%d cells freed\n", nrfreed);
@@ -287,10 +280,10 @@ PRIMITIVE reclaim(LISPT incr) /* Number of blocks to increase with */
 
 LISPT getobject()
 {
-  LISPT f;
-
   if (ISNIL(freelist))
     doreclaim(NOCONSARGS, 0L);
+
+  LISPT f;
   SET(f, CONS, (LISPT) freelist);
   freelist = FREEVAL(freelist);
   return f;
@@ -302,14 +295,14 @@ LISPT getobject()
  */
 PRIMITIVE cons(LISPT a, LISPT b)
 {
-  LISPT f;
-
   if (ISNIL(freelist))
     {
       foo1 = &a;
       foo2 = &b;
       doreclaim(CONSARGS, 0L);
     }
+
+  LISPT f;
   SET(f, CONS, (LISPT) freelist);
   freelist = FREEVAL(freelist);
   CAR(f) = a;
@@ -323,14 +316,11 @@ PRIMITIVE cons(LISPT a, LISPT b)
  */
 LISPT mkstring(const char* str)
 {
-  LISPT s;
-  char* c;
-
-  c = (char*) safemalloc((unsigned) strlen(str) + 1);
+  char* c = (char*) safemalloc((unsigned) strlen(str) + 1);
   if (c == NULL)
     return C_ERROR;
   strcpy(c, str);
-  s = getobject();
+  LISPT s = getobject();
   STRINGVAL(s) = c;
   s->type = STRING;
   return s;
@@ -338,9 +328,7 @@ LISPT mkstring(const char* str)
 
 LISPT mknumber(long i)
 {
-  LISPT c;
-
-  c = getobject();
+  LISPT c = getobject();
   INTVAL(c) = i;
   c->type = INTEGER;
   return c;
@@ -395,10 +383,9 @@ static LISPT buildatom(const char* s, int cpy)
  */
 static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
 {
-  int hv;
   OBARRAY* ob;
 
-  hv = hash(str);
+  int hv = hash(str);
   for (ob = *(obarray + hv); ob; ob = ob->onext)
     {
       if (!strcmp(SYMVAL(ob->sym).pname, str))

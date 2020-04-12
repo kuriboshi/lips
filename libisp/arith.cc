@@ -51,10 +51,8 @@ PRIMITIVE plus(LISPT l)
 
 PRIMITIVE iplus(LISPT l)
 {
-  long sum;
-
   CHECK(CAR(l), INTEGER);
-  sum = INTVAL(CAR(l));
+  auto sum = INTVAL(CAR(l));
   l = CDR(l);
   while (TYPEOF(l) == CONS)
     {
@@ -67,10 +65,8 @@ PRIMITIVE iplus(LISPT l)
 
 PRIMITIVE fplus(LISPT l)
 {
-  double sum;
-
   CHECK(CAR(l), FLOAT);
-  sum = FLOATVAL(CAR(l));
+  auto sum = FLOATVAL(CAR(l));
   l = CDR(l);
   while (TYPEOF(l) == CONS)
     {
@@ -147,10 +143,8 @@ PRIMITIVE ltimes(LISPT l)
 
 PRIMITIVE itimes(LISPT l)
 {
-  long prod;
-
   CHECK(CAR(l), INTEGER);
-  prod = INTVAL(CAR(l));
+  auto prod = INTVAL(CAR(l));
   l = CDR(l);
   while (TYPEOF(l) == CONS)
     {
@@ -163,10 +157,8 @@ PRIMITIVE itimes(LISPT l)
 
 PRIMITIVE ftimes(LISPT l)
 {
-  double prod;
-
   CHECK(CAR(l), FLOAT);
-  prod = FLOATVAL(CAR(l));
+  auto prod = FLOATVAL(CAR(l));
   l = CDR(l);
   while (TYPEOF(l) == CONS)
     {
@@ -346,8 +338,7 @@ PRIMITIVE zerop(LISPT x)
 {
   if (TYPEOF(x) == INTEGER && INTVAL(x) == 0)
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE minusp(LISPT x)
