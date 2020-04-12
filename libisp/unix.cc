@@ -199,25 +199,25 @@ PRIMITIVE uxunlink(LISPT name)
 
 void init_unix()
 {
-  mkprim2(PN_UXACCESS, uxaccess, 2, SUBR);
-  mkprim1(PN_UXALARM, uxalarm, 1, SUBR);
-  mkprim1(PN_UXCHDIR, uxchdir, 1, SUBR);
-  mkprim2(PN_UXCHMOD, uxchmod, 2, SUBR);
-  mkprim1(PN_UXCLOSE, uxclose, 1, SUBR);
-  mkprim2(PN_UXCREAT, uxcreat, 2, SUBR);
-  mkprim1(PN_UXDUP, uxdup, 1, SUBR);
-  mkprim0(PN_UXERRNO, uxerrno, 0, SUBR);
-  mkprim0(PN_UXGETUID, uxgetuid, 0, SUBR);
-  mkprim0(PN_UXGETEUID, uxgeteuid, 0, SUBR);
-  mkprim0(PN_UXGETGID, uxgetgid, 0, SUBR);
-  mkprim0(PN_UXGETEGID, uxgetegid, 0, SUBR);
-  mkprim0(PN_UXGETPID, uxgetpid, 0, SUBR);
-  mkprim2(PN_UXKILL, uxkill, 2, SUBR);
-  mkprim2(PN_UXLINK, uxlink, 2, SUBR);
-  mkprim1(PN_UXNICE, uxnice, 1, SUBR);
-  mkprim2(PN_UXOPEN, uxopen, 2, SUBR);
-  mkprim1(PN_UXSETUID, uxsetuid, 1, SUBR);
-  mkprim1(PN_UXSETGID, uxsetgid, 1, SUBR);
-  mkprim2(PN_SIGNAL, uxsignal, 2, SUBR);
-  mkprim1(PN_UXUNLINK, uxunlink, 1, SUBR);
+  mkprim(PN_UXACCESS, uxaccess, 2, SUBR);
+  mkprim(PN_UXALARM, uxalarm, 1, SUBR);
+  mkprim(PN_UXCHDIR, uxchdir, 1, SUBR);
+  mkprim(PN_UXCHMOD, uxchmod, 2, SUBR);
+  mkprim(PN_UXCLOSE, uxclose, 1, SUBR);
+  mkprim(PN_UXCREAT, uxcreat, 2, SUBR);
+  mkprim(PN_UXDUP, uxdup, 1, SUBR);
+  mkprim(PN_UXERRNO, uxerrno, 0, SUBR);
+  mkprim(PN_UXGETUID, uxgetuid, 0, SUBR);
+  mkprim(PN_UXGETEUID, uxgeteuid, 0, SUBR);
+  mkprim(PN_UXGETGID, uxgetgid, 0, SUBR);
+  mkprim(PN_UXGETEGID, uxgetegid, 0, SUBR);
+  mkprim(PN_UXGETPID, uxgetpid, 0, SUBR);
+  mkprim(PN_UXKILL, uxkill, 2, SUBR);
+  mkprim(PN_UXLINK, uxlink, 2, SUBR);
+  mkprim(PN_UXNICE, uxnice, 1, SUBR);
+  mkprim(PN_UXOPEN, uxopen, 2, SUBR);
+  mkprim(PN_UXSETUID, uxsetuid, 1, SUBR);
+  mkprim(PN_UXSETGID, uxsetgid, 1, SUBR);
+  mkprim(PN_SIGNAL, uxsignal, 2, SUBR);
+  mkprim(PN_UXUNLINK, uxunlink, 1, SUBR);
 }

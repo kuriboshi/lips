@@ -125,17 +125,17 @@ PRIMITIVE envget(LISPT e, LISPT n)
 
 void init_low()
 {
-  mkprim2(PN_SET, set, 2, SUBR);
-  mkprim2(PN_SETQ, setq, 2, FSUBR);
-  mkprim2(PN_SETQQ, set, 2, FSUBR);
-  mkprim1(PN_COND, cond, -1, FSUBR);
-  mkprim2(PN_WHILE, xwhile, -2, FSUBR);
-  mkprim1(PN_PROGN, progn, -1, FSUBR);
-  mkprim2(PN_PROG1, prog1, -2, SUBR);
-  mkprim3(PN_PROG2, prog2, -3, SUBR);
+  mkprim(PN_SET, set, 2, SUBR);
+  mkprim(PN_SETQ, setq, 2, FSUBR);
+  mkprim(PN_SETQQ, set, 2, FSUBR);
+  mkprim(PN_COND, cond, -1, FSUBR);
+  mkprim(PN_WHILE, xwhile, -2, FSUBR);
+  mkprim(PN_PROGN, progn, -1, FSUBR);
+  mkprim(PN_PROG1, prog1, -2, SUBR);
+  mkprim(PN_PROG2, prog2, -3, SUBR);
 #if 0
-  mkprim0(PN_TOPOFSTACK, topofstack,  0, SUBR);
+  mkprim(PN_TOPOFSTACK, topofstack,  0, SUBR);
 #endif
-  mkprim2(PN_ENVGET, envget, 2, SUBR);
+  mkprim(PN_ENVGET, envget, 2, SUBR);
   initcvar(&verboseflg, "verboseflg", C_NIL);
 }

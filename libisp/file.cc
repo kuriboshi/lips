@@ -247,18 +247,18 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
 
 void init_file()
 {
-  mkprim1(PN_LOAD, load, 1, SUBR);
-  mkprim2(PN_PRIN1, prin1, 2, SUBR);
-  mkprim2(PN_PRIN2, prin2, 2, SUBR);
-  mkprim2(PN_PRINT, xprint, 2, SUBR);
-  mkprim1(PN_PLEVEL, plevel, 1, SUBR);
-  mkprim1(PN_RATOM, xratom, 1, SUBR);
-  mkprim1(PN_READ, xread, 1, SUBR);
-  mkprim1(PN_READC, readc, 1, SUBR);
-  mkprim1(PN_READLINE, xreadline, 1, SUBR);
-  mkprim2(PN_SPACES, spaces, 2, SUBR);
-  mkprim1(PN_TERPRI, xterpri, 1, SUBR);
-  mkprim2(PN_CPPRINT, cpprint, 2, SUBR);
+  mkprim(PN_LOAD, load, 1, SUBR);
+  mkprim(PN_PRIN1, prin1, 2, SUBR);
+  mkprim(PN_PRIN2, prin2, 2, SUBR);
+  mkprim(PN_PRINT, xprint, 2, SUBR);
+  mkprim(PN_PLEVEL, plevel, 1, SUBR);
+  mkprim(PN_RATOM, xratom, 1, SUBR);
+  mkprim(PN_READ, xread, 1, SUBR);
+  mkprim(PN_READC, readc, 1, SUBR);
+  mkprim(PN_READLINE, xreadline, 1, SUBR);
+  mkprim(PN_SPACES, spaces, 2, SUBR);
+  mkprim(PN_TERPRI, xterpri, 1, SUBR);
+  mkprim(PN_CPPRINT, cpprint, 2, SUBR);
   primin = stdin;
   primout = stdout;
   primerr = stderr;

@@ -87,8 +87,8 @@ PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 
 void init_map()
 {
-  mkprim3(PN_MAP, map, 3, SUBR);
-  mkprim3(PN_MAPC, mapc, 3, SUBR);
-  mkprim3(PN_MAPLIST, maplist, 3, SUBR);
-  mkprim3(PN_MAPCAR, mapcar, 3, SUBR);
+  mkprim(PN_MAP, map, 3, SUBR);
+  mkprim(PN_MAPC, mapc, 3, SUBR);
+  mkprim(PN_MAPLIST, maplist, 3, SUBR);
+  mkprim(PN_MAPCAR, mapcar, 3, SUBR);
 }

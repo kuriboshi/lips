@@ -112,8 +112,8 @@ PRIMITIVE df(LISPT name, LISPT pars, LISPT body)
 
 void init_user()
 {
-  mkprim2(PN_DEFINE, define, 2, SUBR);
-  mkprim1(PN_GETREP, getrep, 1, SUBR);
-  mkprim3(PN_DE, de, -3, FSUBR);
-  mkprim3(PN_DF, df, -3, FSUBR);
+  mkprim(PN_DEFINE, define, 2, SUBR);
+  mkprim(PN_GETREP, getrep, 1, SUBR);
+  mkprim(PN_DE, de, -3, FSUBR);
+  mkprim(PN_DF, df, -3, FSUBR);
 }

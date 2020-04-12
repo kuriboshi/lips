@@ -107,11 +107,11 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
 
 void init_string()
 {
-  mkprim1(PN_STRINGP, stringp, 1, SUBR);
-  mkprim2(PN_STREQ, streq, 2, SUBR);
-  mkprim1(PN_CONCAT, concat, -1, SUBR);
-  mkprim1(PN_STRLEN, xstrlen, 1, SUBR);
-  mkprim3(PN_SUBSTR, substr, 3, SUBR);
-  mkprim1(PN_SYMSTR, symstr, 1, SUBR);
-  mkprim2(PN_STRCMP, strcomp, 2, SUBR);
+  mkprim(PN_STRINGP, stringp, 1, SUBR);
+  mkprim(PN_STREQ, streq, 2, SUBR);
+  mkprim(PN_CONCAT, concat, -1, SUBR);
+  mkprim(PN_STRLEN, xstrlen, 1, SUBR);
+  mkprim(PN_SUBSTR, substr, 3, SUBR);
+  mkprim(PN_SYMSTR, symstr, 1, SUBR);
+  mkprim(PN_STRCMP, strcomp, 2, SUBR);
 }

@@ -1056,9 +1056,9 @@ PRIMITIVE baktrace()
 
 void init_ev()
 {
-  mkprim1(PN_E, eval, 1, FSUBR);
-  mkprim1(PN_EVAL, eval, 1, SUBR);
-  mkprim2(PN_APPLY, apply, 2, SUBR);
-  mkprim2(PN_APPLYSTAR, apply, -2, SUBR);
-  mkprim0(PN_BAKTRACE, baktrace, 0, SUBR);
+  mkprim(PN_E, eval, 1, FSUBR);
+  mkprim(PN_EVAL, eval, 1, SUBR);
+  mkprim(PN_APPLY, apply, 2, SUBR);
+  mkprim(PN_APPLYSTAR, apply, -2, SUBR);
+  mkprim(PN_BAKTRACE, baktrace, 0, SUBR);
 }

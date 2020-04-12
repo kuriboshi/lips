@@ -510,6 +510,6 @@ void init_alloc()
     }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
-  mkprim1(PN_RECLAIM, reclaim, 1, SUBR);
-  mkprim2(PN_CONS, cons, 2, SUBR);
+  mkprim(PN_RECLAIM, reclaim, 1, SUBR);
+  mkprim(PN_CONS, cons, 2, SUBR);
 }

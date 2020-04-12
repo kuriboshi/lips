@@ -118,9 +118,9 @@ LISPT break0(LISPT exp)
 
 void init_debug()
 {
-  mkprim0(PN_FREECOUNT, freecount, 0, SUBR);
-  mkprim1(PN_EVALTRACE, evaltrace, 1, SUBR);
-  mkprim0(PN_OBARRAY, xobarray, 0, SUBR);
+  mkprim(PN_FREECOUNT, freecount, 0, SUBR);
+  mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
+  mkprim(PN_OBARRAY, xobarray, 0, SUBR);
   messages[ERRNO(NO_MESSAGE)] = "";
   messages[ERRNO(ILLEGAL_ARG)] = "Illegal argument";
   messages[ERRNO(DIVIDE_ZERO)] = "Divide by zero";

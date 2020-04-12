@@ -27,22 +27,22 @@ static LISPT mkprim_(const char* pname, short nrpar, enum lisp_type type)
   return s;
 }
 
-void mkprim0(const char* pname, LISPT (*fname)(void), short nrpar, enum lisp_type type)
+void mkprim(const char* pname, LISPT (*fname)(void), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function0 = fname;
 }
 
-void mkprim1(const char* pname, LISPT (*fname)(LISPT), short nrpar, enum lisp_type type)
+void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function1 = fname;
 }
 
-void mkprim2(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, enum lisp_type type)
+void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function2 = fname;
 }
 
-void mkprim3(
+void mkprim(
   const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, enum lisp_type type)
 {
   SUBRVAL(mkprim_(pname, nrpar, type)).function3 = fname;
@@ -467,37 +467,37 @@ PRIMITIVE uxexit(LISPT status)
 
 void init_prim()
 {
-  mkprim1(PN_ATOM, atom, 1, SUBR);
-  mkprim2(PN_ATTACH, attach, 2, SUBR);
-  mkprim1(PN_APPEND, append, -1, SUBR);
-  mkprim1(PN_CAR, car, 1, SUBR);
-  mkprim1(PN_CDR, cdr, 1, SUBR);
-  mkprim1(PN_CADR, cadr, 1, SUBR);
-  mkprim1(PN_CDAR, cdar, 1, SUBR);
-  mkprim1(PN_CAAR, caar, 1, SUBR);
-  mkprim1(PN_CDDR, cddr, 1, SUBR);
-  mkprim1(PN_CDDDR, cdddr, 1, SUBR);
-  mkprim1(PN_CADDR, caddr, 1, SUBR);
-  mkprim1(PN_CDADR, cdadr, 1, SUBR);
-  mkprim1(PN_CAADR, caadr, 1, SUBR);
-  mkprim1(PN_CDDAR, cddar, 1, SUBR);
-  mkprim1(PN_CADAR, cadar, 1, SUBR);
-  mkprim1(PN_CDAAR, cdaar, 1, SUBR);
-  mkprim1(PN_CAAAR, caaar, 1, SUBR);
-  mkprim2(PN_CLOSURE, closure, 2, SUBR);
-  mkprim2(PN_EQ, eq, 2, SUBR);
-  mkprim1(PN_ERROR, xerror, -1, SUBR);
-  mkprim1(PN_EXIT, uxexit, 1, SUBR);
-  mkprim2(PN_LAMBDA, lambda, -2, FSUBR);
-  mkprim1(PN_LENGTH, length, 1, SUBR);
-  mkprim1(PN_LIST, list, -1, SUBR);
-  mkprim1(PN_NCONC, nconc, -1, SUBR);
-  mkprim2(PN_NLAMBDA, nlambda, -2, FSUBR);
-  mkprim2(PN_NTH, xnth, 2, SUBR);
-  mkprim1(PN_NULL, null, 1, SUBR);
-  mkprim1(PN_QUOTE, quote, 1, FSUBR);
-  mkprim2(PN_RPLACA, rplaca, 2, SUBR);
-  mkprim2(PN_RPLACD, rplacd, 2, SUBR);
-  mkprim2(PN_TCONC, tconc, 2, SUBR);
-  mkprim2(PN_NTHD, nthd, 2, SUBR);
+  mkprim(PN_ATOM, atom, 1, SUBR);
+  mkprim(PN_ATTACH, attach, 2, SUBR);
+  mkprim(PN_APPEND, append, -1, SUBR);
+  mkprim(PN_CAR, car, 1, SUBR);
+  mkprim(PN_CDR, cdr, 1, SUBR);
+  mkprim(PN_CADR, cadr, 1, SUBR);
+  mkprim(PN_CDAR, cdar, 1, SUBR);
+  mkprim(PN_CAAR, caar, 1, SUBR);
+  mkprim(PN_CDDR, cddr, 1, SUBR);
+  mkprim(PN_CDDDR, cdddr, 1, SUBR);
+  mkprim(PN_CADDR, caddr, 1, SUBR);
+  mkprim(PN_CDADR, cdadr, 1, SUBR);
+  mkprim(PN_CAADR, caadr, 1, SUBR);
+  mkprim(PN_CDDAR, cddar, 1, SUBR);
+  mkprim(PN_CADAR, cadar, 1, SUBR);
+  mkprim(PN_CDAAR, cdaar, 1, SUBR);
+  mkprim(PN_CAAAR, caaar, 1, SUBR);
+  mkprim(PN_CLOSURE, closure, 2, SUBR);
+  mkprim(PN_EQ, eq, 2, SUBR);
+  mkprim(PN_ERROR, xerror, -1, SUBR);
+  mkprim(PN_EXIT, uxexit, 1, SUBR);
+  mkprim(PN_LAMBDA, lambda, -2, FSUBR);
+  mkprim(PN_LENGTH, length, 1, SUBR);
+  mkprim(PN_LIST, list, -1, SUBR);
+  mkprim(PN_NCONC, nconc, -1, SUBR);
+  mkprim(PN_NLAMBDA, nlambda, -2, FSUBR);
+  mkprim(PN_NTH, xnth, 2, SUBR);
+  mkprim(PN_NULL, null, 1, SUBR);
+  mkprim(PN_QUOTE, quote, 1, FSUBR);
+  mkprim(PN_RPLACA, rplaca, 2, SUBR);
+  mkprim(PN_RPLACD, rplacd, 2, SUBR);
+  mkprim(PN_TCONC, tconc, 2, SUBR);
+  mkprim(PN_NTHD, nthd, 2, SUBR);
 }

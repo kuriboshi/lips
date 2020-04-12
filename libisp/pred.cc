@@ -166,13 +166,13 @@ PRIMITIVE xtypeof(LISPT a)
 
 void init_pred()
 {
-  mkprim1(PN_LISTP, listp, 1, SUBR);
-  mkprim1(PN_NLISTP, nlistp, 1, SUBR);
-  mkprim2(PN_NEQ, neq, 2, SUBR);
-  mkprim1(PN_NUMBERP, numberp, 1, SUBR);
-  mkprim2(PN_MEMB, memb, 2, SUBR);
-  mkprim2(PN_EQUAL, equal, 2, SUBR);
-  mkprim1(PN_BOUNDP, boundp, 1, SUBR);
-  mkprim1(PN_LITATOM, litatom, 1, SUBR);
-  mkprim1(PN_TYPEOF, xtypeof, 1, SUBR);
+  mkprim(PN_LISTP, listp, 1, SUBR);
+  mkprim(PN_NLISTP, nlistp, 1, SUBR);
+  mkprim(PN_NEQ, neq, 2, SUBR);
+  mkprim(PN_NUMBERP, numberp, 1, SUBR);
+  mkprim(PN_MEMB, memb, 2, SUBR);
+  mkprim(PN_EQUAL, equal, 2, SUBR);
+  mkprim(PN_BOUNDP, boundp, 1, SUBR);
+  mkprim(PN_LITATOM, litatom, 1, SUBR);
+  mkprim(PN_TYPEOF, xtypeof, 1, SUBR);
 }

@@ -109,10 +109,10 @@ extern void init_pred(void);
  * prim.c
  */
 /* functions */
-extern void mkprim0(const char*, LISPT (*fname)(void), short, enum lisp_type);
-extern void mkprim1(const char*, LISPT (*fname)(LISPT), short, enum lisp_type);
-extern void mkprim2(const char*, LISPT (*fname)(LISPT, LISPT), short, enum lisp_type);
-extern void mkprim3(const char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, enum lisp_type);
+extern void mkprim(const char*, LISPT (*fname)(void), short, enum lisp_type);
+extern void mkprim(const char*, LISPT (*fname)(LISPT), short, enum lisp_type);
+extern void mkprim(const char*, LISPT (*fname)(LISPT, LISPT), short, enum lisp_type);
+extern void mkprim(const char*, LISPT (*fname)(LISPT, LISPT, LISPT), short, enum lisp_type);
 extern LISPT nth(LISPT list, long n);
 extern LISPT closobj(LISPT vars);
 extern LISPT mklambda(LISPT args, LISPT def, enum lisp_type);

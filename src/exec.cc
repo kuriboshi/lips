@@ -898,21 +898,21 @@ PRIMITIVE doexec(LISPT cmd)
 
 void init_exec()
 {
-  mkprim3(PN_EXPAND, expand, 3, SUBR);
-  mkprim3(PN_TO, to, 3, FSUBR);
-  mkprim3(PN_FROM, from, 3, FSUBR);
-  mkprim3(PN_TOTO, toto, 3, FSUBR);
-  mkprim1(PN_PIPECMD, pipecmd, -1, FSUBR);
-  mkprim1(PN_BACK, back, -1, FSUBR);
-  mkprim0(PN_STOP, stop, 0, FSUBR);
-  mkprim2(PN_CD, cd, 2, FSUBR);
-  mkprim0(PN_REHASH, rehash, 0, FSUBR);
-  mkprim0(PN_JOBS, jobs, 0, FSUBR);
-  mkprim1(PN_FG, fg, 1, FSUBR);
-  mkprim1(PN_BG, bg, 1, FSUBR);
-  mkprim2(PN_SETENV, p_setenv, 2, FSUBR);
-  mkprim1(PN_GETENV, getenviron, 1, FSUBR);
-  mkprim1(PN_EXEC, doexec, -1, FSUBR);
+  mkprim(PN_EXPAND, expand, 3, SUBR);
+  mkprim(PN_TO, to, 3, FSUBR);
+  mkprim(PN_FROM, from, 3, FSUBR);
+  mkprim(PN_TOTO, toto, 3, FSUBR);
+  mkprim(PN_PIPECMD, pipecmd, -1, FSUBR);
+  mkprim(PN_BACK, back, -1, FSUBR);
+  mkprim(PN_STOP, stop, 0, FSUBR);
+  mkprim(PN_CD, cd, 2, FSUBR);
+  mkprim(PN_REHASH, rehash, 0, FSUBR);
+  mkprim(PN_JOBS, jobs, 0, FSUBR);
+  mkprim(PN_FG, fg, 1, FSUBR);
+  mkprim(PN_BG, bg, 1, FSUBR);
+  mkprim(PN_SETENV, p_setenv, 2, FSUBR);
+  mkprim(PN_GETENV, getenviron, 1, FSUBR);
+  mkprim(PN_EXEC, doexec, -1, FSUBR);
   rehash();
   undefhook = execcommand;
 }

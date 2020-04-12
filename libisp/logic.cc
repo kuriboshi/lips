@@ -58,8 +58,8 @@ PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 
 void init_logic()
 {
-  mkprim1(PN_AND, p_and, -1, FSUBR);
-  mkprim1(PN_OR, p_or, -1, FSUBR);
-  mkprim1(PN_NOT, p_not, 1, SUBR);
-  mkprim3(PN_IF, xif, -3, FSUBR);
+  mkprim(PN_AND, p_and, -1, FSUBR);
+  mkprim(PN_OR, p_or, -1, FSUBR);
+  mkprim(PN_NOT, p_not, 1, SUBR);
+  mkprim(PN_IF, xif, -3, FSUBR);
 }
