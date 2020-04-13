@@ -167,7 +167,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   char buf[120];
   const char* funn;
   char lname[20], cname[20], fname[20];
-  int line, i, acnt;
+  int line, acnt;
 
   if (ISNIL(file))
     f = primout;
@@ -204,6 +204,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
         else
           prin1(C_FSUBR, file);
         putch(' ', f, 0);
+        std::size_t i;
         for (i = 0; buf[i] != '(' && i < sizeof(buf); i++)
           ;
         if ((acnt = SUBRVAL(SYMVAL(oname).value).argcount) == -1)

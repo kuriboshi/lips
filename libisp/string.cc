@@ -91,7 +91,7 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   s = INTVAL(start);
   e = INTVAL(end);
   size = e - s + 1;
-  if (size < 0 || s > strlen(STRINGVAL(str)) || e > strlen(STRINGVAL(str))
+  if (size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str)))
     || s <= 0 || e < 0)
     return C_NIL;
   ns = (char*) safemalloc((unsigned) size + 1);
