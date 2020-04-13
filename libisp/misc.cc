@@ -12,11 +12,10 @@ long trace;
 
 static const char* messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
-static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer",
-  "Not a bignum", "Not a float", "Not indirect", "Not a long", "Not a list",
-  "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
-  "Not a closure", "Not unbound", "Not an environment", "Not a file pointer",
-  "Not T", "Not free", "Not EOF", "Not an ERROR", "Not a hash table"};
+static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "Not a bignum", "Not a float",
+  "Not indirect", "Not a long", "Not a list", "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
+  "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
+  "Not an ERROR", "Not a hash table"};
 
 PRIMITIVE xobarray()
 {
@@ -25,8 +24,8 @@ PRIMITIVE xobarray()
   OBARRAY* l;
 
   o = C_NIL;
-  for (i = 0; i < MAXHASH; i++)
-    for (l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
+  for(i = 0; i < MAXHASH; i++)
+    for(l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
   return o;
 }
 
@@ -34,11 +33,11 @@ PRIMITIVE evaltrace(LISPT state)
 {
   long i = trace;
 
-  if (!ISNIL(state))
-    {
-      CHECK(state, INTEGER);
-      trace = INTVAL(state);
-    }
+  if(!ISNIL(state))
+  {
+    CHECK(state, INTEGER);
+    trace = INTVAL(state);
+  }
   return mknumber(i);
 }
 
@@ -48,28 +47,28 @@ PRIMITIVE freecount()
   LISPT l;
 
   i = 0;
-  for (l = freelist; INTVAL(l); l = CDR(l)) i++;
-  return mknumber((long) i);
+  for(l = freelist; INTVAL(l); l = CDR(l)) i++;
+  return mknumber((long)i);
 }
 
 LISPT error(int messnr, LISPT arg)
 {
-  if (NOT_A & messnr)
+  if(NOT_A & messnr)
     fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
   else
     fprintf(primerr, "%s ", messages[ERRNO(messnr)]);
-  if (messnr & (PRINT_ARG | NOT_A))
+  if(messnr & (PRINT_ARG | NOT_A))
     prin2(arg, C_T);
   return C_ERROR;
 }
 
 LISPT syserr(LISPT fault)
 {
-  if (!ISNIL(fault))
-    {
-      prin2(fault, C_T);
-      fprintf(stderr, ": ");
-    }
+  if(!ISNIL(fault))
+  {
+    prin2(fault, C_T);
+    fprintf(stderr, ": ");
+  }
   fprintf(stderr, "%s", strerror(errno));
   return C_ERROR;
 }
@@ -79,31 +78,31 @@ static LISPT pexp;
 static int dobreak(LISPT* com)
 {
   /* OK, EVAL, ^, ... */
-  if (TYPEOF(*com) != CONS)
-    {
-      unwind();
-      throw lips_error("bad command");
-    }
-  else if (EQ(CAR(*com), C_GO))
-    {
-      pexp = xprint(eval(pexp), C_NIL);
-      return 0;
-    }
-  else if (EQ(CAR(*com), C_RESET))
-    {
-      unwind();
-      throw lips_error("reset");
-    }
-  else if (EQ(CAR(*com), C_BT))
-    {
-      bt();
-      return 2;
-    }
-  else if (EQ(CAR(*com), C_RETURN))
-    {
-      pexp = ISNIL(CDR(*com)) ? C_NIL : CAR(CDR(*com));
-      return 0;
-    }
+  if(TYPEOF(*com) != CONS)
+  {
+    unwind();
+    throw lips_error("bad command");
+  }
+  else if(EQ(CAR(*com), C_GO))
+  {
+    pexp = xprint(eval(pexp), C_NIL);
+    return 0;
+  }
+  else if(EQ(CAR(*com), C_RESET))
+  {
+    unwind();
+    throw lips_error("reset");
+  }
+  else if(EQ(CAR(*com), C_BT))
+  {
+    bt();
+    return 2;
+  }
+  else if(EQ(CAR(*com), C_RETURN))
+  {
+    pexp = ISNIL(CDR(*com)) ? C_NIL : CAR(CDR(*com));
+    return 0;
+  }
   return 1;
 }
 

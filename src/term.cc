@@ -64,7 +64,7 @@ static int position = 0;                /* Current position in line buffer.  */
 static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 
 #ifdef TERMCAP
-static char tcap[128];       /* Buffer for terminal capabilties.  */
+static char tcap[128];             /* Buffer for terminal capabilties.  */
 static const char *curup, *curfwd; /* Various term cap strings.  */
 static const char *cleol, *curdn;
 static int nocap = 0; /* Nonzero if insufficient term cap. */
@@ -97,7 +97,7 @@ void init_keymap()
 {
   int i;
 
-  for (i = NUM_KEYS - 1; i; i--) key_tab[i] = T_INSERT;
+  for(i = NUM_KEYS - 1; i; i--) key_tab[i] = T_INSERT;
   key_tab[CERASE] = T_ERASE;
   key_tab[CTRL('h')] = T_ERASE;
   key_tab[CRPRNT] = T_RETYPE;
@@ -121,36 +121,36 @@ void init_term()
   char* term;
 #endif
 
-  if (!initialized)
-    {
-      tcgetattr(0, &oldterm);
-      signal(SIGINT, cleanup);  /* temporary handle */
-      signal(SIGTERM, cleanup); /* exit gracefully */
-      newterm = oldterm;
-      newterm.c_lflag &= (unsigned) ~ECHO;
-      newterm.c_lflag &= (unsigned) ~ICANON;
-      newterm.c_lflag |= ISIG;
-      newterm.c_cc[VMIN] = 1;
-      newterm.c_cc[VTIME] = 0;
+  if(!initialized)
+  {
+    tcgetattr(0, &oldterm);
+    signal(SIGINT, cleanup);  /* temporary handle */
+    signal(SIGTERM, cleanup); /* exit gracefully */
+    newterm = oldterm;
+    newterm.c_lflag &= (unsigned)~ECHO;
+    newterm.c_lflag &= (unsigned)~ICANON;
+    newterm.c_lflag |= ISIG;
+    newterm.c_cc[VMIN] = 1;
+    newterm.c_cc[VTIME] = 0;
 #ifdef TERMCAP
-      curup = NULL;
-      curfwd = NULL;
-      if ((term = getenv("TERM")) != NULL)
-        if (tgetent(bp, term) == 1)
-          {
-            curup = tgetstr(const_cast<char*>("up"), &termc);
-            curdn = "\n";
-            curfwd = tgetstr(const_cast<char*>("nd"), &termc);
-            cleol = tgetstr(const_cast<char*>("ce"), &termc);
-            if (!curup || !curfwd || !cleol)
-              nocap = 1;
-            else
-              nocap = 0;
-          }
+    curup = NULL;
+    curfwd = NULL;
+    if((term = getenv("TERM")) != NULL)
+      if(tgetent(bp, term) == 1)
+      {
+        curup = tgetstr(const_cast<char*>("up"), &termc);
+        curdn = "\n";
+        curfwd = tgetstr(const_cast<char*>("nd"), &termc);
+        cleol = tgetstr(const_cast<char*>("ce"), &termc);
+        if(!curup || !curfwd || !cleol)
+          nocap = 1;
+        else
+          nocap = 0;
+      }
 #endif
-      init_keymap();
-      initialized = 1;
-    }
+    init_keymap();
+    initialized = 1;
+  }
   tcsetattr(0, TCSANOW, &newterm);
 }
 
@@ -166,11 +166,11 @@ void end_term()
  */
 void pputc(int c, FILE* file)
 {
-  if (c < 0x20 && c != '\n' && c != '\t')
-    {
-      putc('^', file);
-      putc(c + 0x40, file);
-    }
+  if(c < 0x20 && c != '\n' && c != '\t')
+  {
+    putc('^', file);
+    putc(c + 0x40, file);
+  }
   else
     putc(c, file);
 }
@@ -180,7 +180,7 @@ void pputc(int c, FILE* file)
  */
 void putch(int c, FILE* file, int esc)
 {
-  if ((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
+  if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
   pputc(c, file);
 }
@@ -195,28 +195,28 @@ int getch(FILE* file)
 {
   int c;
 
-  if (!isatty(fileno(file)))
-    {
-      c = getc(file);
-      if (c == COMMENTCHAR) /* Skip comments.  */
-        while ((c = getc(file)) != '\n')
-          ;
-      return c;
-    }
+  if(!isatty(fileno(file)))
+  {
+    c = getc(file);
+    if(c == COMMENTCHAR) /* Skip comments.  */
+      while((c = getc(file)) != '\n')
+        ;
+    return c;
+  }
 gotlin:
-  if (position < linepos)
+  if(position < linepos)
     return linebuffer[position++];
   else
+  {
+    init_term();
+    if(lips_getline(file) == 0)
     {
-      init_term();
-      if (lips_getline(file) == 0)
-      {
-        end_term();
-        return EOF;
-      }
       end_term();
-      goto gotlin;
+      return EOF;
     }
+    end_term();
+    goto gotlin;
+  }
 }
 
 /*
@@ -225,11 +225,11 @@ gotlin:
  */
 void ungetch(int c, FILE* file)
 {
-  if (isatty(fileno(file)))
-    {
-      if (position > 0)
-        position--;
-    }
+  if(isatty(fileno(file)))
+  {
+    if(position > 0)
+      position--;
+  }
   else
     ungetc(c, file);
 }
@@ -243,9 +243,9 @@ static int firstnotlp()
 {
   int i;
 
-  for (i = 1; i < position && issepr((int) linebuffer[i]); i++)
+  for(i = 1; i < position && issepr((int)linebuffer[i]); i++)
     ;
-  if (linebuffer[i] == '(')
+  if(linebuffer[i] == '(')
     return 0;
   else
     return 1;
@@ -261,12 +261,12 @@ static void delonechar()
   putc('\b', stdout);
   putc(' ', stdout);
   putc('\b', stdout);
-  if (linebuffer[linepos] < 0x20)
-    {
-      putc('\b', stdout);
-      putc(' ', stdout);
-      putc('\b', stdout);
-    }
+  if(linebuffer[linepos] < 0x20)
+  {
+    putc('\b', stdout);
+    putc(' ', stdout);
+    putc('\b', stdout);
+  }
 }
 
 /*
@@ -276,12 +276,12 @@ static int onlyblanks()
 {
   int i = linepos;
 
-  while (i > 0)
-    {
-      if (!issepr((int) linebuffer[i]))
-        return 0;
-      i--;
-    }
+  while(i > 0)
+  {
+    if(!issepr((int)linebuffer[i]))
+      return 0;
+    i--;
+  }
   return 1;
 }
 
@@ -305,61 +305,61 @@ static void retype(int all)
 #ifdef TERMCAP
   int nl = 0, l = 1;
 
-  if (!nocap)
+  if(!nocap)
+  {
+    l = 0;
+    for(i = 1; i < linepos; i++)
+      if(linebuffer[i] == '\n')
+        nl = i, l++;
+    for(l = all ? l : 1; l; l--)
     {
-      l = 0;
-      for (i = 1; i < linepos; i++)
-        if (linebuffer[i] == '\n')
-          nl = i, l++;
-      for (l = all ? l : 1; l; l--)
-        {
-          if (all == 2)
-            {
-              putc('\r', stdout);
-              tputs(cleol, 1, outc);
-            }
-          tputs(curup, 1, outc);
-        }
-      putc('\r', stdout);
-      if (all)
-        nl = 0;
-      if (nl == 0)
-        fputs(current_prompt, stdout);
-      if (all != 2)
-        for (i = nl + 1; i < linepos; i++)
-          {
-            if (linebuffer[i] == '\n')
-              tputs(cleol, 1, outc);
-            pputc(linebuffer[i], stdout);
-          }
-      tputs(cleol, 1, outc);
+      if(all == 2)
+      {
+        putc('\r', stdout);
+        tputs(cleol, 1, outc);
+      }
+      tputs(curup, 1, outc);
     }
+    putc('\r', stdout);
+    if(all)
+      nl = 0;
+    if(nl == 0)
+      fputs(current_prompt, stdout);
+    if(all != 2)
+      for(i = nl + 1; i < linepos; i++)
+      {
+        if(linebuffer[i] == '\n')
+          tputs(cleol, 1, outc);
+        pputc(linebuffer[i], stdout);
+      }
+    tputs(cleol, 1, outc);
+  }
   else
 #endif
+  {
+    if(all == 0)
     {
-      if (all == 0)
-        {
-          putc('\r', stdout);
-          for (i = linepos - 1; i > 0 && linebuffer[i] != '\n'; i--)
-            ;
-          if (i == 0)
-            fputs(current_prompt, stdout);
-          for (i++; i < linepos; i++) pputc(linebuffer[i], stdout);
-        }
-      else if (all == 1)
-        {
-          pputc(CRPRNT, stdout);
-          pputc('\n', stdout);
-          fputs(current_prompt, stdout);
-          for (i = 1; i < linepos; i++) pputc(linebuffer[i], stdout);
-        }
-      else
-        {
-          pputc(CKILL, stdout);
-          pputc('\n', stdout);
-          fputs(current_prompt, stdout);
-        }
+      putc('\r', stdout);
+      for(i = linepos - 1; i > 0 && linebuffer[i] != '\n'; i--)
+        ;
+      if(i == 0)
+        fputs(current_prompt, stdout);
+      for(i++; i < linepos; i++) pputc(linebuffer[i], stdout);
     }
+    else if(all == 1)
+    {
+      pputc(CRPRNT, stdout);
+      pputc('\n', stdout);
+      fputs(current_prompt, stdout);
+      for(i = 1; i < linepos; i++) pputc(linebuffer[i], stdout);
+    }
+    else
+    {
+      pputc(CKILL, stdout);
+      pputc('\n', stdout);
+      fputs(current_prompt, stdout);
+    }
+  }
 }
 
 /*
@@ -375,17 +375,17 @@ char* mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while (!issepr((int) linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while(!issepr((int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
 static void fillrest(const char* word)
 {
-  for (word += strlen(last) - 1; *word; word++)
-    {
-      pputc(*word, stdout);
-      linebuffer[linepos++] = *word;
-    }
+  for(word += strlen(last) - 1; *word; word++)
+  {
+    pputc(*word, stdout);
+    linebuffer[linepos++] = *word;
+  }
 }
 
 static int checkchar(LISPT words, int pos, int* c)
@@ -394,11 +394,11 @@ static int checkchar(LISPT words, int pos, int* c)
 
   l = words;
   *c = (GETSTR(CAR(l)))[pos];
-  for (; !ISNIL(l); l = CDR(l))
-    {
-      if (*c != (GETSTR(CAR(l)))[pos])
-        return 0;
-    }
+  for(; !ISNIL(l); l = CDR(l))
+  {
+    if(*c != (GETSTR(CAR(l)))[pos])
+      return 0;
+  }
   return 1;
 }
 
@@ -408,11 +408,11 @@ static void complete(LISPT words)
   int c = 1;
 
   pos = strlen(last) - 1;
-  while (c != '\0' && checkchar(words, pos++, &c))
-    {
-      pputc(c, stdout);
-      linebuffer[linepos++] = c;
-    }
+  while(c != '\0' && checkchar(words, pos++, &c))
+  {
+    pputc(c, stdout);
+    linebuffer[linepos++] = c;
+  }
 }
 
 static LISPT strip(LISPT files, const char* prefix, const char* suffix)
@@ -420,14 +420,14 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
   LISPT stripped;
   const char* s;
 
-  if (strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
+  if(strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for (stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = CDR(files))
-    {
-      s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
-      // s[0] = '~';
-      tconc(stripped, mkstring(s));
-    }
+  for(stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = CDR(files))
+  {
+    s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
+    // s[0] = '~';
+    tconc(stripped, mkstring(s));
+  }
   return CAR(stripped);
 }
 
@@ -476,91 +476,91 @@ static void scan(int begin)
   currentpos.cpos = 0;
   currentpos.line = 0;
   currentpos.line_start = NULL;
-  for (pos = begin; pos > 0; pos--)
+  for(pos = begin; pos > 0; pos--)
+  {
+    int cur = linebuffer[pos];
+    cpos++;
+    escape = 0;
+    if(cur == '"' && state == INSTRING)
+      state = EXITSTRING;
+    else if(cur == '"' && state == NORMAL)
+      state = STARTSTRING;
+    else if(cur == '(' && state != INSTRING && state != STARTSTRING)
+      state = LEFTPAR;
+    else if(cur == ')' && state != INSTRING && state != STARTSTRING)
+      state = RIGHTPAR;
+    else if(cur == '\n')
     {
-      int cur = linebuffer[pos];
+      if(parpos.line == line)
+      {
+        parpos.cpos = cpos - parpos.cpos - 1;
+        parpos.line_start = &linebuffer[pos + 1];
+      }
+      if(currentpos.line_start == NULL)
+        currentpos.line_start = &linebuffer[pos + 1];
+      cpos = 0;
+      line++;
+    }
+    while(linebuffer[pos - 1] == '\\')
+    {
+      escape++;
+      pos--;
       cpos++;
-      escape = 0;
-      if (cur == '"' && state == INSTRING)
-        state = EXITSTRING;
-      else if (cur == '"' && state == NORMAL)
-        state = STARTSTRING;
-      else if (cur == '(' && state != INSTRING && state != STARTSTRING)
-        state = LEFTPAR;
-      else if (cur == ')' && state != INSTRING && state != STARTSTRING)
-        state = RIGHTPAR;
-      else if (cur == '\n')
-        {
-          if (parpos.line == line)
-            {
-              parpos.cpos = cpos - parpos.cpos - 1;
-              parpos.line_start = &linebuffer[pos + 1];
-            }
-          if (currentpos.line_start == NULL)
-            currentpos.line_start = &linebuffer[pos + 1];
-          cpos = 0;
-          line++;
-        }
-      while (linebuffer[pos - 1] == '\\')
-        {
-          escape++;
-          pos--;
-          cpos++;
-        }
-      if ((escape % 2) == 1)
-        {
-          switch (state)
-            {
-            case EXITSTRING:
-              state = INSTRING;
-              break;
-            case STARTSTRING:
-              state = NORMAL;
-              break;
-            default:
-              break;
-            }
-        }
-      else
-        {
-          switch (state)
-            {
-            case EXITSTRING:
-              state = NORMAL;
-              break;
-            case STARTSTRING:
-              state = INSTRING;
-              break;
-            case LEFTPAR:
-              state = NORMAL;
-              parcount--;
-              break;
-            case RIGHTPAR:
-              state = NORMAL;
-              parcount++;
-              break;
-            default:
-              break;
-            }
-        }
-      if (!pars && parcount == 0)
-        {
-          parpos.line_start = &linebuffer[pos];
-          parpos.cpos = cpos;
-          parpos.line = line;
-          pars = 1;
-        }
-      if (line == 0)
-        currentpos.cpos++;
     }
-  currentpos.line = line;
-  if (line == 0)
+    if((escape % 2) == 1)
     {
-      currentpos.cpos += strlen(current_prompt);
-      currentpos.line_start = linebuffer + 1;
+      switch(state)
+      {
+        case EXITSTRING:
+          state = INSTRING;
+          break;
+        case STARTSTRING:
+          state = NORMAL;
+          break;
+        default:
+          break;
+      }
     }
+    else
+    {
+      switch(state)
+      {
+        case EXITSTRING:
+          state = NORMAL;
+          break;
+        case STARTSTRING:
+          state = INSTRING;
+          break;
+        case LEFTPAR:
+          state = NORMAL;
+          parcount--;
+          break;
+        case RIGHTPAR:
+          state = NORMAL;
+          parcount++;
+          break;
+        default:
+          break;
+      }
+    }
+    if(!pars && parcount == 0)
+    {
+      parpos.line_start = &linebuffer[pos];
+      parpos.cpos = cpos;
+      parpos.line = line;
+      pars = 1;
+    }
+    if(line == 0)
+      currentpos.cpos++;
+  }
+  currentpos.line = line;
+  if(line == 0)
+  {
+    currentpos.cpos += strlen(current_prompt);
+    currentpos.line_start = linebuffer + 1;
+  }
   parpos.line = line - parpos.line;
-  if (parpos.line == 0)
+  if(parpos.line == 0)
     parpos.cpos = cpos - parpos.cpos + strlen(current_prompt);
 }
 
@@ -570,7 +570,7 @@ static void scan(int begin)
 void nput(const char* str, int ntim)
 {
 #ifdef TERMCAP
-  for (; ntim > 0; ntim--) tputs(str, 1, outc);
+  for(; ntim > 0; ntim--) tputs(str, 1, outc);
 #endif
 }
 
@@ -586,21 +586,21 @@ void blink()
   fd_set rfds;
   int i;
 
-  if (nocap)
+  if(nocap)
     return; /* Sorry, no blink.  */
   ldiff = currentpos.line - parpos.line;
   cdiff = parpos.cpos - currentpos.cpos;
   nput(curup, ldiff);
-  if (cdiff < 0)
+  if(cdiff < 0)
+  {
+    if(-cdiff < parpos.cpos)
+      nput("\b", -cdiff);
+    else
     {
-      if (-cdiff < parpos.cpos)
-        nput("\b", -cdiff);
-      else
-        {
-          putc('\r', stdout);
-          nput(curfwd, parpos.cpos); /* This is realy silly.  */
-        }
+      putc('\r', stdout);
+      nput(curfwd, parpos.cpos); /* This is realy silly.  */
     }
+  }
   else
     nput(curfwd, cdiff);
   fflush(stdout);
@@ -610,18 +610,16 @@ void blink()
   select(1, &rfds, NULL, NULL, &timeout);
   nput(curdn, ldiff); /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
-  if (ldiff == 0)
-    {
-      for (i = 0; parpos.line_start[i]; i++)
-        pputc(parpos.line_start[i], stdout);
-    }
+  if(ldiff == 0)
+  {
+    for(i = 0; parpos.line_start[i]; i++) pputc(parpos.line_start[i], stdout);
+  }
   else
-    {
-      if (currentpos.line == 0)
-        fputs(current_prompt, stdout);
-      for (i = 0; currentpos.line_start[i]; i++)
-        pputc(currentpos.line_start[i], stdout);
-    }
+  {
+    if(currentpos.line == 0)
+      fputs(current_prompt, stdout);
+    for(i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout);
+  }
   fflush(stdout);
 #endif
 }
@@ -642,151 +640,151 @@ int lips_getline(FILE* file)
   int escaped = 0;
   LISPT ex;
 
-  if (options.command)
-    {
-      fprintf(stderr, "Unbalanced parenthesis\n");
-      end_term();
-      exit(1);
-    }
+  if(options.command)
+  {
+    fprintf(stderr, "Unbalanced parenthesis\n");
+    end_term();
+    exit(1);
+  }
   position = 0;
   linepos = 1;
   origpar = parcount;
   linebuffer[0] = ' ';
-  while (1)
+  while(1)
+  {
+    if(escaped)
+      escaped--;
+    FFLUSH(stdout);
+    if(readchar(file, &c) == 0)
+      return 0;
+    switch(key_tab[(int)c])
     {
-      if (escaped)
-        escaped--;
-      FFLUSH(stdout);
-      if (readchar(file, &c) == 0)
-        return 0;
-      switch (key_tab[(int) c])
+      case T_EOF:
+        if(linepos == 1)
         {
-        case T_EOF:
-          if (linepos == 1)
-            {
-              linebuffer[linepos++] = EOF;
-              return 1;
-            }
-          pputc(c, stdout);
           linebuffer[linepos++] = EOF;
+          return 1;
+        }
+        pputc(c, stdout);
+        linebuffer[linepos++] = EOF;
+        break;
+      case T_KILL:
+        retype(2);
+        linepos = 1;
+        parcount = origpar;
+        escaped = 0;
+        instring = 0;
+        break;
+      case T_RETYPE:
+        retype(1);
+        break;
+      case T_TAB:
+        s = mkexstr();
+        t = extilde(s, 0);
+        if(t == NULL)
+        {
+          putc(BELL, stdout);
           break;
-        case T_KILL:
-          retype(2);
-          linepos = 1;
-          parcount = origpar;
-          escaped = 0;
-          instring = 0;
-          break;
-        case T_RETYPE:
-          retype(1);
-          break;
-        case T_TAB:
-          s = mkexstr();
-          t = extilde(s, 0);
-          if (t == NULL)
-            {
-              putc(BELL, stdout);
-              break;
-            }
-          ex = expandfiles(t, 0, 0, 1);
-          if (TYPEOF(ex) == CONS && strlen(s) > 1)
-            ex = strip(ex, t, s);
-          if (TYPEOF(ex) == CONS && ISNIL(CDR(ex)))
-            fillrest(GETSTR(CAR(ex)));
-          else
-            {
-              if (TYPEOF(ex) == CONS)
-                complete(ex);
-              putc(BELL, stdout);
-            }
-          break;
-        case T_ERASE:
-          escaped = 0;
-          if (linepos > 1 && linebuffer[linepos - 1] == '\n')
-            {
-              linepos--;
-              retype(0);
-            }
-          else if (linepos > 1)
-            {
-              delonechar();
-              if (linebuffer[linepos - 1] == '\\')
-                escaped = 2;
-              else
-                {
-                  if (!instring && linebuffer[linepos] == '(')
-                    parcount--;
-                  if (!instring && linebuffer[linepos] == ')')
-                    parcount++;
-                  if (linebuffer[linepos] == '"')
-                    instring = !instring;
-                }
-            }
-          break;
-        case T_STRING:
-          linebuffer[linepos++] = c;
-          pputc(c, stdout);
-          if (!escaped)
-            instring = !instring;
-          break;
-        case T_ESCAPE:
-          linebuffer[linepos++] = c;
-          pputc(c, stdout);
-          if (!escaped)
+        }
+        ex = expandfiles(t, 0, 0, 1);
+        if(TYPEOF(ex) == CONS && strlen(s) > 1)
+          ex = strip(ex, t, s);
+        if(TYPEOF(ex) == CONS && ISNIL(CDR(ex)))
+          fillrest(GETSTR(CAR(ex)));
+        else
+        {
+          if(TYPEOF(ex) == CONS)
+            complete(ex);
+          putc(BELL, stdout);
+        }
+        break;
+      case T_ERASE:
+        escaped = 0;
+        if(linepos > 1 && linebuffer[linepos - 1] == '\n')
+        {
+          linepos--;
+          retype(0);
+        }
+        else if(linepos > 1)
+        {
+          delonechar();
+          if(linebuffer[linepos - 1] == '\\')
             escaped = 2;
-          break;
-        case T_LEFTPAR:
-          if (!instring && !escaped)
-            parcount++;
-          pputc(c, stdout);
-          linebuffer[linepos++] = c;
-          break;
-        case T_RIGHTPAR:
-          if (escaped || instring)
-            {
-              pputc(c, stdout);
-              linebuffer[linepos++] = c;
-              break;
-            }
-          parcount--;
-          pputc(c, stdout);
-          linebuffer[linepos++] = c;
-          if (parcount <= 0)
-            {
-              if (parcount < 0)
-                {
-                  linebuffer[0] = '(';
-                  parcount = 0; /* in case it was negative */
-                }
-              else if (firstnotlp())
-                break; /* paren expression not first (for readline) */
-              linebuffer[linepos++] = '\n';
-              pputc('\n', stdout);
-              return 1;
-            }
           else
-            {
-              scan(linepos - 1);
-              blink();
-            }
-          break;
-        case T_NEWLINE:
-          pputc('\n', stdout);
-          if (linepos == 1 || onlyblanks())
-            {
-              linebuffer[0] = '(';
-              linebuffer[linepos++] = ')';
-            }
-          linebuffer[linepos++] = '\n';
-          if (parcount <= 0 && !instring)
-            return 1;
-          break;
-        case T_INSERT:
+          {
+            if(!instring && linebuffer[linepos] == '(')
+              parcount--;
+            if(!instring && linebuffer[linepos] == ')')
+              parcount++;
+            if(linebuffer[linepos] == '"')
+              instring = !instring;
+          }
+        }
+        break;
+      case T_STRING:
+        linebuffer[linepos++] = c;
+        pputc(c, stdout);
+        if(!escaped)
+          instring = !instring;
+        break;
+      case T_ESCAPE:
+        linebuffer[linepos++] = c;
+        pputc(c, stdout);
+        if(!escaped)
+          escaped = 2;
+        break;
+      case T_LEFTPAR:
+        if(!instring && !escaped)
+          parcount++;
+        pputc(c, stdout);
+        linebuffer[linepos++] = c;
+        break;
+      case T_RIGHTPAR:
+        if(escaped || instring)
+        {
           pputc(c, stdout);
           linebuffer[linepos++] = c;
           break;
         }
+        parcount--;
+        pputc(c, stdout);
+        linebuffer[linepos++] = c;
+        if(parcount <= 0)
+        {
+          if(parcount < 0)
+          {
+            linebuffer[0] = '(';
+            parcount = 0; /* in case it was negative */
+          }
+          else if(firstnotlp())
+            break; /* paren expression not first (for readline) */
+          linebuffer[linepos++] = '\n';
+          pputc('\n', stdout);
+          return 1;
+        }
+        else
+        {
+          scan(linepos - 1);
+          blink();
+        }
+        break;
+      case T_NEWLINE:
+        pputc('\n', stdout);
+        if(linepos == 1 || onlyblanks())
+        {
+          linebuffer[0] = '(';
+          linebuffer[linepos++] = ')';
+        }
+        linebuffer[linepos++] = '\n';
+        if(parcount <= 0 && !instring)
+          return 1;
+        break;
+      case T_INSERT:
+        pputc(c, stdout);
+        linebuffer[linepos++] = c;
+        break;
     }
+  }
 }
 
 /*
@@ -797,15 +795,14 @@ int eoln(FILE* file)
 {
   int i;
 
-  if (!isatty(fileno(file)))
+  if(!isatty(fileno(file)))
     return 0;
-  for (i = position; i < linepos; i++)
-    {
-      if (linebuffer[i] != ' ' && linebuffer[i] != '\t'
-        && linebuffer[i] != '\n')
-        return 0;
-      if (linebuffer[i] == '\n')
-        return 1;
-    }
+  for(i = position; i < linepos; i++)
+  {
+    if(linebuffer[i] != ' ' && linebuffer[i] != '\t' && linebuffer[i] != '\n')
+      return 0;
+    if(linebuffer[i] == '\n')
+      return 1;
+  }
   return 1;
 }

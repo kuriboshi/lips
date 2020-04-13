@@ -12,13 +12,13 @@ PRIMITIVE p_and(LISPT l)
   LISPT foo;
 
   foo = C_T;
-  while (!ISNIL(l))
-    {
-      foo = eval(CAR(l));
-      if (ISNIL(foo))
-        return foo;
-      l = CDR(l);
-    }
+  while(!ISNIL(l))
+  {
+    foo = eval(CAR(l));
+    if(ISNIL(foo))
+      return foo;
+    l = CDR(l);
+  }
   return foo;
 }
 
@@ -27,19 +27,19 @@ PRIMITIVE p_or(LISPT l)
   LISPT foo;
 
   foo = C_NIL;
-  while (!ISNIL(l))
-    {
-      foo = eval(CAR(l));
-      if (!ISNIL(foo))
-        return foo;
-      l = CDR(l);
-    }
+  while(!ISNIL(l))
+  {
+    foo = eval(CAR(l));
+    if(!ISNIL(foo))
+      return foo;
+    l = CDR(l);
+  }
   return foo;
 }
 
 PRIMITIVE p_not(LISPT x)
 {
-  if (ISNIL(x))
+  if(ISNIL(x))
     return C_T;
   else
     return C_NIL;
@@ -50,7 +50,7 @@ PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
   LISPT foo;
 
   foo = eval(pred);
-  if (ISNIL(foo))
+  if(ISNIL(foo))
     return progn(false_expr);
   else
     return eval(true_expr);

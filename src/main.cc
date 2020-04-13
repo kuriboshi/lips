@@ -30,8 +30,8 @@ extern void loadbuf(char*);
 
 extern char* VERSION;
 
-char* progname;   /* Name of the game. */
-int brkflg;       /* 1 means break at next call to peval1. */
+char* progname; /* Name of the game. */
+int brkflg;     /* 1 means break at next call to peval1. */
 int interrupt;
 int mypgrp;             /* lips process group. */
 struct options options; /* Structure for all options. */
@@ -58,8 +58,8 @@ static int getuser(FILE* f, int def)
   timeout.tv_usec = 0;
   FD_ZERO(&readfs);
   FD_SET(0, &readfs);
-  switch (select(FD_SETSIZE, &readfs, NULL, NULL, &timeout))
-    {
+  switch(select(FD_SETSIZE, &readfs, NULL, NULL, &timeout))
+  {
     case -1:
       fprintf(primerr, "(error in select %d) ", errno);
       c = 'n';
@@ -70,7 +70,7 @@ static int getuser(FILE* f, int def)
     default:
       c = getc(f);
       break;
-    }
+  }
   return c;
 #else
   return getc(f);
@@ -88,53 +88,49 @@ void core(int sig)
   int c;
 
   init_term();
-  if (insidefork)
-    {
-      fprintf(primerr, " -- (in fork) core dumped\n");
-      killpg(getpgrp(), sig);
-    }
+  if(insidefork)
+  {
+    fprintf(primerr, " -- (in fork) core dumped\n");
+    killpg(getpgrp(), sig);
+  }
   fprintf(primerr, " -- Continue? ");
   fflush(primerr);
   c = getuser(stdin, 'y');
-  while ('y' != (islower(c) ? c : tolower(c))
-    && 'n' != (islower(c) ? c : tolower(c)))
+  while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser(stdin, 'y');
+  if((islower(c) ? c : tolower(c)) == 'n')
+  {
+    fprintf(primerr, "No\n");
+    fprintf(primerr, "Core dump? ");
+    fflush(primerr);
     c = getuser(stdin, 'y');
-  if ((islower(c) ? c : tolower(c)) == 'n')
+    while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser(stdin, 'y');
+    if((islower(c) ? c : tolower(c)) == 'n')
     {
       fprintf(primerr, "No\n");
-      fprintf(primerr, "Core dump? ");
-      fflush(primerr);
-      c = getuser(stdin, 'y');
-      while ('y' != (islower(c) ? c : tolower(c))
-        && 'n' != (islower(c) ? c : tolower(c)))
-        c = getuser(stdin, 'y');
-      if ((islower(c) ? c : tolower(c)) == 'n')
-        {
-          fprintf(primerr, "No\n");
-          finish(0);
-        }
-      else
-        {
-          signal(sig, SIG_DFL);
-          printf("Yes\n");
-          end_term();
-          killpg(mypgrp, sig);
-        }
+      finish(0);
     }
-  else
+    else
     {
-      fprintf(primerr, "Yes\n");
-      fprintf(primerr, "Warning: continued after signal %d.\n", sig);
-      fprintf(primerr, "Save your work and exit.\n");
+      signal(sig, SIG_DFL);
+      printf("Yes\n");
       end_term();
-      throw lips_error("continue after signal");
+      killpg(mypgrp, sig);
     }
+  }
+  else
+  {
+    fprintf(primerr, "Yes\n");
+    fprintf(primerr, "Warning: continued after signal %d.\n", sig);
+    fprintf(primerr, "Save your work and exit.\n");
+    end_term();
+    throw lips_error("continue after signal");
+  }
 }
 #endif
 
 void onintr(int)
 {
-  if (insidefork)
+  if(insidefork)
     exit(0);
   fprintf(primerr, "^C\n");
   unwind();
@@ -197,29 +193,29 @@ LISPT mungepath(char* pstr)
   char *ps, *s;
   LISPT p;
 
-  ps = (char*) safemalloc((unsigned) (strlen(pstr) + 1));
-  if (ps == NULL)
-    {
-      fprintf(stderr, "No more memory, can't munge path.\n");
-      finish(1);
-    }
+  ps = (char*)safemalloc((unsigned)(strlen(pstr) + 1));
+  if(ps == NULL)
+  {
+    fprintf(stderr, "No more memory, can't munge path.\n");
+    finish(1);
+  }
   strcpy(ps, pstr);
   p = C_NIL;
   s = ps + strlen(ps);
-  while (s >= ps)
-    {
-      *s = '\0';
-      for (; s >= ps && *s != ':'; s--)
-        ;
-      p = cons(mkstring(s + 1), p);
-    }
+  while(s >= ps)
+  {
+    *s = '\0';
+    for(; s >= ps && *s != ':'; s--)
+      ;
+    p = cons(mkstring(s + 1), p);
+  }
   free(ps);
   return p;
 }
 
 void onbreak()
 {
-  if (insidefork)
+  if(insidefork)
     exit(1);
 }
 
@@ -238,15 +234,15 @@ static LISPT put_end(LISPT list, LISPT obj, int conc)
 {
   LISPT t;
 
-  if (ISNIL(list))
-    if (conc)
+  if(ISNIL(list))
+    if(conc)
       return obj;
     else
       return cons(obj, C_NIL);
   else
-    for (t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t))
+    for(t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t))
       ;
-  if (conc)
+  if(conc)
     rplacd(t, obj);
   else
     rplacd(t, cons(obj, C_NIL));
@@ -263,70 +259,70 @@ static LISPT transform(LISPT list)
   tl = C_NIL;
   res = C_NIL;
   conc = 0;
-  for (ll = list; TYPEOF(ll) == CONS; ll = CDR(ll))
+  for(ll = list; TYPEOF(ll) == CONS; ll = CDR(ll))
+  {
+    if(TYPEOF(CAR(ll)) == CONS)
+      tl = put_end(tl, transform(CAR(ll)), conc);
+    else if(EQ(CAR(ll), C_BAR))
     {
-      if (TYPEOF(CAR(ll)) == CONS)
-        tl = put_end(tl, transform(CAR(ll)), conc);
-      else if (EQ(CAR(ll), C_BAR))
-        {
-          if (ISNIL(res))
-            res = cons(C_PIPE, cons(tl, C_NIL));
-          else
-            res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 0;
-        }
-      else if (EQ(CAR(ll), C_SEMI))
-        {
-          if (ISNIL(res))
-            res = cons(C_PROGN, cons(tl, C_NIL));
-          else
-            res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 0;
-        }
-      else if (EQ(CAR(ll), C_GT))
-        {
-          if (ISNIL(res))
-            res = cons(C_TO, cons(tl, C_NIL));
-          else
-            res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 1;
-        }
-      else if (EQ(CAR(ll), C_GGT))
-        {
-          if (ISNIL(res))
-            res = cons(C_TOTO, cons(tl, C_NIL));
-          else
-            res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 1;
-        }
-      else if (EQ(CAR(ll), C_LT))
-        {
-          if (ISNIL(res))
-            res = cons(C_FROM, cons(tl, C_NIL));
-          else
-            res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 1;
-        }
-      else if (EQ(CAR(ll), C_AMPER))
-        {
-          if (ISNIL(res))
-            res = cons(C_BACK, cons(tl, C_NIL));
-          else
-            res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
-          tl = C_NIL;
-          conc = 1;
-        }
+      if(ISNIL(res))
+        res = cons(C_PIPE, cons(tl, C_NIL));
       else
-        tl = put_end(tl, CAR(ll), 0);
+        res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 0;
     }
-  if (ISNIL(res))
+    else if(EQ(CAR(ll), C_SEMI))
+    {
+      if(ISNIL(res))
+        res = cons(C_PROGN, cons(tl, C_NIL));
+      else
+        res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 0;
+    }
+    else if(EQ(CAR(ll), C_GT))
+    {
+      if(ISNIL(res))
+        res = cons(C_TO, cons(tl, C_NIL));
+      else
+        res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 1;
+    }
+    else if(EQ(CAR(ll), C_GGT))
+    {
+      if(ISNIL(res))
+        res = cons(C_TOTO, cons(tl, C_NIL));
+      else
+        res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 1;
+    }
+    else if(EQ(CAR(ll), C_LT))
+    {
+      if(ISNIL(res))
+        res = cons(C_FROM, cons(tl, C_NIL));
+      else
+        res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 1;
+    }
+    else if(EQ(CAR(ll), C_AMPER))
+    {
+      if(ISNIL(res))
+        res = cons(C_BACK, cons(tl, C_NIL));
+      else
+        res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
+      tl = C_NIL;
+      conc = 1;
+    }
+    else
+      tl = put_end(tl, CAR(ll), 0);
+  }
+  if(ISNIL(res))
     return tl;
-  else if (!ISNIL(tl))
+  else if(!ISNIL(tl))
     res = put_end(res, tl, conc);
   return res;
 }
@@ -357,7 +353,7 @@ static void init()
  */
 static void loadinit(const char* initfile)
 {
-  if (loadfile(initfile))
+  if(loadfile(initfile))
     printf("Can't open file %s\n", initfile); /* System init file. */
 }
 
@@ -371,14 +367,14 @@ LISPT greet(LISPT who)
   char loadf[256];
   char* s;
 
-  if (ISNIL(who))
+  if(ISNIL(who))
     s = getenv("USER");
   else
     s = STRINGVAL(who);
-  if (s == NULL)
+  if(s == NULL)
     return C_NIL;
   pws = getpwnam(s);
-  if (pws == NULL)
+  if(pws == NULL)
     return C_NIL;
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
@@ -396,35 +392,35 @@ int main(int argc, char* const* argv)
   options.fast = 0;
   options.interactive = 0;
   options.command = 0;
-  while ((option = getopt(argc, argv, "c:fvid")) != EOF)
+  while((option = getopt(argc, argv, "c:fvid")) != EOF)
+  {
+    switch(option)
     {
-      switch (option)
-        {
-        case 'c':
-          options.command = 1;
-          loadbuf(optarg);
-          break;
-        case 'f':
-          options.fast = 1;
-          break;
-        case 'v':
-          options.version = 1;
-          break;
-        case 'i':
-          options.interactive = 1;
-          break;
-        case 'd':
-          options.debug = 1;
-          break;
-        default:
-          fprintf(primerr, "usage: -fvic [arguments]\n");
-          exit(1);
-          break;
-        }
+      case 'c':
+        options.command = 1;
+        loadbuf(optarg);
+        break;
+      case 'f':
+        options.fast = 1;
+        break;
+      case 'v':
+        options.version = 1;
+        break;
+      case 'i':
+        options.interactive = 1;
+        break;
+      case 'd':
+        options.debug = 1;
+        break;
+      default:
+        fprintf(primerr, "usage: -fvic [arguments]\n");
+        exit(1);
+        break;
     }
-  if (!options.interactive && !options.command)
+  }
+  if(!options.interactive && !options.command)
     options.interactive = isatty(0) ? 1 : 0;
-  if (options.version)
+  if(options.version)
     printf("%s\n", VERSION);
   progname = argv[0];
 
@@ -433,33 +429,32 @@ int main(int argc, char* const* argv)
    */
   init();
   interactive = options.interactive ? C_T : C_NIL;
-  if (!options.debug && options.interactive)
-    {
-      signal(SIGINT, onintr);
-      signal(SIGHUP, SIG_DFL);
-      signal(SIGTSTP, onstop);
+  if(!options.debug && options.interactive)
+  {
+    signal(SIGINT, onintr);
+    signal(SIGHUP, SIG_DFL);
+    signal(SIGTSTP, onstop);
 #ifdef FANCY_SIGNALS
-      signal(SIGQUIT, onquit);
-      signal(SIGILL, onill);
+    signal(SIGQUIT, onquit);
+    signal(SIGILL, onill);
 #ifdef SIGEMT
-      signal(SIGEMT, onill);
+    signal(SIGEMT, onill);
 #endif
-      signal(SIGBUS, onbus);
-      signal(SIGSEGV, onsegv);
+    signal(SIGBUS, onbus);
+    signal(SIGSEGV, onsegv);
 #endif
-    }
-  if (!options.fast)
+  }
+  if(!options.fast)
+  {
+    try
     {
-      try
-      {
-        loadinit(LIPSRC);
-        greet(C_NIL);
-      }
-      catch (const lips_error& error)
-      {
-      }
+      loadinit(LIPSRC);
+      greet(C_NIL);
     }
-  while (true)
+    catch(const lips_error& error)
+    {}
+  }
+  while(true)
   {
     try
     {
@@ -468,10 +463,10 @@ int main(int argc, char* const* argv)
       fun = C_NIL;
       args = C_NIL;
       env = NULL;
-      if (toploop(&topprompt, (int (*)(LISPT*)) NULL))
+      if(toploop(&topprompt, (int (*)(LISPT*))NULL))
         break;
     }
-    catch (const lips_error& error)
+    catch(const lips_error& error)
     {
       printf("error: %s\n", error.what());
     }

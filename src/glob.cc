@@ -34,23 +34,23 @@ static int dircheck(const char* str, const char* wild, const char* ss)
   struct stat sbuf;
   int pos;
 
-  if (*wild == '/')
-    {
-      if (*str)
-        return 0;
-      pos = strlen(r);
-      if (pos != 0)
-        strcat(r, "/");
-      strcat(r, ss);
-      stat(r, &sbuf);
-      r[pos] = '\0';
-      if (sbuf.st_mode & S_IFDIR)
-        return 1;
-      else
-        return 0;
-    }
-  while (*wild == '*') wild++;
-  if (*str || *wild)
+  if(*wild == '/')
+  {
+    if(*str)
+      return 0;
+    pos = strlen(r);
+    if(pos != 0)
+      strcat(r, "/");
+    strcat(r, ss);
+    stat(r, &sbuf);
+    r[pos] = '\0';
+    if(sbuf.st_mode & S_IFDIR)
+      return 1;
+    else
+      return 0;
+  }
+  while(*wild == '*') wild++;
+  if(*str || *wild)
     return 0;
   else
     return 1;
@@ -65,42 +65,42 @@ static int match(const char* str, const char* wild)
   int ok;
   const char* ss = str;
 
-  while (*wild && *str)
+  while(*wild && *str)
+  {
+    switch(*wild)
     {
-      switch (*wild)
+      case '*':
+        wild++;
+        while(*str)
+          if(match(str, wild))
+            return 1;
+          else
+            str++;
+        return dircheck(str, wild, ss);
+      case '?':
+        break;
+      case '[':
+        ok = 0;
+        while(*wild && *wild != ']')
         {
-        case '*':
+          if(*wild == *str)
+            ok = 1;
           wild++;
-          while (*str)
-            if (match(str, wild))
-              return 1;
-            else
-              str++;
-          return dircheck(str, wild, ss);
-        case '?':
-          break;
-        case '[':
-          ok = 0;
-          while (*wild && *wild != ']')
-            {
-              if (*wild == *str)
-                ok = 1;
-              wild++;
-            }
-          if (!ok && *wild)
-            return 0;
-          break;
-        case '\\':
-          wild++;
-          /* fall through */
-        default:
-          if (*str != *wild)
-            return 0;
-          break;
         }
-      str++;
-      wild++;
+        if(!ok && *wild)
+          return 0;
+        break;
+      case '\\':
+        wild++;
+        /* fall through */
+      default:
+        if(*str != *wild)
+          return 0;
+        break;
     }
+    str++;
+    wild++;
+  }
   return dircheck(str, wild, ss);
 }
 
@@ -147,35 +147,35 @@ const char* extilde(const char* w, int rep)
   struct passwd* pw;
   static char s[NAMELEN];
 
-  if (*w != '~')
+  if(*w != '~')
     return w;
   w++;
-  if (*w == '/' || !*w)
+  if(*w == '/' || !*w)
     strcpy(s, GETSTR(home));
   else
+  {
+    if(index(w, '/') == NULL)
     {
-      if (index(w, '/') == NULL)
-        {
-          pw = getpwnam(w);
-          strcpy(s, w);
-          w = "";
-        }
-      else
-        {
-          int i;
-
-          for (i = 0; *w != '/'; i++) s[i] = *w++;
-          s[i] = '\0';
-          pw = getpwnam(s);
-        }
-      if (pw == NULL)
-        {
-          if (rep)
-            error(NO_USER, mkstring(s));
-          return NULL;
-        }
-      strncpy(s, pw->pw_dir, MAXNAMLEN);
+      pw = getpwnam(w);
+      strcpy(s, w);
+      w = "";
     }
+    else
+    {
+      int i;
+
+      for(i = 0; *w != '/'; i++) s[i] = *w++;
+      s[i] = '\0';
+      pw = getpwnam(s);
+    }
+    if(pw == NULL)
+    {
+      if(rep)
+        error(NO_USER, mkstring(s));
+      return NULL;
+    }
+    strncpy(s, pw->pw_dir, MAXNAMLEN);
+  }
   strcat(s, w);
   return s;
 }
@@ -194,50 +194,48 @@ static int walkfiles(const char* wild, int all, int report)
   const char* sw;
   const char* w;
 
-  if (*wild == '/')
+  if(*wild == '/')
     w = wild + 1;
   else
     w = wild;
-  if ((odir = opendir(*r == '\0' ? "." : r)) == NULL)
+  if((odir = opendir(*r == '\0' ? "." : r)) == NULL)
+  {
+    if(report)
+      error(NO_DIRECTORY, mkstring(r));
+    return 0;
+  }
+  while((rdir = readdir(odir)) != NULL)
+  {
+    if((all || rdir->d_name[0] != '.' || *w == '.') && match(rdir->d_name, w))
     {
-      if (report)
-        error(NO_DIRECTORY, mkstring(r));
-      return 0;
-    }
-  while ((rdir = readdir(odir)) != NULL)
-    {
-      if ((all || rdir->d_name[0] != '.' || *w == '.')
-        && match(rdir->d_name, w))
+      result = 1;
+      pos = strlen(r);
+      if(pos != 0 && r[pos - 1] != '/')
+        strcat(r, "/");
+      strcat(r, rdir->d_name);
+      for(sw = w; *sw && *sw != '/'; sw++)
+        ;
+      if(*sw && *(++sw))
+        result = walkfiles(sw, all, 0);
+      else
+      {
+        *globp = strsave(r);
+        if(globp == globlimit)
         {
-          result = 1;
-          pos = strlen(r);
-          if (pos != 0 && r[pos - 1] != '/')
-            strcat(r, "/");
-          strcat(r, rdir->d_name);
-          for (sw = w; *sw && *sw != '/'; sw++)
-            ;
-          if (*sw && *(++sw))
-            result = walkfiles(sw, all, 0);
-          else
-            {
-              *globp = strsave(r);
-              if (globp == globlimit)
-                {
-                  int foo;
+          int foo;
 
-                  foo = globp - globarr;
-                  globarr =
-                    (char**) realloc(globarr, (foo + TICKS) * sizeof(char*));
-                  globlimit = globarr + foo + TICKS;
-                  globp = globarr + foo;
-                }
-              globp++;
-            }
-          r[pos] = '\0';
+          foo = globp - globarr;
+          globarr = (char**)realloc(globarr, (foo + TICKS) * sizeof(char*));
+          globlimit = globarr + foo + TICKS;
+          globp = globarr + foo;
         }
+        globp++;
+      }
+      r[pos] = '\0';
     }
+  }
   closedir(odir);
-  if (!result && report)
+  if(!result && report)
     error(NO_MATCH, mkstring(wild));
   return result;
 }
@@ -248,11 +246,11 @@ static LISPT buildlist()
   LISPT l;
 
   l = C_NIL;
-  for (r = globarr; r < globp; r++)
-    {
-      l = cons(mkstring(*r), l);
-      free(*r);
-    }
+  for(r = globarr; r < globp; r++)
+  {
+    l = cons(mkstring(*r), l);
+    free(*r);
+  }
   free(globarr);
   return l;
 }
@@ -260,24 +258,24 @@ static LISPT buildlist()
 static int comp(const void* a, const void* b)
 {
   /* Reverse sort. */
-  return -strcmp(*(char**) a, *(char**) b);
+  return -strcmp(*(char**)a, *(char**)b);
 }
 
 LISPT expandfiles(const char* wild, int all, int report, int sort)
 {
-  if (*wild == '/' && *(wild + 1) == '\0')
+  if(*wild == '/' && *(wild + 1) == '\0')
     return cons(mkstring(wild), C_NIL);
-  if (*wild == '/')
+  if(*wild == '/')
     strcpy(r, "/");
   else
     strcpy(r, "");
-  globarr = (char**) malloc(TICKS * sizeof(char*));
+  globarr = (char**)malloc(TICKS * sizeof(char*));
   globp = globarr;
   globlimit = globarr + TICKS;
-  if (!walkfiles(wild, all, report))
+  if(!walkfiles(wild, all, report))
     return C_ERROR;
-  if (!ISNIL(globsort) || sort)
-    qsort((char*) globarr, globp - globarr, sizeof(char*), comp);
+  if(!ISNIL(globsort) || sort)
+    qsort((char*)globarr, globp - globarr, sizeof(char*), comp);
   return buildlist();
 }
 
@@ -290,11 +288,11 @@ PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
   const char* wstr;
   int r = 0;
 
-  if (ISNIL(rep))
+  if(ISNIL(rep))
     r = 1;
   CHECK2(wild, STRING, SYMBOL);
   wstr = extilde(GETSTR(wild), r);
-  if (wstr == NULL)
+  if(wstr == NULL)
     return C_NIL;
   return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
 }

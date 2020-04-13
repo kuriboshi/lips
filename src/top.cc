@@ -33,12 +33,12 @@ static void phist()
 {
   LISPT hl;
 
-  for (hl = history; !ISNIL(hl); hl = CDR(hl))
-    {
-      printf("%d.\t", INTVAL(CAR(CAR(hl))));
-      prinbody(CDR(CAR(hl)), stdout, 1);
-      pputc('\n', primout);
-    }
+  for(hl = history; !ISNIL(hl); hl = CDR(hl))
+  {
+    printf("%d.\t", INTVAL(CAR(CAR(hl))));
+    prinbody(CDR(CAR(hl)), stdout, 1);
+    pputc('\n', primout);
+  }
 }
 
 /*
@@ -68,9 +68,9 @@ static void trimhist()
   long i;
 
   hl = history;
-  for (i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl))
+  for(i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl))
     ;
-  if (!ISNIL(hl))
+  if(!ISNIL(hl))
     rplacd(hl, C_NIL);
 }
 
@@ -80,26 +80,25 @@ static void trimhist()
  */
 LISPT histget(long num, LISPT hlist)
 {
-  if (num < 0)
-    {
-      for (; TYPEOF(hlist) == CONS && num < 0; hlist = CDR(hlist), num++)
-        ;
-      if (ISNIL(hlist))
-        return C_NIL;
-      else
-        return CDR(CAR(hlist));
-    }
-  else if (num > 0)
-    {
-      for (; TYPEOF(hlist) == CONS && num != INTVAL(CAR(CAR(hlist)));
-           hlist = CDR(hlist))
-        ;
-      if (ISNIL(hlist))
-        return C_NIL;
-      else
-        return CDR(CAR(hlist));
-    }
-  else if (!ISNIL(hlist))
+  if(num < 0)
+  {
+    for(; TYPEOF(hlist) == CONS && num < 0; hlist = CDR(hlist), num++)
+      ;
+    if(ISNIL(hlist))
+      return C_NIL;
+    else
+      return CDR(CAR(hlist));
+  }
+  else if(num > 0)
+  {
+    for(; TYPEOF(hlist) == CONS && num != INTVAL(CAR(CAR(hlist))); hlist = CDR(hlist))
+      ;
+    if(ISNIL(hlist))
+      return C_NIL;
+    else
+      return CDR(CAR(hlist));
+  }
+  else if(!ISNIL(hlist))
     return CDR(CAR(hlist));
   return C_NIL;
 }
@@ -113,7 +112,7 @@ PRIMITIVE printhist()
 
 static LISPT transform(LISPT list)
 {
-  if (transformhook != NULL)
+  if(transformhook != NULL)
     return (*transformhook)(list);
   else
     return list;
@@ -133,25 +132,24 @@ LISPT findalias(LISPT exp)
   LISPT rval;
 
   rval = exp;
-  while (1)
+  while(1)
+  {
+    if(TYPEOF(rval) == CONS && TYPEOF(CAR(rval)) == SYMBOL)
     {
-      if (TYPEOF(rval) == CONS && TYPEOF(CAR(rval)) == SYMBOL)
-        {
-          alias = getprop(CAR(rval), C_ALIAS);
-          if (!ISNIL(alias)
-            && (ISNIL(alias_expanded) || !EQ(CAR(rval), CAR(alias_expanded))))
-            {
-              if (!ISNIL(memb(CAR(rval), alias_expanded)))
-                return error(ALIAS_LOOP, C_NIL);
-              alias_expanded = cons(CAR(rval), alias_expanded);
-              rval = append(cons(alias, cons(CDR(rval), C_NIL)));
-            }
-          else
-            break;
-        }
+      alias = getprop(CAR(rval), C_ALIAS);
+      if(!ISNIL(alias) && (ISNIL(alias_expanded) || !EQ(CAR(rval), CAR(alias_expanded))))
+      {
+        if(!ISNIL(memb(CAR(rval), alias_expanded)))
+          return error(ALIAS_LOOP, C_NIL);
+        alias_expanded = cons(CAR(rval), alias_expanded);
+        rval = append(cons(alias, cons(CDR(rval), C_NIL)));
+      }
       else
         break;
     }
+    else
+      break;
+  }
   return transform(rval);
 }
 
@@ -162,87 +160,87 @@ void promptprint(LISPT prompt)
   char buf[80];
 
   current_prompt[0] = '\0';
-  if (TYPEOF(prompt) != STRING)
+  if(TYPEOF(prompt) != STRING)
     return;
   else
+  {
+    s = GETSTR(prompt);
+    for(i = 0; s[i]; i++)
     {
-      s = GETSTR(prompt);
-      for (i = 0; s[i]; i++)
-        {
-          if (s[i] == '!')
-            {
-              sprintf(buf, "%d", INTVAL(histnum));
-              strcat(current_prompt, buf);
-              continue;
-            }
-          else if (s[i] == '\\')
-            i++;
-          buf[0] = s[i];
-          buf[1] = '\0';
-          strcat(current_prompt, buf);
-        }
+      if(s[i] == '!')
+      {
+        sprintf(buf, "%d", INTVAL(histnum));
+        strcat(current_prompt, buf);
+        continue;
+      }
+      else if(s[i] == '\\')
+        i++;
+      buf[0] = s[i];
+      buf[1] = '\0';
+      strcat(current_prompt, buf);
     }
+  }
   printf("\r");
   printf("%s", current_prompt);
 }
 
 bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 {
-  while (1)
-    {
-      brkflg = 0;
-      interrupt = 0;
-      printit = 0;
-      echoline = 0;
-      if (beforeprompt != NULL)
-        (*beforeprompt)();
-      /*
+  while(1)
+  {
+    brkflg = 0;
+    interrupt = 0;
+    printit = 0;
+    echoline = 0;
+    if(beforeprompt != NULL)
+      (*beforeprompt)();
+    /*
        * Evaluate promptform and print prompt.
        */
-      if (options.interactive)
-        {
-          if (TYPEOF(eval(promptform)) == ERROR)
-            {
-              xprint(mkstring("Error in promptform, reset to nil"), C_T);
-              promptform = C_NIL;
-            }
-          promptprint(*tprompt);
-        }
-      input_exp = xreadline(C_T);
-      if (macrofun)
-        switch ((*macrofun)(&input_exp))
-          {
-          case 0:
-            return true;
-          case 1:
-            break;
-          case 2:
-            continue;
-          }
-      if (TYPEOF(input_exp) == ENDOFFILE)
-        return true;
-      if (EQ(CAR(input_exp), C_NIL))
-        continue;
-      addhist(input_exp);
-      if (echoline)
-        {
-          prinbody(input_exp, stdout, 1);
-          pputc('\n', primout);
-        }
-      topexp = transform(input_exp);
-      if (TYPEOF(CAR(topexp)) == CONS)
-        {
-          topexp = CAR(topexp);
-          printit = 1;
-        }
-      alias_expanded = C_NIL;
-      topexp = eval(topexp);
-      if (printit)
-        xprint(topexp, C_T);
-      if (!options.interactive && options.command)
-        return false;
-      trimhist();
+    if(options.interactive)
+    {
+      if(TYPEOF(eval(promptform)) == ERROR)
+      {
+        xprint(mkstring("Error in promptform, reset to nil"), C_T);
+        promptform = C_NIL;
+      }
+      promptprint(*tprompt);
     }
+    input_exp = xreadline(C_T);
+    if(macrofun)
+      switch((*macrofun)(&input_exp))
+      {
+        case 0:
+          return true;
+        case 1:
+          break;
+        case 2:
+          continue;
+      }
+    if(TYPEOF(input_exp) == ENDOFFILE)
+      return true;
+    if(EQ(CAR(input_exp), C_NIL))
+      continue;
+    addhist(input_exp);
+    if(echoline)
+    {
+      prinbody(input_exp, stdout, 1);
+      pputc('\n', primout);
+    }
+    topexp = transform(input_exp);
+    if(TYPEOF(CAR(topexp)) == CONS)
+    {
+      topexp = CAR(topexp);
+      printit = 1;
+    }
+    alias_expanded = C_NIL;
+    topexp = eval(topexp);
+    if(printit)
+      xprint(topexp, C_T);
+    if(!options.interactive && options.command)
+      return false;
+    trimhist();
+  }
 }
 
 void init_hist()

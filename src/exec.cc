@@ -78,10 +78,10 @@ char* strsave(const char* str)
 {
   char* newstr;
 
-  if (str == NULL)
+  if(str == NULL)
     return NULL;
-  newstr = (char*) safemalloc((unsigned) strlen(str) + 1);
-  if (newstr == NULL)
+  newstr = (char*)safemalloc((unsigned)strlen(str) + 1);
+  if(newstr == NULL)
     return NULL;
   strcpy(newstr, str);
   return newstr;
@@ -105,18 +105,18 @@ static void printjob(struct job* job)
   char buffer[80];
 
   sprintf(buffer, "[%d]  %d ", job->jobnum, job->procid);
-  if (job->running)
+  if(job->running)
     strcat(buffer, "Running");
-  else if (WIFEXITED(job->status))
+  else if(WIFEXITED(job->status))
     strcat(buffer, "Done");
-  else if (WIFSTOPPED(job->status))
+  else if(WIFSTOPPED(job->status))
     strcat(buffer, sys_siglist[WSTOPSIG(job->status)]);
   else
-    {
-      strcat(buffer, sys_siglist[WTERMSIG(job->status)]);
-      if (WCOREDUMP(job->status))
-        strcat(buffer, " (core dumped)");
-    }
+  {
+    strcat(buffer, sys_siglist[WTERMSIG(job->status)]);
+    if(WCOREDUMP(job->status))
+      strcat(buffer, " (core dumped)");
+  }
   strcat(buffer, "\t");
   fputs(buffer, primout);
   xprint(job->exp, C_NIL);
@@ -133,12 +133,12 @@ static int recordjob(int pid, int bg)
 #ifdef JOB_CONTROL
   struct job* job;
 
-  if (insidefork)
+  if(insidefork)
     return 0; /* Skip this if in a fork. */
-  job = (struct job*) safemalloc(sizeof(struct job));
-  if (job == NULL)
+  job = (struct job*)safemalloc(sizeof(struct job));
+  if(job == NULL)
     return 1;
-  if (joblist)
+  if(joblist)
     job->jobnum = (joblist->jobnum) + 1;
   else
     job->jobnum = 1;
@@ -164,34 +164,34 @@ static void collectjob(int pid, UNION_WAIT stat)
   struct job *i, *j;
 
   i = NULL;
-  for (j = joblist; j; i = j, j = j->next)
-    if (j->procid == pid)
+  for(j = joblist; j; i = j, j = j->next)
+    if(j->procid == pid)
+    {
+      j->running = 0;
+      j->status = stat;
+      if(!WIFSTOPPED(j->status))
       {
-        j->running = 0;
-        j->status = stat;
-        if (!WIFSTOPPED(j->status))
-          {
-            if (i)
-              i->next = j->next;
-            else
-              joblist = j->next;
-            if (WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
-              printjob(j); /* Print if not interrupted. */
-            if (j->background)      /* When running in background, */
-              {                     /* save on another list to be */
-                j->next = cjoblist; /* collected when signaled with */
-                cjoblist = j;       /* SIGCHLD. */
-              }
-            else
-              {
-                free(j->wdir);
-                free((char*) j);
-              }
-          }
+        if(i)
+          i->next = j->next;
         else
-          printjob(j);
-        break;
+          joblist = j->next;
+        if(WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
+          printjob(j);        /* Print if not interrupted. */
+        if(j->background)     /* When running in background, */
+        {                     /* save on another list to be */
+          j->next = cjoblist; /* collected when signaled with */
+          cjoblist = j;       /* SIGCHLD. */
+        }
+        else
+        {
+          free(j->wdir);
+          free((char*)j);
+        }
       }
+      else
+        printjob(j);
+      break;
+    }
 #endif
 }
 
@@ -199,12 +199,12 @@ static void collectjob(int pid, UNION_WAIT stat)
 void printdone()
 {
 #ifdef JOB_CONTROL
-  for (; cjoblist; cjoblist = cjoblist->next)
-    {
-      printjob(cjoblist);
-      free(cjoblist->wdir);
-      free((char*) cjoblist);
-    }
+  for(; cjoblist; cjoblist = cjoblist->next)
+  {
+    printjob(cjoblist);
+    free(cjoblist->wdir);
+    free((char*)cjoblist);
+  }
 #endif
 }
 
@@ -218,26 +218,26 @@ static int mfork()
 {
   int pid;
 
-  if ((pid = fork()) == 0)
+  if((pid = fork()) == 0)
+  {
+    pgrp = getpid();
+    if(!insidefork)
     {
-      pgrp = getpid();
-      if (!insidefork)
-        {
-          setpgid(1, pgrp);
-          tcsetpgrp(1, pgrp);
-          insidefork = 1;
-        }
-      preparefork();
-      return pid;
+      setpgid(1, pgrp);
+      tcsetpgrp(1, pgrp);
+      insidefork = 1;
     }
-  else if (pid < 0)
-    {
-      if (insidefork)
-        fprintf(stderr, "%s\n", strerror(errno));
-      else
-        syserr(C_NIL);
-      return pid;
-    }
+    preparefork();
+    return pid;
+  }
+  else if(pid < 0)
+  {
+    if(insidefork)
+      fprintf(stderr, "%s\n", strerror(errno));
+    else
+      syserr(C_NIL);
+    return pid;
+  }
   recordjob(pid, 0);
   return pid;
 }
@@ -260,13 +260,13 @@ static int checkmeta(char* s)
 {
   int i;
 
-  for (i = 0; s[i]; i++)
-    if (s[i] == '\\')
-      {
-        strcpy(s + i, s + i + 1);
-        continue;
-      }
-    else if (index("*?[]", s[i]))
+  for(i = 0; s[i]; i++)
+    if(s[i] == '\\')
+    {
+      strcpy(s + i, s + i + 1);
+      continue;
+    }
+    else if(index("*?[]", s[i]))
       return 1;
   return 0;
 }
@@ -290,65 +290,65 @@ static char** makeexec(LISPT command)
   sigemptyset(&new_mask);
   sigaddset(&new_mask, SIGINT);
   sigprocmask(SIG_BLOCK, &new_mask, &old_mask); /* Dangerous to interrupt here */
-  for (t = args; *t != NULL; t++)
-    {
-      free(*t);
-      *t = NULL;
-    }
+  for(t = args; *t != NULL; t++)
+  {
+    free(*t);
+    *t = NULL;
+  }
   sigprocmask(SIG_SETMASK, &old_mask, NULL);
-  for (i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
+  for(i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
+  {
+  again:
+    if(TYPEOF(CAR(com)) == SYMBOL)
     {
-    again:
-      if (TYPEOF(CAR(com)) == SYMBOL)
-        {
-          char* c = strsave(extilde(GETSTR(CAR(com)), 1));
-          if (c == NULL)
-            return NULL;
-          if (!checkmeta(c))
-            args[i++] = c;
-          else
-            {
-              if (ok == 0)
-                ok = 1;
-              if (i == 0)
-                {
-                  error(AMBIGUOUS, CAR(com));
-                  return NULL;
-                }
-              files = expandfiles(c, 0, 0, 1);
-              if (!ISNIL(files))
-                ok = 2;
-              while (TYPEOF(files) == CONS)
-                {
-                  args[i++] = strsave(GETSTR(CAR(files)));
-                  files = CDR(files);
-                }
-            }
-        }
-      else if (TYPEOF(CAR(com)) == INTEGER)
-        args[i++] = strsave(ltoa(INTVAL(CAR(com))));
-      else if (TYPEOF(CAR(com)) == STRING)
-        {
-          if ((args[i++] = strsave(GETSTR(CAR(com)))) == NULL)
-            return NULL;
-        }
-      else if (TYPEOF(CAR(com)) == CONS)
-        {
-          rplaca(com, eval(CAR(com)));
-          goto again;
-        }
+      char* c = strsave(extilde(GETSTR(CAR(com)), 1));
+      if(c == NULL)
+        return NULL;
+      if(!checkmeta(c))
+        args[i++] = c;
       else
+      {
+        if(ok == 0)
+          ok = 1;
+        if(i == 0)
         {
-          error(ILLEGAL_ARG, CAR(com));
+          error(AMBIGUOUS, CAR(com));
           return NULL;
         }
+        files = expandfiles(c, 0, 0, 1);
+        if(!ISNIL(files))
+          ok = 2;
+        while(TYPEOF(files) == CONS)
+        {
+          args[i++] = strsave(GETSTR(CAR(files)));
+          files = CDR(files);
+        }
+      }
     }
-  args[i] = NULL;
-  if (ok == 1)
+    else if(TYPEOF(CAR(com)) == INTEGER)
+      args[i++] = strsave(ltoa(INTVAL(CAR(com))));
+    else if(TYPEOF(CAR(com)) == STRING)
     {
-      error(NO_MATCH, CDR(command));
+      if((args[i++] = strsave(GETSTR(CAR(com)))) == NULL)
+        return NULL;
+    }
+    else if(TYPEOF(CAR(com)) == CONS)
+    {
+      rplaca(com, eval(CAR(com)));
+      goto again;
+    }
+    else
+    {
+      error(ILLEGAL_ARG, CAR(com));
       return NULL;
     }
+  }
+  args[i] = NULL;
+  if(ok == 1)
+  {
+    error(NO_MATCH, CDR(command));
+    return NULL;
+  }
   return args;
 }
 
@@ -363,17 +363,16 @@ static UNION_WAIT waitfork(int pid)
   UNION_WAIT wstat;
 
   do
-    {
-      wpid = wait3(&wstat, WUNTRACED, (struct rusage*) NULL);
-      if (wpid != -1 && !insidefork)
-        collectjob(wpid, wstat);
-    }
-  while (pid && pid != wpid && wpid != -1);
-  if (WIFSIGNALED(wstat))
-    {
-      unwind();
-      throw lips_error("waitfork");
-    }
+  {
+    wpid = wait3(&wstat, WUNTRACED, (struct rusage*)NULL);
+    if(wpid != -1 && !insidefork)
+      collectjob(wpid, wstat);
+  } while(pid && pid != wpid && wpid != -1);
+  if(WIFSIGNALED(wstat))
+  {
+    unwind();
+    throw lips_error("waitfork");
+  }
   return wstat;
 }
 
@@ -383,12 +382,11 @@ void checkfork()
   UNION_WAIT wstat;
 
   do
-    {
-      wpid = wait3(&wstat, WUNTRACED | WNOHANG, (struct rusage*) NULL);
-      if (wpid > 0)
-        collectjob(wpid, wstat);
-    }
-  while (wpid > 0);
+  {
+    wpid = wait3(&wstat, WUNTRACED | WNOHANG, (struct rusage*)NULL);
+    if(wpid > 0)
+      collectjob(wpid, wstat);
+  } while(wpid > 0);
 }
 
 /* 
@@ -404,28 +402,28 @@ static LISPT exec(const char* name, LISPT command)
   int pid;
   UNION_WAIT status;
 
-  if ((args = makeexec(command)) == NULL)
+  if((args = makeexec(command)) == NULL)
     return C_ERROR;
-  if (insidefork)
-    {
-      execve(name, args, environ);
-      if (errno == ENOEXEC)
-        execvp(name, args);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(1); /* No return */
-    }
-  else if ((pid = mfork()) == 0)
-    {
-      execve(name, args, environ);
-      if (errno == ENOEXEC)
-        execvp(name, args);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(1);
-    }
-  else if (pid < 0)
+  if(insidefork)
+  {
+    execve(name, args, environ);
+    if(errno == ENOEXEC)
+      execvp(name, args);
+    fprintf(stderr, "%s\n", strerror(errno));
+    exit(1); /* No return */
+  }
+  else if((pid = mfork()) == 0)
+  {
+    execve(name, args, environ);
+    if(errno == ENOEXEC)
+      execvp(name, args);
+    fprintf(stderr, "%s\n", strerror(errno));
+    exit(1);
+  }
+  else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber((long) WEXITSTATUS(status));
+  return mknumber((long)WEXITSTATUS(status));
 }
 
 /* 
@@ -440,9 +438,9 @@ static int ifexec(const char* dir, const char* name)
   strcpy(path, dir);
   strcat(path, "/");
   strcat(path, name);
-  if (stat(path, &buf) == -1)
+  if(stat(path, &buf) == -1)
     return 0;
-  if ((buf.st_mode & (S_IEXEC | S_IFREG)) == (S_IEXEC | S_IFREG))
+  if((buf.st_mode & (S_IEXEC | S_IFREG)) == (S_IEXEC | S_IFREG))
     return 1;
   else
     return 0;
@@ -456,11 +454,11 @@ static BITS32 hashfun(const char* str)
 
   i = 0;
   bc = 0;
-  while (*str)
-    {
-      i ^= (*str++) << bc;
-      bc = (bc + 7) % 10;
-    }
+  while(*str)
+  {
+    i ^= (*str++) << bc;
+    bc = (bc + 7) % 10;
+  }
   return i % (EXECHASH);
 }
 
@@ -479,44 +477,44 @@ int execcommand(LISPT exp, LISPT* res)
 
   *res = C_T;
   command = extilde(GETSTR(CAR(exp)), 1);
-  if (command == NULL)
+  if(command == NULL)
     return -1;
-  if (*command == '/' || strpbrk(command, "/") != NULL)
-    {
-      if (EQ(exec(command, exp), C_ERROR))
-        return -1;
-      else
-        return 1;
-    }
+  if(*command == '/' || strpbrk(command, "/") != NULL)
+  {
+    if(EQ(exec(command, exp), C_ERROR))
+      return -1;
+    else
+      return 1;
+  }
 
   i = hashfun(command);
   possible = exechash[i / 32] & (1 << (i % 32));
 
-  for (cdir = path; TYPEOF(cdir) == CONS; cdir = CDR(cdir))
+  for(cdir = path; TYPEOF(cdir) == CONS; cdir = CDR(cdir))
+  {
+    if(ISNIL(CAR(cdir)) || strcmp(GETSTR(CAR(cdir)), ".") == 0)
+      strcpy(comdir, ".");
+    else if(possible)
     {
-      if (ISNIL(CAR(cdir)) || strcmp(GETSTR(CAR(cdir)), ".") == 0)
-        strcpy(comdir, ".");
-      else if (possible)
-        {
-          /* This isn't really necessary, is it? */
-          if (TYPEOF(CAR(cdir)) != STRING && TYPEOF(CAR(cdir)) != SYMBOL)
-            return -1;
-          strcpy(comdir, GETSTR(CAR(cdir)));
-        }
-      else
-        continue;
-      if (ifexec(comdir, command))
-        {
-          strcat(comdir, "/");
-          strcat(comdir, command);
-          if (EQ(exec(comdir, exp), C_ERROR))
-            return -1;
-          else
-            return 1;
-        }
-      else
-        continue;
+      /* This isn't really necessary, is it? */
+      if(TYPEOF(CAR(cdir)) != STRING && TYPEOF(CAR(cdir)) != SYMBOL)
+        return -1;
+      strcpy(comdir, GETSTR(CAR(cdir)));
     }
+    else
+      continue;
+    if(ifexec(comdir, command))
+    {
+      strcat(comdir, "/");
+      strcat(comdir, command);
+      if(EQ(exec(comdir, exp), C_ERROR))
+        return -1;
+      else
+        return 1;
+    }
+    else
+      continue;
+  }
   return 0;
 }
 
@@ -527,14 +525,14 @@ int execcommand(LISPT exp, LISPT* res)
 static void setenviron(const char* var, const char* val)
 {
 #ifdef PUTENV
-  char* env = (char*) safemalloc((unsigned) strlen(var) + strlen(val) + 2);
+  char* env = (char*)safemalloc((unsigned)strlen(var) + strlen(val) + 2);
   strcpy(env, var);
   strcat(env, "=");
   strcat(env, val);
   putenv(env);
 #else
-  char* var_ = (char*) safemalloc((unsigned) strlen(var) + 1);
-  char* val_ = (char*) safemalloc((unsigned) strlen(val) + 1);
+  char* var_ = (char*)safemalloc((unsigned)strlen(var) + 1);
+  char* val_ = (char*)safemalloc((unsigned)strlen(val) + 1);
   setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
@@ -546,33 +544,33 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd))
+  if(ISNIL(cmd))
     return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed))
+  if(ISNIL(filed))
     oldfd = 1;
   else
-    {
-      CHECK(filed, INTEGER);
-      oldfd = INTVAL(filed);
-    }
-  if ((fd = creat(GETSTR(file), 0644)) == -1)
+  {
+    CHECK(filed, INTEGER);
+    oldfd = INTVAL(filed);
+  }
+  if((fd = creat(GETSTR(file), 0644)) == -1)
     return syserr(file);
-  if ((pid = mfork()) == 0)
+  if((pid = mfork()) == 0)
+  {
+    if(dup2(fd, oldfd) < 0)
     {
-      if (dup2(fd, oldfd) < 0)
-        {
-          fprintf(stderr, "%s\n", strerror(errno));
-          exit(1);
-        }
-      eval(cmd);
-      exit(0);
+      fprintf(stderr, "%s\n", strerror(errno));
+      exit(1);
     }
-  else if (pid < 0)
+    eval(cmd);
+    exit(0);
+  }
+  else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long) WEXITSTATUS(status));
+  return mknumber((long)WEXITSTATUS(status));
 }
 
 PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
@@ -580,33 +578,33 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd))
+  if(ISNIL(cmd))
     return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed))
+  if(ISNIL(filed))
     oldfd = 1;
   else
-    {
-      CHECK(filed, INTEGER);
-      oldfd = INTVAL(filed);
-    }
-  if ((fd = open(GETSTR(file), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+  {
+    CHECK(filed, INTEGER);
+    oldfd = INTVAL(filed);
+  }
+  if((fd = open(GETSTR(file), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
     return syserr(file);
-  if ((pid = mfork()) == 0)
+  if((pid = mfork()) == 0)
+  {
+    if(dup2(fd, oldfd) < 0)
     {
-      if (dup2(fd, oldfd) < 0)
-        {
-          fprintf(stderr, "%s\n", strerror(errno));
-          exit(1);
-        }
-      eval(cmd);
-      exit(0);
+      fprintf(stderr, "%s\n", strerror(errno));
+      exit(1);
     }
-  else if (pid < 0)
+    eval(cmd);
+    exit(0);
+  }
+  else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long) WEXITSTATUS(status));
+  return mknumber((long)WEXITSTATUS(status));
 }
 
 PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
@@ -614,33 +612,33 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if (ISNIL(cmd))
+  if(ISNIL(cmd))
     return C_NIL;
   CHECK2(file, STRING, SYMBOL);
-  if (ISNIL(filed))
+  if(ISNIL(filed))
     oldfd = 0;
   else
-    {
-      CHECK(filed, INTEGER);
-      oldfd = INTVAL(filed);
-    }
-  if ((fd = open(GETSTR(file), O_RDONLY)) == -1)
+  {
+    CHECK(filed, INTEGER);
+    oldfd = INTVAL(filed);
+  }
+  if((fd = open(GETSTR(file), O_RDONLY)) == -1)
     return syserr(file);
-  if ((pid = mfork()) == 0)
+  if((pid = mfork()) == 0)
+  {
+    if(dup2(fd, oldfd) < 0)
     {
-      if (dup2(fd, oldfd) < 0)
-        {
-          fprintf(stderr, "%s\n", strerror(errno));
-          exit(1);
-        }
-      eval(cmd);
-      exit(0);
+      fprintf(stderr, "%s\n", strerror(errno));
+      exit(1);
     }
-  else if (pid < 0)
+    eval(cmd);
+    exit(0);
+  }
+  else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long) WEXITSTATUS(status));
+  return mknumber((long)WEXITSTATUS(status));
 }
 
 PRIMITIVE pipecmd(LISPT cmds)
@@ -649,60 +647,60 @@ PRIMITIVE pipecmd(LISPT cmds)
   int pid;
   UNION_WAIT status;
 
-  if (ISNIL(cmds))
+  if(ISNIL(cmds))
     return C_NIL;
-  if (ISNIL(CDR(cmds)))
+  if(ISNIL(CDR(cmds)))
     return eval(CAR(cmds));
-  if ((pid = mfork()) == 0)
+  if((pid = mfork()) == 0)
+  {
+    pipe(pd);
+    if((pid = mfork()) == 0)
     {
-      pipe(pd);
-      if ((pid = mfork()) == 0)
-        {
-          close(pd[0]);
-          if (dup2(pd[1], 1) < 0)
-            {
-              fprintf(stderr, "%s\n", strerror(errno));
-              exit(1);
-            }
-          eval(CAR(cmds));
-          exit(0);
-        }
-      else if (pid < 0)
+      close(pd[0]);
+      if(dup2(pd[1], 1) < 0)
+      {
+        fprintf(stderr, "%s\n", strerror(errno));
         exit(1);
-      cmds = CDR(cmds);
-      close(pd[1]);
-      if (dup2(pd[0], 0) < 0)
-        {
-          fprintf(stderr, "%s\n", strerror(errno));
-          exit(1);
-        }
+      }
       eval(CAR(cmds));
-      status = waitfork(pid);
       exit(0);
     }
-  else if (pid < 0)
+    else if(pid < 0)
+      exit(1);
+    cmds = CDR(cmds);
+    close(pd[1]);
+    if(dup2(pd[0], 0) < 0)
+    {
+      fprintf(stderr, "%s\n", strerror(errno));
+      exit(1);
+    }
+    eval(CAR(cmds));
+    status = waitfork(pid);
+    exit(0);
+  }
+  else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber((long) WEXITSTATUS(status));
+  return mknumber((long)WEXITSTATUS(status));
 }
 
 PRIMITIVE back(LISPT l)
 {
   int pid;
 
-  if ((pid = fork()) == 0)
-    {
-      pgrp = getpid();
-      insidefork = 1;
-      preparefork();
-      eval(l);
-      exit(0);
-    }
-  else if (pid < 0)
+  if((pid = fork()) == 0)
+  {
+    pgrp = getpid();
+    insidefork = 1;
+    preparefork();
+    eval(l);
+    exit(0);
+  }
+  else if(pid < 0)
     return C_ERROR;
   recordjob(pid, 1);
   printf("[%d] %d\n", joblist->jobnum, pid);
-  return mknumber((long) pid);
+  return mknumber((long)pid);
 }
 
 PRIMITIVE stop()
@@ -719,25 +717,25 @@ PRIMITIVE rehash()
   BITS32 i;
   LISPT p;
 
-  for (i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
-  for (p = path; TYPEOF(p) == CONS; p = CDR(p))
+  for(i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
+  for(p = path; TYPEOF(p) == CONS; p = CDR(p))
+  {
+    if(ISNIL(CAR(p)))
+      continue;
+    else
     {
-      if (ISNIL(CAR(p)))
-        continue;
-      else
-        {
-          CHECK2(CAR(p), STRING, SYMBOL);
-          sdir = GETSTR(CAR(p));
-        }
-      if ((odir = opendir(sdir)) == NULL)
-        continue;
-      while ((rdir = readdir(odir)) != NULL)
-        {
-          i = hashfun(rdir->d_name);
-          exechash[i / 32] |= 1 << (i % 32);
-        }
-      closedir(odir);
+      CHECK2(CAR(p), STRING, SYMBOL);
+      sdir = GETSTR(CAR(p));
     }
+    if((odir = opendir(sdir)) == NULL)
+      continue;
+    while((rdir = readdir(odir)) != NULL)
+    {
+      i = hashfun(rdir->d_name);
+      exechash[i / 32] |= 1 << (i % 32);
+    }
+    closedir(odir);
+  }
   return C_NIL;
 }
 
@@ -746,7 +744,7 @@ PRIMITIVE jobs()
 #ifdef JOB_CONTROL
   struct job* j;
 
-  for (j = joblist; j; j = j->next) printjob(j);
+  for(j = joblist; j; j = j->next) printjob(j);
 #endif
   return C_NIL;
 }
@@ -758,33 +756,33 @@ PRIMITIVE fg(LISPT job)
   int pgrp;
   UNION_WAIT status;
 
-  if (ISNIL(job))
-    {
-      for (j = joblist; j; j = j->next)
-        if (WIFSTOPPED(j->status))
-          break;
-    }
+  if(ISNIL(job))
+  {
+    for(j = joblist; j; j = j->next)
+      if(WIFSTOPPED(j->status))
+        break;
+  }
   else
-    {
-      CHECK(job, INTEGER);
-      for (j = joblist; j; j = j->next)
-        if (j->jobnum == INTVAL(job))
-          break;
-    }
-  if (j)
-    {
-      pgrp = getpgid(j->procid);
-      j->running = 1;
-      printjob(j);
-      tcsetpgrp(1, pgrp);
-      if (WIFSTOPPED(j->status))
-        if (killpg(pgrp, SIGCONT) < 0)
-          return syserr(mknumber((long) pgrp));
-      j->status = 0;
-      j->background = 0;
-      status = waitfork(j->procid);
-      return mknumber((long) WEXITSTATUS(status));
-    }
+  {
+    CHECK(job, INTEGER);
+    for(j = joblist; j; j = j->next)
+      if(j->jobnum == INTVAL(job))
+        break;
+  }
+  if(j)
+  {
+    pgrp = getpgid(j->procid);
+    j->running = 1;
+    printjob(j);
+    tcsetpgrp(1, pgrp);
+    if(WIFSTOPPED(j->status))
+      if(killpg(pgrp, SIGCONT) < 0)
+        return syserr(mknumber((long)pgrp));
+    j->status = 0;
+    j->background = 0;
+    status = waitfork(j->procid);
+    return mknumber((long)WEXITSTATUS(status));
+  }
   return error(NO_SUCH_JOB, job);
 #endif
 }
@@ -795,32 +793,32 @@ PRIMITIVE bg(LISPT job)
   struct job* j;
   int pgrp;
 
-  if (ISNIL(job))
-    {
-      for (j = joblist; j; j = j->next)
-        if (!j->background)
-          break;
-    }
+  if(ISNIL(job))
+  {
+    for(j = joblist; j; j = j->next)
+      if(!j->background)
+        break;
+  }
   else
-    {
-      CHECK(job, INTEGER);
-      for (j = joblist; j; j = j->next)
-        if (j->jobnum == INTVAL(job))
-          break;
-    }
-  if (j)
-    {
-      pgrp = getpgid(j->procid);
-      j->status = 0;
-      j->running = 1;
-      printjob(j);
-      tcsetpgrp(1, pgrp);
-      if (!j->background)
-        if (killpg(pgrp, SIGCONT) < 0)
-          return syserr(mknumber((long) pgrp));
-      j->background = 1;
-      return C_T;
-    }
+  {
+    CHECK(job, INTEGER);
+    for(j = joblist; j; j = j->next)
+      if(j->jobnum == INTVAL(job))
+        break;
+  }
+  if(j)
+  {
+    pgrp = getpgid(j->procid);
+    j->status = 0;
+    j->running = 1;
+    printjob(j);
+    tcsetpgrp(1, pgrp);
+    if(!j->background)
+      if(killpg(pgrp, SIGCONT) < 0)
+        return syserr(mknumber((long)pgrp));
+    j->background = 1;
+    return C_T;
+  }
   return error(NO_SUCH_JOB, job);
 #endif
 }
@@ -839,7 +837,7 @@ PRIMITIVE getenviron(LISPT var)
 
   CHECK2(var, STRING, SYMBOL);
   s = getenv(GETSTR(var));
-  if (s == NULL)
+  if(s == NULL)
     return C_NIL;
   else
     return mkstring(s);
@@ -849,35 +847,35 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
-  if (ISNIL(dir))
+  if(ISNIL(dir))
     ndir = home;
   else
-    {
-      ndir = glob(dir);
-      if (TYPEOF(ndir) == CONS)
-        ndir = CAR(ndir);
-    }
-  if (ISNIL(ndir))
-    {
-      if (ISNIL(emess))
-        return error(NO_MATCH, dir);
-      else
-        return C_NIL;
-    }
-  if (chdir(GETSTR(ndir)) == -1)
-    {
-      if (ISNIL(emess))
-        return syserr(dir);
-      else
-        return C_NIL;
-    }
+  {
+    ndir = glob(dir);
+    if(TYPEOF(ndir) == CONS)
+      ndir = CAR(ndir);
+  }
+  if(ISNIL(ndir))
+  {
+    if(ISNIL(emess))
+      return error(NO_MATCH, dir);
+    else
+      return C_NIL;
+  }
+  if(chdir(GETSTR(ndir)) == -1)
+  {
+    if(ISNIL(emess))
+      return syserr(dir);
+    else
+      return C_NIL;
+  }
   else
-    {
-      char* wd = getcwd(NULL, 0);
-      setenviron("PWD", wd);
-      free(wd);
-      return C_T;
-    }
+  {
+    char* wd = getcwd(NULL, 0);
+    setenviron("PWD", wd);
+    free(wd);
+    return C_T;
+  }
 }
 
 PRIMITIVE doexec(LISPT cmd)
@@ -885,14 +883,14 @@ PRIMITIVE doexec(LISPT cmd)
   LISPT res;
 
   insidefork = 1; /* Prevent exec from forking */
-  switch (execcommand(cmd, &res))
-    {
+  switch(execcommand(cmd, &res))
+  {
     case -1:
       return C_ERROR;
       break;
     default:
       break; /* Never reached */
-    }
+  }
   return C_NIL;
 }
 

@@ -52,14 +52,14 @@ static int (*cont)(void); /* Current continuation. */
  */
 #define BREAK(mess, fault, next) \
   { \
-    if (mess != 0) \
-      { \
-        error(mess, fault); \
-        printwhere(); \
-      } \
-    if (breakhook != NULL) \
+    if(mess != 0) \
+    { \
+      error(mess, fault); \
+      printwhere(); \
+    } \
+    if(breakhook != NULL) \
       (*breakhook)(); \
-    if (env == NULL) \
+    if(env == NULL) \
       throw lips_error("break"); \
     xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T); \
     PUSH_FUNC(next); \
@@ -86,17 +86,17 @@ static int (*cont)(void); /* Current continuation. */
 #define PUSH_LISP(a) \
   control[toctrl].type = CTRL_LISP; \
   control[toctrl++].u.lisp = (a); \
-  if (toctrl >= CTRLBLKSIZE) \
+  if(toctrl >= CTRLBLKSIZE) \
   overflow()
 #define PUSH_POINT(a) \
   control[toctrl].type = CTRL_POINT; \
   control[toctrl++].u.point = (a); \
-  if (toctrl >= CTRLBLKSIZE) \
+  if(toctrl >= CTRLBLKSIZE) \
   overflow()
 #define PUSH_FUNC(a) \
   control[toctrl].type = CTRL_FUNC; \
   control[toctrl++].u.f_point = (a); \
-  if (toctrl >= CTRLBLKSIZE) \
+  if(toctrl >= CTRLBLKSIZE) \
   overflow()
 #define POP_LISP (control[--toctrl].u.lisp)
 #define POP_POINT (control[--toctrl].u.point)
@@ -112,21 +112,22 @@ static int (*cont)(void); /* Current continuation. */
   dest[0].val.d_integer = (s); \
   dest[0].type = 0
 
-#define STOREVAR(v, i) { \
-  dest[i].var.d_lisp = (v); \
-  dest[i].type = 1; \
-}
+#define STOREVAR(v, i) \
+  { \
+    dest[i].var.d_lisp = (v); \
+    dest[i].type = 1; \
+  }
 
 #define UNLINK \
   dfree(env); \
-  env = (struct destblock*) POP_POINT
+  env = (struct destblock*)POP_POINT
 
 #define SEND(a) \
-  if (dest[0].var.d_integer > 0) \
+  if(dest[0].var.d_integer > 0) \
   dest[dest[0].var.d_integer].val.d_lisp = (a)
 #define RECEIVE dest[dest[0].var.d_integer].val.d_lisp
 #define NEXT \
-  if (dest[0].var.d_integer > 0) \
+  if(dest[0].var.d_integer > 0) \
   dest[0].var.d_integer--
 
 /* Use shallow binding. */
@@ -144,22 +145,20 @@ static LISPT printwhere()
   int i;
 
   foo = C_NIL;
-  for (i = toctrl - 1; i; i--) /* find latest completed call */
-    if (control[i].type == CTRL_FUNC && control[i].u.f_point == evlam0)
-      for (; i; i--)
+  for(i = toctrl - 1; i; i--) /* find latest completed call */
+    if(control[i].type == CTRL_FUNC && control[i].u.f_point == evlam0)
+      for(; i; i--)
+      {
+        if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0 && control[i - 1].type == CTRL_LISP
+          && (TYPEOF(control[i - 1].u.lisp) == CONS && TYPEOF(CAR(control[i - 1].u.lisp)) != CONS))
         {
-          if (control[i].type == CTRL_FUNC && control[i].u.f_point == ev0
-            && control[i - 1].type == CTRL_LISP
-            && (TYPEOF(control[i - 1].u.lisp) == CONS
-              && TYPEOF(CAR(control[i - 1].u.lisp)) != CONS))
-            {
-              foo = control[i - 1].u.lisp;
-              fprintf(primerr, " [in ");
-              prin2(CAR(foo), C_T);
-              pputc(']', primerr);
-              goto out;
-            }
+          foo = control[i - 1].u.lisp;
+          fprintf(primerr, " [in ");
+          prin2(CAR(foo), C_T);
+          pputc(']', primerr);
+          goto out;
         }
+      }
 out:
   pputc('\n', primerr);
   return foo;
@@ -178,8 +177,8 @@ static LISPT call(LISPT fun)
 {
   LISPT foo = C_NIL;
 
-  switch (SUBRVAL(fun).argcount)
-    {
+  switch(SUBRVAL(fun).argcount)
+  {
     case 0:
       foo = CALL0();
       break;
@@ -197,7 +196,7 @@ static LISPT call(LISPT fun)
       break;
     default:
       break;
-    }
+  }
   return foo;
 }
 
@@ -232,14 +231,14 @@ PRIMITIVE eval(LISPT expr)
    */
   PUSH_FUNC(eval0);
   cont = peval;
-  while (!(*cont)())
+  while(!(*cont)())
     ;
   /* 
    * Retrieve the result of the evaluation and restore the previous
    * destination.
    */
   foo = RECEIVE;
-  dest = (struct destblock*) POP_POINT;
+  dest = (struct destblock*)POP_POINT;
   /* 
    * Return the result.
    */
@@ -269,10 +268,10 @@ PRIMITIVE apply(LISPT f, LISPT a)
   expression = cons(f, a);
   PUSH_FUNC(apply0);
   cont = peval2;
-  while (!(*cont)())
+  while(!(*cont)())
     ;
   foo = RECEIVE;
-  dest = (struct destblock*) POP_POINT;
+  dest = (struct destblock*)POP_POINT;
   return foo;
 }
 
@@ -299,13 +298,13 @@ static int ev0()
 static int peval()
 {
 #ifdef TRACE
-  if (trace)
+  if(trace)
     xprint(expression, C_T);
 #endif /* TRACE */
   PUSH_LISP(expression);
   PUSH_FUNC(ev0);
-  switch (TYPEOF(expression))
-    {
+  switch(TYPEOF(expression))
+  {
     case CONS:
       PUSH_LISP(fun);
       fun = CAR(expression);
@@ -332,7 +331,7 @@ static int peval()
       SEND(expression);
       cont = POP_FUNC;
       break;
-    }
+  }
   return 0;
 }
 
@@ -348,9 +347,9 @@ static int evalhook(LISPT exp)
 {
   LISPT res;
 
-  if (undefhook != NULL)
-    switch ((*undefhook)(exp, &res))
-      {
+  if(undefhook != NULL)
+    switch((*undefhook)(exp, &res))
+    {
       case 1:
         SEND(res);
         cont = POP_FUNC;
@@ -361,7 +360,7 @@ static int evalhook(LISPT exp)
       default:
         return 0;
         break;
-      }
+    }
   return 1;
 }
 
@@ -375,54 +374,52 @@ void do_unbound(int (*continuation)(void))
    * the symbol is undefined.
    */
   al = getprop(CAR(expression), C_AUTOLOAD);
-  if (!ISNIL(al))
+  if(!ISNIL(al))
+  {
+    PUSH_LISP(expression);
+    PUSH_POINT(dest);
+    load(al);
+    dest = (struct destblock*)POP_POINT;
+    expression = POP_LISP;
+    fun = SYMVALUE(CAR(expression));
+    if(TYPEOF(fun) == UNBOUND)
     {
-      PUSH_LISP(expression);
-      PUSH_POINT(dest);
-      load(al);
-      dest = (struct destblock*) POP_POINT;
-      expression = POP_LISP;
-      fun = SYMVALUE(CAR(expression));
-      if (TYPEOF(fun) == UNBOUND)
-        {
-          if (!evalhook(expression))
-            BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
-        }
-      else
-        cont = continuation;
+      if(!evalhook(expression))
+        BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
     }
+    else
+      cont = continuation;
+  }
   else
+  {
+    expression = findalias(expression);
+    if(EQ(expression, C_ERROR))
+      ABORT(NO_MESSAGE, C_NIL);
+    if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
     {
-      expression = findalias(expression);
-      if (EQ(expression, C_ERROR))
-        ABORT(NO_MESSAGE, C_NIL);
-      if (TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL
-        && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
-        {
-          if (!evalhook(expression))
-            BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
-        }
-      else
-        {
-          fun = CAR(expression);
-          args = CDR(expression);
-          cont = continuation;
-        }
+      if(!evalhook(expression))
+        BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
     }
+    else
+    {
+      fun = CAR(expression);
+      args = CDR(expression);
+      cont = continuation;
+    }
+  }
 }
 
 int do_default(int (*continuation)(void))
 {
   expression = findalias(expression);
-  if (EQ(expression, C_ERROR))
+  if(EQ(expression, C_ERROR))
     ABORT(NO_MESSAGE, C_NIL);
-  if (TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL
-    && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
-    {
-      if (!evalhook(expression))
-        BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
-      return 1;
-    }
+  if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
+  {
+    if(!evalhook(expression))
+      BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
+    return 1;
+  }
   else
     return 0;
 }
@@ -431,13 +428,13 @@ static int peval1()
 {
   int foo;
 
-  if (brkflg)
+  if(brkflg)
     BREAK(KBD_BREAK, fun, peval1)
-  else if (interrupt)
+  else if(interrupt)
     ABORT(NO_MESSAGE, C_NIL)
   else
-    switch (TYPEOF(fun))
-      {
+    switch(TYPEOF(fun))
+    {
       case CLOSURE:
         PUSH_FUNC(peval1);
         cont = evclosure;
@@ -445,33 +442,33 @@ static int peval1()
       case SUBR:
         PUSH_POINT(dest);
         PUSH_FUNC(ev2);
-        if ((foo = SUBRVAL(fun).argcount) < 0)
-          {
-            dest = MKDESTBLOCK(-foo);
-            PUSH_FUNC(noevarg);
-            cont = evlis;
-          }
+        if((foo = SUBRVAL(fun).argcount) < 0)
+        {
+          dest = MKDESTBLOCK(-foo);
+          PUSH_FUNC(noevarg);
+          cont = evlis;
+        }
         else
-          {
-            dest = MKDESTBLOCK(foo);
-            noeval = 0;
-            cont = evalargs;
-          }
+        {
+          dest = MKDESTBLOCK(foo);
+          noeval = 0;
+          cont = evalargs;
+        }
         break;
       case FSUBR:
         PUSH_POINT(dest);
         PUSH_FUNC(ev2);
-        if ((foo = SUBRVAL(fun).argcount) < 0)
-          {
-            dest = MKDESTBLOCK(-foo);
-            cont = spread;
-          }
+        if((foo = SUBRVAL(fun).argcount) < 0)
+        {
+          dest = MKDESTBLOCK(-foo);
+          cont = spread;
+        }
         else
-          {
-            dest = MKDESTBLOCK(foo);
-            noeval = 1;
-            cont = evalargs;
-          }
+        {
+          dest = MKDESTBLOCK(foo);
+          noeval = 1;
+          cont = evalargs;
+        }
         break;
       case LAMBDA:
         noeval = 0;
@@ -495,14 +492,14 @@ static int peval1()
         do_unbound(peval1);
         break;
       case STRING:
-        if (!evalhook(expression))
+        if(!evalhook(expression))
           BREAK(ILLEGAL_FUNCTION, fun, peval1);
         break;
       default:
-        if (!do_default(peval1))
+        if(!do_default(peval1))
           BREAK(ILLEGAL_FUNCTION, fun, peval1);
         break;
-      }
+    }
   return 0;
 }
 
@@ -510,11 +507,11 @@ static int peval2()
 {
   int foo;
 
-  if (brkflg)
+  if(brkflg)
     BREAK(KBD_BREAK, fun, peval2)
   else
-    switch (TYPEOF(fun))
-      {
+    switch(TYPEOF(fun))
+    {
       case CLOSURE:
         PUSH_FUNC(peval2);
         cont = evclosure;
@@ -523,17 +520,17 @@ static int peval2()
       case FSUBR:
         PUSH_POINT(dest);
         PUSH_FUNC(ev2);
-        if ((foo = SUBRVAL(fun).argcount) < 0)
-          {
-            dest = MKDESTBLOCK(-foo);
-            cont = spread;
-          }
+        if((foo = SUBRVAL(fun).argcount) < 0)
+        {
+          dest = MKDESTBLOCK(-foo);
+          cont = spread;
+        }
         else
-          {
-            dest = MKDESTBLOCK(foo);
-            noeval = 1;
-            cont = evalargs;
-          }
+        {
+          dest = MKDESTBLOCK(foo);
+          noeval = 1;
+          cont = evalargs;
+        }
         break;
       case LAMBDA:
       case NLAMBDA:
@@ -554,14 +551,14 @@ static int peval2()
         do_unbound(peval2);
         break;
       case STRING:
-        if (!evalhook(expression))
+        if(!evalhook(expression))
           BREAK(ILLEGAL_FUNCTION, fun, peval2);
         break;
       default:
-        if (!do_default(peval2))
+        if(!do_default(peval2))
           BREAK(ILLEGAL_FUNCTION, fun, peval2);
         break;
-      }
+    }
   return 0;
 }
 
@@ -576,11 +573,11 @@ void bt()
 
   op = printlevel;
   printlevel = 2;
-  for (i = toctrl - 1; i; i--)
-    {
-      if (control[i].type == CTRL_FUNC && control[i].u.f_point == ev0)
-        xprint(control[i - 1].u.lisp, C_T);
-    }
+  for(i = toctrl - 1; i; i--)
+  {
+    if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0)
+      xprint(control[i - 1].u.lisp, C_T);
+  }
   printlevel = op;
 }
 
@@ -601,32 +598,32 @@ static int noevarg()
 
 static int evalargs()
 {
-  if (ISNIL(args))
-    {
-      cont = POP_FUNC;
-    }
+  if(ISNIL(args))
+  {
+    cont = POP_FUNC;
+  }
   else
-    {
-      expression = CAR(args);
-      if (noeval)
-        cont = noev9;
-      else
-        cont = ev9;
-    }
+  {
+    expression = CAR(args);
+    if(noeval)
+      cont = noev9;
+    else
+      cont = ev9;
+  }
   return 0;
 }
 
 static int ev9()
 {
-  if (ISNIL(CDR(args)))
-    {
-      cont = peval;
-    }
+  if(ISNIL(CDR(args)))
+  {
+    cont = peval;
+  }
   else
-    {
-      PUSH_FUNC(ev11);
-      cont = peval;
-    }
+  {
+    PUSH_FUNC(ev11);
+    cont = peval;
+  }
   return 0;
 }
 
@@ -642,48 +639,48 @@ static int ev11()
 static int noev9()
 {
 nextarg:
-  if (ISNIL(CDR(args)))
-    {
-      SEND(expression);
-      cont = POP_FUNC;
-    }
+  if(ISNIL(CDR(args)))
+  {
+    SEND(expression);
+    cont = POP_FUNC;
+  }
   else
-    {
-      SEND(expression);
-      NEXT;
-      args = CDR(args);
-      expression = CAR(args);
-      goto nextarg;
-    }
+  {
+    SEND(expression);
+    NEXT;
+    args = CDR(args);
+    expression = CAR(args);
+    goto nextarg;
+  }
   return 0;
 }
 
 static int evlis()
 {
-  if (ISNIL(args))
-    {
-      cont = POP_FUNC;
-    }
+  if(ISNIL(args))
+  {
+    cont = POP_FUNC;
+  }
   else
-    {
-      expression = CAR(args);
-      cont = evlis1;
-    }
+  {
+    expression = CAR(args);
+    cont = evlis1;
+  }
   return 0;
 }
 
 static int evlis1()
 {
-  if (ISNIL(CDR(args)))
-    {
-      PUSH_FUNC(evlis2);
-      cont = peval;
-    }
+  if(ISNIL(CDR(args)))
+  {
+    PUSH_FUNC(evlis2);
+    cont = peval;
+  }
   else
-    {
-      PUSH_FUNC(evlis3);
-      cont = peval;
-    }
+  {
+    PUSH_FUNC(evlis3);
+    cont = peval;
+  }
   return 0;
 }
 
@@ -714,7 +711,7 @@ static int evlis4()
 
   x = RECEIVE;
   dfree(dest);
-  dest = (struct destblock*) POP_POINT;
+  dest = (struct destblock*)POP_POINT;
   x = cons(RECEIVE, x);
   SEND(x);
   cont = POP_FUNC;
@@ -732,25 +729,24 @@ static int evlam()
   PUSH_POINT(env);
   PUSH_POINT(dest);
   spr = 0;
-  if ((ac = LAMVAL(fun).argcnt) < 0)
-    {
-      ac = -ac;
-      spr++;
-    }
+  if((ac = LAMVAL(fun).argcnt) < 0)
+  {
+    ac = -ac;
+    spr++;
+  }
   dest = MKDESTBLOCK(ac);
-  for (foo = LAMVAL(fun).arglist, i = ac; i; foo = CDR(foo), i--)
-    STOREVAR(CAR(foo), i);
+  for(foo = LAMVAL(fun).arglist, i = ac; i; foo = CDR(foo), i--) STOREVAR(CAR(foo), i);
   PUSH_FUNC(evlam1);
-  if (spr)
+  if(spr)
+  {
+    if(noeval)
+      cont = spread;
+    else
     {
-      if (noeval)
-        cont = spread;
-      else
-        {
-          PUSH_FUNC(noevarg);
-          cont = evlis;
-        }
+      PUSH_FUNC(noevarg);
+      cont = evlis;
     }
+  }
   else
     cont = evalargs;
   return 0;
@@ -759,22 +755,22 @@ static int evlam()
 static int spread()
 {
 respread:
-  if (EQ(args, C_NIL))
-    {
-      cont = POP_FUNC;
-    }
-  else if ((dest[0].var.d_integer) == 1)
-    {
-      SEND(args);
-      cont = POP_FUNC;
-    }
+  if(EQ(args, C_NIL))
+  {
+    cont = POP_FUNC;
+  }
+  else if((dest[0].var.d_integer) == 1)
+  {
+    SEND(args);
+    cont = POP_FUNC;
+  }
   else
-    {
-      SEND(CAR(args));
-      NEXT;
-      args = CDR(args);
-      goto respread;
-    }
+  {
+    SEND(CAR(args));
+    NEXT;
+    args = CDR(args);
+    goto respread;
+  }
   return 0;
 }
 
@@ -784,17 +780,17 @@ static int ev2()
 
   foo = call(fun);
   dfree(dest);
-  dest = (struct destblock*) POP_POINT;
-  if (EQ(foo, C_ERROR))
-    {
-      foo = printwhere();
-      BREAK(0, CAR(foo), peval1); /* CAR(_) broken */
-    }
+  dest = (struct destblock*)POP_POINT;
+  if(EQ(foo, C_ERROR))
+  {
+    foo = printwhere();
+    BREAK(0, CAR(foo), peval1); /* CAR(_) broken */
+  }
   else
-    {
-      SEND(foo);
-      cont = POP_FUNC;
-    }
+  {
+    SEND(foo);
+    cont = POP_FUNC;
+  }
   return 0;
 }
 
@@ -827,19 +823,19 @@ static void Link()
 
   dest[0].var.d_environ = env;
   dest[0].type = 2;
-  env = (struct destblock*) &dest[0];
-  for (i = dest[0].val.d_integer; i > 0; i--)
-    {
-      t = SYMVALUE(dest[i].var.d_lisp);
-      SYMVALUE(dest[i].var.d_lisp) = dest[i].val.d_lisp;
-      dest[i].val.d_lisp = t;
-    }
+  env = (struct destblock*)&dest[0];
+  for(i = dest[0].val.d_integer; i > 0; i--)
+  {
+    t = SYMVALUE(dest[i].var.d_lisp);
+    SYMVALUE(dest[i].var.d_lisp) = dest[i].val.d_lisp;
+    dest[i].val.d_lisp = t;
+  }
 }
 
 static int evlam1()
 {
   Link();
-  dest = (struct destblock*) POP_POINT;
+  dest = (struct destblock*)POP_POINT;
   args = LAMVAL(fun).lambdarep;
   PUSH_FUNC(evlam0);
   cont = evsequence;
@@ -852,8 +848,7 @@ static void unLink()
   struct destblock* c;
 
   c = env;
-  for (i = c[0].val.d_integer; i > 0; i--)
-    SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
+  for(i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
 static int evlam0()
@@ -867,11 +862,11 @@ static int evlam0()
 
 void unwind()
 {
-  while (env != NULL)
-    {
-      unLink();
-      env = env->var.d_environ;
-    }
+  while(env != NULL)
+  {
+    unLink();
+    env = env->var.d_environ;
+  }
 }
 
 static int lookup()
@@ -879,8 +874,8 @@ static int lookup()
   LISPT t;
 
   t = SYMVALUE(expression);
-  switch (TYPEOF(t))
-    {
+  switch(TYPEOF(t))
+  {
     case UNBOUND:
       BREAK(UNBOUND_VARIABLE, expression, lookup);
       return 0;
@@ -894,7 +889,7 @@ static int lookup()
     default:
       SEND(t);
       break;
-    }
+  }
   cont = POP_FUNC;
   return 0;
 }
@@ -908,18 +903,16 @@ static int evclosure()
   PUSH_POINT(env);
   PUSH_POINT(dest);
   dest = MKDESTBLOCK(CLOSVAL(fun).count);
-  for (foo = CLOSVAL(fun).closed, i = CLOSVAL(fun).count; i;
-       foo = CDR(foo), i--)
-    STOREVAR(CAR(foo), i);
-  for (foo = CLOSVAL(fun).cvalues; !ISNIL(foo); foo = CDR(foo))
-    {
-      SEND(CAR(foo));
-      NEXT;
-    }
+  for(foo = CLOSVAL(fun).closed, i = CLOSVAL(fun).count; i; foo = CDR(foo), i--) STOREVAR(CAR(foo), i);
+  for(foo = CLOSVAL(fun).cvalues; !ISNIL(foo); foo = CDR(foo))
+  {
+    SEND(CAR(foo));
+    NEXT;
+  }
   fun = CLOSVAL(fun).cfunction;
   Link();
-  dest = (struct destblock*) POP_POINT;
-  envir = (struct destblock*) POP_POINT;
+  dest = (struct destblock*)POP_POINT;
+  envir = (struct destblock*)POP_POINT;
   cont = POP_FUNC;
   PUSH_POINT(envir);
   PUSH_FUNC(evclosure1);
@@ -936,29 +929,29 @@ static int evclosure1()
 
 static int evsequence()
 {
-  if (EQ(args, C_NIL))
-    {
-      cont = POP_FUNC;
-    }
+  if(EQ(args, C_NIL))
+  {
+    cont = POP_FUNC;
+  }
   else
-    {
-      expression = CAR(args);
-      cont = evseq1;
-    }
+  {
+    expression = CAR(args);
+    cont = evseq1;
+  }
   return 0;
 }
 
 static int evseq1()
 {
-  if (EQ(CDR(args), C_NIL))
-    {
-      cont = peval;
-    }
+  if(EQ(CDR(args), C_NIL))
+  {
+    cont = peval;
+  }
   else
-    {
-      PUSH_FUNC(evseq3);
-      cont = peval;
-    }
+  {
+    PUSH_FUNC(evseq3);
+    cont = peval;
+  }
   return 0;
 }
 
@@ -974,81 +967,81 @@ PRIMITIVE baktrace()
 {
   int i;
 
-  for (i = toctrl; i >= 0; i--)
+  for(i = toctrl; i >= 0; i--)
+  {
+    fprintf(primerr, "%d: ", i);
+    if(control[i].type == CTRL_LISP && TYPEOF(control[i].u.lisp) != NIL)
+      xprint(control[i].u.lisp, C_T);
+    else
     {
-      fprintf(primerr, "%d: ", i);
-      if (control[i].type == CTRL_LISP && TYPEOF(control[i].u.lisp) != NIL)
-        xprint(control[i].u.lisp, C_T);
+      if(control[i].u.f_point == ev0)
+        fprintf(primerr, "ev0\n");
+      else if(control[i].u.f_point == peval)
+        fprintf(primerr, "peval\n");
+      else if(control[i].u.f_point == peval1)
+        fprintf(primerr, "peval1\n");
+      else if(control[i].u.f_point == peval2)
+        fprintf(primerr, "peval2\n");
+      else if(control[i].u.f_point == ev1)
+        fprintf(primerr, "ev1\n");
+      else if(control[i].u.f_point == ev2)
+        fprintf(primerr, "ev2\n");
+      else if(control[i].u.f_point == ev3)
+        fprintf(primerr, "ev3\n");
+      else if(control[i].u.f_point == ev4)
+        fprintf(primerr, "ev4\n");
+      else if(control[i].u.f_point == evlam1)
+        fprintf(primerr, "evlam1\n");
+      else if(control[i].u.f_point == evlam0)
+        fprintf(primerr, "evlam0\n");
+      else if(control[i].u.f_point == ev9)
+        fprintf(primerr, "ev9\n");
+      else if(control[i].u.f_point == ev11)
+        fprintf(primerr, "ev11\n");
+      else if(control[i].u.f_point == ev3p)
+        fprintf(primerr, "ev3p\n");
+      else if(control[i].u.f_point == evalargs)
+        fprintf(primerr, "evalargs\n");
+      else if(control[i].u.f_point == noevarg)
+        fprintf(primerr, "noevarg\n");
+      else if(control[i].u.f_point == evlam)
+        fprintf(primerr, "evlam\n");
+      else if(control[i].u.f_point == spread)
+        fprintf(primerr, "spread\n");
+      else if(control[i].u.f_point == evlis)
+        fprintf(primerr, "evlis\n");
+      else if(control[i].u.f_point == evlis1)
+        fprintf(primerr, "evlis1\n");
+      else if(control[i].u.f_point == evlis2)
+        fprintf(primerr, "evlis2\n");
+      else if(control[i].u.f_point == evlis3)
+        fprintf(primerr, "evlis3\n");
+      else if(control[i].u.f_point == evlis4)
+        fprintf(primerr, "evlis4\n");
+      else if(control[i].u.f_point == noev9)
+        fprintf(primerr, "noev9\n");
+      else if(control[i].u.f_point == evsequence)
+        fprintf(primerr, "evsequence\n");
+      else if(control[i].u.f_point == evseq1)
+        fprintf(primerr, "evseq1\n");
+      else if(control[i].u.f_point == evseq3)
+        fprintf(primerr, "evseq3\n");
+      else if(control[i].u.f_point == evclosure)
+        fprintf(primerr, "evclosure\n");
+      else if(control[i].u.f_point == evclosure1)
+        fprintf(primerr, "evclosure1\n");
+      else if(control[i].u.f_point == eval0)
+        fprintf(primerr, "eval0\n");
+      else if(control[i].u.f_point == apply0)
+        fprintf(primerr, "apply0\n");
+      else if(control[i].u.f_point == everr)
+        fprintf(primerr, "everr\n");
+      else if(control[i].u.f_point == lookup)
+        fprintf(primerr, "lookup\n");
       else
-        {
-          if (control[i].u.f_point == ev0)
-            fprintf(primerr, "ev0\n");
-          else if (control[i].u.f_point == peval)
-            fprintf(primerr, "peval\n");
-          else if (control[i].u.f_point == peval1)
-            fprintf(primerr, "peval1\n");
-          else if (control[i].u.f_point == peval2)
-            fprintf(primerr, "peval2\n");
-          else if (control[i].u.f_point == ev1)
-            fprintf(primerr, "ev1\n");
-          else if (control[i].u.f_point == ev2)
-            fprintf(primerr, "ev2\n");
-          else if (control[i].u.f_point == ev3)
-            fprintf(primerr, "ev3\n");
-          else if (control[i].u.f_point == ev4)
-            fprintf(primerr, "ev4\n");
-          else if (control[i].u.f_point == evlam1)
-            fprintf(primerr, "evlam1\n");
-          else if (control[i].u.f_point == evlam0)
-            fprintf(primerr, "evlam0\n");
-          else if (control[i].u.f_point == ev9)
-            fprintf(primerr, "ev9\n");
-          else if (control[i].u.f_point == ev11)
-            fprintf(primerr, "ev11\n");
-          else if (control[i].u.f_point == ev3p)
-            fprintf(primerr, "ev3p\n");
-          else if (control[i].u.f_point == evalargs)
-            fprintf(primerr, "evalargs\n");
-          else if (control[i].u.f_point == noevarg)
-            fprintf(primerr, "noevarg\n");
-          else if (control[i].u.f_point == evlam)
-            fprintf(primerr, "evlam\n");
-          else if (control[i].u.f_point == spread)
-            fprintf(primerr, "spread\n");
-          else if (control[i].u.f_point == evlis)
-            fprintf(primerr, "evlis\n");
-          else if (control[i].u.f_point == evlis1)
-            fprintf(primerr, "evlis1\n");
-          else if (control[i].u.f_point == evlis2)
-            fprintf(primerr, "evlis2\n");
-          else if (control[i].u.f_point == evlis3)
-            fprintf(primerr, "evlis3\n");
-          else if (control[i].u.f_point == evlis4)
-            fprintf(primerr, "evlis4\n");
-          else if (control[i].u.f_point == noev9)
-            fprintf(primerr, "noev9\n");
-          else if (control[i].u.f_point == evsequence)
-            fprintf(primerr, "evsequence\n");
-          else if (control[i].u.f_point == evseq1)
-            fprintf(primerr, "evseq1\n");
-          else if (control[i].u.f_point == evseq3)
-            fprintf(primerr, "evseq3\n");
-          else if (control[i].u.f_point == evclosure)
-            fprintf(primerr, "evclosure\n");
-          else if (control[i].u.f_point == evclosure1)
-            fprintf(primerr, "evclosure1\n");
-          else if (control[i].u.f_point == eval0)
-            fprintf(primerr, "eval0\n");
-          else if (control[i].u.f_point == apply0)
-            fprintf(primerr, "apply0\n");
-          else if (control[i].u.f_point == everr)
-            fprintf(primerr, "everr\n");
-          else if (control[i].u.f_point == lookup)
-            fprintf(primerr, "lookup\n");
-          else
-            fprintf(stderr, "Unknown control stack element\n");
-        }
+        fprintf(stderr, "Unknown control stack element\n");
     }
+  }
   return C_NIL;
 }
 

@@ -17,7 +17,7 @@ PRIMITIVE symstr(LISPT sym)
 /* T if s is a string, NIL otherwise. */
 PRIMITIVE stringp(LISPT s)
 {
-  if (TYPEOF(s) == STRING)
+  if(TYPEOF(s) == STRING)
     return C_T;
   else
     return C_NIL;
@@ -28,7 +28,7 @@ PRIMITIVE streq(LISPT s1, LISPT s2)
 {
   CHECK(s1, STRING);
   CHECK(s2, STRING);
-  if (!strcmp(STRINGVAL(s1), STRINGVAL(s2)))
+  if(!strcmp(STRINGVAL(s1), STRINGVAL(s2)))
     return C_T;
   else
     return C_NIL;
@@ -50,20 +50,20 @@ PRIMITIVE concat(LISPT strlist)
   char* ns;
 
   size = 0;
-  for (sl = strlist; !ISNIL(sl); sl = CDR(sl))
-    {
-      CHECK(CAR(sl), STRING);
-      size += strlen(STRINGVAL(CAR(sl)));
-    }
-  ns = (char*) safemalloc((unsigned) size + 1);
-  if (ns == NULL)
+  for(sl = strlist; !ISNIL(sl); sl = CDR(sl))
+  {
+    CHECK(CAR(sl), STRING);
+    size += strlen(STRINGVAL(CAR(sl)));
+  }
+  ns = (char*)safemalloc((unsigned)size + 1);
+  if(ns == NULL)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
-  while (!ISNIL(strlist))
-    {
-      strcat(ns, STRINGVAL(CAR(strlist)));
-      strlist = CDR(strlist);
-    }
+  while(!ISNIL(strlist))
+  {
+    strcat(ns, STRINGVAL(CAR(strlist)));
+    strlist = CDR(strlist);
+  }
   return mkstring(ns);
 }
 
@@ -71,7 +71,7 @@ PRIMITIVE concat(LISPT strlist)
 PRIMITIVE xstrlen(LISPT s)
 {
   CHECK(s, STRING);
-  return mknumber((long) strlen(STRINGVAL(s)));
+  return mknumber((long)strlen(STRINGVAL(s)));
 }
 
 /* Extract a substring from start to end.
@@ -91,17 +91,17 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   s = INTVAL(start);
   e = INTVAL(end);
   size = e - s + 1;
-  if (size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str)))
-    || s <= 0 || e < 0)
+  if(size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str))) || s <= 0
+    || e < 0)
     return C_NIL;
-  ns = (char*) safemalloc((unsigned) size + 1);
-  if (ns == NULL)
+  ns = (char*)safemalloc((unsigned)size + 1);
+  if(ns == NULL)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
-  for (size = 0; s <= e; s++, size++)
-    {
-      ns[size] = *(STRINGVAL(str) + s - 1);
-    }
+  for(size = 0; s <= e; s++, size++)
+  {
+    ns[size] = *(STRINGVAL(str) + s - 1);
+  }
   return mkstring(ns);
 }
 

@@ -17,18 +17,18 @@
   rstack = CDR(rstack)
 
 #define CHECKEOF(c) \
-  if ((c) == EOF) \
-    { \
-      if (line || ISNIL(CAR(top))) \
-        return C_EOF; \
-      else \
-        return error(UNEXPECTED_EOF, C_NIL); \
-    }
+  if((c) == EOF) \
+  { \
+    if(line || ISNIL(CAR(top))) \
+      return C_EOF; \
+    else \
+      return error(UNEXPECTED_EOF, C_NIL); \
+  }
 
 #define GETCH(file) \
   do \
     curc = getch(file); \
-  while (curc != EOF && issepr(curc)); \
+  while(curc != EOF && issepr(curc)); \
   CHECKEOF(curc);
 
 extern int getch(FILE*);
@@ -138,17 +138,17 @@ static int integerp(char* buf, long* res)
   int d = 0, sign = 1;
 
   *res = 0;
-  if (*buf == '-')
+  if(*buf == '-')
     sign = *buf++ == '-' ? -1 : 1;
-  if (!*buf)
+  if(!*buf)
     d = 1;
-  for (; *buf; buf++)
-    {
-      if (!isdigit(*buf))
-        d++;
-      else
-        *res = *res * 10 + *buf - '0';
-    }
+  for(; *buf; buf++)
+  {
+    if(!isdigit(*buf))
+      d++;
+    else
+      *res = *res * 10 + *buf - '0';
+  }
   *res *= sign;
   return !d;
 }
@@ -162,39 +162,39 @@ static int floatp(char* buf)
   int state;
 
   state = 0;
-  while (state >= 0 && *buf)
+  while(state >= 0 && *buf)
+  {
+    switch(*buf)
     {
-      switch (*buf)
-        {
-        case '+':
-        case '-':
-          state = nxtstate[0][state];
-          break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-          state = nxtstate[1][state];
-          break;
-        case 'e':
-        case 'E':
-          state = nxtstate[2][state];
-          break;
-        case '.':
-          state = nxtstate[3][state];
-          break;
-        default:
-          state = -1;
-        }
-      buf++;
+      case '+':
+      case '-':
+        state = nxtstate[0][state];
+        break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        state = nxtstate[1][state];
+        break;
+      case 'e':
+      case 'E':
+        state = nxtstate[2][state];
+        break;
+      case '.':
+        state = nxtstate[3][state];
+        break;
+      default:
+        state = -1;
     }
-  if (state == 3 || state == 4 || state == 6 || state == 9)
+    buf++;
+  }
+  if(state == 3 || state == 4 || state == 6 || state == 9)
     return 1;
   else
     return 0;
@@ -209,10 +209,10 @@ static LISPT parsebuf(char* buf)
 {
   long longval;
 
-  if (integerp(buf, &longval))
+  if(integerp(buf, &longval))
     return mknumber(longval);
 #ifdef FLOATING
-  else if (floatp(buf))
+  else if(floatp(buf))
     return mkfloat(atof(buf));
 #endif /* FLOATING */
   else
@@ -228,44 +228,44 @@ LISPT ratom(FILE* file)
   int pos = 0;
 
   c = getch(file);
-  while (1)
+  while(1)
+  {
+    if(c == EOF)
+      return C_EOF;
+    else if(issepr(c))
+      ;
+    else if(isbrk(c))
     {
-      if (c == EOF)
-        return C_EOF;
-      else if (issepr(c))
-        ;
-      else if (isbrk(c))
-        {
-          buf[pos++] = c;
-          buf[pos] = NUL;
-          return mkatom(buf);
-        }
-      else
-        {
-          while (1)
-            {
-              if (c == EOF)
-                return parsebuf(buf);
-              if (c == '\\')
-                c = getch(file);
-              if (pos < MAXATOMSIZE)
-                buf[pos++] = c;
-              c = getch(file);
-              if (isbrk(c))
-                {
-                  ungetch(c, file);
-                  buf[pos] = NUL;
-                  return parsebuf(buf);
-                }
-              else if (issepr(c))
-                {
-                  buf[pos] = NUL;
-                  return parsebuf(buf);
-                }
-            }
-        }
-      c = getch(file);
+      buf[pos++] = c;
+      buf[pos] = NUL;
+      return mkatom(buf);
     }
+    else
+    {
+      while(1)
+      {
+        if(c == EOF)
+          return parsebuf(buf);
+        if(c == '\\')
+          c = getch(file);
+        if(pos < MAXATOMSIZE)
+          buf[pos++] = c;
+        c = getch(file);
+        if(isbrk(c))
+        {
+          ungetch(c, file);
+          buf[pos] = NUL;
+          return parsebuf(buf);
+        }
+        else if(issepr(c))
+        {
+          buf[pos] = NUL;
+          return parsebuf(buf);
+        }
+      }
+    }
+    c = getch(file);
+  }
 }
 
 /*
@@ -279,23 +279,23 @@ static LISPT splice(LISPT c, LISPT l, int tailp)
   LISPT t, t2;
 
   t = CDR(c);
-  if (TYPEOF(l) != CONS)
-    {
-      if (tailp)
-        rplacd(c, cons(l, t));
-      else
-        rplaca(c, l);
-      return c;
-    }
-  if (!tailp)
-    {
-      rplaca(c, CAR(l));
-      l = CDR(l);
-    }
-  if (ISNIL(l))
+  if(TYPEOF(l) != CONS)
+  {
+    if(tailp)
+      rplacd(c, cons(l, t));
+    else
+      rplaca(c, l);
+    return c;
+  }
+  if(!tailp)
+  {
+    rplaca(c, CAR(l));
+    l = CDR(l);
+  }
+  if(ISNIL(l))
     return c;
   rplacd(c, l);
-  for (; TYPEOF(l) == CONS; l = CDR(l)) t2 = l;
+  for(; TYPEOF(l) == CONS; l = CDR(l)) t2 = l;
   return rplacd(t2, t);
 }
 
@@ -314,149 +314,149 @@ LISPT lispread(FILE* file, int line)
   LISPT curr, temp, curatom;
   int curc;
 
-  if (!line)
-    {
-      top = cons(C_NIL, C_NIL);
-      curr = top;
-    }
+  if(!line)
+  {
+    top = cons(C_NIL, C_NIL);
+    curr = top;
+  }
   else
     curr = CAR(top);
 head:
   GETCH(file);
-  if (isinsert(curc))
-    {
-      PUSHR(top);
-      rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
-      POPR(top);
-      goto check;
-    }
-  else if (issplice(curc))
-    {
-      PUSHR(top);
-      temp = (*currentrt.rmacros[curc])(file, curr, curc);
-      POPR(top);
-      curr = splice(curr, temp, 0);
-      goto check;
-    }
-  else if (curc == '(')
-    {
-    head2:
-      rplaca(curr, cons(C_NIL, C_NIL));
-      rplacd(CAR(curr), curr);
-      curr = CAR(curr);
-      goto head;
-    }
-  else if (curc == ')')
-    {
-      curr = CDR(curr);
-      rplaca(curr, C_NIL);
-      goto check;
-    }
+  if(isinsert(curc))
+  {
+    PUSHR(top);
+    rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
+    POPR(top);
+    goto check;
+  }
+  else if(issplice(curc))
+  {
+    PUSHR(top);
+    temp = (*currentrt.rmacros[curc])(file, curr, curc);
+    POPR(top);
+    curr = splice(curr, temp, 0);
+    goto check;
+  }
+  else if(curc == '(')
+  {
+  head2:
+    rplaca(curr, cons(C_NIL, C_NIL));
+    rplacd(CAR(curr), curr);
+    curr = CAR(curr);
+    goto head;
+  }
+  else if(curc == ')')
+  {
+    curr = CDR(curr);
+    rplaca(curr, C_NIL);
+    goto check;
+  }
   else
+  {
+    ungetch(curc, file);
+    curatom = ratom(file);
+    rplaca(curr, curatom);
+  check:
+    if(ISNIL(CDR(curr)))
     {
-      ungetch(curc, file);
-      curatom = ratom(file);
-      rplaca(curr, curatom);
-    check:
-      if (ISNIL(CDR(curr)))
-        {
-          temp = CAR(top);
-          top = C_NIL;
-          return temp;
-        }
-      else if (line && eoln(file) && EQ(CDR(curr), top))
-        goto addparen;
-      else
-        goto tail;
+      temp = CAR(top);
+      top = C_NIL;
+      return temp;
     }
+    else if(line && eoln(file) && EQ(CDR(curr), top))
+      goto addparen;
+    else
+      goto tail;
+  }
 tail:
-  if (line && eoln(file) && EQ(CDR(curr), top))
+  if(line && eoln(file) && EQ(CDR(curr), top))
     goto addparen;
   GETCH(file);
-  if (isinsert(curc))
+  if(isinsert(curc))
+  {
+    temp = CDR(curr);
+    rplacd(curr, cons(C_NIL, temp));
+    curr = CDR(curr);
+    PUSHR(top);
+    rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
+    POPR(top);
+    goto tail;
+  }
+  else if(issplice(curc))
+  {
+    PUSHR(top);
+    temp = (*currentrt.rmacros[curc])(file, curr, curc);
+    POPR(top);
+    curr = splice(curr, temp, 1);
+    goto tail;
+  }
+  else if(isinfix(curc))
+  {
+    curr = (*currentrt.rmacros[curc])(file, curr, curc);
+    goto head;
+  }
+  else if(curc == ')')
+  {
+  addparen:
+    temp = CDR(curr);
+    rplacd(curr, C_NIL);
+    curr = temp;
+    goto check;
+  }
+  else if(curc == '(')
+  {
+    temp = CDR(curr);
+    rplacd(curr, cons(C_NIL, C_NIL));
+    curr = CDR(curr);
+    rplacd(curr, temp);
+    goto head2;
+  }
+  else if(curc == '.')
+  {
+    curc = getch(file);
+    CHECKEOF(curc);
+    if(!issepr(curc) && !isbrk(curc))
     {
-      temp = CDR(curr);
-      rplacd(curr, cons(C_NIL, temp));
-      curr = CDR(curr);
-      PUSHR(top);
-      rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
-      POPR(top);
-      goto tail;
-    }
-  else if (issplice(curc))
-    {
-      PUSHR(top);
-      temp = (*currentrt.rmacros[curc])(file, curr, curc);
-      POPR(top);
-      curr = splice(curr, temp, 1);
-      goto tail;
-    }
-  else if (isinfix(curc))
-    {
-      curr = (*currentrt.rmacros[curc])(file, curr, curc);
-      goto head;
-    }
-  else if (curc == ')')
-    {
-    addparen:
-      temp = CDR(curr);
-      rplacd(curr, C_NIL);
-      curr = temp;
-      goto check;
-    }
-  else if (curc == '(')
-    {
-      temp = CDR(curr);
-      rplacd(curr, cons(C_NIL, C_NIL));
-      curr = CDR(curr);
-      rplacd(curr, temp);
-      goto head2;
-    }
-  else if (curc == '.')
-    {
-      curc = getch(file);
-      CHECKEOF(curc);
-      if (!issepr(curc) && !isbrk(curc))
-        {
-          ungetch(curc, file);
-          ungetch('.', file); /* cross your fingers */
-          goto atom;
-        }
-      if (curc == ')' || eoln(file))
-        {
-          ungetch(curc, file);
-          curatom = C_DOT;
-          goto insert;
-        }
-      if (isbrk(curc))
-        ungetch(curc, file);
-      curatom = ratom(file);
-      temp = CDR(curr);
-      GETCH(file);
-      if (curc != ')')
-        {
-          rplacd(curr, cons(C_DOT, cons(C_NIL, temp)));
-          curr = CDR(CDR(curr));
-          rplaca(curr, curatom);
-          goto another;
-        }
-      rplacd(curr, curatom);
-      curr = temp;
-      goto check;
-    }
-  else
-    {
-    another:
       ungetch(curc, file);
-    atom:
-      curatom = ratom(file);
-    insert:
-      temp = CDR(curr);
-      rplacd(curr, cons(C_NIL, temp));
-      curr = CDR(curr);
-      rplaca(curr, curatom);
-      goto tail;
+      ungetch('.', file); /* cross your fingers */
+      goto atom;
     }
+    if(curc == ')' || eoln(file))
+    {
+      ungetch(curc, file);
+      curatom = C_DOT;
+      goto insert;
+    }
+    if(isbrk(curc))
+      ungetch(curc, file);
+    curatom = ratom(file);
+    temp = CDR(curr);
+    GETCH(file);
+    if(curc != ')')
+    {
+      rplacd(curr, cons(C_DOT, cons(C_NIL, temp)));
+      curr = CDR(CDR(curr));
+      rplaca(curr, curatom);
+      goto another;
+    }
+    rplacd(curr, curatom);
+    curr = temp;
+    goto check;
+  }
+  else
+  {
+  another:
+    ungetch(curc, file);
+  atom:
+    curatom = ratom(file);
+  insert:
+    temp = CDR(curr);
+    rplacd(curr, cons(C_NIL, temp));
+    curr = CDR(curr);
+    rplaca(curr, curatom);
+    goto tail;
+  }
 }
 
 /*
@@ -479,19 +479,19 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
   LISPT tmp, at, l;
 
   c = getch(file);
-  if (issepr(c))
+  if(issepr(c))
     return C_EXCL;
   echoline = 1;
   tmp = histget(0L, history);
-  if (TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
+  if(TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
     tmp = CAR(tmp);
-  switch (c)
-    {
+  switch(c)
+  {
     case '!':
       return histget(0L, history);
       break;
     case '$':
-      while (TYPEOF(CDR(tmp)) == CONS) tmp = CDR(tmp);
+      while(TYPEOF(CDR(tmp)) == CONS) tmp = CDR(tmp);
       return tmp;
       break;
     case '*':
@@ -504,29 +504,29 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
     default:
       ungetch(c, file);
       at = ratom(file);
-      if (TYPEOF(at) == INTEGER)
+      if(TYPEOF(at) == INTEGER)
+      {
+        tmp = histget(INTVAL(at), history);
+        return tmp;
+      }
+      if(TYPEOF(at) == SYMBOL)
+      {
+        for(l = history; !ISNIL(l); l = CDR(l))
         {
-          tmp = histget(INTVAL(at), history);
-          return tmp;
+          tmp = histget(0L, l);
+          if(!ISNIL(tmp) && TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
+            tmp = CAR(tmp);
+          if(!strncmp(GETSTR(CAR(tmp)), GETSTR(at), strlen(GETSTR(at))))
+            return histget(0L, l);
         }
-      if (TYPEOF(at) == SYMBOL)
-        {
-          for (l = history; !ISNIL(l); l = CDR(l))
-            {
-              tmp = histget(0L, l);
-              if (!ISNIL(tmp) && TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
-                tmp = CAR(tmp);
-              if (!strncmp(GETSTR(CAR(tmp)), GETSTR(at), strlen(GETSTR(at))))
-                return histget(0L, l);
-            }
-          return C_NIL;
-        }
+        return C_NIL;
+      }
       else
-        {
-          error(EVENT_NOT_FOUND, at);
-          return C_NIL;
-        }
-    }
+      {
+        error(EVENT_NOT_FOUND, at);
+        return C_NIL;
+      }
+  }
   return C_NIL;
 }
 
@@ -553,13 +553,13 @@ static LISPT rmdquote(FILE* file, LISPT _0, char _1)
   int pos = 0;
 
   c = getch(file);
-  while (c != '"' && pos < MAXATOMSIZE)
-    {
-      if (c == '\\')
-        c = getch(file);
-      buf[pos++] = c;
+  while(c != '"' && pos < MAXATOMSIZE)
+  {
+    if(c == '\\')
       c = getch(file);
-    }
+    buf[pos++] = c;
+    c = getch(file);
+  }
   buf[pos] = NUL;
   return mkstring(buf);
 }
@@ -578,11 +578,11 @@ static LISPT rmsquote(FILE* file, LISPT _0, char _1)
 {
   int c;
 
-  if ((c = getch(file)) == ')' || issepr(c))
-    {
-      ungetch(c, file);
-      return C_QUOTE;
-    }
+  if((c = getch(file)) == ')' || issepr(c))
+  {
+    ungetch(c, file);
+    return C_QUOTE;
+  }
   ungetch(c, file);
   return cons(C_QUOTE, cons(lispread(file, 0), C_NIL));
 }
@@ -633,7 +633,7 @@ LISPT readline(FILE* file)
 /* print the string s, on stream file */
 static void ps(const char* s, FILE* file, int esc)
 {
-  while (*s) putch(*s++, file, esc);
+  while(*s) putch(*s++, file, esc);
 }
 
 static void pi(long i, long base, FILE* file)
@@ -645,17 +645,17 @@ static void pi(long i, long base, FILE* file)
   ss[32] = 0;
   sign = (i < 0) ? -1 : 1;
   i = sign * i;
-  if (!i)
+  if(!i)
     ps("0", file, 0);
   else
+  {
+    while(i)
     {
-      while (i)
-        {
-          ss[j--] = digits[i % base];
-          i /= base;
-        }
+      ss[j--] = digits[i % base];
+      i /= base;
     }
-  if (sign == -1)
+  }
+  if(sign == -1)
     ss[j--] = '-';
   ps(ss + j + 1, file, 0);
 }
@@ -687,36 +687,36 @@ LISPT prinbody(LISPT x, FILE* file, int esc)
   xx = x;
 nxtelt:
   prin0(CAR(xx), file, esc);
-  if (EQ(CDR(xx), C_NIL))
+  if(EQ(CDR(xx), C_NIL))
     ;
-  else if (TYPEOF(CDR(xx)) == CONS)
-    {
-      putch(' ', file, 0);
-      xx = CDR(xx);
-      goto nxtelt;
-    }
+  else if(TYPEOF(CDR(xx)) == CONS)
+  {
+    putch(' ', file, 0);
+    xx = CDR(xx);
+    goto nxtelt;
+  }
   else
-    {
-      putch(' ', file, 0);
-      putch('.', file, 0);
-      putch(' ', file, 0);
-      prin0(CDR(xx), file, esc);
-    }
+  {
+    putch(' ', file, 0);
+    putch('.', file, 0);
+    putch(' ', file, 0);
+    prin0(CDR(xx), file, esc);
+  }
   return x;
 }
 
 LISPT prin0(LISPT x, FILE* file, int esc)
 {
-  switch (TYPEOF(x))
-    {
+  switch(TYPEOF(x))
+  {
     case CONS:
       thisplevel++;
-      if (thisplevel <= printlevel || printlevel <= 0)
-        {
-          putch('(', file, 0);
-          prinbody(x, file, esc);
-          putch(')', file, 0);
-        }
+      if(thisplevel <= printlevel || printlevel <= 0)
+      {
+        putch('(', file, 0);
+        prinbody(x, file, esc);
+        putch(')', file, 0);
+      }
       else
         putch('&', file, 0);
       thisplevel--;
@@ -725,11 +725,11 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       return patom(x, file, esc);
       break;
     case CPOINTER:
-      if (CPOINTVAL(x) != NULL)
-        {
-          ps("#<pointer", file, 0);
-          goto ppoint;
-        }
+      if(CPOINTVAL(x) != NULL)
+      {
+        ps("#<pointer", file, 0);
+        goto ppoint;
+      }
       break;
     case NIL:
       ps("nil", file, 0);
@@ -744,12 +744,12 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       pf(FLOATVAL(x), file);
       break;
     case STRING:
-      if (esc)
-        {
-          putch('"', file, 0);
-          ps(STRINGVAL(x), file, esc);
-          putch('"', file, 0);
-        }
+      if(esc)
+      {
+        putch('"', file, 0);
+        ps(STRINGVAL(x), file, esc);
+        putch('"', file, 0);
+      }
       else
         ps(STRINGVAL(x), file, 0);
       break;
@@ -790,15 +790,15 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       ps("#<error", file, 0);
     ppoint:
       ps(" ", file, 0);
-      pi((long) INTVAL(x), 16L, file);
+      pi((long)INTVAL(x), 16L, file);
       ps(">", file, 0);
       break;
     default:
       ps("#<illegal ", file, 0);
       pi(TYPEOF(x), INTVAL(currentbase), file);
-      pi((long) INTVAL(x), 16L, file);
+      pi((long)INTVAL(x), 16L, file);
       ps(">", file, 0);
-    }
+  }
   return x;
 }
 

@@ -8,10 +8,8 @@
 #include <stdexcept>
 #include <string>
 
-class lips_error : public std::runtime_error
+class lips_error: public std::runtime_error
 {
 public:
-  lips_error(const std::string& error) : std::runtime_error(error)
-  {
-  }
+  lips_error(const std::string& error): std::runtime_error(error) {}
 };

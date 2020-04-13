@@ -19,9 +19,9 @@ FILE* primerr;
 
 PRIMITIVE xratom(LISPT file)
 {
-  if (ISNIL(file))
+  if(ISNIL(file))
     return ratom(primin);
-  if (IST(file))
+  if(IST(file))
     return ratom(stdin);
   CHECK(file, FILET);
   return ratom(FILEVAL(file));
@@ -29,19 +29,19 @@ PRIMITIVE xratom(LISPT file)
 
 PRIMITIVE readc(LISPT file)
 {
-  if (ISNIL(file))
-    return mknumber((long) getch(primin));
-  if (IST(file))
-    return mknumber((long) getch(stdin));
+  if(ISNIL(file))
+    return mknumber((long)getch(primin));
+  if(IST(file))
+    return mknumber((long)getch(stdin));
   CHECK(file, FILET);
-  return mknumber((long) getch(FILEVAL(file)));
+  return mknumber((long)getch(FILEVAL(file)));
 }
 
 PRIMITIVE xread(LISPT file)
 {
-  if (ISNIL(file))
+  if(ISNIL(file))
     return lispread(primin, 0);
-  if (IST(file))
+  if(IST(file))
     return lispread(stdin, 0);
   CHECK(file, FILET);
   return lispread(FILEVAL(file), 0);
@@ -49,9 +49,9 @@ PRIMITIVE xread(LISPT file)
 
 PRIMITIVE xprint(LISPT x, LISPT file)
 {
-  if (ISNIL(file))
+  if(ISNIL(file))
     return print(x, primout);
-  if (IST(file))
+  if(IST(file))
     return print(x, primerr);
   CHECK(file, FILET);
   return print(x, FILEVAL(file));
@@ -63,11 +63,9 @@ int loadfile(const char* lf)
   LISPT rval;
 
   foo = fopen(lf, "r");
-  if (foo == NULL)
+  if(foo == NULL)
     return 1;
-  for (rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE;
-       rval = lispread(foo, 0))
-    rval = eval(rval);
+  for(rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0)) rval = eval(rval);
   fclose(foo);
   return 0;
 }
@@ -75,7 +73,7 @@ int loadfile(const char* lf)
 PRIMITIVE load(LISPT f)
 {
   CHECK2(f, STRING, SYMBOL);
-  if (loadfile(GETSTR(f)))
+  if(loadfile(GETSTR(f)))
     return error(CANT_OPEN, f);
   else
     return f;
@@ -83,9 +81,9 @@ PRIMITIVE load(LISPT f)
 
 PRIMITIVE xterpri(LISPT file)
 {
-  if (ISNIL(file))
+  if(ISNIL(file))
     return terpri(primout);
-  if (IST(file))
+  if(IST(file))
     return terpri(primerr);
   CHECK(file, FILET);
   return terpri(FILEVAL(file));
@@ -94,9 +92,9 @@ PRIMITIVE xterpri(LISPT file)
 PRIMITIVE prin1(LISPT x, LISPT file)
 {
   thisplevel = 0;
-  if (ISNIL(file))
+  if(ISNIL(file))
     return prin0(x, primout, 0);
-  if (IST(file))
+  if(IST(file))
     return prin0(x, primerr, 0);
   CHECK(file, FILET);
   return prin0(x, FILEVAL(file), 0);
@@ -105,9 +103,9 @@ PRIMITIVE prin1(LISPT x, LISPT file)
 PRIMITIVE prin2(LISPT x, LISPT file)
 {
   thisplevel = 0;
-  if (ISNIL(file))
+  if(ISNIL(file))
     return prin0(x, primout, 1);
-  if (IST(file))
+  if(IST(file))
     return prin0(x, primerr, 1);
   CHECK(file, FILET);
   return prin0(x, FILEVAL(file), 0);
@@ -118,11 +116,11 @@ PRIMITIVE plevel(LISPT newl)
   long x;
 
   x = printlevel;
-  if (!ISNIL(newl))
-    {
-      CHECK(newl, INTEGER);
-      printlevel = INTVAL(newl);
-    }
+  if(!ISNIL(newl))
+  {
+    CHECK(newl, INTEGER);
+    printlevel = INTVAL(newl);
+  }
   return mknumber(x);
 }
 
@@ -132,16 +130,16 @@ PRIMITIVE spaces(LISPT n, LISPT file)
   FILE* f;
 
   CHECK(n, INTEGER);
-  if (ISNIL(file))
+  if(ISNIL(file))
     f = primout;
-  else if (IST(file))
+  else if(IST(file))
     f = primerr;
   else
-    {
-      CHECK(file, FILET);
-      f = FILEVAL(file);
-    }
-  for (i = INTVAL(n); i > 0; i--) putc(' ', f);
+  {
+    CHECK(file, FILET);
+    f = FILEVAL(file);
+  }
+  for(i = INTVAL(n); i > 0; i--) putc(' ', f);
   return C_NIL;
 }
 
@@ -149,15 +147,15 @@ PRIMITIVE xreadline(LISPT file)
 {
   FILE* f;
 
-  if (ISNIL(file))
+  if(ISNIL(file))
     f = primin;
-  else if (IST(file))
+  else if(IST(file))
     f = stdin;
   else
-    {
-      CHECK(file, FILET);
-      f = FILEVAL(file);
-    }
+  {
+    CHECK(file, FILET);
+    f = FILEVAL(file);
+  }
   return readline(f);
 }
 
@@ -169,79 +167,79 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   char lname[20], cname[20], fname[20];
   int line, acnt;
 
-  if (ISNIL(file))
+  if(ISNIL(file))
     f = primout;
-  else if (IST(file))
+  else if(IST(file))
     f = primerr;
   else
-    {
-      CHECK(file, FILET);
-      f = FILEVAL(file);
-    }
+  {
+    CHECK(file, FILET);
+    f = FILEVAL(file);
+  }
   CHECK(oname, SYMBOL);
   CHECK2(SYMVAL(oname).value, SUBR, FSUBR);
   funn = SYMVAL(oname).pname;
-  if ((tagsfile = fopen(TAGSFILE, "r")) == NULL)
+  if((tagsfile = fopen(TAGSFILE, "r")) == NULL)
     return error(CANT_OPEN, mkstring(TAGSFILE));
-  while (fgets(buf, 120, tagsfile) != NULL)
-    if (strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
-      {
-        sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
-        strcpy(buf, LIPSLIB);
-        strcat(buf, "/");
-        strcat(buf, fname);
-        fclose(tagsfile);
-        if ((cfile = fopen(buf, "r")) == NULL)
-          return error(CANT_OPEN, mkstring(buf));
-        for (; line > 1; line--) fgets(buf, 120, cfile);
-        fgets(buf, 120, cfile);
-        putch('(', f, 0);
-        prin2(oname, file);
-        putch(' ', f, 0);
-        putch('(', f, 0);
-        if (TYPEOF(SYMVALUE(oname)) == SUBR)
-          prin1(C_SUBR, file);
+  while(fgets(buf, 120, tagsfile) != NULL)
+    if(strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
+    {
+      sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
+      strcpy(buf, LIPSLIB);
+      strcat(buf, "/");
+      strcat(buf, fname);
+      fclose(tagsfile);
+      if((cfile = fopen(buf, "r")) == NULL)
+        return error(CANT_OPEN, mkstring(buf));
+      for(; line > 1; line--) fgets(buf, 120, cfile);
+      fgets(buf, 120, cfile);
+      putch('(', f, 0);
+      prin2(oname, file);
+      putch(' ', f, 0);
+      putch('(', f, 0);
+      if(TYPEOF(SYMVALUE(oname)) == SUBR)
+        prin1(C_SUBR, file);
+      else
+        prin1(C_FSUBR, file);
+      putch(' ', f, 0);
+      std::size_t i;
+      for(i = 0; buf[i] != '(' && i < sizeof(buf); i++)
+        ;
+      if((acnt = SUBRVAL(SYMVAL(oname).value).argcount) == -1)
+        i++;
+      for(; buf[i] != ')' && i < sizeof(buf); i++)
+        if(buf[i] != ',')
+          putch(buf[i], f, 0);
         else
-          prin1(C_FSUBR, file);
-        putch(' ', f, 0);
-        std::size_t i;
-        for (i = 0; buf[i] != '(' && i < sizeof(buf); i++)
-          ;
-        if ((acnt = SUBRVAL(SYMVAL(oname).value).argcount) == -1)
-          i++;
-        for (; buf[i] != ')' && i < sizeof(buf); i++)
-          if (buf[i] != ',')
-            putch(buf[i], f, 0);
-          else
-            {
-              acnt++;
-              if (acnt == -1)
-                {
-                  putch(' ', f, 0);
-                  putch('.', f, 0);
-                  acnt++;
-                }
-            }
-        if (acnt != -1)
-          putch(')', f, 0);
-        putch('\n', f, 0);
-        while (buf[0] != '{')
+        {
+          acnt++;
+          if(acnt == -1)
           {
-            fgets(buf, 120, cfile);
-            fgets(buf, 120, cfile);
+            putch(' ', f, 0);
+            putch('.', f, 0);
+            acnt++;
           }
-        while (buf[0] != '}')
-          {
-            fputs(buf, f);
-            fgets(buf, 120, cfile);
-          }
-        putch('}', f, 0);
+        }
+      if(acnt != -1)
         putch(')', f, 0);
-        putch(')', f, 0);
-        putch('\n', f, 0);
-        fclose(cfile);
-        return oname;
+      putch('\n', f, 0);
+      while(buf[0] != '{')
+      {
+        fgets(buf, 120, cfile);
+        fgets(buf, 120, cfile);
       }
+      while(buf[0] != '}')
+      {
+        fputs(buf, f);
+        fgets(buf, 120, cfile);
+      }
+      putch('}', f, 0);
+      putch(')', f, 0);
+      putch(')', f, 0);
+      putch('\n', f, 0);
+      fclose(cfile);
+      return oname;
+    }
   fclose(tagsfile);
   return error(NOT_PRINTABLE, oname);
 }

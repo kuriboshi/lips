@@ -8,8 +8,8 @@
 
 PRIMITIVE numberp(LISPT a)
 {
-  switch (TYPEOF(a))
-    {
+  switch(TYPEOF(a))
+  {
     case INTEGER:
     case FLOAT:
     case BIGNUM:
@@ -19,12 +19,12 @@ PRIMITIVE numberp(LISPT a)
 #endif /* FLOATING */
     default:
       return C_NIL;
-    }
+  }
 }
 
 PRIMITIVE listp(LISPT a)
 {
-  if (TYPEOF(a) == CONS)
+  if(TYPEOF(a) == CONS)
     return a;
   else
     return C_NIL;
@@ -32,12 +32,12 @@ PRIMITIVE listp(LISPT a)
 
 PRIMITIVE memb(LISPT x, LISPT l)
 {
-  while (!EQ(l, C_NIL))
-    {
-      if (EQ(x, CAR(l)))
-        return l;
-      l = CDR(l);
-    }
+  while(!EQ(l, C_NIL))
+  {
+    if(EQ(x, CAR(l)))
+      return l;
+    l = CDR(l);
+  }
   return C_NIL;
 }
 
@@ -45,24 +45,24 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
 {
   LISPT x;
 
-  if (TYPEOF(l1) != TYPEOF(l2))
+  if(TYPEOF(l1) != TYPEOF(l2))
     return C_NIL;
-  if (EQ(l1, l2))
+  if(EQ(l1, l2))
     return C_T;
-  switch (TYPEOF(l1))
-    {
+  switch(TYPEOF(l1))
+  {
     case CONS:
-      while (!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
+      while(!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
+      {
+        x = equal(CAR(l1), CAR(l2));
+        if(EQ(x, C_T))
         {
-          x = equal(CAR(l1), CAR(l2));
-          if (EQ(x, C_T))
-            {
-              l1 = CDR(l1);
-              l2 = CDR(l2);
-            }
-          else
-            return C_NIL;
+          l1 = CDR(l1);
+          l2 = CDR(l2);
         }
+        else
+          return C_NIL;
+      }
       return x;
     case STRING:
       return (!strcmp(STRINGVAL(l1), STRINGVAL(l2))) ? C_T : C_NIL;
@@ -76,13 +76,13 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
       break;
     default:
       break;
-    }
+  }
   return C_NIL;
 }
 
 PRIMITIVE nlistp(LISPT a)
 {
-  if (TYPEOF(a) != CONS)
+  if(TYPEOF(a) != CONS)
     return a;
   else
     return C_NIL;
@@ -90,7 +90,7 @@ PRIMITIVE nlistp(LISPT a)
 
 PRIMITIVE neq(LISPT a, LISPT b)
 {
-  if (!EQ(a, b))
+  if(!EQ(a, b))
     return C_T;
   else
     return C_NIL;
@@ -98,9 +98,9 @@ PRIMITIVE neq(LISPT a, LISPT b)
 
 PRIMITIVE boundp(LISPT a)
 {
-  if (TYPEOF(a) != SYMBOL)
+  if(TYPEOF(a) != SYMBOL)
     return C_NIL;
-  else if (TYPEOF(SYMVAL(a).value) != UNBOUND)
+  else if(TYPEOF(SYMVAL(a).value) != UNBOUND)
     return C_T;
   else
     return C_NIL;
@@ -108,7 +108,7 @@ PRIMITIVE boundp(LISPT a)
 
 PRIMITIVE litatom(LISPT a)
 {
-  if (TYPEOF(a) == SYMBOL)
+  if(TYPEOF(a) == SYMBOL)
     return C_T;
   else
     return C_NIL;
@@ -116,8 +116,8 @@ PRIMITIVE litatom(LISPT a)
 
 PRIMITIVE xtypeof(LISPT a)
 {
-  switch (TYPEOF(a))
-    {
+  switch(TYPEOF(a))
+  {
     case NIL:
       return C_NIL;
     case SYMBOL:
@@ -160,7 +160,7 @@ PRIMITIVE xtypeof(LISPT a)
       return C_FILE;
     default:
       return C_NIL;
-    }
+  }
   return C_NIL;
 }
 

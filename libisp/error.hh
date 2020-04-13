@@ -45,8 +45,8 @@ extern LISPT error(int, LISPT);
 #define MAXMESSAGE 29
 
 #define CHECK(arg, typ) \
-  if (TYPEOF(arg) != typ) \
+  if(TYPEOF(arg) != typ) \
   return error(NOT_A | typ, arg)
 #define CHECK2(arg, typ1, typ2) \
-  if (TYPEOF(arg) != typ1 && TYPEOF(arg) != typ2) \
+  if(TYPEOF(arg) != typ1 && TYPEOF(arg) != typ2) \
     return error(ILLEGAL_ARG, arg);

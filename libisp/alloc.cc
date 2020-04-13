@@ -31,10 +31,10 @@ struct conscells
   struct lispt cells[CONSCELLS];
   struct conscells* next;
 };
-static struct conscells* conscells; /* Cons cell storage */
-static int nrconses;                /* Number of conses since last gc. */
+static struct conscells* conscells;               /* Cons cell storage */
+static int nrconses;                              /* Number of conses since last gc. */
 static struct destblock destblock[DESTBLOCKSIZE]; /* Destblock area */
-static int destblockused; /* Index to last slot in destblock */
+static int destblockused;                         /* Index to last slot in destblock */
 
 #ifdef FLOATING
 static unsigned short point = 31;
@@ -64,11 +64,11 @@ static struct floats
 char* realmalloc(unsigned int size)
 {
   char* cp = (char*)malloc(size);
-  if (cp == NULL)
-    {
-      error(OUT_OF_MEMORY, C_NIL);
-      return NULL;
-    }
+  if(cp == NULL)
+  {
+    error(OUT_OF_MEMORY, C_NIL);
+    return NULL;
+  }
   return cp;
 }
 
@@ -79,7 +79,7 @@ char* realmalloc(unsigned int size)
 static struct conscells* newpage()
 {
   struct conscells* newp = new struct conscells;
-  if (newp == nullptr)
+  if(newp == nullptr)
     return conscells;
   newp->next = conscells;
   return newp;
@@ -96,38 +96,38 @@ static int sweep()
 
   int nrfreed = 0;
   int i = 0;
-  for (cc = conscells; cc && cc->cells[i].gcmark; cc = cc->next, i = 0)
+  for(cc = conscells; cc && cc->cells[i].gcmark; cc = cc->next, i = 0)
+  {
+    for(; i < CONSCELLS && cc->cells[i].gcmark; i++)
     {
-      for (; i < CONSCELLS && cc->cells[i].gcmark; i++)
-        {
-          cc->cells[i].gcmark = 0;
-        }
-      if (i < CONSCELLS)
-        break;
+      cc->cells[i].gcmark = 0;
     }
-  SET(freelist, FREE, (LISPT) &cc->cells[i]);
+    if(i < CONSCELLS)
+      break;
+  }
+  SET(freelist, FREE, (LISPT)&cc->cells[i]);
   nrfreed++;
   LISPT f = freelist;
-  if (TYPEOF(f) == CPOINTER)
+  if(TYPEOF(f) == CPOINTER)
     free(CPOINTVAL(f));
   i++; /* Check *next* cell */
-  for (; cc; cc = cc->next, i = 0)
-    for (; i < CONSCELLS; i++)
-      if (!cc->cells[i].gcmark)
-        {
-          nrfreed++;
-          /*
+  for(; cc; cc = cc->next, i = 0)
+    for(; i < CONSCELLS; i++)
+      if(!cc->cells[i].gcmark)
+      {
+        nrfreed++;
+        /*
 	   * C pointers must be freed.
 	   */
-          if (TYPEOF(f) == CPOINTER)
-            free(CPOINTVAL(f));
-          SET(FREEVAL(f), FREE, (LISPT) &cc->cells[i]);
-          f = FREEVAL(f);
-        }
+        if(TYPEOF(f) == CPOINTER)
+          free(CPOINTVAL(f));
+        SET(FREEVAL(f), FREE, (LISPT)&cc->cells[i]);
+        f = FREEVAL(f);
+      }
       else
-        {
-          cc->cells[i].gcmark = 0;
-        }
+      {
+        cc->cells[i].gcmark = 0;
+      }
   FREEVAL(f) = C_NIL;
   return nrfreed;
 }
@@ -142,10 +142,10 @@ static void mark(LISPT* x)
   int y;
 #endif
 
-  switch (TYPEOF(*x))
-    {
+  switch(TYPEOF(*x))
+  {
     case CONS:
-      if (MARKED(*x))
+      if(MARKED(*x))
         break;
       MARK(*x);
       mark(&CAR(*x));
@@ -153,7 +153,7 @@ static void mark(LISPT* x)
       break;
 #ifdef FLOATING
     case FLOAT:
-      y = (int) (&FLOATVAL(*x) - &floats.fdata[0]);
+      y = (int)(&FLOATVAL(*x) - &floats.fdata[0]);
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
 #endif /* FLOATING */
@@ -183,7 +183,7 @@ static void mark(LISPT* x)
     default:
       MARK(*x);
       break;
-    }
+  }
 }
 
 /*
@@ -195,66 +195,65 @@ static LISPT doreclaim(int doconsargs, long incr)
 {
   int i;
 
-  if (ISNIL(gcgag))
+  if(ISNIL(gcgag))
     fprintf(primerr, "garbage collecting\n");
 #ifdef FLOATING
-  for (i = 0; i < 4; i++) floats.marks[i] = 0;
+  for(i = 0; i < 4; i++) floats.marks[i] = 0;
   point = 31;
   p0 = 0;
 #endif /* FLOATING */
-  if (C_T != NULL)
+  if(C_T != NULL)
     MARK(C_T);
-  if (doconsargs)
+  if(doconsargs)
+  {
+    mark(foo1);
+    mark(foo2);
+  }
+  if(dest != NULL)
+    for(i = dest[0].val.d_integer; i > 0; i--)
     {
-      mark(foo1);
-      mark(foo2);
+      mark(&dest[i].var.d_lisp);
+      mark(&dest[i].val.d_lisp);
     }
-  if (dest != NULL)
-    for (i = dest[0].val.d_integer; i > 0; i--)
-      {
-        mark(&dest[i].var.d_lisp);
-        mark(&dest[i].val.d_lisp);
-      }
-  for (i = 0; markobjs[i] != NULL; i++) mark(markobjs[i]);
+  for(i = 0; markobjs[i] != NULL; i++) mark(markobjs[i]);
 #if 0
   if (env != NULL && ENVVAL(env) != NULL)
     mark((LISPT *) &ENVVAL(env));
 #endif
-  for (i = 0; i < toctrl; i++)
-    if (control[i].type == CTRL_LISP && control[i].u.lisp != NULL
-      && TYPEOF(control[i].u.lisp) != ENVIRON)
+  for(i = 0; i < toctrl; i++)
+    if(control[i].type == CTRL_LISP && control[i].u.lisp != NULL && TYPEOF(control[i].u.lisp) != ENVIRON)
       mark(&control[i].u.lisp);
-  for (i = 0; i < MAXHASH; i++)
-    for (auto* l = obarray[i]; l; l = l->onext)
-      {
-        MARK(l->sym);
-        mark(&(SYMVAL(l->sym).value));
-        mark(&(SYMVAL(l->sym).plist));
-      }
-  for (i = destblockused - 1; i >= 0; i--)
+  for(i = 0; i < MAXHASH; i++)
+    for(auto* l = obarray[i]; l; l = l->onext)
     {
-      if (destblock[i].type != 0)
-        {
-          mark(&destblock[i].var.d_lisp);
-          mark(&destblock[i].val.d_lisp);
-        }
+      MARK(l->sym);
+      mark(&(SYMVAL(l->sym).value));
+      mark(&(SYMVAL(l->sym).plist));
     }
-  if (savept)
-    for (i = savept; i; i--) mark(&savearray[i - 1]);
+  for(i = destblockused - 1; i >= 0; i--)
+  {
+    if(destblock[i].type != 0)
+    {
+      mark(&destblock[i].var.d_lisp);
+      mark(&destblock[i].val.d_lisp);
+    }
+  }
+  if(savept)
+    for(i = savept; i; i--) mark(&savearray[i - 1]);
   /*
    * A new page is allocated if the number of conses is lower
    * than MINCONSES or if requested by calling doreclaim with
    * incr greater than 0.
    */
-  if (nrconses < MINCONSES || incr > 0)
-    {
-      do
-        conscells = newpage();
-      while (incr-- > 0); /* At least one page more */
-    }
+  if(nrconses < MINCONSES || incr > 0)
+  {
+    do
+      conscells = newpage();
+    while(incr-- > 0); /* At least one page more */
+  }
   int nrfreed = sweep();
   nrconses = 0;
-  if (ISNIL(gcgag))
+  if(ISNIL(gcgag))
     fprintf(primerr, "%d cells freed\n", nrfreed);
   return C_NIL;
 }
@@ -267,24 +266,24 @@ PRIMITIVE reclaim(LISPT incr) /* Number of blocks to increase with */
 {
   long i;
 
-  if (ISNIL(incr))
+  if(ISNIL(incr))
     i = 0;
   else
-    {
-      CHECK(incr, INTEGER);
-      i = INTVAL(incr);
-    }
+  {
+    CHECK(incr, INTEGER);
+    i = INTVAL(incr);
+  }
   doreclaim(NOCONSARGS, i);
   return C_NIL;
 }
 
 LISPT getobject()
 {
-  if (ISNIL(freelist))
+  if(ISNIL(freelist))
     doreclaim(NOCONSARGS, 0L);
 
   LISPT f;
-  SET(f, CONS, (LISPT) freelist);
+  SET(f, CONS, (LISPT)freelist);
   freelist = FREEVAL(freelist);
   return f;
 }
@@ -295,15 +294,15 @@ LISPT getobject()
  */
 PRIMITIVE cons(LISPT a, LISPT b)
 {
-  if (ISNIL(freelist))
-    {
-      foo1 = &a;
-      foo2 = &b;
-      doreclaim(CONSARGS, 0L);
-    }
+  if(ISNIL(freelist))
+  {
+    foo1 = &a;
+    foo2 = &b;
+    doreclaim(CONSARGS, 0L);
+  }
 
   LISPT f;
-  SET(f, CONS, (LISPT) freelist);
+  SET(f, CONS, (LISPT)freelist);
   freelist = FREEVAL(freelist);
   CAR(f) = a;
   CDR(f) = b;
@@ -316,8 +315,8 @@ PRIMITIVE cons(LISPT a, LISPT b)
  */
 LISPT mkstring(const char* str)
 {
-  char* c = (char*) safemalloc((unsigned) strlen(str) + 1);
-  if (c == NULL)
+  char* c = (char*)safemalloc((unsigned)strlen(str) + 1);
+  if(c == NULL)
     return C_ERROR;
   strcpy(c, str);
   LISPT s = getobject();
@@ -341,7 +340,7 @@ static int hash(const char* str)
 {
   int sum = 0;
 
-  for (; *str; str++) sum += *str;
+  for(; *str; str++) sum += *str;
   return sum % MAXHASH;
 }
 
@@ -355,19 +354,19 @@ static LISPT buildatom(const char* s, int cpy)
   LISPT l;
   static LISPT unbound = NULL;
 
-  if (unbound == NULL)
+  if(unbound == NULL)
     SET(unbound, UNBOUND, getobject());
   newatom = getobject();
-  if (newatom == C_ERROR)
+  if(newatom == C_ERROR)
     return C_ERROR;
-  if (cpy)
-    {
-      char* pname = safemalloc((unsigned) strlen(s) + 1);
-      if (pname == NULL)
-        return C_ERROR;
-      strcpy(pname, s);
-      SYMVAL(newatom).pname = pname;
-    }
+  if(cpy)
+  {
+    char* pname = safemalloc((unsigned)strlen(s) + 1);
+    if(pname == NULL)
+      return C_ERROR;
+    strcpy(pname, s);
+    SYMVAL(newatom).pname = pname;
+  }
   else
     SYMVAL(newatom).pname = s;
   SYMVAL(newatom).plist = C_NIL;
@@ -386,21 +385,21 @@ static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
   OBARRAY* ob;
 
   int hv = hash(str);
-  for (ob = *(obarray + hv); ob; ob = ob->onext)
-    {
-      if (!strcmp(SYMVAL(ob->sym).pname, str))
-        return ob->sym;
-    }
-  ob = (OBARRAY*) safemalloc(sizeof(OBARRAY));
-  if (ob == NULL)
+  for(ob = *(obarray + hv); ob; ob = ob->onext)
+  {
+    if(!strcmp(SYMVAL(ob->sym).pname, str))
+      return ob->sym;
+  }
+  ob = (OBARRAY*)safemalloc(sizeof(OBARRAY));
+  if(ob == NULL)
     return C_ERROR;
   ob->onext = obarray[hv];
   ob->sym = buildatom(str, cpy);
-  if (EQ(ob->sym, C_ERROR))
-    {
-      free((char*) ob);
-      return C_ERROR;
-    }
+  if(EQ(ob->sym, C_ERROR))
+  {
+    free((char*)ob);
+    return C_ERROR;
+  }
   obarray[hv] = ob;
   return ob->sym;
 }
@@ -432,27 +431,27 @@ LISPT mkfloat(double num)
 
 #ifdef FLOATING
 again:
-  while (p0 < 4)
-    if ((floats.marks[p0] & (1 << point)) == 0)
+  while(p0 < 4)
+    if((floats.marks[p0] & (1 << point)) == 0)
       break;
     else
-      {
-        point--;
-        if (!point)
-          {
-            p0++;
-            point = 31;
-          }
-      }
-  if (p0 == 4)
     {
-      nrconses = MINCONSES;
-      doreclaim(NOCONSARGS, 0L);
-      goto again;
+      point--;
+      if(!point)
+      {
+        p0++;
+        point = 31;
+      }
     }
+  if(p0 == 4)
+  {
+    nrconses = MINCONSES;
+    doreclaim(NOCONSARGS, 0L);
+    goto again;
+  }
   SET(rval, FLOAT, &floats.fdata[p0 * 32 + (31 - point)]);
   floats.marks[p0] |= 1 << point;
-  *((double*) POINTER(rval)) = num;
+  *((double*)POINTER(rval)) = num;
 #endif /* FLOATING */
   SET(rval, FLOAT, getobject());
   return rval;
@@ -466,15 +465,15 @@ struct destblock* dalloc(int size)
 {
   int i;
 
-  if (size <= DESTBLOCKSIZE - destblockused)
+  if(size <= DESTBLOCKSIZE - destblockused)
+  {
+    destblockused += size;
+    for(i = 0; i < size; i++)
     {
-      destblockused += size;
-      for (i = 0; i < size; i++)
-        {
-          destblock[destblockused - 1 - i].var.d_lisp = C_NIL;
-          destblock[destblockused - 1 - i].val.d_lisp = C_NIL;
-        }
+      destblock[destblockused - 1 - i].var.d_lisp = C_NIL;
+      destblock[destblockused - 1 - i].val.d_lisp = C_NIL;
     }
+  }
   else
     return NULL;
   return &destblock[destblockused - size];
@@ -503,11 +502,11 @@ void init_alloc()
   destblockused = 0;
   conscells = NULL;
   conscells = newpage(); /* Allocate one page of storage */
-  if (conscells == NULL)
-    {
-      fprintf(stderr, "Sorry, no memory for cons cells\n");
-      finish(1);
-    }
+  if(conscells == NULL)
+  {
+    fprintf(stderr, "Sorry, no memory for cons cells\n");
+    finish(1);
+  }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
   mkprim(PN_RECLAIM, reclaim, 1, SUBR);
