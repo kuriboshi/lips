@@ -390,14 +390,14 @@ static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
     if(!strcmp(SYMVAL(ob->sym).pname, str))
       return ob->sym;
   }
-  ob = (OBARRAY*)safemalloc(sizeof(OBARRAY));
-  if(ob == NULL)
+  ob = new OBARRAY;
+  if(ob == nullptr)
     return C_ERROR;
   ob->onext = obarray[hv];
   ob->sym = buildatom(str, cpy);
   if(EQ(ob->sym, C_ERROR))
   {
-    free((char*)ob);
+    delete ob;
     return C_ERROR;
   }
   obarray[hv] = ob;

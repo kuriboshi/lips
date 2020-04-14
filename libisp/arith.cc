@@ -6,6 +6,7 @@
  *
  */
 #include "lisp.hh"
+#include "iter.hh"
 
 /*
  * Function with an i as a prefix are for integer arithmetic and those
@@ -51,14 +52,11 @@ PRIMITIVE plus(LISPT l)
 
 PRIMITIVE iplus(LISPT l)
 {
-  CHECK(CAR(l), INTEGER);
-  auto sum = INTVAL(CAR(l));
-  l = CDR(l);
-  while(TYPEOF(l) == CONS)
+  int sum = 0;
+  for(auto i = lisp::begin(l); i != lisp::end(l); ++i)
   {
-    CHECK(CAR(l), INTEGER);
-    sum = sum + INTVAL(CAR(l));
-    l = CDR(l);
+    CHECK(*i, INTEGER);
+    sum += INTVAL(*i);
   }
   return mknumber(sum);
 }
