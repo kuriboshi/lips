@@ -5,9 +5,19 @@
  * $Id$
  *
  */
-#include <string.h>
-#include <stdlib.h>
-#include "lisp.hh"
+
+#include <cstring>
+#include <cstdlib>
+
+#include "libisp.hh"
+#include "low.hh"
+#include "garb.hh"
+
+extern LISPT history;
+extern LISPT histnum;
+extern LISPT path;
+extern LISPT home;
+extern LISPT alias_expanded;
 
 #define CONSCELLS 1000     /* Number of cells in each block */
 #define DESTBLOCKSIZE 3000 /* Size of destination block area */
@@ -36,6 +46,13 @@ static int nrconses;                              /* Number of conses since last
 static struct destblock destblock[DESTBLOCKSIZE]; /* Destblock area */
 static int destblockused;                         /* Index to last slot in destblock */
 
+/*
+ * markobjs contains pointers to all LISPT type c variables that
+ * contains data to be retained during gc.
+ */
+LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &fun, &expression, &args, &path, &home, &verboseflg, &topprompt,
+  &promptform, &brkprompt, &currentbase, &interactive, &version, &gcgag, &alias_expanded, &C_EOF, nullptr};
+
 #ifdef FLOATING
 static unsigned short point = 31;
 static int p0 = 0;
@@ -54,8 +71,6 @@ static struct floats
   struct floats* fnext;
 } floats;
 #endif /* FLOATING */
-
-#include "garb.hh"
 
 /*
  * safemalloc is defined in terms of realmalloc depending on

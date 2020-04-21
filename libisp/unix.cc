@@ -4,13 +4,15 @@
  *
  * $Id$
  */
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "lisp.hh"
+
+#include "libisp.hh"
 
 #define MAXFILES 8
 

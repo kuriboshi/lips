@@ -1,3 +1,8 @@
+//
+// Lips, lisp shell.
+// Copyright 2020 Krister Joas
+//
+
 #pragma once
 
 #include <iterator>
@@ -20,7 +25,7 @@ private:
   LISPT _car;
 };
 
-iterator begin(LISPT l) { return iterator(l); }
-iterator end(LISPT l) { return iterator(nullptr); }
+inline iterator begin(LISPT l) { return iterator(l); }
+inline iterator end(LISPT l) { return iterator(nullptr); }
 
 }

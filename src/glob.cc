@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <lisp.hh>
+#include <libisp.hh>
 #include "main.hh"
 #include "exec.hh"
 #include "glob.hh"

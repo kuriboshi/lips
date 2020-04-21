@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <libisp.hh>
 #include "main.hh"
 #include "exec.hh"
 #include "top.hh"

@@ -5,7 +5,8 @@
  * $Id$
  *
  */
-#include "lisp.hh"
+
+#include "libisp.hh"
 
 extern int brkflg;
 extern int interrupt;

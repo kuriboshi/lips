@@ -4,8 +4,8 @@
  *
  * $Id$
  */
-#include "lisp.hh"
-#include "func.hh"
+
+#include "libisp.hh"
 
 PRIMITIVE p_and(LISPT l)
 {

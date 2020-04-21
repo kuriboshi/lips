@@ -4,8 +4,9 @@
  *
  * $Id$
  */
-#include <errno.h>
-#include "lisp.hh"
+#include <cerrno>
+
+#include "libisp.hh"
 
 extern bool toploop(LISPT*, int (*)(LISPT*));
 long trace;

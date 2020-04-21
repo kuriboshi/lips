@@ -10,10 +10,12 @@
  * This header file is private to the libisp libray.  Applications using
  * libisp should only include libisp.h.
  */
-#include <stdio.h>
-#include <memory.h>
+
+#include <cstdio>
 #include "config.hh"
-#include "libisp.hh"
+
+struct lispt;
+using LISPT = struct lispt*;
 
 /* This is used to recognize c-functions for cpprint */
 #define PRIMITIVE LISPT
@@ -224,9 +226,3 @@ struct destblock
 #define safemalloc(x) realmalloc(x)
 
 #define MAXHASH 255 /* The number of hash buckets */
-
-#include "defs.hh"
-#include "io.hh"
-#include "constants.hh"
-#include "error.hh"
-#include "func.hh"

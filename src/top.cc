@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-#include <lisp.hh>
+#include <libisp.hh>
 #include "main.hh"
 
 #define PROMPTLENGTH 80

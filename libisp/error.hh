@@ -6,6 +6,7 @@
  */
 #pragma once
 
+#include "lisp.hh"
 #include "except.hh"
 
 extern LISPT error(int, LISPT);

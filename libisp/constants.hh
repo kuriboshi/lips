@@ -6,6 +6,8 @@
  */
 #pragma once
 
+#include "lisp.hh"
+
 /*
  * All lisp constants needed internally.
  */

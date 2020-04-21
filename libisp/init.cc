@@ -4,10 +4,20 @@
  *
  * $Id$
  */
-#include "lisp.hh"
+
+#include "libisp.hh"
 
 extern char* VERSION;
+extern void init_arith(void);
 extern void init_file(void);
+extern void init_logic(void);
+extern void init_low(void);
+extern void init_map(void);
+extern void init_pred(void);
+extern void init_prop(void);
+extern void init_string(void);
+extern void init_user(void);
+
 /*
  * All lisp constants needed internally.
  */

@@ -14,11 +14,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
+#include <string.h>
 
-#include "exec.hh"
-#include "top.hh"
+#include <libisp.hh>
 #include "glob.hh"
 #include "main.hh"
+#include "top.hh"
 
 #define MAXARGS 256
 #define EXECHASH 1023 /* Hash table size for commands */

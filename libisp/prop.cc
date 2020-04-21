@@ -4,7 +4,8 @@
  *
  * $Id$
  */
-#include "lisp.hh"
+
+#include "libisp.hh"
 
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {

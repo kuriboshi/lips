@@ -28,7 +28,6 @@ target_sources(libisp PRIVATE
   defs.hh
   error.hh
   except.hh
-  func.hh
   garb.hh
   io.hh
   libisp.hh

@@ -18,6 +18,7 @@
 #include <term.h>
 #endif
 
+#include <libisp.hh>
 #include "top.hh"
 #include "main.hh"
 #include "glob.hh"

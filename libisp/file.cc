@@ -8,7 +8,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "lisp.hh"
+
+#include "libisp.hh"
 
 extern int getch(FILE*);
 extern void putch(int, FILE*, int);

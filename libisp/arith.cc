@@ -5,8 +5,8 @@
  * $Id$
  *
  */
-#include "lisp.hh"
-#include "iter.hh"
+
+#include "libisp.hh"
 
 /*
  * Function with an i as a prefix are for integer arithmetic and those

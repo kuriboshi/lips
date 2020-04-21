@@ -4,7 +4,9 @@
  *
  * $Id$
  */
-#include "lisp.hh"
+
+#include "libisp.hh"
+#include "low.hh"
 
 static LISPT getargs(LISPT al)
 {
@@ -85,7 +87,7 @@ PRIMITIVE define(LISPT name, LISPT lam)
   return name;
 }
 
-static LISPT def(LISPT name, LISPT pars, LISPT body, enum lisp_type type)
+static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
   LISPT foo;
 

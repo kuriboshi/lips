@@ -6,6 +6,8 @@
  */
 #pragma once
 
+#include "lisp.hh"
+
 #define SEPR 001   /* seperator */
 #define BRK 002    /* break character */
 #define INSERT 004 /* insert read macro */

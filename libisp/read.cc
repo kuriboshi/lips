@@ -4,9 +4,10 @@
  *
  * $Id$
  */
-#include <ctype.h>
-#include <stdlib.h>
-#include "lisp.hh"
+#include <cctype>
+#include <cstdlib>
+
+#include "libisp.hh"
 
 #define NUL '\0'
 #define MAXATOMSIZE 128 /* max length of atom read can handle */
