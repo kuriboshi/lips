@@ -56,7 +56,7 @@ PRIMITIVE concat(LISPT strlist)
     size += strlen(STRINGVAL(CAR(sl)));
   }
   ns = (char*)safemalloc((unsigned)size + 1);
-  if(ns == NULL)
+  if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
   while(!ISNIL(strlist))
@@ -95,7 +95,7 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
     || e < 0)
     return C_NIL;
   ns = (char*)safemalloc((unsigned)size + 1);
-  if(ns == NULL)
+  if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
   for(size = 0; s <= e; s++, size++)

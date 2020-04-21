@@ -37,9 +37,7 @@ LISPT version;     /* Is set to the version string. */
  */
 void initcvar(LISPT* cvar, const char* name, LISPT val)
 {
-  LISPT t;
-
-  t = intern(name);
+  LISPT t = intern(name);
   SET(SYMVAL(t).value, CVARIABLE, getobject());
   CVARVAL(SYMVAL(t).value) = cvar;
   *cvar = val;
@@ -129,6 +127,6 @@ void init_lisp()
   init_low();
   init_map();
 
-  undefhook = NULL;
-  breakhook = NULL;
+  undefhook = nullptr;
+  breakhook = nullptr;
 }

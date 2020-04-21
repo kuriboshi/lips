@@ -64,10 +64,10 @@ static struct floats
 char* realmalloc(unsigned int size)
 {
   char* cp = (char*)malloc(size);
-  if(cp == NULL)
+  if(cp == nullptr)
   {
     error(OUT_OF_MEMORY, C_NIL);
-    return NULL;
+    return nullptr;
   }
   return cp;
 }
@@ -202,26 +202,26 @@ static LISPT doreclaim(int doconsargs, long incr)
   point = 31;
   p0 = 0;
 #endif /* FLOATING */
-  if(C_T != NULL)
+  if(C_T != nullptr)
     MARK(C_T);
   if(doconsargs)
   {
     mark(foo1);
     mark(foo2);
   }
-  if(dest != NULL)
+  if(dest != nullptr)
     for(i = dest[0].val.d_integer; i > 0; i--)
     {
       mark(&dest[i].var.d_lisp);
       mark(&dest[i].val.d_lisp);
     }
-  for(i = 0; markobjs[i] != NULL; i++) mark(markobjs[i]);
+  for(i = 0; markobjs[i] != nullptr; i++) mark(markobjs[i]);
 #if 0
-  if (env != NULL && ENVVAL(env) != NULL)
+  if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
   for(i = 0; i < toctrl; i++)
-    if(control[i].type == CTRL_LISP && control[i].u.lisp != NULL && TYPEOF(control[i].u.lisp) != ENVIRON)
+    if(control[i].type == CTRL_LISP && control[i].u.lisp != nullptr && TYPEOF(control[i].u.lisp) != ENVIRON)
       mark(&control[i].u.lisp);
   for(i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
@@ -316,7 +316,7 @@ PRIMITIVE cons(LISPT a, LISPT b)
 LISPT mkstring(const char* str)
 {
   char* c = (char*)safemalloc((unsigned)strlen(str) + 1);
-  if(c == NULL)
+  if(c == nullptr)
     return C_ERROR;
   strcpy(c, str);
   LISPT s = getobject();
@@ -352,9 +352,9 @@ static LISPT buildatom(const char* s, int cpy)
 {
   LISPT newatom;
   LISPT l;
-  static LISPT unbound = NULL;
+  static LISPT unbound = nullptr;
 
-  if(unbound == NULL)
+  if(unbound == nullptr)
     SET(unbound, UNBOUND, getobject());
   newatom = getobject();
   if(newatom == C_ERROR)
@@ -362,7 +362,7 @@ static LISPT buildatom(const char* s, int cpy)
   if(cpy)
   {
     char* pname = safemalloc((unsigned)strlen(s) + 1);
-    if(pname == NULL)
+    if(pname == nullptr)
       return C_ERROR;
     strcpy(pname, s);
     SYMVAL(newatom).pname = pname;
@@ -458,7 +458,7 @@ again:
 }
 
 /*
- * dalloc - Allocates a destination block of size size. Returns NULL if
+ * dalloc - Allocates a destination block of size size. Returns nullptr if
  *          no more space available.
  */
 struct destblock* dalloc(int size)
@@ -475,7 +475,7 @@ struct destblock* dalloc(int size)
     }
   }
   else
-    return NULL;
+    return nullptr;
   return &destblock[destblockused - size];
 }
 
@@ -500,9 +500,9 @@ void dzero()
 void init_alloc()
 {
   destblockused = 0;
-  conscells = NULL;
+  conscells = nullptr;
   conscells = newpage(); /* Allocate one page of storage */
-  if(conscells == NULL)
+  if(conscells == nullptr)
   {
     fprintf(stderr, "Sorry, no memory for cons cells\n");
     finish(1);

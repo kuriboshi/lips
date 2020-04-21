@@ -20,7 +20,7 @@
 
 enum lisp_type
 {
-  NIL = 0,   /* so that NULL also becomes NIL */
+  NIL = 0,   /* so that nullptr also becomes NIL */
   SYMBOL,    /* an atomic symbol */
   INTEGER,   /* 24 bit integer in same word */
   BIGNUM,    /* bigger than longs (NYI) */
@@ -51,13 +51,13 @@ enum lisp_type
 /*
  * Some more or less helpfull macros.
  */
-#define TYPEOF(a) ((a) == NULL ? NIL : (a)->type)
+#define TYPEOF(a) ((a) == nullptr ? NIL : (a)->type)
 #define SETTYPE(a, t) ((a)->type = (t))
 #define MARKED(a) ((a)->gcmark)
 #define MARK(a) ((a)->gcmark = 1)
 #define UNMARK(a) ((a)->gcmark = 0)
 
-#define C_NIL NULL
+#define C_NIL nullptr
 extern LISPT C_T;
 
 #define STRINGVAL(s) ((s)->u.l_string)
@@ -77,7 +77,7 @@ extern LISPT C_T;
 
 #define SET(a, t, p) ((a) = (p), (a)->type = (t), UNMARK(a))
 
-#define ISNIL(x) ((x) == NULL || TYPEOF(x) == NIL)
+#define ISNIL(x) ((x) == nullptr || TYPEOF(x) == NIL)
 #define IST(x) (TYPEOF(x) == TRUE)
 
 #define CAR(x) (CONSVAL(x).car)

@@ -57,9 +57,9 @@ static int (*cont)(void); /* Current continuation. */
       error(mess, fault); \
       printwhere(); \
     } \
-    if(breakhook != NULL) \
+    if(breakhook != nullptr) \
       (*breakhook)(); \
-    if(env == NULL) \
+    if(env == nullptr) \
       throw lips_error("break"); \
     xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T); \
     PUSH_FUNC(next); \
@@ -347,7 +347,7 @@ static int evalhook(LISPT exp)
 {
   LISPT res;
 
-  if(undefhook != NULL)
+  if(undefhook != nullptr)
     switch((*undefhook)(exp, &res))
     {
       case 1:
@@ -862,7 +862,7 @@ static int evlam0()
 
 void unwind()
 {
-  while(env != NULL)
+  while(env != nullptr)
   {
     unLink();
     env = env->var.d_environ;

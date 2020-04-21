@@ -725,7 +725,7 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       return patom(x, file, esc);
       break;
     case CPOINTER:
-      if(CPOINTVAL(x) != NULL)
+      if(CPOINTVAL(x) != nullptr)
       {
         ps("#<pointer", file, 0);
         goto ppoint;

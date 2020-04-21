@@ -63,7 +63,7 @@ int loadfile(const char* lf)
   LISPT rval;
 
   foo = fopen(lf, "r");
-  if(foo == NULL)
+  if(foo == nullptr)
     return 1;
   for(rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0)) rval = eval(rval);
   fclose(foo);
@@ -179,9 +179,9 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   CHECK(oname, SYMBOL);
   CHECK2(SYMVAL(oname).value, SUBR, FSUBR);
   funn = SYMVAL(oname).pname;
-  if((tagsfile = fopen(TAGSFILE, "r")) == NULL)
+  if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
     return error(CANT_OPEN, mkstring(TAGSFILE));
-  while(fgets(buf, 120, tagsfile) != NULL)
+  while(fgets(buf, 120, tagsfile) != nullptr)
     if(strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
     {
       sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
@@ -189,7 +189,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
       strcat(buf, "/");
       strcat(buf, fname);
       fclose(tagsfile);
-      if((cfile = fopen(buf, "r")) == NULL)
+      if((cfile = fopen(buf, "r")) == nullptr)
         return error(CANT_OPEN, mkstring(buf));
       for(; line > 1; line--) fgets(buf, 120, cfile);
       fgets(buf, 120, cfile);
