@@ -37,15 +37,13 @@ PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 
 PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  LISPT rval, tmp;
-
-  tmp = C_NIL;
+  LISPT tmp = C_NIL;
   if(TYPEOF(obj) == CONS)
   {
     tmp = cons(apply(fn1, cons(obj, C_NIL)), C_NIL);
     obj = CDR(obj);
   }
-  rval = tmp;
+  LISPT rval = tmp;
   SAVE(rval);
   while(TYPEOF(obj) == CONS)
   {
@@ -62,15 +60,13 @@ PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
 
 PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  LISPT rval, tmp;
-
-  tmp = C_NIL;
+  LISPT tmp = C_NIL;
   if(TYPEOF(obj) == CONS)
   {
     tmp = cons(apply(fn1, cons(CAR(obj), C_NIL)), C_NIL);
     obj = CDR(obj);
   }
-  rval = tmp;
+  LISPT rval = tmp;
   SAVE(rval);
   while(TYPEOF(obj) == CONS)
   {

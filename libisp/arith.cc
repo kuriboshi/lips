@@ -46,8 +46,7 @@ PRIMITIVE plus(LISPT l)
   }
   if(f)
     return mkfloat(fsum);
-  else
-    return mknumber(sum);
+  return mknumber(sum);
 }
 
 PRIMITIVE iplus(LISPT l)
@@ -86,9 +85,7 @@ PRIMITIVE difference(LISPT a, LISPT b)
       return mkfloat((double)INTVAL(a) - FLOATVAL(b));
   else if(TYPEOF(b) == INTEGER)
     return mkfloat(FLOATVAL(a) - (double)INTVAL(b));
-  else
-    return mkfloat(FLOATVAL(a) - FLOATVAL(b));
-  /*NOTREACHED*/
+  return mkfloat(FLOATVAL(a) - FLOATVAL(b));
 }
 
 PRIMITIVE idifference(LISPT a, LISPT b)
@@ -135,8 +132,7 @@ PRIMITIVE ltimes(LISPT l)
   }
   if(f)
     return mkfloat(fprod);
-  else
-    return mknumber(prod);
+  return mknumber(prod);
 }
 
 PRIMITIVE itimes(LISPT l)
@@ -339,17 +335,20 @@ PRIMITIVE zerop(LISPT x)
 PRIMITIVE minusp(LISPT x)
 {
   if(TYPEOF(x) == FLOAT)
+  {
     if(FLOATVAL(x) < 0.0)
       return C_T;
     else
       return C_NIL;
+  }
   else if(TYPEOF(x) == INTEGER)
+  {
     if(INTVAL(x) < 0)
       return C_T;
     else
       return C_NIL;
-  else
-    return error(ILLEGAL_ARG, x);
+  }
+  return error(ILLEGAL_ARG, x);
 }
 
 void init_arith()

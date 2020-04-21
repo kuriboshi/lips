@@ -18,12 +18,11 @@ static LISPT getargs(LISPT al)
 
 PRIMITIVE getrep(LISPT fun)
 {
-  LAMBDAT* x;
   LISPT args;
 
   if(TYPEOF(fun) != LAMBDA && TYPEOF(fun) != NLAMBDA)
     return C_NIL;
-  x = &LAMVAL(fun);
+  auto* x = &LAMVAL(fun);
   if(x->argcnt == -1)
     args = CAR(x->arglist);
   else if(x->argcnt < 0)
@@ -38,16 +37,13 @@ PRIMITIVE getrep(LISPT fun)
 
 LISPT funeq(LISPT f1, LISPT f2)
 {
-  LISPT t1, t2;
-  LISPT tmp;
-
   if(EQ(f1, f2))
     return C_T;
   if(LAMVAL(f1).argcnt == LAMVAL(f2).argcnt)
   {
-    t1 = LAMVAL(f1).arglist;
-    t2 = LAMVAL(f2).arglist;
-    tmp = equal(t1, t2);
+    LISPT t1 = LAMVAL(f1).arglist;
+    LISPT t2 = LAMVAL(f2).arglist;
+    LISPT tmp = equal(t1, t2);
     if(!ISNIL(tmp))
     {
       t1 = LAMVAL(f1).lambdarep;
@@ -62,12 +58,10 @@ LISPT funeq(LISPT f1, LISPT f2)
 
 static LISPT checkfn(LISPT name, LISPT lam)
 {
-  LISPT t;
-
   if(TYPEOF(GETOPVAL(name)) != UNBOUND)
     if(TYPEOF(GETOPVAL(name)) == LAMBDA || TYPEOF(GETOPVAL(name)) == NLAMBDA)
     {
-      t = funeq(GETOPVAL(name), lam);
+      LISPT t = funeq(GETOPVAL(name), lam);
       if(ISNIL(t))
       {
         putprop(name, C_OLDDEF, GETOPVAL(name));
@@ -89,12 +83,10 @@ PRIMITIVE define(LISPT name, LISPT lam)
 
 static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
-  LISPT foo;
-
   CHECK(name, SYMBOL);
   if(!ISNIL(pars) && TYPEOF(pars) != SYMBOL)
     CHECK(pars, CONS);
-  foo = mklambda(pars, body, type);
+  LISPT foo = mklambda(pars, body, type);
   if(TYPEOF(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);

@@ -153,10 +153,6 @@ static int sweep()
  */
 static void mark(LISPT* x)
 {
-#ifdef FLOATING
-  int y;
-#endif
-
   switch(TYPEOF(*x))
   {
     case CONS:
@@ -168,9 +164,11 @@ static void mark(LISPT* x)
       break;
 #ifdef FLOATING
     case FLOAT:
-      y = (int)(&FLOATVAL(*x) - &floats.fdata[0]);
+    {
+      int y = (int)(&FLOATVAL(*x) - &floats.fdata[0]);
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
+    }
 #endif /* FLOATING */
     case SYMBOL:
       break;
@@ -208,12 +206,10 @@ static void mark(LISPT* x)
  */
 static LISPT doreclaim(int doconsargs, long incr)
 {
-  int i;
-
   if(ISNIL(gcgag))
     fprintf(primerr, "garbage collecting\n");
 #ifdef FLOATING
-  for(i = 0; i < 4; i++) floats.marks[i] = 0;
+  for(int i = 0; i < 4; i++) floats.marks[i] = 0;
   point = 31;
   p0 = 0;
 #endif /* FLOATING */
@@ -225,27 +221,27 @@ static LISPT doreclaim(int doconsargs, long incr)
     mark(foo2);
   }
   if(dest != nullptr)
-    for(i = dest[0].val.d_integer; i > 0; i--)
+    for(int i = dest[0].val.d_integer; i > 0; i--)
     {
       mark(&dest[i].var.d_lisp);
       mark(&dest[i].val.d_lisp);
     }
-  for(i = 0; markobjs[i] != nullptr; i++) mark(markobjs[i]);
+  for(int i = 0; markobjs[i] != nullptr; i++) mark(markobjs[i]);
 #if 0
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
-  for(i = 0; i < toctrl; i++)
+  for(int i = 0; i < toctrl; i++)
     if(control[i].type == CTRL_LISP && control[i].u.lisp != nullptr && TYPEOF(control[i].u.lisp) != ENVIRON)
       mark(&control[i].u.lisp);
-  for(i = 0; i < MAXHASH; i++)
+  for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
     {
       MARK(l->sym);
       mark(&(SYMVAL(l->sym).value));
       mark(&(SYMVAL(l->sym).plist));
     }
-  for(i = destblockused - 1; i >= 0; i--)
+  for(int i = destblockused - 1; i >= 0; i--)
   {
     if(destblock[i].type != 0)
     {
@@ -254,7 +250,7 @@ static LISPT doreclaim(int doconsargs, long incr)
     }
   }
   if(savept)
-    for(i = savept; i; i--) mark(&savearray[i - 1]);
+    for(int i = savept; i; i--) mark(&savearray[i - 1]);
   /*
    * A new page is allocated if the number of conses is lower
    * than MINCONSES or if requested by calling doreclaim with
@@ -365,13 +361,11 @@ static int hash(const char* str)
  */
 static LISPT buildatom(const char* s, int cpy)
 {
-  LISPT newatom;
-  LISPT l;
   static LISPT unbound = nullptr;
 
   if(unbound == nullptr)
     SET(unbound, UNBOUND, getobject());
-  newatom = getobject();
+  LISPT newatom = getobject();
   if(newatom == C_ERROR)
     return C_ERROR;
   if(cpy)
@@ -386,6 +380,7 @@ static LISPT buildatom(const char* s, int cpy)
     SYMVAL(newatom).pname = s;
   SYMVAL(newatom).plist = C_NIL;
   SYMVAL(newatom).value = unbound;
+  LISPT l;
   SET(l, SYMBOL, newatom);
   return l;
 }
@@ -397,9 +392,8 @@ static LISPT buildatom(const char* s, int cpy)
  */
 static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
 {
-  OBARRAY* ob;
-
   int hv = hash(str);
+  OBARRAY* ob;
   for(ob = *(obarray + hv); ob; ob = ob->onext)
   {
     if(!strcmp(SYMVAL(ob->sym).pname, str))
@@ -478,12 +472,10 @@ again:
  */
 struct destblock* dalloc(int size)
 {
-  int i;
-
   if(size <= DESTBLOCKSIZE - destblockused)
   {
     destblockused += size;
-    for(i = 0; i < size; i++)
+    for(int i = 0; i < size; i++)
     {
       destblock[destblockused - 1 - i].var.d_lisp = C_NIL;
       destblock[destblockused - 1 - i].val.d_lisp = C_NIL;

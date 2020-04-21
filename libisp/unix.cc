@@ -124,9 +124,7 @@ PRIMITIVE uxnice(LISPT incr)
 
 PRIMITIVE uxopen(LISPT name, LISPT mode)
 {
-  FILE* f;
-  const char* openmode;
-  LISPT newfile;
+  const char* openmode = nullptr;
 
   CHECK(name, STRING);
   if(ISNIL(mode))
@@ -143,9 +141,10 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
     else
       return error(UNKNOWN_REQUEST, mode);
   }
-  f = fopen(STRINGVAL(name), openmode);
+  auto* f = fopen(STRINGVAL(name), openmode);
   if(!f)
     return error(CANT_OPEN, name);
+  LISPT newfile;
   SET(newfile, FILET, getobject());
   FILEVAL(newfile) = f;
   return newfile;

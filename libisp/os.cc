@@ -15,9 +15,7 @@
  */
 int readchar(FILE* file, char* cp)
 {
-  int i;
-
-  i = read(fileno(file), cp, 1);
+  int i = read(fileno(file), cp, 1);
   if(i != 1)
     return 0;
   return 1;

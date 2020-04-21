@@ -136,7 +136,8 @@ static char digits[] = {
  */
 static int integerp(char* buf, long* res)
 {
-  int d = 0, sign = 1;
+  int d = 0;
+  int sign = 1;
 
   *res = 0;
   if(*buf == '-')
@@ -160,9 +161,7 @@ static int integerp(char* buf, long* res)
 #ifdef FLOATING
 static int floatp(char* buf)
 {
-  int state;
-
-  state = 0;
+  int state = 0;
   while(state >= 0 && *buf)
   {
     switch(*buf)
@@ -225,10 +224,9 @@ static LISPT parsebuf(char* buf)
  */
 LISPT ratom(FILE* file)
 {
-  int c;
   int pos = 0;
 
-  c = getch(file);
+  int c = getch(file);
   while(1)
   {
     if(c == EOF)
@@ -277,9 +275,7 @@ LISPT ratom(FILE* file)
  */
 static LISPT splice(LISPT c, LISPT l, int tailp)
 {
-  LISPT t, t2;
-
-  t = CDR(c);
+  LISPT t = CDR(c);
   if(TYPEOF(l) != CONS)
   {
     if(tailp)
@@ -296,6 +292,7 @@ static LISPT splice(LISPT c, LISPT l, int tailp)
   if(ISNIL(l))
     return c;
   rplacd(c, l);
+  LISPT t2 = C_NIL;
   for(; TYPEOF(l) == CONS; l = CDR(l)) t2 = l;
   return rplacd(t2, t);
 }
@@ -476,14 +473,13 @@ tail:
 /*ARGSUSED*/
 static LISPT rmexcl(FILE* file, LISPT _0, char _1)
 {
-  int c;
-  LISPT tmp, at, l;
+  LISPT at, l;
 
-  c = getch(file);
+  int c = getch(file);
   if(issepr(c))
     return C_EXCL;
   echoline = 1;
-  tmp = histget(0L, history);
+  LISPT tmp = histget(0L, history);
   if(TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
     tmp = CAR(tmp);
   switch(c)

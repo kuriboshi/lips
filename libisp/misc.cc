@@ -20,19 +20,15 @@ static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "No
 
 PRIMITIVE xobarray()
 {
-  int i;
-  LISPT o;
-  OBARRAY* l;
-
-  o = C_NIL;
-  for(i = 0; i < MAXHASH; i++)
-    for(l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
+  LISPT o = C_NIL;
+  for(int i = 0; i < MAXHASH; i++)
+    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
   return o;
 }
 
 PRIMITIVE evaltrace(LISPT state)
 {
-  long i = trace;
+  auto i = trace;
 
   if(!ISNIL(state))
   {
@@ -44,11 +40,8 @@ PRIMITIVE evaltrace(LISPT state)
 
 PRIMITIVE freecount()
 {
-  int i;
-  LISPT l;
-
-  i = 0;
-  for(l = freelist; INTVAL(l); l = CDR(l)) i++;
+  int i = 0;
+  for(auto l = freelist; INTVAL(l); l = CDR(l)) i++;
   return mknumber((long)i);
 }
 

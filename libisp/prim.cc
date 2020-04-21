@@ -129,16 +129,14 @@ static LISPT mkarglis(LISPT alist)
  */
 LISPT mklambda(LISPT args, LISPT def, lisp_type type)
 {
-  LISPT t;
-  LISPT s;
-
   SAVE(args);
   SAVE(def);
-  s = getobject();
+  LISPT s = getobject();
   LAMVAL(s).lambdarep = def;
   count = 0;
   LAMVAL(s).arglist = mkarglis(args);
   LAMVAL(s).argcnt = count;
+  LISPT t;
   SET(t, type, s);
   UNSAVE(def);
   UNSAVE(args);
@@ -149,112 +147,98 @@ PRIMITIVE car(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return CAR(a);
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cdr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return CDR(a);
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(CDR(a));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cdar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(CAR(a));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE caar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(CAR(a));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(CDR(a));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cdddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(cdr(CDR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE caddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(cdr(CDR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cdadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(car(CDR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE caadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(car(CDR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cddar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(cdr(CAR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cadar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(cdr(CAR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE cdaar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return cdr(car(CAR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE caaar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
     return car(car(CAR(a)));
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE rplaca(LISPT x, LISPT y)
@@ -275,16 +259,14 @@ PRIMITIVE eq(LISPT a, LISPT b)
 {
   if(EQ(a, b))
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE atom(LISPT a)
 {
   if(ISNIL(a) || IST(a) || TYPEOF(a) == SYMBOL || TYPEOF(a) == INTEGER || TYPEOF(a) == FLOAT)
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE nconc(LISPT l)
@@ -366,8 +348,7 @@ PRIMITIVE null(LISPT a)
 {
   if(EQ(a, C_NIL))
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE quote(LISPT a)

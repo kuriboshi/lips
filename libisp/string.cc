@@ -21,8 +21,7 @@ PRIMITIVE stringp(LISPT s)
 {
   if(TYPEOF(s) == STRING)
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 /* T if both strings are equal */
@@ -32,8 +31,7 @@ PRIMITIVE streq(LISPT s1, LISPT s2)
   CHECK(s2, STRING);
   if(!strcmp(STRINGVAL(s1), STRINGVAL(s2)))
     return C_T;
-  else
-    return C_NIL;
+  return C_NIL;
 }
 
 PRIMITIVE strcomp(LISPT s1, LISPT s2)

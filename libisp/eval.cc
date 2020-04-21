@@ -142,11 +142,9 @@ static int (*cont)(void); /* Current continuation. */
 
 static LISPT printwhere()
 {
-  LISPT foo;
-  int i;
-
-  foo = C_NIL;
-  for(i = toctrl - 1; i; i--) /* find latest completed call */
+  LISPT foo = C_NIL;
+  for(int i = toctrl - 1; i; i--) /* find latest completed call */
+  {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == evlam0)
       for(; i; i--)
       {
@@ -160,6 +158,7 @@ static LISPT printwhere()
           goto out;
         }
       }
+  }
 out:
   pputc('\n', primerr);
   return foo;
@@ -211,8 +210,6 @@ PRIMITIVE eval(LISPT expr)
 */
 PRIMITIVE eval(LISPT expr)
 {
-  LISPT foo;
-
   /* 
    * Set the current expression to `expr' and push the current
    * destination onto the control stack.  (Why isn't `exp' pushed?)
@@ -238,7 +235,7 @@ PRIMITIVE eval(LISPT expr)
    * Retrieve the result of the evaluation and restore the previous
    * destination.
    */
-  foo = RECEIVE;
+  LISPT foo = RECEIVE;
   dest = (struct destblock*)POP_POINT;
   /* 
    * Return the result.
@@ -258,8 +255,6 @@ PRIMITIVE apply(f, a)
 */
 PRIMITIVE apply(LISPT f, LISPT a)
 {
-  LISPT foo;
-
   PUSH_POINT(dest);
   dest = MKDESTBLOCK(1);
   PUSH_LISP(fun);
@@ -271,7 +266,7 @@ PRIMITIVE apply(LISPT f, LISPT a)
   cont = peval2;
   while(!(*cont)())
     ;
-  foo = RECEIVE;
+  LISPT foo = RECEIVE;
   dest = (struct destblock*)POP_POINT;
   return foo;
 }
@@ -367,14 +362,12 @@ static int evalhook(LISPT exp)
 
 void do_unbound(int (*continuation)(void))
 {
-  LISPT al;
-
   /* 
    * If an undefined symbol has the AUTOLOAD property, we try to
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
-  al = getprop(CAR(expression), C_AUTOLOAD);
+  LISPT al = getprop(CAR(expression), C_AUTOLOAD);
   if(!ISNIL(al))
   {
     PUSH_LISP(expression);
@@ -569,12 +562,9 @@ static int peval2()
  */
 void bt()
 {
-  int op;
-  int i;
-
-  op = printlevel;
+  int op = printlevel;
   printlevel = 2;
-  for(i = toctrl - 1; i; i--)
+  for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0)
       xprint(control[i - 1].u.lisp, C_T);
@@ -687,9 +677,7 @@ static int evlis1()
 
 static int evlis2()
 {
-  LISPT x;
-
-  x = cons(RECEIVE, C_NIL);
+  LISPT x = cons(RECEIVE, C_NIL);
   SEND(x);
   cont = POP_FUNC;
   return 0;
@@ -708,9 +696,7 @@ static int evlis3()
 
 static int evlis4()
 {
-  LISPT x;
-
-  x = RECEIVE;
+  LISPT x = RECEIVE;
   dfree(dest);
   dest = (struct destblock*)POP_POINT;
   x = cons(RECEIVE, x);
@@ -723,13 +709,12 @@ static int evlam()
 {
   int i;
   int ac;
-  int spr;
   LISPT foo;
 
   PUSH_LISP(expression);
   PUSH_POINT(env);
   PUSH_POINT(dest);
-  spr = 0;
+  int spr = 0;
   if((ac = LAMVAL(fun).argcnt) < 0)
   {
     ac = -ac;
@@ -777,9 +762,7 @@ respread:
 
 static int ev2()
 {
-  LISPT foo;
-
-  foo = call(fun);
+  LISPT foo = call(fun);
   dfree(dest);
   dest = (struct destblock*)POP_POINT;
   if(EQ(foo, C_ERROR))
@@ -819,15 +802,12 @@ static int ev4()
 
 static void Link()
 {
-  long i;
-  LISPT t;
-
   dest[0].var.d_environ = env;
   dest[0].type = 2;
   env = (struct destblock*)&dest[0];
-  for(i = dest[0].val.d_integer; i > 0; i--)
+  for(auto i = dest[0].val.d_integer; i > 0; i--)
   {
-    t = SYMVALUE(dest[i].var.d_lisp);
+    LISPT t = SYMVALUE(dest[i].var.d_lisp);
     SYMVALUE(dest[i].var.d_lisp) = dest[i].val.d_lisp;
     dest[i].val.d_lisp = t;
   }
@@ -845,11 +825,8 @@ static int evlam1()
 
 static void unLink()
 {
-  long i;
-  struct destblock* c;
-
-  c = env;
-  for(i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
+  struct destblock* c = env;
+  for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
 static int evlam0()
@@ -872,9 +849,7 @@ void unwind()
 
 static int lookup()
 {
-  LISPT t;
-
-  t = SYMVALUE(expression);
+  LISPT t = SYMVALUE(expression);
   switch(TYPEOF(t))
   {
     case UNBOUND:
@@ -899,7 +874,7 @@ static int evclosure()
 {
   LISPT foo;
   int i;
-  struct destblock* envir;
+  struct destblock* envir = nullptr;
 
   PUSH_POINT(env);
   PUSH_POINT(dest);
@@ -966,9 +941,7 @@ static int evseq3()
 
 PRIMITIVE baktrace()
 {
-  int i;
-
-  for(i = toctrl; i >= 0; i--)
+  for(int i = toctrl; i >= 0; i--)
   {
     fprintf(primerr, "%d: ", i);
     if(control[i].type == CTRL_LISP && TYPEOF(control[i].u.lisp) != NIL)

@@ -60,13 +60,13 @@ PRIMITIVE xprint(LISPT x, LISPT file)
 
 int loadfile(const char* lf)
 {
-  FILE* foo;
-  LISPT rval;
-
-  foo = fopen(lf, "r");
+  auto* foo = fopen(lf, "r");
   if(foo == nullptr)
     return 1;
-  for(rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0)) rval = eval(rval);
+  for(auto rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0))
+  {
+    rval = eval(rval);
+  }
   fclose(foo);
   return 0;
 }
@@ -114,9 +114,7 @@ PRIMITIVE prin2(LISPT x, LISPT file)
 
 PRIMITIVE plevel(LISPT newl)
 {
-  long x;
-
-  x = printlevel;
+  auto x = printlevel;
   if(!ISNIL(newl))
   {
     CHECK(newl, INTEGER);

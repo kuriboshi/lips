@@ -22,11 +22,9 @@ PRIMITIVE getplist(LISPT a)
 
 PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 {
-  LISPT pl;
-
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
-  for(pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
+  for(auto pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
     if(EQ(CAR(pl), p))
     {
       rplaca(CDR(pl), v);
@@ -38,11 +36,9 @@ PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 
 PRIMITIVE getprop(LISPT a, LISPT p)
 {
-  LISPT pl;
-
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
-  for(pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
+  for(auto pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
   {
     if(EQ(CAR(pl), p))
       return CAR(CDR(pl));
@@ -52,11 +48,11 @@ PRIMITIVE getprop(LISPT a, LISPT p)
 
 PRIMITIVE remprop(LISPT a, LISPT p)
 {
-  LISPT pl, pl2, r;
+  LISPT pl, pl2;
 
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
-  r = C_NIL;
+  LISPT r = C_NIL;
   for(pl = SYMVAL(a).plist, pl2 = C_NIL; !ISNIL(pl); pl = CDR(CDR(pl)))
   {
     if(EQ(CAR(pl), p))

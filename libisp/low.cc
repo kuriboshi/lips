@@ -46,15 +46,12 @@ PRIMITIVE progn(LISPT lexp)
 
 PRIMITIVE cond(LISPT args)
 {
-  LISPT alt;
-  LISPT res;
-
-  res = C_NIL;
+  LISPT res = C_NIL;
   if(ISNIL(args))
     return C_NIL;
   while(ISNIL(res))
   {
-    alt = CAR(args);
+    LISPT alt = CAR(args);
     CHECK(alt, CONS);
     res = eval(CAR(alt));
     if(!ISNIL(res))
@@ -73,9 +70,7 @@ PRIMITIVE cond(LISPT args)
 
 PRIMITIVE xwhile(LISPT pred, LISPT exp)
 {
-  LISPT res;
-
-  res = eval(pred);
+  LISPT res = eval(pred);
   while(!ISNIL(res))
   {
     progn(exp);
@@ -84,14 +79,12 @@ PRIMITIVE xwhile(LISPT pred, LISPT exp)
   return C_NIL;
 }
 
-/*ARGSUSED*/
-PRIMITIVE prog1(LISPT a1, LISPT la)
+PRIMITIVE prog1(LISPT a1, LISPT)
 {
   return a1;
 }
 
-/*ARGSUSED*/
-PRIMITIVE prog2(LISPT a1, LISPT a2, LISPT la)
+PRIMITIVE prog2(LISPT, LISPT a2, LISPT)
 {
   return a2;
 }
