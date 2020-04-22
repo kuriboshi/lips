@@ -14,7 +14,6 @@
 #include "eval.hh"
 #include "file.hh"
 #include "init.hh"
-#include "io.hh"
 #include "iter.hh"
 #include "misc.hh"
 #include "prim.hh"
