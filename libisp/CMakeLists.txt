@@ -23,15 +23,24 @@ target_sources(libisp PRIVATE
   version.cc
 )
 target_sources(libisp PRIVATE
+  alloc.hh
   config.hh
   constants.hh
   defs.hh
   error.hh
+  eval.hh
   except.hh
+  file.hh
   garb.hh
-  io.hh
+  init.hh
+  iter.hh
   libisp.hh
   lisp.hh
+  low.hh
+  misc.hh
+  prim.hh
+  read.hh
+  user.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(libisp PUBLIC -Wall -Werror)
