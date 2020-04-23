@@ -136,9 +136,9 @@ void init_term()
     newterm.c_cc[VMIN] = 1;
     newterm.c_cc[VTIME] = 0;
 #ifdef TERMCAP
-    curup = NULL;
-    curfwd = NULL;
-    if((term = getenv("TERM")) != NULL)
+    curup = nullptr;
+    curfwd = nullptr;
+    if((term = getenv("TERM")) != nullptr)
       if(tgetent(bp, term) == 1)
       {
         curup = tgetstr(const_cast<char*>("up"), &termc);
@@ -478,7 +478,7 @@ static void scan(int begin)
   parpos.line = 0;
   currentpos.cpos = 0;
   currentpos.line = 0;
-  currentpos.line_start = NULL;
+  currentpos.line_start = nullptr;
   for(pos = begin; pos > 0; pos--)
   {
     int cur = linebuffer[pos];
@@ -499,7 +499,7 @@ static void scan(int begin)
         parpos.cpos = cpos - parpos.cpos - 1;
         parpos.line_start = &linebuffer[pos + 1];
       }
-      if(currentpos.line_start == NULL)
+      if(currentpos.line_start == nullptr)
         currentpos.line_start = &linebuffer[pos + 1];
       cpos = 0;
       line++;
@@ -610,7 +610,7 @@ void blink()
   timeout.tv_sec = 1L;
   timeout.tv_usec = 0L;
   FD_SET(1, &rfds);
-  select(1, &rfds, NULL, NULL, &timeout);
+  select(1, &rfds, nullptr, nullptr, &timeout);
   nput(curdn, ldiff); /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
@@ -684,7 +684,7 @@ int lips_getline(FILE* file)
       case T_TAB:
         s = mkexstr();
         t = extilde(s, 0);
-        if(t == NULL)
+        if(t == nullptr)
         {
           putc(BELL, stdout);
           break;

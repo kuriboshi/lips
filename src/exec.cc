@@ -51,8 +51,8 @@ struct job
   int running;       /* Nonzero if running */
 };
 
-static struct job* joblist = NULL;  /* List of jobs */
-static struct job* cjoblist = NULL; /* List of collected jobs */
+static struct job* joblist = nullptr;  /* List of jobs */
+static struct job* cjoblist = nullptr; /* List of collected jobs */
 #endif
 
 /* 
@@ -74,18 +74,18 @@ static void preparefork()
 
 /* 
  * strsave - saves string in argument STR in a safe place with malloc.  
- *           Returns NULL if either STR is NULL or malloc fail to allocate 
+ *           Returns nullptr if either STR is nullptr or malloc fail to allocate 
  *           more memory.
  */
 char* strsave(const char* str)
 {
   char* newstr;
 
-  if(str == NULL)
-    return NULL;
+  if(str == nullptr)
+    return nullptr;
   newstr = (char*)realmalloc((unsigned)strlen(str) + 1);
-  if(newstr == NULL)
-    return NULL;
+  if(newstr == nullptr)
+    return nullptr;
   strcpy(newstr, str);
   return newstr;
 }
@@ -139,7 +139,7 @@ static int recordjob(int pid, int bg)
   if(insidefork)
     return 0; /* Skip this if in a fork. */
   job = (struct job*)realmalloc(sizeof(struct job));
-  if(job == NULL)
+  if(job == nullptr)
     return 1;
   if(joblist)
     job->jobnum = (joblist->jobnum) + 1;
@@ -147,7 +147,7 @@ static int recordjob(int pid, int bg)
     job->jobnum = 1;
   job->procid = pid;
   job->status = 0;
-  job->wdir = getcwd(NULL, 0); /* Not a fatal error if NULL */
+  job->wdir = getcwd(nullptr, 0); /* Not a fatal error if nullptr */
   job->next = joblist;
   job->exp = input_exp;
   job->background = bg;
@@ -166,7 +166,7 @@ static void collectjob(int pid, UNION_WAIT stat)
 #ifdef JOB_CONTROL
   struct job *i, *j;
 
-  i = NULL;
+  i = nullptr;
   for(j = joblist; j; i = j, j = j->next)
     if(j->procid == pid)
     {
@@ -276,7 +276,7 @@ static int checkmeta(char* s)
 
 /* 
  * makeexec - Parse command lin and build argument vector suitable for 
- *            execve. Returns NULL if some error occured, like a no match 
+ *            execve. Returns nullptr if some error occured, like a no match 
  *            for wild cards. Returns pointers to globbed arguments.
  */
 static char** makeexec(LISPT command)
@@ -293,20 +293,20 @@ static char** makeexec(LISPT command)
   sigemptyset(&new_mask);
   sigaddset(&new_mask, SIGINT);
   sigprocmask(SIG_BLOCK, &new_mask, &old_mask); /* Dangerous to interrupt here */
-  for(t = args; *t != NULL; t++)
+  for(t = args; *t != nullptr; t++)
   {
     free(*t);
-    *t = NULL;
+    *t = nullptr;
   }
-  sigprocmask(SIG_SETMASK, &old_mask, NULL);
+  sigprocmask(SIG_SETMASK, &old_mask, nullptr);
   for(i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
   {
   again:
     if(TYPEOF(CAR(com)) == SYMBOL)
     {
       char* c = strsave(extilde(GETSTR(CAR(com)), 1));
-      if(c == NULL)
-        return NULL;
+      if(c == nullptr)
+        return nullptr;
       if(!checkmeta(c))
         args[i++] = c;
       else
@@ -316,7 +316,7 @@ static char** makeexec(LISPT command)
         if(i == 0)
         {
           error(AMBIGUOUS, CAR(com));
-          return NULL;
+          return nullptr;
         }
         files = expandfiles(c, 0, 0, 1);
         if(!ISNIL(files))
@@ -332,8 +332,8 @@ static char** makeexec(LISPT command)
       args[i++] = strsave(ltoa(INTVAL(CAR(com))));
     else if(TYPEOF(CAR(com)) == STRING)
     {
-      if((args[i++] = strsave(GETSTR(CAR(com)))) == NULL)
-        return NULL;
+      if((args[i++] = strsave(GETSTR(CAR(com)))) == nullptr)
+        return nullptr;
     }
     else if(TYPEOF(CAR(com)) == CONS)
     {
@@ -343,14 +343,14 @@ static char** makeexec(LISPT command)
     else
     {
       error(ILLEGAL_ARG, CAR(com));
-      return NULL;
+      return nullptr;
     }
   }
-  args[i] = NULL;
+  args[i] = nullptr;
   if(ok == 1)
   {
     error(NO_MATCH, CDR(command));
-    return NULL;
+    return nullptr;
   }
   return args;
 }
@@ -367,7 +367,7 @@ static UNION_WAIT waitfork(int pid)
 
   do
   {
-    wpid = wait3(&wstat, WUNTRACED, (struct rusage*)NULL);
+    wpid = wait3(&wstat, WUNTRACED, nullptr);
     if(wpid != -1 && !insidefork)
       collectjob(wpid, wstat);
   } while(pid && pid != wpid && wpid != -1);
@@ -386,7 +386,7 @@ void checkfork()
 
   do
   {
-    wpid = wait3(&wstat, WUNTRACED | WNOHANG, (struct rusage*)NULL);
+    wpid = wait3(&wstat, WUNTRACED | WNOHANG, nullptr);
     if(wpid > 0)
       collectjob(wpid, wstat);
   } while(wpid > 0);
@@ -405,7 +405,7 @@ static LISPT exec(const char* name, LISPT command)
   int pid;
   UNION_WAIT status;
 
-  if((args = makeexec(command)) == NULL)
+  if((args = makeexec(command)) == nullptr)
     return C_ERROR;
   if(insidefork)
   {
@@ -480,9 +480,9 @@ int execcommand(LISPT exp, LISPT* res)
 
   *res = C_T;
   command = extilde(GETSTR(CAR(exp)), 1);
-  if(command == NULL)
+  if(command == nullptr)
     return -1;
-  if(*command == '/' || strpbrk(command, "/") != NULL)
+  if(*command == '/' || strpbrk(command, "/") != nullptr)
   {
     if(EQ(exec(command, exp), C_ERROR))
       return -1;
@@ -730,9 +730,9 @@ PRIMITIVE rehash()
       CHECK2(CAR(p), STRING, SYMBOL);
       sdir = GETSTR(CAR(p));
     }
-    if((odir = opendir(sdir)) == NULL)
+    if((odir = opendir(sdir)) == nullptr)
       continue;
-    while((rdir = readdir(odir)) != NULL)
+    while((rdir = readdir(odir)) != nullptr)
     {
       i = hashfun(rdir->d_name);
       exechash[i / 32] |= 1 << (i % 32);
@@ -840,7 +840,7 @@ PRIMITIVE getenviron(LISPT var)
 
   CHECK2(var, STRING, SYMBOL);
   s = getenv(GETSTR(var));
-  if(s == NULL)
+  if(s == nullptr)
     return C_NIL;
   else
     return mkstring(s);
@@ -874,7 +874,7 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
   }
   else
   {
-    char* wd = getcwd(NULL, 0);
+    char* wd = getcwd(nullptr, 0);
     setenviron("PWD", wd);
     free(wd);
     return C_T;

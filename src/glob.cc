@@ -156,7 +156,7 @@ const char* extilde(const char* w, int rep)
     strcpy(s, GETSTR(home));
   else
   {
-    if(index(w, '/') == NULL)
+    if(index(w, '/') == nullptr)
     {
       pw = getpwnam(w);
       strcpy(s, w);
@@ -170,11 +170,11 @@ const char* extilde(const char* w, int rep)
       s[i] = '\0';
       pw = getpwnam(s);
     }
-    if(pw == NULL)
+    if(pw == nullptr)
     {
       if(rep)
         error(NO_USER, mkstring(s));
-      return NULL;
+      return nullptr;
     }
     strncpy(s, pw->pw_dir, MAXNAMLEN);
   }
@@ -200,13 +200,13 @@ static int walkfiles(const char* wild, int all, int report)
     w = wild + 1;
   else
     w = wild;
-  if((odir = opendir(*r == '\0' ? "." : r)) == NULL)
+  if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
   {
     if(report)
       error(NO_DIRECTORY, mkstring(r));
     return 0;
   }
-  while((rdir = readdir(odir)) != NULL)
+  while((rdir = readdir(odir)) != nullptr)
   {
     if((all || rdir->d_name[0] != '.' || *w == '.') && match(rdir->d_name, w))
     {
@@ -294,7 +294,7 @@ PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
     r = 1;
   CHECK2(wild, STRING, SYMBOL);
   wstr = extilde(GETSTR(wild), r);
-  if(wstr == NULL)
+  if(wstr == nullptr)
     return C_NIL;
   return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
 }

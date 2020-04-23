@@ -20,7 +20,7 @@ LISPT histmax;                 /* Maximum number of events to save. */
 LISPT input_exp;               /* The input expression. */
 LISPT topexp;                  /* Transformed expression to evaluate. */
 LISPT alias_expanded;          /* For checking alias loops. */
-LISPT (*transformhook)(LISPT); /* Applied on input if non-NULL. */
+LISPT (*transformhook)(LISPT); /* Applied on input if non-nullptr. */
 void (*beforeprompt)(void);    /* Called before the prompt is printed. */
 
 static int printit; /* If the result will be printed. */
@@ -114,7 +114,7 @@ PRIMITIVE printhist()
 
 static LISPT transform(LISPT list)
 {
-  if(transformhook != NULL)
+  if(transformhook != nullptr)
     return (*transformhook)(list);
   else
     return list;
@@ -194,7 +194,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
     interrupt = 0;
     printit = 0;
     echoline = 0;
-    if(beforeprompt != NULL)
+    if(beforeprompt != nullptr)
       (*beforeprompt)();
     /*
        * Evaluate promptform and print prompt.

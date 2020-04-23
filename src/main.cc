@@ -61,7 +61,7 @@ static int getuser(FILE* f, int def)
   timeout.tv_usec = 0;
   FD_ZERO(&readfs);
   FD_SET(0, &readfs);
-  switch(select(FD_SETSIZE, &readfs, NULL, NULL, &timeout))
+  switch(select(FD_SETSIZE, &readfs, nullptr, nullptr, &timeout))
   {
     case -1:
       fprintf(primerr, "(error in select %d) ", errno);
@@ -197,7 +197,7 @@ LISPT mungepath(char* pstr)
   LISPT p;
 
   ps = (char*)realmalloc((unsigned)(strlen(pstr) + 1));
-  if(ps == NULL)
+  if(ps == nullptr)
   {
     fprintf(stderr, "No more memory, can't munge path.\n");
     finish(1);
@@ -374,10 +374,10 @@ LISPT greet(LISPT who)
     s = getenv("USER");
   else
     s = STRINGVAL(who);
-  if(s == NULL)
+  if(s == nullptr)
     return C_NIL;
   pws = getpwnam(s);
-  if(pws == NULL)
+  if(pws == nullptr)
     return C_NIL;
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
@@ -465,8 +465,8 @@ int main(int argc, char* const* argv)
       dzero();
       fun = C_NIL;
       args = C_NIL;
-      env = NULL;
-      if(toploop(&topprompt, (int (*)(LISPT*))NULL))
+      env = nullptr;
+      if(toploop(&topprompt, nullptr))
         break;
     }
     catch(const lisp_error& error)
