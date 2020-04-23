@@ -24,8 +24,8 @@ public:
   static const int SAVEARRAYSIZE = 1000; // Size of gc save array
   static const int MAXHASH = 255;        // Max number of hash buckets
 
-  static const int NOCONSARGS = 0;    // Don't reclaim arguments of cons
-  static const int CONSARGS = 1;      // Reclaim called from cons
+  static const int NOCONSARGS = 0; // Don't reclaim arguments of cons
+  static const int CONSARGS = 1;   // Reclaim called from cons
 
   struct conscells
   {
@@ -63,7 +63,7 @@ public:
   static int savept;
   static obarray_t* obarray[MAXHASH];
   static LISPT freelist;
-  static LISPT gcgag;           // Nonnil means print gc message.
+  static LISPT gcgag; // Nonnil means print gc message.
 
   /* functions */
   static LISPT intern(const char*);
@@ -94,25 +94,61 @@ private:
   static LISPT buildatom(const char* s, int cpy);
   static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
 
-  static LISPT *foo1;           // Protect arguments of cons when gc.
-  static LISPT *foo2;
-  static int nrconses;          // Number of conses since last gc.
-  static lisp::alloc::conscells_t* conscells;    // Cons cell storage.
+  static LISPT* foo1; // Protect arguments of cons when gc.
+  static LISPT* foo2;
+  static int nrconses;                                                   // Number of conses since last gc.
+  static lisp::alloc::conscells_t* conscells;                            // Cons cell storage.
   static lisp::alloc::destblock_t destblock[lisp::alloc::DESTBLOCKSIZE]; // Destblock area.
-  static int destblockused;              // Index to last slot in destblock.
+  static int destblockused;                                              // Index to last slot in destblock.
 };
 
-inline void init_alloc() { alloc::init_alloc(); }
-inline LISPT intern(const char* s) { return alloc::intern(s); }
-inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
-inline LISPT mkstring(const char* s) { return alloc::mkstring(s); }
-inline LISPT mknumber(long i) { return alloc::mknumber(i); }
-inline LISPT mkatom(char* s) { return alloc::mkatom(s); }
-inline LISPT mkfloat(double d) { return alloc::mkfloat(d); }
-inline LISPT getobject() { return alloc::getobject(); }
-inline alloc::destblock_t* dalloc(int i) { return alloc::dalloc(i); }
-inline void dfree(alloc::destblock_t* d) { alloc::dfree(d); }
-inline void dzero() { alloc::dzero(); }
-inline char* realmalloc(unsigned int u) { return alloc::realmalloc(u); }
-
+inline void init_alloc()
+{
+  alloc::init_alloc();
 }
+inline LISPT intern(const char* s)
+{
+  return alloc::intern(s);
+}
+inline LISPT cons(LISPT a, LISPT b)
+{
+  return alloc::cons(a, b);
+}
+inline LISPT mkstring(const char* s)
+{
+  return alloc::mkstring(s);
+}
+inline LISPT mknumber(long i)
+{
+  return alloc::mknumber(i);
+}
+inline LISPT mkatom(char* s)
+{
+  return alloc::mkatom(s);
+}
+inline LISPT mkfloat(double d)
+{
+  return alloc::mkfloat(d);
+}
+inline LISPT getobject()
+{
+  return alloc::getobject();
+}
+inline alloc::destblock_t* dalloc(int i)
+{
+  return alloc::dalloc(i);
+}
+inline void dfree(alloc::destblock_t* d)
+{
+  alloc::dfree(d);
+}
+inline void dzero()
+{
+  alloc::dzero();
+}
+inline char* realmalloc(unsigned int u)
+{
+  return alloc::realmalloc(u);
+}
+
+} // namespace lisp

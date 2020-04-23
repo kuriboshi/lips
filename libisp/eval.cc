@@ -22,9 +22,9 @@ int (*undefhook)(LISPT, LISPT*); /* Called in case of undefined function. */
  * These variables are really local to this file but are needed
  * by the garbage collector.
  */
-LISPT fun;              /* Store current function beeing evaluated. */
-LISPT expression;       /* Current expression. */
-LISPT args;             /* Current arguments. */
+LISPT fun;                /* Store current function beeing evaluated. */
+LISPT expression;         /* Current expression. */
+LISPT args;               /* Current arguments. */
 alloc::destblock_t* env;  /* Current environment. */
 alloc::destblock_t* dest; /* Current destination beeing built. */
 

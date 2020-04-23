@@ -47,15 +47,14 @@ namespace lisp {
  * contains data to be retained during gc.
  */
 LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &fun, &expression, &args, &path, &home, &verboseflg, &topprompt,
-                     &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag, &alias_expanded, &C_EOF,
-                     nullptr};
+  &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag, &alias_expanded, &C_EOF, nullptr};
 
-LISPT* alloc::foo1 = nullptr;           // Protect arguments of cons when gc.
+LISPT* alloc::foo1 = nullptr; // Protect arguments of cons when gc.
 LISPT* alloc::foo2 = nullptr;
-int alloc::nrconses = 0;          // Number of conses since last gc.
-alloc::conscells_t* alloc::conscells = nullptr;    // Cons cell storage.
+int alloc::nrconses = 0;                                   // Number of conses since last gc.
+alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
 alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
-int alloc::destblockused = 0;              // Index to last slot in destblock.
+int alloc::destblockused = 0;                              // Index to last slot in destblock.
 
 alloc::alloc()
 {
@@ -153,8 +152,7 @@ void alloc::mark(LISPT* x)
       mark(&CDR(*x));
       break;
 #ifdef FLOATING
-    case FLOAT:
-    {
+    case FLOAT: {
       int y = (int)(&FLOATVAL(*x) - &floats.fdata[0]);
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
@@ -533,4 +531,4 @@ int alloc::savept = 0;
 alloc::obarray_t* alloc::obarray[];
 LISPT alloc::freelist;
 
-}
+} // namespace lisp
