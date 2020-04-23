@@ -11,6 +11,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 extern int getch(FILE*);
 extern void putch(int, FILE*, int);
 

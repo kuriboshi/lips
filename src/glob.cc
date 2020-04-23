@@ -17,6 +17,8 @@
 #include "exec.hh"
 #include "glob.hh"
 
+using namespace lisp;
+
 #define TICKS 64
 #define NAMELEN 1024
 

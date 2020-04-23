@@ -8,6 +8,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 /*
  * Function with an i as a prefix are for integer arithmetic and those
  * whith an f are for floats. Without a prefix, the functions

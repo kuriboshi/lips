@@ -75,7 +75,9 @@ extern LISPT C_T;
 #define CVARVAL(v) ((v)->u.l_cvariable)
 #define CPOINTVAL(c) ((c)->u.l_cpointer)
 #define FREEVAL(f) ((f)->u.l_free)
+#if 0
 #define ENVVAL(e) ((e)->u.l_environ)
+#endif
 
 #define SET(a, t, p) ((a) = (p), (a)->type = (t), UNMARK(a))
 
@@ -95,11 +97,8 @@ extern LISPT C_T;
  * A simple way of protecting internal lisp objects from
  * the garbage collector.
  */
-#define USESAVE \
-  extern LISPT savearray[]; \
-  extern int savept;
-#define SAVE(v) savearray[savept++] = v;
-#define UNSAVE(v) v = savearray[--savept];
+#define SAVE(v) lisp::alloc::save(v)
+#define UNSAVE(v) v = lisp::alloc::unsave()
 
 #define BITS32 int
 
@@ -147,9 +146,9 @@ struct lispt
   unsigned int gcmark : 1;
   enum lisp_type type;
   union
-  { /* One entry for each type.  Types that
-				   has no, or just one value are indicated
-				   by a comment. */
+  {
+    // One entry for each type.  Types that has no, or just one value are
+    // indicated by a comment.
     /* NIL */
     SYMBOLT l_symbol;
     int l_integer;
@@ -162,7 +161,7 @@ struct lispt
     LAMBDAT l_lambda;
     CLOSURET l_closure;
     /* UNBOUND */
-    struct destblock* l_environ;
+    //lisp::alloc::destblock_t* l_environ;
     FILE* l_filet;
     /* TRUE */
     LISPT l_free;
@@ -174,55 +173,3 @@ struct lispt
     /* USER */
   } u;
 };
-
-/*
- * Each hashbucket contains a symbol and a pointer to the next
- * symbol in that bucket.
- */
-typedef struct obarr
-{
-  LISPT sym;
-  struct obarr* onext;
-} OBARRAY;
-
-/*
- * The control stack.
- */
-enum control_type
-{
-  CTRL_LISP,
-  CTRL_FUNC,
-  CTRL_POINT,
-};
-
-struct control
-{
-  enum control_type type;
-  union
-  {
-    int (*f_point)(void);
-    void* point;
-    LISPT lisp;
-  } u;
-};
-#define CTRLBLKSIZE 4000
-typedef struct control CONTROL[CTRLBLKSIZE];
-
-struct destblock
-{
-  char type;
-  union
-  {
-    LISPT d_lisp;
-    int d_integer;
-    struct destblock* d_environ;
-  } var, val;
-};
-
-/*
- * Just to avoid lint complaints about pointers returned by
- * `malloc' beeing unaligned.
- */
-#define safemalloc(x) realmalloc(x)
-
-#define MAXHASH 255 /* The number of hash buckets */

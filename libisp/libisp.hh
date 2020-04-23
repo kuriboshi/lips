@@ -25,8 +25,6 @@
 #define PP3(name) extern LISPT name(LISPT, LISPT, LISPT)
 
 /* Lisp primitives */
-PP1(reclaim);
-PP2(cons);
 PP1(plus);
 PP1(iplus);
 PP1(fplus);
@@ -88,9 +86,7 @@ PP3(map);
 PP3(mapc);
 PP3(maplist);
 PP3(mapcar);
-PP0(xobarray);
 PP1(evaltrace);
-PP0(freecount);
 PP1(numberp);
 PP1(listp);
 PP2(memb);

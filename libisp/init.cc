@@ -7,6 +7,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 extern char* VERSION;
 extern void init_arith(void);
 extern void init_file(void);

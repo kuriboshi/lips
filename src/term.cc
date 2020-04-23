@@ -23,6 +23,8 @@
 #include "main.hh"
 #include "glob.hh"
 
+using namespace lisp;
+
 #define FFLUSH(file) fflush(file)
 
 extern void finish(int);

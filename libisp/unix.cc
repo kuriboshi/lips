@@ -14,6 +14,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 #define MAXFILES 8
 
 LISPT sighandler[NSIG - 1];

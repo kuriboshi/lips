@@ -9,6 +9,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
 {
@@ -55,7 +57,7 @@ PRIMITIVE concat(LISPT strlist)
     CHECK(CAR(sl), STRING);
     size += strlen(STRINGVAL(CAR(sl)));
   }
-  ns = (char*)safemalloc((unsigned)size + 1);
+  ns = (char*)realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
@@ -94,7 +96,7 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   if(size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str))) || s <= 0
     || e < 0)
     return C_NIL;
-  ns = (char*)safemalloc((unsigned)size + 1);
+  ns = (char*)realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';

@@ -7,9 +7,9 @@
 
 #include "libisp.hh"
 
-extern void finish(int);
+using namespace lisp;
 
-USESAVE
+extern void finish(int);
 
 static int count;
 

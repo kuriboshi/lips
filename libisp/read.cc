@@ -9,6 +9,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 #define NUL '\0'
 #define MAXATOMSIZE 128 /* max length of atom read can handle */
 

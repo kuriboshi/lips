@@ -7,7 +7,7 @@
 
 #include "libisp.hh"
 
-USESAVE
+using namespace lisp;
 
 PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
 {

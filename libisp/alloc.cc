@@ -19,39 +19,7 @@ extern LISPT path;
 extern LISPT home;
 extern LISPT alias_expanded;
 
-#define CONSCELLS 1000     /* Number of cells in each block */
-#define DESTBLOCKSIZE 3000 /* Size of destination block area */
-#define MINCONSES 2000     /* Minimum number of cells after gc */
-#define SAVEARRAYSIZE 1000 /* Size of gc save array */
-
-#define NOCONSARGS 0 /* Don't reclaim arguments of cons. */
-#define CONSARGS 1   /* Reclaim called from cons. */
-
-LISPT savearray[SAVEARRAYSIZE]; /* Gc save */
-int savept = 0;
-OBARRAY* obarray[MAXHASH]; /* Array containing global symbols */
-LISPT freelist;            /* List of free cells */
-
 extern void finish(int);
-
-static LISPT gcgag;        /* Nonnil means print gc message. */
-static LISPT *foo1, *foo2; /* Protect arguments of cons when gc. */
-struct conscells
-{
-  struct lispt cells[CONSCELLS];
-  struct conscells* next;
-};
-static struct conscells* conscells;               /* Cons cell storage */
-static int nrconses;                              /* Number of conses since last gc. */
-static struct destblock destblock[DESTBLOCKSIZE]; /* Destblock area */
-static int destblockused;                         /* Index to last slot in destblock */
-
-/*
- * markobjs contains pointers to all LISPT type c variables that
- * contains data to be retained during gc.
- */
-LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &fun, &expression, &args, &path, &home, &verboseflg, &topprompt,
-  &promptform, &brkprompt, &currentbase, &interactive, &version, &gcgag, &alias_expanded, &C_EOF, nullptr};
 
 #ifdef FLOATING
 static unsigned short point = 31;
@@ -72,11 +40,33 @@ static struct floats
 } floats;
 #endif /* FLOATING */
 
+namespace lisp {
+
+/*
+ * markobjs contains pointers to all LISPT type c variables that
+ * contains data to be retained during gc.
+ */
+LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &fun, &expression, &args, &path, &home, &verboseflg, &topprompt,
+                     &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag, &alias_expanded, &C_EOF,
+                     nullptr};
+
+LISPT* alloc::foo1 = nullptr;           // Protect arguments of cons when gc.
+LISPT* alloc::foo2 = nullptr;
+int alloc::nrconses = 0;          // Number of conses since last gc.
+alloc::conscells_t* alloc::conscells = nullptr;    // Cons cell storage.
+alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
+int alloc::destblockused = 0;              // Index to last slot in destblock.
+
+alloc::alloc()
+{
+  init_alloc();
+}
+
 /*
  * safemalloc is defined in terms of realmalloc depending on
  * whether the `lint' is defined or not.
  */
-char* realmalloc(unsigned int size)
+char* alloc::realmalloc(unsigned int size)
 {
   char* cp = (char*)malloc(size);
   if(cp == nullptr)
@@ -91,9 +81,9 @@ char* realmalloc(unsigned int size)
  * newpage - Allocates a new block of cons cells and links it into the 
  *           current list of blocks.
  */
-static struct conscells* newpage()
+alloc::conscells_t* alloc::newpage()
 {
-  struct conscells* newp = new struct conscells;
+  auto* newp = new conscells_t;
   if(newp == nullptr)
     return conscells;
   newp->next = conscells;
@@ -105,9 +95,9 @@ static struct conscells* newpage()
  *         space allocated by malloc. These objects has the type field set 
  *         to NIL, and the rest of the field is the pointer.
  */
-static int sweep()
+int alloc::sweep()
 {
-  struct conscells* cc;
+  conscells_t* cc;
 
   int nrfreed = 0;
   int i = 0;
@@ -151,7 +141,7 @@ static int sweep()
  * mark - Mark a cell and traverse car and cdr of cons cells and all other
  *        fields of type LISPT.
  */
-static void mark(LISPT* x)
+void alloc::mark(LISPT* x)
 {
   switch(TYPEOF(*x))
   {
@@ -204,7 +194,7 @@ static void mark(LISPT* x)
  *	       sweep up garbage.  Argument doconsargs is nonzero
  *	       
  */
-static LISPT doreclaim(int doconsargs, long incr)
+LISPT alloc::doreclaim(int doconsargs, long incr)
 {
   if(ISNIL(gcgag))
     fprintf(primerr, "garbage collecting\n");
@@ -273,7 +263,7 @@ static LISPT doreclaim(int doconsargs, long incr)
  * reclaim - Lips function reclaim interface. incr is the number of pages
  *           to inrease storage with.
  */
-PRIMITIVE reclaim(LISPT incr) /* Number of blocks to increase with */
+PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 {
   long i;
 
@@ -288,7 +278,7 @@ PRIMITIVE reclaim(LISPT incr) /* Number of blocks to increase with */
   return C_NIL;
 }
 
-LISPT getobject()
+LISPT alloc::getobject()
 {
   if(ISNIL(freelist))
     doreclaim(NOCONSARGS, 0L);
@@ -303,7 +293,7 @@ LISPT getobject()
  * cons - Builds a cons cell out of arguments A and B. Reclaims space
  *        and allocates new blocks if necessary.
  */
-PRIMITIVE cons(LISPT a, LISPT b)
+PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   if(ISNIL(freelist))
   {
@@ -320,13 +310,28 @@ PRIMITIVE cons(LISPT a, LISPT b)
   return f;
 }
 
+PRIMITIVE alloc::xobarray()
+{
+  LISPT o = C_NIL;
+  for(int i = 0; i < MAXHASH; i++)
+    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
+  return o;
+}
+
+PRIMITIVE alloc::freecount()
+{
+  int i = 0;
+  for(auto l = freelist; INTVAL(l); l = CDR(l)) i++;
+  return mknumber((long)i);
+}
+
 /*
  * mkstring - Strings are stored in a cons cell with car set to NIL and
  *            cdr is set to the string pointer.
  */
-LISPT mkstring(const char* str)
+LISPT alloc::mkstring(const char* str)
 {
-  char* c = (char*)safemalloc((unsigned)strlen(str) + 1);
+  char* c = (char*)realmalloc((unsigned)strlen(str) + 1);
   if(c == nullptr)
     return C_ERROR;
   strcpy(c, str);
@@ -336,7 +341,7 @@ LISPT mkstring(const char* str)
   return s;
 }
 
-LISPT mknumber(long i)
+LISPT alloc::mknumber(long i)
 {
   LISPT c = getobject();
   INTVAL(c) = i;
@@ -347,7 +352,7 @@ LISPT mknumber(long i)
 /*
  * Calculates hash value of string.
  */
-static int hash(const char* str)
+int alloc::hash(const char* str)
 {
   int sum = 0;
 
@@ -359,7 +364,7 @@ static int hash(const char* str)
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-static LISPT buildatom(const char* s, int cpy)
+LISPT alloc::buildatom(const char* s, int cpy)
 {
   static LISPT unbound = nullptr;
 
@@ -370,7 +375,7 @@ static LISPT buildatom(const char* s, int cpy)
     return C_ERROR;
   if(cpy)
   {
-    char* pname = safemalloc((unsigned)strlen(s) + 1);
+    char* pname = realmalloc((unsigned)strlen(s) + 1);
     if(pname == nullptr)
       return C_ERROR;
     strcpy(pname, s);
@@ -390,16 +395,16 @@ static LISPT buildatom(const char* s, int cpy)
  *           If the atom is already in obarray, no new atom is created.
  *           Copy str if CPY is non-zero. Returns the atom.
  */
-static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
+LISPT alloc::puthash(const char* str, obarray_t* obarray[], int cpy)
 {
   int hv = hash(str);
-  OBARRAY* ob;
+  obarray_t* ob;
   for(ob = *(obarray + hv); ob; ob = ob->onext)
   {
     if(!strcmp(SYMVAL(ob->sym).pname, str))
       return ob->sym;
   }
-  ob = new OBARRAY;
+  ob = new obarray_t;
   if(ob == nullptr)
     return C_ERROR;
   ob->onext = obarray[hv];
@@ -417,7 +422,7 @@ static LISPT puthash(const char* str, OBARRAY* obarray[], int cpy)
  * intern - Make interned symbol in hasharray obarray. Str is not copied
  *          so this is only used with constant strings during init.
  */
-LISPT intern(const char* str)
+LISPT alloc::intern(const char* str)
 {
   return puthash(str, obarray, 0);
 }
@@ -425,7 +430,7 @@ LISPT intern(const char* str)
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-LISPT mkatom(char* str)
+LISPT alloc::mkatom(char* str)
 {
   return puthash(str, obarray, 1);
 }
@@ -434,7 +439,7 @@ LISPT mkatom(char* str)
 /*
  * mkfloat - Make a floating point number.
  */
-LISPT mkfloat(double num)
+LISPT alloc::mkfloat(double num)
 {
   LISPT rval;
 
@@ -470,7 +475,7 @@ again:
  * dalloc - Allocates a destination block of size size. Returns nullptr if
  *          no more space available.
  */
-struct destblock* dalloc(int size)
+alloc::destblock_t* alloc::dalloc(int size)
 {
   if(size <= DESTBLOCKSIZE - destblockused)
   {
@@ -491,7 +496,7 @@ struct destblock* dalloc(int size)
  *         stored in the cdr of the first element. If it isn't, look
  *         elsewhere.
  */
-void dfree(struct destblock* ptr)
+void alloc::dfree(destblock_t* ptr)
 {
   destblockused -= ptr->val.d_integer + 1;
 }
@@ -499,12 +504,12 @@ void dfree(struct destblock* ptr)
 /*
  * dzero - Frees all destination blocks.
  */
-void dzero()
+void alloc::dzero()
 {
   destblockused = 0;
 }
 
-void init_alloc()
+void alloc::init_alloc()
 {
   destblockused = 0;
   conscells = nullptr;
@@ -518,4 +523,14 @@ void init_alloc()
   initcvar(&gcgag, "gcgag", C_NIL);
   mkprim(PN_RECLAIM, reclaim, 1, SUBR);
   mkprim(PN_CONS, cons, 2, SUBR);
+  mkprim(PN_FREECOUNT, freecount, 0, SUBR);
+  mkprim(PN_OBARRAY, xobarray, 0, SUBR);
+}
+
+LISPT alloc::gcgag = nullptr;
+LISPT alloc::savearray[];
+int alloc::savept = 0;
+alloc::obarray_t* alloc::obarray[];
+LISPT alloc::freelist;
+
 }

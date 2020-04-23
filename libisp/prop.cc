@@ -7,6 +7,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
   CHECK(a, SYMBOL);

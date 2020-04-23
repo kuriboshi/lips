@@ -8,6 +8,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 extern int brkflg;
 extern int interrupt;
 extern LISPT findalias(LISPT);
@@ -23,8 +25,8 @@ int (*undefhook)(LISPT, LISPT*); /* Called in case of undefined function. */
 LISPT fun;              /* Store current function beeing evaluated. */
 LISPT expression;       /* Current expression. */
 LISPT args;             /* Current arguments. */
-struct destblock* env;  /* Current environment. */
-struct destblock* dest; /* Current destination beeing built. */
+alloc::destblock_t* env;  /* Current environment. */
+alloc::destblock_t* dest; /* Current destination beeing built. */
 
 CONTROL control; /* Control-stack. */
 int toctrl;      /* Control-stack stack pointer. */
@@ -121,7 +123,7 @@ static int (*cont)(void); /* Current continuation. */
 
 #define UNLINK \
   dfree(env); \
-  env = (struct destblock*)POP_POINT
+  env = POP_POINT
 
 #define SEND(a) \
   if(dest[0].var.d_integer > 0) \
@@ -236,7 +238,7 @@ PRIMITIVE eval(LISPT expr)
    * destination.
    */
   LISPT foo = RECEIVE;
-  dest = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
   /* 
    * Return the result.
    */
@@ -267,7 +269,7 @@ PRIMITIVE apply(LISPT f, LISPT a)
   while(!(*cont)())
     ;
   LISPT foo = RECEIVE;
-  dest = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
   return foo;
 }
 
@@ -373,7 +375,7 @@ void do_unbound(int (*continuation)(void))
     PUSH_LISP(expression);
     PUSH_POINT(dest);
     load(al);
-    dest = (struct destblock*)POP_POINT;
+    dest = POP_POINT;
     expression = POP_LISP;
     fun = SYMVALUE(CAR(expression));
     if(TYPEOF(fun) == UNBOUND)
@@ -698,7 +700,7 @@ static int evlis4()
 {
   LISPT x = RECEIVE;
   dfree(dest);
-  dest = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
   x = cons(RECEIVE, x);
   SEND(x);
   cont = POP_FUNC;
@@ -764,7 +766,7 @@ static int ev2()
 {
   LISPT foo = call(fun);
   dfree(dest);
-  dest = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
   if(EQ(foo, C_ERROR))
   {
     foo = printwhere();
@@ -804,7 +806,7 @@ static void Link()
 {
   dest[0].var.d_environ = env;
   dest[0].type = 2;
-  env = (struct destblock*)&dest[0];
+  env = (alloc::destblock_t*)&dest[0];
   for(auto i = dest[0].val.d_integer; i > 0; i--)
   {
     LISPT t = SYMVALUE(dest[i].var.d_lisp);
@@ -816,7 +818,7 @@ static void Link()
 static int evlam1()
 {
   Link();
-  dest = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
   args = LAMVAL(fun).lambdarep;
   PUSH_FUNC(evlam0);
   cont = evsequence;
@@ -825,7 +827,7 @@ static int evlam1()
 
 static void unLink()
 {
-  struct destblock* c = env;
+  auto* c = env;
   for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
@@ -874,7 +876,6 @@ static int evclosure()
 {
   LISPT foo;
   int i;
-  struct destblock* envir = nullptr;
 
   PUSH_POINT(env);
   PUSH_POINT(dest);
@@ -887,8 +888,8 @@ static int evclosure()
   }
   fun = CLOSVAL(fun).cfunction;
   Link();
-  dest = (struct destblock*)POP_POINT;
-  envir = (struct destblock*)POP_POINT;
+  dest = POP_POINT;
+  auto envir = POP_POINT;
   cont = POP_FUNC;
   PUSH_POINT(envir);
   PUSH_FUNC(evclosure1);

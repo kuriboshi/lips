@@ -8,6 +8,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 extern bool toploop(LISPT*, int (*)(LISPT*));
 long trace;
 
@@ -17,14 +19,6 @@ static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "No
   "Not indirect", "Not a long", "Not a list", "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
   "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
   "Not an ERROR", "Not a hash table"};
-
-PRIMITIVE xobarray()
-{
-  LISPT o = C_NIL;
-  for(int i = 0; i < MAXHASH; i++)
-    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
-  return o;
-}
 
 PRIMITIVE evaltrace(LISPT state)
 {
@@ -36,13 +30,6 @@ PRIMITIVE evaltrace(LISPT state)
     trace = INTVAL(state);
   }
   return mknumber(i);
-}
-
-PRIMITIVE freecount()
-{
-  int i = 0;
-  for(auto l = freelist; INTVAL(l); l = CDR(l)) i++;
-  return mknumber((long)i);
 }
 
 LISPT error(int messnr, LISPT arg)
@@ -109,9 +96,7 @@ LISPT break0(LISPT exp)
 
 void init_debug()
 {
-  mkprim(PN_FREECOUNT, freecount, 0, SUBR);
   mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
-  mkprim(PN_OBARRAY, xobarray, 0, SUBR);
   messages[ERRNO(NO_MESSAGE)] = "";
   messages[ERRNO(ILLEGAL_ARG)] = "Illegal argument";
   messages[ERRNO(DIVIDE_ZERO)] = "Divide by zero";

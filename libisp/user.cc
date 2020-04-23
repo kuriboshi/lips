@@ -8,6 +8,8 @@
 #include "libisp.hh"
 #include "low.hh"
 
+using namespace lisp;
+
 static LISPT getargs(LISPT al)
 {
   if(ISNIL(CDR(al)))

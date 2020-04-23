@@ -20,6 +20,8 @@
 #include "exec.hh"
 #include "top.hh"
 
+using namespace lisp;
+
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
 #endif
@@ -194,7 +196,7 @@ LISPT mungepath(char* pstr)
   char *ps, *s;
   LISPT p;
 
-  ps = (char*)safemalloc((unsigned)(strlen(pstr) + 1));
+  ps = (char*)realmalloc((unsigned)(strlen(pstr) + 1));
   if(ps == NULL)
   {
     fprintf(stderr, "No more memory, can't munge path.\n");

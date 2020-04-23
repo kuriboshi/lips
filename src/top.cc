@@ -7,6 +7,8 @@
 #include <libisp.hh>
 #include "main.hh"
 
+using namespace lisp;
+
 #define PROMPTLENGTH 80
 
 extern void pputc(int, FILE*);

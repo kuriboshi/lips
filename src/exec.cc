@@ -21,6 +21,8 @@
 #include "main.hh"
 #include "top.hh"
 
+using namespace lisp;
+
 #define MAXARGS 256
 #define EXECHASH 1023 /* Hash table size for commands */
 #define DEFAULT_SHELL "/bin/sh"
@@ -81,7 +83,7 @@ char* strsave(const char* str)
 
   if(str == NULL)
     return NULL;
-  newstr = (char*)safemalloc((unsigned)strlen(str) + 1);
+  newstr = (char*)realmalloc((unsigned)strlen(str) + 1);
   if(newstr == NULL)
     return NULL;
   strcpy(newstr, str);
@@ -136,7 +138,7 @@ static int recordjob(int pid, int bg)
 
   if(insidefork)
     return 0; /* Skip this if in a fork. */
-  job = (struct job*)safemalloc(sizeof(struct job));
+  job = (struct job*)realmalloc(sizeof(struct job));
   if(job == NULL)
     return 1;
   if(joblist)
@@ -532,8 +534,8 @@ static void setenviron(const char* var, const char* val)
   strcat(env, val);
   putenv(env);
 #else
-  char* var_ = (char*)safemalloc((unsigned)strlen(var) + 1);
-  char* val_ = (char*)safemalloc((unsigned)strlen(val) + 1);
+  char* var_ = (char*)realmalloc((unsigned)strlen(var) + 1);
+  char* val_ = (char*)realmalloc((unsigned)strlen(val) + 1);
   setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
