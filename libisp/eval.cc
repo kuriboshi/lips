@@ -795,7 +795,10 @@ static int ev2()
   if(EQ(foo, C_ERROR))
   {
     foo = printwhere();
-    xbreak(0, CAR(foo), peval1); /* CAR(_) broken */
+    if (ISNIL(foo))
+      xbreak(0, C_NIL, peval1);
+    else
+      xbreak(0, CAR(foo), peval1); /* CAR(_) broken */
   }
   else
   {
