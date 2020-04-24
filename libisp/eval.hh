@@ -10,6 +10,8 @@
 /*
  * The control stack.
  */
+using continuation_t = int(*)();
+
 enum control_type
 {
   CTRL_LISP,
@@ -22,7 +24,7 @@ struct control
   enum control_type type;
   union
   {
-    int (*f_point)(void);
+    continuation_t f_point;
     lisp::alloc::destblock_t* point;
     LISPT lisp;
   } u;

@@ -47,100 +47,7 @@ static int everr(void);
 static int lookup(void);
 
 static int noeval;        /* Don't evaluate arguments. */
-static int (*cont)(void); /* Current continuation. */
-
-/*
- * This macro prints an error message, and sets up a call
- * to everr that handles breaks.
- */
-#define BREAK(mess, fault, next) \
-  { \
-    if(mess != 0) \
-    { \
-      error(mess, fault); \
-      printwhere(); \
-    } \
-    if(breakhook != nullptr) \
-      (*breakhook)(); \
-    if(env == nullptr) \
-      throw lisp_error("break"); \
-    xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T); \
-    PUSH_FUNC(next); \
-    cont = everr; \
-  }
-
-/*
- * Print errormessage, abort current evaluation, and
- * return to top level.
- */
-#define ABORT(m, v) \
-  { \
-    error(m, v); \
-    printwhere(); \
-    unwind(); \
-    throw lisp_error("abort"); \
-  }
-
-/* 
- * These macros handles the control stack.  The control stack stores
- * continuations, destinations, and LISPT objects.  There are two macros 
- * to push and to pop pointers and LISPT objects.
- */
-#define PUSH_LISP(a) \
-  control[toctrl].type = CTRL_LISP; \
-  control[toctrl++].u.lisp = (a); \
-  if(toctrl >= CTRLBLKSIZE) \
-  overflow()
-#define PUSH_POINT(a) \
-  control[toctrl].type = CTRL_POINT; \
-  control[toctrl++].u.point = (a); \
-  if(toctrl >= CTRLBLKSIZE) \
-  overflow()
-#define PUSH_FUNC(a) \
-  control[toctrl].type = CTRL_FUNC; \
-  control[toctrl++].u.f_point = (a); \
-  if(toctrl >= CTRLBLKSIZE) \
-  overflow()
-#define POP_LISP (control[--toctrl].u.lisp)
-#define POP_POINT (control[--toctrl].u.point)
-#define POP_FUNC (control[--toctrl].u.f_point)
-
-/* 
- * The macro MKDESTBLOCK creates a new destination block of size
- * `s' and initializes it.
- */
-#define MKDESTBLOCK(s) \
-  dalloc((s) + 1); \
-  dest[0].var.d_integer = (s); \
-  dest[0].val.d_integer = (s); \
-  dest[0].type = 0
-
-#define STOREVAR(v, i) \
-  { \
-    dest[i].var.d_lisp = (v); \
-    dest[i].type = 1; \
-  }
-
-#define UNLINK \
-  dfree(env); \
-  env = POP_POINT
-
-#define SEND(a) \
-  if(dest[0].var.d_integer > 0) \
-  dest[dest[0].var.d_integer].val.d_lisp = (a)
-#define RECEIVE dest[dest[0].var.d_integer].val.d_lisp
-#define NEXT \
-  if(dest[0].var.d_integer > 0) \
-  dest[0].var.d_integer--
-
-/* Use shallow binding. */
-#define SHALLOW
-
-/* Just some convenience macros. */
-#define CALL0 (*(SUBRVAL(fun).function0))
-#define CALL1 (*(SUBRVAL(fun).function1))
-#define CALL2 (*(SUBRVAL(fun).function2))
-#define CALL3 (*(SUBRVAL(fun).function3))
+static continuation_t cont; /* Current continuation. */
 
 static LISPT printwhere()
 {
@@ -166,9 +73,127 @@ out:
   return foo;
 }
 
+/*
+ * Print errormessage, abort current evaluation, and
+ * return to top level.
+ */
+static void abort(int m, LISPT v)
+{
+  error(m, v);
+  printwhere();
+  unwind();
+  throw lisp_error("abort");
+}
+
 static void overflow()
 {
-  ABORT(STACK_OVERFLOW, C_NIL);
+  abort(STACK_OVERFLOW, C_NIL);
+}
+
+/* 
+ * These macros handles the control stack.  The control stack stores
+ * continuations, destinations, and LISPT objects.  There are two macros 
+ * to push and to pop pointers and LISPT objects.
+ */
+inline void push_lisp(LISPT a)
+{
+  control[toctrl].type = CTRL_LISP;
+  control[toctrl++].u.lisp = a;
+  if(toctrl >= CTRLBLKSIZE)
+    overflow();
+}
+
+inline void push_point(lisp::alloc::destblock_t* d)
+{
+  control[toctrl].type = CTRL_POINT;
+  control[toctrl++].u.point = d;
+  if(toctrl >= CTRLBLKSIZE)
+    overflow();
+}
+
+inline void push_func(continuation_t f)
+{
+  control[toctrl].type = CTRL_FUNC;
+  control[toctrl++].u.f_point = f;
+  if(toctrl >= CTRLBLKSIZE)
+    overflow();
+}
+
+inline LISPT pop_lisp()
+{
+  return control[--toctrl].u.lisp;
+}
+
+inline lisp::alloc::destblock_t* pop_point()
+{
+  return control[--toctrl].u.point;
+}
+
+inline continuation_t pop_func()
+{
+  return control[--toctrl].u.f_point;
+}
+
+/*
+ * This function prints an error message, and sets up a call
+ * to everr that handles breaks.
+ */
+static void xbreak(int mess, LISPT fault, continuation_t next)
+{
+  if(mess != 0)
+  {
+    error(mess, fault);
+    printwhere();
+  }
+  if(breakhook != nullptr)
+    (*breakhook)();
+  if(env == nullptr)
+    throw lisp_error("break");
+  xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T);
+  push_func(next);
+  cont = everr;
+}
+
+/* 
+ * mkdestblock - creates a new destination block of size
+ *               `s' and initializes it.
+ */
+inline alloc::destblock_t* mkdestblock(int s)
+{
+  auto dest = dalloc(s + 1);
+  dest[0].var.d_integer = s;
+  dest[0].val.d_integer = s;
+  dest[0].type = 0;
+  return dest;
+}
+
+inline void storevar(LISPT v, int i)
+{
+  dest[i].var.d_lisp = v;
+  dest[i].type = 1;
+}
+
+inline static alloc::destblock_t* pop_env()
+{
+  dfree(env);
+  return pop_point();
+}
+
+static inline void send(LISPT a)
+{
+  if(dest[0].var.d_integer > 0)
+    dest[dest[0].var.d_integer].val.d_lisp = a;
+}
+
+static inline LISPT receive()
+{
+  return dest[dest[0].var.d_integer].val.d_lisp;
+}
+
+static inline void next()
+{
+  if(dest[0].var.d_integer > 0)
+    --dest[0].var.d_integer;
 }
 
 /* 
@@ -182,19 +207,19 @@ static LISPT call(LISPT fun)
   switch(SUBRVAL(fun).argcount)
   {
     case 0:
-      foo = CALL0();
+      foo = (*(SUBRVAL(fun).function0))();
       break;
     case 1:
     case -1:
-      foo = CALL1(dest[1].val.d_lisp);
+      foo = (*(SUBRVAL(fun).function1))(dest[1].val.d_lisp);
       break;
     case 2:
     case -2:
-      foo = CALL2(dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(SUBRVAL(fun).function2))(dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
     case -3:
-      foo = CALL3(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(SUBRVAL(fun).function3))(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
@@ -217,19 +242,19 @@ PRIMITIVE eval(LISPT expr)
    * destination onto the control stack.  (Why isn't `exp' pushed?)
    */
   expression = expr;
-  PUSH_POINT(dest);
+  push_point(dest);
   /* 
    * The result of evalutating `expr' is stored in the destination,
    * which is retrieved with the RECEIVE macro.
    */
-  dest = MKDESTBLOCK(1);
+  dest = mkdestblock(1);
   /* 
    * This how it works in general: Push the function to be called
    * last, and set the continuation variable `cont' to `peval'.
    * `peval' may push more contiuations onto the stack but eventaully
    * `eval0' is called which returns 1, signalling end of evaluation.
    */
-  PUSH_FUNC(eval0);
+  push_func(eval0);
   cont = peval;
   while(!(*cont)())
     ;
@@ -237,8 +262,8 @@ PRIMITIVE eval(LISPT expr)
    * Retrieve the result of the evaluation and restore the previous
    * destination.
    */
-  LISPT foo = RECEIVE;
-  dest = POP_POINT;
+  LISPT foo = receive();
+  dest = pop_point();
   /* 
    * Return the result.
    */
@@ -257,27 +282,27 @@ PRIMITIVE apply(f, a)
 */
 PRIMITIVE apply(LISPT f, LISPT a)
 {
-  PUSH_POINT(dest);
-  dest = MKDESTBLOCK(1);
-  PUSH_LISP(fun);
+  push_point(dest);
+  dest = mkdestblock(1);
+  push_lisp(fun);
   fun = f;
-  PUSH_LISP(args);
+  push_lisp(args);
   args = a;
   expression = cons(f, a);
-  PUSH_FUNC(apply0);
+  push_func(apply0);
   cont = peval2;
   while(!(*cont)())
     ;
-  LISPT foo = RECEIVE;
-  dest = POP_POINT;
+  LISPT foo = receive();
+  dest = pop_point();
   return foo;
 }
 
 static int apply0()
 {
   dfree(dest);
-  args = POP_LISP;
-  fun = POP_LISP;
+  args = pop_lisp();
+  fun = pop_lisp();
   return 1;
 }
 
@@ -289,7 +314,7 @@ static int ev0()
    * `ev0' is also used as a placeholder for the beginning of an eval.
    */
   toctrl -= 1;
-  cont = POP_FUNC;
+  cont = pop_func();
   return 0;
 }
 
@@ -299,35 +324,35 @@ static int peval()
   if(trace)
     xprint(expression, C_T);
 #endif /* TRACE */
-  PUSH_LISP(expression);
-  PUSH_FUNC(ev0);
+  push_lisp(expression);
+  push_func(ev0);
   switch(TYPEOF(expression))
   {
     case CONS:
-      PUSH_LISP(fun);
+      push_lisp(fun);
       fun = CAR(expression);
-      PUSH_LISP(args);
+      push_lisp(args);
       args = CDR(expression);
-      PUSH_FUNC(ev1);
+      push_func(ev1);
       cont = peval1;
       break;
     case SYMBOL:
       cont = lookup;
       break;
     case INDIRECT:
-      SEND(INDIRECTVAL(expression));
-      cont = POP_FUNC;
+      send(INDIRECTVAL(expression));
+      cont = pop_func();
       break;
     case CVARIABLE:
-      SEND(*CVARVAL(expression));
-      cont = POP_FUNC;
+      send(*CVARVAL(expression));
+      cont = pop_func();
       break;
     case FREE:
-      ABORT(CORRUPT_DATA, expression);
+      abort(CORRUPT_DATA, expression);
       break;
     default:
-      SEND(expression);
-      cont = POP_FUNC;
+      send(expression);
+      cont = pop_func();
       break;
   }
   return 0;
@@ -335,9 +360,9 @@ static int peval()
 
 static int ev1()
 {
-  args = POP_LISP;
-  fun = POP_LISP;
-  cont = POP_FUNC;
+  args = pop_lisp();
+  fun = pop_lisp();
+  cont = pop_func();
   return 0;
 }
 
@@ -349,11 +374,11 @@ static int evalhook(LISPT exp)
     switch((*undefhook)(exp, &res))
     {
       case 1:
-        SEND(res);
-        cont = POP_FUNC;
+        send(res);
+        cont = pop_func();
         break;
       case -1:
-        ABORT(NO_MESSAGE, C_NIL);
+        abort(NO_MESSAGE, C_NIL);
         break;
       default:
         return 0;
@@ -372,16 +397,16 @@ void do_unbound(int (*continuation)(void))
   LISPT al = getprop(CAR(expression), C_AUTOLOAD);
   if(!ISNIL(al))
   {
-    PUSH_LISP(expression);
-    PUSH_POINT(dest);
+    push_lisp(expression);
+    push_point(dest);
     load(al);
-    dest = POP_POINT;
-    expression = POP_LISP;
+    dest = pop_point();
+    expression = pop_lisp();
     fun = SYMVALUE(CAR(expression));
     if(TYPEOF(fun) == UNBOUND)
     {
       if(!evalhook(expression))
-        BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
+        xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
     }
     else
       cont = continuation;
@@ -390,11 +415,11 @@ void do_unbound(int (*continuation)(void))
   {
     expression = findalias(expression);
     if(EQ(expression, C_ERROR))
-      ABORT(NO_MESSAGE, C_NIL);
+      abort(NO_MESSAGE, C_NIL);
     if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
     {
       if(!evalhook(expression))
-        BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
+        xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
     }
     else
     {
@@ -409,11 +434,11 @@ int do_default(int (*continuation)(void))
 {
   expression = findalias(expression);
   if(EQ(expression, C_ERROR))
-    ABORT(NO_MESSAGE, C_NIL);
+    abort(NO_MESSAGE, C_NIL);
   if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
   {
     if(!evalhook(expression))
-      BREAK(UNDEF_FUNCTION, CAR(expression), continuation);
+      xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
     return 1;
   }
   else
@@ -425,43 +450,43 @@ static int peval1()
   int foo;
 
   if(brkflg)
-    BREAK(KBD_BREAK, fun, peval1)
+    xbreak(KBD_BREAK, fun, peval1);
   else if(interrupt)
-    ABORT(NO_MESSAGE, C_NIL)
+    abort(NO_MESSAGE, C_NIL);
   else
     switch(TYPEOF(fun))
     {
       case CLOSURE:
-        PUSH_FUNC(peval1);
+        push_func(peval1);
         cont = evclosure;
         break;
       case SUBR:
-        PUSH_POINT(dest);
-        PUSH_FUNC(ev2);
+        push_point(dest);
+        push_func(ev2);
         if((foo = SUBRVAL(fun).argcount) < 0)
         {
-          dest = MKDESTBLOCK(-foo);
-          PUSH_FUNC(noevarg);
+          dest = mkdestblock(-foo);
+          push_func(noevarg);
           cont = evlis;
         }
         else
         {
-          dest = MKDESTBLOCK(foo);
+          dest = mkdestblock(foo);
           noeval = 0;
           cont = evalargs;
         }
         break;
       case FSUBR:
-        PUSH_POINT(dest);
-        PUSH_FUNC(ev2);
+        push_point(dest);
+        push_func(ev2);
         if((foo = SUBRVAL(fun).argcount) < 0)
         {
-          dest = MKDESTBLOCK(-foo);
+          dest = mkdestblock(-foo);
           cont = spread;
         }
         else
         {
-          dest = MKDESTBLOCK(foo);
+          dest = mkdestblock(foo);
           noeval = 1;
           cont = evalargs;
         }
@@ -477,7 +502,7 @@ static int peval1()
       case CONS:
       case INDIRECT:
         expression = fun;
-        PUSH_FUNC(ev3);
+        push_func(ev3);
         cont = peval;
         break;
       case SYMBOL:
@@ -489,11 +514,11 @@ static int peval1()
         break;
       case STRING:
         if(!evalhook(expression))
-          BREAK(ILLEGAL_FUNCTION, fun, peval1);
+          xbreak(ILLEGAL_FUNCTION, fun, peval1);
         break;
       default:
         if(!do_default(peval1))
-          BREAK(ILLEGAL_FUNCTION, fun, peval1);
+          xbreak(ILLEGAL_FUNCTION, fun, peval1);
         break;
     }
   return 0;
@@ -504,26 +529,26 @@ static int peval2()
   int foo;
 
   if(brkflg)
-    BREAK(KBD_BREAK, fun, peval2)
+    xbreak(KBD_BREAK, fun, peval2);
   else
     switch(TYPEOF(fun))
     {
       case CLOSURE:
-        PUSH_FUNC(peval2);
+        push_func(peval2);
         cont = evclosure;
         break;
       case SUBR:
       case FSUBR:
-        PUSH_POINT(dest);
-        PUSH_FUNC(ev2);
+        push_point(dest);
+        push_func(ev2);
         if((foo = SUBRVAL(fun).argcount) < 0)
         {
-          dest = MKDESTBLOCK(-foo);
+          dest = mkdestblock(-foo);
           cont = spread;
         }
         else
         {
-          dest = MKDESTBLOCK(foo);
+          dest = mkdestblock(foo);
           noeval = 1;
           cont = evalargs;
         }
@@ -536,7 +561,7 @@ static int peval2()
       case CONS:
       case INDIRECT:
         expression = fun;
-        PUSH_FUNC(ev3p);
+        push_func(ev3p);
         cont = peval;
         break;
       case SYMBOL:
@@ -548,11 +573,11 @@ static int peval2()
         break;
       case STRING:
         if(!evalhook(expression))
-          BREAK(ILLEGAL_FUNCTION, fun, peval2);
+          xbreak(ILLEGAL_FUNCTION, fun, peval2);
         break;
       default:
         if(!do_default(peval2))
-          BREAK(ILLEGAL_FUNCTION, fun, peval2);
+          xbreak(ILLEGAL_FUNCTION, fun, peval2);
         break;
     }
   return 0;
@@ -577,14 +602,14 @@ void bt()
 static int everr()
 {
   expression = break0(expression);
-  cont = POP_FUNC; /* Discard one continuation. */
-  cont = POP_FUNC;
+  cont = pop_func(); /* Discard one continuation. */
+  cont = pop_func();
   return 0;
 }
 
 static int noevarg()
 {
-  args = RECEIVE;
+  args = receive();
   cont = spread;
   return 0;
 }
@@ -593,7 +618,7 @@ static int evalargs()
 {
   if(ISNIL(args))
   {
-    cont = POP_FUNC;
+    cont = pop_func();
   }
   else
   {
@@ -614,7 +639,7 @@ static int ev9()
   }
   else
   {
-    PUSH_FUNC(ev11);
+    push_func(ev11);
     cont = peval;
   }
   return 0;
@@ -622,7 +647,7 @@ static int ev9()
 
 static int ev11()
 {
-  NEXT;
+  next();
   args = CDR(args);
   expression = CAR(args);
   cont = ev9;
@@ -634,13 +659,13 @@ static int noev9()
 nextarg:
   if(ISNIL(CDR(args)))
   {
-    SEND(expression);
-    cont = POP_FUNC;
+    send(expression);
+    cont = pop_func();
   }
   else
   {
-    SEND(expression);
-    NEXT;
+    send(expression);
+    next();
     args = CDR(args);
     expression = CAR(args);
     goto nextarg;
@@ -652,7 +677,7 @@ static int evlis()
 {
   if(ISNIL(args))
   {
-    cont = POP_FUNC;
+    cont = pop_func();
   }
   else
   {
@@ -666,12 +691,12 @@ static int evlis1()
 {
   if(ISNIL(CDR(args)))
   {
-    PUSH_FUNC(evlis2);
+    push_func(evlis2);
     cont = peval;
   }
   else
   {
-    PUSH_FUNC(evlis3);
+    push_func(evlis3);
     cont = peval;
   }
   return 0;
@@ -679,17 +704,17 @@ static int evlis1()
 
 static int evlis2()
 {
-  LISPT x = cons(RECEIVE, C_NIL);
-  SEND(x);
-  cont = POP_FUNC;
+  LISPT x = cons(receive(), C_NIL);
+  send(x);
+  cont = pop_func();
   return 0;
 }
 
 static int evlis3()
 {
-  PUSH_POINT(dest);
-  dest = MKDESTBLOCK(1);
-  PUSH_FUNC(evlis4);
+  push_point(dest);
+  dest = mkdestblock(1);
+  push_func(evlis4);
   args = CDR(args);
   expression = CAR(args);
   cont = evlis1;
@@ -698,12 +723,12 @@ static int evlis3()
 
 static int evlis4()
 {
-  LISPT x = RECEIVE;
+  LISPT x = receive();
   dfree(dest);
-  dest = POP_POINT;
-  x = cons(RECEIVE, x);
-  SEND(x);
-  cont = POP_FUNC;
+  dest = pop_point();
+  x = cons(receive(), x);
+  send(x);
+  cont = pop_func();
   return 0;
 }
 
@@ -713,25 +738,25 @@ static int evlam()
   int ac;
   LISPT foo;
 
-  PUSH_LISP(expression);
-  PUSH_POINT(env);
-  PUSH_POINT(dest);
+  push_lisp(expression);
+  push_point(env);
+  push_point(dest);
   int spr = 0;
   if((ac = LAMVAL(fun).argcnt) < 0)
   {
     ac = -ac;
     spr++;
   }
-  dest = MKDESTBLOCK(ac);
-  for(foo = LAMVAL(fun).arglist, i = ac; i; foo = CDR(foo), i--) STOREVAR(CAR(foo), i);
-  PUSH_FUNC(evlam1);
+  dest = mkdestblock(ac);
+  for(foo = LAMVAL(fun).arglist, i = ac; i; foo = CDR(foo), i--) storevar(CAR(foo), i);
+  push_func(evlam1);
   if(spr)
   {
     if(noeval)
       cont = spread;
     else
     {
-      PUSH_FUNC(noevarg);
+      push_func(noevarg);
       cont = evlis;
     }
   }
@@ -745,17 +770,17 @@ static int spread()
 respread:
   if(EQ(args, C_NIL))
   {
-    cont = POP_FUNC;
+    cont = pop_func();
   }
   else if((dest[0].var.d_integer) == 1)
   {
-    SEND(args);
-    cont = POP_FUNC;
+    send(args);
+    cont = pop_func();
   }
   else
   {
-    SEND(CAR(args));
-    NEXT;
+    send(CAR(args));
+    next();
     args = CDR(args);
     goto respread;
   }
@@ -766,39 +791,39 @@ static int ev2()
 {
   LISPT foo = call(fun);
   dfree(dest);
-  dest = POP_POINT;
+  dest = pop_point();
   if(EQ(foo, C_ERROR))
   {
     foo = printwhere();
-    BREAK(0, CAR(foo), peval1); /* CAR(_) broken */
+    xbreak(0, CAR(foo), peval1); /* CAR(_) broken */
   }
   else
   {
-    SEND(foo);
-    cont = POP_FUNC;
+    send(foo);
+    cont = pop_func();
   }
   return 0;
 }
 
 static int ev3()
 {
-  fun = RECEIVE;
-  PUSH_FUNC(ev4);
+  fun = receive();
+  push_func(ev4);
   cont = peval1;
   return 0;
 }
 
 static int ev3p()
 {
-  fun = RECEIVE;
-  PUSH_FUNC(ev4);
+  fun = receive();
+  push_func(ev4);
   cont = peval2;
   return 0;
 }
 
 static int ev4()
 {
-  cont = POP_FUNC;
+  cont = pop_func();
   return 0;
 }
 
@@ -818,14 +843,14 @@ static void Link()
 static int evlam1()
 {
   Link();
-  dest = POP_POINT;
+  dest = pop_point();
   args = LAMVAL(fun).lambdarep;
-  PUSH_FUNC(evlam0);
+  push_func(evlam0);
   cont = evsequence;
   return 0;
 }
 
-static void unLink()
+static void restore_env()
 {
   auto* c = env;
   for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
@@ -833,10 +858,10 @@ static void unLink()
 
 static int evlam0()
 {
-  unLink();
-  UNLINK;
-  expression = POP_LISP;
-  cont = POP_FUNC;
+  restore_env();
+  env = pop_env();
+  expression = pop_lisp();
+  cont = pop_func();
   return 0;
 }
 
@@ -844,7 +869,7 @@ void unwind()
 {
   while(env != nullptr)
   {
-    unLink();
+    restore_env();
     env = env->var.d_environ;
   }
 }
@@ -855,20 +880,20 @@ static int lookup()
   switch(TYPEOF(t))
   {
     case UNBOUND:
-      BREAK(UNBOUND_VARIABLE, expression, lookup);
+      xbreak(UNBOUND_VARIABLE, expression, lookup);
       return 0;
       break;
     case INDIRECT:
-      SEND(INDIRECTVAL(t));
+      send(INDIRECTVAL(t));
       break;
     case CVARIABLE:
-      SEND(*CVARVAL(t));
+      send(*CVARVAL(t));
       break;
     default:
-      SEND(t);
+      send(t);
       break;
   }
-  cont = POP_FUNC;
+  cont = pop_func();
   return 0;
 }
 
@@ -877,30 +902,30 @@ static int evclosure()
   LISPT foo;
   int i;
 
-  PUSH_POINT(env);
-  PUSH_POINT(dest);
-  dest = MKDESTBLOCK(CLOSVAL(fun).count);
-  for(foo = CLOSVAL(fun).closed, i = CLOSVAL(fun).count; i; foo = CDR(foo), i--) STOREVAR(CAR(foo), i);
+  push_point(env);
+  push_point(dest);
+  dest = mkdestblock(CLOSVAL(fun).count);
+  for(foo = CLOSVAL(fun).closed, i = CLOSVAL(fun).count; i; foo = CDR(foo), i--) storevar(CAR(foo), i);
   for(foo = CLOSVAL(fun).cvalues; !ISNIL(foo); foo = CDR(foo))
   {
-    SEND(CAR(foo));
-    NEXT;
+    send(CAR(foo));
+    next();
   }
   fun = CLOSVAL(fun).cfunction;
   Link();
-  dest = POP_POINT;
-  auto envir = POP_POINT;
-  cont = POP_FUNC;
-  PUSH_POINT(envir);
-  PUSH_FUNC(evclosure1);
+  dest = pop_point();
+  auto envir = pop_point();
+  cont = pop_func();
+  push_point(envir);
+  push_func(evclosure1);
   return 0;
 }
 
 static int evclosure1()
 {
-  unLink();
-  UNLINK;
-  cont = POP_FUNC;
+  restore_env();
+  env = pop_env();
+  cont = pop_func();
   return 0;
 }
 
@@ -908,7 +933,7 @@ static int evsequence()
 {
   if(EQ(args, C_NIL))
   {
-    cont = POP_FUNC;
+    cont = pop_func();
   }
   else
   {
@@ -926,7 +951,7 @@ static int evseq1()
   }
   else
   {
-    PUSH_FUNC(evseq3);
+    push_func(evseq3);
     cont = peval;
   }
   return 0;
