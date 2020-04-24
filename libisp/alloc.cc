@@ -62,8 +62,7 @@ alloc::alloc()
 }
 
 /*
- * safemalloc is defined in terms of realmalloc depending on
- * whether the `lint' is defined or not.
+ * realmalloc - wrapper around malloc which returns a char*.
  */
 char* alloc::realmalloc(unsigned int size)
 {
@@ -329,7 +328,7 @@ PRIMITIVE alloc::freecount()
  */
 LISPT alloc::mkstring(const char* str)
 {
-  char* c = (char*)realmalloc((unsigned)strlen(str) + 1);
+  auto* c = realmalloc((unsigned)strlen(str) + 1);
   if(c == nullptr)
     return C_ERROR;
   strcpy(c, str);
@@ -373,7 +372,7 @@ LISPT alloc::buildatom(const char* s, int cpy)
     return C_ERROR;
   if(cpy)
   {
-    char* pname = realmalloc((unsigned)strlen(s) + 1);
+    auto* pname = realmalloc((unsigned)strlen(s) + 1);
     if(pname == nullptr)
       return C_ERROR;
     strcpy(pname, s);

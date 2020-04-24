@@ -39,20 +39,20 @@ static BITS32 exechash[EXECHASH / 32]; /* One bit set for each program */
 static int pgrp;                       /* Process group of current job */
 
 #ifdef JOB_CONTROL
-struct job
+struct job_t
 {
   int jobnum;        /* Job number */
   int procid;        /* Process id */
   UNION_WAIT status; /* Return value */
   char* wdir;        /* Working directory */
   LISPT exp;         /* Job expression */
-  struct job* next;  /* Pointer to next job */
+  job_t* next;       /* Pointer to next job */
   int background;    /* Nonzero means job runs in bg */
   int running;       /* Nonzero if running */
 };
 
-static struct job* joblist = nullptr;  /* List of jobs */
-static struct job* cjoblist = nullptr; /* List of collected jobs */
+static job_t* joblist = nullptr;  /* List of jobs */
+static job_t* cjoblist = nullptr; /* List of collected jobs */
 #endif
 
 /* 
@@ -79,11 +79,9 @@ static void preparefork()
  */
 char* strsave(const char* str)
 {
-  char* newstr;
-
   if(str == nullptr)
     return nullptr;
-  newstr = (char*)realmalloc((unsigned)strlen(str) + 1);
+  auto* newstr = realmalloc((unsigned)strlen(str) + 1);
   if(newstr == nullptr)
     return nullptr;
   strcpy(newstr, str);
@@ -103,7 +101,7 @@ char* strsave(const char* str)
  *            Status is Done if job has exited.
  */
 #ifdef JOB_CONTROL
-static void printjob(struct job* job)
+static void printjob(job_t* job)
 {
   char buffer[80];
 
@@ -134,11 +132,9 @@ static void printjob(struct job* job)
 static int recordjob(int pid, int bg)
 {
 #ifdef JOB_CONTROL
-  struct job* job;
-
   if(insidefork)
     return 0; /* Skip this if in a fork. */
-  job = (struct job*)realmalloc(sizeof(struct job));
+  auto* job = new job_t;
   if(job == nullptr)
     return 1;
   if(joblist)
@@ -164,10 +160,8 @@ static int recordjob(int pid, int bg)
 static void collectjob(int pid, UNION_WAIT stat)
 {
 #ifdef JOB_CONTROL
-  struct job *i, *j;
-
-  i = nullptr;
-  for(j = joblist; j; i = j, j = j->next)
+  job_t* i = nullptr;
+  for(auto* j = joblist; j; i = j, j = j->next)
     if(j->procid == pid)
     {
       j->running = 0;
@@ -528,14 +522,14 @@ int execcommand(LISPT exp, LISPT* res)
 static void setenviron(const char* var, const char* val)
 {
 #ifdef PUTENV
-  char* env = (char*)safemalloc((unsigned)strlen(var) + strlen(val) + 2);
+  auto* env = realmalloc((unsigned)strlen(var) + strlen(val) + 2);
   strcpy(env, var);
   strcat(env, "=");
   strcat(env, val);
   putenv(env);
 #else
-  char* var_ = (char*)realmalloc((unsigned)strlen(var) + 1);
-  char* val_ = (char*)realmalloc((unsigned)strlen(val) + 1);
+  auto* var_ = realmalloc((unsigned)strlen(var) + 1);
+  auto* val_ = realmalloc((unsigned)strlen(val) + 1);
   setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
@@ -745,9 +739,7 @@ PRIMITIVE rehash()
 PRIMITIVE jobs()
 {
 #ifdef JOB_CONTROL
-  struct job* j;
-
-  for(j = joblist; j; j = j->next) printjob(j);
+  for(auto* j = joblist; j; j = j->next) printjob(j);
 #endif
   return C_NIL;
 }
@@ -755,9 +747,7 @@ PRIMITIVE jobs()
 PRIMITIVE fg(LISPT job)
 {
 #ifdef JOB_CONTROL
-  struct job* j;
-  int pgrp;
-  UNION_WAIT status;
+  job_t* j = nullptr;
 
   if(ISNIL(job))
   {
@@ -774,7 +764,7 @@ PRIMITIVE fg(LISPT job)
   }
   if(j)
   {
-    pgrp = getpgid(j->procid);
+    auto pgrp = getpgid(j->procid);
     j->running = 1;
     printjob(j);
     tcsetpgrp(1, pgrp);
@@ -783,7 +773,7 @@ PRIMITIVE fg(LISPT job)
         return syserr(mknumber((long)pgrp));
     j->status = 0;
     j->background = 0;
-    status = waitfork(j->procid);
+    auto status = waitfork(j->procid);
     return mknumber((long)WEXITSTATUS(status));
   }
   return error(NO_SUCH_JOB, job);
@@ -793,8 +783,7 @@ PRIMITIVE fg(LISPT job)
 PRIMITIVE bg(LISPT job)
 {
 #ifdef JOB_CONTROL
-  struct job* j;
-  int pgrp;
+  job_t* j = nullptr;
 
   if(ISNIL(job))
   {
@@ -811,7 +800,7 @@ PRIMITIVE bg(LISPT job)
   }
   if(j)
   {
-    pgrp = getpgid(j->procid);
+    auto pgrp = getpgid(j->procid);
     j->status = 0;
     j->running = 1;
     printjob(j);

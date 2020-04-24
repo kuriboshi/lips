@@ -7,9 +7,6 @@
 
 #include "lisp.hh"
 
-//struct lispt;
-//using LISPT = struct lispt*;
-
 namespace lisp {
 
 class alloc
@@ -86,7 +83,7 @@ public:
   static PRIMITIVE freecount();
 
 private:
-  static lisp::alloc::conscells_t* newpage();
+  static conscells_t* newpage();
   static int sweep();
   static void mark(LISPT*);
   static LISPT doreclaim(int doconsargs, long incr);
@@ -94,12 +91,12 @@ private:
   static LISPT buildatom(const char* s, int cpy);
   static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
 
-  static LISPT* foo1; // Protect arguments of cons when gc.
+  static LISPT* foo1;                          // Protect arguments of cons when gc.
   static LISPT* foo2;
-  static int nrconses;                                                   // Number of conses since last gc.
-  static lisp::alloc::conscells_t* conscells;                            // Cons cell storage.
-  static lisp::alloc::destblock_t destblock[lisp::alloc::DESTBLOCKSIZE]; // Destblock area.
-  static int destblockused;                                              // Index to last slot in destblock.
+  static int nrconses;                         // Number of conses since last gc.
+  static conscells_t* conscells;               // Cons cell storage.
+  static destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
+  static int destblockused;                    // Index to last slot in destblock.
 };
 
 inline void init_alloc()

@@ -47,17 +47,13 @@ PRIMITIVE strcomp(LISPT s1, LISPT s2)
    to one string */
 PRIMITIVE concat(LISPT strlist)
 {
-  LISPT sl;
-  int size;
-  char* ns;
-
-  size = 0;
-  for(sl = strlist; !ISNIL(sl); sl = CDR(sl))
+  int size = 0;
+  for(auto sl = strlist; !ISNIL(sl); sl = CDR(sl))
   {
     CHECK(CAR(sl), STRING);
     size += strlen(STRINGVAL(CAR(sl)));
   }
-  ns = (char*)realmalloc((unsigned)size + 1);
+  auto* ns = realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
@@ -83,20 +79,16 @@ PRIMITIVE xstrlen(LISPT s)
    to zero if start is equal to one is accepted. */
 PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
 {
-  int size;
-  int s, e;
-  char* ns;
-
   CHECK(str, STRING);
   CHECK(start, INTEGER);
   CHECK(end, INTEGER);
-  s = INTVAL(start);
-  e = INTVAL(end);
-  size = e - s + 1;
+  auto s = INTVAL(start);
+  auto e = INTVAL(end);
+  auto size = e - s + 1;
   if(size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str))) || s <= 0
     || e < 0)
     return C_NIL;
-  ns = (char*)realmalloc((unsigned)size + 1);
+  auto* ns = realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';

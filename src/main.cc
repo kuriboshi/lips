@@ -196,7 +196,7 @@ LISPT mungepath(char* pstr)
   char *ps, *s;
   LISPT p;
 
-  ps = (char*)realmalloc((unsigned)(strlen(pstr) + 1));
+  ps = realmalloc((unsigned)(strlen(pstr) + 1));
   if(ps == nullptr)
   {
     fprintf(stderr, "No more memory, can't munge path.\n");
