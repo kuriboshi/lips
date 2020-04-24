@@ -63,7 +63,7 @@ static int (*cont)(void); /* Current continuation. */
     if(breakhook != nullptr) \
       (*breakhook)(); \
     if(env == nullptr) \
-      throw lips_error("break"); \
+      throw lisp_error("break"); \
     xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T); \
     PUSH_FUNC(next); \
     cont = everr; \
@@ -78,7 +78,7 @@ static int (*cont)(void); /* Current continuation. */
     error(m, v); \
     printwhere(); \
     unwind(); \
-    throw lips_error("abort"); \
+    throw lisp_error("abort"); \
   }
 
 /* 

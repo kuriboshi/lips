@@ -126,7 +126,7 @@ void core(int sig)
     fprintf(primerr, "Warning: continued after signal %d.\n", sig);
     fprintf(primerr, "Save your work and exit.\n");
     end_term();
-    throw lips_error("continue after signal");
+    throw lisp_error("continue after signal");
   }
 }
 #endif
@@ -138,7 +138,7 @@ void onintr(int)
   fprintf(primerr, "^C\n");
   unwind();
   clearlbuf();
-  throw lips_error("onintr");
+  throw lisp_error("onintr");
 }
 
 #ifdef FANCY_SIGNALS
@@ -454,7 +454,7 @@ int main(int argc, char* const* argv)
       loadinit(LIPSRC);
       greet(C_NIL);
     }
-    catch(const lips_error& error)
+    catch(const lisp_error& error)
     {}
   }
   while(true)
@@ -469,7 +469,7 @@ int main(int argc, char* const* argv)
       if(toploop(&topprompt, (int (*)(LISPT*))NULL))
         break;
     }
-    catch(const lips_error& error)
+    catch(const lisp_error& error)
     {
       printf("error: %s\n", error.what());
     }

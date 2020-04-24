@@ -45,6 +45,16 @@ extern LISPT error(int, LISPT);
 #define USER_ERROR (PRINT_ARG | 28)
 #define MAXMESSAGE 29
 
+namespace lisp {
+
+inline void check(LISPT arg, lisp_type type)
+{
+  if (TYPEOF(arg) != type)
+    throw type_error(type);
+}
+
+}
+
 #define CHECK(arg, typ) \
   if(TYPEOF(arg) != typ) \
   return error(NOT_A | typ, arg)

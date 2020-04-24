@@ -62,7 +62,7 @@ static int dobreak(LISPT* com)
   if(TYPEOF(*com) != CONS)
   {
     unwind();
-    throw lips_error("bad command");
+    throw lisp_error("bad command");
   }
   else if(EQ(CAR(*com), C_GO))
   {
@@ -72,7 +72,7 @@ static int dobreak(LISPT* com)
   else if(EQ(CAR(*com), C_RESET))
   {
     unwind();
-    throw lips_error("reset");
+    throw lisp_error("reset");
   }
   else if(EQ(CAR(*com), C_BT))
   {

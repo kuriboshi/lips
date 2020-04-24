@@ -374,7 +374,7 @@ static UNION_WAIT waitfork(int pid)
   if(WIFSIGNALED(wstat))
   {
     unwind();
-    throw lips_error("waitfork");
+    throw lisp_error("waitfork");
   }
   return wstat;
 }
