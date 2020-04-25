@@ -7,9 +7,9 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp
+{
 
-extern char* VERSION;
 extern void init_arith(void);
 extern void init_file(void);
 extern void init_logic(void);
@@ -141,4 +141,6 @@ void init_lisp()
 
   evaluator::undefhook = nullptr;
   evaluator::breakhook = nullptr;
+}
+
 }

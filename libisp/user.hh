@@ -7,6 +7,10 @@
 
 #include "lisp.hh"
 
+namespace lisp {
+
 /* functions */
 extern LISPT funeq(LISPT, LISPT);
 extern void init_user(void);
+
+}

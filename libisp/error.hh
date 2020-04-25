@@ -9,8 +9,6 @@
 #include "lisp.hh"
 #include "except.hh"
 
-extern LISPT error(int, LISPT);
-
 #define PRINT_ARG (1 << 8)
 #define NOT_A (1 << 9)
 #define ERRNO(x) ((x) & ~PRINT_ARG & ~NOT_A)

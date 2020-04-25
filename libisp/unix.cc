@@ -14,9 +14,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
-#define MAXFILES 8
+namespace lisp {
 
 LISPT sighandler[NSIG - 1];
 
@@ -223,4 +221,6 @@ void init_unix()
   mkprim(PN_UXSETGID, uxsetgid, 1, SUBR);
   mkprim(PN_SIGNAL, uxsignal, 2, SUBR);
   mkprim(PN_UXUNLINK, uxunlink, 1, SUBR);
+}
+
 }

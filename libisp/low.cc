@@ -7,7 +7,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp {
 
 LISPT verboseflg;
 
@@ -134,4 +134,6 @@ void init_low()
 #endif
   mkprim(PN_ENVGET, envget, 2, SUBR);
   initcvar(&verboseflg, "verboseflg", C_NIL);
+}
+
 }

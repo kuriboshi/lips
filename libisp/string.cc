@@ -9,7 +9,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp {
 
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
@@ -108,4 +108,6 @@ void init_string()
   mkprim(PN_SUBSTR, substr, 3, SUBR);
   mkprim(PN_SYMSTR, symstr, 1, SUBR);
   mkprim(PN_STRCMP, strcomp, 2, SUBR);
+}
+
 }

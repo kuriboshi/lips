@@ -7,7 +7,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp {
 
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
@@ -77,4 +77,6 @@ void init_prop()
   mkprim(PN_PUTPROP, putprop, 3, SUBR);
   mkprim(PN_GETPROP, getprop, 2, SUBR);
   mkprim(PN_REMPROP, remprop, 2, SUBR);
+}
+
 }

@@ -10,16 +10,16 @@
 #include "lisp.hh"
 
 extern char current_prompt[];
-extern LISPT history;
-extern LISPT histnum;
-extern LISPT histmax;
-extern LISPT input_exp;
-extern LISPT topexp;
-extern LISPT alias_expanded;
-extern LISPT (*transformhook)(LISPT);
-extern void (*beforeprompt)(void);
+extern lisp::LISPT history;
+extern lisp::LISPT histnum;
+extern lisp::LISPT histmax;
+extern lisp::LISPT input_exp;
+extern lisp::LISPT topexp;
+extern lisp::LISPT alias_expanded;
+extern lisp::LISPT (*transformhook)(lisp::LISPT);
+extern void (*beforeprompt)();
 
-extern LISPT histget(long, LISPT);
-extern LISPT findalias(LISPT);
-extern bool toploop(LISPT*, int (*)(LISPT*));
-extern void init_hist(void);
+extern lisp::LISPT histget(long, lisp::LISPT);
+extern lisp::LISPT findalias(lisp::LISPT);
+extern bool toploop(lisp::LISPT*, int (*)(lisp::LISPT*));
+extern void init_hist();

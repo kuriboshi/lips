@@ -9,8 +9,6 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
 #define NUL '\0'
 #define MAXATOMSIZE 128 /* max length of atom read can handle */
 
@@ -38,10 +36,10 @@ extern int getch(FILE*);
 extern void ungetch(int, FILE*);
 extern int eoln(FILE*);
 extern void putch(int, FILE*, int);
+extern lisp::LISPT histget(long, lisp::LISPT);
+extern lisp::LISPT history;
 
-extern LISPT history, currentbase;
-
-extern LISPT histget(long, LISPT);
+namespace lisp {
 
 #if 0
 static LISPT userreadmacros[128];
@@ -539,6 +537,7 @@ static LISPT rmuser(FILE* file, LISPT curr, char curc)
   if (ISNIL(userreadmacros[(int)curc]))
     return curr;
   else
+
     curr = apply(userreadmacros[(int)curc], curr);
   return curr;
 }
@@ -807,4 +806,6 @@ LISPT print(LISPT x, FILE* file)
   prin0(x, file, 1);
   terpri(file);
   return x;
+}
+
 }

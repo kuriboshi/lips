@@ -8,7 +8,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp {
 
 /*
  * Function with an i as a prefix are for integer arithmetic and those
@@ -382,4 +382,6 @@ void init_arith()
   mkprim(PN_NEQP, neqp, 2, SUBR);
   mkprim(PN_MINUSP, minusp, 1, SUBR);
   mkprim(PN_ABS, absval, 1, SUBR);
+}
+
 }

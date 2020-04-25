@@ -11,7 +11,6 @@
 using namespace lisp;
 
 extern bool toploop(LISPT*, int (*)(LISPT*));
-long trace;
 
 static const char* messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
@@ -19,6 +18,10 @@ static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "No
   "Not indirect", "Not a long", "Not a list", "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
   "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
   "Not an ERROR", "Not a hash table"};
+
+namespace lisp {
+
+long trace;
 
 PRIMITIVE evaltrace(LISPT state)
 {
@@ -124,4 +127,6 @@ void init_debug()
   messages[ERRNO(UNBOUND_VARIABLE)] = "Unbound variable";
   messages[ERRNO(KBD_BREAK)] = "Break";
   messages[ERRNO(USER_ERROR)] = "";
+}
+
 }

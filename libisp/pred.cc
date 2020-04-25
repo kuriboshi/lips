@@ -10,6 +10,8 @@
 #include "libisp.hh"
 #include "user.hh"
 
+namespace lisp {
+
 PRIMITIVE numberp(LISPT a)
 {
   switch(TYPEOF(a))
@@ -179,4 +181,6 @@ void init_pred()
   mkprim(PN_BOUNDP, boundp, 1, SUBR);
   mkprim(PN_LITATOM, litatom, 1, SUBR);
   mkprim(PN_TYPEOF, xtypeof, 1, SUBR);
+}
+
 }

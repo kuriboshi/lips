@@ -10,6 +10,10 @@
 #include "constants.hh"
 #include "init.hh"
 
-extern LISPT top, rstack, history, histnum, fun, expression;
-extern LISPT args, path, home, verboseflg, promptform, brkprompt, topprompt;
-extern LISPT alias_expanded, interactive, version;
+namespace lisp {
+
+extern LISPT top, rstack, fun, expression;
+extern LISPT args, verboseflg, promptform, brkprompt, topprompt;
+extern LISPT interactive, version;
+
+}

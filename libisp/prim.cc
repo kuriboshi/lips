@@ -7,9 +7,9 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
 extern void finish(int);
+
+namespace lisp {
 
 static int count;
 
@@ -471,4 +471,6 @@ void init_prim()
   mkprim(PN_RPLACD, rplacd, 2, SUBR);
   mkprim(PN_TCONC, tconc, 2, SUBR);
   mkprim(PN_NTHD, nthd, 2, SUBR);
+}
+
 }

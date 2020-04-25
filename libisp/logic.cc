@@ -7,7 +7,7 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
+namespace lisp {
 
 PRIMITIVE p_and(LISPT l)
 {
@@ -56,4 +56,6 @@ void init_logic()
   mkprim(PN_OR, p_or, -1, FSUBR);
   mkprim(PN_NOT, p_not, 1, SUBR);
   mkprim(PN_IF, xif, -3, FSUBR);
+}
+
 }

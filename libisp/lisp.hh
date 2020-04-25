@@ -14,6 +14,9 @@
 #include <cstdio>
 #include "config.hh"
 
+namespace lisp
+{
+
 struct lispt;
 using LISPT = struct lispt*;
 
@@ -173,3 +176,5 @@ struct lispt
     /* USER */
   } u;
 };
+
+}

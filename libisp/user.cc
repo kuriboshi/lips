@@ -8,7 +8,7 @@
 #include "libisp.hh"
 #include "low.hh"
 
-using namespace lisp;
+namespace lisp {
 
 static LISPT getargs(LISPT al)
 {
@@ -112,4 +112,6 @@ void init_user()
   mkprim(PN_GETREP, getrep, 1, SUBR);
   mkprim(PN_DE, de, -3, FSUBR);
   mkprim(PN_DF, df, -3, FSUBR);
+}
+
 }

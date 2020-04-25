@@ -9,7 +9,7 @@
 #include <libisp.hh>
 
 extern const char* extilde(const char*, int);
-extern LISPT expandfiles(const char*, int, int, int);
-extern LISPT glob(LISPT);
+extern lisp::LISPT expandfiles(const char*, int, int, int);
+extern lisp::LISPT glob(lisp::LISPT);
 
-extern LISPT expand(LISPT, LISPT, LISPT);
+extern lisp::LISPT expand(lisp::LISPT, lisp::LISPT, lisp::LISPT);

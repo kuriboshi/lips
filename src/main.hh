@@ -12,9 +12,9 @@
 extern int interrupt;
 extern int brkflg;
 extern struct options options;
-extern LISPT path;
-extern LISPT home;
-extern LISPT globsort;
+extern lisp::LISPT path;
+extern lisp::LISPT home;
+extern lisp::LISPT globsort;
 
 struct options
 {

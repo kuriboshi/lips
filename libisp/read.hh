@@ -7,6 +7,8 @@
 
 #include "lisp.hh"
 
+namespace lisp {
+
 struct rtinfo
 {
   unsigned char chclass[128];
@@ -65,3 +67,5 @@ extern LISPT terpri(FILE*);
 extern LISPT prinbody(LISPT, FILE*, int);
 extern LISPT prin0(LISPT, FILE*, int);
 extern LISPT print(LISPT, FILE*);
+
+}

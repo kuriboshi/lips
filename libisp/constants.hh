@@ -8,6 +8,9 @@
 
 #include "lisp.hh"
 
+namespace lisp
+{
+
 /*
  * All lisp constants needed internally.
  */
@@ -20,3 +23,5 @@ extern LISPT C_LAMBDA, C_NLAMBDA, C_OLDDEF, C_OLDVAL, C_PIPE;
 extern LISPT C_QUOTE, C_READ, C_REDEFINED, C_RESET, C_RETURN, C_STRING;
 extern LISPT C_SUBR, C_SYMBOL, C_TO, C_TOTO, C_UNBOUND, C_WRITE;
 extern LISPT C_BAR, C_GT, C_GGT, C_LT, C_SEMI, C_PROGN, C_AMPER;
+
+}

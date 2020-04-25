@@ -31,8 +31,6 @@ extern void end_term(void);
 extern void clearlbuf(void);
 extern void loadbuf(char*);
 
-extern char* VERSION;
-
 char* progname; /* Name of the game. */
 int brkflg;     /* 1 means break at next call to peval1. */
 int interrupt;

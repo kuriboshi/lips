@@ -13,13 +13,14 @@
 #include "low.hh"
 #include "garb.hh"
 
-extern LISPT history;
-extern LISPT histnum;
-extern LISPT path;
-extern LISPT home;
-extern LISPT alias_expanded;
-
+extern lisp::LISPT history;
+extern lisp::LISPT histnum;
+extern lisp::LISPT path;
+extern lisp::LISPT home;
+extern lisp::LISPT alias_expanded;
 extern void finish(int);
+
+namespace lisp {
 
 #ifdef FLOATING
 static unsigned short point = 31;
@@ -39,8 +40,6 @@ static struct floats
   struct floats* fnext;
 } floats;
 #endif /* FLOATING */
-
-namespace lisp {
 
 /*
  * markobjs contains pointers to all LISPT type c variables that

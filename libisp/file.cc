@@ -11,14 +11,14 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
 extern int getch(FILE*);
 extern void putch(int, FILE*, int);
 
 FILE* primin;
 FILE* primout;
 FILE* primerr;
+
+namespace lisp {
 
 PRIMITIVE xratom(LISPT file)
 {
@@ -262,4 +262,6 @@ void init_file()
   primin = stdin;
   primout = stdout;
   primerr = stderr;
+}
+
 }
