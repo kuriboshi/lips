@@ -158,7 +158,7 @@ inline LISPT& FREEVAL(LISPT f) { return f->u.l_free; }
 inline alloc::destblock_t*& ENVVAL(LISPT e) { return e->u.l_environ; }
 #endif
 
-inline void SET(LISPT a, lisp_type t, LISPT p) { a = p; a->type = t; UNMARK(a); }
+inline void SET(LISPT& a, lisp_type t, LISPT p) { a = p; a->type = t; UNMARK(a); }
 
 inline bool IST(LISPT x) { return TYPEOF(x) == TRUE; }
 inline bool ISNIL(LISPT x) { return x == nullptr || TYPEOF(x) == NIL; }
