@@ -51,11 +51,6 @@ alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
 alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
 int alloc::destblockused = 0;                              // Index to last slot in destblock.
 
-alloc::alloc()
-{
-  init_alloc();
-}
-
 /*
  * realmalloc - wrapper around malloc which returns a char*.
  */

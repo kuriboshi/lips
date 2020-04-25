@@ -12,8 +12,8 @@ namespace lisp {
 class alloc
 {
 public:
-  alloc();
-  ~alloc() = default;
+  alloc() = delete;
+  ~alloc() = delete;
 
   static const int CONSCELLS = 1000;     // Number of cells in each block
   static const int DESTBLOCKSIZE = 3000; // Size of destination block area
@@ -26,7 +26,7 @@ public:
 
   struct conscells
   {
-    struct lispt cells[CONSCELLS];
+    struct lisp_t cells[CONSCELLS];
     struct conscells* next;
   };
 

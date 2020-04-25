@@ -18,8 +18,8 @@
 namespace lisp
 {
 
-struct lispt;
-using LISPT = struct lispt*;
+struct lisp_t;
+using LISPT = struct lisp_t*;
 /* This is used to recognize c-functions for cpprint */
 using PRIMITIVE = LISPT;
 
@@ -98,7 +98,7 @@ typedef struct
   short count;
 } CLOSURET;
 
-struct lispt
+struct lisp_t
 {
   bool gcmark = false;
   enum lisp_type type;
