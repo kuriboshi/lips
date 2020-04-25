@@ -32,7 +32,6 @@ target_sources(libisp PRIVATE
   eval.hh
   except.hh
   file.hh
-  garb.hh
   init.hh
   iter.hh
   libisp.hh
