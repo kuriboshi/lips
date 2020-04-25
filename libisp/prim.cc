@@ -136,7 +136,7 @@ LISPT mklambda(LISPT args, LISPT def, lisp_type type)
   count = 0;
   LAMVAL(s).arglist = mkarglis(args);
   LAMVAL(s).argcnt = count;
-  LISPT t;
+  LISPT t = nullptr;
   SET(t, type, s);
   UNSAVE(def);
   UNSAVE(args);
@@ -395,7 +395,7 @@ PRIMITIVE closure(LISPT fun, LISPT vars)
   if(TYPEOF(f) == ERROR)
     return f;
   CLOSVAL(c).cvalues = f;
-  LISPT clos;
+  LISPT clos = nullptr;
   SET(clos, CLOSURE, c);
   return clos;
 }

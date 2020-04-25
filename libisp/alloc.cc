@@ -276,7 +276,7 @@ LISPT alloc::getobject()
   if(ISNIL(freelist))
     doreclaim(NOCONSARGS, 0L);
 
-  LISPT f;
+  LISPT f = nullptr;
   SET(f, CONS, (LISPT)freelist);
   freelist = FREEVAL(freelist);
   return f;
@@ -295,7 +295,7 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
     doreclaim(CONSARGS, 0L);
   }
 
-  LISPT f;
+  LISPT f = nullptr;
   SET(f, CONS, (LISPT)freelist);
   freelist = FREEVAL(freelist);
   CAR(f) = a;
@@ -378,7 +378,7 @@ LISPT alloc::buildatom(const char* s, int cpy)
     SYMVAL(newatom).pname = s;
   SYMVAL(newatom).plist = C_NIL;
   SYMVAL(newatom).value = unbound;
-  LISPT l;
+  LISPT l = nullptr;
   SET(l, SYMBOL, newatom);
   return l;
 }
@@ -434,7 +434,7 @@ LISPT alloc::mkatom(char* str)
  */
 LISPT alloc::mkfloat(double num)
 {
-  LISPT rval;
+  LISPT rval = nullptr;
 
 #ifdef FLOATING
 again:

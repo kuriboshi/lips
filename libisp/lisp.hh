@@ -20,9 +20,8 @@ namespace lisp
 
 struct lispt;
 using LISPT = struct lispt*;
-
 /* This is used to recognize c-functions for cpprint */
-#define PRIMITIVE LISPT
+using PRIMITIVE = LISPT;
 
 enum lisp_type
 {
@@ -54,57 +53,10 @@ enum lisp_type
   USER,      /* user defined type */
 };
 
-/*
- * Some more or less helpfull macros.
- */
-#define TYPEOF(a) ((a) == nullptr ? NIL : (a)->type)
-#define SETTYPE(a, t) ((a)->type = (t))
-#define MARKED(a) ((a)->gcmark)
-#define MARK(a) ((a)->gcmark = 1)
-#define UNMARK(a) ((a)->gcmark = 0)
-
 #define C_NIL nullptr
 extern LISPT C_T;
 
-#define STRINGVAL(s) ((s)->u.l_string)
-#define INTVAL(i) ((i)->u.l_integer)
-#define SYMVAL(s) ((s)->u.l_symbol)
-#define CONSVAL(c) ((c)->u.l_cons)
-#define SUBRVAL(s) ((s)->u.l_subr)
-#define LAMVAL(l) ((l)->u.l_lambda)
-#define CLOSVAL(c) ((c)->u.l_closure)
-#define FLOATVAL(f) ((f)->u.l_float)
-#define FILEVAL(f) ((f)->u.l_filet)
-#define INDIRECTVAL(i) ((i)->u.l_indirect)
-#define CVARVAL(v) ((v)->u.l_cvariable)
-#define CPOINTVAL(c) ((c)->u.l_cpointer)
-#define FREEVAL(f) ((f)->u.l_free)
-#if 0
-#define ENVVAL(e) ((e)->u.l_environ)
-#endif
-
-#define SET(a, t, p) ((a) = (p), (a)->type = (t), UNMARK(a))
-
-#define ISNIL(x) ((x) == nullptr || TYPEOF(x) == NIL)
-#define IST(x) (TYPEOF(x) == TRUE)
-
-#define CAR(x) (CONSVAL(x).car)
-#define CDR(x) (CONSVAL(x).cdr)
-#define EQ(x, y) ((x) == (y))
-#define SETQ(x, y) (SYMVAL(x).value = (y))
-#define SYMVALUE(x) (SYMVAL(x).value)
-#define SETOPVAL(x, y) SETQ(x, y)
-#define GETOPVAL(x) (SYMVAL(x).value)
-#define GETSTR(s) TYPEOF(s) == STRING ? STRINGVAL(s) : SYMVAL(s).pname
-
-/*
- * A simple way of protecting internal lisp objects from
- * the garbage collector.
- */
-#define SAVE(v) lisp::alloc::save(v)
-#define UNSAVE(v) v = lisp::alloc::unsave()
-
-#define BITS32 int
+using BITS32 = int;
 
 typedef struct
 { /* The cons cell */
@@ -121,13 +73,14 @@ typedef struct
 } SYMBOLT;
 
 typedef struct
-{ /* The type of internal c-functions */
+{
+  // The type of internal c-functions
   LISPT (*function0)(void);
   LISPT (*function1)(LISPT);
   LISPT (*function2)(LISPT, LISPT);
   LISPT (*function3)(LISPT, LISPT, LISPT);
-  short argcount; /* Negative argcount indicates that
-                     arguments should not be evaluated */
+  short argcount; // Negative argcount indicates that arguments should not be
+                  // evaluated
 } SUBRT;
 
 typedef struct
@@ -147,7 +100,7 @@ typedef struct
 
 struct lispt
 {
-  unsigned int gcmark : 1;
+  bool gcmark = false;
   enum lisp_type type;
   union
   {
@@ -157,7 +110,7 @@ struct lispt
     SYMBOLT l_symbol;
     int l_integer;
     int* l_bignum;
-    float l_float;
+    double l_float;
     LISPT l_indirect;
     CONST l_cons;
     char* l_string;
@@ -165,7 +118,7 @@ struct lispt
     LAMBDAT l_lambda;
     CLOSURET l_closure;
     /* UNBOUND */
-    //lisp::alloc::destblock_t* l_environ;
+    // alloc::destblock_t* l_environ;
     FILE* l_filet;
     /* TRUE */
     LISPT l_free;
@@ -177,5 +130,46 @@ struct lispt
     /* USER */
   } u;
 };
+
+/*
+ * Some more or less helpfull functions
+ */
+inline lisp_type TYPEOF(LISPT a) { return a == nullptr ? NIL : a->type; }
+inline void SETTYPE(LISPT a, lisp_type t) { a->type = t; }
+inline bool MARKED(LISPT a) { return a->gcmark; }
+inline void MARK(LISPT a) { a->gcmark = true; }
+inline void UNMARK(LISPT a) { a->gcmark = false; }
+
+inline char*& STRINGVAL(LISPT s) { return s->u.l_string; }
+inline int& INTVAL(LISPT i) { return i->u.l_integer; }
+inline SYMBOLT& SYMVAL(LISPT s) { return s->u.l_symbol; }
+inline CONST& CONSVAL(LISPT c) { return c->u.l_cons; }
+inline SUBRT& SUBRVAL(LISPT s) { return s->u.l_subr; }
+inline LAMBDAT& LAMVAL(LISPT l) { return l->u.l_lambda; }
+inline CLOSURET& CLOSVAL(LISPT c) { return c->u.l_closure; }
+inline double& FLOATVAL(LISPT f) { return f->u.l_float; }
+inline FILE*& FILEVAL(LISPT f) { return f->u.l_filet; }
+inline LISPT& INDIRECTVAL(LISPT i) { return i->u.l_indirect; }
+inline LISPT*& CVARVAL(LISPT v) { return v->u.l_cvariable; }
+inline void*& CPOINTVAL(LISPT c) { return c->u.l_cpointer; }
+inline LISPT& FREEVAL(LISPT f) { return f->u.l_free; }
+
+#if 0
+inline alloc::destblock_t*& ENVVAL(LISPT e) { return e->u.l_environ; }
+#endif
+
+inline void SET(LISPT a, lisp_type t, LISPT p) { a = p; a->type = t; UNMARK(a); }
+
+inline bool IST(LISPT x) { return TYPEOF(x) == TRUE; }
+inline bool ISNIL(LISPT x) { return x == nullptr || TYPEOF(x) == NIL; }
+
+inline LISPT& CAR(LISPT x) { return CONSVAL(x).car; }
+inline LISPT& CDR(LISPT x) { return CONSVAL(x).cdr; }
+inline bool EQ(LISPT x, LISPT y) { return x == y; }
+inline void SETQ(LISPT x, LISPT y) { SYMVAL(x).value = y; }
+inline LISPT& SYMVALUE(LISPT x) { return SYMVAL(x).value; }
+inline void SETOPVAL(LISPT x, LISPT y) { SETQ(x, y); }
+inline LISPT GETOPVAL(LISPT x) { return SYMVAL(x).value; }
+inline const char* GETSTR(LISPT s) { return TYPEOF(s) == STRING ? STRINGVAL(s) : SYMVAL(s).pname; }
 
 }

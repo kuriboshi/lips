@@ -148,4 +148,11 @@ inline char* realmalloc(unsigned int u)
   return alloc::realmalloc(u);
 }
 
+/*
+ * A simple way of protecting internal lisp objects from
+ * the garbage collector.
+ */
+inline void SAVE(LISPT v) { alloc::save(v); }
+inline void UNSAVE(LISPT v) { v = alloc::unsave(); }
+
 } // namespace lisp

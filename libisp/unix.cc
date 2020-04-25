@@ -144,7 +144,7 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
   auto* f = fopen(STRINGVAL(name), openmode);
   if(!f)
     return error(CANT_OPEN, name);
-  LISPT newfile;
+  LISPT newfile = nullptr;
   SET(newfile, FILET, getobject());
   FILEVAL(newfile) = f;
   return newfile;
