@@ -346,7 +346,7 @@ static void init()
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;
   beforeprompt = promptfun;
-  breakhook = onbreak;
+  evaluator::breakhook = onbreak;
 
   init_exec();
 }
@@ -461,11 +461,11 @@ int main(int argc, char* const* argv)
   {
     try
     {
-      toctrl = 0;
+      evaluator::toctrl = 0;
       dzero();
-      fun = C_NIL;
-      args = C_NIL;
-      env = nullptr;
+      evaluator::fun = C_NIL;
+      evaluator::args = C_NIL;
+      evaluator::env = nullptr;
       if(toploop(&topprompt, nullptr))
         break;
     }

@@ -46,8 +46,9 @@ namespace lisp {
  * markobjs contains pointers to all LISPT type c variables that
  * contains data to be retained during gc.
  */
-LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &fun, &expression, &args, &path, &home, &verboseflg, &topprompt,
-  &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag, &alias_expanded, &C_EOF, nullptr};
+LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evaluator::expression, &evaluator::args, &path,
+                     &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
+                     &alloc::gcgag, &alias_expanded, &C_EOF, nullptr};
 
 LISPT* alloc::foo1 = nullptr; // Protect arguments of cons when gc.
 LISPT* alloc::foo2 = nullptr;
@@ -207,20 +208,21 @@ LISPT alloc::doreclaim(int doconsargs, long incr)
     mark(foo1);
     mark(foo2);
   }
-  if(dest != nullptr)
-    for(int i = dest[0].val.d_integer; i > 0; i--)
+  if(evaluator::dest != nullptr)
+    for(int i = evaluator::dest[0].val.d_integer; i > 0; i--)
     {
-      mark(&dest[i].var.d_lisp);
-      mark(&dest[i].val.d_lisp);
+      mark(&evaluator::dest[i].var.d_lisp);
+      mark(&evaluator::dest[i].val.d_lisp);
     }
   for(int i = 0; markobjs[i] != nullptr; i++) mark(markobjs[i]);
 #if 0
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
-  for(int i = 0; i < toctrl; i++)
-    if(control[i].type == CTRL_LISP && control[i].u.lisp != nullptr && TYPEOF(control[i].u.lisp) != ENVIRON)
-      mark(&control[i].u.lisp);
+  for(int i = 0; i < evaluator::toctrl; i++)
+    if(evaluator::control[i].type == evaluator::CTRL_LISP && evaluator::control[i].u.lisp != nullptr
+      && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
+      mark(&evaluator::control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
     {

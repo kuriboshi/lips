@@ -15,41 +15,27 @@ extern int interrupt;
 extern LISPT findalias(LISPT);
 extern void pputc(int, FILE*);
 
-void (*breakhook)(void);         /* Called before going into break. */
-int (*undefhook)(LISPT, LISPT*); /* Called in case of undefined function. */
+bool evaluator::noeval = 0;
+evaluator::continuation_t evaluator::cont = nullptr;
+evaluator::breakhook_t evaluator::breakhook = nullptr; // Called before going into break.
+evaluator::undefhook_t evaluator::undefhook = nullptr; // Called in case of undefined function.
 
 /* 
  * These variables are really local to this file but are needed
  * by the garbage collector.
  */
-LISPT fun;                /* Store current function beeing evaluated. */
-LISPT expression;         /* Current expression. */
-LISPT args;               /* Current arguments. */
-alloc::destblock_t* env;  /* Current environment. */
-alloc::destblock_t* dest; /* Current destination beeing built. */
+LISPT evaluator::fun = nullptr;                /* Store current function beeing evaluated. */
+LISPT evaluator::expression = nullptr;         /* Current expression. */
+LISPT evaluator::args = nullptr;               /* Current arguments. */
+alloc::destblock_t* evaluator::env = nullptr;  /* Current environment. */
+alloc::destblock_t* evaluator::dest = nullptr; /* Current destination beeing built. */
 
-CONTROL control; /* Control-stack. */
-int toctrl;      /* Control-stack stack pointer. */
+namespace lisp {
 
-static int peval(void);
-static int peval1(void);
-static int peval2(void);
-static int ev0(void), ev1(void), ev2(void), ev3(void), ev4(void), evlam1(void);
-static int evlam0(void);
-static int ev9(void), ev11(void), ev3p(void);
-static int evalargs(void), noevarg(void), evlam(void), spread(void);
-static int evlis(void), evlis1(void), evlis2(void), evlis3(void), evlis4(void);
-static int noev9(void);
-static int evsequence(void), evseq1(void), evseq3(void);
-static int evclosure(void), evclosure1(void);
-static int eval0(void), apply0(void);
-static int everr(void);
-static int lookup(void);
+evaluator::control_t evaluator::control[]; /* Control-stack. */
+int evaluator::toctrl = 0;      /* Control-stack stack pointer. */
 
-static int noeval;        /* Don't evaluate arguments. */
-static continuation_t cont; /* Current continuation. */
-
-static LISPT printwhere()
+LISPT evaluator::printwhere()
 {
   LISPT foo = C_NIL;
   for(int i = toctrl - 1; i; i--) /* find latest completed call */
@@ -77,7 +63,7 @@ out:
  * Print errormessage, abort current evaluation, and
  * return to top level.
  */
-static void abort(int m, LISPT v)
+void evaluator::abort(int m, LISPT v)
 {
   error(m, v);
   printwhere();
@@ -85,7 +71,7 @@ static void abort(int m, LISPT v)
   throw lisp_error("abort");
 }
 
-static void overflow()
+void evaluator::overflow()
 {
   abort(STACK_OVERFLOW, C_NIL);
 }
@@ -95,7 +81,7 @@ static void overflow()
  * continuations, destinations, and LISPT objects.  There are two macros 
  * to push and to pop pointers and LISPT objects.
  */
-inline void push_lisp(LISPT a)
+void evaluator::push_lisp(LISPT a)
 {
   control[toctrl].type = CTRL_LISP;
   control[toctrl++].u.lisp = a;
@@ -103,7 +89,7 @@ inline void push_lisp(LISPT a)
     overflow();
 }
 
-inline void push_point(lisp::alloc::destblock_t* d)
+void evaluator::push_point(alloc::destblock_t* d)
 {
   control[toctrl].type = CTRL_POINT;
   control[toctrl++].u.point = d;
@@ -111,7 +97,7 @@ inline void push_point(lisp::alloc::destblock_t* d)
     overflow();
 }
 
-inline void push_func(continuation_t f)
+void evaluator::push_func(continuation_t f)
 {
   control[toctrl].type = CTRL_FUNC;
   control[toctrl++].u.f_point = f;
@@ -119,17 +105,17 @@ inline void push_func(continuation_t f)
     overflow();
 }
 
-inline LISPT pop_lisp()
+LISPT evaluator::pop_lisp()
 {
   return control[--toctrl].u.lisp;
 }
 
-inline lisp::alloc::destblock_t* pop_point()
+alloc::destblock_t* evaluator::pop_point()
 {
   return control[--toctrl].u.point;
 }
 
-inline continuation_t pop_func()
+evaluator::continuation_t evaluator::pop_func()
 {
   return control[--toctrl].u.f_point;
 }
@@ -138,7 +124,7 @@ inline continuation_t pop_func()
  * This function prints an error message, and sets up a call
  * to everr that handles breaks.
  */
-static void xbreak(int mess, LISPT fault, continuation_t next)
+void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 {
   if(mess != 0)
   {
@@ -158,7 +144,7 @@ static void xbreak(int mess, LISPT fault, continuation_t next)
  * mkdestblock - creates a new destination block of size
  *               `s' and initializes it.
  */
-inline alloc::destblock_t* mkdestblock(int s)
+alloc::destblock_t* evaluator::mkdestblock(int s)
 {
   auto dest = dalloc(s + 1);
   dest[0].var.d_integer = s;
@@ -167,30 +153,30 @@ inline alloc::destblock_t* mkdestblock(int s)
   return dest;
 }
 
-inline void storevar(LISPT v, int i)
+void evaluator::storevar(LISPT v, int i)
 {
   dest[i].var.d_lisp = v;
   dest[i].type = 1;
 }
 
-inline static alloc::destblock_t* pop_env()
+alloc::destblock_t* evaluator::pop_env()
 {
   dfree(env);
   return pop_point();
 }
 
-static inline void send(LISPT a)
+void evaluator::send(LISPT a)
 {
   if(dest[0].var.d_integer > 0)
     dest[dest[0].var.d_integer].val.d_lisp = a;
 }
 
-static inline LISPT receive()
+LISPT evaluator::receive()
 {
   return dest[dest[0].var.d_integer].val.d_lisp;
 }
 
-static inline void next()
+void evaluator::next()
 {
   if(dest[0].var.d_integer > 0)
     --dest[0].var.d_integer;
@@ -200,7 +186,7 @@ static inline void next()
  * Make a call to the function in parameter `fun'.  It can handle
  * functions with up to three arguments.
  */
-static LISPT call(LISPT fun)
+LISPT evaluator::call(LISPT fun)
 {
   LISPT foo = C_NIL;
 
@@ -235,7 +221,7 @@ static LISPT call(LISPT fun)
 Dummy definition for the pretty printer.
 PRIMITIVE eval(LISPT expr)
 */
-PRIMITIVE eval(LISPT expr)
+PRIMITIVE evaluator::eval(LISPT expr)
 {
   /* 
    * Set the current expression to `expr' and push the current
@@ -270,7 +256,7 @@ PRIMITIVE eval(LISPT expr)
   return foo;
 }
 
-static int eval0()
+int evaluator::eval0()
 {
   dfree(dest);
   return 1;
@@ -280,7 +266,7 @@ static int eval0()
 Dummy definition for the pretty printer.
 PRIMITIVE apply(f, a)
 */
-PRIMITIVE apply(LISPT f, LISPT a)
+PRIMITIVE evaluator::apply(LISPT f, LISPT a)
 {
   push_point(dest);
   dest = mkdestblock(1);
@@ -298,7 +284,7 @@ PRIMITIVE apply(LISPT f, LISPT a)
   return foo;
 }
 
-static int apply0()
+int evaluator::apply0()
 {
   dfree(dest);
   args = pop_lisp();
@@ -306,7 +292,7 @@ static int apply0()
   return 1;
 }
 
-static int ev0()
+int evaluator::ev0()
 {
   /* 
    * Discard the top of stack (it's the previous expression, see
@@ -318,7 +304,7 @@ static int ev0()
   return 0;
 }
 
-static int peval()
+int evaluator::peval()
 {
 #ifdef TRACE
   if(trace)
@@ -358,7 +344,7 @@ static int peval()
   return 0;
 }
 
-static int ev1()
+int evaluator::ev1()
 {
   args = pop_lisp();
   fun = pop_lisp();
@@ -366,7 +352,7 @@ static int ev1()
   return 0;
 }
 
-static int evalhook(LISPT exp)
+int evaluator::evalhook(LISPT exp)
 {
   LISPT res;
 
@@ -387,7 +373,7 @@ static int evalhook(LISPT exp)
   return 1;
 }
 
-void do_unbound(int (*continuation)(void))
+void evaluator::do_unbound(continuation_t continuation)
 {
   /* 
    * If an undefined symbol has the AUTOLOAD property, we try to
@@ -430,7 +416,7 @@ void do_unbound(int (*continuation)(void))
   }
 }
 
-int do_default(int (*continuation)(void))
+int evaluator::do_default(continuation_t continuation)
 {
   expression = findalias(expression);
   if(EQ(expression, C_ERROR))
@@ -445,7 +431,7 @@ int do_default(int (*continuation)(void))
     return 0;
 }
 
-static int peval1()
+int evaluator::peval1()
 {
   int foo;
 
@@ -524,7 +510,7 @@ static int peval1()
   return 0;
 }
 
-static int peval2()
+int evaluator::peval2()
 {
   int foo;
 
@@ -587,7 +573,7 @@ static int peval2()
  * bt - Prints a backtrace of all expressions on the
  *    	stack.
  */
-void bt()
+void evaluator::bt()
 {
   int op = printlevel;
   printlevel = 2;
@@ -599,7 +585,7 @@ void bt()
   printlevel = op;
 }
 
-static int everr()
+int evaluator::everr()
 {
   expression = break0(expression);
   cont = pop_func(); /* Discard one continuation. */
@@ -607,14 +593,14 @@ static int everr()
   return 0;
 }
 
-static int noevarg()
+int evaluator::noevarg()
 {
   args = receive();
   cont = spread;
   return 0;
 }
 
-static int evalargs()
+int evaluator::evalargs()
 {
   if(ISNIL(args))
   {
@@ -631,7 +617,7 @@ static int evalargs()
   return 0;
 }
 
-static int ev9()
+int evaluator::ev9()
 {
   if(ISNIL(CDR(args)))
   {
@@ -645,7 +631,7 @@ static int ev9()
   return 0;
 }
 
-static int ev11()
+int evaluator::ev11()
 {
   next();
   args = CDR(args);
@@ -654,7 +640,7 @@ static int ev11()
   return 0;
 }
 
-static int noev9()
+int evaluator::noev9()
 {
 nextarg:
   if(ISNIL(CDR(args)))
@@ -673,7 +659,7 @@ nextarg:
   return 0;
 }
 
-static int evlis()
+int evaluator::evlis()
 {
   if(ISNIL(args))
   {
@@ -687,7 +673,7 @@ static int evlis()
   return 0;
 }
 
-static int evlis1()
+int evaluator::evlis1()
 {
   if(ISNIL(CDR(args)))
   {
@@ -702,7 +688,7 @@ static int evlis1()
   return 0;
 }
 
-static int evlis2()
+int evaluator::evlis2()
 {
   LISPT x = cons(receive(), C_NIL);
   send(x);
@@ -710,7 +696,7 @@ static int evlis2()
   return 0;
 }
 
-static int evlis3()
+int evaluator::evlis3()
 {
   push_point(dest);
   dest = mkdestblock(1);
@@ -721,7 +707,7 @@ static int evlis3()
   return 0;
 }
 
-static int evlis4()
+int evaluator::evlis4()
 {
   LISPT x = receive();
   dfree(dest);
@@ -732,7 +718,7 @@ static int evlis4()
   return 0;
 }
 
-static int evlam()
+int evaluator::evlam()
 {
   int i;
   int ac;
@@ -765,7 +751,7 @@ static int evlam()
   return 0;
 }
 
-static int spread()
+int evaluator::spread()
 {
 respread:
   if(EQ(args, C_NIL))
@@ -787,7 +773,7 @@ respread:
   return 0;
 }
 
-static int ev2()
+int evaluator::ev2()
 {
   LISPT foo = call(fun);
   dfree(dest);
@@ -808,7 +794,7 @@ static int ev2()
   return 0;
 }
 
-static int ev3()
+int evaluator::ev3()
 {
   fun = receive();
   push_func(ev4);
@@ -816,7 +802,7 @@ static int ev3()
   return 0;
 }
 
-static int ev3p()
+int evaluator::ev3p()
 {
   fun = receive();
   push_func(ev4);
@@ -824,13 +810,13 @@ static int ev3p()
   return 0;
 }
 
-static int ev4()
+int evaluator::ev4()
 {
   cont = pop_func();
   return 0;
 }
 
-static void Link()
+void evaluator::link()
 {
   dest[0].var.d_environ = env;
   dest[0].type = 2;
@@ -843,9 +829,9 @@ static void Link()
   }
 }
 
-static int evlam1()
+int evaluator::evlam1()
 {
-  Link();
+  link();
   dest = pop_point();
   args = LAMVAL(fun).lambdarep;
   push_func(evlam0);
@@ -853,13 +839,13 @@ static int evlam1()
   return 0;
 }
 
-static void restore_env()
+void evaluator::restore_env()
 {
   auto* c = env;
   for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
-static int evlam0()
+int evaluator::evlam0()
 {
   restore_env();
   env = pop_env();
@@ -868,7 +854,7 @@ static int evlam0()
   return 0;
 }
 
-void unwind()
+void evaluator::unwind()
 {
   while(env != nullptr)
   {
@@ -877,7 +863,7 @@ void unwind()
   }
 }
 
-static int lookup()
+int evaluator::lookup()
 {
   LISPT t = SYMVALUE(expression);
   switch(TYPEOF(t))
@@ -900,7 +886,7 @@ static int lookup()
   return 0;
 }
 
-static int evclosure()
+int evaluator::evclosure()
 {
   LISPT foo;
   int i;
@@ -915,7 +901,7 @@ static int evclosure()
     next();
   }
   fun = CLOSVAL(fun).cfunction;
-  Link();
+  link();
   dest = pop_point();
   auto envir = pop_point();
   cont = pop_func();
@@ -924,7 +910,7 @@ static int evclosure()
   return 0;
 }
 
-static int evclosure1()
+int evaluator::evclosure1()
 {
   restore_env();
   env = pop_env();
@@ -932,7 +918,7 @@ static int evclosure1()
   return 0;
 }
 
-static int evsequence()
+int evaluator::evsequence()
 {
   if(EQ(args, C_NIL))
   {
@@ -946,7 +932,7 @@ static int evsequence()
   return 0;
 }
 
-static int evseq1()
+int evaluator::evseq1()
 {
   if(EQ(CDR(args), C_NIL))
   {
@@ -960,7 +946,7 @@ static int evseq1()
   return 0;
 }
 
-static int evseq3()
+int evaluator::evseq3()
 {
   args = CDR(args);
   expression = CAR(args);
@@ -968,7 +954,7 @@ static int evseq3()
   return 0;
 }
 
-PRIMITIVE baktrace()
+PRIMITIVE evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
@@ -1048,11 +1034,13 @@ PRIMITIVE baktrace()
   return C_NIL;
 }
 
-void init_ev()
+void evaluator::init_ev()
 {
   mkprim(PN_E, eval, 1, FSUBR);
   mkprim(PN_EVAL, eval, 1, SUBR);
   mkprim(PN_APPLY, apply, 2, SUBR);
   mkprim(PN_APPLYSTAR, apply, -2, SUBR);
   mkprim(PN_BAKTRACE, baktrace, 0, SUBR);
+}
+
 }

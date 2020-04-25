@@ -7,6 +7,8 @@
 
 #include "libisp.hh"
 
+using namespace lisp;
+
 PRIMITIVE p_and(LISPT l)
 {
   LISPT foo = C_T;

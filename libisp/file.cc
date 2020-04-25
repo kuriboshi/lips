@@ -67,7 +67,7 @@ int loadfile(const char* lf)
     return 1;
   for(auto rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0))
   {
-    rval = eval(rval);
+    rval = evaluator::eval(rval);
   }
   fclose(foo);
   return 0;

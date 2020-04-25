@@ -66,7 +66,7 @@ static int dobreak(LISPT* com)
   }
   else if(EQ(CAR(*com), C_GO))
   {
-    pexp = xprint(eval(pexp), C_NIL);
+    pexp = xprint(evaluator::eval(pexp), C_NIL);
     return 0;
   }
   else if(EQ(CAR(*com), C_RESET))

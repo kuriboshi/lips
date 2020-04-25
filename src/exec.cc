@@ -904,5 +904,5 @@ void init_exec()
   mkprim(PN_GETENV, getenviron, 1, FSUBR);
   mkprim(PN_EXEC, doexec, -1, FSUBR);
   rehash();
-  undefhook = execcommand;
+  evaluator::undefhook = execcommand;
 }

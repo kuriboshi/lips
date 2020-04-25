@@ -139,6 +139,6 @@ void init_lisp()
   init_low();
   init_map();
 
-  undefhook = nullptr;
-  breakhook = nullptr;
+  evaluator::undefhook = nullptr;
+  evaluator::breakhook = nullptr;
 }
