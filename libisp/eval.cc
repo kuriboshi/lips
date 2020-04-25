@@ -33,12 +33,12 @@ alloc::destblock_t* evaluator::dest = nullptr; /* Current destination beeing bui
 namespace lisp {
 
 evaluator::control_t evaluator::control[]; /* Control-stack. */
-int evaluator::toctrl = 0;      /* Control-stack stack pointer. */
+int evaluator::toctrl = 0;                 /* Control-stack stack pointer. */
 
 LISPT evaluator::printwhere()
 {
   LISPT foo = C_NIL;
-  for(int i = toctrl - 1; i; i--) /* find latest completed call */
+  for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == evlam0)
       for(; i; i--)
@@ -142,7 +142,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 
 /* 
  * mkdestblock - creates a new destination block of size
- *               `s' and initializes it.
+ *               's' and initializes it.
  */
 alloc::destblock_t* evaluator::mkdestblock(int s)
 {
@@ -820,7 +820,7 @@ void evaluator::link()
 {
   dest[0].var.d_environ = env;
   dest[0].type = 2;
-  env = (alloc::destblock_t*)&dest[0];
+  env = dest;
   for(auto i = dest[0].val.d_integer; i > 0; i--)
   {
     LISPT t = SYMVALUE(dest[i].var.d_lisp);

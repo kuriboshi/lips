@@ -35,7 +35,7 @@ public:
     union
     {
       continuation_t f_point;
-      lisp::alloc::destblock_t* point;
+      alloc::destblock_t* point;
       LISPT lisp;
     } u;
   };
@@ -47,12 +47,27 @@ public:
   static PRIMITIVE apply(LISPT f, LISPT a);
   static PRIMITIVE baktrace();
 
+  static void bt();
+  static void unwind();
+  static void init_ev();
+  static int toctrl;
+  static LISPT fun;
+  static LISPT expression;
+  static LISPT args;
+  static alloc::destblock_t* env;
+  static alloc::destblock_t* dest;
+
+  using undefhook_t = int (*)(LISPT, LISPT*);
+  static undefhook_t undefhook;
+  using breakhook_t = void (*)();
+  static breakhook_t breakhook;
+
 private:
   static void push_lisp(LISPT);
   static void push_point(lisp::alloc::destblock_t*);
   static void push_func(continuation_t);
   static LISPT pop_lisp();
-  static lisp::alloc::destblock_t* pop_point();
+  static alloc::destblock_t* pop_point();
   static alloc::destblock_t* pop_env();
   static continuation_t pop_func();
   static void xbreak(int mess, LISPT fault, continuation_t next);
@@ -107,20 +122,6 @@ private:
 
   static bool noeval;        /* Don't evaluate arguments. */
   static continuation_t cont; /* Current continuation. */
-public:
-  static void bt();
-  static void unwind();
-  static void init_ev();
-  static int toctrl;
-  static LISPT fun;
-  static LISPT expression;
-  static LISPT args;
-  static alloc::destblock_t* env;
-  static alloc::destblock_t* dest;
-  using undefhook_t = int (*)(LISPT, LISPT*);
-  static undefhook_t undefhook;
-  using breakhook_t = void (*)();
-  static breakhook_t breakhook;
 };
 
 inline void unwind() { evaluator::unwind(); }
