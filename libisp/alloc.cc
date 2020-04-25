@@ -6,12 +6,7 @@
  *
  */
 
-#include <cstring>
-#include <cstdlib>
-
 #include "libisp.hh"
-#include "low.hh"
-#include "garb.hh"
 
 extern lisp::LISPT history;
 extern lisp::LISPT histnum;

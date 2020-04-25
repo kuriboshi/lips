@@ -28,7 +28,6 @@ using namespace lisp;
 #define FFLUSH(file) fflush(file)
 
 extern void finish(int);
-extern int readchar(FILE*, char*);
 
 #define NUM_KEYS 256
 #define COMMENTCHAR '#'

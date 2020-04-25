@@ -18,6 +18,7 @@
 #include "iter.hh"
 #include "low.hh"
 #include "misc.hh"
+#include "os.hh"
 #include "pred.hh"
 #include "prim.hh"
 #include "prop.hh"

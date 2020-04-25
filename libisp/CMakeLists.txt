@@ -24,6 +24,7 @@ target_sources(libisp PRIVATE
 )
 target_sources(libisp PRIVATE
   alloc.hh
+  arith.hh
   config.hh
   constants.hh
   defs.hh
@@ -38,9 +39,13 @@ target_sources(libisp PRIVATE
   lisp.hh
   low.hh
   misc.hh
+  os.hh
+  pred.hh
   prim.hh
+  prop.hh
   read.hh
   user.hh
+  version.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(libisp PUBLIC -Wall -Werror)

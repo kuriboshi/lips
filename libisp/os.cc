@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <unistd.h>
 
+namespace lisp {
+
 /*
  * Read a characters from a terminal.  Returns 0 if
  * no character was read.  The character is returned in
@@ -19,4 +21,6 @@ int readchar(FILE* file, char* cp)
   if(i != 1)
     return 0;
   return 1;
+}
+
 }

@@ -4,18 +4,20 @@
  *
  * $Id$
  */
-#include <cctype>
-#include <cstdlib>
 
 #include "libisp.hh"
 
-#define NUL '\0'
-#define MAXATOMSIZE 128 /* max length of atom read can handle */
+extern int getch(FILE*);
+extern void ungetch(int, FILE*);
+extern int eoln(FILE*);
+extern void putch(int, FILE*, int);
+extern lisp::LISPT histget(long, lisp::LISPT);
+extern lisp::LISPT history;
 
-#define PUSHR(w) rstack = cons(w, rstack)
-#define POPR(w) \
-  w = CAR(rstack); \
-  rstack = CDR(rstack)
+namespace {
+constexpr int NUL = '\0';
+constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
+}
 
 #define CHECKEOF(c) \
   if((c) == EOF) \
@@ -32,14 +34,10 @@
   while(curc != EOF && issepr(curc)); \
   CHECKEOF(curc);
 
-extern int getch(FILE*);
-extern void ungetch(int, FILE*);
-extern int eoln(FILE*);
-extern void putch(int, FILE*, int);
-extern lisp::LISPT histget(long, lisp::LISPT);
-extern lisp::LISPT history;
-
 namespace lisp {
+
+inline void pushr(LISPT w) { rstack = cons(w, rstack); }
+inline void popr(LISPT w) { w = CAR(rstack); rstack = CDR(rstack); }
 
 #if 0
 static LISPT userreadmacros[128];
@@ -323,16 +321,16 @@ head:
   GETCH(file);
   if(isinsert(curc))
   {
-    PUSHR(top);
+    pushr(top);
     rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
-    POPR(top);
+    popr(top);
     goto check;
   }
   else if(issplice(curc))
   {
-    PUSHR(top);
+    pushr(top);
     temp = (*currentrt.rmacros[curc])(file, curr, curc);
-    POPR(top);
+    popr(top);
     curr = splice(curr, temp, 0);
     goto check;
   }
@@ -376,16 +374,16 @@ tail:
     temp = CDR(curr);
     rplacd(curr, cons(C_NIL, temp));
     curr = CDR(curr);
-    PUSHR(top);
+    pushr(top);
     rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
-    POPR(top);
+    popr(top);
     goto tail;
   }
   else if(issplice(curc))
   {
-    PUSHR(top);
+    pushr(top);
     temp = (*currentrt.rmacros[curc])(file, curr, curc);
-    POPR(top);
+    popr(top);
     curr = splice(curr, temp, 1);
     goto tail;
   }
