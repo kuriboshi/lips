@@ -8,12 +8,12 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
 extern int brkflg;
 extern int interrupt;
 extern LISPT findalias(LISPT);
 extern void pputc(int, FILE*);
+
+namespace lisp {
 
 bool evaluator::noeval = 0;
 evaluator::continuation_t evaluator::cont = nullptr;
@@ -29,8 +29,6 @@ LISPT evaluator::expression = nullptr;         /* Current expression. */
 LISPT evaluator::args = nullptr;               /* Current arguments. */
 alloc::destblock_t* evaluator::env = nullptr;  /* Current environment. */
 alloc::destblock_t* evaluator::dest = nullptr; /* Current destination beeing built. */
-
-namespace lisp {
 
 evaluator::control_t evaluator::control[]; /* Control-stack. */
 int evaluator::toctrl = 0;                 /* Control-stack stack pointer. */
@@ -256,10 +254,10 @@ PRIMITIVE evaluator::eval(LISPT expr)
   return foo;
 }
 
-int evaluator::eval0()
+bool evaluator::eval0()
 {
   dfree(dest);
-  return 1;
+  return true;
 }
 
 /*
@@ -284,15 +282,15 @@ PRIMITIVE evaluator::apply(LISPT f, LISPT a)
   return foo;
 }
 
-int evaluator::apply0()
+bool evaluator::apply0()
 {
   dfree(dest);
   args = pop_lisp();
   fun = pop_lisp();
-  return 1;
+  return true;
 }
 
-int evaluator::ev0()
+bool evaluator::ev0()
 {
   /* 
    * Discard the top of stack (it's the previous expression, see
@@ -301,10 +299,10 @@ int evaluator::ev0()
    */
   toctrl -= 1;
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::peval()
+bool evaluator::peval()
 {
 #ifdef TRACE
   if(trace)
@@ -341,18 +339,18 @@ int evaluator::peval()
       cont = pop_func();
       break;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::ev1()
+bool evaluator::ev1()
 {
   args = pop_lisp();
   fun = pop_lisp();
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::evalhook(LISPT exp)
+bool evaluator::evalhook(LISPT exp)
 {
   LISPT res;
 
@@ -367,10 +365,10 @@ int evaluator::evalhook(LISPT exp)
         abort(NO_MESSAGE, C_NIL);
         break;
       default:
-        return 0;
+        return false;
         break;
     }
-  return 1;
+  return true;
 }
 
 void evaluator::do_unbound(continuation_t continuation)
@@ -416,7 +414,7 @@ void evaluator::do_unbound(continuation_t continuation)
   }
 }
 
-int evaluator::do_default(continuation_t continuation)
+bool evaluator::do_default(continuation_t continuation)
 {
   expression = findalias(expression);
   if(EQ(expression, C_ERROR))
@@ -425,13 +423,13 @@ int evaluator::do_default(continuation_t continuation)
   {
     if(!evalhook(expression))
       xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
-    return 1;
+    return true;
   }
   else
-    return 0;
+    return false;
 }
 
-int evaluator::peval1()
+bool evaluator::peval1()
 {
   int foo;
 
@@ -507,10 +505,10 @@ int evaluator::peval1()
           xbreak(ILLEGAL_FUNCTION, fun, peval1);
         break;
     }
-  return 0;
+  return false;
 }
 
-int evaluator::peval2()
+bool evaluator::peval2()
 {
   int foo;
 
@@ -566,7 +564,7 @@ int evaluator::peval2()
           xbreak(ILLEGAL_FUNCTION, fun, peval2);
         break;
     }
-  return 0;
+  return false;
 }
 
 /*
@@ -585,22 +583,22 @@ void evaluator::bt()
   printlevel = op;
 }
 
-int evaluator::everr()
+bool evaluator::everr()
 {
   expression = break0(expression);
   cont = pop_func(); /* Discard one continuation. */
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::noevarg()
+bool evaluator::noevarg()
 {
   args = receive();
   cont = spread;
-  return 0;
+  return false;
 }
 
-int evaluator::evalargs()
+bool evaluator::evalargs()
 {
   if(ISNIL(args))
   {
@@ -614,10 +612,10 @@ int evaluator::evalargs()
     else
       cont = ev9;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::ev9()
+bool evaluator::ev9()
 {
   if(ISNIL(CDR(args)))
   {
@@ -628,19 +626,19 @@ int evaluator::ev9()
     push_func(ev11);
     cont = peval;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::ev11()
+bool evaluator::ev11()
 {
   next();
   args = CDR(args);
   expression = CAR(args);
   cont = ev9;
-  return 0;
+  return false;
 }
 
-int evaluator::noev9()
+bool evaluator::noev9()
 {
 nextarg:
   if(ISNIL(CDR(args)))
@@ -656,10 +654,10 @@ nextarg:
     expression = CAR(args);
     goto nextarg;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::evlis()
+bool evaluator::evlis()
 {
   if(ISNIL(args))
   {
@@ -670,10 +668,10 @@ int evaluator::evlis()
     expression = CAR(args);
     cont = evlis1;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::evlis1()
+bool evaluator::evlis1()
 {
   if(ISNIL(CDR(args)))
   {
@@ -685,18 +683,18 @@ int evaluator::evlis1()
     push_func(evlis3);
     cont = peval;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::evlis2()
+bool evaluator::evlis2()
 {
   LISPT x = cons(receive(), C_NIL);
   send(x);
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::evlis3()
+bool evaluator::evlis3()
 {
   push_point(dest);
   dest = mkdestblock(1);
@@ -704,10 +702,10 @@ int evaluator::evlis3()
   args = CDR(args);
   expression = CAR(args);
   cont = evlis1;
-  return 0;
+  return false;
 }
 
-int evaluator::evlis4()
+bool evaluator::evlis4()
 {
   LISPT x = receive();
   dfree(dest);
@@ -715,10 +713,10 @@ int evaluator::evlis4()
   x = cons(receive(), x);
   send(x);
   cont = pop_func();
-  return 0;
+  return true;
 }
 
-int evaluator::evlam()
+bool evaluator::evlam()
 {
   int i;
   int ac;
@@ -748,10 +746,10 @@ int evaluator::evlam()
   }
   else
     cont = evalargs;
-  return 0;
+  return false;
 }
 
-int evaluator::spread()
+bool evaluator::spread()
 {
 respread:
   if(EQ(args, C_NIL))
@@ -770,10 +768,10 @@ respread:
     args = CDR(args);
     goto respread;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::ev2()
+bool evaluator::ev2()
 {
   LISPT foo = call(fun);
   dfree(dest);
@@ -791,29 +789,29 @@ int evaluator::ev2()
     send(foo);
     cont = pop_func();
   }
-  return 0;
+  return false;
 }
 
-int evaluator::ev3()
+bool evaluator::ev3()
 {
   fun = receive();
   push_func(ev4);
   cont = peval1;
-  return 0;
+  return false;
 }
 
-int evaluator::ev3p()
+bool evaluator::ev3p()
 {
   fun = receive();
   push_func(ev4);
   cont = peval2;
-  return 0;
+  return false;
 }
 
-int evaluator::ev4()
+bool evaluator::ev4()
 {
   cont = pop_func();
-  return 0;
+  return false;
 }
 
 void evaluator::link()
@@ -829,14 +827,14 @@ void evaluator::link()
   }
 }
 
-int evaluator::evlam1()
+bool evaluator::evlam1()
 {
   link();
   dest = pop_point();
   args = LAMVAL(fun).lambdarep;
   push_func(evlam0);
   cont = evsequence;
-  return 0;
+  return false;
 }
 
 void evaluator::restore_env()
@@ -845,13 +843,13 @@ void evaluator::restore_env()
   for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
 }
 
-int evaluator::evlam0()
+bool evaluator::evlam0()
 {
   restore_env();
   env = pop_env();
   expression = pop_lisp();
   cont = pop_func();
-  return 0;
+  return false;
 }
 
 void evaluator::unwind()
@@ -863,14 +861,14 @@ void evaluator::unwind()
   }
 }
 
-int evaluator::lookup()
+bool evaluator::lookup()
 {
   LISPT t = SYMVALUE(expression);
   switch(TYPEOF(t))
   {
     case UNBOUND:
       xbreak(UNBOUND_VARIABLE, expression, lookup);
-      return 0;
+      return false;
       break;
     case INDIRECT:
       send(INDIRECTVAL(t));
@@ -883,10 +881,10 @@ int evaluator::lookup()
       break;
   }
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::evclosure()
+bool evaluator::evclosure()
 {
   LISPT foo;
   int i;
@@ -907,18 +905,18 @@ int evaluator::evclosure()
   cont = pop_func();
   push_point(envir);
   push_func(evclosure1);
-  return 0;
+  return false;
 }
 
-int evaluator::evclosure1()
+bool evaluator::evclosure1()
 {
   restore_env();
   env = pop_env();
   cont = pop_func();
-  return 0;
+  return false;
 }
 
-int evaluator::evsequence()
+bool evaluator::evsequence()
 {
   if(EQ(args, C_NIL))
   {
@@ -929,10 +927,10 @@ int evaluator::evsequence()
     expression = CAR(args);
     cont = evseq1;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::evseq1()
+bool evaluator::evseq1()
 {
   if(EQ(CDR(args), C_NIL))
   {
@@ -943,15 +941,15 @@ int evaluator::evseq1()
     push_func(evseq3);
     cont = peval;
   }
-  return 0;
+  return false;
 }
 
-int evaluator::evseq3()
+bool evaluator::evseq3()
 {
   args = CDR(args);
   expression = CAR(args);
   cont = evseq1;
-  return 0;
+  return false;
 }
 
 PRIMITIVE evaluator::baktrace()

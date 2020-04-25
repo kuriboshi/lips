@@ -13,11 +13,11 @@ namespace lisp
 class evaluator
 {
 public:
-  evaluator();
-  ~evaluator() = default;
+  evaluator() = delete;
+  ~evaluator() = delete;
 
 public:
-  using continuation_t = int(*)();
+  using continuation_t = bool(*)();
 
   /*
    * The control stack.
@@ -50,6 +50,7 @@ public:
   static void bt();
   static void unwind();
   static void init_ev();
+
   static int toctrl;
   static LISPT fun;
   static LISPT expression;
@@ -59,6 +60,7 @@ public:
 
   using undefhook_t = int (*)(LISPT, LISPT*);
   static undefhook_t undefhook;
+
   using breakhook_t = void (*)();
   static breakhook_t breakhook;
 
@@ -77,51 +79,52 @@ private:
   static LISPT receive();
   static void next();
   static LISPT call(LISPT fun);
-  static int evalhook(LISPT exp);
+  static bool evalhook(LISPT exp);
   static void do_unbound(continuation_t continuation);
-  static int do_default(continuation_t continuation);
+  static bool do_default(continuation_t continuation);
   static void link();
   static void restore_env();
 
-  static int peval();
-  static int peval1();
-  static int peval2();
-  static int ev0();
-  static int ev1();
-  static int ev2();
-  static int ev3();
-  static int ev4();
-  static int evlam1();
-  static int evlam0();
-  static int ev9();
-  static int ev11();
-  static int ev3p();
-  static int evalargs();
-  static int noevarg();
-  static int evlam();
-  static int spread();
-  static int evlis();
-  static int evlis1();
-  static int evlis2();
-  static int evlis3();
-  static int evlis4();
-  static int noev9();
-  static int evsequence();
-  static int evseq1();
-  static int evseq3();
-  static int evclosure();
-  static int evclosure1();
-  static int eval0();
-  static int apply0();
-  static int everr();
-  static int lookup();
+  // Continuations
+  static bool peval();
+  static bool peval1();
+  static bool peval2();
+  static bool ev0();
+  static bool ev1();
+  static bool ev2();
+  static bool ev3();
+  static bool ev4();
+  static bool evlam1();
+  static bool evlam0();
+  static bool ev9();
+  static bool ev11();
+  static bool ev3p();
+  static bool evalargs();
+  static bool noevarg();
+  static bool evlam();
+  static bool spread();
+  static bool evlis();
+  static bool evlis1();
+  static bool evlis2();
+  static bool evlis3();
+  static bool evlis4();
+  static bool noev9();
+  static bool evsequence();
+  static bool evseq1();
+  static bool evseq3();
+  static bool evclosure();
+  static bool evclosure1();
+  static bool eval0();
+  static bool apply0();
+  static bool everr();
+  static bool lookup();
 
   static LISPT printwhere();
   static void abort(int m, LISPT v);
   static void overflow();
 
-  static bool noeval;        /* Don't evaluate arguments. */
-  static continuation_t cont; /* Current continuation. */
+  static bool noeval;           // Don't evaluate arguments.
+  static continuation_t cont;   // Current continuation.
 };
 
 inline void unwind() { evaluator::unwind(); }
