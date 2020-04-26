@@ -39,20 +39,17 @@ namespace lisp {
 inline void pushr(LISPT w) { rstack = cons(w, rstack); }
 inline void popr(LISPT& w) { w = rstack->car(); rstack = rstack->cdr(); }
 
-#if 0
-static LISPT userreadmacros[128];
-#endif
 static char buf[MAXATOMSIZE];
 
 static LISPT rmsquote(FILE*, LISPT, char);
-#if 0
-static LISPT rmredir(FILE*, LISPT, char);
-static LISPT rmpipe(FILE*, LISPT, char);
-#endif
-/* static LISPT rmbg(); */
 static LISPT rmdquote(FILE*, LISPT, char);
 static LISPT rmexcl(FILE*, LISPT, char);
+
 #if 0
+static LISPT rmpipe(FILE*, LISPT, char);
+static LISPT rmredir(FILE*, LISPT, char);
+static LISPT rmbg(FILE*, LISPT, char);
+static LISPT userreadmacros[128];
 static LISPT rmuser(FILE*, LISPT, char); /* Installed for user read macros. */
 #endif
 
@@ -468,8 +465,7 @@ tail:
  *   !*      - all arguments
  * others could be added easily.
  */
-/*ARGSUSED*/
-static LISPT rmexcl(FILE* file, LISPT _0, char _1)
+static LISPT rmexcl(FILE* file, LISPT, char)
 {
   LISPT at, l;
 
@@ -525,24 +521,7 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
   return C_NIL;
 }
 
-/*
- * Handles user macros.
- */
-#if 0
-/*ARGSUSED*/
-static LISPT rmuser(FILE* file, LISPT curr, char curc)
-{
-  if (ISNIL(userreadmacros[(int)curc]))
-    return curr;
-  else
-
-    curr = apply(userreadmacros[(int)curc], curr);
-  return curr;
-}
-#endif
-
-/*ARGSUSED*/
-static LISPT rmdquote(FILE* file, LISPT _0, char _1)
+static LISPT rmdquote(FILE* file, LISPT, char)
 {
   char buf[MAXATOMSIZE];
   char c;
@@ -560,16 +539,6 @@ static LISPT rmdquote(FILE* file, LISPT _0, char _1)
   return mkstring(buf);
 }
 
-#ifdef COMMENT
-/*ARGSUSED*/
-static LISPT rmbg(FILE* file, LISPT curr, char curc)
-{
-  rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
-  rplacd(curr, cons(C_NIL, CDR(curr)));
-  return CDR(curr);
-}
-#endif
-
 static LISPT rmsquote(FILE* file, LISPT _0, char _1)
 {
   int c;
@@ -584,8 +553,7 @@ static LISPT rmsquote(FILE* file, LISPT _0, char _1)
 }
 
 #if 0
-/*ARGSUSED*/
-static LISPT rmpipe(FILE* file, LISPT curr, char curc)
+static LISPT rmpipe(FILE*, LISPT curr, char)
 {
   LISPT t1, t2;
 
@@ -595,10 +563,7 @@ static LISPT rmpipe(FILE* file, LISPT curr, char curc)
   rplacd(curr, C_NIL);
   return t2;
 }
-#endif
 
-#if 0
-/*ARGSUSED*/
 static LISPT rmredir(FILE* file, LISPT curr, char curc)
 {
   LISPT t1, t2;
@@ -613,6 +578,26 @@ static LISPT rmredir(FILE* file, LISPT curr, char curc)
     ungetch(c, file);
   rplacd(curr, C_NIL);
   return t2;
+}
+
+static LISPT rmbg(FILE*, LISPT curr, char)
+{
+  rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
+  rplacd(curr, cons(C_NIL, CDR(curr)));
+  return CDR(curr);
+}
+
+/*
+ * Handles user macros.
+ */
+static LISPT rmuser(FILE*, LISPT curr, char curc)
+{
+  if (ISNIL(userreadmacros[(int)curc]))
+    return curr;
+  else
+
+    curr = apply(userreadmacros[(int)curc], curr);
+  return curr;
 }
 #endif
 
