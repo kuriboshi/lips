@@ -67,7 +67,7 @@ static void remhist()
 static void trimhist()
 {
   LISPT hl;
-  long i;
+  int i;
 
   hl = history;
   for(i = 0; i < histmax->intval() && !ISNIL(hl); i++, hl = hl->cdr())
@@ -80,7 +80,7 @@ static void trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-LISPT histget(long num, LISPT hlist)
+LISPT histget(int num, LISPT hlist)
 {
   if(num < 0)
   {

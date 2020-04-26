@@ -21,7 +21,7 @@ namespace lisp {
 PRIMITIVE plus(LISPT l)
 {
   double fsum = 0.0;
-  long sum = 0;
+  int sum = 0;
   int f = 0;
 
   while(TYPEOF(l) == CONS)
@@ -107,7 +107,7 @@ PRIMITIVE fdifference(LISPT a, LISPT b)
 PRIMITIVE ltimes(LISPT l)
 {
   double fprod = 1.0;
-  long prod = 1;
+  int prod = 1;
   int f = 0;
 
   while(TYPEOF(l) == CONS)

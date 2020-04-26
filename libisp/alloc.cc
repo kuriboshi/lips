@@ -181,7 +181,7 @@ void alloc::mark(LISPT x)
  *	       sweep up garbage.  Argument doconsargs is nonzero
  *	       
  */
-LISPT alloc::doreclaim(int doconsargs, long incr)
+LISPT alloc::doreclaim(int doconsargs, int incr)
 {
   if(ISNIL(gcgag))
     fprintf(primerr, "garbage collecting\n");
@@ -254,7 +254,7 @@ LISPT alloc::doreclaim(int doconsargs, long incr)
  */
 PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 {
-  long i;
+  int i;
 
   if(ISNIL(incr))
     i = 0;
@@ -311,7 +311,7 @@ PRIMITIVE alloc::freecount()
 {
   int i = 0;
   for(auto l = freelist; l->intval(); l = l->cdr()) i++;
-  return mknumber((long)i);
+  return mknumber(i);
 }
 
 /*
@@ -329,7 +329,7 @@ LISPT alloc::mkstring(const char* str)
   return s;
 }
 
-LISPT alloc::mknumber(long i)
+LISPT alloc::mknumber(int i)
 {
   LISPT c = getobject();
   c->intval(i);

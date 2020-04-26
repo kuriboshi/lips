@@ -8,7 +8,7 @@
 namespace lisp {
 
 /* variables */
-extern long trace;
+extern int trace;
 
 /* functions */
 extern LISPT error(int, LISPT);

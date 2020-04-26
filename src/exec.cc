@@ -240,11 +240,11 @@ static int mfork()
 }
 
 /* ltoa - Converts a long to its ascii representation. */
-char* ltoa(long v)
+char* ltoa(int v)
 {
   static char buf[20];
 
-  sprintf(buf, "%ld", v);
+  sprintf(buf, "%d", v);
   return buf;
 }
 
@@ -420,7 +420,7 @@ static LISPT exec(const char* name, LISPT command)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber((long)WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 /* 
@@ -446,7 +446,7 @@ static int ifexec(const char* dir, const char* name)
 /* hashfun - Calculates the hash function used in hashtable. */
 static BITS32 hashfun(const char* str)
 {
-  long i;
+  int i;
   int bc;
 
   i = 0;
@@ -567,7 +567,7 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long)WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
@@ -601,7 +601,7 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long)WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
@@ -635,7 +635,7 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber((long)WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 PRIMITIVE pipecmd(LISPT cmds)
@@ -678,7 +678,7 @@ PRIMITIVE pipecmd(LISPT cmds)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber((long)WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 PRIMITIVE back(LISPT l)
@@ -697,7 +697,7 @@ PRIMITIVE back(LISPT l)
     return C_ERROR;
   recordjob(pid, 1);
   printf("[%d] %d\n", joblist->jobnum, pid);
-  return mknumber((long)pid);
+  return mknumber(pid);
 }
 
 PRIMITIVE stop()
@@ -770,11 +770,11 @@ PRIMITIVE fg(LISPT job)
     tcsetpgrp(1, pgrp);
     if(WIFSTOPPED(j->status))
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber((long)pgrp));
+        return syserr(mknumber(pgrp));
     j->status = 0;
     j->background = 0;
     auto status = waitfork(j->procid);
-    return mknumber((long)WEXITSTATUS(status));
+    return mknumber(WEXITSTATUS(status));
   }
   return error(NO_SUCH_JOB, job);
 #endif
@@ -807,7 +807,7 @@ PRIMITIVE bg(LISPT job)
     tcsetpgrp(1, pgrp);
     if(!j->background)
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber((long)pgrp));
+        return syserr(mknumber(pgrp));
     j->background = 1;
     return C_T;
   }

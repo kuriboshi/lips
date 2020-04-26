@@ -30,11 +30,11 @@ PRIMITIVE xratom(LISPT file)
 PRIMITIVE readc(LISPT file)
 {
   if(ISNIL(file))
-    return mknumber((long)getch(primin));
+    return mknumber(getch(primin));
   if(IST(file))
-    return mknumber((long)getch(stdin));
+    return mknumber(getch(stdin));
   CHECK(file, FILET);
-  return mknumber((long)getch(file->fileval()));
+  return mknumber(getch(file->fileval()));
 }
 
 PRIMITIVE xread(LISPT file)

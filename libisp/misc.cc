@@ -22,7 +22,7 @@ static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "No
 
 namespace lisp {
 
-long trace;
+int trace;
 
 PRIMITIVE evaltrace(LISPT state)
 {

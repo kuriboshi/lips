@@ -20,33 +20,33 @@ LISPT sighandler[NSIG - 1];
 
 PRIMITIVE uxerrno()
 {
-  return mknumber((long)errno);
+  return mknumber(errno);
 }
 
 PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
   CHECK(name, STRING);
   CHECK(mode, INTEGER);
-  return mknumber((long)access(name->stringval(), (int)mode->intval()));
+  return mknumber(access(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxalarm(LISPT seconds)
 {
   CHECK(seconds, INTEGER);
-  return mknumber((long)alarm(seconds->intval()));
+  return mknumber(alarm(seconds->intval()));
 }
 
 PRIMITIVE uxchdir(LISPT dirname)
 {
   CHECK(dirname, STRING);
-  return mknumber((long)chdir(dirname->stringval()));
+  return mknumber(chdir(dirname->stringval()));
 }
 
 PRIMITIVE uxchmod(LISPT name, LISPT mode)
 {
   CHECK(name, STRING);
   CHECK(mode, INTEGER);
-  return mknumber((long)chmod(name->stringval(), (int)mode->intval()));
+  return mknumber(chmod(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxclose(LISPT fildes)
@@ -68,58 +68,58 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
   if(i < 0)
     return C_NIL;
   else
-    return mknumber((long)i);
+    return mknumber(i);
 }
 
 PRIMITIVE uxdup(LISPT fildes)
 {
   CHECK(fildes, INTEGER);
-  return mknumber((long)dup((int)fildes->intval()));
+  return mknumber(dup((int)fildes->intval()));
 }
 
 PRIMITIVE uxgetuid()
 {
-  return mknumber((long)getuid());
+  return mknumber(getuid());
 }
 
 PRIMITIVE uxgeteuid()
 {
-  return mknumber((long)geteuid());
+  return mknumber(geteuid());
 }
 
 PRIMITIVE uxgetgid()
 {
-  return mknumber((long)getgid());
+  return mknumber(getgid());
 }
 
 PRIMITIVE uxgetegid()
 {
-  return mknumber((long)getegid());
+  return mknumber(getegid());
 }
 
 PRIMITIVE uxgetpid()
 {
-  return mknumber((long)getpid());
+  return mknumber(getpid());
 }
 
 PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
   CHECK(pid, INTEGER);
   CHECK(sig, INTEGER);
-  return mknumber((long)kill((int)pid->intval(), (int)sig->intval()));
+  return mknumber(kill((int)pid->intval(), (int)sig->intval()));
 }
 
 PRIMITIVE uxlink(LISPT name1, LISPT name2)
 {
   CHECK(name1, STRING);
   CHECK(name2, STRING);
-  return mknumber((long)link(name1->stringval(), name2->stringval()));
+  return mknumber(link(name1->stringval(), name2->stringval()));
 }
 
 PRIMITIVE uxnice(LISPT incr)
 {
   CHECK(incr, INTEGER);
-  return mknumber((long)nice((int)incr->intval()));
+  return mknumber(nice((int)incr->intval()));
 }
 
 PRIMITIVE uxopen(LISPT name, LISPT mode)
@@ -153,13 +153,13 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
 PRIMITIVE uxsetuid(LISPT uid)
 {
   CHECK(uid, INTEGER);
-  return mknumber((long)setuid((int)uid->intval()));
+  return mknumber(setuid((int)uid->intval()));
 }
 
 PRIMITIVE uxsetgid(LISPT gid)
 {
   CHECK(gid, INTEGER);
-  return mknumber((long)setgid((int)gid->intval()));
+  return mknumber(setgid((int)gid->intval()));
 }
 
 /*ARGSUSED*/
@@ -195,7 +195,7 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 PRIMITIVE uxunlink(LISPT name)
 {
   CHECK(name, STRING);
-  return mknumber((long)unlink(name->stringval()));
+  return mknumber(unlink(name->stringval()));
 }
 
 void init_unix()

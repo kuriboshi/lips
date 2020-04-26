@@ -11,7 +11,7 @@ extern int getch(FILE*);
 extern void ungetch(int, FILE*);
 extern int eoln(FILE*);
 extern void putch(int, FILE*, int);
-extern lisp::LISPT histget(long, lisp::LISPT);
+extern lisp::LISPT histget(int, lisp::LISPT);
 extern lisp::LISPT history;
 
 namespace {
@@ -57,8 +57,8 @@ LISPT prin0(LISPT, FILE*, int);
 
 LISPT top;           /* used for threading the input structure */
 LISPT rstack;        /* partially built structure read stack */
-long printlevel = 0; /* maximum print level */
-long thisplevel;     /* during print, print level */
+int printlevel = 0; /* maximum print level */
+int thisplevel;     /* during print, print level */
 bool echoline = false;          /* is true if ! has been used */
 
 /* clang-format off */
@@ -129,7 +129,7 @@ static char digits[] = {
  * INTEGERP returns nonzero if the characters in buffer BUF
  * represents an integer, and the result as a long in res.
  */
-static int integerp(char* buf, long* res)
+static int integerp(char* buf, int* res)
 {
   int d = 0;
   int sign = 1;
@@ -202,7 +202,7 @@ static int floatp(char* buf)
  */
 static LISPT parsebuf(char* buf)
 {
-  long longval;
+  int longval;
 
   if(integerp(buf, &longval))
     return mknumber(longval);
@@ -617,7 +617,7 @@ static void ps(const char* s, FILE* file, int esc)
   while(*s) putch(*s++, file, esc);
 }
 
-static void pi(long i, long base, FILE* file)
+static void pi(int i, int base, FILE* file)
 {
   char ss[33];
   int sign;
@@ -771,13 +771,13 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       ps("#<error", file, 0);
     ppoint:
       ps(" ", file, 0);
-      pi((long)x->intval(), 16L, file);
+      pi(x->intval(), 16L, file);
       ps(">", file, 0);
       break;
     default:
       ps("#<illegal ", file, 0);
       pi(TYPEOF(x), currentbase->intval(), file);
-      pi((long)x->intval(), 16L, file);
+      pi(x->intval(), 16L, file);
       ps(">", file, 0);
   }
   return x;

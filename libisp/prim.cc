@@ -52,7 +52,7 @@ void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar,
  * nth - Return the N'th element in the list LIST. If N is greater than 
  *       the length of LIST,  return NIL.
  */
-LISPT nth(LISPT list, long n)
+LISPT nth(LISPT list, int n)
 {
   LISPT l;
 
@@ -379,7 +379,7 @@ PRIMITIVE length(LISPT l)
     l = l->cdr();
     i++;
   }
-  return mknumber((long)i);
+  return mknumber(i);
 }
 
 PRIMITIVE closure(LISPT fun, LISPT vars)

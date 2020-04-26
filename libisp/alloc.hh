@@ -66,7 +66,7 @@ public:
   static LISPT intern(const char*);
   static LISPT getobject();
   static LISPT mkstring(const char*);
-  static LISPT mknumber(long);
+  static LISPT mknumber(int);
   static LISPT mkatom(char*);
   static LISPT mkfloat(double);
   static destblock_t* dalloc(int);
@@ -86,7 +86,7 @@ private:
   static conscells_t* newpage();
   static int sweep();
   static void mark(LISPT);
-  static LISPT doreclaim(int doconsargs, long incr);
+  static LISPT doreclaim(int doconsargs, int incr);
   static int hash(const char* str);
   static LISPT buildatom(const char* s, int cpy);
   static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
@@ -115,7 +115,7 @@ inline LISPT mkstring(const char* s)
 {
   return alloc::mkstring(s);
 }
-inline LISPT mknumber(long i)
+inline LISPT mknumber(int i)
 {
   return alloc::mknumber(i);
 }

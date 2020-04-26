@@ -19,7 +19,7 @@ extern lisp::LISPT alias_expanded;
 extern lisp::LISPT (*transformhook)(lisp::LISPT);
 extern void (*beforeprompt)();
 
-extern lisp::LISPT histget(long, lisp::LISPT);
+extern lisp::LISPT histget(int, lisp::LISPT);
 extern lisp::LISPT findalias(lisp::LISPT);
 extern bool toploop(lisp::LISPT*, int (*)(lisp::LISPT*));
 extern void init_hist();

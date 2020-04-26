@@ -69,7 +69,7 @@ PRIMITIVE concat(LISPT strlist)
 PRIMITIVE xstrlen(LISPT s)
 {
   CHECK(s, STRING);
-  return mknumber((long)strlen(s->stringval()));
+  return mknumber(strlen(s->stringval()));
 }
 
 /* Extract a substring from start to end.
