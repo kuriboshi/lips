@@ -395,10 +395,10 @@ static int checkchar(LISPT words, int pos, int* c)
   LISPT l;
 
   l = words;
-  *c = (GETSTR(CAR(l)))[pos];
-  for(; !ISNIL(l); l = CDR(l))
+  *c = (l->car()->getstr())[pos];
+  for(; !ISNIL(l); l = l->cdr())
   {
-    if(*c != (GETSTR(CAR(l)))[pos])
+    if(*c != (l->car()->getstr())[pos])
       return 0;
   }
   return 1;
@@ -422,15 +422,15 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
   LISPT stripped;
   const char* s;
 
-  if(strncmp(GETSTR(CAR(files)), prefix, strlen(prefix) - 1) != 0)
+  if(strncmp(files->car()->getstr(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = CDR(files))
+  for(stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = files->cdr())
   {
-    s = GETSTR(CAR(files)) + strlen(prefix) - strlen(suffix);
+    s = files->car()->getstr() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
     tconc(stripped, mkstring(s));
   }
-  return CAR(stripped);
+  return stripped->car();
 }
 
 /*
@@ -691,8 +691,8 @@ int lips_getline(FILE* file)
         ex = expandfiles(t, 0, 0, 1);
         if(TYPEOF(ex) == CONS && strlen(s) > 1)
           ex = strip(ex, t, s);
-        if(TYPEOF(ex) == CONS && ISNIL(CDR(ex)))
-          fillrest(GETSTR(CAR(ex)));
+        if(TYPEOF(ex) == CONS && ISNIL(ex->cdr()))
+          fillrest(ex->car()->getstr());
         else
         {
           if(TYPEOF(ex) == CONS)

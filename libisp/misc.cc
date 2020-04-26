@@ -31,7 +31,7 @@ PRIMITIVE evaltrace(LISPT state)
   if(!ISNIL(state))
   {
     CHECK(state, INTEGER);
-    trace = INTVAL(state);
+    trace = state->intval();
   }
   return mknumber(i);
 }
@@ -68,24 +68,24 @@ static int dobreak(LISPT* com)
     unwind();
     throw lisp_error("bad command");
   }
-  else if(EQ(CAR(*com), C_GO))
+  else if(EQ((**com).car(), C_GO))
   {
     pexp = xprint(evaluator::eval(pexp), C_NIL);
     return 0;
   }
-  else if(EQ(CAR(*com), C_RESET))
+  else if(EQ((**com).car(), C_RESET))
   {
     unwind();
     throw lisp_error("reset");
   }
-  else if(EQ(CAR(*com), C_BT))
+  else if(EQ((**com).car(), C_BT))
   {
     bt();
     return 2;
   }
-  else if(EQ(CAR(*com), C_RETURN))
+  else if(EQ((**com).car(), C_RETURN))
   {
-    pexp = ISNIL(CDR(*com)) ? C_NIL : CAR(CDR(*com));
+    pexp = ISNIL((**com).cdr()) ? C_NIL : (**com).cdr()->car();
     return 0;
   }
   return 1;

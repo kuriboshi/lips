@@ -44,8 +44,8 @@ LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evalua
                      &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
                      &alloc::gcgag, &alias_expanded, &C_EOF, nullptr};
 
-LISPT* alloc::foo1 = nullptr; // Protect arguments of cons when gc.
-LISPT* alloc::foo2 = nullptr;
+LISPT alloc::foo1 = nullptr; // Protect arguments of cons when gc.
+LISPT alloc::foo2 = nullptr;
 int alloc::nrconses = 0;                                   // Number of conses since last gc.
 alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
 alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
@@ -102,7 +102,7 @@ int alloc::sweep()
   nrfreed++;
   LISPT f = freelist;
   if(TYPEOF(f) == CPOINTER)
-    free(CPOINTVAL(f));
+    free(f->cpointval());
   i++; /* Check *next* cell */
   for(; cc; cc = cc->next, i = 0)
     for(; i < CONSCELLS; i++)
@@ -113,15 +113,15 @@ int alloc::sweep()
 	   * C pointers must be freed.
 	   */
         if(TYPEOF(f) == CPOINTER)
-          free(CPOINTVAL(f));
-        SET(FREEVAL(f), FREE, (LISPT)&cc->cells[i]);
-        f = FREEVAL(f);
+          free(f->cpointval());
+        SET(f->freeval(), FREE, &cc->cells[i]);
+        f = f->freeval();
       }
       else
       {
         cc->cells[i].gcmark = 0;
       }
-  FREEVAL(f) = C_NIL;
+  f->freeval() = C_NIL;
   return nrfreed;
 }
 
@@ -129,20 +129,20 @@ int alloc::sweep()
  * mark - Mark a cell and traverse car and cdr of cons cells and all other
  *        fields of type LISPT.
  */
-void alloc::mark(LISPT* x)
+void alloc::mark(LISPT x)
 {
-  switch(TYPEOF(*x))
+  switch(TYPEOF(x))
   {
     case CONS:
-      if(MARKED(*x))
+      if(MARKED(x))
         break;
-      MARK(*x);
-      mark(&CAR(*x));
-      mark(&CDR(*x));
+      MARK(x);
+      mark(x->car());
+      mark(x->cdr());
       break;
 #ifdef FLOATING
     case FLOAT: {
-      int y = (int)(&FLOATVAL(*x) - &floats.fdata[0]);
+      int y = (int)(&FLOATVAL(x) - &floats.fdata[0]);
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
     }
@@ -151,27 +151,27 @@ void alloc::mark(LISPT* x)
       break;
     case LAMBDA:
     case NLAMBDA:
-      MARK(*x);
-      mark(&LAMVAL(*x).lambdarep);
-      mark(&LAMVAL(*x).arglist);
+      MARK(x);
+      mark(x->lamval().lambdarep);
+      mark(x->lamval().arglist);
       break;
     case CLOSURE:
-      MARK(*x);
-      mark(&CLOSVAL(*x).cfunction);
-      mark(&CLOSVAL(*x).closed);
-      mark(&CLOSVAL(*x).cvalues);
+      MARK(x);
+      mark(x->closval().cfunction);
+      mark(x->closval().closed);
+      mark(x->closval().cvalues);
       break;
     case STRING:
-      MARK(*x);
+      MARK(x);
       break;
     case INDIRECT:
-      MARK(*x);
-      mark(&INDIRECTVAL(*x));
+      MARK(x);
+      mark(x->indirectval());
       break;
     case NIL:
       break;
     default:
-      MARK(*x);
+      MARK(x);
       break;
   }
 }
@@ -200,35 +200,36 @@ LISPT alloc::doreclaim(int doconsargs, long incr)
   if(evaluator::dest != nullptr)
     for(int i = evaluator::dest[0].val.d_integer; i > 0; i--)
     {
-      mark(&evaluator::dest[i].var.d_lisp);
-      mark(&evaluator::dest[i].val.d_lisp);
+      mark(evaluator::dest[i].var.d_lisp);
+      mark(evaluator::dest[i].val.d_lisp);
     }
-  for(int i = 0; markobjs[i] != nullptr; i++) mark(markobjs[i]);
+  for(int i = 0; markobjs[i] != nullptr; i++) mark(*markobjs[i]);
 #if 0
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
   for(int i = 0; i < evaluator::toctrl; i++)
-    if(evaluator::control[i].type == evaluator::CTRL_LISP && evaluator::control[i].u.lisp != nullptr
-      && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
-      mark(&evaluator::control[i].u.lisp);
+    if(evaluator::control[i].type == evaluator::CTRL_LISP
+       && evaluator::control[i].u.lisp != nullptr
+       && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
+      mark(evaluator::control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
     {
       MARK(l->sym);
-      mark(&(SYMVAL(l->sym).value));
-      mark(&(SYMVAL(l->sym).plist));
+      mark((l->sym->symval().value));
+      mark((l->sym->symval().plist));
     }
   for(int i = destblockused - 1; i >= 0; i--)
   {
     if(destblock[i].type != 0)
     {
-      mark(&destblock[i].var.d_lisp);
-      mark(&destblock[i].val.d_lisp);
+      mark(destblock[i].var.d_lisp);
+      mark(destblock[i].val.d_lisp);
     }
   }
   if(savept)
-    for(int i = savept; i; i--) mark(&savearray[i - 1]);
+    for(int i = savept; i; i--) mark(savearray[i - 1]);
   /*
    * A new page is allocated if the number of conses is lower
    * than MINCONSES or if requested by calling doreclaim with
@@ -260,7 +261,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
   else
   {
     CHECK(incr, INTEGER);
-    i = INTVAL(incr);
+    i = incr->intval();
   }
   doreclaim(NOCONSARGS, i);
   return C_NIL;
@@ -273,7 +274,7 @@ LISPT alloc::getobject()
 
   LISPT f = nullptr;
   SET(f, CONS, (LISPT)freelist);
-  freelist = FREEVAL(freelist);
+  freelist = freelist->freeval();
   return f;
 }
 
@@ -285,16 +286,16 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   if(ISNIL(freelist))
   {
-    foo1 = &a;
-    foo2 = &b;
+    foo1 = a;
+    foo2 = b;
     doreclaim(CONSARGS, 0L);
   }
 
   LISPT f = nullptr;
   SET(f, CONS, (LISPT)freelist);
-  freelist = FREEVAL(freelist);
-  CAR(f) = a;
-  CDR(f) = b;
+  freelist = freelist->freeval();
+  f->car(a);
+  f->cdr(b);
   return f;
 }
 
@@ -309,7 +310,7 @@ PRIMITIVE alloc::xobarray()
 PRIMITIVE alloc::freecount()
 {
   int i = 0;
-  for(auto l = freelist; INTVAL(l); l = CDR(l)) i++;
+  for(auto l = freelist; l->intval(); l = l->cdr()) i++;
   return mknumber((long)i);
 }
 
@@ -324,16 +325,14 @@ LISPT alloc::mkstring(const char* str)
     return C_ERROR;
   strcpy(c, str);
   LISPT s = getobject();
-  STRINGVAL(s) = c;
-  s->type = STRING;
+  s->stringval(c);
   return s;
 }
 
 LISPT alloc::mknumber(long i)
 {
   LISPT c = getobject();
-  INTVAL(c) = i;
-  c->type = INTEGER;
+  c->intval(i);
   return c;
 }
 
@@ -367,12 +366,12 @@ LISPT alloc::buildatom(const char* s, int cpy)
     if(pname == nullptr)
       return C_ERROR;
     strcpy(pname, s);
-    SYMVAL(newatom).pname = pname;
+    newatom->symval().pname = pname;
   }
   else
-    SYMVAL(newatom).pname = s;
-  SYMVAL(newatom).plist = C_NIL;
-  SYMVAL(newatom).value = unbound;
+    newatom->symval().pname = s;
+  newatom->symval().plist = C_NIL;
+  newatom->symval().value = unbound;
   LISPT l = nullptr;
   SET(l, SYMBOL, newatom);
   return l;
@@ -389,7 +388,7 @@ LISPT alloc::puthash(const char* str, obarray_t* obarray[], int cpy)
   obarray_t* ob;
   for(ob = *(obarray + hv); ob; ob = ob->onext)
   {
-    if(!strcmp(SYMVAL(ob->sym).pname, str))
+    if(!strcmp(ob->sym->symval().pname, str))
       return ob->sym;
   }
   ob = new obarray_t;

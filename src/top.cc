@@ -35,10 +35,10 @@ static void phist()
 {
   LISPT hl;
 
-  for(hl = history; !ISNIL(hl); hl = CDR(hl))
+  for(hl = history; !ISNIL(hl); hl = hl->cdr())
   {
-    printf("%d.\t", INTVAL(CAR(CAR(hl))));
-    prinbody(CDR(CAR(hl)), stdout, 1);
+    printf("%d.\t", hl->car()->car()->intval());
+    prinbody(hl->car()->cdr(), stdout, 1);
     pputc('\n', primout);
   }
 }
@@ -57,7 +57,7 @@ static void addhist(LISPT what)
  */
 static void remhist()
 {
-  history = CDR(history);
+  history = history->cdr();
   histnum = sub1(histnum);
 }
 
@@ -70,7 +70,7 @@ static void trimhist()
   long i;
 
   hl = history;
-  for(i = 0; i < INTVAL(histmax) && !ISNIL(hl); i++, hl = CDR(hl))
+  for(i = 0; i < histmax->intval() && !ISNIL(hl); i++, hl = hl->cdr())
     ;
   if(!ISNIL(hl))
     rplacd(hl, C_NIL);
@@ -84,24 +84,24 @@ LISPT histget(long num, LISPT hlist)
 {
   if(num < 0)
   {
-    for(; TYPEOF(hlist) == CONS && num < 0; hlist = CDR(hlist), num++)
+    for(; TYPEOF(hlist) == CONS && num < 0; hlist = hlist->cdr(), num++)
       ;
     if(ISNIL(hlist))
       return C_NIL;
     else
-      return CDR(CAR(hlist));
+      return hlist->car()->cdr();
   }
   else if(num > 0)
   {
-    for(; TYPEOF(hlist) == CONS && num != INTVAL(CAR(CAR(hlist))); hlist = CDR(hlist))
+    for(; TYPEOF(hlist) == CONS && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
       ;
     if(ISNIL(hlist))
       return C_NIL;
     else
-      return CDR(CAR(hlist));
+      return hlist->car()->cdr();
   }
   else if(!ISNIL(hlist))
-    return CDR(CAR(hlist));
+    return hlist->car()->cdr();
   return C_NIL;
 }
 
@@ -136,15 +136,15 @@ LISPT findalias(LISPT exp)
   rval = exp;
   while(1)
   {
-    if(TYPEOF(rval) == CONS && TYPEOF(CAR(rval)) == SYMBOL)
+    if(TYPEOF(rval) == CONS && TYPEOF(rval->car()) == SYMBOL)
     {
-      alias = getprop(CAR(rval), C_ALIAS);
-      if(!ISNIL(alias) && (ISNIL(alias_expanded) || !EQ(CAR(rval), CAR(alias_expanded))))
+      alias = getprop(rval->car(), C_ALIAS);
+      if(!ISNIL(alias) && (ISNIL(alias_expanded) || !EQ(rval->car(), alias_expanded->car())))
       {
-        if(!ISNIL(memb(CAR(rval), alias_expanded)))
+        if(!ISNIL(memb(rval->car(), alias_expanded)))
           return error(ALIAS_LOOP, C_NIL);
-        alias_expanded = cons(CAR(rval), alias_expanded);
-        rval = append(cons(alias, cons(CDR(rval), C_NIL)));
+        alias_expanded = cons(rval->car(), alias_expanded);
+        rval = append(cons(alias, cons(rval->cdr(), C_NIL)));
       }
       else
         break;
@@ -166,12 +166,12 @@ void promptprint(LISPT prompt)
     return;
   else
   {
-    s = GETSTR(prompt);
+    s = prompt->getstr();
     for(i = 0; s[i]; i++)
     {
       if(s[i] == '!')
       {
-        sprintf(buf, "%d", INTVAL(histnum));
+        sprintf(buf, "%d", histnum->intval());
         strcat(current_prompt, buf);
         continue;
       }
@@ -221,7 +221,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       }
     if(TYPEOF(input_exp) == ENDOFFILE)
       return true;
-    if(EQ(CAR(input_exp), C_NIL))
+    if(EQ(input_exp->car(), C_NIL))
       continue;
     addhist(input_exp);
     if(echoline)
@@ -230,9 +230,9 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       pputc('\n', primout);
     }
     topexp = transform(input_exp);
-    if(TYPEOF(CAR(topexp)) == CONS)
+    if(TYPEOF(topexp->car()) == CONS)
     {
-      topexp = CAR(topexp);
+      topexp = topexp->car();
       printit = 1;
     }
     alias_expanded = C_NIL;

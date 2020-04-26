@@ -15,7 +15,7 @@ namespace lisp {
 PRIMITIVE symstr(LISPT sym)
 {
   CHECK(sym, SYMBOL);
-  return mkstring(SYMVAL(sym).pname);
+  return mkstring(sym->symval().pname);
 }
 
 /* T if s is a string, NIL otherwise. */
@@ -31,7 +31,7 @@ PRIMITIVE streq(LISPT s1, LISPT s2)
 {
   CHECK(s1, STRING);
   CHECK(s2, STRING);
-  if(!strcmp(STRINGVAL(s1), STRINGVAL(s2)))
+  if(!strcmp(s1->stringval(), s2->stringval()))
     return C_T;
   return C_NIL;
 }
@@ -40,7 +40,7 @@ PRIMITIVE strcomp(LISPT s1, LISPT s2)
 {
   CHECK(s1, STRING);
   CHECK(s2, STRING);
-  return mknumber(strcmp(STRINGVAL(s1), STRINGVAL(s2)));
+  return mknumber(strcmp(s1->stringval(), s2->stringval()));
 }
 
 /* Concatenate arbitrary many strings to
@@ -48,10 +48,10 @@ PRIMITIVE strcomp(LISPT s1, LISPT s2)
 PRIMITIVE concat(LISPT strlist)
 {
   int size = 0;
-  for(auto sl = strlist; !ISNIL(sl); sl = CDR(sl))
+  for(auto sl = strlist; !ISNIL(sl); sl = sl->cdr())
   {
-    CHECK(CAR(sl), STRING);
-    size += strlen(STRINGVAL(CAR(sl)));
+    CHECK(sl->car(), STRING);
+    size += strlen(sl->car()->stringval());
   }
   auto* ns = realmalloc((unsigned)size + 1);
   if(ns == nullptr)
@@ -59,8 +59,8 @@ PRIMITIVE concat(LISPT strlist)
   ns[0] = '\0';
   while(!ISNIL(strlist))
   {
-    strcat(ns, STRINGVAL(CAR(strlist)));
-    strlist = CDR(strlist);
+    strcat(ns, strlist->car()->stringval());
+    strlist = strlist->cdr();
   }
   return mkstring(ns);
 }
@@ -69,7 +69,7 @@ PRIMITIVE concat(LISPT strlist)
 PRIMITIVE xstrlen(LISPT s)
 {
   CHECK(s, STRING);
-  return mknumber((long)strlen(STRINGVAL(s)));
+  return mknumber((long)strlen(s->stringval()));
 }
 
 /* Extract a substring from start to end.
@@ -82,10 +82,10 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   CHECK(str, STRING);
   CHECK(start, INTEGER);
   CHECK(end, INTEGER);
-  auto s = INTVAL(start);
-  auto e = INTVAL(end);
+  auto s = start->intval();
+  auto e = end->intval();
   auto size = e - s + 1;
-  if(size < 0 || s > static_cast<int>(strlen(STRINGVAL(str))) || e > static_cast<int>(strlen(STRINGVAL(str))) || s <= 0
+  if(size < 0 || s > static_cast<int>(strlen(str->stringval())) || e > static_cast<int>(strlen(str->stringval())) || s <= 0
     || e < 0)
     return C_NIL;
   auto* ns = realmalloc((unsigned)size + 1);
@@ -94,7 +94,7 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   ns[size] = '\0';
   for(size = 0; s <= e; s++, size++)
   {
-    ns[size] = *(STRINGVAL(str) + s - 1);
+    ns[size] = *(str->stringval() + s - 1);
   }
   return mkstring(ns);
 }

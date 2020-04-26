@@ -22,7 +22,7 @@ constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
 #define CHECKEOF(c) \
   if((c) == EOF) \
   { \
-    if(line || ISNIL(CAR(top))) \
+    if(line || ISNIL(top->car())) \
       return C_EOF; \
     else \
       return error(UNEXPECTED_EOF, C_NIL); \
@@ -37,7 +37,7 @@ constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
 namespace lisp {
 
 inline void pushr(LISPT w) { rstack = cons(w, rstack); }
-inline void popr(LISPT w) { w = CAR(rstack); rstack = CDR(rstack); }
+inline void popr(LISPT& w) { w = rstack->car(); rstack = rstack->cdr(); }
 
 #if 0
 static LISPT userreadmacros[128];
@@ -273,7 +273,7 @@ LISPT ratom(FILE* file)
  */
 static LISPT splice(LISPT c, LISPT l, int tailp)
 {
-  LISPT t = CDR(c);
+  LISPT t = c->cdr();
   if(TYPEOF(l) != CONS)
   {
     if(tailp)
@@ -284,14 +284,14 @@ static LISPT splice(LISPT c, LISPT l, int tailp)
   }
   if(!tailp)
   {
-    rplaca(c, CAR(l));
-    l = CDR(l);
+    rplaca(c, l->car());
+    l = l->cdr();
   }
   if(ISNIL(l))
     return c;
   rplacd(c, l);
   LISPT t2 = C_NIL;
-  for(; TYPEOF(l) == CONS; l = CDR(l)) t2 = l;
+  for(; TYPEOF(l) == CONS; l = l->cdr()) t2 = l;
   return rplacd(t2, t);
 }
 
@@ -316,7 +316,7 @@ LISPT lispread(FILE* file, int line)
     curr = top;
   }
   else
-    curr = CAR(top);
+    curr = top->car();
 head:
   GETCH(file);
   if(isinsert(curc))
@@ -338,13 +338,13 @@ head:
   {
   head2:
     rplaca(curr, cons(C_NIL, C_NIL));
-    rplacd(CAR(curr), curr);
-    curr = CAR(curr);
+    rplacd(curr->car(), curr);
+    curr = curr->car();
     goto head;
   }
   else if(curc == ')')
   {
-    curr = CDR(curr);
+    curr = curr->cdr();
     rplaca(curr, C_NIL);
     goto check;
   }
@@ -354,26 +354,26 @@ head:
     curatom = ratom(file);
     rplaca(curr, curatom);
   check:
-    if(ISNIL(CDR(curr)))
+    if(ISNIL(curr->cdr()))
     {
-      temp = CAR(top);
+      temp = top->car();
       top = C_NIL;
       return temp;
     }
-    else if(line && eoln(file) && EQ(CDR(curr), top))
+    else if(line && eoln(file) && EQ(curr->cdr(), top))
       goto addparen;
     else
       goto tail;
   }
 tail:
-  if(line && eoln(file) && EQ(CDR(curr), top))
+  if(line && eoln(file) && EQ(curr->cdr(), top))
     goto addparen;
   GETCH(file);
   if(isinsert(curc))
   {
-    temp = CDR(curr);
+    temp = curr->cdr();
     rplacd(curr, cons(C_NIL, temp));
-    curr = CDR(curr);
+    curr = curr->cdr();
     pushr(top);
     rplaca(curr, (*currentrt.rmacros[curc])(file, curr, curc));
     popr(top);
@@ -395,16 +395,16 @@ tail:
   else if(curc == ')')
   {
   addparen:
-    temp = CDR(curr);
+    temp = curr->cdr();
     rplacd(curr, C_NIL);
     curr = temp;
     goto check;
   }
   else if(curc == '(')
   {
-    temp = CDR(curr);
+    temp = curr->cdr();
     rplacd(curr, cons(C_NIL, C_NIL));
-    curr = CDR(curr);
+    curr = curr->cdr();
     rplacd(curr, temp);
     goto head2;
   }
@@ -427,12 +427,12 @@ tail:
     if(isbrk(curc))
       ungetch(curc, file);
     curatom = ratom(file);
-    temp = CDR(curr);
+    temp = curr->cdr();
     GETCH(file);
     if(curc != ')')
     {
       rplacd(curr, cons(C_DOT, cons(C_NIL, temp)));
-      curr = CDR(CDR(curr));
+      curr = curr->cdr()->cdr();
       rplaca(curr, curatom);
       goto another;
     }
@@ -447,9 +447,9 @@ tail:
   atom:
     curatom = ratom(file);
   insert:
-    temp = CDR(curr);
+    temp = curr->cdr();
     rplacd(curr, cons(C_NIL, temp));
-    curr = CDR(curr);
+    curr = curr->cdr();
     rplaca(curr, curatom);
     goto tail;
   }
@@ -478,19 +478,19 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
     return C_EXCL;
   echoline = 1;
   LISPT tmp = histget(0L, history);
-  if(TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
-    tmp = CAR(tmp);
+  if(TYPEOF(tmp->car()) == CONS && ISNIL(tmp->cdr()))
+    tmp = tmp->car();
   switch(c)
   {
     case '!':
       return histget(0L, history);
       break;
     case '$':
-      while(TYPEOF(CDR(tmp)) == CONS) tmp = CDR(tmp);
+      while(TYPEOF(tmp->cdr()) == CONS) tmp = tmp->cdr();
       return tmp;
       break;
     case '*':
-      return CDR(tmp);
+      return tmp->cdr();
       break;
     case '\n':
       echoline = 0;
@@ -501,17 +501,17 @@ static LISPT rmexcl(FILE* file, LISPT _0, char _1)
       at = ratom(file);
       if(TYPEOF(at) == INTEGER)
       {
-        tmp = histget(INTVAL(at), history);
+        tmp = histget(at->intval(), history);
         return tmp;
       }
       if(TYPEOF(at) == SYMBOL)
       {
-        for(l = history; !ISNIL(l); l = CDR(l))
+        for(l = history; !ISNIL(l); l = l->cdr())
         {
           tmp = histget(0L, l);
-          if(!ISNIL(tmp) && TYPEOF(CAR(tmp)) == CONS && ISNIL(CDR(tmp)))
-            tmp = CAR(tmp);
-          if(!strncmp(GETSTR(CAR(tmp)), GETSTR(at), strlen(GETSTR(at))))
+          if(!ISNIL(tmp) && TYPEOF(tmp->car()) == CONS && ISNIL(tmp->cdr()))
+            tmp = tmp->car();
+          if(!strncmp(tmp->car()->getstr(), at->getstr(), strlen(at->getstr())))
             return histget(0L, l);
         }
         return C_NIL;
@@ -666,7 +666,7 @@ static void pf(double d, FILE* file)
 
 LISPT patom(LISPT x, FILE* file, int esc)
 {
-  ps(SYMVAL(x).pname, file, esc);
+  ps(x->symval().pname, file, esc);
   return x;
 }
 
@@ -682,13 +682,13 @@ LISPT prinbody(LISPT x, FILE* file, int esc)
 
   xx = x;
 nxtelt:
-  prin0(CAR(xx), file, esc);
-  if(EQ(CDR(xx), C_NIL))
+  prin0(xx->car(), file, esc);
+  if(EQ(xx->cdr(), C_NIL))
     ;
-  else if(TYPEOF(CDR(xx)) == CONS)
+  else if(TYPEOF(xx->cdr()) == CONS)
   {
     putch(' ', file, 0);
-    xx = CDR(xx);
+    xx = xx->cdr();
     goto nxtelt;
   }
   else
@@ -696,7 +696,7 @@ nxtelt:
     putch(' ', file, 0);
     putch('.', file, 0);
     putch(' ', file, 0);
-    prin0(CDR(xx), file, esc);
+    prin0(xx->cdr(), file, esc);
   }
   return x;
 }
@@ -721,7 +721,7 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       return patom(x, file, esc);
       break;
     case CPOINTER:
-      if(CPOINTVAL(x) != nullptr)
+      if(x->cpointval() != nullptr)
       {
         ps("#<pointer", file, 0);
         goto ppoint;
@@ -734,20 +734,20 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       putch('t', file, 0);
       break;
     case INTEGER:
-      pi(INTVAL(x), INTVAL(currentbase), file);
+      pi(x->intval(), currentbase->intval(), file);
       break;
     case FLOAT:
-      pf(FLOATVAL(x), file);
+      pf(x->floatval(), file);
       break;
     case STRING:
       if(esc)
       {
         putch('"', file, 0);
-        ps(STRINGVAL(x), file, esc);
+        ps(x->stringval(), file, esc);
         putch('"', file, 0);
       }
       else
-        ps(STRINGVAL(x), file, 0);
+        ps(x->stringval(), file, 0);
       break;
     case CLOSURE:
       ps("#<closure", file, 0);
@@ -786,13 +786,13 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       ps("#<error", file, 0);
     ppoint:
       ps(" ", file, 0);
-      pi((long)INTVAL(x), 16L, file);
+      pi((long)x->intval(), 16L, file);
       ps(">", file, 0);
       break;
     default:
       ps("#<illegal ", file, 0);
-      pi(TYPEOF(x), INTVAL(currentbase), file);
-      pi((long)INTVAL(x), 16L, file);
+      pi(TYPEOF(x), currentbase->intval(), file);
+      pi((long)x->intval(), 16L, file);
       ps(">", file, 0);
   }
   return x;

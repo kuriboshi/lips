@@ -241,7 +241,7 @@ static LISPT put_end(LISPT list, LISPT obj, int conc)
     else
       return cons(obj, C_NIL);
   else
-    for(t = list; TYPEOF(CDR(t)) == CONS; t = CDR(t))
+    for(t = list; TYPEOF(t->cdr()) == CONS; t = t->cdr())
       ;
   if(conc)
     rplacd(t, obj);
@@ -260,11 +260,11 @@ static LISPT transform(LISPT list)
   tl = C_NIL;
   res = C_NIL;
   conc = 0;
-  for(ll = list; TYPEOF(ll) == CONS; ll = CDR(ll))
+  for(ll = list; TYPEOF(ll) == CONS; ll = ll->cdr())
   {
-    if(TYPEOF(CAR(ll)) == CONS)
-      tl = put_end(tl, transform(CAR(ll)), conc);
-    else if(EQ(CAR(ll), C_BAR))
+    if(TYPEOF(ll->car()) == CONS)
+      tl = put_end(tl, transform(ll->car()), conc);
+    else if(EQ(ll->car(), C_BAR))
     {
       if(ISNIL(res))
         res = cons(C_PIPE, cons(tl, C_NIL));
@@ -273,7 +273,7 @@ static LISPT transform(LISPT list)
       tl = C_NIL;
       conc = 0;
     }
-    else if(EQ(CAR(ll), C_SEMI))
+    else if(EQ(ll->car(), C_SEMI))
     {
       if(ISNIL(res))
         res = cons(C_PROGN, cons(tl, C_NIL));
@@ -282,7 +282,7 @@ static LISPT transform(LISPT list)
       tl = C_NIL;
       conc = 0;
     }
-    else if(EQ(CAR(ll), C_GT))
+    else if(EQ(ll->car(), C_GT))
     {
       if(ISNIL(res))
         res = cons(C_TO, cons(tl, C_NIL));
@@ -291,7 +291,7 @@ static LISPT transform(LISPT list)
       tl = C_NIL;
       conc = 1;
     }
-    else if(EQ(CAR(ll), C_GGT))
+    else if(EQ(ll->car(), C_GGT))
     {
       if(ISNIL(res))
         res = cons(C_TOTO, cons(tl, C_NIL));
@@ -300,7 +300,7 @@ static LISPT transform(LISPT list)
       tl = C_NIL;
       conc = 1;
     }
-    else if(EQ(CAR(ll), C_LT))
+    else if(EQ(ll->car(), C_LT))
     {
       if(ISNIL(res))
         res = cons(C_FROM, cons(tl, C_NIL));
@@ -309,7 +309,7 @@ static LISPT transform(LISPT list)
       tl = C_NIL;
       conc = 1;
     }
-    else if(EQ(CAR(ll), C_AMPER))
+    else if(EQ(ll->car(), C_AMPER))
     {
       if(ISNIL(res))
         res = cons(C_BACK, cons(tl, C_NIL));
@@ -319,7 +319,7 @@ static LISPT transform(LISPT list)
       conc = 1;
     }
     else
-      tl = put_end(tl, CAR(ll), 0);
+      tl = put_end(tl, ll->car(), 0);
   }
   if(ISNIL(res))
     return tl;
@@ -366,12 +366,12 @@ LISPT greet(LISPT who)
 {
   struct passwd* pws;
   char loadf[256];
-  char* s;
+  const char* s;
 
   if(ISNIL(who))
     s = getenv("USER");
   else
-    s = STRINGVAL(who);
+    s = who->stringval();
   if(s == nullptr)
     return C_NIL;
   pws = getpwnam(s);

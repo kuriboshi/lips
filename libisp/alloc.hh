@@ -85,14 +85,14 @@ public:
 private:
   static conscells_t* newpage();
   static int sweep();
-  static void mark(LISPT*);
+  static void mark(LISPT);
   static LISPT doreclaim(int doconsargs, long incr);
   static int hash(const char* str);
   static LISPT buildatom(const char* s, int cpy);
   static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
 
-  static LISPT* foo1;                          // Protect arguments of cons when gc.
-  static LISPT* foo2;
+  static LISPT foo1;                           // Protect arguments of cons when gc.
+  static LISPT foo2;
   static int nrconses;                         // Number of conses since last gc.
   static conscells_t* conscells;               // Cons cell storage.
   static destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.

@@ -28,23 +28,23 @@ PRIMITIVE plus(LISPT l)
   {
     if(f)
     {
-      if(TYPEOF(CAR(l)) == INTEGER)
-        fsum += (double)INTVAL(CAR(l));
-      else if(TYPEOF(CAR(l)) == FLOAT)
-        fsum += FLOATVAL(CAR(l));
+      if(TYPEOF(l->car()) == INTEGER)
+        fsum += (double)l->car()->intval();
+      else if(TYPEOF(l->car()) == FLOAT)
+        fsum += l->car()->floatval();
       else
-        return error(ILLEGAL_ARG, CAR(l));
+        return error(ILLEGAL_ARG, l->car());
     }
-    else if(TYPEOF(CAR(l)) == INTEGER)
-      sum += INTVAL(CAR(l));
-    else if(TYPEOF(CAR(l)) == FLOAT)
+    else if(TYPEOF(l->car()) == INTEGER)
+      sum += l->car()->intval();
+    else if(TYPEOF(l->car()) == FLOAT)
     {
       f = 1;
-      fsum = FLOATVAL(CAR(l)) + (double)sum;
+      fsum = l->car()->floatval() + (double)sum;
     }
     else
-      return error(ILLEGAL_ARG, CAR(l));
-    l = CDR(l);
+      return error(ILLEGAL_ARG, l->car());
+    l = l->cdr();
   }
   if(f)
     return mkfloat(fsum);
@@ -57,21 +57,21 @@ PRIMITIVE iplus(LISPT l)
   for(auto i = lisp::begin(l); i != lisp::end(l); ++i)
   {
     CHECK(*i, INTEGER);
-    sum += INTVAL(*i);
+    sum += (**i).intval();
   }
   return mknumber(sum);
 }
 
 PRIMITIVE fplus(LISPT l)
 {
-  CHECK(CAR(l), FLOAT);
-  auto sum = FLOATVAL(CAR(l));
-  l = CDR(l);
+  CHECK(l->car(), FLOAT);
+  auto sum = l->car()->floatval();
+  l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(CAR(l), FLOAT);
-    sum = sum + FLOATVAL(CAR(l));
-    l = CDR(l);
+    CHECK(l->car(), FLOAT);
+    sum = sum + l->car()->floatval();
+    l = l->cdr();
   }
   return mkfloat(sum);
 }
@@ -82,26 +82,26 @@ PRIMITIVE difference(LISPT a, LISPT b)
   CHECK2(b, INTEGER, FLOAT);
   if(TYPEOF(a) == INTEGER)
     if(TYPEOF(b) == INTEGER)
-      return mknumber(INTVAL(a) - INTVAL(b));
+      return mknumber(a->intval() - b->intval());
     else
-      return mkfloat((double)INTVAL(a) - FLOATVAL(b));
+      return mkfloat((double)a->intval() - b->floatval());
   else if(TYPEOF(b) == INTEGER)
-    return mkfloat(FLOATVAL(a) - (double)INTVAL(b));
-  return mkfloat(FLOATVAL(a) - FLOATVAL(b));
+    return mkfloat(a->floatval() - (double)b->intval());
+  return mkfloat(a->floatval() - b->floatval());
 }
 
 PRIMITIVE idifference(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
-  return mknumber(INTVAL(a) - INTVAL(b));
+  return mknumber(a->intval() - b->intval());
 }
 
 PRIMITIVE fdifference(LISPT a, LISPT b)
 {
   CHECK(a, FLOAT);
   CHECK(b, FLOAT);
-  return mkfloat(FLOATVAL(a) - FLOATVAL(b));
+  return mkfloat(a->floatval() - b->floatval());
 }
 
 PRIMITIVE ltimes(LISPT l)
@@ -114,23 +114,23 @@ PRIMITIVE ltimes(LISPT l)
   {
     if(f)
     {
-      if(TYPEOF(CAR(l)) == INTEGER)
-        fprod *= (double)INTVAL(CAR(l));
-      else if(TYPEOF(CAR(l)) == FLOAT)
-        fprod *= FLOATVAL(CAR(l));
+      if(TYPEOF(l->car()) == INTEGER)
+        fprod *= (double)l->car()->intval();
+      else if(TYPEOF(l->car()) == FLOAT)
+        fprod *= l->car()->floatval();
       else
-        return error(ILLEGAL_ARG, CAR(l));
+        return error(ILLEGAL_ARG, l->car());
     }
-    else if(TYPEOF(CAR(l)) == INTEGER)
-      prod *= INTVAL(CAR(l));
-    else if(TYPEOF(CAR(l)) == FLOAT)
+    else if(TYPEOF(l->car()) == INTEGER)
+      prod *= l->car()->intval();
+    else if(TYPEOF(l->car()) == FLOAT)
     {
       f = 1;
-      fprod = FLOATVAL(CAR(l)) * (double)prod;
+      fprod = l->car()->floatval() * (double)prod;
     }
     else
-      return error(ILLEGAL_ARG, CAR(l));
-    l = CDR(l);
+      return error(ILLEGAL_ARG, l->car());
+    l = l->cdr();
   }
   if(f)
     return mkfloat(fprod);
@@ -139,28 +139,28 @@ PRIMITIVE ltimes(LISPT l)
 
 PRIMITIVE itimes(LISPT l)
 {
-  CHECK(CAR(l), INTEGER);
-  auto prod = INTVAL(CAR(l));
-  l = CDR(l);
+  CHECK(l->car(), INTEGER);
+  auto prod = l->car()->intval();
+  l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(CAR(l), INTEGER);
-    prod = prod * INTVAL(CAR(l));
-    l = CDR(l);
+    CHECK(l->car(), INTEGER);
+    prod = prod * l->car()->intval();
+    l = l->cdr();
   }
   return mknumber(prod);
 }
 
 PRIMITIVE ftimes(LISPT l)
 {
-  CHECK(CAR(l), FLOAT);
-  auto prod = FLOATVAL(CAR(l));
-  l = CDR(l);
+  CHECK(l->car(), FLOAT);
+  auto prod = l->car()->floatval();
+  l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(CAR(l), FLOAT);
-    prod = prod * FLOATVAL(CAR(l));
-    l = CDR(l);
+    CHECK(l->car(), FLOAT);
+    prod = prod * l->car()->floatval();
+    l = l->cdr();
   }
   return mkfloat(prod);
 }
@@ -171,13 +171,13 @@ PRIMITIVE divide(LISPT a, LISPT b)
   CHECK2(b, INTEGER, FLOAT);
   if(TYPEOF(a) == INTEGER)
     if(TYPEOF(b) == INTEGER)
-      return mknumber(INTVAL(a) / INTVAL(b));
+      return mknumber(a->intval() / b->intval());
     else
-      return mkfloat((double)INTVAL(a) / FLOATVAL(b));
+      return mkfloat((double)a->intval() / b->floatval());
   else if(TYPEOF(b) == INTEGER)
-    return mkfloat(FLOATVAL(a) / (double)INTVAL(b));
+    return mkfloat(a->floatval() / (double)b->intval());
   else
-    return mkfloat(FLOATVAL(a) / FLOATVAL(b));
+    return mkfloat(a->floatval() / b->floatval());
   /*NOTREACHED*/
 }
 
@@ -185,42 +185,42 @@ PRIMITIVE iquotient(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
-  if(INTVAL(b) == 0)
+  if(b->intval() == 0)
     return error(DIVIDE_ZERO, C_NIL);
-  return mknumber(INTVAL(a) / INTVAL(b));
+  return mknumber(a->intval() / b->intval());
 }
 
 PRIMITIVE iremainder(LISPT a, LISPT b)
 {
   CHECK(a, INTEGER);
   CHECK(b, INTEGER);
-  if(INTVAL(b) == 0)
+  if(b->intval() == 0)
     return error(DIVIDE_ZERO, C_NIL);
-  return mknumber(INTVAL(a) % INTVAL(b));
+  return mknumber(a->intval() % b->intval());
 }
 
 PRIMITIVE fdivide(LISPT a, LISPT b)
 {
   CHECK(a, FLOAT);
   CHECK(b, FLOAT);
-  if(FLOATVAL(b) == 0.0)
+  if(b->floatval() == 0.0)
     return error(DIVIDE_ZERO, C_NIL);
-  return mkfloat(FLOATVAL(a) / FLOATVAL(b));
+  return mkfloat(a->floatval() / b->floatval());
 }
 
 PRIMITIVE minus(LISPT a)
 {
   CHECK2(a, FLOAT, INTEGER);
   if(TYPEOF(a) == INTEGER)
-    return mknumber(-INTVAL(a));
+    return mknumber(-a->intval());
   else
-    return mkfloat(-FLOATVAL(a));
+    return mkfloat(-a->floatval());
 }
 
 PRIMITIVE iminus(LISPT a)
 {
   CHECK(a, INTEGER);
-  return mknumber(-INTVAL(a));
+  return mknumber(-a->intval());
 }
 
 PRIMITIVE absval(LISPT i)
@@ -228,29 +228,29 @@ PRIMITIVE absval(LISPT i)
   int sign;
 
   CHECK(i, INTEGER);
-  if(INTVAL(i) < 0)
+  if(i->intval() < 0)
     sign = -1;
   else
     sign = 1;
-  return mknumber(INTVAL(i) * sign);
+  return mknumber(i->intval() * sign);
 }
 
 PRIMITIVE itof(LISPT i)
 {
   CHECK(i, INTEGER);
-  return mkfloat((double)INTVAL(i));
+  return mkfloat((double)i->intval());
 }
 
 PRIMITIVE add1(LISPT a)
 {
   CHECK(a, INTEGER);
-  return mknumber(INTVAL(a) + 1);
+  return mknumber(a->intval() + 1);
 }
 
 PRIMITIVE sub1(LISPT a)
 {
   CHECK(a, INTEGER);
-  return mknumber(INTVAL(a) - 1);
+  return mknumber(a->intval() - 1);
 }
 
 #define FLOATFLOAT 0 /* Both arguments are float */
@@ -282,13 +282,13 @@ PRIMITIVE sub1(LISPT a)
   switch(NUMTYPE(x, y)) \
   { \
     case FLOATFLOAT: \
-      DOCHECK(FLOATVAL(x), FLOATVAL(y), cmp); \
+      DOCHECK(x->floatval(), y->floatval(), cmp); \
     case FLOATINT: \
-      DOCHECK(FLOATVAL(x), (double)INTVAL(y), cmp); \
+      DOCHECK(x->floatval(), (double)y->intval(), cmp); \
     case INTFLOAT: \
-      DOCHECK((double)INTVAL(x), FLOATVAL(y), cmp); \
+      DOCHECK((double)x->intval(), y->floatval(), cmp); \
     case INTINT: \
-      DOCHECK(INTVAL(x), INTVAL(y), cmp); \
+      DOCHECK(x->intval(), y->intval(), cmp); \
     case ILLEGAL1: \
       ILLEGALRETURN(x); \
     case ILLEGAL2: \
@@ -329,7 +329,7 @@ PRIMITIVE neqp(LISPT x, LISPT y)
 
 PRIMITIVE zerop(LISPT x)
 {
-  if(TYPEOF(x) == INTEGER && INTVAL(x) == 0)
+  if(TYPEOF(x) == INTEGER && x->intval() == 0)
     return C_T;
   return C_NIL;
 }
@@ -338,14 +338,14 @@ PRIMITIVE minusp(LISPT x)
 {
   if(TYPEOF(x) == FLOAT)
   {
-    if(FLOATVAL(x) < 0.0)
+    if(x->floatval() < 0.0)
       return C_T;
     else
       return C_NIL;
   }
   else if(TYPEOF(x) == INTEGER)
   {
-    if(INTVAL(x) < 0)
+    if(x->intval() < 0)
       return C_T;
     else
       return C_NIL;

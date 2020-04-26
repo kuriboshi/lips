@@ -100,13 +100,17 @@ typedef struct
 
 struct lisp_t
 {
+  lisp_t() { gcmark = false; type = NIL; }
+  ~lisp_t() {}
+  lisp_t(const lisp_t&) = delete;
+
   bool gcmark = false;
   enum lisp_type type;
   union
   {
     // One entry for each type.  Types that has no, or just one value are
     // indicated by a comment.
-    /* NIL */
+    // NIL
     SYMBOLT l_symbol;
     int l_integer;
     int* l_bignum;
@@ -117,18 +121,47 @@ struct lisp_t
     SUBRT l_subr;
     LAMBDAT l_lambda;
     CLOSURET l_closure;
-    /* UNBOUND */
+    // UNBOUND
     // alloc::destblock_t* l_environ;
     FILE* l_filet;
-    /* TRUE */
+    // TRUE
     LISPT l_free;
-    /* ENDOFFILE */
-    /* ERROR */
-    /* HASHTAB */
+    // ENDOFFILE
+    // ERROR
+    // HASHTAB
     LISPT* l_cvariable;
     void* l_cpointer;
-    /* USER */
+    // USER
   } u;
+  SYMBOLT& symval() { return u.l_symbol; }
+  LISPT& freeval() { return u.l_free; }
+  LISPT* cvarval() { return u.l_cvariable; }
+  void cvarval(LISPT* x) { u.l_cvariable = x; }
+  LISPT& indirectval() { return u.l_indirect; }
+  LISPT car() { return u.l_cons.car; }
+  LISPT cdr() { return u.l_cons.cdr; }
+  void car(LISPT x) { u.l_cons.car = x; }
+  void cdr(LISPT x) { u.l_cons.cdr = x; }
+  LAMBDAT& lamval() { return u.l_lambda; }
+  CLOSURET& closval() { return u.l_closure; }
+  SUBRT& subrval() { return u.l_subr; }
+  LISPT symvalue() { return u.l_symbol.value; }
+  void symvalue(LISPT x) { symval().value = x; }
+  const char* stringval() { return u.l_string; }
+  void stringval(char* s) { u.l_string = s; type = STRING; }
+  int intval() { return u.l_integer; }
+  void intval(int x) { u.l_integer = x; type = INTEGER; }
+  double floatval() { return u.l_float; }
+  void floatval(double f) { u.l_float = f; type = FLOAT; }
+  CONST& CONSVAL() { return u.l_cons; }
+  FILE* fileval() { return u.l_filet; }
+  void fileval(FILE* f) { u.l_filet = f; }
+  void* cpointval() { return u.l_cpointer; }
+  LISPT& FREEVAL() { return u.l_free; }
+  void setq(LISPT y) { u.l_symbol.value = y; }
+  void setopval(LISPT y) { setq(y); }
+  LISPT getopval() { return symvalue(); }
+  const char* getstr() { return type == STRING ? stringval() : symval().pname; }
 };
 
 /*
@@ -140,36 +173,15 @@ inline bool MARKED(LISPT a) { return a->gcmark; }
 inline void MARK(LISPT a) { a->gcmark = true; }
 inline void UNMARK(LISPT a) { a->gcmark = false; }
 
-inline char*& STRINGVAL(LISPT s) { return s->u.l_string; }
-inline int& INTVAL(LISPT i) { return i->u.l_integer; }
-inline SYMBOLT& SYMVAL(LISPT s) { return s->u.l_symbol; }
-inline CONST& CONSVAL(LISPT c) { return c->u.l_cons; }
-inline SUBRT& SUBRVAL(LISPT s) { return s->u.l_subr; }
-inline LAMBDAT& LAMVAL(LISPT l) { return l->u.l_lambda; }
-inline CLOSURET& CLOSVAL(LISPT c) { return c->u.l_closure; }
-inline double& FLOATVAL(LISPT f) { return f->u.l_float; }
-inline FILE*& FILEVAL(LISPT f) { return f->u.l_filet; }
-inline LISPT& INDIRECTVAL(LISPT i) { return i->u.l_indirect; }
-inline LISPT*& CVARVAL(LISPT v) { return v->u.l_cvariable; }
-inline void*& CPOINTVAL(LISPT c) { return c->u.l_cpointer; }
-inline LISPT& FREEVAL(LISPT f) { return f->u.l_free; }
+inline bool EQ(LISPT x, LISPT y) { return x == y; }
 
 #if 0
-inline alloc::destblock_t*& ENVVAL(LISPT e) { return e->u.l_environ; }
+inline alloc::destblock_t* ENVVAL(LISPT e) { return e->u.l_environ; }
 #endif
 
 inline void SET(LISPT& a, lisp_type t, LISPT p) { a = p; a->type = t; UNMARK(a); }
 
 inline bool IST(LISPT x) { return TYPEOF(x) == TRUE; }
-inline bool ISNIL(LISPT x) { return x == nullptr || TYPEOF(x) == NIL; }
-
-inline LISPT& CAR(LISPT x) { return CONSVAL(x).car; }
-inline LISPT& CDR(LISPT x) { return CONSVAL(x).cdr; }
-inline bool EQ(LISPT x, LISPT y) { return x == y; }
-inline void SETQ(LISPT x, LISPT y) { SYMVAL(x).value = y; }
-inline LISPT& SYMVALUE(LISPT x) { return SYMVAL(x).value; }
-inline void SETOPVAL(LISPT x, LISPT y) { SETQ(x, y); }
-inline LISPT GETOPVAL(LISPT x) { return SYMVAL(x).value; }
-inline const char* GETSTR(LISPT s) { return TYPEOF(s) == STRING ? STRINGVAL(s) : SYMVAL(s).pname; }
+inline bool ISNIL(LISPT x) { return TYPEOF(x) == NIL; }
 
 }

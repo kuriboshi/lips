@@ -23,29 +23,29 @@ static LISPT mkprim_(const char* pname, short nrpar, lisp_type type)
 {
   LISPT s = getobject();
   LISPT f = intern(pname);
-  SUBRVAL(s).argcount = nrpar;
-  SET(SYMVAL(f).value, type, s);
+  s->subrval().argcount = nrpar;
+  SET(f->symval().value, type, s);
   return s;
 }
 
 void mkprim(const char* pname, LISPT (*fname)(void), short nrpar, lisp_type type)
 {
-  SUBRVAL(mkprim_(pname, nrpar, type)).function0 = fname;
+  mkprim_(pname, nrpar, type)->subrval().function0 = fname;
 }
 
 void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
 {
-  SUBRVAL(mkprim_(pname, nrpar, type)).function1 = fname;
+  mkprim_(pname, nrpar, type)->subrval().function1 = fname;
 }
 
 void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
 {
-  SUBRVAL(mkprim_(pname, nrpar, type)).function2 = fname;
+  mkprim_(pname, nrpar, type)->subrval().function2 = fname;
 }
 
 void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
 {
-  SUBRVAL(mkprim_(pname, nrpar, type)).function3 = fname;
+  mkprim_(pname, nrpar, type)->subrval().function3 = fname;
 }
 
 /* 
@@ -56,10 +56,10 @@ LISPT nth(LISPT list, long n)
 {
   LISPT l;
 
-  for(l = list; n > 1 && !ISNIL(l); n--, l = CDR(l))
+  for(l = list; n > 1 && !ISNIL(l); n--, l = l->cdr())
     ;
   if(!ISNIL(l))
-    return CAR(l);
+    return l->car();
   else
     return C_NIL;
 }
@@ -96,8 +96,8 @@ LISPT closobj(LISPT vars)
   if(ISNIL(vars))
     return C_NIL;
   CHECK(vars, CONS);
-  CHECK(CAR(vars), SYMBOL);
-  return cons(mkindirect(SYMVAL(CAR(vars)).value), closobj(CDR(vars)));
+  CHECK(vars->car(), SYMBOL);
+  return cons(mkindirect(vars->car()->symval().value), closobj(vars->cdr()));
 }
 
 /* 
@@ -112,7 +112,7 @@ static LISPT mkarglis(LISPT alist)
   if(TYPEOF(alist) == CONS)
   {
     count++;
-    return cons(CAR(alist), mkarglis(CDR(alist)));
+    return cons(alist->car(), mkarglis(alist->cdr()));
   }
   else if(EQ(alist, C_NIL))
     return C_NIL;
@@ -132,10 +132,10 @@ LISPT mklambda(LISPT args, LISPT def, lisp_type type)
   SAVE(args);
   SAVE(def);
   LISPT s = getobject();
-  LAMVAL(s).lambdarep = def;
+  s->lamval().lambdarep = def;
   count = 0;
-  LAMVAL(s).arglist = mkarglis(args);
-  LAMVAL(s).argcnt = count;
+  s->lamval().arglist = mkarglis(args);
+  s->lamval().argcnt = count;
   LISPT t = nullptr;
   SET(t, type, s);
   UNSAVE(def);
@@ -146,112 +146,112 @@ LISPT mklambda(LISPT args, LISPT def, lisp_type type)
 PRIMITIVE car(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return CAR(a);
+    return a->car();
   return C_NIL;
 }
 
 PRIMITIVE cdr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return CDR(a);
+    return a->cdr();
   return C_NIL;
 }
 
 PRIMITIVE cadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(CDR(a));
+    return car(a->cdr());
   return C_NIL;
 }
 
 PRIMITIVE cdar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(CAR(a));
+    return cdr(a->car());
   return C_NIL;
 }
 
 PRIMITIVE caar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(CAR(a));
+    return car(a->car());
   return C_NIL;
 }
 
 PRIMITIVE cddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(CDR(a));
+    return cdr(a->cdr());
   return C_NIL;
 }
 
 PRIMITIVE cdddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(cdr(CDR(a)));
+    return cdr(cdr(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE caddr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(cdr(CDR(a)));
+    return car(cdr(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE cdadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(car(CDR(a)));
+    return cdr(car(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE caadr(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(car(CDR(a)));
+    return car(car(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE cddar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(cdr(CAR(a)));
+    return cdr(cdr(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE cadar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(cdr(CAR(a)));
+    return car(cdr(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE cdaar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return cdr(car(CAR(a)));
+    return cdr(car(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE caaar(LISPT a)
 {
   if(TYPEOF(a) == CONS)
-    return car(car(CAR(a)));
+    return car(car(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE rplaca(LISPT x, LISPT y)
 {
   CHECK(x, CONS);
-  CAR(x) = y;
+  x->car(y);
   return x;
 }
 
 PRIMITIVE rplacd(LISPT x, LISPT y)
 {
   CHECK(x, CONS);
-  CDR(x) = y;
+  x->cdr(y);
   return x;
 }
 
@@ -275,19 +275,19 @@ PRIMITIVE nconc(LISPT l)
 
   LISPT newl = C_NIL;
   LISPT curp = newl;
-  for(; !ISNIL(l); l = CDR(l))
+  for(; !ISNIL(l); l = l->cdr())
   {
-    if(!ISNIL(CAR(l)))
+    if(!ISNIL(l->car()))
     {
-      CHECK(CAR(l), CONS);
+      CHECK(l->car(), CONS);
       if(ISNIL(curp))
       {
-        curp = CAR(l);
+        curp = l->car();
         newl = curp;
       }
       else
-        rplacd(curp, CAR(l));
-      for(cl = CAR(l); !ISNIL(CDR(cl)); cl = CDR(cl))
+        rplacd(curp, l->car());
+      for(cl = l->car(); !ISNIL(cl->cdr()); cl = cl->cdr())
         ;
       curp = cl;
     }
@@ -300,16 +300,16 @@ PRIMITIVE tconc(LISPT cell, LISPT obj)
   if(ISNIL(cell))
   {
     cell = cons(cons(obj, C_NIL), C_NIL);
-    return rplacd(cell, CAR(cell));
+    return rplacd(cell, cell->car());
   }
   CHECK(cell, CONS);
-  if(TYPEOF(CAR(cell)) != CONS)
+  if(TYPEOF(cell->car()) != CONS)
   {
     rplacd(cell, cons(obj, C_NIL));
-    return rplaca(cell, CDR(cell));
+    return rplaca(cell, cell->cdr());
   }
-  rplacd(CDR(cell), cons(obj, C_NIL));
-  return rplacd(cell, CDR(CDR(cell)));
+  rplacd(cell->cdr(), cons(obj, C_NIL));
+  return rplacd(cell, cell->cdr()->cdr());
 }
 
 PRIMITIVE attach(LISPT obj, LISPT list)
@@ -317,7 +317,7 @@ PRIMITIVE attach(LISPT obj, LISPT list)
   if(ISNIL(list))
     return cons(obj, C_NIL);
   CHECK(list, CONS);
-  rplacd(list, cons(CAR(list), CDR(list)));
+  rplacd(list, cons(list->car(), list->cdr()));
   return rplaca(list, obj);
 }
 
@@ -328,20 +328,20 @@ PRIMITIVE append(LISPT l)
   LISPT newl = cons(C_NIL, C_NIL);
   SAVE(newl);
   LISPT curp = newl;
-  for(; !ISNIL(l); l = CDR(l))
+  for(; !ISNIL(l); l = l->cdr())
   {
-    if(!ISNIL(CAR(l)))
+    if(!ISNIL(l->car()))
     {
-      CHECK(CAR(l), CONS);
-      for(cl = CAR(l); !ISNIL(cl); cl = CDR(cl))
+      CHECK(l->car(), CONS);
+      for(cl = l->car(); !ISNIL(cl); cl = cl->cdr())
       {
-        rplacd(curp, cons(CAR(cl), C_NIL));
-        curp = CDR(curp);
+        rplacd(curp, cons(cl->car(), C_NIL));
+        curp = curp->cdr();
       }
     }
   }
   UNSAVE(newl);
-  return CDR(newl);
+  return newl->cdr();
 }
 
 PRIMITIVE null(LISPT a)
@@ -376,7 +376,7 @@ PRIMITIVE length(LISPT l)
   int i = 0;
   while(!ISNIL(l) && TYPEOF(l) == CONS)
   {
-    l = CDR(l);
+    l = l->cdr();
     i++;
   }
   return mknumber((long)i);
@@ -387,14 +387,14 @@ PRIMITIVE closure(LISPT fun, LISPT vars)
   SAVE(fun);
   SAVE(vars);
   LISPT c = getobject();
-  CLOSVAL(c).cfunction = fun;
-  CLOSVAL(c).closed = vars;
+  c->closval().cfunction = fun;
+  c->closval().closed = vars;
   LISPT f = length(vars);
-  CLOSVAL(c).count = INTVAL(f);
+  c->closval().count = f->intval();
   f = closobj(vars);
   if(TYPEOF(f) == ERROR)
     return f;
-  CLOSVAL(c).cvalues = f;
+  c->closval().cvalues = f;
   LISPT clos = nullptr;
   SET(clos, CLOSURE, c);
   return clos;
@@ -406,18 +406,18 @@ PRIMITIVE xnth(LISPT l, LISPT p)
   if(ISNIL(l))
     return C_NIL;
   CHECK(l, CONS);
-  return nth(l, INTVAL(p));
+  return nth(l, p->intval());
 }
 
 PRIMITIVE nthd(LISPT list, LISPT pos)
 {
   CHECK(pos, INTEGER);
-  int p = INTVAL(pos);
+  int p = pos->intval();
   if(ISNIL(list))
     return C_NIL;
   CHECK(list, CONS);
   LISPT l;
-  for(l = list; TYPEOF(l) == CONS && p > 1; l = CDR(l)) p--;
+  for(l = list; TYPEOF(l) == CONS && p > 1; l = l->cdr()) p--;
   return l;
 }
 
@@ -432,7 +432,7 @@ PRIMITIVE uxexit(LISPT status)
   if(ISNIL(status))
     finish(0);
   CHECK(status, INTEGER);
-  finish((int)INTVAL(status));
+  finish((int)status->intval());
   return C_NIL;
 }
 

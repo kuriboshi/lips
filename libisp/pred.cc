@@ -40,9 +40,9 @@ PRIMITIVE memb(LISPT x, LISPT l)
 {
   while(!EQ(l, C_NIL))
   {
-    if(EQ(x, CAR(l)))
+    if(EQ(x, l->car()))
       return l;
-    l = CDR(l);
+    l = l->cdr();
   }
   return C_NIL;
 }
@@ -60,25 +60,25 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
     case CONS:
       while(!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
       {
-        x = equal(CAR(l1), CAR(l2));
+        x = equal(l1->car(), l2->car());
         if(EQ(x, C_T))
         {
-          l1 = CDR(l1);
-          l2 = CDR(l2);
+          l1 = l1->cdr();
+          l2 = l2->cdr();
         }
         else
           return C_NIL;
       }
       return x;
     case STRING:
-      return (!strcmp(STRINGVAL(l1), STRINGVAL(l2))) ? C_T : C_NIL;
+      return (!strcmp(l1->stringval(), l2->stringval())) ? C_T : C_NIL;
       break;
     case LAMBDA:
     case NLAMBDA:
       return funeq(l1, l2);
       break;
     case INTEGER:
-      return (INTVAL(l1) == INTVAL(l2) ? C_T : C_NIL);
+      return (l1->intval() == l2->intval() ? C_T : C_NIL);
       break;
     default:
       break;
@@ -106,7 +106,7 @@ PRIMITIVE boundp(LISPT a)
 {
   if(TYPEOF(a) != SYMBOL)
     return C_NIL;
-  else if(TYPEOF(SYMVAL(a).value) != UNBOUND)
+  else if(TYPEOF(a->symval().value) != UNBOUND)
     return C_T;
   else
     return C_NIL;

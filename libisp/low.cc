@@ -20,12 +20,12 @@ PRIMITIVE set(LISPT var, LISPT val)
   CHECK(var, SYMBOL);
   if(EQ(var, CE_NIL) || EQ(var, CE_T))
     return error(ATTEMPT_TO_RESET, var);
-  if(TYPEOF(SYMVAL(var).value) == INDIRECT)
-    INDIRECTVAL(SYMVAL(var).value) = val;
-  else if(TYPEOF(SYMVAL(var).value) == CVARIABLE)
-    *CVARVAL(SYMVAL(var).value) = val;
+  if(TYPEOF(var->symval().value) == INDIRECT)
+    var->symval().value->indirectval() = val;
+  else if(TYPEOF(var->symval().value) == CVARIABLE)
+    *var->symval().value->cvarval() = val;
   else
-    SYMVAL(var).value = val;
+    var->symval().value = val;
   return val;
 }
 
@@ -38,12 +38,12 @@ PRIMITIVE progn(LISPT lexp)
 {
   if(ISNIL(lexp))
     return C_NIL;
-  while(!ISNIL(CDR(lexp)))
+  while(!ISNIL(lexp->cdr()))
   {
-    eval(CAR(lexp));
-    lexp = CDR(lexp);
+    eval(lexp->car());
+    lexp = lexp->cdr();
   }
-  return eval(CAR(lexp));
+  return eval(lexp->car());
 }
 
 PRIMITIVE cond(LISPT args)
@@ -53,17 +53,17 @@ PRIMITIVE cond(LISPT args)
     return C_NIL;
   while(ISNIL(res))
   {
-    LISPT alt = CAR(args);
+    LISPT alt = args->car();
     CHECK(alt, CONS);
-    res = eval(CAR(alt));
+    res = eval(alt->car());
     if(!ISNIL(res))
     {
-      if(ISNIL(CDR(alt)))
+      if(ISNIL(alt->cdr()))
         return res;
       else
-        return progn(CDR(alt));
+        return progn(alt->cdr());
     }
-    args = CDR(args);
+    args = args->cdr();
     if(ISNIL(args))
       break;
   }

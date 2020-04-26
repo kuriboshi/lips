@@ -50,8 +50,8 @@ LISPT version;     /* Is set to the version string. */
 void initcvar(LISPT* cvar, const char* name, LISPT val)
 {
   LISPT t = intern(name);
-  SET(SYMVAL(t).value, CVARIABLE, getobject());
-  CVARVAL(SYMVAL(t).value) = cvar;
+  SET(t->symval().value, CVARIABLE, getobject());
+  t->symval().value->cvarval(cvar);
   *cvar = val;
 }
 
@@ -113,8 +113,8 @@ void init_lisp()
 
   C_ERROR->type = ERROR;
   SET(C_EOF, ENDOFFILE, getobject());
-  SETQ(CE_NIL, C_NIL);
-  SETQ(CE_T, C_T);
+  CE_NIL->setq(C_NIL);
+  CE_T->setq(C_T);
 
   initcvar(&topprompt, "prompt", mkstring("!_"));
   initcvar(&promptform, "promptform", C_NIL);

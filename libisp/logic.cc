@@ -14,10 +14,10 @@ PRIMITIVE p_and(LISPT l)
   LISPT foo = C_T;
   while(!ISNIL(l))
   {
-    foo = eval(CAR(l));
+    foo = eval(l->car());
     if(ISNIL(foo))
       return foo;
-    l = CDR(l);
+    l = l->cdr();
   }
   return foo;
 }
@@ -27,10 +27,10 @@ PRIMITIVE p_or(LISPT l)
   LISPT foo = C_NIL;
   while(!ISNIL(l))
   {
-    foo = eval(CAR(l));
+    foo = eval(l->car());
     if(!ISNIL(foo))
       return foo;
-    l = CDR(l);
+    l = l->cdr();
   }
   return foo;
 }

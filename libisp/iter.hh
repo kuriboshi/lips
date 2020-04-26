@@ -20,7 +20,7 @@ public:
   iterator& operator++()
   {
     if(TYPEOF(_car) == CONS)
-      _car = CDR(_car);
+      _car = _car->cdr();
     else
       _car = nullptr;
     return *this;
@@ -31,7 +31,7 @@ public:
     ++(*this);
     return tmp;
   }
-  LISPT operator*() const { return CAR(_car); }
+  LISPT operator*() const { return _car->car(); }
 
 private:
   LISPT _car;

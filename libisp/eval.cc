@@ -42,11 +42,11 @@ LISPT evaluator::printwhere()
       for(; i; i--)
       {
         if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0 && control[i - 1].type == CTRL_LISP
-          && (TYPEOF(control[i - 1].u.lisp) == CONS && TYPEOF(CAR(control[i - 1].u.lisp)) != CONS))
+          && (TYPEOF(control[i - 1].u.lisp) == CONS && TYPEOF(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
           fprintf(primerr, " [in ");
-          prin2(CAR(foo), C_T);
+          prin2(foo->car(), C_T);
           pputc(']', primerr);
           goto out;
         }
@@ -188,22 +188,22 @@ LISPT evaluator::call(LISPT fun)
 {
   LISPT foo = C_NIL;
 
-  switch(SUBRVAL(fun).argcount)
+  switch(fun->subrval().argcount)
   {
     case 0:
-      foo = (*(SUBRVAL(fun).function0))();
+      foo = (*(fun->subrval().function0))();
       break;
     case 1:
     case -1:
-      foo = (*(SUBRVAL(fun).function1))(dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function1))(dest[1].val.d_lisp);
       break;
     case 2:
     case -2:
-      foo = (*(SUBRVAL(fun).function2))(dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function2))(dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
     case -3:
-      foo = (*(SUBRVAL(fun).function3))(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function3))(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
@@ -314,9 +314,9 @@ bool evaluator::peval()
   {
     case CONS:
       push_lisp(fun);
-      fun = CAR(expression);
+      fun = expression->car();
       push_lisp(args);
-      args = CDR(expression);
+      args = expression->cdr();
       push_func(ev1);
       cont = peval1;
       break;
@@ -324,11 +324,11 @@ bool evaluator::peval()
       cont = lookup;
       break;
     case INDIRECT:
-      send(INDIRECTVAL(expression));
+      send(expression->indirectval());
       cont = pop_func();
       break;
     case CVARIABLE:
-      send(*CVARVAL(expression));
+      send(*expression->cvarval());
       cont = pop_func();
       break;
     case FREE:
@@ -378,7 +378,7 @@ void evaluator::do_unbound(continuation_t continuation)
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
-  LISPT al = getprop(CAR(expression), C_AUTOLOAD);
+  LISPT al = getprop(expression->car(), C_AUTOLOAD);
   if(!ISNIL(al))
   {
     push_lisp(expression);
@@ -386,11 +386,11 @@ void evaluator::do_unbound(continuation_t continuation)
     load(al);
     dest = pop_point();
     expression = pop_lisp();
-    fun = SYMVALUE(CAR(expression));
+    fun = expression->car()->symvalue();
     if(TYPEOF(fun) == UNBOUND)
     {
       if(!evalhook(expression))
-        xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
+        xbreak(UNDEF_FUNCTION, expression->car(), continuation);
     }
     else
       cont = continuation;
@@ -400,15 +400,15 @@ void evaluator::do_unbound(continuation_t continuation)
     expression = findalias(expression);
     if(EQ(expression, C_ERROR))
       abort(NO_MESSAGE, C_NIL);
-    if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
+    if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL && TYPEOF(expression->car()->symvalue()) == UNBOUND)
     {
       if(!evalhook(expression))
-        xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
+        xbreak(UNDEF_FUNCTION, expression->car(), continuation);
     }
     else
     {
-      fun = CAR(expression);
-      args = CDR(expression);
+      fun = expression->car();
+      args = expression->cdr();
       cont = continuation;
     }
   }
@@ -419,10 +419,10 @@ bool evaluator::do_default(continuation_t continuation)
   expression = findalias(expression);
   if(EQ(expression, C_ERROR))
     abort(NO_MESSAGE, C_NIL);
-  if(TYPEOF(expression) == CONS && TYPEOF(CAR(expression)) == SYMBOL && TYPEOF(SYMVALUE(CAR(expression))) == UNBOUND)
+  if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL && TYPEOF(expression->car()->symvalue()) == UNBOUND)
   {
     if(!evalhook(expression))
-      xbreak(UNDEF_FUNCTION, CAR(expression), continuation);
+      xbreak(UNDEF_FUNCTION, expression->car(), continuation);
     return true;
   }
   else
@@ -447,7 +447,7 @@ bool evaluator::peval1()
       case SUBR:
         push_point(dest);
         push_func(ev2);
-        if((foo = SUBRVAL(fun).argcount) < 0)
+        if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
           push_func(noevarg);
@@ -463,7 +463,7 @@ bool evaluator::peval1()
       case FSUBR:
         push_point(dest);
         push_func(ev2);
-        if((foo = SUBRVAL(fun).argcount) < 0)
+        if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
           cont = spread;
@@ -490,7 +490,7 @@ bool evaluator::peval1()
         cont = peval;
         break;
       case SYMBOL:
-        fun = SYMVALUE(fun);
+        fun = fun->symvalue();
         cont = peval1;
         break;
       case UNBOUND:
@@ -525,7 +525,7 @@ bool evaluator::peval2()
       case FSUBR:
         push_point(dest);
         push_func(ev2);
-        if((foo = SUBRVAL(fun).argcount) < 0)
+        if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
           cont = spread;
@@ -549,7 +549,7 @@ bool evaluator::peval2()
         cont = peval;
         break;
       case SYMBOL:
-        fun = SYMVALUE(fun);
+        fun = fun->symvalue();
         cont = peval2;
         break;
       case UNBOUND:
@@ -606,7 +606,7 @@ bool evaluator::evalargs()
   }
   else
   {
-    expression = CAR(args);
+    expression = args->car();
     if(noeval)
       cont = noev9;
     else
@@ -617,7 +617,7 @@ bool evaluator::evalargs()
 
 bool evaluator::ev9()
 {
-  if(ISNIL(CDR(args)))
+  if(ISNIL(args->cdr()))
   {
     cont = peval;
   }
@@ -632,8 +632,8 @@ bool evaluator::ev9()
 bool evaluator::ev11()
 {
   next();
-  args = CDR(args);
-  expression = CAR(args);
+  args = args->cdr();
+  expression = args->car();
   cont = ev9;
   return false;
 }
@@ -641,7 +641,7 @@ bool evaluator::ev11()
 bool evaluator::noev9()
 {
 nextarg:
-  if(ISNIL(CDR(args)))
+  if(ISNIL(args->cdr()))
   {
     send(expression);
     cont = pop_func();
@@ -650,8 +650,8 @@ nextarg:
   {
     send(expression);
     next();
-    args = CDR(args);
-    expression = CAR(args);
+    args = args->cdr();
+    expression = args->car();
     goto nextarg;
   }
   return false;
@@ -665,7 +665,7 @@ bool evaluator::evlis()
   }
   else
   {
-    expression = CAR(args);
+    expression = args->car();
     cont = evlis1;
   }
   return false;
@@ -673,7 +673,7 @@ bool evaluator::evlis()
 
 bool evaluator::evlis1()
 {
-  if(ISNIL(CDR(args)))
+  if(ISNIL(args->cdr()))
   {
     push_func(evlis2);
     cont = peval;
@@ -699,8 +699,8 @@ bool evaluator::evlis3()
   push_point(dest);
   dest = mkdestblock(1);
   push_func(evlis4);
-  args = CDR(args);
-  expression = CAR(args);
+  args = args->cdr();
+  expression = args->car();
   cont = evlis1;
   return false;
 }
@@ -726,13 +726,13 @@ bool evaluator::evlam()
   push_point(env);
   push_point(dest);
   int spr = 0;
-  if((ac = LAMVAL(fun).argcnt) < 0)
+  if((ac = fun->lamval().argcnt) < 0)
   {
     ac = -ac;
     spr++;
   }
   dest = mkdestblock(ac);
-  for(foo = LAMVAL(fun).arglist, i = ac; i; foo = CDR(foo), i--) storevar(CAR(foo), i);
+  for(foo = fun->lamval().arglist, i = ac; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
   push_func(evlam1);
   if(spr)
   {
@@ -763,9 +763,9 @@ respread:
   }
   else
   {
-    send(CAR(args));
+    send(args->car());
     next();
-    args = CDR(args);
+    args = args->cdr();
     goto respread;
   }
   return false;
@@ -782,7 +782,7 @@ bool evaluator::ev2()
     if (ISNIL(foo))
       xbreak(0, C_NIL, peval1);
     else
-      xbreak(0, CAR(foo), peval1); /* CAR(_) broken */
+      xbreak(0, foo->car(), peval1); /* CAR(_) broken */
   }
   else
   {
@@ -821,8 +821,8 @@ void evaluator::link()
   env = dest;
   for(auto i = dest[0].val.d_integer; i > 0; i--)
   {
-    LISPT t = SYMVALUE(dest[i].var.d_lisp);
-    SYMVALUE(dest[i].var.d_lisp) = dest[i].val.d_lisp;
+    LISPT t = dest[i].var.d_lisp->symvalue();
+    dest[i].var.d_lisp->symvalue(dest[i].val.d_lisp);
     dest[i].val.d_lisp = t;
   }
 }
@@ -831,7 +831,7 @@ bool evaluator::evlam1()
 {
   link();
   dest = pop_point();
-  args = LAMVAL(fun).lambdarep;
+  args = fun->lamval().lambdarep;
   push_func(evlam0);
   cont = evsequence;
   return false;
@@ -840,7 +840,7 @@ bool evaluator::evlam1()
 void evaluator::restore_env()
 {
   auto* c = env;
-  for(auto i = c[0].val.d_integer; i > 0; i--) SYMVALUE(c[i].var.d_lisp) = c[i].val.d_lisp;
+  for(auto i = c[0].val.d_integer; i > 0; i--) c[i].var.d_lisp->symvalue(c[i].val.d_lisp);
 }
 
 bool evaluator::evlam0()
@@ -863,7 +863,7 @@ void evaluator::unwind()
 
 bool evaluator::lookup()
 {
-  LISPT t = SYMVALUE(expression);
+  LISPT t = expression->symvalue();
   switch(TYPEOF(t))
   {
     case UNBOUND:
@@ -871,10 +871,10 @@ bool evaluator::lookup()
       return false;
       break;
     case INDIRECT:
-      send(INDIRECTVAL(t));
+      send(t->indirectval());
       break;
     case CVARIABLE:
-      send(*CVARVAL(t));
+      send(*t->cvarval());
       break;
     default:
       send(t);
@@ -891,14 +891,14 @@ bool evaluator::evclosure()
 
   push_point(env);
   push_point(dest);
-  dest = mkdestblock(CLOSVAL(fun).count);
-  for(foo = CLOSVAL(fun).closed, i = CLOSVAL(fun).count; i; foo = CDR(foo), i--) storevar(CAR(foo), i);
-  for(foo = CLOSVAL(fun).cvalues; !ISNIL(foo); foo = CDR(foo))
+  dest = mkdestblock(fun->closval().count);
+  for(foo = fun->closval().closed, i = fun->closval().count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(foo = fun->closval().cvalues; !ISNIL(foo); foo = foo->cdr())
   {
-    send(CAR(foo));
+    send(foo->car());
     next();
   }
-  fun = CLOSVAL(fun).cfunction;
+  fun = fun->closval().cfunction;
   link();
   dest = pop_point();
   auto envir = pop_point();
@@ -924,7 +924,7 @@ bool evaluator::evsequence()
   }
   else
   {
-    expression = CAR(args);
+    expression = args->car();
     cont = evseq1;
   }
   return false;
@@ -932,7 +932,7 @@ bool evaluator::evsequence()
 
 bool evaluator::evseq1()
 {
-  if(EQ(CDR(args), C_NIL))
+  if(EQ(args->cdr(), C_NIL))
   {
     cont = peval;
   }
@@ -946,8 +946,8 @@ bool evaluator::evseq1()
 
 bool evaluator::evseq3()
 {
-  args = CDR(args);
-  expression = CAR(args);
+  args = args->cdr();
+  expression = args->car();
   cont = evseq1;
   return false;
 }

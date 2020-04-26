@@ -12,10 +12,10 @@ namespace lisp {
 
 static LISPT getargs(LISPT al)
 {
-  if(ISNIL(CDR(al)))
-    return CAR(al);
+  if(ISNIL(al->cdr()))
+    return al->car();
   else
-    return cons(CAR(al), getargs(CDR(al)));
+    return cons(al->car(), getargs(al->cdr()));
 }
 
 PRIMITIVE getrep(LISPT fun)
@@ -24,32 +24,31 @@ PRIMITIVE getrep(LISPT fun)
 
   if(TYPEOF(fun) != LAMBDA && TYPEOF(fun) != NLAMBDA)
     return C_NIL;
-  auto* x = &LAMVAL(fun);
-  if(x->argcnt == -1)
-    args = CAR(x->arglist);
-  else if(x->argcnt < 0)
-    args = getargs(x->arglist);
+  auto& x = fun->lamval();
+  if(x.argcnt == -1)
+    args = x.arglist->car();
+  else if(x.argcnt < 0)
+    args = getargs(x.arglist);
   else
-    args = x->arglist;
+    args = x.arglist;
   if(TYPEOF(fun) == LAMBDA)
-    return cons(C_LAMBDA, cons(args, x->lambdarep));
-  else
-    return cons(C_NLAMBDA, cons(args, x->lambdarep));
+    return cons(C_LAMBDA, cons(args, x.lambdarep));
+  return cons(C_NLAMBDA, cons(args, x.lambdarep));
 }
 
 LISPT funeq(LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
     return C_T;
-  if(LAMVAL(f1).argcnt == LAMVAL(f2).argcnt)
+  if(f1->lamval().argcnt == f2->lamval().argcnt)
   {
-    LISPT t1 = LAMVAL(f1).arglist;
-    LISPT t2 = LAMVAL(f2).arglist;
+    LISPT t1 = f1->lamval().arglist;
+    LISPT t2 = f2->lamval().arglist;
     LISPT tmp = equal(t1, t2);
     if(!ISNIL(tmp))
     {
-      t1 = LAMVAL(f1).lambdarep;
-      t2 = LAMVAL(f2).lambdarep;
+      t1 = f1->lamval().lambdarep;
+      t2 = f2->lamval().lambdarep;
       tmp = equal(t1, t2);
       if(!ISNIL(tmp))
         return C_T;
@@ -60,13 +59,13 @@ LISPT funeq(LISPT f1, LISPT f2)
 
 static LISPT checkfn(LISPT name, LISPT lam)
 {
-  if(TYPEOF(GETOPVAL(name)) != UNBOUND)
-    if(TYPEOF(GETOPVAL(name)) == LAMBDA || TYPEOF(GETOPVAL(name)) == NLAMBDA)
+  if(TYPEOF(name->getopval()) != UNBOUND)
+    if(TYPEOF(name->getopval()) == LAMBDA || TYPEOF(name->getopval()) == NLAMBDA)
     {
-      LISPT t = funeq(GETOPVAL(name), lam);
+      LISPT t = funeq(name->getopval(), lam);
       if(ISNIL(t))
       {
-        putprop(name, C_OLDDEF, GETOPVAL(name));
+        putprop(name, C_OLDDEF, name->getopval());
         if(!ISNIL(verboseflg))
           xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
       }
@@ -79,7 +78,7 @@ PRIMITIVE define(LISPT name, LISPT lam)
   CHECK(name, SYMBOL);
   CHECK2(lam, LAMBDA, NLAMBDA);
   checkfn(name, lam);
-  SETOPVAL(name, lam);
+  name->setopval(lam);
   return name;
 }
 
@@ -92,7 +91,7 @@ static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
   if(TYPEOF(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);
-  SETOPVAL(name, foo);
+  name->setopval(foo);
   return cons(name, C_NIL);
 }
 

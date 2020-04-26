@@ -27,32 +27,32 @@ PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
   CHECK(name, STRING);
   CHECK(mode, INTEGER);
-  return mknumber((long)access(STRINGVAL(name), (int)INTVAL(mode)));
+  return mknumber((long)access(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxalarm(LISPT seconds)
 {
   CHECK(seconds, INTEGER);
-  return mknumber((long)alarm(INTVAL(seconds)));
+  return mknumber((long)alarm(seconds->intval()));
 }
 
 PRIMITIVE uxchdir(LISPT dirname)
 {
   CHECK(dirname, STRING);
-  return mknumber((long)chdir(STRINGVAL(dirname)));
+  return mknumber((long)chdir(dirname->stringval()));
 }
 
 PRIMITIVE uxchmod(LISPT name, LISPT mode)
 {
   CHECK(name, STRING);
   CHECK(mode, INTEGER);
-  return mknumber((long)chmod(STRINGVAL(name), (int)INTVAL(mode)));
+  return mknumber((long)chmod(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxclose(LISPT fildes)
 {
   CHECK(fildes, FILET);
-  if(fclose(FILEVAL(fildes)) == -1)
+  if(fclose(fildes->fileval()) == -1)
     return C_NIL;
   else
     return C_T;
@@ -64,7 +64,7 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 
   CHECK(name, STRING);
   CHECK(mode, INTEGER);
-  i = creat(STRINGVAL(name), (int)INTVAL(mode));
+  i = creat(name->stringval(), (int)mode->intval());
   if(i < 0)
     return C_NIL;
   else
@@ -74,7 +74,7 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 PRIMITIVE uxdup(LISPT fildes)
 {
   CHECK(fildes, INTEGER);
-  return mknumber((long)dup((int)INTVAL(fildes)));
+  return mknumber((long)dup((int)fildes->intval()));
 }
 
 PRIMITIVE uxgetuid()
@@ -106,20 +106,20 @@ PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
   CHECK(pid, INTEGER);
   CHECK(sig, INTEGER);
-  return mknumber((long)kill((int)INTVAL(pid), (int)INTVAL(sig)));
+  return mknumber((long)kill((int)pid->intval(), (int)sig->intval()));
 }
 
 PRIMITIVE uxlink(LISPT name1, LISPT name2)
 {
   CHECK(name1, STRING);
   CHECK(name2, STRING);
-  return mknumber((long)link(STRINGVAL(name1), STRINGVAL(name2)));
+  return mknumber((long)link(name1->stringval(), name2->stringval()));
 }
 
 PRIMITIVE uxnice(LISPT incr)
 {
   CHECK(incr, INTEGER);
-  return mknumber((long)nice((int)INTVAL(incr)));
+  return mknumber((long)nice((int)incr->intval()));
 }
 
 PRIMITIVE uxopen(LISPT name, LISPT mode)
@@ -141,25 +141,25 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
     else
       return error(UNKNOWN_REQUEST, mode);
   }
-  auto* f = fopen(STRINGVAL(name), openmode);
+  auto* f = fopen(name->stringval(), openmode);
   if(!f)
     return error(CANT_OPEN, name);
   LISPT newfile = nullptr;
   SET(newfile, FILET, getobject());
-  FILEVAL(newfile) = f;
+  newfile->fileval(f);
   return newfile;
 }
 
 PRIMITIVE uxsetuid(LISPT uid)
 {
   CHECK(uid, INTEGER);
-  return mknumber((long)setuid((int)INTVAL(uid)));
+  return mknumber((long)setuid((int)uid->intval()));
 }
 
 PRIMITIVE uxsetgid(LISPT gid)
 {
   CHECK(gid, INTEGER);
-  return mknumber((long)setgid((int)INTVAL(gid)));
+  return mknumber((long)setgid((int)gid->intval()));
 }
 
 /*ARGSUSED*/
@@ -172,22 +172,22 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 {
   CHECK(sig, INTEGER);
 
-  if(INTVAL(sig) >= NSIG || INTVAL(sig) < 1)
+  if(sig->intval() >= NSIG || sig->intval() < 1)
     return error(ILLEGAL_SIGNAL, sig);
   if(ISNIL(fun))
   {
-    signal((int)INTVAL(sig), SIG_IGN);
-    sighandler[INTVAL(sig)] = C_NIL;
+    signal((int)sig->intval(), SIG_IGN);
+    sighandler[sig->intval()] = C_NIL;
   }
   else if(IST(fun))
   {
-    signal((int)INTVAL(sig), SIG_DFL);
-    sighandler[INTVAL(sig)] = C_NIL;
+    signal((int)sig->intval(), SIG_DFL);
+    sighandler[sig->intval()] = C_NIL;
   }
   else
   {
-    sighandler[INTVAL(sig)] = fun;
-    signal((int)INTVAL(sig), sighandle);
+    sighandler[sig->intval()] = fun;
+    signal((int)sig->intval(), sighandle);
   }
   return C_T;
 }
@@ -195,7 +195,7 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 PRIMITIVE uxunlink(LISPT name)
 {
   CHECK(name, STRING);
-  return mknumber((long)unlink(STRINGVAL(name)));
+  return mknumber((long)unlink(name->stringval()));
 }
 
 void init_unix()

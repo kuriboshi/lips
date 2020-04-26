@@ -12,27 +12,27 @@ namespace lisp {
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
   CHECK(a, SYMBOL);
-  SYMVAL(a).plist = pl;
+  a->symval().plist = pl;
   return pl;
 }
 
 PRIMITIVE getplist(LISPT a)
 {
   CHECK(a, SYMBOL);
-  return SYMVAL(a).plist;
+  return a->symval().plist;
 }
 
 PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 {
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
-  for(auto pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
-    if(EQ(CAR(pl), p))
+  for(auto pl = a->symval().plist; !ISNIL(pl); pl = pl->cdr()->cdr())
+    if(EQ(pl->car(), p))
     {
-      rplaca(CDR(pl), v);
+      rplaca(pl->cdr(), v);
       return v;
     }
-  SYMVAL(a).plist = cons(p, cons(v, SYMVAL(a).plist));
+  a->symval().plist = cons(p, cons(v, a->symval().plist));
   return v;
 }
 
@@ -40,10 +40,10 @@ PRIMITIVE getprop(LISPT a, LISPT p)
 {
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
-  for(auto pl = SYMVAL(a).plist; !ISNIL(pl); pl = CDR(CDR(pl)))
+  for(auto pl = a->symval().plist; !ISNIL(pl); pl = pl->cdr()->cdr())
   {
-    if(EQ(CAR(pl), p))
-      return CAR(CDR(pl));
+    if(EQ(pl->car(), p))
+      return pl->cdr()->car();
   }
   return C_NIL;
 }
@@ -55,17 +55,17 @@ PRIMITIVE remprop(LISPT a, LISPT p)
   CHECK(a, SYMBOL);
   CHECK(p, SYMBOL);
   LISPT r = C_NIL;
-  for(pl = SYMVAL(a).plist, pl2 = C_NIL; !ISNIL(pl); pl = CDR(CDR(pl)))
+  for(pl = a->symval().plist, pl2 = C_NIL; !ISNIL(pl); pl = pl->cdr()->cdr())
   {
-    if(EQ(CAR(pl), p))
+    if(EQ(pl->car(), p))
     {
-      r = CAR(CDR(pl));
+      r = pl->cdr()->car();
       if(ISNIL(pl2))
-        SYMVAL(a).plist = CDR(CDR(pl));
+        a->symval().plist = pl->cdr()->cdr();
       else
-        rplacd(pl2, CDR(CDR(pl)));
+        rplacd(pl2, pl->cdr()->cdr());
     }
-    pl2 = CDR(pl);
+    pl2 = pl->cdr();
   }
   return r;
 }

@@ -293,12 +293,12 @@ static char** makeexec(LISPT command)
     *t = nullptr;
   }
   sigprocmask(SIG_SETMASK, &old_mask, nullptr);
-  for(i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = CDR(com))
+  for(i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = com->cdr())
   {
   again:
-    if(TYPEOF(CAR(com)) == SYMBOL)
+    if(TYPEOF(com->car()) == SYMBOL)
     {
-      char* c = strsave(extilde(GETSTR(CAR(com)), 1));
+      char* c = strsave(extilde(com->car()->getstr(), 1));
       if(c == nullptr)
         return nullptr;
       if(!checkmeta(c))
@@ -309,7 +309,7 @@ static char** makeexec(LISPT command)
           ok = 1;
         if(i == 0)
         {
-          error(AMBIGUOUS, CAR(com));
+          error(AMBIGUOUS, com->car());
           return nullptr;
         }
         files = expandfiles(c, 0, 0, 1);
@@ -317,33 +317,33 @@ static char** makeexec(LISPT command)
           ok = 2;
         while(TYPEOF(files) == CONS)
         {
-          args[i++] = strsave(GETSTR(CAR(files)));
-          files = CDR(files);
+          args[i++] = strsave(files->car()->getstr());
+          files = files->cdr();
         }
       }
     }
-    else if(TYPEOF(CAR(com)) == INTEGER)
-      args[i++] = strsave(ltoa(INTVAL(CAR(com))));
-    else if(TYPEOF(CAR(com)) == STRING)
+    else if(TYPEOF(com->car()) == INTEGER)
+      args[i++] = strsave(ltoa(com->car()->intval()));
+    else if(TYPEOF(com->car()) == STRING)
     {
-      if((args[i++] = strsave(GETSTR(CAR(com)))) == nullptr)
+      if((args[i++] = strsave(com->car()->getstr())) == nullptr)
         return nullptr;
     }
-    else if(TYPEOF(CAR(com)) == CONS)
+    else if(TYPEOF(com->car()) == CONS)
     {
-      rplaca(com, eval(CAR(com)));
+      rplaca(com, eval(com->car()));
       goto again;
     }
     else
     {
-      error(ILLEGAL_ARG, CAR(com));
+      error(ILLEGAL_ARG, com->car());
       return nullptr;
     }
   }
   args[i] = nullptr;
   if(ok == 1)
   {
-    error(NO_MATCH, CDR(command));
+    error(NO_MATCH, command->cdr());
     return nullptr;
   }
   return args;
@@ -473,7 +473,7 @@ int execcommand(LISPT exp, LISPT* res)
   BITS32 i, possible;
 
   *res = C_T;
-  command = extilde(GETSTR(CAR(exp)), 1);
+  command = extilde(exp->car()->getstr(), 1);
   if(command == nullptr)
     return -1;
   if(*command == '/' || strpbrk(command, "/") != nullptr)
@@ -487,16 +487,16 @@ int execcommand(LISPT exp, LISPT* res)
   i = hashfun(command);
   possible = exechash[i / 32] & (1 << (i % 32));
 
-  for(cdir = path; TYPEOF(cdir) == CONS; cdir = CDR(cdir))
+  for(cdir = path; TYPEOF(cdir) == CONS; cdir = cdir->cdr())
   {
-    if(ISNIL(CAR(cdir)) || strcmp(GETSTR(CAR(cdir)), ".") == 0)
+    if(ISNIL(cdir->car()) || strcmp(cdir->car()->getstr(), ".") == 0)
       strcpy(comdir, ".");
     else if(possible)
     {
       /* This isn't really necessary, is it? */
-      if(TYPEOF(CAR(cdir)) != STRING && TYPEOF(CAR(cdir)) != SYMBOL)
+      if(TYPEOF(cdir->car()) != STRING && TYPEOF(cdir->car()) != SYMBOL)
         return -1;
-      strcpy(comdir, GETSTR(CAR(cdir)));
+      strcpy(comdir, cdir->car()->getstr());
     }
     else
       continue;
@@ -549,9 +549,9 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
   else
   {
     CHECK(filed, INTEGER);
-    oldfd = INTVAL(filed);
+    oldfd = filed->intval();
   }
-  if((fd = creat(GETSTR(file), 0644)) == -1)
+  if((fd = creat(file->getstr(), 0644)) == -1)
     return syserr(file);
   if((pid = mfork()) == 0)
   {
@@ -583,9 +583,9 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
   else
   {
     CHECK(filed, INTEGER);
-    oldfd = INTVAL(filed);
+    oldfd = filed->intval();
   }
-  if((fd = open(GETSTR(file), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+  if((fd = open(file->getstr(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
     return syserr(file);
   if((pid = mfork()) == 0)
   {
@@ -617,9 +617,9 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
   else
   {
     CHECK(filed, INTEGER);
-    oldfd = INTVAL(filed);
+    oldfd = filed->intval();
   }
-  if((fd = open(GETSTR(file), O_RDONLY)) == -1)
+  if((fd = open(file->getstr(), O_RDONLY)) == -1)
     return syserr(file);
   if((pid = mfork()) == 0)
   {
@@ -646,8 +646,8 @@ PRIMITIVE pipecmd(LISPT cmds)
 
   if(ISNIL(cmds))
     return C_NIL;
-  if(ISNIL(CDR(cmds)))
-    return eval(CAR(cmds));
+  if(ISNIL(cmds->cdr()))
+    return eval(cmds->car());
   if((pid = mfork()) == 0)
   {
     pipe(pd);
@@ -659,19 +659,19 @@ PRIMITIVE pipecmd(LISPT cmds)
         fprintf(stderr, "%s\n", strerror(errno));
         exit(1);
       }
-      eval(CAR(cmds));
+      eval(cmds->car());
       exit(0);
     }
     else if(pid < 0)
       exit(1);
-    cmds = CDR(cmds);
+    cmds = cmds->cdr();
     close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
       fprintf(stderr, "%s\n", strerror(errno));
       exit(1);
     }
-    eval(CAR(cmds));
+    eval(cmds->car());
     status = waitfork(pid);
     exit(0);
   }
@@ -715,14 +715,14 @@ PRIMITIVE rehash()
   LISPT p;
 
   for(i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
-  for(p = path; TYPEOF(p) == CONS; p = CDR(p))
+  for(p = path; TYPEOF(p) == CONS; p = p->cdr())
   {
-    if(ISNIL(CAR(p)))
+    if(ISNIL(p->car()))
       continue;
     else
     {
-      CHECK2(CAR(p), STRING, SYMBOL);
-      sdir = GETSTR(CAR(p));
+      CHECK2(p->car(), STRING, SYMBOL);
+      sdir = p->car()->getstr();
     }
     if((odir = opendir(sdir)) == nullptr)
       continue;
@@ -759,7 +759,7 @@ PRIMITIVE fg(LISPT job)
   {
     CHECK(job, INTEGER);
     for(j = joblist; j; j = j->next)
-      if(j->jobnum == INTVAL(job))
+      if(j->jobnum == job->intval())
         break;
   }
   if(j)
@@ -795,7 +795,7 @@ PRIMITIVE bg(LISPT job)
   {
     CHECK(job, INTEGER);
     for(j = joblist; j; j = j->next)
-      if(j->jobnum == INTVAL(job))
+      if(j->jobnum == job->intval())
         break;
   }
   if(j)
@@ -819,7 +819,7 @@ PRIMITIVE p_setenv(LISPT var, LISPT val)
 {
   CHECK2(var, STRING, SYMBOL);
   CHECK2(val, STRING, SYMBOL);
-  setenviron(GETSTR(var), GETSTR(val));
+  setenviron(var->getstr(), val->getstr());
   return var;
 }
 
@@ -828,7 +828,7 @@ PRIMITIVE getenviron(LISPT var)
   char* s;
 
   CHECK2(var, STRING, SYMBOL);
-  s = getenv(GETSTR(var));
+  s = getenv(var->getstr());
   if(s == nullptr)
     return C_NIL;
   else
@@ -845,7 +845,7 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
   {
     ndir = glob(dir);
     if(TYPEOF(ndir) == CONS)
-      ndir = CAR(ndir);
+      ndir = ndir->car();
   }
   if(ISNIL(ndir))
   {
@@ -854,7 +854,7 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
     else
       return C_NIL;
   }
-  if(chdir(GETSTR(ndir)) == -1)
+  if(chdir(ndir->getstr()) == -1)
   {
     if(ISNIL(emess))
       return syserr(dir);

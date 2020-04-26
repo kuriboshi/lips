@@ -15,7 +15,7 @@ PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
   {
     apply(fn1, cons(obj, C_NIL));
     if(ISNIL(fn2))
-      obj = CDR(obj);
+      obj = obj->cdr();
     else
       obj = apply(fn2, obj);
   }
@@ -26,9 +26,9 @@ PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(TYPEOF(obj) == CONS)
   {
-    apply(fn1, cons(CAR(obj), C_NIL));
+    apply(fn1, cons(obj->car(), C_NIL));
     if(ISNIL(fn2))
-      obj = CDR(obj);
+      obj = obj->cdr();
     else
       apply(fn2, cons(obj, C_NIL));
   }
@@ -41,16 +41,16 @@ PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
   if(TYPEOF(obj) == CONS)
   {
     tmp = cons(apply(fn1, cons(obj, C_NIL)), C_NIL);
-    obj = CDR(obj);
+    obj = obj->cdr();
   }
   LISPT rval = tmp;
   SAVE(rval);
   while(TYPEOF(obj) == CONS)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj, C_NIL)), C_NIL));
-    tmp = CDR(tmp);
+    tmp = tmp->cdr();
     if(ISNIL(fn2))
-      obj = CDR(obj);
+      obj = obj->cdr();
     else
       obj = apply(fn2, cons(obj, C_NIL));
   }
@@ -63,17 +63,17 @@ PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   LISPT tmp = C_NIL;
   if(TYPEOF(obj) == CONS)
   {
-    tmp = cons(apply(fn1, cons(CAR(obj), C_NIL)), C_NIL);
-    obj = CDR(obj);
+    tmp = cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL);
+    obj = obj->cdr();
   }
   LISPT rval = tmp;
   SAVE(rval);
   while(TYPEOF(obj) == CONS)
   {
-    rplacd(tmp, cons(apply(fn1, cons(CAR(obj), C_NIL)), C_NIL));
-    tmp = CDR(tmp);
+    rplacd(tmp, cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL));
+    tmp = tmp->cdr();
     if(ISNIL(fn2))
-      obj = CDR(obj);
+      obj = obj->cdr();
     else
       apply(fn2, cons(obj, C_NIL));
   }
