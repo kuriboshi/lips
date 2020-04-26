@@ -7,8 +7,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 PRIMITIVE p_and(LISPT l)
 {
   LISPT foo = C_T;
@@ -58,4 +58,4 @@ void init_logic()
   mkprim(PN_IF, xif, -3, FSUBR);
 }
 
-}
+} // namespace lisp

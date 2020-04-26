@@ -15,8 +15,8 @@ FILE* primin;
 FILE* primout;
 FILE* primerr;
 
-namespace lisp {
-
+namespace lisp
+{
 PRIMITIVE xratom(LISPT file)
 {
   if(ISNIL(file))
@@ -261,4 +261,4 @@ void init_file()
   primerr = stderr;
 }
 
-}
+} // namespace lisp

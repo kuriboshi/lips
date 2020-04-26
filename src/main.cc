@@ -164,20 +164,14 @@ void onill(int)
   core(SIGILL);
 }
 
-void onhup()
-{
-  exit(0);
-}
+void onhup() { exit(0); }
 #endif
 
 /*
  * The stop key means to break inside a lisp expression. The
  * brkflg is checked on every entry to eval.
  */
-void onstop(int)
-{
-  brkflg = 1;
-}
+void onstop(int) { brkflg = 1; }
 
 static void fixpgrp()
 {

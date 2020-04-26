@@ -7,8 +7,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 struct rtinfo
 {
   unsigned char chclass[128];
@@ -34,30 +34,12 @@ enum char_class
   RMACRO = 014  // read macro mask
 };
 
-inline bool issepr(int c)
-{
-  return (currentrt.chclass[c] & SEPR) == SEPR;
-}
-inline bool isbrk(int c)
-{
-  return (currentrt.chclass[c] & BRK) == BRK;
-}
-inline bool isrm(int c)
-{
-  return (currentrt.chclass[c] & RMACRO) == RMACRO;
-}
-inline bool isinsert(int c)
-{
-  return (currentrt.chclass[c] & RMACRO) == INSERT;
-}
-inline bool issplice(int c)
-{
-  return (currentrt.chclass[c] & RMACRO) == SPLICE;
-}
-inline bool isinfix(int c)
-{
-  return (currentrt.chclass[c] & RMACRO) == INFIX;
-}
+inline bool issepr(int c) { return (currentrt.chclass[c] & SEPR) == SEPR; }
+inline bool isbrk(int c) { return (currentrt.chclass[c] & BRK) == BRK; }
+inline bool isrm(int c) { return (currentrt.chclass[c] & RMACRO) == RMACRO; }
+inline bool isinsert(int c) { return (currentrt.chclass[c] & RMACRO) == INSERT; }
+inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; }
+inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
 
 extern LISPT ratom(FILE*);
 extern LISPT lispread(FILE*, int);
@@ -68,4 +50,4 @@ extern LISPT prinbody(LISPT, FILE*, int);
 extern LISPT prin0(LISPT, FILE*, int);
 extern LISPT print(LISPT, FILE*);
 
-}
+} // namespace lisp

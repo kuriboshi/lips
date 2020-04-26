@@ -9,8 +9,8 @@
 
 extern void finish(int);
 
-namespace lisp {
-
+namespace lisp
+{
 static int count;
 
 /*
@@ -351,25 +351,13 @@ PRIMITIVE null(LISPT a)
   return C_NIL;
 }
 
-PRIMITIVE quote(LISPT a)
-{
-  return a;
-}
+PRIMITIVE quote(LISPT a) { return a; }
 
-PRIMITIVE lambda(LISPT a, LISPT f)
-{
-  return mklambda(a, f, LAMBDA);
-}
+PRIMITIVE lambda(LISPT a, LISPT f) { return mklambda(a, f, LAMBDA); }
 
-PRIMITIVE nlambda(LISPT a, LISPT f)
-{
-  return mklambda(a, f, NLAMBDA);
-}
+PRIMITIVE nlambda(LISPT a, LISPT f) { return mklambda(a, f, NLAMBDA); }
 
-PRIMITIVE list(LISPT l)
-{
-  return l;
-}
+PRIMITIVE list(LISPT l) { return l; }
 
 PRIMITIVE length(LISPT l)
 {
@@ -473,4 +461,4 @@ void init_prim()
   mkprim(PN_NTHD, nthd, 2, SUBR);
 }
 
-}
+} // namespace lisp

@@ -12,8 +12,8 @@ extern FILE* primin;
 extern FILE* primout;
 extern FILE* primerr;
 
-namespace lisp {
-
+namespace lisp
+{
 extern LISPT xratom(LISPT);
 extern LISPT readc(LISPT);
 extern LISPT xread(LISPT);
@@ -29,4 +29,4 @@ extern LISPT cpprint(LISPT, LISPT);
 
 extern int loadfile(const char*);
 
-}
+} // namespace lisp

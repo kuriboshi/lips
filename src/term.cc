@@ -74,10 +74,7 @@ static int nocap = 0; /* Nonzero if insufficient term cap. */
 
 int lips_getline(FILE*);
 
-void cleanup(int)
-{
-  finish(0);
-}
+void cleanup(int) { finish(0); }
 
 void clearlbuf()
 {
@@ -157,10 +154,7 @@ void init_term()
 }
 
 /* Reset terminal to previous value */
-void end_term()
-{
-  tcsetattr(0, TCSANOW, &oldterm);
-}
+void end_term() { tcsetattr(0, TCSANOW, &oldterm); }
 
 /*
  * Put a character on stdout prefixing it with a ^ if it's

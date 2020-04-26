@@ -8,8 +8,8 @@
 #include <cstdio>
 #include <unistd.h>
 
-namespace lisp {
-
+namespace lisp
+{
 /*
  * Read a characters from a terminal.  Returns 0 if
  * no character was read.  The character is returned in
@@ -23,4 +23,4 @@ int readchar(FILE* file, char* cp)
   return 1;
 }
 
-}
+} // namespace lisp

@@ -9,7 +9,6 @@
 
 namespace lisp
 {
-
 const char* VERSION = "libisp 0.3(130), 2020-04-06";
 
 }

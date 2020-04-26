@@ -7,8 +7,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 /* variables */
 extern LISPT currentbase;
 extern LISPT topprompt;
@@ -21,4 +21,4 @@ extern LISPT version;
 extern void init_lisp(void);
 extern void initcvar(LISPT*, const char*, LISPT);
 
-}
+} // namespace lisp

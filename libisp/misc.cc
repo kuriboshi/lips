@@ -20,8 +20,8 @@ static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "No
   "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
   "Not an ERROR", "Not a hash table"};
 
-namespace lisp {
-
+namespace lisp
+{
 int trace;
 
 PRIMITIVE evaltrace(LISPT state)
@@ -130,4 +130,4 @@ void init_debug()
   messages[ERRNO(USER_ERROR)] = "";
 }
 
-}
+} // namespace lisp

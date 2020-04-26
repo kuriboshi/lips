@@ -7,8 +7,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 class alloc
 {
 public:
@@ -91,7 +91,7 @@ private:
   static LISPT buildatom(const char* s, int cpy);
   static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
 
-  static LISPT foo1;                           // Protect arguments of cons when gc.
+  static LISPT foo1; // Protect arguments of cons when gc.
   static LISPT foo2;
   static int nrconses;                         // Number of conses since last gc.
   static conscells_t* conscells;               // Cons cell storage.
@@ -99,54 +99,18 @@ private:
   static int destblockused;                    // Index to last slot in destblock.
 };
 
-inline void init_alloc()
-{
-  alloc::init_alloc();
-}
-inline LISPT intern(const char* s)
-{
-  return alloc::intern(s);
-}
-inline LISPT cons(LISPT a, LISPT b)
-{
-  return alloc::cons(a, b);
-}
-inline LISPT mkstring(const char* s)
-{
-  return alloc::mkstring(s);
-}
-inline LISPT mknumber(int i)
-{
-  return alloc::mknumber(i);
-}
-inline LISPT mkatom(char* s)
-{
-  return alloc::mkatom(s);
-}
-inline LISPT mkfloat(double d)
-{
-  return alloc::mkfloat(d);
-}
-inline LISPT getobject()
-{
-  return alloc::getobject();
-}
-inline alloc::destblock_t* dalloc(int i)
-{
-  return alloc::dalloc(i);
-}
-inline void dfree(alloc::destblock_t* d)
-{
-  alloc::dfree(d);
-}
-inline void dzero()
-{
-  alloc::dzero();
-}
-inline char* realmalloc(unsigned int u)
-{
-  return alloc::realmalloc(u);
-}
+inline void init_alloc() { alloc::init_alloc(); }
+inline LISPT intern(const char* s) { return alloc::intern(s); }
+inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
+inline LISPT mkstring(const char* s) { return alloc::mkstring(s); }
+inline LISPT mknumber(int i) { return alloc::mknumber(i); }
+inline LISPT mkatom(char* s) { return alloc::mkatom(s); }
+inline LISPT mkfloat(double d) { return alloc::mkfloat(d); }
+inline LISPT getobject() { return alloc::getobject(); }
+inline alloc::destblock_t* dalloc(int i) { return alloc::dalloc(i); }
+inline void dfree(alloc::destblock_t* d) { alloc::dfree(d); }
+inline void dzero() { alloc::dzero(); }
+inline char* realmalloc(unsigned int u) { return alloc::realmalloc(u); }
 
 /*
  * A simple way of protecting internal lisp objects from

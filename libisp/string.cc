@@ -9,8 +9,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
 {
@@ -85,8 +85,8 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
-  if(size < 0 || s > static_cast<int>(strlen(str->stringval())) || e > static_cast<int>(strlen(str->stringval())) || s <= 0
-    || e < 0)
+  if(size < 0 || s > static_cast<int>(strlen(str->stringval())) || e > static_cast<int>(strlen(str->stringval()))
+    || s <= 0 || e < 0)
     return C_NIL;
   auto* ns = realmalloc((unsigned)size + 1);
   if(ns == nullptr)
@@ -110,4 +110,4 @@ void init_string()
   mkprim(PN_STRCMP, strcomp, 2, SUBR);
 }
 
-}
+} // namespace lisp

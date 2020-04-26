@@ -9,8 +9,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 class iterator: public std::iterator<std::forward_iterator_tag, LISPT>
 {
 public:
@@ -37,13 +37,7 @@ private:
   LISPT _car;
 };
 
-inline iterator begin(LISPT l)
-{
-  return iterator(l);
-}
-inline iterator end(LISPT l)
-{
-  return iterator(nullptr);
-}
+inline iterator begin(LISPT l) { return iterator(l); }
+inline iterator end(LISPT l) { return iterator(nullptr); }
 
 } // namespace lisp

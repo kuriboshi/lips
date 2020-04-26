@@ -14,14 +14,11 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 LISPT sighandler[NSIG - 1];
 
-PRIMITIVE uxerrno()
-{
-  return mknumber(errno);
-}
+PRIMITIVE uxerrno() { return mknumber(errno); }
 
 PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
@@ -77,30 +74,15 @@ PRIMITIVE uxdup(LISPT fildes)
   return mknumber(dup((int)fildes->intval()));
 }
 
-PRIMITIVE uxgetuid()
-{
-  return mknumber(getuid());
-}
+PRIMITIVE uxgetuid() { return mknumber(getuid()); }
 
-PRIMITIVE uxgeteuid()
-{
-  return mknumber(geteuid());
-}
+PRIMITIVE uxgeteuid() { return mknumber(geteuid()); }
 
-PRIMITIVE uxgetgid()
-{
-  return mknumber(getgid());
-}
+PRIMITIVE uxgetgid() { return mknumber(getgid()); }
 
-PRIMITIVE uxgetegid()
-{
-  return mknumber(getegid());
-}
+PRIMITIVE uxgetegid() { return mknumber(getegid()); }
 
-PRIMITIVE uxgetpid()
-{
-  return mknumber(getpid());
-}
+PRIMITIVE uxgetpid() { return mknumber(getpid()); }
 
 PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
@@ -163,10 +145,7 @@ PRIMITIVE uxsetgid(LISPT gid)
 }
 
 /*ARGSUSED*/
-void sighandle(int sig)
-{
-  eval(sighandler[sig]);
-}
+void sighandle(int sig) { eval(sighandler[sig]); }
 
 PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 {
@@ -223,4 +202,4 @@ void init_unix()
   mkprim(PN_UXUNLINK, uxunlink, 1, SUBR);
 }
 
-}
+} // namespace lisp

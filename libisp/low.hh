@@ -7,8 +7,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 /* variables */
 extern LISPT verboseflg;
 
@@ -25,4 +25,4 @@ extern LISPT progn(LISPT);
 extern LISPT prog1(LISPT, LISPT);
 extern LISPT prog2(LISPT, LISPT, LISPT);
 
-}
+} // namespace lisp

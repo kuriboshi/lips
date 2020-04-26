@@ -9,7 +9,6 @@
 
 namespace lisp
 {
-
 extern void init_arith(void);
 extern void init_file(void);
 extern void init_logic(void);
@@ -143,4 +142,4 @@ void init_lisp()
   evaluator::breakhook = nullptr;
 }
 
-}
+} // namespace lisp

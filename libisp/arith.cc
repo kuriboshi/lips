@@ -8,8 +8,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 /*
  * Function with an i as a prefix are for integer arithmetic and those
  * whith an f are for floats. Without a prefix, the functions
@@ -297,35 +297,17 @@ PRIMITIVE sub1(LISPT a)
       return error(BUG, C_NIL); \
   }
 
-PRIMITIVE greaterp(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, >);
-}
+PRIMITIVE greaterp(LISPT x, LISPT y) { NUMCHECK(x, y, >); }
 
-PRIMITIVE lessp(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, <);
-}
+PRIMITIVE lessp(LISPT x, LISPT y) { NUMCHECK(x, y, <); }
 
-PRIMITIVE eqp(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, ==);
-}
+PRIMITIVE eqp(LISPT x, LISPT y) { NUMCHECK(x, y, ==); }
 
-PRIMITIVE geq(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, >=);
-}
+PRIMITIVE geq(LISPT x, LISPT y) { NUMCHECK(x, y, >=); }
 
-PRIMITIVE leq(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, <=);
-}
+PRIMITIVE leq(LISPT x, LISPT y) { NUMCHECK(x, y, <=); }
 
-PRIMITIVE neqp(LISPT x, LISPT y)
-{
-  NUMCHECK(x, y, !=);
-}
+PRIMITIVE neqp(LISPT x, LISPT y) { NUMCHECK(x, y, !=); }
 
 PRIMITIVE zerop(LISPT x)
 {
@@ -384,4 +366,4 @@ void init_arith()
   mkprim(PN_ABS, absval, 1, SUBR);
 }
 
-}
+} // namespace lisp

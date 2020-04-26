@@ -7,7 +7,6 @@
 
 namespace lisp
 {
-
 extern const char* VERSION;
 
 }

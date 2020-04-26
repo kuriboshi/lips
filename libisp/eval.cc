@@ -13,8 +13,8 @@ extern void pputc(int, FILE*);
 extern int brkflg;
 extern int interrupt;
 
-namespace lisp {
-
+namespace lisp
+{
 bool evaluator::noeval = 0;
 evaluator::continuation_t evaluator::cont = nullptr;
 evaluator::breakhook_t evaluator::breakhook = nullptr; // Called before going into break.
@@ -69,10 +69,7 @@ void evaluator::abort(int m, LISPT v)
   throw lisp_error("abort");
 }
 
-void evaluator::overflow()
-{
-  abort(STACK_OVERFLOW, C_NIL);
-}
+void evaluator::overflow() { abort(STACK_OVERFLOW, C_NIL); }
 
 /* 
  * These macros handles the control stack.  The control stack stores
@@ -103,20 +100,11 @@ void evaluator::push_func(continuation_t f)
     overflow();
 }
 
-LISPT evaluator::pop_lisp()
-{
-  return control[--toctrl].u.lisp;
-}
+LISPT evaluator::pop_lisp() { return control[--toctrl].u.lisp; }
 
-alloc::destblock_t* evaluator::pop_point()
-{
-  return control[--toctrl].u.point;
-}
+alloc::destblock_t* evaluator::pop_point() { return control[--toctrl].u.point; }
 
-evaluator::continuation_t evaluator::pop_func()
-{
-  return control[--toctrl].u.f_point;
-}
+evaluator::continuation_t evaluator::pop_func() { return control[--toctrl].u.f_point; }
 
 /*
  * This function prints an error message, and sets up a call
@@ -169,10 +157,7 @@ void evaluator::send(LISPT a)
     dest[dest[0].var.d_integer].val.d_lisp = a;
 }
 
-LISPT evaluator::receive()
-{
-  return dest[dest[0].var.d_integer].val.d_lisp;
-}
+LISPT evaluator::receive() { return dest[dest[0].var.d_integer].val.d_lisp; }
 
 void evaluator::next()
 {
@@ -400,7 +385,8 @@ void evaluator::do_unbound(continuation_t continuation)
     expression = findalias(expression);
     if(EQ(expression, C_ERROR))
       abort(NO_MESSAGE, C_NIL);
-    if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL && TYPEOF(expression->car()->symvalue()) == UNBOUND)
+    if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
+      && TYPEOF(expression->car()->symvalue()) == UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -419,7 +405,8 @@ bool evaluator::do_default(continuation_t continuation)
   expression = findalias(expression);
   if(EQ(expression, C_ERROR))
     abort(NO_MESSAGE, C_NIL);
-  if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL && TYPEOF(expression->car()->symvalue()) == UNBOUND)
+  if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
+    && TYPEOF(expression->car()->symvalue()) == UNBOUND)
   {
     if(!evalhook(expression))
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -779,7 +766,7 @@ bool evaluator::ev2()
   if(EQ(foo, C_ERROR))
   {
     foo = printwhere();
-    if (ISNIL(foo))
+    if(ISNIL(foo))
       xbreak(0, C_NIL, peval1);
     else
       xbreak(0, foo->car(), peval1); /* CAR(_) broken */
@@ -1041,4 +1028,4 @@ void evaluator::init_ev()
   mkprim(PN_BAKTRACE, baktrace, 0, SUBR);
 }
 
-}
+} // namespace lisp

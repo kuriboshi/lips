@@ -7,8 +7,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(TYPEOF(obj) == CONS)
@@ -89,4 +89,4 @@ void init_map()
   mkprim(PN_MAPCAR, mapcar, 3, SUBR);
 }
 
-}
+} // namespace lisp

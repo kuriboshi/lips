@@ -17,7 +17,6 @@
 
 namespace lisp
 {
-
 struct lisp_t;
 using LISPT = struct lisp_t*;
 /* This is used to recognize c-functions for cpprint */
@@ -100,7 +99,11 @@ typedef struct
 
 struct lisp_t
 {
-  lisp_t() { gcmark = false; type = NIL; }
+  lisp_t()
+  {
+    gcmark = false;
+    type = NIL;
+  }
   ~lisp_t() {}
   lisp_t(const lisp_t&) = delete;
 
@@ -148,11 +151,23 @@ struct lisp_t
   LISPT symvalue() { return u.l_symbol.value; }
   void symvalue(LISPT x) { symval().value = x; }
   const char* stringval() { return u.l_string; }
-  void stringval(char* s) { u.l_string = s; type = STRING; }
+  void stringval(char* s)
+  {
+    u.l_string = s;
+    type = STRING;
+  }
   int intval() { return u.l_integer; }
-  void intval(int x) { u.l_integer = x; type = INTEGER; }
+  void intval(int x)
+  {
+    u.l_integer = x;
+    type = INTEGER;
+  }
   double floatval() { return u.l_float; }
-  void floatval(double f) { u.l_float = f; type = FLOAT; }
+  void floatval(double f)
+  {
+    u.l_float = f;
+    type = FLOAT;
+  }
   CONST& CONSVAL() { return u.l_cons; }
   FILE* fileval() { return u.l_filet; }
   void fileval(FILE* f) { u.l_filet = f; }
@@ -179,9 +194,14 @@ inline bool EQ(LISPT x, LISPT y) { return x == y; }
 inline alloc::destblock_t* ENVVAL(LISPT e) { return e->u.l_environ; }
 #endif
 
-inline void SET(LISPT& a, lisp_type t, LISPT p) { a = p; a->type = t; UNMARK(a); }
+inline void SET(LISPT& a, lisp_type t, LISPT p)
+{
+  a = p;
+  a->type = t;
+  UNMARK(a);
+}
 
 inline bool IST(LISPT x) { return TYPEOF(x) == TRUE; }
 inline bool ISNIL(LISPT x) { return TYPEOF(x) == NIL; }
 
-}
+} // namespace lisp

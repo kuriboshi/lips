@@ -8,8 +8,8 @@
 #include "libisp.hh"
 #include "low.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 static LISPT getargs(LISPT al)
 {
   if(ISNIL(al->cdr()))
@@ -95,15 +95,9 @@ static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
   return cons(name, C_NIL);
 }
 
-PRIMITIVE de(LISPT name, LISPT pars, LISPT body)
-{
-  return def(name, pars, body, LAMBDA);
-}
+PRIMITIVE de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, LAMBDA); }
 
-PRIMITIVE df(LISPT name, LISPT pars, LISPT body)
-{
-  return def(name, pars, body, NLAMBDA);
-}
+PRIMITIVE df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
 
 void init_user()
 {
@@ -113,4 +107,4 @@ void init_user()
   mkprim(PN_DF, df, -3, FSUBR);
 }
 
-}
+} // namespace lisp

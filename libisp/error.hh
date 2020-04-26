@@ -43,15 +43,15 @@
 #define USER_ERROR (PRINT_ARG | 28)
 #define MAXMESSAGE 29
 
-namespace lisp {
-
+namespace lisp
+{
 inline void check(LISPT arg, lisp_type type)
 {
-  if (TYPEOF(arg) != type)
+  if(TYPEOF(arg) != type)
     throw type_error(type);
 }
 
-}
+} // namespace lisp
 
 #define CHECK(arg, typ) \
   if(TYPEOF(arg) != typ) \

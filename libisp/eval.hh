@@ -9,7 +9,6 @@
 
 namespace lisp
 {
-
 class evaluator
 {
 public:
@@ -17,7 +16,7 @@ public:
   ~evaluator() = delete;
 
 public:
-  using continuation_t = bool(*)();
+  using continuation_t = bool (*)();
 
   /*
    * The control stack.
@@ -123,8 +122,8 @@ private:
   static void abort(int m, LISPT v);
   static void overflow();
 
-  static bool noeval;           // Don't evaluate arguments.
-  static continuation_t cont;   // Current continuation.
+  static bool noeval;         // Don't evaluate arguments.
+  static continuation_t cont; // Current continuation.
 };
 
 inline void unwind() { evaluator::unwind(); }
@@ -135,4 +134,4 @@ inline PRIMITIVE eval(LISPT expr) { return evaluator::eval(expr); }
 inline PRIMITIVE apply(LISPT f, LISPT a) { return evaluator::apply(f, a); }
 inline PRIMITIVE baktrace() { return evaluator::baktrace(); }
 
-}
+} // namespace lisp

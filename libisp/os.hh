@@ -5,8 +5,8 @@
 
 #pragma once
 
-namespace lisp {
-
+namespace lisp
+{
 extern int readchar(FILE*, char*);
 
 }

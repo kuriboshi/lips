@@ -1,5 +1,5 @@
-namespace lisp {
-
+namespace lisp
+{
 extern LISPT plus(LISPT);
 extern LISPT iplus(LISPT);
 extern LISPT fplus(LISPT);
@@ -29,4 +29,4 @@ extern LISPT zerop(LISPT);
 extern LISPT minusp(LISPT);
 extern void init_arith();
 
-}
+} // namespace lisp

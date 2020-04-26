@@ -5,8 +5,8 @@
 
 #pragma once
 
-namespace lisp {
-
+namespace lisp
+{
 /* variables */
 extern int trace;
 
@@ -16,4 +16,4 @@ extern LISPT syserr(LISPT);
 extern LISPT break0(LISPT);
 extern void init_debug(void);
 
-}
+} // namespace lisp

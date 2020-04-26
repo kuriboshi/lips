@@ -299,7 +299,4 @@ PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
   return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
 }
 
-LISPT glob(LISPT wild)
-{
-  return expand(wild, 0, 0);
-}
+LISPT glob(LISPT wild) { return expand(wild, 0, 0); }

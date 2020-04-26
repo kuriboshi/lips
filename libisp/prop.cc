@@ -7,8 +7,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
   CHECK(a, SYMBOL);
@@ -79,4 +79,4 @@ void init_prop()
   mkprim(PN_REMPROP, remprop, 2, SUBR);
 }
 
-}
+} // namespace lisp

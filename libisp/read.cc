@@ -14,10 +14,11 @@ extern void putch(int, FILE*, int);
 extern lisp::LISPT histget(int, lisp::LISPT);
 extern lisp::LISPT history;
 
-namespace {
+namespace
+{
 constexpr int NUL = '\0';
 constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
-}
+} // namespace
 
 #define CHECKEOF(c) \
   if((c) == EOF) \
@@ -34,10 +35,14 @@ constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
   while(curc != EOF && issepr(curc)); \
   CHECKEOF(curc);
 
-namespace lisp {
-
+namespace lisp
+{
 inline void pushr(LISPT w) { rstack = cons(w, rstack); }
-inline void popr(LISPT& w) { w = rstack->car(); rstack = rstack->cdr(); }
+inline void popr(LISPT& w)
+{
+  w = rstack->car();
+  rstack = rstack->cdr();
+}
 
 static char buf[MAXATOMSIZE];
 
@@ -55,11 +60,11 @@ static LISPT rmuser(FILE*, LISPT, char); /* Installed for user read macros. */
 
 LISPT prin0(LISPT, FILE*, int);
 
-LISPT top;           /* used for threading the input structure */
-LISPT rstack;        /* partially built structure read stack */
-int printlevel = 0; /* maximum print level */
-int thisplevel;     /* during print, print level */
-bool echoline = false;          /* is true if ! has been used */
+LISPT top;             /* used for threading the input structure */
+LISPT rstack;          /* partially built structure read stack */
+int printlevel = 0;    /* maximum print level */
+int thisplevel;        /* during print, print level */
+bool echoline = false; /* is true if ! has been used */
 
 /* clang-format off */
 struct rtinfo currentrt = 
@@ -791,4 +796,4 @@ LISPT print(LISPT x, FILE* file)
   return x;
 }
 
-}
+} // namespace lisp

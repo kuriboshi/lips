@@ -7,8 +7,8 @@
 
 #include "libisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 LISPT verboseflg;
 
 /*
@@ -29,10 +29,7 @@ PRIMITIVE set(LISPT var, LISPT val)
   return val;
 }
 
-PRIMITIVE setq(LISPT var, LISPT val)
-{
-  return set(var, eval(val));
-}
+PRIMITIVE setq(LISPT var, LISPT val) { return set(var, eval(val)); }
 
 PRIMITIVE progn(LISPT lexp)
 {
@@ -81,15 +78,9 @@ PRIMITIVE xwhile(LISPT pred, LISPT exp)
   return C_NIL;
 }
 
-PRIMITIVE prog1(LISPT a1, LISPT)
-{
-  return a1;
-}
+PRIMITIVE prog1(LISPT a1, LISPT) { return a1; }
 
-PRIMITIVE prog2(LISPT, LISPT a2, LISPT)
-{
-  return a2;
-}
+PRIMITIVE prog2(LISPT, LISPT a2, LISPT) { return a2; }
 
 #if 0
 PRIMITIVE topofstack()
@@ -136,4 +127,4 @@ void init_low()
   initcvar(&verboseflg, "verboseflg", C_NIL);
 }
 
-}
+} // namespace lisp

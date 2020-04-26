@@ -7,8 +7,8 @@
 
 #include "lisp.hh"
 
-namespace lisp {
-
+namespace lisp
+{
 /* functions */
 extern void mkprim(const char*, LISPT (*fname)(void), short, lisp_type);
 extern void mkprim(const char*, LISPT (*fname)(LISPT), short, lisp_type);
@@ -53,4 +53,4 @@ extern LISPT nthd(LISPT, LISPT);
 extern LISPT xerror(LISPT);
 extern LISPT uxexit(LISPT);
 
-}
+} // namespace lisp

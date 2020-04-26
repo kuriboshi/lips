@@ -15,8 +15,8 @@ extern lisp::LISPT home;
 extern lisp::LISPT alias_expanded;
 extern void finish(int);
 
-namespace lisp {
-
+namespace lisp
+{
 #ifdef FLOATING
 static unsigned short point = 31;
 static int p0 = 0;
@@ -40,9 +40,9 @@ static struct floats
  * markobjs contains pointers to all LISPT type c variables that
  * contains data to be retained during gc.
  */
-LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evaluator::expression, &evaluator::args, &path,
-                     &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
-                     &alloc::gcgag, &alias_expanded, &C_EOF, nullptr};
+LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evaluator::expression, &evaluator::args,
+  &path, &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag,
+  &alias_expanded, &C_EOF, nullptr};
 
 LISPT alloc::foo1 = nullptr; // Protect arguments of cons when gc.
 LISPT alloc::foo2 = nullptr;
@@ -209,9 +209,8 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
     mark((LISPT *) &ENVVAL(env));
 #endif
   for(int i = 0; i < evaluator::toctrl; i++)
-    if(evaluator::control[i].type == evaluator::CTRL_LISP
-       && evaluator::control[i].u.lisp != nullptr
-       && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
+    if(evaluator::control[i].type == evaluator::CTRL_LISP && evaluator::control[i].u.lisp != nullptr
+      && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
       mark(evaluator::control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
@@ -409,18 +408,12 @@ LISPT alloc::puthash(const char* str, obarray_t* obarray[], int cpy)
  * intern - Make interned symbol in hasharray obarray. Str is not copied
  *          so this is only used with constant strings during init.
  */
-LISPT alloc::intern(const char* str)
-{
-  return puthash(str, obarray, 0);
-}
+LISPT alloc::intern(const char* str) { return puthash(str, obarray, 0); }
 
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-LISPT alloc::mkatom(char* str)
-{
-  return puthash(str, obarray, 1);
-}
+LISPT alloc::mkatom(char* str) { return puthash(str, obarray, 1); }
 
 /* This isn't converted yet */
 /*
@@ -483,18 +476,12 @@ alloc::destblock_t* alloc::dalloc(int size)
  *         stored in the cdr of the first element. If it isn't, look
  *         elsewhere.
  */
-void alloc::dfree(destblock_t* ptr)
-{
-  destblockused -= ptr->val.d_integer + 1;
-}
+void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
 
 /*
  * dzero - Frees all destination blocks.
  */
-void alloc::dzero()
-{
-  destblockused = 0;
-}
+void alloc::dzero() { destblockused = 0; }
 
 void alloc::init_alloc()
 {
