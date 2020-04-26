@@ -193,7 +193,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
     brkflg = 0;
     interrupt = 0;
     printit = 0;
-    echoline = 0;
+    echoline = false;
     if(beforeprompt != nullptr)
       (*beforeprompt)();
     /*

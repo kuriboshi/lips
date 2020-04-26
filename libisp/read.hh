@@ -20,7 +20,7 @@ extern LISPT top;
 extern LISPT rstack;
 extern long printlevel;
 extern long thisplevel;
-extern int echoline;
+extern bool echoline;
 extern struct rtinfo currentrt;
 
 /* functions */

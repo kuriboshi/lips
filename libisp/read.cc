@@ -59,7 +59,7 @@ LISPT top;           /* used for threading the input structure */
 LISPT rstack;        /* partially built structure read stack */
 long printlevel = 0; /* maximum print level */
 long thisplevel;     /* during print, print level */
-int echoline;        /* is 1 if ! has been used */
+bool echoline = false;          /* is true if ! has been used */
 
 /* clang-format off */
 struct rtinfo currentrt = 
@@ -472,7 +472,7 @@ static LISPT rmexcl(FILE* file, LISPT, char)
   int c = getch(file);
   if(issepr(c))
     return C_EXCL;
-  echoline = 1;
+  echoline = true;
   LISPT tmp = histget(0L, history);
   if(TYPEOF(tmp->car()) == CONS && ISNIL(tmp->cdr()))
     tmp = tmp->car();
@@ -489,7 +489,7 @@ static LISPT rmexcl(FILE* file, LISPT, char)
       return tmp->cdr();
       break;
     case '\n':
-      echoline = 0;
+      echoline = false;
       return C_EXCL;
       break;
     default:
