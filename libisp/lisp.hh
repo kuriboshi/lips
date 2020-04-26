@@ -57,21 +57,21 @@ extern LISPT C_T;
 
 using BITS32 = int;
 
-typedef struct
+struct cons_t
 { /* The cons cell */
   LISPT car;
   LISPT cdr;
-} CONST;
+};
 
-typedef struct
+struct symbol_t
 {
   const char* pname; /* The printname of the atom */
   LISPT value;
   LISPT plist;  /* The property list */
   LISPT topval; /* Holds top value (not used yet) */
-} SYMBOLT;
+};
 
-typedef struct
+struct subr_t
 {
   // The type of internal c-functions
   LISPT (*function0)(void);
@@ -80,22 +80,22 @@ typedef struct
   LISPT (*function3)(LISPT, LISPT, LISPT);
   short argcount; // Negative argcount indicates that arguments should not be
                   // evaluated
-} SUBRT;
+};
 
-typedef struct
+struct lambda_t
 {
   LISPT lambdarep;
   LISPT arglist;
   short argcnt;
-} LAMBDAT;
+};
 
-typedef struct
+struct closure_t
 {
   LISPT cfunction;
   LISPT closed;
   LISPT cvalues;
   short count;
-} CLOSURET;
+};
 
 struct lisp_t
 {
@@ -113,17 +113,18 @@ struct lisp_t
   {
     // One entry for each type.  Types that has no, or just one value are
     // indicated by a comment.
+
     // NIL
-    SYMBOLT l_symbol;
+    symbol_t l_symbol;
     int l_integer;
     int* l_bignum;
     double l_float;
     LISPT l_indirect;
-    CONST l_cons;
+    cons_t l_cons;
     char* l_string;
-    SUBRT l_subr;
-    LAMBDAT l_lambda;
-    CLOSURET l_closure;
+    subr_t l_subr;
+    lambda_t l_lambda;
+    closure_t l_closure;
     // UNBOUND
     // alloc::destblock_t* l_environ;
     FILE* l_filet;
@@ -136,7 +137,7 @@ struct lisp_t
     void* l_cpointer;
     // USER
   } u;
-  SYMBOLT& symval() { return u.l_symbol; }
+  symbol_t& symval() { return u.l_symbol; }
   LISPT& freeval() { return u.l_free; }
   LISPT* cvarval() { return u.l_cvariable; }
   void cvarval(LISPT* x) { u.l_cvariable = x; }
@@ -145,9 +146,9 @@ struct lisp_t
   LISPT cdr() { return u.l_cons.cdr; }
   void car(LISPT x) { u.l_cons.car = x; }
   void cdr(LISPT x) { u.l_cons.cdr = x; }
-  LAMBDAT& lamval() { return u.l_lambda; }
-  CLOSURET& closval() { return u.l_closure; }
-  SUBRT& subrval() { return u.l_subr; }
+  lambda_t& lamval() { return u.l_lambda; }
+  closure_t& closval() { return u.l_closure; }
+  subr_t& subrval() { return u.l_subr; }
   LISPT symvalue() { return u.l_symbol.value; }
   void symvalue(LISPT x) { symval().value = x; }
   const char* stringval() { return u.l_string; }
@@ -168,7 +169,7 @@ struct lisp_t
     u.l_float = f;
     type = FLOAT;
   }
-  CONST& CONSVAL() { return u.l_cons; }
+  cons_t& CONSVAL() { return u.l_cons; }
   FILE* fileval() { return u.l_filet; }
   void fileval(FILE* f) { u.l_filet = f; }
   void* cpointval() { return u.l_cpointer; }
