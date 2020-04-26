@@ -713,7 +713,7 @@ bool evaluator::evlis4()
   x = cons(receive(), x);
   send(x);
   cont = pop_func();
-  return true;
+  return false;
 }
 
 bool evaluator::evlam()
