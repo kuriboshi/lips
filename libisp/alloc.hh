@@ -153,6 +153,6 @@ inline char* realmalloc(unsigned int u)
  * the garbage collector.
  */
 inline void SAVE(LISPT v) { alloc::save(v); }
-inline void UNSAVE(LISPT v) { v = alloc::unsave(); }
+inline void UNSAVE(LISPT& v) { v = alloc::unsave(); }
 
 } // namespace lisp
