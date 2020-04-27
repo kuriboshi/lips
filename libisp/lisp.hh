@@ -150,7 +150,7 @@ struct lisp_t
   closure_t& closval() { return u.l_closure; }
   subr_t& subrval() { return u.l_subr; }
   LISPT symvalue() { return u.l_symbol.value; }
-  void symvalue(LISPT x) { symval().value = x; }
+  void symvalue(LISPT x) { u.l_symbol.value = x; }
   const char* stringval() { return u.l_string; }
   void stringval(char* s)
   {
@@ -169,11 +169,10 @@ struct lisp_t
     u.l_float = f;
     type = FLOAT;
   }
-  cons_t& CONSVAL() { return u.l_cons; }
+  cons_t& consval() { return u.l_cons; }
   FILE* fileval() { return u.l_filet; }
   void fileval(FILE* f) { u.l_filet = f; }
   void* cpointval() { return u.l_cpointer; }
-  LISPT& FREEVAL() { return u.l_free; }
   void setq(LISPT y) { u.l_symbol.value = y; }
   void setopval(LISPT y) { setq(y); }
   LISPT getopval() { return symvalue(); }

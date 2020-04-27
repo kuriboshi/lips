@@ -25,7 +25,7 @@ PRIMITIVE set(LISPT var, LISPT val)
   else if(TYPEOF(var->symval().value) == CVARIABLE)
     *var->symval().value->cvarval() = val;
   else
-    var->symval().value = val;
+    var->symvalue(val);
   return val;
 }
 
