@@ -30,14 +30,21 @@ public:
     struct conscells* next;
   };
 
-  struct destblock
+  enum class block_type
   {
-    char type;
+    EMPTY = 0,
+    LISPT,
+    ENVIRON
+  };
+
+  struct destblock_t
+  {
+    block_type type = block_type::EMPTY;
     union
     {
       LISPT d_lisp;
       int d_integer;
-      destblock* d_environ;
+      destblock_t* d_environ;
     } var, val;
   };
 
@@ -52,7 +59,6 @@ public:
   };
 
   using conscells_t = struct conscells;
-  using destblock_t = struct destblock;
   using obarray_t = struct obarray;
 
   /* variables */

@@ -135,14 +135,14 @@ alloc::destblock_t* evaluator::mkdestblock(int s)
   auto dest = dalloc(s + 1);
   dest[0].var.d_integer = s;
   dest[0].val.d_integer = s;
-  dest[0].type = 0;
+  dest[0].type = alloc::block_type::EMPTY;
   return dest;
 }
 
 void evaluator::storevar(LISPT v, int i)
 {
   dest[i].var.d_lisp = v;
-  dest[i].type = 1;
+  dest[i].type = alloc::block_type::LISPT;
 }
 
 alloc::destblock_t* evaluator::pop_env()
@@ -804,7 +804,8 @@ bool evaluator::ev4()
 void evaluator::link()
 {
   dest[0].var.d_environ = env;
-  dest[0].type = 2;
+  // dest[0].val.d_integer contains the number of var/val pairs
+  dest[0].type = alloc::block_type::ENVIRON;
   env = dest;
   for(auto i = dest[0].val.d_integer; i > 0; i--)
   {

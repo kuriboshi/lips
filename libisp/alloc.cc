@@ -220,10 +220,16 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
     }
   for(int i = destblockused - 1; i >= 0; i--)
   {
-    if(destblock[i].type != 0)
+    switch(destblock[i].type)
     {
-      mark(destblock[i].var.d_lisp);
-      mark(destblock[i].val.d_lisp);
+      case block_type::EMPTY:
+        break;
+      case block_type::LISPT:
+        mark(destblock[i].var.d_lisp);
+        mark(destblock[i].val.d_lisp);
+        break;
+      case block_type::ENVIRON:
+        break;
     }
   }
   if(savept)
