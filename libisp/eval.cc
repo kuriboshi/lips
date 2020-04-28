@@ -383,8 +383,6 @@ void evaluator::do_unbound(continuation_t continuation)
   else
   {
     expression = findalias(expression);
-    if(EQ(expression, C_ERROR))
-      abort(NO_MESSAGE, C_NIL);
     if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
       && TYPEOF(expression->car()->symvalue()) == UNBOUND)
     {
@@ -403,8 +401,6 @@ void evaluator::do_unbound(continuation_t continuation)
 bool evaluator::do_default(continuation_t continuation)
 {
   expression = findalias(expression);
-  if(EQ(expression, C_ERROR))
-    abort(NO_MESSAGE, C_NIL);
   if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
     && TYPEOF(expression->car()->symvalue()) == UNBOUND)
   {
@@ -760,21 +756,22 @@ respread:
 
 bool evaluator::ev2()
 {
-  LISPT foo = call(fun);
-  dfree(dest);
-  dest = pop_point();
-  if(EQ(foo, C_ERROR))
+  try
   {
-    foo = printwhere();
+    auto foo = call(fun);
+    dfree(dest);
+    dest = pop_point();
+    send(foo);
+    cont = pop_func();
+  }
+  catch(const lisp_error& ex)
+  {
+    fprintf(primerr, "%s ", ex.what());
+    auto foo = printwhere();
     if(ISNIL(foo))
       xbreak(0, C_NIL, peval1);
     else
       xbreak(0, foo->car(), peval1); /* CAR(_) broken */
-  }
-  else
-  {
-    send(foo);
-    cont = pop_func();
   }
   return false;
 }
@@ -945,76 +942,84 @@ PRIMITIVE evaluator::baktrace()
   for(int i = toctrl; i >= 0; i--)
   {
     fprintf(primerr, "%d: ", i);
-    if(control[i].type == CTRL_LISP && TYPEOF(control[i].u.lisp) != NIL)
-      xprint(control[i].u.lisp, C_T);
-    else
+    switch(control[i].type)
     {
-      if(control[i].u.f_point == ev0)
-        fprintf(primerr, "ev0\n");
-      else if(control[i].u.f_point == peval)
-        fprintf(primerr, "peval\n");
-      else if(control[i].u.f_point == peval1)
-        fprintf(primerr, "peval1\n");
-      else if(control[i].u.f_point == peval2)
-        fprintf(primerr, "peval2\n");
-      else if(control[i].u.f_point == ev1)
-        fprintf(primerr, "ev1\n");
-      else if(control[i].u.f_point == ev2)
-        fprintf(primerr, "ev2\n");
-      else if(control[i].u.f_point == ev3)
-        fprintf(primerr, "ev3\n");
-      else if(control[i].u.f_point == ev4)
-        fprintf(primerr, "ev4\n");
-      else if(control[i].u.f_point == evlam1)
-        fprintf(primerr, "evlam1\n");
-      else if(control[i].u.f_point == evlam0)
-        fprintf(primerr, "evlam0\n");
-      else if(control[i].u.f_point == ev9)
-        fprintf(primerr, "ev9\n");
-      else if(control[i].u.f_point == ev11)
-        fprintf(primerr, "ev11\n");
-      else if(control[i].u.f_point == ev3p)
-        fprintf(primerr, "ev3p\n");
-      else if(control[i].u.f_point == evalargs)
-        fprintf(primerr, "evalargs\n");
-      else if(control[i].u.f_point == noevarg)
-        fprintf(primerr, "noevarg\n");
-      else if(control[i].u.f_point == evlam)
-        fprintf(primerr, "evlam\n");
-      else if(control[i].u.f_point == spread)
-        fprintf(primerr, "spread\n");
-      else if(control[i].u.f_point == evlis)
-        fprintf(primerr, "evlis\n");
-      else if(control[i].u.f_point == evlis1)
-        fprintf(primerr, "evlis1\n");
-      else if(control[i].u.f_point == evlis2)
-        fprintf(primerr, "evlis2\n");
-      else if(control[i].u.f_point == evlis3)
-        fprintf(primerr, "evlis3\n");
-      else if(control[i].u.f_point == evlis4)
-        fprintf(primerr, "evlis4\n");
-      else if(control[i].u.f_point == noev9)
-        fprintf(primerr, "noev9\n");
-      else if(control[i].u.f_point == evsequence)
-        fprintf(primerr, "evsequence\n");
-      else if(control[i].u.f_point == evseq1)
-        fprintf(primerr, "evseq1\n");
-      else if(control[i].u.f_point == evseq3)
-        fprintf(primerr, "evseq3\n");
-      else if(control[i].u.f_point == evclosure)
-        fprintf(primerr, "evclosure\n");
-      else if(control[i].u.f_point == evclosure1)
-        fprintf(primerr, "evclosure1\n");
-      else if(control[i].u.f_point == eval0)
-        fprintf(primerr, "eval0\n");
-      else if(control[i].u.f_point == apply0)
-        fprintf(primerr, "apply0\n");
-      else if(control[i].u.f_point == everr)
-        fprintf(primerr, "everr\n");
-      else if(control[i].u.f_point == lookup)
-        fprintf(primerr, "lookup\n");
-      else
-        fprintf(stderr, "Unknown control stack element\n");
+      case CTRL_LISP:
+        xprint(control[i].u.lisp, C_T);
+        break;
+      case CTRL_POINT:
+        fprintf(primerr, "destblock\n");
+        break;
+      case CTRL_FUNC:
+        if(control[i].u.f_point == ev0)
+          fprintf(primerr, "ev0\n");
+        else if(control[i].u.f_point == peval)
+          fprintf(primerr, "peval\n");
+        else if(control[i].u.f_point == peval1)
+          fprintf(primerr, "peval1\n");
+        else if(control[i].u.f_point == peval2)
+          fprintf(primerr, "peval2\n");
+        else if(control[i].u.f_point == ev0)
+          fprintf(primerr, "ev0\n");
+        else if(control[i].u.f_point == ev1)
+          fprintf(primerr, "ev1\n");
+        else if(control[i].u.f_point == ev2)
+          fprintf(primerr, "ev2\n");
+        else if(control[i].u.f_point == ev3)
+          fprintf(primerr, "ev3\n");
+        else if(control[i].u.f_point == ev4)
+          fprintf(primerr, "ev4\n");
+        else if(control[i].u.f_point == evlam0)
+          fprintf(primerr, "evlam0\n");
+        else if(control[i].u.f_point == evlam1)
+          fprintf(primerr, "evlam1\n");
+        else if(control[i].u.f_point == ev9)
+          fprintf(primerr, "ev9\n");
+        else if(control[i].u.f_point == ev11)
+          fprintf(primerr, "ev11\n");
+        else if(control[i].u.f_point == ev3p)
+          fprintf(primerr, "ev3p\n");
+        else if(control[i].u.f_point == evalargs)
+          fprintf(primerr, "evalargs\n");
+        else if(control[i].u.f_point == noevarg)
+          fprintf(primerr, "noevarg\n");
+        else if(control[i].u.f_point == evlam)
+          fprintf(primerr, "evlam\n");
+        else if(control[i].u.f_point == spread)
+          fprintf(primerr, "spread\n");
+        else if(control[i].u.f_point == evlis)
+          fprintf(primerr, "evlis\n");
+        else if(control[i].u.f_point == evlis1)
+          fprintf(primerr, "evlis1\n");
+        else if(control[i].u.f_point == evlis2)
+          fprintf(primerr, "evlis2\n");
+        else if(control[i].u.f_point == evlis3)
+          fprintf(primerr, "evlis3\n");
+        else if(control[i].u.f_point == evlis4)
+          fprintf(primerr, "evlis4\n");
+        else if(control[i].u.f_point == noev9)
+          fprintf(primerr, "noev9\n");
+        else if(control[i].u.f_point == evsequence)
+          fprintf(primerr, "evsequence\n");
+        else if(control[i].u.f_point == evseq1)
+          fprintf(primerr, "evseq1\n");
+        else if(control[i].u.f_point == evseq3)
+          fprintf(primerr, "evseq3\n");
+        else if(control[i].u.f_point == evclosure)
+          fprintf(primerr, "evclosure\n");
+        else if(control[i].u.f_point == evclosure1)
+          fprintf(primerr, "evclosure1\n");
+        else if(control[i].u.f_point == eval0)
+          fprintf(primerr, "eval0\n");
+        else if(control[i].u.f_point == apply0)
+          fprintf(primerr, "apply0\n");
+        else if(control[i].u.f_point == everr)
+          fprintf(primerr, "everr\n");
+        else if(control[i].u.f_point == lookup)
+          fprintf(primerr, "lookup\n");
+        else
+          fprintf(stderr, "Unknown control stack element\n");
+        break;
     }
   }
   return C_NIL;

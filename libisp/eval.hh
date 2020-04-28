@@ -93,8 +93,8 @@ private:
   static bool ev2();
   static bool ev3();
   static bool ev4();
-  static bool evlam1();
   static bool evlam0();
+  static bool evlam1();
   static bool ev9();
   static bool ev11();
   static bool ev3p();

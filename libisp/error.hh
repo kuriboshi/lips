@@ -48,14 +48,16 @@ namespace lisp
 inline void check(LISPT arg, lisp_type type)
 {
   if(TYPEOF(arg) != type)
-    throw type_error(type);
+    throw type_error(arg, type);
+}
+
+inline void check2(LISPT arg, lisp_type type0, lisp_type type1)
+{
+  if(TYPEOF(arg) != type0 && TYPEOF(arg) != type1)
+    throw type_error(arg, type0, type1);
 }
 
 } // namespace lisp
 
-#define CHECK(arg, typ) \
-  if(TYPEOF(arg) != typ) \
-  return error(NOT_A | typ, arg)
-#define CHECK2(arg, typ1, typ2) \
-  if(TYPEOF(arg) != typ1 && TYPEOF(arg) != typ2) \
-    return error(ILLEGAL_ARG, arg);
+#define CHECK(arg, typ) check(arg, typ)
+#define CHECK2(arg, typ1, typ2) check2(arg, typ1, typ2)

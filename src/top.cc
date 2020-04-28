@@ -142,7 +142,7 @@ LISPT findalias(LISPT exp)
       if(!ISNIL(alias) && (ISNIL(alias_expanded) || !EQ(rval->car(), alias_expanded->car())))
       {
         if(!ISNIL(memb(rval->car(), alias_expanded)))
-          return error(ALIAS_LOOP, C_NIL);
+          throw lisp_error("Alias loop");
         alias_expanded = cons(rval->car(), alias_expanded);
         rval = append(cons(alias, cons(rval->cdr(), C_NIL)));
       }
