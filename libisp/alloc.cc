@@ -46,7 +46,6 @@ LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evalua
 
 LISPT alloc::foo1 = nullptr; // Protect arguments of cons when gc.
 LISPT alloc::foo2 = nullptr;
-int alloc::nrconses = 0;                                   // Number of conses since last gc.
 alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
 alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
 int alloc::destblockused = 0;                              // Index to last slot in destblock.
@@ -229,19 +228,18 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
   }
   if(savept)
     for(int i = savept; i; i--) mark(savearray[i - 1]);
+  int nrfreed = sweep();
   /*
    * A new page is allocated if the number of conses is lower
    * than MINCONSES or if requested by calling doreclaim with
    * incr greater than 0.
    */
-  if(nrconses < MINCONSES || incr > 0)
+  if(nrfreed < MINCONSES || incr > 0)
   {
     do
       conscells = newpage();
     while(incr-- > 0); /* At least one page more */
   }
-  int nrfreed = sweep();
-  nrconses = 0;
   if(ISNIL(gcgag))
     fprintf(primerr, "%d cells freed\n", nrfreed);
   return C_NIL;
@@ -439,7 +437,6 @@ again:
     }
   if(p0 == 4)
   {
-    nrconses = MINCONSES;
     doreclaim(NOCONSARGS, 0L);
     goto again;
   }
