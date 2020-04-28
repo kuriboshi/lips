@@ -59,6 +59,3 @@ inline void check2(LISPT arg, lisp_type type0, lisp_type type1)
 }
 
 } // namespace lisp
-
-#define CHECK(arg, typ) check(arg, typ)
-#define CHECK2(arg, typ1, typ2) check2(arg, typ1, typ2)

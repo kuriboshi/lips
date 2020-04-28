@@ -95,8 +95,8 @@ LISPT closobj(LISPT vars)
 {
   if(ISNIL(vars))
     return C_NIL;
-  CHECK(vars, CONS);
-  CHECK(vars->car(), SYMBOL);
+  check(vars, CONS);
+  check(vars->car(), SYMBOL);
   return cons(mkindirect(vars->car()->symval().value), closobj(vars->cdr()));
 }
 
@@ -243,14 +243,14 @@ PRIMITIVE caaar(LISPT a)
 
 PRIMITIVE rplaca(LISPT x, LISPT y)
 {
-  CHECK(x, CONS);
+  check(x, CONS);
   x->car(y);
   return x;
 }
 
 PRIMITIVE rplacd(LISPT x, LISPT y)
 {
-  CHECK(x, CONS);
+  check(x, CONS);
   x->cdr(y);
   return x;
 }
@@ -279,7 +279,7 @@ PRIMITIVE nconc(LISPT l)
   {
     if(!ISNIL(l->car()))
     {
-      CHECK(l->car(), CONS);
+      check(l->car(), CONS);
       if(ISNIL(curp))
       {
         curp = l->car();
@@ -302,7 +302,7 @@ PRIMITIVE tconc(LISPT cell, LISPT obj)
     cell = cons(cons(obj, C_NIL), C_NIL);
     return rplacd(cell, cell->car());
   }
-  CHECK(cell, CONS);
+  check(cell, CONS);
   if(TYPEOF(cell->car()) != CONS)
   {
     rplacd(cell, cons(obj, C_NIL));
@@ -316,7 +316,7 @@ PRIMITIVE attach(LISPT obj, LISPT list)
 {
   if(ISNIL(list))
     return cons(obj, C_NIL);
-  CHECK(list, CONS);
+  check(list, CONS);
   rplacd(list, cons(list->car(), list->cdr()));
   return rplaca(list, obj);
 }
@@ -332,7 +332,7 @@ PRIMITIVE append(LISPT l)
   {
     if(!ISNIL(l->car()))
     {
-      CHECK(l->car(), CONS);
+      check(l->car(), CONS);
       for(cl = l->car(); !ISNIL(cl); cl = cl->cdr())
       {
         rplacd(curp, cons(cl->car(), C_NIL));
@@ -390,20 +390,20 @@ PRIMITIVE closure(LISPT fun, LISPT vars)
 
 PRIMITIVE xnth(LISPT l, LISPT p)
 {
-  CHECK(p, INTEGER);
+  check(p, INTEGER);
   if(ISNIL(l))
     return C_NIL;
-  CHECK(l, CONS);
+  check(l, CONS);
   return nth(l, p->intval());
 }
 
 PRIMITIVE nthd(LISPT list, LISPT pos)
 {
-  CHECK(pos, INTEGER);
+  check(pos, INTEGER);
   int p = pos->intval();
   if(ISNIL(list))
     return C_NIL;
-  CHECK(list, CONS);
+  check(list, CONS);
   LISPT l;
   for(l = list; TYPEOF(l) == CONS && p > 1; l = l->cdr()) p--;
   return l;
@@ -411,7 +411,7 @@ PRIMITIVE nthd(LISPT list, LISPT pos)
 
 PRIMITIVE xerror(LISPT mess)
 {
-  CHECK(mess, STRING);
+  check(mess, STRING);
   return error(USER_ERROR, mess);
 }
 
@@ -419,7 +419,7 @@ PRIMITIVE uxexit(LISPT status)
 {
   if(ISNIL(status))
     finish(0);
-  CHECK(status, INTEGER);
+  check(status, INTEGER);
   finish((int)status->intval());
   return C_NIL;
 }

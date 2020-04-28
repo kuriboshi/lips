@@ -17,7 +17,7 @@ PRIMITIVE set(var, val)
 */
 PRIMITIVE set(LISPT var, LISPT val)
 {
-  CHECK(var, SYMBOL);
+  check(var, SYMBOL);
   if(EQ(var, CE_NIL) || EQ(var, CE_T))
     return error(ATTEMPT_TO_RESET, var);
   if(TYPEOF(var->symval().value) == INDIRECT)
@@ -51,7 +51,7 @@ PRIMITIVE cond(LISPT args)
   while(ISNIL(res))
   {
     LISPT alt = args->car();
-    CHECK(alt, CONS);
+    check(alt, CONS);
     res = eval(alt->car());
     if(!ISNIL(res))
     {

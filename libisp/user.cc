@@ -75,8 +75,8 @@ static LISPT checkfn(LISPT name, LISPT lam)
 
 PRIMITIVE define(LISPT name, LISPT lam)
 {
-  CHECK(name, SYMBOL);
-  CHECK2(lam, LAMBDA, NLAMBDA);
+  check(name, SYMBOL);
+  check2(lam, LAMBDA, NLAMBDA);
   checkfn(name, lam);
   name->setopval(lam);
   return name;
@@ -84,9 +84,9 @@ PRIMITIVE define(LISPT name, LISPT lam)
 
 static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
-  CHECK(name, SYMBOL);
+  check(name, SYMBOL);
   if(!ISNIL(pars) && TYPEOF(pars) != SYMBOL)
-    CHECK(pars, CONS);
+    check(pars, CONS);
   LISPT foo = mklambda(pars, body, type);
   if(TYPEOF(foo) == ERROR)
     return C_NIL;

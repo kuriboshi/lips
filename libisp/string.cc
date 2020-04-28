@@ -14,7 +14,7 @@ namespace lisp
 /* Return symbols print name as a string. */
 PRIMITIVE symstr(LISPT sym)
 {
-  CHECK(sym, SYMBOL);
+  check(sym, SYMBOL);
   return mkstring(sym->symval().pname);
 }
 
@@ -29,8 +29,8 @@ PRIMITIVE stringp(LISPT s)
 /* T if both strings are equal */
 PRIMITIVE streq(LISPT s1, LISPT s2)
 {
-  CHECK(s1, STRING);
-  CHECK(s2, STRING);
+  check(s1, STRING);
+  check(s2, STRING);
   if(!strcmp(s1->stringval(), s2->stringval()))
     return C_T;
   return C_NIL;
@@ -38,8 +38,8 @@ PRIMITIVE streq(LISPT s1, LISPT s2)
 
 PRIMITIVE strcomp(LISPT s1, LISPT s2)
 {
-  CHECK(s1, STRING);
-  CHECK(s2, STRING);
+  check(s1, STRING);
+  check(s2, STRING);
   return mknumber(strcmp(s1->stringval(), s2->stringval()));
 }
 
@@ -50,7 +50,7 @@ PRIMITIVE concat(LISPT strlist)
   int size = 0;
   for(auto sl = strlist; !ISNIL(sl); sl = sl->cdr())
   {
-    CHECK(sl->car(), STRING);
+    check(sl->car(), STRING);
     size += strlen(sl->car()->stringval());
   }
   auto* ns = realmalloc((unsigned)size + 1);
@@ -68,7 +68,7 @@ PRIMITIVE concat(LISPT strlist)
 /* Return string length of s */
 PRIMITIVE xstrlen(LISPT s)
 {
-  CHECK(s, STRING);
+  check(s, STRING);
   return mknumber(strlen(s->stringval()));
 }
 
@@ -79,9 +79,9 @@ PRIMITIVE xstrlen(LISPT s)
    to zero if start is equal to one is accepted. */
 PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
 {
-  CHECK(str, STRING);
-  CHECK(start, INTEGER);
-  CHECK(end, INTEGER);
+  check(str, STRING);
+  check(start, INTEGER);
+  check(end, INTEGER);
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;

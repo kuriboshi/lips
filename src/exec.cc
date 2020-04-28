@@ -543,12 +543,12 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
 
   if(ISNIL(cmd))
     return C_NIL;
-  CHECK2(file, STRING, SYMBOL);
+  check2(file, STRING, SYMBOL);
   if(ISNIL(filed))
     oldfd = 1;
   else
   {
-    CHECK(filed, INTEGER);
+    check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr(), 0644)) == -1)
@@ -577,12 +577,12 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
 
   if(ISNIL(cmd))
     return C_NIL;
-  CHECK2(file, STRING, SYMBOL);
+  check2(file, STRING, SYMBOL);
   if(ISNIL(filed))
     oldfd = 1;
   else
   {
-    CHECK(filed, INTEGER);
+    check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
@@ -611,12 +611,12 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
 
   if(ISNIL(cmd))
     return C_NIL;
-  CHECK2(file, STRING, SYMBOL);
+  check2(file, STRING, SYMBOL);
   if(ISNIL(filed))
     oldfd = 0;
   else
   {
-    CHECK(filed, INTEGER);
+    check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr(), O_RDONLY)) == -1)
@@ -721,7 +721,7 @@ PRIMITIVE rehash()
       continue;
     else
     {
-      CHECK2(p->car(), STRING, SYMBOL);
+      check2(p->car(), STRING, SYMBOL);
       sdir = p->car()->getstr();
     }
     if((odir = opendir(sdir)) == nullptr)
@@ -757,7 +757,7 @@ PRIMITIVE fg(LISPT job)
   }
   else
   {
-    CHECK(job, INTEGER);
+    check(job, INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -793,7 +793,7 @@ PRIMITIVE bg(LISPT job)
   }
   else
   {
-    CHECK(job, INTEGER);
+    check(job, INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -817,8 +817,8 @@ PRIMITIVE bg(LISPT job)
 
 PRIMITIVE p_setenv(LISPT var, LISPT val)
 {
-  CHECK2(var, STRING, SYMBOL);
-  CHECK2(val, STRING, SYMBOL);
+  check2(var, STRING, SYMBOL);
+  check2(val, STRING, SYMBOL);
   setenviron(var->getstr(), val->getstr());
   return var;
 }
@@ -827,7 +827,7 @@ PRIMITIVE getenviron(LISPT var)
 {
   char* s;
 
-  CHECK2(var, STRING, SYMBOL);
+  check2(var, STRING, SYMBOL);
   s = getenv(var->getstr());
   if(s == nullptr)
     return C_NIL;

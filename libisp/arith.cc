@@ -56,7 +56,7 @@ PRIMITIVE iplus(LISPT l)
   int sum = 0;
   for(auto i = lisp::begin(l); i != lisp::end(l); ++i)
   {
-    CHECK(*i, INTEGER);
+    check(*i, INTEGER);
     sum += (**i).intval();
   }
   return mknumber(sum);
@@ -64,12 +64,12 @@ PRIMITIVE iplus(LISPT l)
 
 PRIMITIVE fplus(LISPT l)
 {
-  CHECK(l->car(), FLOAT);
+  check(l->car(), FLOAT);
   auto sum = l->car()->floatval();
   l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(l->car(), FLOAT);
+    check(l->car(), FLOAT);
     sum = sum + l->car()->floatval();
     l = l->cdr();
   }
@@ -78,8 +78,8 @@ PRIMITIVE fplus(LISPT l)
 
 PRIMITIVE difference(LISPT a, LISPT b)
 {
-  CHECK2(a, INTEGER, FLOAT);
-  CHECK2(b, INTEGER, FLOAT);
+  check2(a, INTEGER, FLOAT);
+  check2(b, INTEGER, FLOAT);
   if(TYPEOF(a) == INTEGER)
     if(TYPEOF(b) == INTEGER)
       return mknumber(a->intval() - b->intval());
@@ -92,15 +92,15 @@ PRIMITIVE difference(LISPT a, LISPT b)
 
 PRIMITIVE idifference(LISPT a, LISPT b)
 {
-  CHECK(a, INTEGER);
-  CHECK(b, INTEGER);
+  check(a, INTEGER);
+  check(b, INTEGER);
   return mknumber(a->intval() - b->intval());
 }
 
 PRIMITIVE fdifference(LISPT a, LISPT b)
 {
-  CHECK(a, FLOAT);
-  CHECK(b, FLOAT);
+  check(a, FLOAT);
+  check(b, FLOAT);
   return mkfloat(a->floatval() - b->floatval());
 }
 
@@ -139,12 +139,12 @@ PRIMITIVE ltimes(LISPT l)
 
 PRIMITIVE itimes(LISPT l)
 {
-  CHECK(l->car(), INTEGER);
+  check(l->car(), INTEGER);
   auto prod = l->car()->intval();
   l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(l->car(), INTEGER);
+    check(l->car(), INTEGER);
     prod = prod * l->car()->intval();
     l = l->cdr();
   }
@@ -153,12 +153,12 @@ PRIMITIVE itimes(LISPT l)
 
 PRIMITIVE ftimes(LISPT l)
 {
-  CHECK(l->car(), FLOAT);
+  check(l->car(), FLOAT);
   auto prod = l->car()->floatval();
   l = l->cdr();
   while(TYPEOF(l) == CONS)
   {
-    CHECK(l->car(), FLOAT);
+    check(l->car(), FLOAT);
     prod = prod * l->car()->floatval();
     l = l->cdr();
   }
@@ -167,8 +167,8 @@ PRIMITIVE ftimes(LISPT l)
 
 PRIMITIVE divide(LISPT a, LISPT b)
 {
-  CHECK2(a, INTEGER, FLOAT);
-  CHECK2(b, INTEGER, FLOAT);
+  check2(a, INTEGER, FLOAT);
+  check2(b, INTEGER, FLOAT);
   if(TYPEOF(a) == INTEGER)
     if(TYPEOF(b) == INTEGER)
       return mknumber(a->intval() / b->intval());
@@ -183,8 +183,8 @@ PRIMITIVE divide(LISPT a, LISPT b)
 
 PRIMITIVE iquotient(LISPT a, LISPT b)
 {
-  CHECK(a, INTEGER);
-  CHECK(b, INTEGER);
+  check(a, INTEGER);
+  check(b, INTEGER);
   if(b->intval() == 0)
     return error(DIVIDE_ZERO, C_NIL);
   return mknumber(a->intval() / b->intval());
@@ -192,8 +192,8 @@ PRIMITIVE iquotient(LISPT a, LISPT b)
 
 PRIMITIVE iremainder(LISPT a, LISPT b)
 {
-  CHECK(a, INTEGER);
-  CHECK(b, INTEGER);
+  check(a, INTEGER);
+  check(b, INTEGER);
   if(b->intval() == 0)
     return error(DIVIDE_ZERO, C_NIL);
   return mknumber(a->intval() % b->intval());
@@ -201,8 +201,8 @@ PRIMITIVE iremainder(LISPT a, LISPT b)
 
 PRIMITIVE fdivide(LISPT a, LISPT b)
 {
-  CHECK(a, FLOAT);
-  CHECK(b, FLOAT);
+  check(a, FLOAT);
+  check(b, FLOAT);
   if(b->floatval() == 0.0)
     return error(DIVIDE_ZERO, C_NIL);
   return mkfloat(a->floatval() / b->floatval());
@@ -210,7 +210,7 @@ PRIMITIVE fdivide(LISPT a, LISPT b)
 
 PRIMITIVE minus(LISPT a)
 {
-  CHECK2(a, FLOAT, INTEGER);
+  check2(a, FLOAT, INTEGER);
   if(TYPEOF(a) == INTEGER)
     return mknumber(-a->intval());
   else
@@ -219,7 +219,7 @@ PRIMITIVE minus(LISPT a)
 
 PRIMITIVE iminus(LISPT a)
 {
-  CHECK(a, INTEGER);
+  check(a, INTEGER);
   return mknumber(-a->intval());
 }
 
@@ -227,7 +227,7 @@ PRIMITIVE absval(LISPT i)
 {
   int sign;
 
-  CHECK(i, INTEGER);
+  check(i, INTEGER);
   if(i->intval() < 0)
     sign = -1;
   else
@@ -237,19 +237,19 @@ PRIMITIVE absval(LISPT i)
 
 PRIMITIVE itof(LISPT i)
 {
-  CHECK(i, INTEGER);
+  check(i, INTEGER);
   return mkfloat((double)i->intval());
 }
 
 PRIMITIVE add1(LISPT a)
 {
-  CHECK(a, INTEGER);
+  check(a, INTEGER);
   return mknumber(a->intval() + 1);
 }
 
 PRIMITIVE sub1(LISPT a)
 {
-  CHECK(a, INTEGER);
+  check(a, INTEGER);
   return mknumber(a->intval() - 1);
 }
 

@@ -292,7 +292,7 @@ PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
 
   if(ISNIL(rep))
     r = 1;
-  CHECK2(wild, STRING, SYMBOL);
+  check2(wild, STRING, SYMBOL);
   wstr = extilde(wild->getstr(), r);
   if(wstr == nullptr)
     return C_NIL;

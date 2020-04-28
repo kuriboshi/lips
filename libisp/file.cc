@@ -23,7 +23,7 @@ PRIMITIVE xratom(LISPT file)
     return ratom(primin);
   if(IST(file))
     return ratom(stdin);
-  CHECK(file, FILET);
+  check(file, FILET);
   return ratom(file->fileval());
 }
 
@@ -33,7 +33,7 @@ PRIMITIVE readc(LISPT file)
     return mknumber(getch(primin));
   if(IST(file))
     return mknumber(getch(stdin));
-  CHECK(file, FILET);
+  check(file, FILET);
   return mknumber(getch(file->fileval()));
 }
 
@@ -43,7 +43,7 @@ PRIMITIVE xread(LISPT file)
     return lispread(primin, 0);
   if(IST(file))
     return lispread(stdin, 0);
-  CHECK(file, FILET);
+  check(file, FILET);
   return lispread(file->fileval(), 0);
 }
 
@@ -53,7 +53,7 @@ PRIMITIVE xprint(LISPT x, LISPT file)
     return print(x, primout);
   if(IST(file))
     return print(x, primerr);
-  CHECK(file, FILET);
+  check(file, FILET);
   return print(x, file->fileval());
 }
 
@@ -72,7 +72,7 @@ int loadfile(const char* lf)
 
 PRIMITIVE load(LISPT f)
 {
-  CHECK2(f, STRING, SYMBOL);
+  check2(f, STRING, SYMBOL);
   if(loadfile(f->getstr()))
     return error(CANT_OPEN, f);
   else
@@ -85,7 +85,7 @@ PRIMITIVE xterpri(LISPT file)
     return terpri(primout);
   if(IST(file))
     return terpri(primerr);
-  CHECK(file, FILET);
+  check(file, FILET);
   return terpri(file->fileval());
 }
 
@@ -96,7 +96,7 @@ PRIMITIVE prin1(LISPT x, LISPT file)
     return prin0(x, primout, 0);
   if(IST(file))
     return prin0(x, primerr, 0);
-  CHECK(file, FILET);
+  check(file, FILET);
   return prin0(x, file->fileval(), 0);
 }
 
@@ -107,7 +107,7 @@ PRIMITIVE prin2(LISPT x, LISPT file)
     return prin0(x, primout, 1);
   if(IST(file))
     return prin0(x, primerr, 1);
-  CHECK(file, FILET);
+  check(file, FILET);
   return prin0(x, file->fileval(), 0);
 }
 
@@ -116,7 +116,7 @@ PRIMITIVE plevel(LISPT newl)
   auto x = printlevel;
   if(!ISNIL(newl))
   {
-    CHECK(newl, INTEGER);
+    check(newl, INTEGER);
     printlevel = newl->intval();
   }
   return mknumber(x);
@@ -127,14 +127,14 @@ PRIMITIVE spaces(LISPT n, LISPT file)
   int i;
   FILE* f;
 
-  CHECK(n, INTEGER);
+  check(n, INTEGER);
   if(ISNIL(file))
     f = primout;
   else if(IST(file))
     f = primerr;
   else
   {
-    CHECK(file, FILET);
+    check(file, FILET);
     f = file->fileval();
   }
   for(i = n->intval(); i > 0; i--) putc(' ', f);
@@ -151,7 +151,7 @@ PRIMITIVE xreadline(LISPT file)
     f = stdin;
   else
   {
-    CHECK(file, FILET);
+    check(file, FILET);
     f = file->fileval();
   }
   return readline(f);
@@ -171,11 +171,11 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
     f = primerr;
   else
   {
-    CHECK(file, FILET);
+    check(file, FILET);
     f = file->fileval();
   }
-  CHECK(oname, SYMBOL);
-  CHECK2(oname->symval().value, SUBR, FSUBR);
+  check(oname, SYMBOL);
+  check2(oname->symval().value, SUBR, FSUBR);
   funn = oname->symval().pname;
   if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
     return error(CANT_OPEN, mkstring(TAGSFILE));

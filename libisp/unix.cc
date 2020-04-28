@@ -22,33 +22,33 @@ PRIMITIVE uxerrno() { return mknumber(errno); }
 
 PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
-  CHECK(name, STRING);
-  CHECK(mode, INTEGER);
+  check(name, STRING);
+  check(mode, INTEGER);
   return mknumber(access(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxalarm(LISPT seconds)
 {
-  CHECK(seconds, INTEGER);
+  check(seconds, INTEGER);
   return mknumber(alarm(seconds->intval()));
 }
 
 PRIMITIVE uxchdir(LISPT dirname)
 {
-  CHECK(dirname, STRING);
+  check(dirname, STRING);
   return mknumber(chdir(dirname->stringval()));
 }
 
 PRIMITIVE uxchmod(LISPT name, LISPT mode)
 {
-  CHECK(name, STRING);
-  CHECK(mode, INTEGER);
+  check(name, STRING);
+  check(mode, INTEGER);
   return mknumber(chmod(name->stringval(), (int)mode->intval()));
 }
 
 PRIMITIVE uxclose(LISPT fildes)
 {
-  CHECK(fildes, FILET);
+  check(fildes, FILET);
   if(fclose(fildes->fileval()) == -1)
     return C_NIL;
   else
@@ -59,8 +59,8 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
-  CHECK(name, STRING);
-  CHECK(mode, INTEGER);
+  check(name, STRING);
+  check(mode, INTEGER);
   i = creat(name->stringval(), (int)mode->intval());
   if(i < 0)
     return C_NIL;
@@ -70,7 +70,7 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 
 PRIMITIVE uxdup(LISPT fildes)
 {
-  CHECK(fildes, INTEGER);
+  check(fildes, INTEGER);
   return mknumber(dup((int)fildes->intval()));
 }
 
@@ -86,21 +86,21 @@ PRIMITIVE uxgetpid() { return mknumber(getpid()); }
 
 PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
-  CHECK(pid, INTEGER);
-  CHECK(sig, INTEGER);
+  check(pid, INTEGER);
+  check(sig, INTEGER);
   return mknumber(kill((int)pid->intval(), (int)sig->intval()));
 }
 
 PRIMITIVE uxlink(LISPT name1, LISPT name2)
 {
-  CHECK(name1, STRING);
-  CHECK(name2, STRING);
+  check(name1, STRING);
+  check(name2, STRING);
   return mknumber(link(name1->stringval(), name2->stringval()));
 }
 
 PRIMITIVE uxnice(LISPT incr)
 {
-  CHECK(incr, INTEGER);
+  check(incr, INTEGER);
   return mknumber(nice((int)incr->intval()));
 }
 
@@ -108,12 +108,12 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
 {
   const char* openmode = nullptr;
 
-  CHECK(name, STRING);
+  check(name, STRING);
   if(ISNIL(mode))
     openmode = "r";
   else
   {
-    CHECK(mode, SYMBOL);
+    check(mode, SYMBOL);
     if(EQ(mode, C_READ))
       openmode = "r";
     else if(EQ(mode, C_WRITE))
@@ -134,13 +134,13 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
 
 PRIMITIVE uxsetuid(LISPT uid)
 {
-  CHECK(uid, INTEGER);
+  check(uid, INTEGER);
   return mknumber(setuid((int)uid->intval()));
 }
 
 PRIMITIVE uxsetgid(LISPT gid)
 {
-  CHECK(gid, INTEGER);
+  check(gid, INTEGER);
   return mknumber(setgid((int)gid->intval()));
 }
 
@@ -149,7 +149,7 @@ void sighandle(int sig) { eval(sighandler[sig]); }
 
 PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 {
-  CHECK(sig, INTEGER);
+  check(sig, INTEGER);
 
   if(sig->intval() >= NSIG || sig->intval() < 1)
     return error(ILLEGAL_SIGNAL, sig);
@@ -173,7 +173,7 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 
 PRIMITIVE uxunlink(LISPT name)
 {
-  CHECK(name, STRING);
+  check(name, STRING);
   return mknumber(unlink(name->stringval()));
 }
 

@@ -263,7 +263,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     i = 0;
   else
   {
-    CHECK(incr, INTEGER);
+    check(incr, INTEGER);
     i = incr->intval();
   }
   doreclaim(NOCONSARGS, i);

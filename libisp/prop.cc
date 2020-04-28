@@ -11,21 +11,21 @@ namespace lisp
 {
 PRIMITIVE setplist(LISPT a, LISPT pl)
 {
-  CHECK(a, SYMBOL);
+  check(a, SYMBOL);
   a->symval().plist = pl;
   return pl;
 }
 
 PRIMITIVE getplist(LISPT a)
 {
-  CHECK(a, SYMBOL);
+  check(a, SYMBOL);
   return a->symval().plist;
 }
 
 PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 {
-  CHECK(a, SYMBOL);
-  CHECK(p, SYMBOL);
+  check(a, SYMBOL);
+  check(p, SYMBOL);
   for(auto pl = a->symval().plist; !ISNIL(pl); pl = pl->cdr()->cdr())
     if(EQ(pl->car(), p))
     {
@@ -38,8 +38,8 @@ PRIMITIVE putprop(LISPT a, LISPT p, LISPT v)
 
 PRIMITIVE getprop(LISPT a, LISPT p)
 {
-  CHECK(a, SYMBOL);
-  CHECK(p, SYMBOL);
+  check(a, SYMBOL);
+  check(p, SYMBOL);
   for(auto pl = a->symval().plist; !ISNIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
@@ -52,8 +52,8 @@ PRIMITIVE remprop(LISPT a, LISPT p)
 {
   LISPT pl, pl2;
 
-  CHECK(a, SYMBOL);
-  CHECK(p, SYMBOL);
+  check(a, SYMBOL);
+  check(p, SYMBOL);
   LISPT r = C_NIL;
   for(pl = a->symval().plist, pl2 = C_NIL; !ISNIL(pl); pl = pl->cdr()->cdr())
   {

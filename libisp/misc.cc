@@ -30,7 +30,7 @@ PRIMITIVE evaltrace(LISPT state)
 
   if(!ISNIL(state))
   {
-    CHECK(state, INTEGER);
+    check(state, INTEGER);
     trace = state->intval();
   }
   return mknumber(i);
