@@ -8,6 +8,7 @@
 
 #include "lisp.hh"
 #include "except.hh"
+#include "misc.hh"
 
 #define PRINT_ARG (1 << 8)
 #define NOT_A (1 << 9)
@@ -48,13 +49,13 @@ namespace lisp
 inline void check(LISPT arg, lisp_type type)
 {
   if(TYPEOF(arg) != type)
-    throw type_error(arg, type);
+    error(NOT_A | type, arg);
 }
 
 inline void check2(LISPT arg, lisp_type type0, lisp_type type1)
 {
   if(TYPEOF(arg) != type0 && TYPEOF(arg) != type1)
-    throw type_error(arg, type0, type1);
+    error(ILLEGAL_ARG, arg);
 }
 
 } // namespace lisp

@@ -36,7 +36,7 @@ PRIMITIVE evaltrace(LISPT state)
   return mknumber(i);
 }
 
-LISPT error(int messnr, LISPT arg)
+LISPT perror(int messnr, LISPT arg)
 {
   if(NOT_A & messnr)
     fprintf(primerr, "%s ", errmess[ERRNO(messnr)]);
@@ -45,6 +45,12 @@ LISPT error(int messnr, LISPT arg)
   if(messnr & (PRINT_ARG | NOT_A))
     prin2(arg, C_T);
   return C_ERROR;
+}
+
+LISPT error(int messnr, LISPT arg)
+{
+  perror(messnr, arg);
+  throw lisp_error("lisp_error");
 }
 
 LISPT syserr(LISPT fault)
@@ -76,7 +82,7 @@ static int dobreak(LISPT* com)
   else if(EQ((**com).car(), C_RESET))
   {
     unwind();
-    throw lisp_error("reset");
+    throw lisp_reset();
   }
   else if(EQ((**com).car(), C_BT))
   {

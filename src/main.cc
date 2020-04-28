@@ -461,6 +461,9 @@ int main(int argc, char* const* argv)
       if(toploop(&topprompt, nullptr))
         break;
     }
+    catch(const lisp_reset&)
+    {
+    }
     catch(const lisp_error& error)
     {
       printf("error: %s\n", error.what());

@@ -114,7 +114,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 {
   if(mess != 0)
   {
-    error(mess, fault);
+    perror(mess, fault);
     printwhere();
   }
   if(breakhook != nullptr)
@@ -764,9 +764,12 @@ bool evaluator::ev2()
     send(foo);
     cont = pop_func();
   }
+  catch(const lisp_reset&)
+  {
+  }
   catch(const lisp_error& ex)
   {
-    fprintf(primerr, "%s ", ex.what());
+    // fprintf(primerr, "%s ", ex.what());
     auto foo = printwhere();
     if(ISNIL(foo))
       xbreak(0, C_NIL, peval1);
