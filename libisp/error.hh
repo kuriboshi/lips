@@ -10,42 +10,44 @@
 #include "except.hh"
 #include "misc.hh"
 
-#define PRINT_ARG (1 << 8)
-#define NOT_A (1 << 9)
-#define ERRNO(x) ((x) & ~PRINT_ARG & ~NOT_A)
-
-#define NO_MESSAGE 0
-#define ILLEGAL_ARG (PRINT_ARG | 1)
-#define DIVIDE_ZERO 2
-#define BUG 3
-#define NO_MATCH (PRINT_ARG | 4)
-#define CANT_CREATE (PRINT_ARG | 6)
-#define CANT_CREATE_OPEN (PRINT_ARG | 7)
-#define CANT_OPEN (PRINT_ARG | 8)
-#define NO_SUCH_JOB (PRINT_ARG | 9)
-#define NOT_PRINTABLE (PRINT_ARG | 10)
-#define NO_DIRECTORY (PRINT_ARG | 11)
-#define NO_USER (PRINT_ARG | 12)
-#define ATTEMPT_TO_RESET (PRINT_ARG | 13)
-#define OUT_OF_MEMORY 14
-#define UNEXPECTED_EOF 15
-#define EVENT_NOT_FOUND 16
-#define UNKNOWN_REQUEST (PRINT_ARG | 17)
-#define ILLEGAL_SIGNAL 18
-#define STACK_OVERFLOW 19
-#define CORRUPT_DATA (PRINT_ARG | 20)
-#define COMMAND_ABORTED 21
-#define ALIAS_LOOP (PRINT_ARG | 22)
-#define ILLEGAL_FUNCTION (PRINT_ARG | 23)
-#define UNDEF_FUNCTION (PRINT_ARG | 24)
-#define UNBOUND_VARIABLE (PRINT_ARG | 25)
-#define KBD_BREAK (PRINT_ARG | 26)
-#define AMBIGUOUS (PRINT_ARG | 27)
-#define USER_ERROR (PRINT_ARG | 28)
-#define MAXMESSAGE 29
-
 namespace lisp
 {
+
+inline constexpr int PRINT_ARG = 1 << 8;
+inline constexpr int NOT_A = 1 << 9;
+
+inline constexpr int NO_MESSAGE = 0;
+inline constexpr int ILLEGAL_ARG = (PRINT_ARG | 1);
+inline constexpr int DIVIDE_ZERO = 2;
+inline constexpr int BUG = 3;
+inline constexpr int NO_MATCH = (PRINT_ARG | 4);
+inline constexpr int CANT_CREATE = (PRINT_ARG | 6);
+inline constexpr int CANT_CREATE_OPEN = (PRINT_ARG | 7);
+inline constexpr int CANT_OPEN = (PRINT_ARG | 8);
+inline constexpr int NO_SUCH_JOB = (PRINT_ARG | 9);
+inline constexpr int NOT_PRINTABLE = (PRINT_ARG | 10);
+inline constexpr int NO_DIRECTORY = (PRINT_ARG | 11);
+inline constexpr int NO_USER = (PRINT_ARG | 12);
+inline constexpr int ATTEMPT_TO_RESET = (PRINT_ARG | 13);
+inline constexpr int OUT_OF_MEMORY = 14;
+inline constexpr int UNEXPECTED_EOF = 15;
+inline constexpr int EVENT_NOT_FOUND = 16;
+inline constexpr int UNKNOWN_REQUEST = (PRINT_ARG | 17);
+inline constexpr int ILLEGAL_SIGNAL = 18;
+inline constexpr int STACK_OVERFLOW = 19;
+inline constexpr int CORRUPT_DATA = (PRINT_ARG | 20);
+inline constexpr int COMMAND_ABORTED = 21;
+inline constexpr int ALIAS_LOOP = (PRINT_ARG | 22);
+inline constexpr int ILLEGAL_FUNCTION = (PRINT_ARG | 23);
+inline constexpr int UNDEF_FUNCTION = (PRINT_ARG | 24);
+inline constexpr int UNBOUND_VARIABLE = (PRINT_ARG | 25);
+inline constexpr int KBD_BREAK = (PRINT_ARG | 26);
+inline constexpr int AMBIGUOUS = (PRINT_ARG | 27);
+inline constexpr int USER_ERROR = (PRINT_ARG | 28);
+inline constexpr int MAXMESSAGE = 29;
+
+inline int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
+
 inline void check(LISPT arg, lisp_type type)
 {
   if(TYPEOF(arg) != type)
