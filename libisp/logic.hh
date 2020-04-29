@@ -5,13 +5,13 @@
 
 #pragma once
 
-namespace lisp {
-
+namespace lisp
+{
 class logic
 {
 public:
   logic();
   ~logic() = default;
 };
-  
-}
+
+} // namespace lisp

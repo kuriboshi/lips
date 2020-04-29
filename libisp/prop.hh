@@ -7,7 +7,6 @@
 
 namespace lisp
 {
-
 class prop
 {
 public:

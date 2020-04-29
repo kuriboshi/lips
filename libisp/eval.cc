@@ -768,8 +768,7 @@ bool evaluator::ev2()
     cont = pop_func();
   }
   catch(const lisp_reset&)
-  {
-  }
+  {}
   catch(const lisp_error& ex)
   {
     // fprintf(primerr, "%s ", ex.what());

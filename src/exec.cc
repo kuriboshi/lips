@@ -32,7 +32,7 @@ LISPT p_setenv(LISPT, LISPT);
 #define UNION_WAIT int
 
 bool insidefork = false; /* Is nonzero in the child after */
-                    /* a fork */
+                         /* a fork */
 
 static BITS32 exechash[EXECHASH / 32]; /* One bit set for each program */
 static int pgrp;                       /* Process group of current job */

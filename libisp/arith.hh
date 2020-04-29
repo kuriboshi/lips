@@ -1,6 +1,5 @@
 namespace lisp
 {
-
 class arith
 {
 public:

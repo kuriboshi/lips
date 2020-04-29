@@ -8,7 +8,6 @@
 
 namespace lisp
 {
-
 PRIMITIVE xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(TYPEOF(obj) == CONS)

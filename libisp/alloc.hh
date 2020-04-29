@@ -115,15 +115,26 @@ private:
   static destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
   static int destblockused;                    // Index to last slot in destblock.
   static std::vector<LISPT*> markobjs;
-
 };
 
 inline LISPT intern(const char* s) { return alloc::intern(s); }
 inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
-inline void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
+inline void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
 inline LISPT mkstring(const char* s) { return alloc::mkstring(s); }
 inline LISPT mknumber(int i) { return alloc::mknumber(i); }
 inline LISPT mkatom(char* s) { return alloc::mkatom(s); }

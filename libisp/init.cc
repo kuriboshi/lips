@@ -8,7 +8,6 @@
 
 namespace lisp
 {
-
 /*
  * All lisp constants needed internally.
  */

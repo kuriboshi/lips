@@ -31,8 +31,8 @@ extern void end_term();
 extern void clearlbuf();
 extern void loadbuf(char*);
 
-char* progname; /* Name of the game. */
-bool brkflg = false;     /* 1 means break at next call to peval1. */
+char* progname;      /* Name of the game. */
+bool brkflg = false; /* 1 means break at next call to peval1. */
 bool interrupt;
 int mypgrp;             /* lips process group. */
 struct options options; /* Structure for all options. */
@@ -460,8 +460,7 @@ int main(int argc, char* const* argv)
         break;
     }
     catch(const lisp_reset&)
-    {
-    }
+    {}
     catch(const lisp_error& error)
     {
       printf("error: %s\n", error.what());

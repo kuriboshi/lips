@@ -9,7 +9,6 @@
 
 namespace lisp
 {
-
 class map
 {
 public:
@@ -17,4 +16,4 @@ public:
   ~map() = default;
 };
 
-}
+} // namespace lisp

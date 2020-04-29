@@ -19,7 +19,7 @@ public:
 class lisp_reset: public lisp_error
 {
 public:
-  lisp_reset() : lisp_error("reset") {}
+  lisp_reset(): lisp_error("reset") {}
 };
 
 } // namespace lisp

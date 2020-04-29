@@ -9,7 +9,6 @@
 
 namespace lisp
 {
-
 class user
 {
 public:
