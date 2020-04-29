@@ -453,11 +453,7 @@ int main(int argc, char* const* argv)
   {
     try
     {
-      evaluator::toctrl = 0;
-      dzero();
-      evaluator::fun = C_NIL;
-      evaluator::args = C_NIL;
-      evaluator::env = nullptr;
+      evaluator::reset();
       if(toploop(&topprompt, nullptr))
         break;
     }

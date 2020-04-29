@@ -36,19 +36,12 @@ static struct floats
 } floats;
 #endif /* FLOATING */
 
-/*
- * markobjs contains pointers to all LISPT type c variables that
- * contains data to be retained during gc.
- */
-LISPT* markobjs[] = {&top, &rstack, &history, &histnum, &evaluator::fun, &evaluator::expression, &evaluator::args,
-  &path, &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version, &alloc::gcgag,
-  &alias_expanded, &C_EOF, nullptr};
-
 LISPT alloc::foo1 = nullptr; // Protect arguments of cons when gc.
 LISPT alloc::foo2 = nullptr;
 alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
 alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
 int alloc::destblockused = 0;                              // Index to last slot in destblock.
+std::vector<LISPT*> alloc::markobjs;
 
 /*
  * realmalloc - wrapper around malloc which returns a char*.
@@ -202,7 +195,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
       mark(evaluator::dest[i].var.d_lisp);
       mark(evaluator::dest[i].val.d_lisp);
     }
-  for(int i = 0; markobjs[i] != nullptr; i++) mark(*markobjs[i]);
+  for(auto i: markobjs) mark(*i);
 #if 0
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
@@ -488,6 +481,10 @@ void alloc::dzero() { destblockused = 0; }
 
 void alloc::init_alloc()
 {
+  for(auto i: {&top, &rstack, &history, &histnum,
+        &path, &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
+        &gcgag, &alias_expanded, &C_EOF})
+    add_mark_object(i);
   destblockused = 0;
   conscells = nullptr;
   conscells = newpage(); /* Allocate one page of storage */

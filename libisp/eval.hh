@@ -42,6 +42,8 @@ public:
   static const int CTRLBLKSIZE = 4000;
   static control_t control[CTRLBLKSIZE];
 
+  static void reset();
+
   static PRIMITIVE eval(LISPT expr);
   static PRIMITIVE apply(LISPT f, LISPT a);
   static PRIMITIVE baktrace();
@@ -51,10 +53,6 @@ public:
   static void init_ev();
 
   static int toctrl;
-  static LISPT fun;
-  static LISPT expression;
-  static LISPT args;
-  static alloc::destblock_t* env;
   static alloc::destblock_t* dest;
 
   using undefhook_t = int (*)(LISPT, LISPT*);
@@ -122,8 +120,12 @@ private:
   static void abort(int m, LISPT v);
   static void overflow();
 
+  static LISPT fun;
+  static LISPT expression;
+  static LISPT args;
   static bool noeval;         // Don't evaluate arguments.
   static continuation_t cont; // Current continuation.
+  static alloc::destblock_t* env;
 };
 
 inline void unwind() { evaluator::unwind(); }

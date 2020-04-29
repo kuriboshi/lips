@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include "lisp.hh"
 
 namespace lisp
@@ -88,6 +89,8 @@ public:
   static PRIMITIVE xobarray();
   static PRIMITIVE freecount();
 
+  static void add_mark_object(LISPT* o) { markobjs.push_back(o); }
+
 private:
   static conscells_t* newpage();
   static int sweep();
@@ -103,6 +106,8 @@ private:
   static conscells_t* conscells;               // Cons cell storage.
   static destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
   static int destblockused;                    // Index to last slot in destblock.
+  static std::vector<LISPT*> markobjs;
+
 };
 
 inline void init_alloc() { alloc::init_alloc(); }

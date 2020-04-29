@@ -20,11 +20,7 @@ evaluator::continuation_t evaluator::cont = nullptr;
 evaluator::breakhook_t evaluator::breakhook = nullptr; // Called before going into break.
 evaluator::undefhook_t evaluator::undefhook = nullptr; // Called in case of undefined function.
 
-/* 
- * These variables are really local to this file but are needed
- * by the garbage collector.
- */
-LISPT evaluator::fun = nullptr;                /* Store current function beeing evaluated. */
+LISPT evaluator::fun = nullptr;                /* Store current function being evaluated. */
 LISPT evaluator::expression = nullptr;         /* Current expression. */
 LISPT evaluator::args = nullptr;               /* Current arguments. */
 alloc::destblock_t* evaluator::env = nullptr;  /* Current environment. */
@@ -32,6 +28,15 @@ alloc::destblock_t* evaluator::dest = nullptr; /* Current destination beeing bui
 
 evaluator::control_t evaluator::control[]; /* Control-stack. */
 int evaluator::toctrl = 0;                 /* Control-stack stack pointer. */
+
+void evaluator::reset()
+{
+  dzero();
+  toctrl = 0;
+  fun = C_NIL;
+  args = C_NIL;
+  env = nullptr;
+}
 
 LISPT evaluator::printwhere()
 {
@@ -1030,6 +1035,9 @@ PRIMITIVE evaluator::baktrace()
 
 void evaluator::init_ev()
 {
+  alloc::add_mark_object(&evaluator::fun);
+  alloc::add_mark_object(&evaluator::expression);
+  alloc::add_mark_object(&evaluator::args);
   mkprim(PN_E, eval, 1, FSUBR);
   mkprim(PN_EVAL, eval, 1, SUBR);
   mkprim(PN_APPLY, apply, 2, SUBR);
