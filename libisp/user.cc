@@ -10,7 +10,7 @@ namespace lisp
 {
 static LISPT getargs(LISPT al)
 {
-  if(ISNIL(al->cdr()))
+  if(is_NIL(al->cdr()))
     return al->car();
   else
     return cons(al->car(), getargs(al->cdr()));
@@ -20,7 +20,7 @@ PRIMITIVE getrep(LISPT fun)
 {
   LISPT args;
 
-  if(TYPEOF(fun) != LAMBDA && TYPEOF(fun) != NLAMBDA)
+  if(type_of(fun) != LAMBDA && type_of(fun) != NLAMBDA)
     return C_NIL;
   auto& x = fun->lamval();
   if(x.argcnt == -1)
@@ -29,7 +29,7 @@ PRIMITIVE getrep(LISPT fun)
     args = getargs(x.arglist);
   else
     args = x.arglist;
-  if(TYPEOF(fun) == LAMBDA)
+  if(type_of(fun) == LAMBDA)
     return cons(C_LAMBDA, cons(args, x.lambdarep));
   return cons(C_NLAMBDA, cons(args, x.lambdarep));
 }
@@ -43,12 +43,12 @@ LISPT funeq(LISPT f1, LISPT f2)
     LISPT t1 = f1->lamval().arglist;
     LISPT t2 = f2->lamval().arglist;
     LISPT tmp = equal(t1, t2);
-    if(!ISNIL(tmp))
+    if(!is_NIL(tmp))
     {
       t1 = f1->lamval().lambdarep;
       t2 = f2->lamval().lambdarep;
       tmp = equal(t1, t2);
-      if(!ISNIL(tmp))
+      if(!is_NIL(tmp))
         return C_T;
     }
   }
@@ -57,14 +57,14 @@ LISPT funeq(LISPT f1, LISPT f2)
 
 static LISPT checkfn(LISPT name, LISPT lam)
 {
-  if(TYPEOF(name->getopval()) != UNBOUND)
-    if(TYPEOF(name->getopval()) == LAMBDA || TYPEOF(name->getopval()) == NLAMBDA)
+  if(type_of(name->getopval()) != UNBOUND)
+    if(type_of(name->getopval()) == LAMBDA || type_of(name->getopval()) == NLAMBDA)
     {
       LISPT t = funeq(name->getopval(), lam);
-      if(ISNIL(t))
+      if(is_NIL(t))
       {
         putprop(name, C_OLDDEF, name->getopval());
-        if(!ISNIL(verboseflg))
+        if(!is_NIL(verboseflg))
           xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
       }
     }
@@ -83,10 +83,10 @@ PRIMITIVE define(LISPT name, LISPT lam)
 static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
   check(name, SYMBOL);
-  if(!ISNIL(pars) && TYPEOF(pars) != SYMBOL)
+  if(!is_NIL(pars) && type_of(pars) != SYMBOL)
     check(pars, CONS);
   LISPT foo = alloc::mklambda(pars, body, type);
-  if(TYPEOF(foo) == ERROR)
+  if(type_of(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);
   name->setopval(foo);

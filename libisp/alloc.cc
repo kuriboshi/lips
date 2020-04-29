@@ -86,7 +86,7 @@ int alloc::sweep()
   SET(freelist, FREE, (LISPT)&cc->cells[i]);
   nrfreed++;
   LISPT f = freelist;
-  if(TYPEOF(f) == CPOINTER)
+  if(type_of(f) == CPOINTER)
     free(f->cpointval());
   i++; /* Check *next* cell */
   for(; cc; cc = cc->next, i = 0)
@@ -97,7 +97,7 @@ int alloc::sweep()
         /*
 	   * C pointers must be freed.
 	   */
-        if(TYPEOF(f) == CPOINTER)
+        if(type_of(f) == CPOINTER)
           free(f->cpointval());
         SET(f->freeval(), FREE, &cc->cells[i]);
         f = f->freeval();
@@ -116,12 +116,12 @@ int alloc::sweep()
  */
 void alloc::mark(LISPT x)
 {
-  switch(TYPEOF(x))
+  switch(type_of(x))
   {
     case CONS:
-      if(MARKED(x))
+      if(x->marked())
         break;
-      MARK(x);
+      x->mark();
       mark(x->car());
       mark(x->cdr());
       break;
@@ -136,27 +136,27 @@ void alloc::mark(LISPT x)
       break;
     case LAMBDA:
     case NLAMBDA:
-      MARK(x);
+      x->mark();
       mark(x->lamval().lambdarep);
       mark(x->lamval().arglist);
       break;
     case CLOSURE:
-      MARK(x);
+      x->mark();
       mark(x->closval().cfunction);
       mark(x->closval().closed);
       mark(x->closval().cvalues);
       break;
     case STRING:
-      MARK(x);
+      x->mark();
       break;
     case INDIRECT:
-      MARK(x);
+      x->mark();
       mark(x->indirectval());
       break;
     case NIL:
       break;
     default:
-      MARK(x);
+      x->mark();
       break;
   }
 }
@@ -168,7 +168,7 @@ void alloc::mark(LISPT x)
  */
 LISPT alloc::doreclaim(int doconsargs, int incr)
 {
-  if(ISNIL(gcgag))
+  if(is_NIL(gcgag))
     fprintf(primerr, "garbage collecting\n");
 #ifdef FLOATING
   for(int i = 0; i < 4; i++) floats.marks[i] = 0;
@@ -176,7 +176,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
   p0 = 0;
 #endif /* FLOATING */
   if(C_T != nullptr)
-    MARK(C_T);
+    C_T->mark();
   if(doconsargs)
   {
     mark(foo1);
@@ -195,12 +195,12 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
 #endif
   for(int i = 0; i < evaluator::toctrl; i++)
     if(evaluator::control[i].type == evaluator::CTRL_LISP && evaluator::control[i].u.lisp != nullptr
-      && TYPEOF(evaluator::control[i].u.lisp) != ENVIRON)
+      && type_of(evaluator::control[i].u.lisp) != ENVIRON)
       mark(evaluator::control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
     {
-      MARK(l->sym);
+      l->sym->mark();
       mark((l->sym->symval().value));
       mark((l->sym->symval().plist));
     }
@@ -232,7 +232,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
       conscells = newpage();
     while(incr-- > 0); /* At least one page more */
   }
-  if(ISNIL(gcgag))
+  if(is_NIL(gcgag))
     fprintf(primerr, "%d cells freed\n", nrfreed);
   return C_NIL;
 }
@@ -245,7 +245,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 {
   int i;
 
-  if(ISNIL(incr))
+  if(is_NIL(incr))
     i = 0;
   else
   {
@@ -258,7 +258,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 
 LISPT alloc::getobject()
 {
-  if(ISNIL(freelist))
+  if(is_NIL(freelist))
     doreclaim(NOCONSARGS, 0L);
 
   LISPT f = nullptr;
@@ -273,7 +273,7 @@ LISPT alloc::getobject()
  */
 PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
-  if(ISNIL(freelist))
+  if(is_NIL(freelist))
   {
     foo1 = a;
     foo2 = b;
@@ -369,7 +369,7 @@ LISPT alloc::mknumber(int i)
  */
 static LISPT mkarglis(LISPT alist, int& count)
 {
-  if(TYPEOF(alist) == CONS)
+  if(type_of(alist) == CONS)
   {
     count++;
     return cons(alist->car(), mkarglis(alist->cdr(), count));

@@ -51,13 +51,14 @@ enum lisp_type
   USER,      /* user defined type */
 };
 
-#define C_NIL nullptr
+inline constexpr auto C_NIL = nullptr;
 extern LISPT C_T;
 
 using BITS32 = int;
 
+// The cons cell
 struct cons_t
-{ /* The cons cell */
+{
   LISPT car;
   LISPT cdr;
 };
@@ -98,16 +99,12 @@ struct closure_t
 
 struct lisp_t
 {
-  lisp_t()
-  {
-    gcmark = false;
-    type = NIL;
-  }
+  lisp_t() {}
   ~lisp_t() {}
   lisp_t(const lisp_t&) = delete;
 
   bool gcmark = false;
-  enum lisp_type type;
+  enum lisp_type type = NIL;
   union
   {
     // One entry for each type.  Types that has no, or just one value are
@@ -176,18 +173,18 @@ struct lisp_t
   void setopval(LISPT y) { setq(y); }
   LISPT getopval() { return symvalue(); }
   const char* getstr() { return type == STRING ? stringval() : symval().pname; }
+
+  /*
+   * Some more or less helpfull functions
+   */
+  void settype(lisp_type t) { type = t; }
+  bool marked() { return gcmark; }
+  void mark() { gcmark = true; }
+  void unmark() { gcmark = false; }
 };
 
-/*
- * Some more or less helpfull functions
- */
-inline lisp_type TYPEOF(LISPT a) { return a == nullptr ? NIL : a->type; }
-inline void SETTYPE(LISPT a, lisp_type t) { a->type = t; }
-inline bool MARKED(LISPT a) { return a->gcmark; }
-inline void MARK(LISPT a) { a->gcmark = true; }
-inline void UNMARK(LISPT a) { a->gcmark = false; }
-
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
+inline lisp_type type_of(LISPT a) { return a == nullptr ? NIL : a->type; }
 
 #if 0
 inline alloc::destblock_t* ENVVAL(LISPT e) { return e->u.l_environ; }
@@ -197,10 +194,10 @@ inline void SET(LISPT& a, lisp_type t, LISPT p)
 {
   a = p;
   a->type = t;
-  UNMARK(a);
+  a->unmark();
 }
 
-inline bool IST(LISPT x) { return TYPEOF(x) == TRUE; }
-inline bool ISNIL(LISPT x) { return TYPEOF(x) == NIL; }
+inline bool is_T(LISPT x) { return type_of(x) == TRUE; }
+inline bool is_NIL(LISPT x) { return type_of(x) == NIL; }
 
 } // namespace lisp

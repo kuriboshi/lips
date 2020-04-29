@@ -27,7 +27,7 @@ PRIMITIVE evaltrace(LISPT state)
 {
   auto i = trace;
 
-  if(!ISNIL(state))
+  if(!is_NIL(state))
   {
     check(state, INTEGER);
     trace = state->intval();
@@ -54,7 +54,7 @@ LISPT error(int messnr, LISPT arg)
 
 LISPT syserr(LISPT fault)
 {
-  if(!ISNIL(fault))
+  if(!is_NIL(fault))
   {
     prin2(fault, C_T);
     fprintf(stderr, ": ");
@@ -68,7 +68,7 @@ static LISPT pexp;
 static int dobreak(LISPT* com)
 {
   /* OK, EVAL, ^, ... */
-  if(TYPEOF(*com) != CONS)
+  if(type_of(*com) != CONS)
   {
     unwind();
     throw lisp_error("bad command");
@@ -90,7 +90,7 @@ static int dobreak(LISPT* com)
   }
   else if(EQ((**com).car(), C_RETURN))
   {
-    pexp = ISNIL((**com).cdr()) ? C_NIL : (**com).cdr()->car();
+    pexp = is_NIL((**com).cdr()) ? C_NIL : (**com).cdr()->car();
     return 0;
   }
   return 1;

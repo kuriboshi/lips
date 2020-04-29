@@ -17,9 +17,9 @@ namespace lisp
 {
 PRIMITIVE xratom(LISPT file)
 {
-  if(ISNIL(file))
+  if(is_NIL(file))
     return ratom(primin);
-  if(IST(file))
+  if(is_T(file))
     return ratom(stdin);
   check(file, FILET);
   return ratom(file->fileval());
@@ -27,9 +27,9 @@ PRIMITIVE xratom(LISPT file)
 
 PRIMITIVE readc(LISPT file)
 {
-  if(ISNIL(file))
+  if(is_NIL(file))
     return mknumber(getch(primin));
-  if(IST(file))
+  if(is_T(file))
     return mknumber(getch(stdin));
   check(file, FILET);
   return mknumber(getch(file->fileval()));
@@ -37,9 +37,9 @@ PRIMITIVE readc(LISPT file)
 
 PRIMITIVE xread(LISPT file)
 {
-  if(ISNIL(file))
+  if(is_NIL(file))
     return lispread(primin, 0);
-  if(IST(file))
+  if(is_T(file))
     return lispread(stdin, 0);
   check(file, FILET);
   return lispread(file->fileval(), 0);
@@ -47,9 +47,9 @@ PRIMITIVE xread(LISPT file)
 
 PRIMITIVE xprint(LISPT x, LISPT file)
 {
-  if(ISNIL(file))
+  if(is_NIL(file))
     return print(x, primout);
-  if(IST(file))
+  if(is_T(file))
     return print(x, primerr);
   check(file, FILET);
   return print(x, file->fileval());
@@ -60,7 +60,7 @@ bool loadfile(const char* lf)
   auto* foo = fopen(lf, "r");
   if(foo == nullptr)
     return false;
-  for(auto rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0))
+  for(auto rval = lispread(foo, 0); type_of(rval) != ENDOFFILE; rval = lispread(foo, 0))
   {
     rval = evaluator::eval(rval);
   }
@@ -78,9 +78,9 @@ PRIMITIVE load(LISPT f)
 
 PRIMITIVE xterpri(LISPT file)
 {
-  if(ISNIL(file))
+  if(is_NIL(file))
     return terpri(primout);
-  if(IST(file))
+  if(is_T(file))
     return terpri(primerr);
   check(file, FILET);
   return terpri(file->fileval());
@@ -89,9 +89,9 @@ PRIMITIVE xterpri(LISPT file)
 PRIMITIVE prin1(LISPT x, LISPT file)
 {
   thisplevel = 0;
-  if(ISNIL(file))
+  if(is_NIL(file))
     return prin0(x, primout, 0);
-  if(IST(file))
+  if(is_T(file))
     return prin0(x, primerr, 0);
   check(file, FILET);
   return prin0(x, file->fileval(), 0);
@@ -100,9 +100,9 @@ PRIMITIVE prin1(LISPT x, LISPT file)
 PRIMITIVE prin2(LISPT x, LISPT file)
 {
   thisplevel = 0;
-  if(ISNIL(file))
+  if(is_NIL(file))
     return prin0(x, primout, 1);
-  if(IST(file))
+  if(is_T(file))
     return prin0(x, primerr, 1);
   check(file, FILET);
   return prin0(x, file->fileval(), 0);
@@ -111,7 +111,7 @@ PRIMITIVE prin2(LISPT x, LISPT file)
 PRIMITIVE plevel(LISPT newl)
 {
   auto x = printlevel;
-  if(!ISNIL(newl))
+  if(!is_NIL(newl))
   {
     check(newl, INTEGER);
     printlevel = newl->intval();
@@ -125,9 +125,9 @@ PRIMITIVE spaces(LISPT n, LISPT file)
   FILE* f;
 
   check(n, INTEGER);
-  if(ISNIL(file))
+  if(is_NIL(file))
     f = primout;
-  else if(IST(file))
+  else if(is_T(file))
     f = primerr;
   else
   {
@@ -142,9 +142,9 @@ PRIMITIVE xreadline(LISPT file)
 {
   FILE* f;
 
-  if(ISNIL(file))
+  if(is_NIL(file))
     f = primin;
-  else if(IST(file))
+  else if(is_T(file))
     f = stdin;
   else
   {
@@ -162,9 +162,9 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   char lname[20], cname[20], fname[20];
   int line, acnt;
 
-  if(ISNIL(file))
+  if(is_NIL(file))
     f = primout;
-  else if(IST(file))
+  else if(is_T(file))
     f = primerr;
   else
   {
@@ -192,7 +192,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
       prin2(oname, file);
       putch(' ', f, 0);
       putch('(', f, 0);
-      if(TYPEOF(oname->symvalue()) == SUBR)
+      if(type_of(oname->symvalue()) == SUBR)
         prin1(C_SUBR, file);
       else
         prin1(C_FSUBR, file);

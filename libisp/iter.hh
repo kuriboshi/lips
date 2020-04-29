@@ -19,7 +19,7 @@ public:
   bool operator!=(const iterator& x) const { return _car != x._car; }
   iterator& operator++()
   {
-    if(TYPEOF(_car) == CONS)
+    if(type_of(_car) == CONS)
       _car = _car->cdr();
     else
       _car = nullptr;

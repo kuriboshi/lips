@@ -22,20 +22,20 @@ PRIMITIVE plus(LISPT l)
   int sum = 0;
   int f = 0;
 
-  while(TYPEOF(l) == CONS)
+  while(type_of(l) == CONS)
   {
     if(f)
     {
-      if(TYPEOF(l->car()) == INTEGER)
+      if(type_of(l->car()) == INTEGER)
         fsum += (double)l->car()->intval();
-      else if(TYPEOF(l->car()) == FLOAT)
+      else if(type_of(l->car()) == FLOAT)
         fsum += l->car()->floatval();
       else
         return error(ILLEGAL_ARG, l->car());
     }
-    else if(TYPEOF(l->car()) == INTEGER)
+    else if(type_of(l->car()) == INTEGER)
       sum += l->car()->intval();
-    else if(TYPEOF(l->car()) == FLOAT)
+    else if(type_of(l->car()) == FLOAT)
     {
       f = 1;
       fsum = l->car()->floatval() + (double)sum;
@@ -65,7 +65,7 @@ PRIMITIVE fplus(LISPT l)
   check(l->car(), FLOAT);
   auto sum = l->car()->floatval();
   l = l->cdr();
-  while(TYPEOF(l) == CONS)
+  while(type_of(l) == CONS)
   {
     check(l->car(), FLOAT);
     sum = sum + l->car()->floatval();
@@ -78,12 +78,12 @@ PRIMITIVE difference(LISPT a, LISPT b)
 {
   check2(a, INTEGER, FLOAT);
   check2(b, INTEGER, FLOAT);
-  if(TYPEOF(a) == INTEGER)
-    if(TYPEOF(b) == INTEGER)
+  if(type_of(a) == INTEGER)
+    if(type_of(b) == INTEGER)
       return mknumber(a->intval() - b->intval());
     else
       return mkfloat((double)a->intval() - b->floatval());
-  else if(TYPEOF(b) == INTEGER)
+  else if(type_of(b) == INTEGER)
     return mkfloat(a->floatval() - (double)b->intval());
   return mkfloat(a->floatval() - b->floatval());
 }
@@ -108,20 +108,20 @@ PRIMITIVE ltimes(LISPT l)
   int prod = 1;
   int f = 0;
 
-  while(TYPEOF(l) == CONS)
+  while(type_of(l) == CONS)
   {
     if(f)
     {
-      if(TYPEOF(l->car()) == INTEGER)
+      if(type_of(l->car()) == INTEGER)
         fprod *= (double)l->car()->intval();
-      else if(TYPEOF(l->car()) == FLOAT)
+      else if(type_of(l->car()) == FLOAT)
         fprod *= l->car()->floatval();
       else
         return error(ILLEGAL_ARG, l->car());
     }
-    else if(TYPEOF(l->car()) == INTEGER)
+    else if(type_of(l->car()) == INTEGER)
       prod *= l->car()->intval();
-    else if(TYPEOF(l->car()) == FLOAT)
+    else if(type_of(l->car()) == FLOAT)
     {
       f = 1;
       fprod = l->car()->floatval() * (double)prod;
@@ -140,7 +140,7 @@ PRIMITIVE itimes(LISPT l)
   check(l->car(), INTEGER);
   auto prod = l->car()->intval();
   l = l->cdr();
-  while(TYPEOF(l) == CONS)
+  while(type_of(l) == CONS)
   {
     check(l->car(), INTEGER);
     prod = prod * l->car()->intval();
@@ -154,7 +154,7 @@ PRIMITIVE ftimes(LISPT l)
   check(l->car(), FLOAT);
   auto prod = l->car()->floatval();
   l = l->cdr();
-  while(TYPEOF(l) == CONS)
+  while(type_of(l) == CONS)
   {
     check(l->car(), FLOAT);
     prod = prod * l->car()->floatval();
@@ -167,12 +167,12 @@ PRIMITIVE divide(LISPT a, LISPT b)
 {
   check2(a, INTEGER, FLOAT);
   check2(b, INTEGER, FLOAT);
-  if(TYPEOF(a) == INTEGER)
-    if(TYPEOF(b) == INTEGER)
+  if(type_of(a) == INTEGER)
+    if(type_of(b) == INTEGER)
       return mknumber(a->intval() / b->intval());
     else
       return mkfloat((double)a->intval() / b->floatval());
-  else if(TYPEOF(b) == INTEGER)
+  else if(type_of(b) == INTEGER)
     return mkfloat(a->floatval() / (double)b->intval());
   else
     return mkfloat(a->floatval() / b->floatval());
@@ -209,7 +209,7 @@ PRIMITIVE fdivide(LISPT a, LISPT b)
 PRIMITIVE minus(LISPT a)
 {
   check2(a, FLOAT, INTEGER);
-  if(TYPEOF(a) == INTEGER)
+  if(type_of(a) == INTEGER)
     return mknumber(-a->intval());
   else
     return mkfloat(-a->floatval());
@@ -263,19 +263,19 @@ enum class num_type
 
 inline num_type numtype(LISPT x, LISPT y)
 {
-  if(TYPEOF(x) == FLOAT)
+  if(type_of(x) == FLOAT)
   {
-    if(TYPEOF(y) == FLOAT)
+    if(type_of(y) == FLOAT)
       return num_type::FLOATFLOAT;
-    else if(TYPEOF(y) == INTEGER)
+    else if(type_of(y) == INTEGER)
       return num_type::FLOATINT;
     return num_type::ILLEGAL2;
   }
-  else if(TYPEOF(x) == INTEGER)
+  else if(type_of(x) == INTEGER)
   {
-    if(TYPEOF(y) == FLOAT)
+    if(type_of(y) == FLOAT)
       return num_type::INTFLOAT;
-    else if(TYPEOF(y) == INTEGER)
+    else if(type_of(y) == INTEGER)
       return num_type::INTINT;
     return num_type::ILLEGAL2;
   }
@@ -334,21 +334,21 @@ PRIMITIVE neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(x, y); }
 
 PRIMITIVE zerop(LISPT x)
 {
-  if(TYPEOF(x) == INTEGER && x->intval() == 0)
+  if(type_of(x) == INTEGER && x->intval() == 0)
     return C_T;
   return C_NIL;
 }
 
 PRIMITIVE minusp(LISPT x)
 {
-  if(TYPEOF(x) == FLOAT)
+  if(type_of(x) == FLOAT)
   {
     if(x->floatval() < 0.0)
       return C_T;
     else
       return C_NIL;
   }
-  else if(TYPEOF(x) == INTEGER)
+  else if(type_of(x) == INTEGER)
   {
     if(x->intval() < 0)
       return C_T;

@@ -20,7 +20,7 @@ PRIMITIVE symstr(LISPT sym)
 /* T if s is a string, NIL otherwise. */
 PRIMITIVE stringp(LISPT s)
 {
-  if(TYPEOF(s) == STRING)
+  if(type_of(s) == STRING)
     return C_T;
   return C_NIL;
 }
@@ -47,7 +47,7 @@ PRIMITIVE strcomp(LISPT s1, LISPT s2)
 PRIMITIVE concat(LISPT strlist)
 {
   int size = 0;
-  for(auto sl = strlist; !ISNIL(sl); sl = sl->cdr())
+  for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
     check(sl->car(), STRING);
     size += strlen(sl->car()->stringval());
@@ -56,7 +56,7 @@ PRIMITIVE concat(LISPT strlist)
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
-  while(!ISNIL(strlist))
+  while(!is_NIL(strlist))
   {
     strcat(ns, strlist->car()->stringval());
     strlist = strlist->cdr();

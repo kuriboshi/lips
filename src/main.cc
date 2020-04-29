@@ -229,13 +229,13 @@ static LISPT put_end(LISPT list, LISPT obj, int conc)
 {
   LISPT t;
 
-  if(ISNIL(list))
+  if(is_NIL(list))
     if(conc)
       return obj;
     else
       return cons(obj, C_NIL);
   else
-    for(t = list; TYPEOF(t->cdr()) == CONS; t = t->cdr())
+    for(t = list; type_of(t->cdr()) == CONS; t = t->cdr())
       ;
   if(conc)
     rplacd(t, obj);
@@ -254,13 +254,13 @@ static LISPT transform(LISPT list)
   tl = C_NIL;
   res = C_NIL;
   conc = 0;
-  for(ll = list; TYPEOF(ll) == CONS; ll = ll->cdr())
+  for(ll = list; type_of(ll) == CONS; ll = ll->cdr())
   {
-    if(TYPEOF(ll->car()) == CONS)
+    if(type_of(ll->car()) == CONS)
       tl = put_end(tl, transform(ll->car()), conc);
     else if(EQ(ll->car(), C_BAR))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_PIPE, cons(tl, C_NIL));
       else
         res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
@@ -269,7 +269,7 @@ static LISPT transform(LISPT list)
     }
     else if(EQ(ll->car(), C_SEMI))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_PROGN, cons(tl, C_NIL));
       else
         res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
@@ -278,7 +278,7 @@ static LISPT transform(LISPT list)
     }
     else if(EQ(ll->car(), C_GT))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_TO, cons(tl, C_NIL));
       else
         res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
@@ -287,7 +287,7 @@ static LISPT transform(LISPT list)
     }
     else if(EQ(ll->car(), C_GGT))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_TOTO, cons(tl, C_NIL));
       else
         res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
@@ -296,7 +296,7 @@ static LISPT transform(LISPT list)
     }
     else if(EQ(ll->car(), C_LT))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_FROM, cons(tl, C_NIL));
       else
         res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
@@ -305,7 +305,7 @@ static LISPT transform(LISPT list)
     }
     else if(EQ(ll->car(), C_AMPER))
     {
-      if(ISNIL(res))
+      if(is_NIL(res))
         res = cons(C_BACK, cons(tl, C_NIL));
       else
         res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
@@ -315,9 +315,9 @@ static LISPT transform(LISPT list)
     else
       tl = put_end(tl, ll->car(), 0);
   }
-  if(ISNIL(res))
+  if(is_NIL(res))
     return tl;
-  else if(!ISNIL(tl))
+  else if(!is_NIL(tl))
     res = put_end(res, tl, conc);
   return res;
 }
@@ -364,7 +364,7 @@ LISPT greet(LISPT who)
   char loadf[256];
   const char* s;
 
-  if(ISNIL(who))
+  if(is_NIL(who))
     s = getenv("USER");
   else
     s = who->stringval();

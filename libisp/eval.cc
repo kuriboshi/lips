@@ -45,7 +45,7 @@ LISPT evaluator::printwhere()
       for(; i; i--)
       {
         if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0 && control[i - 1].type == CTRL_LISP
-          && (TYPEOF(control[i - 1].u.lisp) == CONS && TYPEOF(control[i - 1].u.lisp->car()) != CONS))
+          && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
           fprintf(primerr, " [in ");
@@ -298,7 +298,7 @@ bool evaluator::peval()
 #endif /* TRACE */
   push_lisp(expression);
   push_func(ev0);
-  switch(TYPEOF(expression))
+  switch(type_of(expression))
   {
     case CONS:
       push_lisp(fun);
@@ -367,7 +367,7 @@ void evaluator::do_unbound(continuation_t continuation)
    * the symbol is undefined.
    */
   LISPT al = getprop(expression->car(), C_AUTOLOAD);
-  if(!ISNIL(al))
+  if(!is_NIL(al))
   {
     push_lisp(expression);
     push_point(dest);
@@ -375,7 +375,7 @@ void evaluator::do_unbound(continuation_t continuation)
     dest = pop_point();
     expression = pop_lisp();
     fun = expression->car()->symvalue();
-    if(TYPEOF(fun) == UNBOUND)
+    if(type_of(fun) == UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -386,8 +386,8 @@ void evaluator::do_unbound(continuation_t continuation)
   else
   {
     expression = findalias(expression);
-    if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
-      && TYPEOF(expression->car()->symvalue()) == UNBOUND)
+    if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
+      && type_of(expression->car()->symvalue()) == UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -404,8 +404,8 @@ void evaluator::do_unbound(continuation_t continuation)
 bool evaluator::do_default(continuation_t continuation)
 {
   expression = findalias(expression);
-  if(TYPEOF(expression) == CONS && TYPEOF(expression->car()) == SYMBOL
-    && TYPEOF(expression->car()->symvalue()) == UNBOUND)
+  if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
+    && type_of(expression->car()->symvalue()) == UNBOUND)
   {
     if(!evalhook(expression))
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -424,7 +424,7 @@ bool evaluator::peval1()
   else if(interrupt)
     abort(NO_MESSAGE, C_NIL);
   else
-    switch(TYPEOF(fun))
+    switch(type_of(fun))
     {
       case CLOSURE:
         push_func(peval1);
@@ -501,7 +501,7 @@ bool evaluator::peval2()
   if(brkflg)
     xbreak(KBD_BREAK, fun, peval2);
   else
-    switch(TYPEOF(fun))
+    switch(type_of(fun))
     {
       case CLOSURE:
         push_func(peval2);
@@ -586,7 +586,7 @@ bool evaluator::noevarg()
 
 bool evaluator::evalargs()
 {
-  if(ISNIL(args))
+  if(is_NIL(args))
   {
     cont = pop_func();
   }
@@ -603,7 +603,7 @@ bool evaluator::evalargs()
 
 bool evaluator::ev9()
 {
-  if(ISNIL(args->cdr()))
+  if(is_NIL(args->cdr()))
   {
     cont = peval;
   }
@@ -627,7 +627,7 @@ bool evaluator::ev11()
 bool evaluator::noev9()
 {
 nextarg:
-  if(ISNIL(args->cdr()))
+  if(is_NIL(args->cdr()))
   {
     send(expression);
     cont = pop_func();
@@ -645,7 +645,7 @@ nextarg:
 
 bool evaluator::evlis()
 {
-  if(ISNIL(args))
+  if(is_NIL(args))
   {
     cont = pop_func();
   }
@@ -659,7 +659,7 @@ bool evaluator::evlis()
 
 bool evaluator::evlis1()
 {
-  if(ISNIL(args->cdr()))
+  if(is_NIL(args->cdr()))
   {
     push_func(evlis2);
     cont = peval;
@@ -773,7 +773,7 @@ bool evaluator::ev2()
   {
     // fprintf(primerr, "%s ", ex.what());
     auto foo = printwhere();
-    if(ISNIL(foo))
+    if(is_NIL(foo))
       xbreak(0, C_NIL, peval1);
     else
       xbreak(0, foo->car(), peval1); /* CAR(_) broken */
@@ -854,7 +854,7 @@ void evaluator::unwind()
 bool evaluator::lookup()
 {
   LISPT t = expression->symvalue();
-  switch(TYPEOF(t))
+  switch(type_of(t))
   {
     case UNBOUND:
       xbreak(UNBOUND_VARIABLE, expression, lookup);
@@ -883,7 +883,7 @@ bool evaluator::evclosure()
   push_point(dest);
   dest = mkdestblock(fun->closval().count);
   for(foo = fun->closval().closed, i = fun->closval().count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
-  for(foo = fun->closval().cvalues; !ISNIL(foo); foo = foo->cdr())
+  for(foo = fun->closval().cvalues; !is_NIL(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();

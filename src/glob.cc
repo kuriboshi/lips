@@ -113,11 +113,11 @@ static LISPT orderinsert(LISPT what, LISPT where)
 
   p1 = C_NIL;
   p2 = where;
-  while (!ISNIL(p2))
+  while (!is_NIL(p2))
     {
       if (strcmp(GETSTR(CAR(p2)), GETSTR(what)) > 0)
         {
-          if (!ISNIL(p1))
+          if (!is_NIL(p1))
             {
               rplacd(p1, cons(what, C_NIL));
               rplacd(CDR(p1), p2);
@@ -129,9 +129,9 @@ static LISPT orderinsert(LISPT what, LISPT where)
       p1 = p2;
       p2 = CDR(p2);
     }
-  if (ISNIL(where))
+  if (is_NIL(where))
     where = cons(what, C_NIL);
-  else if (ISNIL(p2))
+  else if (is_NIL(p2))
     rplacd(p1, cons(what, C_NIL));
   return where;
 }
@@ -273,7 +273,7 @@ LISPT expandfiles(const char* wild, int all, int report, int sort)
   globlimit = globarr + TICKS;
   if(!walkfiles(wild, all, report))
     return C_ERROR;
-  if(!ISNIL(globsort) || sort)
+  if(!is_NIL(globsort) || sort)
     qsort((char*)globarr, globp - globarr, sizeof(char*), comp);
   return buildlist();
 }
@@ -287,13 +287,13 @@ PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
   const char* wstr;
   int r = 0;
 
-  if(ISNIL(rep))
+  if(is_NIL(rep))
     r = 1;
   check2(wild, STRING, SYMBOL);
   wstr = extilde(wild->getstr(), r);
   if(wstr == nullptr)
     return C_NIL;
-  return expandfiles(wstr, ISNIL(all) ? 0 : 1, r, 0);
+  return expandfiles(wstr, is_NIL(all) ? 0 : 1, r, 0);
 }
 
 LISPT glob(LISPT wild) { return expand(wild, 0, 0); }

@@ -22,7 +22,7 @@ constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
 #define CHECKEOF(c) \
   if((c) == EOF) \
   { \
-    if(line || ISNIL(top->car())) \
+    if(line || is_NIL(top->car())) \
       return C_EOF; \
     else \
       return error(UNEXPECTED_EOF, C_NIL); \
@@ -274,7 +274,7 @@ LISPT ratom(FILE* file)
 static LISPT splice(LISPT c, LISPT l, int tailp)
 {
   LISPT t = c->cdr();
-  if(TYPEOF(l) != CONS)
+  if(type_of(l) != CONS)
   {
     if(tailp)
       rplacd(c, cons(l, t));
@@ -287,11 +287,11 @@ static LISPT splice(LISPT c, LISPT l, int tailp)
     rplaca(c, l->car());
     l = l->cdr();
   }
-  if(ISNIL(l))
+  if(is_NIL(l))
     return c;
   rplacd(c, l);
   LISPT t2 = C_NIL;
-  for(; TYPEOF(l) == CONS; l = l->cdr()) t2 = l;
+  for(; type_of(l) == CONS; l = l->cdr()) t2 = l;
   return rplacd(t2, t);
 }
 
@@ -354,7 +354,7 @@ head:
     curatom = ratom(file);
     rplaca(curr, curatom);
   check:
-    if(ISNIL(curr->cdr()))
+    if(is_NIL(curr->cdr()))
     {
       temp = top->car();
       top = C_NIL;
@@ -477,7 +477,7 @@ static LISPT rmexcl(FILE* file, LISPT, char)
     return C_EXCL;
   echoline = true;
   LISPT tmp = histget(0L, history);
-  if(TYPEOF(tmp->car()) == CONS && ISNIL(tmp->cdr()))
+  if(type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
     tmp = tmp->car();
   switch(c)
   {
@@ -485,7 +485,7 @@ static LISPT rmexcl(FILE* file, LISPT, char)
       return histget(0L, history);
       break;
     case '$':
-      while(TYPEOF(tmp->cdr()) == CONS) tmp = tmp->cdr();
+      while(type_of(tmp->cdr()) == CONS) tmp = tmp->cdr();
       return tmp;
       break;
     case '*':
@@ -498,17 +498,17 @@ static LISPT rmexcl(FILE* file, LISPT, char)
     default:
       ungetch(c, file);
       at = ratom(file);
-      if(TYPEOF(at) == INTEGER)
+      if(type_of(at) == INTEGER)
       {
         tmp = histget(at->intval(), history);
         return tmp;
       }
-      if(TYPEOF(at) == SYMBOL)
+      if(type_of(at) == SYMBOL)
       {
-        for(l = history; !ISNIL(l); l = l->cdr())
+        for(l = history; !is_NIL(l); l = l->cdr())
         {
           tmp = histget(0L, l);
-          if(!ISNIL(tmp) && TYPEOF(tmp->car()) == CONS && ISNIL(tmp->cdr()))
+          if(!is_NIL(tmp) && type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
             tmp = tmp->car();
           if(!strncmp(tmp->car()->getstr(), at->getstr(), strlen(at->getstr())))
             return histget(0L, l);
@@ -595,7 +595,7 @@ static LISPT rmbg(FILE*, LISPT curr, char)
  */
 static LISPT rmuser(FILE*, LISPT curr, char curc)
 {
-  if (ISNIL(userreadmacros[(int)curc]))
+  if (is_NIL(userreadmacros[(int)curc]))
     return curr;
   else
 
@@ -673,7 +673,7 @@ nxtelt:
   prin0(xx->car(), file, esc);
   if(EQ(xx->cdr(), C_NIL))
     ;
-  else if(TYPEOF(xx->cdr()) == CONS)
+  else if(type_of(xx->cdr()) == CONS)
   {
     putch(' ', file, 0);
     xx = xx->cdr();
@@ -691,7 +691,7 @@ nxtelt:
 
 LISPT prin0(LISPT x, FILE* file, int esc)
 {
-  switch(TYPEOF(x))
+  switch(type_of(x))
   {
     case CONS:
       thisplevel++;
@@ -779,7 +779,7 @@ LISPT prin0(LISPT x, FILE* file, int esc)
       break;
     default:
       ps("#<illegal ", file, 0);
-      pi(TYPEOF(x), currentbase->intval(), file);
+      pi(type_of(x), currentbase->intval(), file);
       pi(x->intval(), 16L, file);
       ps(">", file, 0);
   }

@@ -389,7 +389,7 @@ static bool checkchar(LISPT words, int pos, int* c)
 
   l = words;
   *c = (l->car()->getstr())[pos];
-  for(; !ISNIL(l); l = l->cdr())
+  for(; !is_NIL(l); l = l->cdr())
   {
     if(*c != (l->car()->getstr())[pos])
       return false;
@@ -417,7 +417,7 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
 
   if(strncmp(files->car()->getstr(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(C_NIL, C_NIL); !ISNIL(files); files = files->cdr())
+  for(stripped = cons(C_NIL, C_NIL); !is_NIL(files); files = files->cdr())
   {
     s = files->car()->getstr() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
@@ -682,13 +682,13 @@ bool lips_getline(FILE* file)
           break;
         }
         ex = expandfiles(t, 0, 0, 1);
-        if(TYPEOF(ex) == CONS && strlen(s) > 1)
+        if(type_of(ex) == CONS && strlen(s) > 1)
           ex = strip(ex, t, s);
-        if(TYPEOF(ex) == CONS && ISNIL(ex->cdr()))
+        if(type_of(ex) == CONS && is_NIL(ex->cdr()))
           fillrest(ex->car()->getstr());
         else
         {
-          if(TYPEOF(ex) == CONS)
+          if(type_of(ex) == CONS)
             complete(ex);
           putc(BELL, stdout);
         }

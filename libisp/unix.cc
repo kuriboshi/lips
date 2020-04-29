@@ -108,7 +108,7 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
   const char* openmode = nullptr;
 
   check(name, STRING);
-  if(ISNIL(mode))
+  if(is_NIL(mode))
     openmode = "r";
   else
   {
@@ -152,12 +152,12 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
 
   if(sig->intval() >= NSIG || sig->intval() < 1)
     return error(ILLEGAL_SIGNAL, sig);
-  if(ISNIL(fun))
+  if(is_NIL(fun))
   {
     signal(sig->intval(), SIG_IGN);
     sighandler[sig->intval()] = C_NIL;
   }
-  else if(IST(fun))
+  else if(is_T(fun))
   {
     signal(sig->intval(), SIG_DFL);
     sighandler[sig->intval()] = C_NIL;

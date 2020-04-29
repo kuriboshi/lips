@@ -292,10 +292,10 @@ static char** makeexec(LISPT command)
     *t = nullptr;
   }
   sigprocmask(SIG_SETMASK, &old_mask, nullptr);
-  for(i = 0; TYPEOF(com) == CONS && i < (MAXARGS - 1); com = com->cdr())
+  for(i = 0; type_of(com) == CONS && i < (MAXARGS - 1); com = com->cdr())
   {
   again:
-    if(TYPEOF(com->car()) == SYMBOL)
+    if(type_of(com->car()) == SYMBOL)
     {
       char* c = strsave(extilde(com->car()->getstr(), 1));
       if(c == nullptr)
@@ -312,23 +312,23 @@ static char** makeexec(LISPT command)
           return nullptr;
         }
         files = expandfiles(c, 0, 0, 1);
-        if(!ISNIL(files))
+        if(!is_NIL(files))
           ok = 2;
-        while(TYPEOF(files) == CONS)
+        while(type_of(files) == CONS)
         {
           args[i++] = strsave(files->car()->getstr());
           files = files->cdr();
         }
       }
     }
-    else if(TYPEOF(com->car()) == INTEGER)
+    else if(type_of(com->car()) == INTEGER)
       args[i++] = strsave(ltoa(com->car()->intval()));
-    else if(TYPEOF(com->car()) == STRING)
+    else if(type_of(com->car()) == STRING)
     {
       if((args[i++] = strsave(com->car()->getstr())) == nullptr)
         return nullptr;
     }
-    else if(TYPEOF(com->car()) == CONS)
+    else if(type_of(com->car()) == CONS)
     {
       rplaca(com, eval(com->car()));
       goto again;
@@ -484,14 +484,14 @@ int execcommand(LISPT exp, LISPT* res)
   i = hashfun(command);
   possible = exechash[i / 32] & (1 << (i % 32));
 
-  for(cdir = path; TYPEOF(cdir) == CONS; cdir = cdir->cdr())
+  for(cdir = path; type_of(cdir) == CONS; cdir = cdir->cdr())
   {
-    if(ISNIL(cdir->car()) || strcmp(cdir->car()->getstr(), ".") == 0)
+    if(is_NIL(cdir->car()) || strcmp(cdir->car()->getstr(), ".") == 0)
       strcpy(comdir, ".");
     else if(possible)
     {
       /* This isn't really necessary, is it? */
-      if(TYPEOF(cdir->car()) != STRING && TYPEOF(cdir->car()) != SYMBOL)
+      if(type_of(cdir->car()) != STRING && type_of(cdir->car()) != SYMBOL)
         return -1;
       strcpy(comdir, cdir->car()->getstr());
     }
@@ -538,10 +538,10 @@ PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if(ISNIL(cmd))
+  if(is_NIL(cmd))
     return C_NIL;
   check2(file, STRING, SYMBOL);
-  if(ISNIL(filed))
+  if(is_NIL(filed))
     oldfd = 1;
   else
   {
@@ -572,10 +572,10 @@ PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if(ISNIL(cmd))
+  if(is_NIL(cmd))
     return C_NIL;
   check2(file, STRING, SYMBOL);
-  if(ISNIL(filed))
+  if(is_NIL(filed))
     oldfd = 1;
   else
   {
@@ -606,10 +606,10 @@ PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
   int fd, pid, oldfd;
   UNION_WAIT status;
 
-  if(ISNIL(cmd))
+  if(is_NIL(cmd))
     return C_NIL;
   check2(file, STRING, SYMBOL);
-  if(ISNIL(filed))
+  if(is_NIL(filed))
     oldfd = 0;
   else
   {
@@ -641,9 +641,9 @@ PRIMITIVE pipecmd(LISPT cmds)
   int pid;
   UNION_WAIT status;
 
-  if(ISNIL(cmds))
+  if(is_NIL(cmds))
     return C_NIL;
-  if(ISNIL(cmds->cdr()))
+  if(is_NIL(cmds->cdr()))
     return eval(cmds->car());
   if((pid = mfork()) == 0)
   {
@@ -712,9 +712,9 @@ PRIMITIVE rehash()
   LISPT p;
 
   for(i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
-  for(p = path; TYPEOF(p) == CONS; p = p->cdr())
+  for(p = path; type_of(p) == CONS; p = p->cdr())
   {
-    if(ISNIL(p->car()))
+    if(is_NIL(p->car()))
       continue;
     else
     {
@@ -746,7 +746,7 @@ PRIMITIVE fg(LISPT job)
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
 
-  if(ISNIL(job))
+  if(is_NIL(job))
   {
     for(j = joblist; j; j = j->next)
       if(WIFSTOPPED(j->status))
@@ -782,7 +782,7 @@ PRIMITIVE bg(LISPT job)
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
 
-  if(ISNIL(job))
+  if(is_NIL(job))
   {
     for(j = joblist; j; j = j->next)
       if(!j->background)
@@ -836,24 +836,24 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
-  if(ISNIL(dir))
+  if(is_NIL(dir))
     ndir = home;
   else
   {
     ndir = glob(dir);
-    if(TYPEOF(ndir) == CONS)
+    if(type_of(ndir) == CONS)
       ndir = ndir->car();
   }
-  if(ISNIL(ndir))
+  if(is_NIL(ndir))
   {
-    if(ISNIL(emess))
+    if(is_NIL(emess))
       return error(NO_MATCH, dir);
     else
       return C_NIL;
   }
   if(chdir(ndir->getstr()) == -1)
   {
-    if(ISNIL(emess))
+    if(is_NIL(emess))
       return syserr(dir);
     else
       return C_NIL;

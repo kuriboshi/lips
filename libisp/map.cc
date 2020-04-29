@@ -10,10 +10,10 @@ namespace lisp
 {
 PRIMITIVE xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(TYPEOF(obj) == CONS)
+  while(type_of(obj) == CONS)
   {
     apply(fn1, cons(obj, C_NIL));
-    if(ISNIL(fn2))
+    if(is_NIL(fn2))
       obj = obj->cdr();
     else
       obj = apply(fn2, obj);
@@ -23,10 +23,10 @@ PRIMITIVE xmap(LISPT obj, LISPT fn1, LISPT fn2)
 
 PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(TYPEOF(obj) == CONS)
+  while(type_of(obj) == CONS)
   {
     apply(fn1, cons(obj->car(), C_NIL));
-    if(ISNIL(fn2))
+    if(is_NIL(fn2))
       obj = obj->cdr();
     else
       apply(fn2, cons(obj, C_NIL));
@@ -37,18 +37,18 @@ PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
 PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
-  if(TYPEOF(obj) == CONS)
+  if(type_of(obj) == CONS)
   {
     tmp = cons(apply(fn1, cons(obj, C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   save(rval);
-  while(TYPEOF(obj) == CONS)
+  while(type_of(obj) == CONS)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj, C_NIL)), C_NIL));
     tmp = tmp->cdr();
-    if(ISNIL(fn2))
+    if(is_NIL(fn2))
       obj = obj->cdr();
     else
       obj = apply(fn2, cons(obj, C_NIL));
@@ -60,18 +60,18 @@ PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
 PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
-  if(TYPEOF(obj) == CONS)
+  if(type_of(obj) == CONS)
   {
     tmp = cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   save(rval);
-  while(TYPEOF(obj) == CONS)
+  while(type_of(obj) == CONS)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL));
     tmp = tmp->cdr();
-    if(ISNIL(fn2))
+    if(is_NIL(fn2))
       obj = obj->cdr();
     else
       apply(fn2, cons(obj, C_NIL));

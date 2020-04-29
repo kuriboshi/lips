@@ -12,7 +12,7 @@ namespace lisp
 {
 PRIMITIVE numberp(LISPT a)
 {
-  switch(TYPEOF(a))
+  switch(type_of(a))
   {
     case INTEGER:
     case FLOAT:
@@ -28,7 +28,7 @@ PRIMITIVE numberp(LISPT a)
 
 PRIMITIVE listp(LISPT a)
 {
-  if(TYPEOF(a) == CONS)
+  if(type_of(a) == CONS)
     return a;
   else
     return C_NIL;
@@ -49,11 +49,11 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
 {
   LISPT x;
 
-  if(TYPEOF(l1) != TYPEOF(l2))
+  if(type_of(l1) != type_of(l2))
     return C_NIL;
   if(EQ(l1, l2))
     return C_T;
-  switch(TYPEOF(l1))
+  switch(type_of(l1))
   {
     case CONS:
       while(!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
@@ -86,7 +86,7 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
 
 PRIMITIVE nlistp(LISPT a)
 {
-  if(TYPEOF(a) != CONS)
+  if(type_of(a) != CONS)
     return a;
   else
     return C_NIL;
@@ -102,9 +102,9 @@ PRIMITIVE neq(LISPT a, LISPT b)
 
 PRIMITIVE boundp(LISPT a)
 {
-  if(TYPEOF(a) != SYMBOL)
+  if(type_of(a) != SYMBOL)
     return C_NIL;
-  else if(TYPEOF(a->symval().value) != UNBOUND)
+  else if(type_of(a->symval().value) != UNBOUND)
     return C_T;
   else
     return C_NIL;
@@ -112,7 +112,7 @@ PRIMITIVE boundp(LISPT a)
 
 PRIMITIVE litatom(LISPT a)
 {
-  if(TYPEOF(a) == SYMBOL)
+  if(type_of(a) == SYMBOL)
     return C_T;
   else
     return C_NIL;
@@ -120,7 +120,7 @@ PRIMITIVE litatom(LISPT a)
 
 PRIMITIVE xtypeof(LISPT a)
 {
-  switch(TYPEOF(a))
+  switch(type_of(a))
   {
     case NIL:
       return C_NIL;

@@ -19,9 +19,9 @@ PRIMITIVE set(LISPT var, LISPT val)
   check(var, SYMBOL);
   if(EQ(var, CE_NIL) || EQ(var, CE_T))
     return error(ATTEMPT_TO_RESET, var);
-  if(TYPEOF(var->symval().value) == INDIRECT)
+  if(type_of(var->symval().value) == INDIRECT)
     var->symval().value->indirectval() = val;
-  else if(TYPEOF(var->symval().value) == CVARIABLE)
+  else if(type_of(var->symval().value) == CVARIABLE)
     *var->symval().value->cvarval() = val;
   else
     var->symvalue(val);
@@ -32,9 +32,9 @@ PRIMITIVE setq(LISPT var, LISPT val) { return set(var, eval(val)); }
 
 PRIMITIVE progn(LISPT lexp)
 {
-  if(ISNIL(lexp))
+  if(is_NIL(lexp))
     return C_NIL;
-  while(!ISNIL(lexp->cdr()))
+  while(!is_NIL(lexp->cdr()))
   {
     eval(lexp->car());
     lexp = lexp->cdr();
@@ -45,22 +45,22 @@ PRIMITIVE progn(LISPT lexp)
 PRIMITIVE cond(LISPT args)
 {
   LISPT res = C_NIL;
-  if(ISNIL(args))
+  if(is_NIL(args))
     return C_NIL;
-  while(ISNIL(res))
+  while(is_NIL(res))
   {
     LISPT alt = args->car();
     check(alt, CONS);
     res = eval(alt->car());
-    if(!ISNIL(res))
+    if(!is_NIL(res))
     {
-      if(ISNIL(alt->cdr()))
+      if(is_NIL(alt->cdr()))
         return res;
       else
         return progn(alt->cdr());
     }
     args = args->cdr();
-    if(ISNIL(args))
+    if(is_NIL(args))
       break;
   }
   return C_NIL;
@@ -69,7 +69,7 @@ PRIMITIVE cond(LISPT args)
 PRIMITIVE xwhile(LISPT pred, LISPT exp)
 {
   LISPT res = eval(pred);
-  while(!ISNIL(res))
+  while(!is_NIL(res))
   {
     progn(exp);
     res = eval(pred);

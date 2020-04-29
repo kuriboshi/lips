@@ -11,10 +11,10 @@ namespace lisp
 PRIMITIVE p_and(LISPT l)
 {
   LISPT foo = C_T;
-  while(!ISNIL(l))
+  while(!is_NIL(l))
   {
     foo = eval(l->car());
-    if(ISNIL(foo))
+    if(is_NIL(foo))
       return foo;
     l = l->cdr();
   }
@@ -24,10 +24,10 @@ PRIMITIVE p_and(LISPT l)
 PRIMITIVE p_or(LISPT l)
 {
   LISPT foo = C_NIL;
-  while(!ISNIL(l))
+  while(!is_NIL(l))
   {
     foo = eval(l->car());
-    if(!ISNIL(foo))
+    if(!is_NIL(foo))
       return foo;
     l = l->cdr();
   }
@@ -36,7 +36,7 @@ PRIMITIVE p_or(LISPT l)
 
 PRIMITIVE p_not(LISPT x)
 {
-  if(ISNIL(x))
+  if(is_NIL(x))
     return C_T;
   return C_NIL;
 }
@@ -44,7 +44,7 @@ PRIMITIVE p_not(LISPT x)
 PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo = eval(pred);
-  if(ISNIL(foo))
+  if(is_NIL(foo))
     return progn(false_expr);
   return eval(true_expr);
 }
