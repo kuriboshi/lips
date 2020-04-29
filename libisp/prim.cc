@@ -128,8 +128,8 @@ static LISPT mkarglis(LISPT alist)
  */
 LISPT mklambda(LISPT args, LISPT def, lisp_type type)
 {
-  SAVE(args);
-  SAVE(def);
+  save(args);
+  save(def);
   LISPT s = getobject();
   s->lamval().lambdarep = def;
   count = 0;
@@ -137,8 +137,8 @@ LISPT mklambda(LISPT args, LISPT def, lisp_type type)
   s->lamval().argcnt = count;
   LISPT t = nullptr;
   SET(t, type, s);
-  UNSAVE(def);
-  UNSAVE(args);
+  unsave(def);
+  unsave(args);
   return t;
 }
 
@@ -325,7 +325,7 @@ PRIMITIVE append(LISPT l)
   LISPT cl;
 
   LISPT newl = cons(C_NIL, C_NIL);
-  SAVE(newl);
+  save(newl);
   LISPT curp = newl;
   for(; !ISNIL(l); l = l->cdr())
   {
@@ -339,7 +339,7 @@ PRIMITIVE append(LISPT l)
       }
     }
   }
-  UNSAVE(newl);
+  unsave(newl);
   return newl->cdr();
 }
 
@@ -371,8 +371,8 @@ PRIMITIVE length(LISPT l)
 
 PRIMITIVE closure(LISPT fun, LISPT vars)
 {
-  SAVE(fun);
-  SAVE(vars);
+  save(fun);
+  save(vars);
   LISPT c = getobject();
   c->closval().cfunction = fun;
   c->closval().closed = vars;
