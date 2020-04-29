@@ -2,8 +2,8 @@
  * Lips, lisp shell.
  * Copyright 1992, 2020 Krister Joas.
  *
- * $Id$
  */
+
 #pragma once
 
 #include "lisp.hh"

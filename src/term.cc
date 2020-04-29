@@ -2,13 +2,14 @@
  * Lips, lisp shell.
  * Copyright 1988, 2020 Krister Joas
  *
- * $Id$
  */
+
 /*
  * This file contains all functions dealing with low level terminal
  * and file i/o.  Terminal i/o uses its own buffering and line editing.
  * It sets the terminal in cbreak and no echo mode.
  */
+
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>

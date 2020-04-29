@@ -2,7 +2,6 @@
  * Lips, lisp shell.
  * Copyright 2020 Krister Joas
  *
- * $Id$
  */
 
 #pragma once

@@ -2,7 +2,6 @@
  * Lips, lisp shell.
  * Copyright 1989, 2020 Krister Joas
  *
- * $Id$
  */
 
 #include "libisp.hh"

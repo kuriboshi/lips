@@ -2,9 +2,8 @@
  * Lips, lisp shell.
  * Copyright 1988, 2020 Krister Joas
  *
- * $Id$
- *
  */
+
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <dirent.h>
