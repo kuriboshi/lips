@@ -24,7 +24,7 @@ PRIMITIVE uxaccess(LISPT name, LISPT mode)
 {
   check(name, STRING);
   check(mode, INTEGER);
-  return mknumber(access(name->stringval(), (int)mode->intval()));
+  return mknumber(access(name->stringval(), mode->intval()));
 }
 
 PRIMITIVE uxalarm(LISPT seconds)
@@ -43,7 +43,7 @@ PRIMITIVE uxchmod(LISPT name, LISPT mode)
 {
   check(name, STRING);
   check(mode, INTEGER);
-  return mknumber(chmod(name->stringval(), (int)mode->intval()));
+  return mknumber(chmod(name->stringval(), mode->intval()));
 }
 
 PRIMITIVE uxclose(LISPT fildes)
@@ -61,7 +61,7 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 
   check(name, STRING);
   check(mode, INTEGER);
-  i = creat(name->stringval(), (int)mode->intval());
+  i = creat(name->stringval(), mode->intval());
   if(i < 0)
     return C_NIL;
   else
@@ -71,7 +71,7 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
 PRIMITIVE uxdup(LISPT fildes)
 {
   check(fildes, INTEGER);
-  return mknumber(dup((int)fildes->intval()));
+  return mknumber(dup(fildes->intval()));
 }
 
 PRIMITIVE uxgetuid() { return mknumber(getuid()); }
@@ -88,7 +88,7 @@ PRIMITIVE uxkill(LISPT pid, LISPT sig)
 {
   check(pid, INTEGER);
   check(sig, INTEGER);
-  return mknumber(kill((int)pid->intval(), (int)sig->intval()));
+  return mknumber(kill(pid->intval(), sig->intval()));
 }
 
 PRIMITIVE uxlink(LISPT name1, LISPT name2)
@@ -101,7 +101,7 @@ PRIMITIVE uxlink(LISPT name1, LISPT name2)
 PRIMITIVE uxnice(LISPT incr)
 {
   check(incr, INTEGER);
-  return mknumber(nice((int)incr->intval()));
+  return mknumber(nice(incr->intval()));
 }
 
 PRIMITIVE uxopen(LISPT name, LISPT mode)
@@ -135,13 +135,13 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
 PRIMITIVE uxsetuid(LISPT uid)
 {
   check(uid, INTEGER);
-  return mknumber(setuid((int)uid->intval()));
+  return mknumber(setuid(uid->intval()));
 }
 
 PRIMITIVE uxsetgid(LISPT gid)
 {
   check(gid, INTEGER);
-  return mknumber(setgid((int)gid->intval()));
+  return mknumber(setgid(gid->intval()));
 }
 
 /*ARGSUSED*/
@@ -155,18 +155,18 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
     return error(ILLEGAL_SIGNAL, sig);
   if(ISNIL(fun))
   {
-    signal((int)sig->intval(), SIG_IGN);
+    signal(sig->intval(), SIG_IGN);
     sighandler[sig->intval()] = C_NIL;
   }
   else if(IST(fun))
   {
-    signal((int)sig->intval(), SIG_DFL);
+    signal(sig->intval(), SIG_DFL);
     sighandler[sig->intval()] = C_NIL;
   }
   else
   {
     sighandler[sig->intval()] = fun;
-    signal((int)sig->intval(), sighandle);
+    signal(sig->intval(), sighandle);
   }
   return C_T;
 }

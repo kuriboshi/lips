@@ -420,7 +420,7 @@ PRIMITIVE uxexit(LISPT status)
   if(ISNIL(status))
     finish(0);
   check(status, INTEGER);
-  finish((int)status->intval());
+  finish(status->intval());
   return C_NIL;
 }
 

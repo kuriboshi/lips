@@ -141,7 +141,7 @@ void alloc::mark(LISPT x)
       break;
 #ifdef FLOATING
     case FLOAT: {
-      int y = (int)(&FLOATVAL(x) - &floats.fdata[0]);
+      int y = &FLOATVAL(x) - &floats.fdata[0];
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
     }
