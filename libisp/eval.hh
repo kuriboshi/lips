@@ -12,11 +12,11 @@ namespace lisp
 class evaluator
 {
 public:
-  evaluator() = delete;
-  ~evaluator() = delete;
+  evaluator(lisp&);
+  ~evaluator();
 
 public:
-  using continuation_t = bool (*)();
+  using continuation_t = bool (evaluator::*)();
 
   /*
    * The control stack.
@@ -39,100 +39,105 @@ public:
     } u;
   };
 
-  static const int CTRLBLKSIZE = 4000;
-  static control_t control[CTRLBLKSIZE];
+  static constexpr int CTRLBLKSIZE = 4000;
+  control_t control[CTRLBLKSIZE]; // Control-stack
+  int toctrl = 0;                 // Control-stack stack pointer
 
-  static void reset();
+  void reset();
 
-  static PRIMITIVE eval(LISPT expr);
-  static PRIMITIVE apply(LISPT f, LISPT a);
-  static PRIMITIVE baktrace();
+  PRIMITIVE eval(lisp&, LISPT);
+  PRIMITIVE apply(lisp&, LISPT, LISPT);
+  PRIMITIVE baktrace(lisp&);
 
-  static void bt();
-  static void unwind();
-  static void init();
+  void bt();
+  void unwind();
+  void init();
 
-  static int toctrl;
-  static alloc::destblock_t* dest;
+  alloc::destblock_t* dest = nullptr; // Current destination being built.
 
   using undefhook_t = int (*)(LISPT, LISPT*);
-  static undefhook_t undefhook;
+  undefhook_t undefhook = nullptr; // Called in case of undefined function.
 
   using breakhook_t = void (*)();
-  static breakhook_t breakhook;
+  breakhook_t breakhook = nullptr; // Called before going into break.
 
 private:
-  static void push_lisp(LISPT);
-  static void push_point(lisp::alloc::destblock_t*);
-  static void push_func(continuation_t);
-  static LISPT pop_lisp();
-  static alloc::destblock_t* pop_point();
-  static alloc::destblock_t* pop_env();
-  static continuation_t pop_func();
-  static void xbreak(int mess, LISPT fault, continuation_t next);
-  static alloc::destblock_t* mkdestblock(int);
-  static void storevar(LISPT v, int i);
-  static void send(LISPT a);
-  static LISPT receive();
-  static void next();
-  static LISPT call(LISPT fun);
-  static bool evalhook(LISPT exp);
-  static void do_unbound(continuation_t continuation);
-  static bool do_default(continuation_t continuation);
-  static void link();
-  static void restore_env();
+  alloc& a() { return _lisp.a(); }
+
+  void push_lisp(LISPT);
+  void push_point(alloc::destblock_t*);
+  void push_func(continuation_t);
+  LISPT pop_lisp();
+  alloc::destblock_t* pop_point();
+  alloc::destblock_t* pop_env();
+  continuation_t pop_func();
+  void xbreak(int mess, LISPT fault, continuation_t next);
+  alloc::destblock_t* mkdestblock(int);
+  void storevar(LISPT v, int i);
+  void send(LISPT a);
+  LISPT receive();
+  void next();
+  LISPT call(LISPT fun);
+  bool evalhook(LISPT exp);
+  void do_unbound(continuation_t continuation);
+  bool do_default(continuation_t continuation);
+  void link();
+  void restore_env();
 
   // Continuations
-  static bool peval();
-  static bool peval1();
-  static bool peval2();
-  static bool ev0();
-  static bool ev1();
-  static bool ev2();
-  static bool ev3();
-  static bool ev4();
-  static bool evlam0();
-  static bool evlam1();
-  static bool ev9();
-  static bool ev11();
-  static bool ev3p();
-  static bool evalargs();
-  static bool noevarg();
-  static bool evlam();
-  static bool spread();
-  static bool evlis();
-  static bool evlis1();
-  static bool evlis2();
-  static bool evlis3();
-  static bool evlis4();
-  static bool noev9();
-  static bool evsequence();
-  static bool evseq1();
-  static bool evseq3();
-  static bool evclosure();
-  static bool evclosure1();
-  static bool eval0();
-  static bool apply0();
-  static bool everr();
-  static bool lookup();
+  bool peval();
+  bool peval1();
+  bool peval2();
+  bool ev0();
+  bool ev1();
+  bool ev2();
+  bool ev3();
+  bool ev4();
+  bool evlam0();
+  bool evlam1();
+  bool ev9();
+  bool ev11();
+  bool ev3p();
+  bool evalargs();
+  bool noevarg();
+  bool evlam();
+  bool spread();
+  bool evlis();
+  bool evlis1();
+  bool evlis2();
+  bool evlis3();
+  bool evlis4();
+  bool noev9();
+  bool evsequence();
+  bool evseq1();
+  bool evseq3();
+  bool evclosure();
+  bool evclosure1();
+  bool eval0();
+  bool apply0();
+  bool everr();
+  bool lookup();
 
-  static LISPT printwhere();
-  static void abort(int m, LISPT v);
-  static void overflow();
+  LISPT printwhere();
+  void abort(int m, LISPT v);
+  void overflow();
 
-  static LISPT fun;
-  static LISPT expression;
-  static LISPT args;
-  static bool noeval;         // Don't evaluate arguments.
-  static continuation_t cont; // Current continuation.
-  static alloc::destblock_t* env;
+  lisp& _lisp;                       // Context
+  LISPT fun = nullptr;               // Store current function being evaluated.
+  LISPT expression = nullptr;        // Current expression.
+  LISPT args = nullptr;              // Current arguments.
+  bool noeval = false;               // Don't evaluate arguments.
+  continuation_t cont = nullptr;     // Current continuation.
+  alloc::destblock_t* env = nullptr; // Current environment.
 };
 
+#if 0
 inline void unwind() { evaluator::unwind(); }
 inline void bt() { evaluator::bt(); }
+#endif
 
-inline PRIMITIVE eval(LISPT expr) { return evaluator::eval(expr); }
-inline PRIMITIVE apply(LISPT f, LISPT a) { return evaluator::apply(f, a); }
-inline PRIMITIVE baktrace() { return evaluator::baktrace(); }
+inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(l, expr); }
+inline LISPT apply(lisp& l, LISPT f, LISPT a) { return l.e().apply(l, f, a); }
+inline LISPT baktrace(lisp& l) { return l.e().baktrace(l); }
 
 } // namespace lisp

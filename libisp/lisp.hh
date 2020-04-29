@@ -16,6 +16,9 @@
 
 namespace lisp
 {
+class lisp;
+class evaluator;
+class alloc;
 struct lisp_t;
 using LISPT = struct lisp_t*;
 /* This is used to recognize c-functions for cpprint */
@@ -74,10 +77,10 @@ struct symbol_t
 struct subr_t
 {
   // The type of internal c-functions
-  LISPT (*function0)();
-  LISPT (*function1)(LISPT);
-  LISPT (*function2)(LISPT, LISPT);
-  LISPT (*function3)(LISPT, LISPT, LISPT);
+  LISPT (*function0)(lisp&);
+  LISPT (*function1)(lisp&, LISPT);
+  LISPT (*function2)(lisp&, LISPT, LISPT);
+  LISPT (*function3)(lisp&, LISPT, LISPT, LISPT);
   short argcount; // Negative argcount indicates that arguments should not be
                   // evaluated
 };
@@ -199,5 +202,18 @@ inline void set(LISPT& a, lisp_type t, LISPT p)
 
 inline bool is_T(LISPT x) { return type_of(x) == TRUE; }
 inline bool is_NIL(LISPT x) { return type_of(x) == NIL; }
+
+class lisp
+{
+public:
+  lisp();
+  ~lisp();
+  evaluator& e() { return _eval; };
+  alloc& a() { return _alloc; }
+
+private:
+  evaluator& _eval;
+  alloc& _alloc;
+};
 
 } // namespace lisp

@@ -4,7 +4,17 @@
  *
  */
 
-#include "libisp.hh"
+#include <cstdio>
+#include "alloc.hh"
+#include "constants.hh"
+#include "error.hh"
+#include "eval.hh"
+#include "init.hh"
+
+// TODO:
+extern FILE* primerr;
+extern FILE* primout;
+extern FILE* primin;
 
 extern void finish(int);
 
@@ -28,13 +38,6 @@ static struct floats
   struct floats* fnext;
 } floats;
 #endif /* FLOATING */
-
-LISPT alloc::foo1 = nullptr; // Protect arguments of cons when gc.
-LISPT alloc::foo2 = nullptr;
-alloc::conscells_t* alloc::conscells = nullptr;            // Cons cell storage.
-alloc::destblock_t alloc::destblock[alloc::DESTBLOCKSIZE]; // Destblock area.
-int alloc::destblockused = 0;                              // Index to last slot in destblock.
-std::vector<LISPT*> alloc::markobjs;
 
 /*
  * realmalloc - wrapper around malloc which returns a char*.
@@ -83,7 +86,7 @@ int alloc::sweep()
     if(i < CONSCELLS)
       break;
   }
-  set(freelist, FREE, (LISPT)&cc->cells[i]);
+  set(freelist, FREE, &cc->cells[i]);
   nrfreed++;
   LISPT f = freelist;
   if(type_of(f) == CPOINTER)
@@ -182,21 +185,21 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
     mark(foo1);
     mark(foo2);
   }
-  if(evaluator::dest != nullptr)
-    for(int i = evaluator::dest[0].val.d_integer; i > 0; i--)
+  if(e().dest != nullptr)
+    for(int i = e().dest[0].val.d_integer; i > 0; i--)
     {
-      mark(evaluator::dest[i].var.d_lisp);
-      mark(evaluator::dest[i].val.d_lisp);
+      mark(e().dest[i].var.d_lisp);
+      mark(e().dest[i].val.d_lisp);
     }
   for(auto i: markobjs) mark(*i);
 #if 0
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
-  for(int i = 0; i < evaluator::toctrl; i++)
-    if(evaluator::control[i].type == evaluator::CTRL_LISP && evaluator::control[i].u.lisp != nullptr
-      && type_of(evaluator::control[i].u.lisp) != ENVIRON)
-      mark(evaluator::control[i].u.lisp);
+  for(int i = 0; i < e().toctrl; i++)
+    if(e().control[i].type == e().CTRL_LISP && e().control[i].u.lisp != nullptr
+      && type_of(e().control[i].u.lisp) != ENVIRON)
+      mark(e().control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
     {
@@ -241,7 +244,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
  * reclaim - Lips function reclaim interface. incr is the number of pages
  *           to inrease storage with.
  */
-PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
+PRIMITIVE alloc::reclaim(lisp&, LISPT incr) /* Number of blocks to increase with */
 {
   int i;
 
@@ -262,7 +265,7 @@ LISPT alloc::getobject()
     doreclaim(NOCONSARGS, 0L);
 
   LISPT f = nullptr;
-  set(f, CONS, (LISPT)freelist);
+  set(f, CONS, freelist);
   freelist = freelist->freeval();
   return f;
 }
@@ -271,7 +274,7 @@ LISPT alloc::getobject()
  * cons - Builds a cons cell out of arguments A and B. Reclaims space
  *        and allocates new blocks if necessary.
  */
-PRIMITIVE alloc::cons(LISPT a, LISPT b)
+PRIMITIVE alloc::cons(lisp&, LISPT a, LISPT b)
 {
   if(is_NIL(freelist))
   {
@@ -281,22 +284,22 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
   }
 
   LISPT f = nullptr;
-  set(f, CONS, (LISPT)freelist);
+  set(f, CONS, freelist);
   freelist = freelist->freeval();
   f->car(a);
   f->cdr(b);
   return f;
 }
 
-PRIMITIVE alloc::xobarray()
+PRIMITIVE alloc::xobarray(lisp& ctx)
 {
   LISPT o = C_NIL;
   for(int i = 0; i < MAXHASH; i++)
-    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
+    for(auto* l = obarray[i]; l; l = l->onext) o = cons(ctx, l->sym, o);
   return o;
 }
 
-PRIMITIVE alloc::freecount()
+PRIMITIVE alloc::freecount(lisp&)
 {
   int i = 0;
   for(auto l = freelist; l->intval(); l = l->cdr()) i++;
@@ -318,22 +321,22 @@ LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
   return s;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
 {
   mkprim(pname, nrpar, type)->subrval().function0 = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
 {
   mkprim(pname, nrpar, type)->subrval().function1 = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
 {
   mkprim(pname, nrpar, type)->subrval().function2 = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
 {
   mkprim(pname, nrpar, type)->subrval().function3 = fname;
 }
@@ -367,19 +370,19 @@ LISPT alloc::mknumber(int i)
  *             function. COUNT is set to the number of arguments and is
  *             negative if halfspread or nospread.
  */
-static LISPT mkarglis(LISPT alist, int& count)
+LISPT alloc::mkarglis(LISPT alist, int& count)
 {
   if(type_of(alist) == CONS)
   {
     count++;
-    return cons(alist->car(), mkarglis(alist->cdr(), count));
+    return cons(_lisp, alist->car(), mkarglis(alist->cdr(), count));
   }
   else if(EQ(alist, C_NIL))
     return C_NIL;
   else
   {
     count = -(count + 1);
-    return cons(alist, C_NIL);
+    return cons(_lisp, alist, C_NIL);
   }
 }
 
@@ -398,8 +401,8 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
   s->lamval().argcnt = count;
   LISPT t = nullptr;
   set(t, type, s);
-  lisp::unsave(def);
-  lisp::unsave(args);
+  def = unsave();
+  args = unsave();
   return t;
 }
 
@@ -550,11 +553,14 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
  */
 void alloc::dzero() { destblockused = 0; }
 
-void alloc::init()
+alloc::alloc(lisp& lisp) : _lisp(lisp)
 {
+#if 0
+  // TODO: Fix me
   for(auto i: {&top, &rstack, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
         &gcgag, &C_EOF})
     add_mark_object(i);
+#endif
   destblockused = 0;
   conscells = nullptr;
   conscells = newpage(); /* Allocate one page of storage */
@@ -565,16 +571,15 @@ void alloc::init()
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
-  mkprim(PN_RECLAIM, reclaim, 1, SUBR);
-  mkprim(PN_CONS, cons, 2, SUBR);
-  mkprim(PN_FREECOUNT, freecount, 0, SUBR);
-  mkprim(PN_OBARRAY, xobarray, 0, SUBR);
+  mkprim(PN_RECLAIM, ::lisp::reclaim, 1, SUBR);
+  mkprim(PN_CONS, ::lisp::cons, 2, SUBR);
+  mkprim(PN_FREECOUNT, ::lisp::freecount, 0, SUBR);
+  mkprim(PN_OBARRAY, ::lisp::xobarray, 0, SUBR);
 }
 
-LISPT alloc::gcgag = nullptr;
-LISPT alloc::savearray[];
-int alloc::savept = 0;
-alloc::obarray_t* alloc::obarray[];
-LISPT alloc::freelist;
+alloc::~alloc()
+{
+  // TODO: Free all memory
+}
 
 } // namespace lisp

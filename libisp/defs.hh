@@ -8,8 +8,6 @@
 
 namespace lisp
 {
-inline constexpr auto PN_RECLAIM = "reclaim";       // initiate garbage collection
-inline constexpr auto PN_CONS = "cons";             // make a new cons cell
 inline constexpr auto PN_PLUS = "+";                // add
 inline constexpr auto PN_DIFFERENCE = "-";          // subtract
 inline constexpr auto PN_TIMES = "*";               // multiply
@@ -37,9 +35,7 @@ inline constexpr auto PN_ZEROP = "zerop";           // t if eq to 0
 inline constexpr auto PN_EQP = "eqp";               // number eq
 inline constexpr auto PN_NEQP = "neqp";             // not eqp
 inline constexpr auto PN_MINUSP = "minusp";         // t if negative
-inline constexpr auto PN_FREECOUNT = "freecount";   // number of free cells
 inline constexpr auto PN_EVALTRACE = "evaltrace";   //
-inline constexpr auto PN_OBARRAY = "obarray";       // return list of all atoms
 inline constexpr auto PN_E = "e";                   // noeval version of eval
 inline constexpr auto PN_EVAL = "eval";             // evaluate exp
 inline constexpr auto PN_APPLY = "apply";           // apply function on args

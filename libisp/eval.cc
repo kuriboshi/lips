@@ -13,23 +13,9 @@ extern bool interrupt;
 
 namespace lisp
 {
-bool evaluator::noeval = 0;
-evaluator::continuation_t evaluator::cont = nullptr;
-evaluator::breakhook_t evaluator::breakhook = nullptr; // Called before going into break.
-evaluator::undefhook_t evaluator::undefhook = nullptr; // Called in case of undefined function.
-
-LISPT evaluator::fun = nullptr;                /* Store current function being evaluated. */
-LISPT evaluator::expression = nullptr;         /* Current expression. */
-LISPT evaluator::args = nullptr;               /* Current arguments. */
-alloc::destblock_t* evaluator::env = nullptr;  /* Current environment. */
-alloc::destblock_t* evaluator::dest = nullptr; /* Current destination beeing built. */
-
-evaluator::control_t evaluator::control[]; /* Control-stack. */
-int evaluator::toctrl = 0;                 /* Control-stack stack pointer. */
-
 void evaluator::reset()
 {
-  dzero();
+  a().dzero();
   toctrl = 0;
   fun = C_NIL;
   args = C_NIL;
@@ -41,10 +27,10 @@ LISPT evaluator::printwhere()
   LISPT foo = C_NIL;
   for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
-    if(control[i].type == CTRL_FUNC && control[i].u.f_point == evlam0)
+    if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::evlam0)
       for(; i; i--)
       {
-        if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0 && control[i - 1].type == CTRL_LISP
+        if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0 && control[i - 1].type == CTRL_LISP
           && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
@@ -124,9 +110,9 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  xprint(cons(fault, cons(C_BROKEN, C_NIL)), C_T);
+  xprint(a().cons(_lisp, fault, a().cons(_lisp, C_BROKEN, C_NIL)), C_T);
   push_func(next);
-  cont = everr;
+  cont = &evaluator::everr;
 }
 
 /* 
@@ -135,7 +121,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
  */
 alloc::destblock_t* evaluator::mkdestblock(int s)
 {
-  auto dest = dalloc(s + 1);
+  auto dest = a().dalloc(s + 1);
   dest[0].var.d_integer = s;
   dest[0].val.d_integer = s;
   dest[0].type = alloc::block_type::EMPTY;
@@ -150,7 +136,7 @@ void evaluator::storevar(LISPT v, int i)
 
 alloc::destblock_t* evaluator::pop_env()
 {
-  dfree(env);
+  a().dfree(env);
   return pop_point();
 }
 
@@ -179,19 +165,19 @@ LISPT evaluator::call(LISPT fun)
   switch(fun->subrval().argcount)
   {
     case 0:
-      foo = (*(fun->subrval().function0))();
+      foo = (*(fun->subrval().function0))(_lisp);
       break;
     case 1:
     case -1:
-      foo = (*(fun->subrval().function1))(dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function1))(_lisp, dest[1].val.d_lisp);
       break;
     case 2:
     case -2:
-      foo = (*(fun->subrval().function2))(dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function2))(_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
     case -3:
-      foo = (*(fun->subrval().function3))(dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function3))(_lisp, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
@@ -207,7 +193,7 @@ LISPT evaluator::call(LISPT fun)
 Dummy definition for the pretty printer.
 PRIMITIVE eval(LISPT expr)
 */
-PRIMITIVE evaluator::eval(LISPT expr)
+PRIMITIVE evaluator::eval(lisp&, LISPT expr)
 {
   /* 
    * Set the current expression to `expr' and push the current
@@ -226,9 +212,9 @@ PRIMITIVE evaluator::eval(LISPT expr)
    * `peval' may push more contiuations onto the stack but eventaully
    * `eval0' is called which returns 1, signalling end of evaluation.
    */
-  push_func(eval0);
-  cont = peval;
-  while(!(*cont)())
+  push_func(&evaluator::eval0);
+  cont = &evaluator::peval;
+  while(!(this->*cont)())
     ;
   /* 
    * Retrieve the result of the evaluation and restore the previous
@@ -244,7 +230,7 @@ PRIMITIVE evaluator::eval(LISPT expr)
 
 bool evaluator::eval0()
 {
-  dfree(dest);
+  a().dfree(dest);
   return true;
 }
 
@@ -252,18 +238,18 @@ bool evaluator::eval0()
 Dummy definition for the pretty printer.
 PRIMITIVE apply(f, a)
 */
-PRIMITIVE evaluator::apply(LISPT f, LISPT a)
+PRIMITIVE evaluator::apply(lisp&, LISPT f, LISPT x)
 {
   push_point(dest);
   dest = mkdestblock(1);
   push_lisp(fun);
   fun = f;
   push_lisp(args);
-  args = a;
-  expression = cons(f, a);
-  push_func(apply0);
-  cont = peval2;
-  while(!(*cont)())
+  args = x;
+  expression = a().cons(_lisp, f, x);
+  push_func(&evaluator::apply0);
+  cont = &evaluator::peval2;
+  while(!(this->*cont)())
     ;
   LISPT foo = receive();
   dest = pop_point();
@@ -272,7 +258,7 @@ PRIMITIVE evaluator::apply(LISPT f, LISPT a)
 
 bool evaluator::apply0()
 {
-  dfree(dest);
+  a().dfree(dest);
   args = pop_lisp();
   fun = pop_lisp();
   return true;
@@ -297,7 +283,7 @@ bool evaluator::peval()
     xprint(expression, C_T);
 #endif /* TRACE */
   push_lisp(expression);
-  push_func(ev0);
+  push_func(&evaluator::ev0);
   switch(type_of(expression))
   {
     case CONS:
@@ -305,11 +291,11 @@ bool evaluator::peval()
       fun = expression->car();
       push_lisp(args);
       args = expression->cdr();
-      push_func(ev1);
-      cont = peval1;
+      push_func(&evaluator::ev1);
+      cont = &evaluator::peval1;
       break;
     case SYMBOL:
-      cont = lookup;
+      cont = &evaluator::lookup;
       break;
     case INDIRECT:
       send(expression->indirectval());
@@ -420,75 +406,75 @@ bool evaluator::peval1()
   int foo;
 
   if(brkflg)
-    xbreak(KBD_BREAK, fun, peval1);
+    xbreak(KBD_BREAK, fun, &evaluator::peval1);
   else if(interrupt)
     abort(NO_MESSAGE, C_NIL);
   else
     switch(type_of(fun))
     {
       case CLOSURE:
-        push_func(peval1);
-        cont = evclosure;
+        push_func(&evaluator::peval1);
+        cont = &evaluator::evclosure;
         break;
       case SUBR:
         push_point(dest);
-        push_func(ev2);
+        push_func(&evaluator::ev2);
         if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
-          push_func(noevarg);
-          cont = evlis;
+          push_func(&evaluator::noevarg);
+          cont = &evaluator::evlis;
         }
         else
         {
           dest = mkdestblock(foo);
           noeval = 0;
-          cont = evalargs;
+          cont = &evaluator::evalargs;
         }
         break;
       case FSUBR:
         push_point(dest);
-        push_func(ev2);
+        push_func(&evaluator::ev2);
         if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
-          cont = spread;
+          cont = &evaluator::spread;
         }
         else
         {
           dest = mkdestblock(foo);
           noeval = 1;
-          cont = evalargs;
+          cont = &evaluator::evalargs;
         }
         break;
       case LAMBDA:
         noeval = 0;
-        cont = evlam;
+        cont = &evaluator::evlam;
         break;
       case NLAMBDA:
         noeval = 1;
-        cont = evlam;
+        cont = &evaluator::evlam;
         break;
       case CONS:
       case INDIRECT:
         expression = fun;
-        push_func(ev3);
-        cont = peval;
+        push_func(&evaluator::ev3);
+        cont = &evaluator::peval;
         break;
       case SYMBOL:
         fun = fun->symvalue();
-        cont = peval1;
+        cont = &evaluator::peval1;
         break;
       case UNBOUND:
-        do_unbound(peval1);
+        do_unbound(&evaluator::peval1);
         break;
       case STRING:
         if(!evalhook(expression))
-          xbreak(ILLEGAL_FUNCTION, fun, peval1);
+          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval1);
         break;
       default:
-        if(!do_default(peval1))
-          xbreak(ILLEGAL_FUNCTION, fun, peval1);
+        if(!do_default(&evaluator::peval1))
+          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval1);
         break;
     }
   return false;
@@ -499,55 +485,55 @@ bool evaluator::peval2()
   int foo;
 
   if(brkflg)
-    xbreak(KBD_BREAK, fun, peval2);
+    xbreak(KBD_BREAK, fun, &evaluator::peval2);
   else
     switch(type_of(fun))
     {
       case CLOSURE:
-        push_func(peval2);
-        cont = evclosure;
+        push_func(&evaluator::peval2);
+        cont = &evaluator::evclosure;
         break;
       case SUBR:
       case FSUBR:
         push_point(dest);
-        push_func(ev2);
+        push_func(&evaluator::ev2);
         if((foo = fun->subrval().argcount) < 0)
         {
           dest = mkdestblock(-foo);
-          cont = spread;
+          cont = &evaluator::spread;
         }
         else
         {
           dest = mkdestblock(foo);
           noeval = 1;
-          cont = evalargs;
+          cont = &evaluator::evalargs;
         }
         break;
       case LAMBDA:
       case NLAMBDA:
         noeval = 1;
-        cont = evlam;
+        cont = &evaluator::evlam;
         break;
       case CONS:
       case INDIRECT:
         expression = fun;
-        push_func(ev3p);
-        cont = peval;
+        push_func(&evaluator::ev3p);
+        cont = &evaluator::peval;
         break;
       case SYMBOL:
         fun = fun->symvalue();
-        cont = peval2;
+        cont = &evaluator::peval2;
         break;
       case UNBOUND:
-        do_unbound(peval2);
+        do_unbound(&evaluator::peval2);
         break;
       case STRING:
         if(!evalhook(expression))
-          xbreak(ILLEGAL_FUNCTION, fun, peval2);
+          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval2);
         break;
       default:
-        if(!do_default(peval2))
-          xbreak(ILLEGAL_FUNCTION, fun, peval2);
+        if(!do_default(&evaluator::peval2))
+          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval2);
         break;
     }
   return false;
@@ -563,7 +549,7 @@ void evaluator::bt()
   printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
-    if(control[i].type == CTRL_FUNC && control[i].u.f_point == ev0)
+    if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
       xprint(control[i - 1].u.lisp, C_T);
   }
   printlevel = op;
@@ -580,7 +566,7 @@ bool evaluator::everr()
 bool evaluator::noevarg()
 {
   args = receive();
-  cont = spread;
+  cont = &evaluator::spread;
   return false;
 }
 
@@ -594,9 +580,9 @@ bool evaluator::evalargs()
   {
     expression = args->car();
     if(noeval)
-      cont = noev9;
+      cont = &evaluator::noev9;
     else
-      cont = ev9;
+      cont = &evaluator::ev9;
   }
   return false;
 }
@@ -605,12 +591,12 @@ bool evaluator::ev9()
 {
   if(is_NIL(args->cdr()))
   {
-    cont = peval;
+    cont = &evaluator::peval;
   }
   else
   {
-    push_func(ev11);
-    cont = peval;
+    push_func(&evaluator::ev11);
+    cont = &evaluator::peval;
   }
   return false;
 }
@@ -620,7 +606,7 @@ bool evaluator::ev11()
   next();
   args = args->cdr();
   expression = args->car();
-  cont = ev9;
+  cont = &evaluator::ev9;
   return false;
 }
 
@@ -652,7 +638,7 @@ bool evaluator::evlis()
   else
   {
     expression = args->car();
-    cont = evlis1;
+    cont = &evaluator::evlis1;
   }
   return false;
 }
@@ -661,20 +647,20 @@ bool evaluator::evlis1()
 {
   if(is_NIL(args->cdr()))
   {
-    push_func(evlis2);
-    cont = peval;
+    push_func(&evaluator::evlis2);
+    cont = &evaluator::peval;
   }
   else
   {
-    push_func(evlis3);
-    cont = peval;
+    push_func(&evaluator::evlis3);
+    cont = &evaluator::peval;
   }
   return false;
 }
 
 bool evaluator::evlis2()
 {
-  LISPT x = cons(receive(), C_NIL);
+  LISPT x = a().cons(_lisp, receive(), C_NIL);
   send(x);
   cont = pop_func();
   return false;
@@ -684,19 +670,19 @@ bool evaluator::evlis3()
 {
   push_point(dest);
   dest = mkdestblock(1);
-  push_func(evlis4);
+  push_func(&evaluator::evlis4);
   args = args->cdr();
   expression = args->car();
-  cont = evlis1;
+  cont = &evaluator::evlis1;
   return false;
 }
 
 bool evaluator::evlis4()
 {
   LISPT x = receive();
-  dfree(dest);
+  a().dfree(dest);
   dest = pop_point();
-  x = cons(receive(), x);
+  x = a().cons(_lisp, receive(), x);
   send(x);
   cont = pop_func();
   return false;
@@ -719,19 +705,19 @@ bool evaluator::evlam()
   }
   dest = mkdestblock(ac);
   for(foo = fun->lamval().arglist, i = ac; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
-  push_func(evlam1);
+  push_func(&evaluator::evlam1);
   if(spr)
   {
     if(noeval)
-      cont = spread;
+      cont = &evaluator::spread;
     else
     {
-      push_func(noevarg);
-      cont = evlis;
+      push_func(&evaluator::noevarg);
+      cont = &evaluator::evlis;
     }
   }
   else
-    cont = evalargs;
+    cont = &evaluator::evalargs;
   return false;
 }
 
@@ -762,7 +748,7 @@ bool evaluator::ev2()
   try
   {
     auto foo = call(fun);
-    dfree(dest);
+    a().dfree(dest);
     dest = pop_point();
     send(foo);
     cont = pop_func();
@@ -774,9 +760,9 @@ bool evaluator::ev2()
     // fprintf(primerr, "%s ", ex.what());
     auto foo = printwhere();
     if(is_NIL(foo))
-      xbreak(0, C_NIL, peval1);
+      xbreak(0, C_NIL, &evaluator::peval1);
     else
-      xbreak(0, foo->car(), peval1); /* CAR(_) broken */
+      xbreak(0, foo->car(), &evaluator::peval1); /* CAR(_) broken */
   }
   return false;
 }
@@ -784,16 +770,16 @@ bool evaluator::ev2()
 bool evaluator::ev3()
 {
   fun = receive();
-  push_func(ev4);
-  cont = peval1;
+  push_func(&evaluator::ev4);
+  cont = &evaluator::peval1;
   return false;
 }
 
 bool evaluator::ev3p()
 {
   fun = receive();
-  push_func(ev4);
-  cont = peval2;
+  push_func(&evaluator::ev4);
+  cont = &evaluator::peval2;
   return false;
 }
 
@@ -822,8 +808,8 @@ bool evaluator::evlam1()
   link();
   dest = pop_point();
   args = fun->lamval().lambdarep;
-  push_func(evlam0);
-  cont = evsequence;
+  push_func(&evaluator::evlam0);
+  cont = &evaluator::evsequence;
   return false;
 }
 
@@ -857,7 +843,7 @@ bool evaluator::lookup()
   switch(type_of(t))
   {
     case UNBOUND:
-      xbreak(UNBOUND_VARIABLE, expression, lookup);
+      xbreak(UNBOUND_VARIABLE, expression, &evaluator::lookup);
       return false;
       break;
     case INDIRECT:
@@ -894,7 +880,7 @@ bool evaluator::evclosure()
   auto envir = pop_point();
   cont = pop_func();
   push_point(envir);
-  push_func(evclosure1);
+  push_func(&evaluator::evclosure1);
   return false;
 }
 
@@ -915,7 +901,7 @@ bool evaluator::evsequence()
   else
   {
     expression = args->car();
-    cont = evseq1;
+    cont = &evaluator::evseq1;
   }
   return false;
 }
@@ -924,12 +910,12 @@ bool evaluator::evseq1()
 {
   if(EQ(args->cdr(), C_NIL))
   {
-    cont = peval;
+    cont = &evaluator::peval;
   }
   else
   {
-    push_func(evseq3);
-    cont = peval;
+    push_func(&evaluator::evseq3);
+    cont = &evaluator::peval;
   }
   return false;
 }
@@ -938,11 +924,11 @@ bool evaluator::evseq3()
 {
   args = args->cdr();
   expression = args->car();
-  cont = evseq1;
+  cont = &evaluator::evseq1;
   return false;
 }
 
-PRIMITIVE evaluator::baktrace()
+PRIMITIVE evaluator::baktrace(lisp&)
 {
   for(int i = toctrl; i >= 0; i--)
   {
@@ -956,71 +942,71 @@ PRIMITIVE evaluator::baktrace()
         fprintf(primerr, "destblock\n");
         break;
       case CTRL_FUNC:
-        if(control[i].u.f_point == ev0)
+        if(control[i].u.f_point == &evaluator::ev0)
           fprintf(primerr, "ev0\n");
-        else if(control[i].u.f_point == peval)
+        else if(control[i].u.f_point == &evaluator::peval)
           fprintf(primerr, "peval\n");
-        else if(control[i].u.f_point == peval1)
+        else if(control[i].u.f_point == &evaluator::peval1)
           fprintf(primerr, "peval1\n");
-        else if(control[i].u.f_point == peval2)
+        else if(control[i].u.f_point == &evaluator::peval2)
           fprintf(primerr, "peval2\n");
-        else if(control[i].u.f_point == ev0)
+        else if(control[i].u.f_point == &evaluator::ev0)
           fprintf(primerr, "ev0\n");
-        else if(control[i].u.f_point == ev1)
+        else if(control[i].u.f_point == &evaluator::ev1)
           fprintf(primerr, "ev1\n");
-        else if(control[i].u.f_point == ev2)
+        else if(control[i].u.f_point == &evaluator::ev2)
           fprintf(primerr, "ev2\n");
-        else if(control[i].u.f_point == ev3)
+        else if(control[i].u.f_point == &evaluator::ev3)
           fprintf(primerr, "ev3\n");
-        else if(control[i].u.f_point == ev4)
+        else if(control[i].u.f_point == &evaluator::ev4)
           fprintf(primerr, "ev4\n");
-        else if(control[i].u.f_point == evlam0)
+        else if(control[i].u.f_point == &evaluator::evlam0)
           fprintf(primerr, "evlam0\n");
-        else if(control[i].u.f_point == evlam1)
+        else if(control[i].u.f_point == &evaluator::evlam1)
           fprintf(primerr, "evlam1\n");
-        else if(control[i].u.f_point == ev9)
+        else if(control[i].u.f_point == &evaluator::ev9)
           fprintf(primerr, "ev9\n");
-        else if(control[i].u.f_point == ev11)
+        else if(control[i].u.f_point == &evaluator::ev11)
           fprintf(primerr, "ev11\n");
-        else if(control[i].u.f_point == ev3p)
+        else if(control[i].u.f_point == &evaluator::ev3p)
           fprintf(primerr, "ev3p\n");
-        else if(control[i].u.f_point == evalargs)
+        else if(control[i].u.f_point == &evaluator::evalargs)
           fprintf(primerr, "evalargs\n");
-        else if(control[i].u.f_point == noevarg)
+        else if(control[i].u.f_point == &evaluator::noevarg)
           fprintf(primerr, "noevarg\n");
-        else if(control[i].u.f_point == evlam)
+        else if(control[i].u.f_point == &evaluator::evlam)
           fprintf(primerr, "evlam\n");
-        else if(control[i].u.f_point == spread)
+        else if(control[i].u.f_point == &evaluator::spread)
           fprintf(primerr, "spread\n");
-        else if(control[i].u.f_point == evlis)
+        else if(control[i].u.f_point == &evaluator::evlis)
           fprintf(primerr, "evlis\n");
-        else if(control[i].u.f_point == evlis1)
+        else if(control[i].u.f_point == &evaluator::evlis1)
           fprintf(primerr, "evlis1\n");
-        else if(control[i].u.f_point == evlis2)
+        else if(control[i].u.f_point == &evaluator::evlis2)
           fprintf(primerr, "evlis2\n");
-        else if(control[i].u.f_point == evlis3)
+        else if(control[i].u.f_point == &evaluator::evlis3)
           fprintf(primerr, "evlis3\n");
-        else if(control[i].u.f_point == evlis4)
+        else if(control[i].u.f_point == &evaluator::evlis4)
           fprintf(primerr, "evlis4\n");
-        else if(control[i].u.f_point == noev9)
+        else if(control[i].u.f_point == &evaluator::noev9)
           fprintf(primerr, "noev9\n");
-        else if(control[i].u.f_point == evsequence)
+        else if(control[i].u.f_point == &evaluator::evsequence)
           fprintf(primerr, "evsequence\n");
-        else if(control[i].u.f_point == evseq1)
+        else if(control[i].u.f_point == &evaluator::evseq1)
           fprintf(primerr, "evseq1\n");
-        else if(control[i].u.f_point == evseq3)
+        else if(control[i].u.f_point == &evaluator::evseq3)
           fprintf(primerr, "evseq3\n");
-        else if(control[i].u.f_point == evclosure)
+        else if(control[i].u.f_point == &evaluator::evclosure)
           fprintf(primerr, "evclosure\n");
-        else if(control[i].u.f_point == evclosure1)
+        else if(control[i].u.f_point == &evaluator::evclosure1)
           fprintf(primerr, "evclosure1\n");
-        else if(control[i].u.f_point == eval0)
+        else if(control[i].u.f_point == &evaluator::eval0)
           fprintf(primerr, "eval0\n");
-        else if(control[i].u.f_point == apply0)
+        else if(control[i].u.f_point == &evaluator::apply0)
           fprintf(primerr, "apply0\n");
-        else if(control[i].u.f_point == everr)
+        else if(control[i].u.f_point == &evaluator::everr)
           fprintf(primerr, "everr\n");
-        else if(control[i].u.f_point == lookup)
+        else if(control[i].u.f_point == &evaluator::lookup)
           fprintf(primerr, "lookup\n");
         else
           fprintf(stderr, "Unknown control stack element\n");
@@ -1030,16 +1016,16 @@ PRIMITIVE evaluator::baktrace()
   return C_NIL;
 }
 
-void evaluator::init()
+evaluator::evaluator(lisp& lisp) : _lisp(lisp)
 {
-  alloc::add_mark_object(&evaluator::fun);
-  alloc::add_mark_object(&evaluator::expression);
-  alloc::add_mark_object(&evaluator::args);
-  mkprim(PN_E, eval, 1, FSUBR);
-  mkprim(PN_EVAL, eval, 1, SUBR);
-  mkprim(PN_APPLY, apply, 2, SUBR);
-  mkprim(PN_APPLYSTAR, apply, -2, SUBR);
-  mkprim(PN_BAKTRACE, baktrace, 0, SUBR);
+  a().add_mark_object(&fun);
+  a().add_mark_object(&expression);
+  a().add_mark_object(&args);
+  a().mkprim(PN_E, ::lisp::eval, 1, FSUBR);
+  a().mkprim(PN_EVAL, ::lisp::eval, 1, SUBR);
+  a().mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
+  a().mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
+  a().mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
 }
 
 } // namespace lisp

@@ -170,7 +170,7 @@ const char* extilde(const char* w, int rep)
     if(pw == nullptr)
     {
       if(rep)
-        error(NO_USER, mkstring(s));
+        error(NO_USER, a().mkstring(s));
       return nullptr;
     }
     strncpy(s, pw->pw_dir, MAXNAMLEN);
@@ -200,7 +200,7 @@ static bool walkfiles(const char* wild, int all, int report)
   if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
   {
     if(report)
-      error(NO_DIRECTORY, mkstring(r));
+      error(NO_DIRECTORY, a().mkstring(r));
     return false;
   }
   while((rdir = readdir(odir)) != nullptr)
@@ -247,7 +247,7 @@ static LISPT buildlist()
   l = C_NIL;
   for(r = globarr; r < globp; r++)
   {
-    l = cons(mkstring(*r), l);
+    l = cons(a().mkstring(*r), l);
     free(*r);
   }
   free(globarr);
@@ -263,7 +263,7 @@ static int comp(const void* a, const void* b)
 LISPT expandfiles(const char* wild, int all, int report, int sort)
 {
   if(*wild == '/' && *(wild + 1) == '\0')
-    return cons(mkstring(wild), C_NIL);
+    return cons(a().mkstring(wild), C_NIL);
   if(*wild == '/')
     strcpy(r, "/");
   else

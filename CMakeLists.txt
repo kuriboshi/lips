@@ -7,4 +7,4 @@ project(lips VERSION 0.2.0)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(libisp)
-add_subdirectory(src)
+# add_subdirectory(src)

@@ -10,11 +10,18 @@
 
 namespace lisp
 {
+inline constexpr auto PN_RECLAIM = "reclaim";       // initiate garbage collection
+inline constexpr auto PN_CONS = "cons";             // make a new cons cell
+inline constexpr auto PN_FREECOUNT = "freecount";   // number of free cells
+inline constexpr auto PN_OBARRAY = "obarray";       // return list of all atoms
+
+class evaluator;
+
 class alloc
 {
 public:
-  alloc() = delete;
-  ~alloc() = delete;
+  alloc(lisp&);
+  ~alloc();
 
   static const int CONSCELLS = 1000;     // Number of cells in each block
   static const int DESTBLOCKSIZE = 3000; // Size of destination block area
@@ -25,10 +32,10 @@ public:
   static const int NOCONSARGS = 0; // Don't reclaim arguments of cons
   static const int CONSARGS = 1;   // Reclaim called from cons
 
-  struct conscells
+  struct conscells_t
   {
-    struct lisp_t cells[CONSCELLS];
-    struct conscells* next;
+    lisp_t cells[CONSCELLS];
+    conscells_t* next;
   };
 
   enum class block_type
@@ -53,88 +60,94 @@ public:
    * Each hashbucket contains a symbol and a pointer to the next
    * symbol in that bucket.
    */
-  struct obarray
+  struct obarray_t
   {
     LISPT sym;
-    struct obarray* onext;
+    obarray_t* onext;
   };
 
-  using conscells_t = struct conscells;
-  using obarray_t = struct obarray;
-
   /* variables */
-  static LISPT savearray[SAVEARRAYSIZE];
-  static int savept;
-  static obarray_t* obarray[MAXHASH];
-  static LISPT freelist;
-  static LISPT gcgag; // Nonnil means print gc message.
+  LISPT savearray[SAVEARRAYSIZE];
+  int savept = 0;
+  obarray_t* obarray[MAXHASH];
+  LISPT freelist = nullptr;
+  LISPT gcgag = nullptr; // Nonnil means print gc message.
 
   /* functions */
-  static LISPT intern(const char*);
-  static LISPT getobject();
+  LISPT intern(const char*);
+  LISPT getobject();
 
-  static LISPT mkprim(const char* pname, short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type);
-  static LISPT mklambda(LISPT args, LISPT def, lisp_type type);
+  LISPT mkprim(const char* pname, short nrpar, lisp_type type);
+  void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type);
+  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type);
+  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type);
+  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type);
+  LISPT mkarglis(LISPT alist, int& count);
+  LISPT mklambda(LISPT args, LISPT def, lisp_type type);
+  LISPT mkstring(const char*);
+  LISPT mknumber(int);
+  LISPT mkatom(char*);
+  LISPT mkfloat(double);
 
-  static LISPT mkstring(const char*);
-  static LISPT mknumber(int);
-  static LISPT mkatom(char*);
-  static LISPT mkfloat(double);
-  static destblock_t* dalloc(int);
-  static void dfree(destblock_t*);
-  static void dzero();
-  static void init();
-  static char* realmalloc(unsigned int);
-  static void save(LISPT v) { savearray[savept++] = v; }
-  static LISPT unsave() { return savearray[--savept]; }
+  destblock_t* dalloc(int);
+  void dfree(destblock_t*);
+  void dzero();
 
-  static PRIMITIVE reclaim(LISPT incr); /* Number of blocks to increase with */
-  static PRIMITIVE cons(LISPT, LISPT);
-  static PRIMITIVE xobarray();
-  static PRIMITIVE freecount();
+  char* realmalloc(unsigned int);
+  void save(LISPT v) { savearray[savept++] = v; }
+  LISPT unsave() { return savearray[--savept]; }
 
-  static void add_mark_object(LISPT* o) { markobjs.push_back(o); }
+  PRIMITIVE reclaim(lisp&, LISPT incr); /* Number of blocks to increase with */
+  PRIMITIVE cons(lisp&, LISPT, LISPT);
+  PRIMITIVE xobarray(lisp&);
+  PRIMITIVE freecount(lisp&);
+
+  void add_mark_object(LISPT* o) { markobjs.push_back(o); }
 
 private:
-  static conscells_t* newpage();
-  static int sweep();
-  static void mark(LISPT);
-  static LISPT doreclaim(int doconsargs, int incr);
-  static int hash(const char* str);
-  static LISPT buildatom(const char* s, int cpy);
-  static LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
+  lisp& _lisp;                  // Context
 
-  static LISPT foo1; // Protect arguments of cons when gc.
-  static LISPT foo2;
-  static int nrconses;                         // Number of conses since last gc.
-  static conscells_t* conscells;               // Cons cell storage.
-  static destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
-  static int destblockused;                    // Index to last slot in destblock.
-  static std::vector<LISPT*> markobjs;
+  evaluator& e() { return _lisp.e(); }
+  conscells_t* newpage();
+  int sweep();
+  void mark(LISPT);
+  LISPT doreclaim(int doconsargs, int incr);
+  int hash(const char* str);
+  LISPT buildatom(const char* s, int cpy);
+  LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
+
+  LISPT foo1 = nullptr; // Protect arguments of cons when gc.
+  LISPT foo2 = nullptr;
+  conscells_t* conscells = nullptr;               // Cons cell storage.
+  destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
+  int destblockused = 0;                    // Index to last slot in destblock.
+  std::vector<LISPT*> markobjs;
 };
 
-inline LISPT intern(const char* s) { return alloc::intern(s); }
-inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
-inline void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
+inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(l, a, b); }
+inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(l, a); }
+inline LISPT xobarray(lisp& l) { return l.a().xobarray(l); }
+inline LISPT freecount(lisp& l) { return l.a().freecount(l); }
+
+inline LISPT intern(lisp& l, const char* s) { return l.a().intern(s); }
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  l.a().mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  l.a().mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  l.a().mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  l.a().mkprim(pname, fname, nrpar, type);
 }
+
+#if 0
 inline LISPT mkstring(const char* s) { return alloc::mkstring(s); }
 inline LISPT mknumber(int i) { return alloc::mknumber(i); }
 inline LISPT mkatom(char* s) { return alloc::mkatom(s); }
@@ -151,5 +164,6 @@ inline char* realmalloc(unsigned int u) { return alloc::realmalloc(u); }
  */
 inline void save(LISPT v) { alloc::save(v); }
 inline void unsave(LISPT& v) { v = alloc::unsave(); }
+#endif
 
 } // namespace lisp
