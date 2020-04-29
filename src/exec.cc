@@ -22,14 +22,14 @@
 
 using namespace lisp;
 
-#define MAXARGS 256
-#define EXECHASH 1023 /* Hash table size for commands */
-#define DEFAULT_SHELL "/bin/sh"
+inline constexpr int MAXARGS = 256;
+inline constexpr int EXECHASH =  1023; /* Hash table size for commands */
+inline constexpr auto DEFAULT_SHELL = "/bin/sh";
 
 extern char** environ;
 LISPT p_setenv(LISPT, LISPT);
 
-#define UNION_WAIT int
+using UNION_WAIT = int;
 
 bool insidefork = false; /* Is nonzero in the child after */
                          /* a fork */

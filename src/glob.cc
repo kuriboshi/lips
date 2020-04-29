@@ -18,8 +18,8 @@
 
 using namespace lisp;
 
-#define TICKS 64
-#define NAMELEN 1024
+inline constexpr int TICKS = 64;
+inline constexpr int NAMELEN = 1024;
 
 static char r[MAXPATHLEN];
 static char** globarr;

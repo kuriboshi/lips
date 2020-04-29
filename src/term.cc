@@ -5,9 +5,9 @@
  */
 
 /*
- * This file contains all functions dealing with low level terminal
- * and file i/o.  Terminal i/o uses its own buffering and line editing.
- * It sets the terminal in cbreak and no echo mode.
+ * This file contains all functions dealing with low level terminal and file
+ * i/o.  Terminal i/o uses its own buffering and line editing.  It sets the
+ * terminal in cbreak and no echo mode.
  */
 
 #include <signal.h>
@@ -26,21 +26,20 @@
 
 using namespace lisp;
 
-#define FFLUSH(file) fflush(file)
-
 extern void finish(int);
 
-#define NUM_KEYS 256
-#define COMMENTCHAR '#'
+inline constexpr int NUM_KEYS = 256;
+inline constexpr char COMMENTCHAR = '#';
+
 #ifndef BELL
 #define BELL '\007'
 #endif
 
 /*
- * Terminal functions.  Each constant stands for a function provided
- * by the line editor.
+ * Terminal functions.  Each constant stands for a function provided by the
+ * line editor.
  */
-enum term_fun
+enum class term_fun
 {
   T_INSERT = 0,
   T_ERASE,
@@ -97,18 +96,18 @@ void init_keymap()
 {
   int i;
 
-  for(i = NUM_KEYS - 1; i; i--) key_tab[i] = T_INSERT;
-  key_tab[CERASE] = T_ERASE;
-  key_tab[CTRL('h')] = T_ERASE;
-  key_tab[CRPRNT] = T_RETYPE;
-  key_tab[CKILL] = T_KILL;
-  key_tab[CEOF] = T_EOF;
-  key_tab[CTRL('i')] = T_TAB;
-  key_tab[(int)'('] = T_LEFTPAR;
-  key_tab[(int)')'] = T_RIGHTPAR;
-  key_tab[(int)'\n'] = T_NEWLINE;
-  key_tab[(int)'\\'] = T_ESCAPE;
-  key_tab[(int)'"'] = T_STRING;
+  for(i = NUM_KEYS - 1; i; i--) key_tab[i] = term_fun::T_INSERT;
+  key_tab[CERASE] = term_fun::T_ERASE;
+  key_tab[CTRL('h')] = term_fun::T_ERASE;
+  key_tab[CRPRNT] = term_fun::T_RETYPE;
+  key_tab[CKILL] = term_fun::T_KILL;
+  key_tab[CEOF] = term_fun::T_EOF;
+  key_tab[CTRL('i')] = term_fun::T_TAB;
+  key_tab[(int)'('] = term_fun::T_LEFTPAR;
+  key_tab[(int)')'] = term_fun::T_RIGHTPAR;
+  key_tab[(int)'\n'] = term_fun::T_NEWLINE;
+  key_tab[(int)'\\'] = term_fun::T_ESCAPE;
+  key_tab[(int)'"'] = term_fun::T_STRING;
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -183,10 +182,9 @@ void putch(int c, FILE* file, int esc)
 }
 
 /*
- * Get a character from stream file.  If it's from a
- * terminal, buffer input with procedure getline, and get
- * characters from linebuffer.  If it's not from a terminal
- * do io the standard way.
+ * Get a character from stream file.  If it's from a terminal, buffer input
+ * with procedure getline, and get characters from linebuffer.  If it's not
+ * from a terminal do io the standard way.
  */
 int getch(FILE* file)
 {
@@ -217,8 +215,8 @@ gotlin:
 }
 
 /*
- * Unget a character.  If reading from a terminal, 
- * just push it back in the buffer, if not, do an ungetc.
+ * Unget a character.  If reading from a terminal, just push it back in the
+ * buffer, if not, do an ungetc.
  */
 void ungetch(int c, FILE* file)
 {
@@ -232,9 +230,8 @@ void ungetch(int c, FILE* file)
 }
 
 /*
- * Skips separators in the beginning of the line and returns 1 if
- * the first non-separator character is a left parenthesis, zero
- * otherwise.
+ * Skips separators in the beginning of the line and returns true if the first
+ * non-separator character is a left parenthesis, zero otherwise.
  */
 static bool firstnotlp()
 {
@@ -247,8 +244,8 @@ static bool firstnotlp()
 }
 
 /*
- * Delete one character the easy way by sending backspace - space -
- * backspace.  Do it twice if it was a control character.
+ * Delete one character the easy way by sending backspace - space - backspace.
+ * Do it twice if it was a control character.
  */
 static void delonechar()
 {
@@ -290,9 +287,9 @@ int outc(int c)
 }
 
 /* 
- * retype - If ALL is 0 then retype only current line.  If ALL is 1 then 
- *          retype complete line, including prompt.  It ALL is 2 just 
- *          delete all lines.  Used for ctrl-u kill.
+ * retype - If ALL is 0 then retype only current line.  If ALL is 1 then retype
+ *          complete line, including prompt.  It ALL is 2 just delete all
+ *          lines.  Used for ctrl-u kill.
  */
 static void retype(int all)
 {
@@ -429,12 +426,15 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
 /*
  * Routines for paren blinking.
  */
-#define NORMAL 0
-#define INSTRING 1
-#define EXITSTRING 2
-#define STARTSTRING 3
-#define LEFTPAR 4
-#define RIGHTPAR 5
+enum class paren_blink
+{
+  NORMAL,
+  INSTRING,
+  EXITSTRING,
+  STARTSTRING,
+  LEFTPAR,
+  RIGHTPAR
+};
 
 struct curpos
 {
@@ -447,23 +447,22 @@ static struct curpos parpos;     /* Saves position of matching par.  */
 static struct curpos currentpos; /* Current position.  */
 
 /*
- * Scans backwards and tries to find a matching left parenthesis
- * skipping strings and escapes.  It records its finding in parpos.
- * It also updates where the cursor is now in currentpos, so it
- * can find its way back.  BEGIN is the position in linebuffer from
- * where to start searching.
+ * Scans backwards and tries to find a matching left parenthesis skipping
+ * strings and escapes.  It records its finding in parpos.  It also updates
+ * where the cursor is now in currentpos, so it can find its way back.  BEGIN
+ * is the position in linebuffer from where to start searching.
  */
 static void scan(int begin)
 {
   int line, cpos;
   int pos;
   int escape;
-  int state;
+  paren_blink state;
   int parcount, pars;
 
   line = 0;
   cpos = 0;
-  state = NORMAL;
+  state = paren_blink::NORMAL;
   parcount = 0;
   pars = 0;
   parpos.cpos = 0;
@@ -476,14 +475,14 @@ static void scan(int begin)
     int cur = linebuffer[pos];
     cpos++;
     escape = 0;
-    if(cur == '"' && state == INSTRING)
-      state = EXITSTRING;
-    else if(cur == '"' && state == NORMAL)
-      state = STARTSTRING;
-    else if(cur == '(' && state != INSTRING && state != STARTSTRING)
-      state = LEFTPAR;
-    else if(cur == ')' && state != INSTRING && state != STARTSTRING)
-      state = RIGHTPAR;
+    if(cur == '"' && state == paren_blink::INSTRING)
+      state = paren_blink::EXITSTRING;
+    else if(cur == '"' && state == paren_blink::NORMAL)
+      state = paren_blink::STARTSTRING;
+    else if(cur == '(' && state != paren_blink::INSTRING && state != paren_blink::STARTSTRING)
+      state = paren_blink::LEFTPAR;
+    else if(cur == ')' && state != paren_blink::INSTRING && state != paren_blink::STARTSTRING)
+      state = paren_blink::RIGHTPAR;
     else if(cur == '\n')
     {
       if(parpos.line == line)
@@ -506,11 +505,11 @@ static void scan(int begin)
     {
       switch(state)
       {
-        case EXITSTRING:
-          state = INSTRING;
+        case paren_blink::EXITSTRING:
+          state = paren_blink::INSTRING;
           break;
-        case STARTSTRING:
-          state = NORMAL;
+        case paren_blink::STARTSTRING:
+          state = paren_blink::NORMAL;
           break;
         default:
           break;
@@ -520,18 +519,18 @@ static void scan(int begin)
     {
       switch(state)
       {
-        case EXITSTRING:
-          state = NORMAL;
+        case paren_blink::EXITSTRING:
+          state = paren_blink::NORMAL;
           break;
-        case STARTSTRING:
-          state = INSTRING;
+        case paren_blink::STARTSTRING:
+          state = paren_blink::INSTRING;
           break;
-        case LEFTPAR:
-          state = NORMAL;
+        case paren_blink::LEFTPAR:
+          state = paren_blink::NORMAL;
           parcount--;
           break;
-        case RIGHTPAR:
-          state = NORMAL;
+        case paren_blink::RIGHTPAR:
+          state = paren_blink::NORMAL;
           parcount++;
           break;
         default:
@@ -620,11 +619,10 @@ void blink()
 }
 
 /*
- * Get a line from stdin.  Do line editing functions such as kill line, 
- * retype line and delete character.  Count parethesis pairs and
- * terminate line if matching right paren.  Typing just a return
- * puts a right paren in the buffer as well as the newline.
- * Returns zero if anything goes wrong.
+ * Get a line from stdin.  Do line editing functions such as kill line, retype
+ * line and delete character.  Count parethesis pairs and terminate line if
+ * matching right paren.  Typing just a return puts a right paren in the buffer
+ * as well as the newline.  Returns zero if anything goes wrong.
  */
 bool lips_getline(FILE* file)
 {
@@ -649,12 +647,12 @@ bool lips_getline(FILE* file)
   {
     if(escaped)
       escaped--;
-    FFLUSH(stdout);
+    fflush(stdout);
     if(readchar(file, &c) == 0)
       return false;
     switch(key_tab[(int)c])
     {
-      case T_EOF:
+      case term_fun::T_EOF:
         if(linepos == 1)
         {
           linebuffer[linepos++] = EOF;
@@ -663,17 +661,17 @@ bool lips_getline(FILE* file)
         pputc(c, stdout);
         linebuffer[linepos++] = EOF;
         break;
-      case T_KILL:
+      case term_fun::T_KILL:
         retype(2);
         linepos = 1;
         parcount = origpar;
         escaped = 0;
         instring = 0;
         break;
-      case T_RETYPE:
+      case term_fun::T_RETYPE:
         retype(1);
         break;
-      case T_TAB:
+      case term_fun::T_TAB:
         s = mkexstr();
         t = extilde(s, 0);
         if(t == nullptr)
@@ -693,7 +691,7 @@ bool lips_getline(FILE* file)
           putc(BELL, stdout);
         }
         break;
-      case T_ERASE:
+      case term_fun::T_ERASE:
         escaped = 0;
         if(linepos > 1 && linebuffer[linepos - 1] == '\n')
         {
@@ -716,25 +714,25 @@ bool lips_getline(FILE* file)
           }
         }
         break;
-      case T_STRING:
+      case term_fun::T_STRING:
         linebuffer[linepos++] = c;
         pputc(c, stdout);
         if(!escaped)
           instring = !instring;
         break;
-      case T_ESCAPE:
+      case term_fun::T_ESCAPE:
         linebuffer[linepos++] = c;
         pputc(c, stdout);
         if(!escaped)
           escaped = 2;
         break;
-      case T_LEFTPAR:
+      case term_fun::T_LEFTPAR:
         if(!instring && !escaped)
           parcount++;
         pputc(c, stdout);
         linebuffer[linepos++] = c;
         break;
-      case T_RIGHTPAR:
+      case term_fun::T_RIGHTPAR:
         if(escaped || instring)
         {
           pputc(c, stdout);
@@ -763,7 +761,7 @@ bool lips_getline(FILE* file)
           blink();
         }
         break;
-      case T_NEWLINE:
+      case term_fun::T_NEWLINE:
         pputc('\n', stdout);
         if(linepos == 1 || onlyblanks())
         {
@@ -774,7 +772,7 @@ bool lips_getline(FILE* file)
         if(parcount <= 0 && !instring)
           return true;
         break;
-      case T_INSERT:
+      case term_fun::T_INSERT:
         pputc(c, stdout);
         linebuffer[linepos++] = c;
         break;
@@ -783,8 +781,8 @@ bool lips_getline(FILE* file)
 }
 
 /*
- * Return 1 if currently at end of line, or
- * at end of line after skipping blanks.
+ * Return true if currently at end of line, or at end of line after skipping
+ * blanks.
  */
 bool eoln(FILE* file)
 {
