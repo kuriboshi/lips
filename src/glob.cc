@@ -31,7 +31,7 @@ static char** globlimit;
  * If *wild is a slash then str must be a directory to match
  * wild completely. Used by match.
  */
-static int dircheck(const char* str, const char* wild, const char* ss)
+static bool dircheck(const char* str, const char* wild, const char* ss)
 {
   struct stat sbuf;
   int pos;
@@ -39,7 +39,7 @@ static int dircheck(const char* str, const char* wild, const char* ss)
   if(*wild == '/')
   {
     if(*str)
-      return 0;
+      return false;
     pos = strlen(r);
     if(pos != 0)
       strcat(r, "/");
@@ -47,22 +47,20 @@ static int dircheck(const char* str, const char* wild, const char* ss)
     stat(r, &sbuf);
     r[pos] = '\0';
     if(sbuf.st_mode & S_IFDIR)
-      return 1;
-    else
-      return 0;
+      return true;
+    return false;
   }
   while(*wild == '*') wild++;
   if(*str || *wild)
-    return 0;
-  else
-    return 1;
+    return false;
+  return true;
 }
 
 /*
  * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
  * is a simple string with no slashes.
  */
-static int match(const char* str, const char* wild)
+static bool match(const char* str, const char* wild)
 {
   int ok;
   const char* ss = str;
@@ -75,7 +73,7 @@ static int match(const char* str, const char* wild)
         wild++;
         while(*str)
           if(match(str, wild))
-            return 1;
+            return true;
           else
             str++;
         return dircheck(str, wild, ss);
@@ -90,14 +88,14 @@ static int match(const char* str, const char* wild)
           wild++;
         }
         if(!ok && *wild)
-          return 0;
+          return false;
         break;
       case '\\':
         wild++;
         /* fall through */
       default:
         if(*str != *wild)
-          return 0;
+          return false;
         break;
     }
     str++;
@@ -184,12 +182,12 @@ const char* extilde(const char* w, int rep)
 
 /* 
  * walkfiles - walks through files as specified by WILD and builds an 
- *             unsorted array of character strings. Returns non-zero if
- *             any file matched the pattern, zero otherwise.
+ *             unsorted array of character strings. Returns true if
+ *             any file matched the pattern, false otherwise.
  */
-static int walkfiles(const char* wild, int all, int report)
+static bool walkfiles(const char* wild, int all, int report)
 {
-  int result;
+  bool result;
   int pos;
   struct dirent* rdir;
   DIR* odir;
@@ -204,13 +202,13 @@ static int walkfiles(const char* wild, int all, int report)
   {
     if(report)
       error(NO_DIRECTORY, mkstring(r));
-    return 0;
+    return false;
   }
   while((rdir = readdir(odir)) != nullptr)
   {
     if((all || rdir->d_name[0] != '.' || *w == '.') && match(rdir->d_name, w))
     {
-      result = 1;
+      result = true;
       pos = strlen(r);
       if(pos != 0 && r[pos - 1] != '/')
         strcat(r, "/");

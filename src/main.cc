@@ -32,8 +32,8 @@ extern void clearlbuf();
 extern void loadbuf(char*);
 
 char* progname; /* Name of the game. */
-int brkflg;     /* 1 means break at next call to peval1. */
-int interrupt;
+bool brkflg = false;     /* 1 means break at next call to peval1. */
+bool interrupt;
 int mypgrp;             /* lips process group. */
 struct options options; /* Structure for all options. */
 LISPT path;             /* Search path for executables. */
@@ -171,7 +171,7 @@ void onhup() { exit(0); }
  * The stop key means to break inside a lisp expression. The
  * brkflg is checked on every entry to eval.
  */
-void onstop(int) { brkflg = 1; }
+void onstop(int) { brkflg = true; }
 
 static void fixpgrp()
 {
@@ -348,7 +348,7 @@ static void init()
  */
 static void loadinit(const char* initfile)
 {
-  if(loadfile(initfile))
+  if(!loadfile(initfile))
     printf("Can't open file %s\n", initfile); /* System init file. */
 }
 

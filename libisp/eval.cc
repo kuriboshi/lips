@@ -10,8 +10,8 @@
 
 extern lisp::LISPT findalias(lisp::LISPT);
 extern void pputc(int, FILE*);
-extern int brkflg;
-extern int interrupt;
+extern bool brkflg;
+extern bool interrupt;
 
 namespace lisp
 {

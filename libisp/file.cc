@@ -57,26 +57,25 @@ PRIMITIVE xprint(LISPT x, LISPT file)
   return print(x, file->fileval());
 }
 
-int loadfile(const char* lf)
+bool loadfile(const char* lf)
 {
   auto* foo = fopen(lf, "r");
   if(foo == nullptr)
-    return 1;
+    return false;
   for(auto rval = lispread(foo, 0); TYPEOF(rval) != ENDOFFILE; rval = lispread(foo, 0))
   {
     rval = evaluator::eval(rval);
   }
   fclose(foo);
-  return 0;
+  return true;
 }
 
 PRIMITIVE load(LISPT f)
 {
   check2(f, STRING, SYMBOL);
-  if(loadfile(f->getstr()))
+  if(!loadfile(f->getstr()))
     return error(CANT_OPEN, f);
-  else
-    return f;
+  return f;
 }
 
 PRIMITIVE xterpri(LISPT file)

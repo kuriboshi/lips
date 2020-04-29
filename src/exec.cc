@@ -32,7 +32,7 @@ LISPT p_setenv(LISPT, LISPT);
 
 #define UNION_WAIT int
 
-int insidefork = 0; /* Is nonzero in the child after */
+bool insidefork = false; /* Is nonzero in the child after */
                     /* a fork */
 
 static BITS32 exechash[EXECHASH / 32]; /* One bit set for each program */
@@ -127,16 +127,16 @@ static void printjob(job_t* job)
 /* 
  * recordjob - register job with process id PID in the linked list of jobs. If 
  *             BG is non-zero, job is registered as running in background.
- *             Returns 0 if all went well, non-zero otherwise.
+ *             Returns true if all went well, false otherwise.
  */
-static int recordjob(int pid, int bg)
+static bool recordjob(int pid, int bg)
 {
 #ifdef JOB_CONTROL
   if(insidefork)
-    return 0; /* Skip this if in a fork. */
+    return true; /* Skip this if in a fork. */
   auto* job = new job_t;
   if(job == nullptr)
-    return 1;
+    return false;
   if(joblist)
     job->jobnum = (joblist->jobnum) + 1;
   else
@@ -150,7 +150,7 @@ static int recordjob(int pid, int bg)
   job->running = 1;
   joblist = job;
 #endif
-  return 0;
+  return true;
 }
 
 /* 
@@ -253,7 +253,7 @@ char* ltoa(int v)
  *             meta characters in which case it returns true.
  *             It also strips off all quote-characters (backslash).
  */
-static int checkmeta(char* s)
+static bool checkmeta(char* s)
 {
   int i;
 
@@ -264,8 +264,8 @@ static int checkmeta(char* s)
       continue;
     }
     else if(index("*?[]", s[i]))
-      return 1;
-  return 0;
+      return true;
+  return false;
 }
 
 /* 
@@ -424,10 +424,9 @@ static LISPT exec(const char* name, LISPT command)
 }
 
 /* 
- * ifexec - Returns non-zero if directory DIR contains a NAME that is
- *          executable.
+ * ifexec - Returns true if directory DIR contains a NAME that is executable.
  */
-static int ifexec(const char* dir, const char* name)
+static bool ifexec(const char* dir, const char* name)
 {
   static char path[MAXNAMLEN];
   struct stat buf;
@@ -436,11 +435,10 @@ static int ifexec(const char* dir, const char* name)
   strcat(path, "/");
   strcat(path, name);
   if(stat(path, &buf) == -1)
-    return 0;
+    return false;
   if((buf.st_mode & (S_IEXEC | S_IFREG)) == (S_IEXEC | S_IFREG))
-    return 1;
-  else
-    return 0;
+    return true;
+  return false;
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */

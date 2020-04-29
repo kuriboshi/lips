@@ -23,7 +23,7 @@ LISPT alias_expanded;          /* For checking alias loops. */
 LISPT (*transformhook)(LISPT); /* Applied on input if non-nullptr. */
 void (*beforeprompt)();    /* Called before the prompt is printed. */
 
-static int printit; /* If the result will be printed. */
+static bool printit = false; /* If the result will be printed. */
 
 /*
  * History functions.
@@ -190,9 +190,9 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 {
   while(1)
   {
-    brkflg = 0;
-    interrupt = 0;
-    printit = 0;
+    brkflg = false;
+    interrupt = false;
+    printit = false;
     echoline = false;
     if(beforeprompt != nullptr)
       (*beforeprompt)();
@@ -233,7 +233,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
     if(TYPEOF(topexp->car()) == CONS)
     {
       topexp = topexp->car();
-      printit = 1;
+      printit = true;
     }
     alias_expanded = C_NIL;
     topexp = eval(topexp);

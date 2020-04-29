@@ -27,6 +27,6 @@ extern LISPT spaces(LISPT, LISPT);
 extern LISPT xreadline(LISPT);
 extern LISPT cpprint(LISPT, LISPT);
 
-extern int loadfile(const char*);
+extern bool loadfile(const char*);
 
 } // namespace lisp

@@ -9,8 +9,8 @@
 
 #include <lisp.hh>
 
-extern int interrupt;
-extern int brkflg;
+extern bool interrupt;
+extern bool brkflg;
 extern struct options options;
 extern lisp::LISPT path;
 extern lisp::LISPT home;

@@ -69,10 +69,10 @@ static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 static char tcap[128];             /* Buffer for terminal capabilties.  */
 static const char *curup, *curfwd; /* Various term cap strings.  */
 static const char *cleol, *curdn;
-static int nocap = 0; /* Nonzero if insufficient term cap. */
+static bool nocap = false; /* true if insufficient term cap. */
 #endif
 
-int lips_getline(FILE*);
+bool lips_getline(FILE*);
 
 void cleanup(int) { finish(0); }
 
@@ -235,16 +235,14 @@ void ungetch(int c, FILE* file)
  * the first non-separator character is a left parenthesis, zero
  * otherwise.
  */
-static int firstnotlp()
+static bool firstnotlp()
 {
-  int i;
-
-  for(i = 1; i < position && issepr((int)linebuffer[i]); i++)
+  int i = 1;
+  for(; i < position && issepr((int)linebuffer[i]); i++)
     ;
   if(linebuffer[i] == '(')
-    return 0;
-  else
-    return 1;
+    return false;
+  return true;
 }
 
 /*
@@ -268,17 +266,17 @@ static void delonechar()
 /*
  * Returns zero if the line contains only separators.
  */
-static int onlyblanks()
+static bool onlyblanks()
 {
   int i = linepos;
 
   while(i > 0)
   {
     if(!issepr((int)linebuffer[i]))
-      return 0;
+      return false;
     i--;
   }
-  return 1;
+  return true;
 }
 
 /*
@@ -384,7 +382,7 @@ static void fillrest(const char* word)
   }
 }
 
-static int checkchar(LISPT words, int pos, int* c)
+static bool checkchar(LISPT words, int pos, int* c)
 {
   LISPT l;
 
@@ -393,9 +391,9 @@ static int checkchar(LISPT words, int pos, int* c)
   for(; !ISNIL(l); l = l->cdr())
   {
     if(*c != (l->car()->getstr())[pos])
-      return 0;
+      return false;
   }
-  return 1;
+  return true;
 }
 
 static void complete(LISPT words)
@@ -627,7 +625,7 @@ void blink()
  * puts a right paren in the buffer as well as the newline.
  * Returns zero if anything goes wrong.
  */
-int lips_getline(FILE* file)
+bool lips_getline(FILE* file)
 {
   char c;
   const char *s, *t;
@@ -652,14 +650,14 @@ int lips_getline(FILE* file)
       escaped--;
     FFLUSH(stdout);
     if(readchar(file, &c) == 0)
-      return 0;
+      return false;
     switch(key_tab[(int)c])
     {
       case T_EOF:
         if(linepos == 1)
         {
           linebuffer[linepos++] = EOF;
-          return 1;
+          return true;
         }
         pputc(c, stdout);
         linebuffer[linepos++] = EOF;
@@ -756,7 +754,7 @@ int lips_getline(FILE* file)
             break; /* paren expression not first (for readline) */
           linebuffer[linepos++] = '\n';
           pputc('\n', stdout);
-          return 1;
+          return true;
         }
         else
         {
@@ -773,7 +771,7 @@ int lips_getline(FILE* file)
         }
         linebuffer[linepos++] = '\n';
         if(parcount <= 0 && !instring)
-          return 1;
+          return true;
         break;
       case T_INSERT:
         pputc(c, stdout);
@@ -787,18 +785,18 @@ int lips_getline(FILE* file)
  * Return 1 if currently at end of line, or
  * at end of line after skipping blanks.
  */
-int eoln(FILE* file)
+bool eoln(FILE* file)
 {
   int i;
 
   if(!isatty(fileno(file)))
-    return 0;
+    return false;
   for(i = position; i < linepos; i++)
   {
     if(linebuffer[i] != ' ' && linebuffer[i] != '\t' && linebuffer[i] != '\n')
-      return 0;
+      return false;
     if(linebuffer[i] == '\n')
-      return 1;
+      return true;
   }
-  return 1;
+  return true;
 }

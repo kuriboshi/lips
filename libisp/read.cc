@@ -134,7 +134,7 @@ static char digits[] = {
  * INTEGERP returns nonzero if the characters in buffer BUF
  * represents an integer, and the result as a long in res.
  */
-static int integerp(char* buf, int* res)
+static bool integerp(char* buf, int* res)
 {
   int d = 0;
   int sign = 1;
@@ -159,7 +159,7 @@ static int integerp(char* buf, int* res)
  * Returns nonzero if buffer BUF is a floating point constant.
  */
 #ifdef FLOATING
-static int floatp(char* buf)
+static bool floatp(char* buf)
 {
   int state = 0;
   while(state >= 0 && *buf)
@@ -195,9 +195,8 @@ static int floatp(char* buf)
     buf++;
   }
   if(state == 3 || state == 4 || state == 6 || state == 9)
-    return 1;
-  else
-    return 0;
+    return true;
+  return false;
 }
 #endif
 

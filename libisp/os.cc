@@ -15,12 +15,12 @@ namespace lisp
  * no character was read.  The character is returned in
  * the single character buffer cp.
  */
-int readchar(FILE* file, char* cp)
+bool readchar(FILE* file, char* cp)
 {
   int i = read(fileno(file), cp, 1);
   if(i != 1)
-    return 0;
-  return 1;
+    return false;
+  return true;
 }
 
 } // namespace lisp
