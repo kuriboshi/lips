@@ -334,6 +334,8 @@ static void init()
 
   initcvar(&path, "path", mungepath(getenv("PATH")));
   initcvar(&home, "home", mkstring(getenv("HOME")));
+  alloc::add_mark_object(&path);
+  alloc::add_mark_object(&home);
 
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;

@@ -8,11 +8,6 @@
 
 #include "libisp.hh"
 
-extern lisp::LISPT history;
-extern lisp::LISPT histnum;
-extern lisp::LISPT path;
-extern lisp::LISPT home;
-extern lisp::LISPT alias_expanded;
 extern void finish(int);
 
 namespace lisp
@@ -481,9 +476,8 @@ void alloc::dzero() { destblockused = 0; }
 
 void alloc::init_alloc()
 {
-  for(auto i: {&top, &rstack, &history, &histnum,
-        &path, &home, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
-        &gcgag, &alias_expanded, &C_EOF})
+  for(auto i: {&top, &rstack, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
+        &gcgag, &C_EOF})
     add_mark_object(i);
   destblockused = 0;
   conscells = nullptr;

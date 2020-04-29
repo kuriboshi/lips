@@ -247,6 +247,10 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 
 void init_hist()
 {
+  alloc::add_mark_object(&history);
+  alloc::add_mark_object(&histnum);
+  alloc::add_mark_object(&histmax);
+  alloc::add_mark_object(&alias_expanded);
   initcvar(&history, "history", C_NIL);
   initcvar(&histnum, "histnum", mknumber(1L));
   initcvar(&histmax, "histmax", mknumber(100L));
