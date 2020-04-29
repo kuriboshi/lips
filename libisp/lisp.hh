@@ -190,7 +190,7 @@ inline lisp_type type_of(LISPT a) { return a == nullptr ? NIL : a->type; }
 inline alloc::destblock_t* ENVVAL(LISPT e) { return e->u.l_environ; }
 #endif
 
-inline void SET(LISPT& a, lisp_type t, LISPT p)
+inline void set(LISPT& a, lisp_type t, LISPT p)
 {
   a = p;
   a->type = t;

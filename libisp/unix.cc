@@ -126,7 +126,7 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
   if(!f)
     return error(CANT_OPEN, name);
   LISPT newfile = nullptr;
-  SET(newfile, FILET, getobject());
+  set(newfile, FILET, getobject());
   newfile->fileval(f);
   return newfile;
 }

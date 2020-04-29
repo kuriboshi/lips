@@ -38,7 +38,7 @@ LISPT version;     /* Is set to the version string. */
 void initcvar(LISPT* cvar, const char* name, LISPT val)
 {
   LISPT t = intern(name);
-  SET(t->symval().value, CVARIABLE, getobject());
+  set(t->symval().value, CVARIABLE, getobject());
   t->symval().value->cvarval(cvar);
   *cvar = val;
 }
@@ -47,7 +47,7 @@ void init_lisp()
 {
   alloc::init();
 
-  SET(C_T, TRUE, getobject());
+  set(C_T, TRUE, getobject());
 
   CE_NIL = intern("nil");
   CE_T = intern("t");
@@ -100,7 +100,7 @@ void init_lisp()
   C_AMPER = intern("&");
 
   C_ERROR->type = ERROR;
-  SET(C_EOF, ENDOFFILE, getobject());
+  set(C_EOF, ENDOFFILE, getobject());
   CE_NIL->setq(C_NIL);
   CE_T->setq(C_T);
 

@@ -83,7 +83,7 @@ int alloc::sweep()
     if(i < CONSCELLS)
       break;
   }
-  SET(freelist, FREE, (LISPT)&cc->cells[i]);
+  set(freelist, FREE, (LISPT)&cc->cells[i]);
   nrfreed++;
   LISPT f = freelist;
   if(type_of(f) == CPOINTER)
@@ -99,7 +99,7 @@ int alloc::sweep()
 	   */
         if(type_of(f) == CPOINTER)
           free(f->cpointval());
-        SET(f->freeval(), FREE, &cc->cells[i]);
+        set(f->freeval(), FREE, &cc->cells[i]);
         f = f->freeval();
       }
       else
@@ -262,7 +262,7 @@ LISPT alloc::getobject()
     doreclaim(NOCONSARGS, 0L);
 
   LISPT f = nullptr;
-  SET(f, CONS, (LISPT)freelist);
+  set(f, CONS, (LISPT)freelist);
   freelist = freelist->freeval();
   return f;
 }
@@ -281,7 +281,7 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
   }
 
   LISPT f = nullptr;
-  SET(f, CONS, (LISPT)freelist);
+  set(f, CONS, (LISPT)freelist);
   freelist = freelist->freeval();
   f->car(a);
   f->cdr(b);
@@ -314,7 +314,7 @@ LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
   LISPT s = getobject();
   LISPT f = intern(pname);
   s->subrval().argcount = nrpar;
-  SET(f->symval().value, type, s);
+  set(f->symval().value, type, s);
   return s;
 }
 
@@ -397,7 +397,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
   s->lamval().arglist = mkarglis(args, count);
   s->lamval().argcnt = count;
   LISPT t = nullptr;
-  SET(t, type, s);
+  set(t, type, s);
   lisp::unsave(def);
   lisp::unsave(args);
   return t;
@@ -423,7 +423,7 @@ LISPT alloc::buildatom(const char* s, int cpy)
   static LISPT unbound = nullptr;
 
   if(unbound == nullptr)
-    SET(unbound, UNBOUND, getobject());
+    set(unbound, UNBOUND, getobject());
   LISPT newatom = getobject();
   if(newatom == C_ERROR)
     return C_ERROR;
@@ -440,7 +440,7 @@ LISPT alloc::buildatom(const char* s, int cpy)
   newatom->symval().plist = C_NIL;
   newatom->symval().value = unbound;
   LISPT l = nullptr;
-  SET(l, SYMBOL, newatom);
+  set(l, SYMBOL, newatom);
   return l;
 }
 
@@ -514,7 +514,7 @@ again:
   floats.marks[p0] |= 1 << point;
   *((double*)POINTER(rval)) = num;
 #endif /* FLOATING */
-  SET(rval, FLOAT, getobject());
+  set(rval, FLOAT, getobject());
   return rval;
 }
 

@@ -287,7 +287,7 @@ PRIMITIVE closure(LISPT fun, LISPT vars)
     return f;
   c->closval().cvalues = f;
   LISPT clos = nullptr;
-  SET(clos, CLOSURE, c);
+  set(clos, CLOSURE, c);
   return clos;
 }
 
