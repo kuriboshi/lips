@@ -29,25 +29,13 @@ LISPT brkprompt;   /* Prompt in break. */
 LISPT interactive; /* Nonnil if interactive lips. */
 LISPT version;     /* Is set to the version string. */
 
-/*
- * Initializes a lisp symbol with the pname NAME to contain the same
- * value as the C variable that CVAR points to. CVAR is set to VAL.
- * Whenever CVAR is changed the corresponding lisp variable changes
- * and vice versa.
- */
-void initcvar(LISPT* cvar, const char* name, LISPT val)
-{
-  LISPT t = intern(name);
-  set(t->symval().value, CVARIABLE, getobject());
-  t->symval().value->cvarval(cvar);
-  *cvar = val;
-}
-
 void init_lisp()
 {
-  alloc::init();
+  auto& l = *new lisp;
 
-  set(C_T, TRUE, getobject());
+  set(C_T, TRUE, l.a().getobject());
+
+  auto intern = [&l](const char* s) { return l.a().intern(s); };
 
   CE_NIL = intern("nil");
   CE_T = intern("t");
@@ -100,37 +88,37 @@ void init_lisp()
   C_AMPER = intern("&");
 
   C_ERROR->type = ERROR;
-  set(C_EOF, ENDOFFILE, getobject());
+  set(C_EOF, ENDOFFILE, l.a().getobject());
   CE_NIL->setq(C_NIL);
   CE_T->setq(C_T);
 
-  initcvar(&topprompt, "prompt", mkstring("!_"));
-  initcvar(&promptform, "promptform", C_NIL);
-  initcvar(&brkprompt, "brkprompt", mkstring("!:"));
-  initcvar(&currentbase, "base", mknumber(10L));
-  initcvar(&interactive, "interactive", C_NIL);
-  initcvar(&version, "version", mkstring(VERSION));
+  initcvar(l, &topprompt, "prompt", l.a().mkstring("!_"));
+  initcvar(l, &promptform, "promptform", C_NIL);
+  initcvar(l, &brkprompt, "brkprompt", l.a().mkstring("!:"));
+  initcvar(l, &currentbase, "base", l.a().mknumber(10L));
+  initcvar(l, &interactive, "interactive", C_NIL);
+  initcvar(l, &version, "version", l.a().mkstring(VERSION));
 
+#if 0
   rstack = C_NIL;
   top = C_NIL;
+#endif
 
-  evaluator::init();
+  // new arith(l);
+  new debug(l);
+  new file(l);
+  // new logic(l);
+  // new low(l);
+  // new map(l);
+  // new pred(l);
+  // new prim(l);
+  // new prop(l);
+  // new string(l);
+  // new unix(l);
+  // new user(l);
 
-  new arith;
-  new debug;
-  new file;
-  new logic;
-  new low;
-  new map;
-  new pred;
-  new prim;
-  new prop;
-  new string;
-  new unix;
-  new user;
-
-  evaluator::undefhook = nullptr;
-  evaluator::breakhook = nullptr;
+  l.e().undefhook = nullptr;
+  l.e().breakhook = nullptr;
 }
 
 } // namespace lisp

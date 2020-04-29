@@ -6,13 +6,13 @@ target_sources(libisp PRIVATE
   alloc.cc
   #arith.cc
   eval.cc
-  #file.cc
-  #init.cc
+  file.cc
+  init.cc
   lisp.cc
   #logic.cc
   #low.cc
   #map.cc
-  #misc.cc
+  misc.cc
   #os.cc
   #pred.cc
   #prim.cc
@@ -21,7 +21,7 @@ target_sources(libisp PRIVATE
   #string.cc
   #unix.cc
   #user.cc
-  #version.cc
+  version.cc
 )
 target_sources(libisp PRIVATE
   alloc.hh
@@ -32,8 +32,8 @@ target_sources(libisp PRIVATE
   #error.hh
   eval.hh
   #except.hh
-  #file.hh
-  #init.hh
+  file.hh
+  init.hh
   #iter.hh
   #libisp.hh
   lisp.hh
@@ -49,7 +49,10 @@ target_sources(libisp PRIVATE
   #string.hh
   #user.hh
   #unix.hh
-  #version.hh
+  version.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(libisp PUBLIC -Wall -Werror)
+target_link_libraries(libisp doctest)
+add_executable(testlibisp test.cc)
+target_link_libraries(testlibisp libisp)

@@ -208,12 +208,12 @@ class lisp
 public:
   lisp();
   ~lisp();
-  evaluator& e() { return _eval; };
   alloc& a() { return _alloc; }
+  evaluator& e() { return _eval; };
 
 private:
-  evaluator& _eval;
   alloc& _alloc;
+  evaluator& _eval;
 };
 
 } // namespace lisp

@@ -16,7 +16,10 @@ extern FILE* primerr;
 extern FILE* primout;
 extern FILE* primin;
 
+#if 0
+// TODO:
 extern void finish(int);
+#endif
 
 namespace lisp
 {
@@ -193,6 +196,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
     }
   for(auto i: markobjs) mark(*i);
 #if 0
+  // TODO:
   if (env != nullptr && ENVVAL(env) != nullptr)
     mark((LISPT *) &ENVVAL(env));
 #endif
@@ -567,7 +571,10 @@ alloc::alloc(lisp& lisp) : _lisp(lisp)
   if(conscells == nullptr)
   {
     fprintf(stderr, "Sorry, no memory for cons cells\n");
+#if 0
+    // TODO:
     finish(1);
+#endif
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);

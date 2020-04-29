@@ -8,8 +8,9 @@
 namespace lisp
 {
 
-lisp::lisp() : _eval(*new evaluator(*this)),
-               _alloc(*new alloc(*this))
+lisp::lisp() : 
+  _alloc(*new alloc(*this)),
+  _eval(*new evaluator(*this))
 {}
 
 lisp::~lisp()

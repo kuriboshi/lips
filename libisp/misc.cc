@@ -14,16 +14,18 @@ extern bool toploop(LISPT*, int (*)(LISPT*));
 
 static const char* messages[MAXMESSAGE];
 /* Some standard messages, all of them not necessarily used */
+#if 0
 static const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "Not a bignum", "Not a float",
   "Not indirect", "Not a long", "Not a list", "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
   "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
   "Not an ERROR", "Not a hash table"};
+#endif
 
 namespace lisp
 {
 int trace;
 
-PRIMITIVE evaltrace(LISPT state)
+PRIMITIVE evaltrace(lisp& l, LISPT state)
 {
   auto i = trace;
 
@@ -32,9 +34,10 @@ PRIMITIVE evaltrace(LISPT state)
     check(state, INTEGER);
     trace = state->intval();
   }
-  return mknumber(i);
+  return mknumber(l, i);
 }
 
+#if 0
 LISPT perror(int messnr, LISPT arg)
 {
   if(NOT_A & messnr)
@@ -45,13 +48,17 @@ LISPT perror(int messnr, LISPT arg)
     prin2(arg, C_T);
   return C_ERROR;
 }
+#endif
 
 LISPT error(int messnr, LISPT arg)
 {
+#if 0
   perror(messnr, arg);
+#endif
   throw lisp_error("lisp_error");
 }
 
+#if 0
 LISPT syserr(LISPT fault)
 {
   if(!is_NIL(fault))
@@ -75,7 +82,7 @@ static int dobreak(LISPT* com)
   }
   else if(EQ((**com).car(), C_GO))
   {
-    pexp = xprint(evaluator::eval(pexp), C_NIL);
+    pexp = xprint(eval(_lisp, pexp), C_NIL);
     return 0;
   }
   else if(EQ((**com).car(), C_RESET))
@@ -102,10 +109,11 @@ LISPT break0(LISPT exp)
   toploop(&brkprompt, dobreak);
   return pexp;
 }
+#endif
 
-debug::debug()
+debug::debug(lisp& lisp) : _lisp(lisp)
 {
-  mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
+  _lisp.a().mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
   messages[error_code(NO_MESSAGE)] = "";
   messages[error_code(ILLEGAL_ARG)] = "Illegal argument";
   messages[error_code(DIVIDE_ZERO)] = "Divide by zero";

@@ -6,10 +6,10 @@
 
 #include "libisp.hh"
 
-extern lisp::LISPT findalias(lisp::LISPT);
-extern void pputc(int, FILE*);
-extern bool brkflg;
-extern bool interrupt;
+// extern lisp::LISPT findalias(lisp::LISPT);
+// extern void pputc(int, FILE*);
+// extern bool brkflg;
+// extern bool interrupt;
 
 namespace lisp
 {
@@ -25,6 +25,8 @@ void evaluator::reset()
 LISPT evaluator::printwhere()
 {
   LISPT foo = C_NIL;
+#if 0
+  // TODO:
   for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::evlam0)
@@ -35,7 +37,7 @@ LISPT evaluator::printwhere()
         {
           foo = control[i - 1].u.lisp;
           fprintf(primerr, " [in ");
-          prin2(foo->car(), C_T);
+          file(_lisp).prin2(foo->car(), C_T);
           pputc(']', primerr);
           goto out;
         }
@@ -43,6 +45,7 @@ LISPT evaluator::printwhere()
   }
 out:
   pputc('\n', primerr);
+#endif
   return foo;
 }
 
@@ -103,14 +106,17 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 {
   if(mess != 0)
   {
+#if 0
+    // TODO:
     perror(mess, fault);
+#endif
     printwhere();
   }
   if(breakhook != nullptr)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  xprint(a().cons(_lisp, fault, a().cons(_lisp, C_BROKEN, C_NIL)), C_T);
+  file(_lisp).xprint(a().cons(_lisp, fault, a().cons(_lisp, C_BROKEN, C_NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -280,7 +286,7 @@ bool evaluator::peval()
 {
 #ifdef TRACE
   if(trace)
-    xprint(expression, C_T);
+    file(_lisp).xprint(expression, C_T);
 #endif /* TRACE */
   push_lisp(expression);
   push_func(&evaluator::ev0);
@@ -352,12 +358,17 @@ void evaluator::do_unbound(continuation_t continuation)
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
+#if 0
+  // TODO:
   LISPT al = getprop(expression->car(), C_AUTOLOAD);
+#else
+  LISPT al = C_NIL;
+#endif
   if(!is_NIL(al))
   {
     push_lisp(expression);
     push_point(dest);
-    load(al);
+    file(_lisp).load(al);
     dest = pop_point();
     expression = pop_lisp();
     fun = expression->car()->symvalue();
@@ -371,6 +382,8 @@ void evaluator::do_unbound(continuation_t continuation)
   }
   else
   {
+#if 0
+    // TODO:
     expression = findalias(expression);
     if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
       && type_of(expression->car()->symvalue()) == UNBOUND)
@@ -380,15 +393,21 @@ void evaluator::do_unbound(continuation_t continuation)
     }
     else
     {
+#endif
       fun = expression->car();
       args = expression->cdr();
       cont = continuation;
+#if 0
+      // TODO:
     }
+#endif
   }
 }
 
 bool evaluator::do_default(continuation_t continuation)
 {
+#if 0
+  // TODO:
   expression = findalias(expression);
   if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
     && type_of(expression->car()->symvalue()) == UNBOUND)
@@ -397,19 +416,22 @@ bool evaluator::do_default(continuation_t continuation)
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
     return true;
   }
-  else
-    return false;
+#endif
+  return false;
 }
 
 bool evaluator::peval1()
 {
   int foo;
 
+#if 0
+  // TODO:
   if(brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval1);
   else if(interrupt)
     abort(NO_MESSAGE, C_NIL);
   else
+#endif
     switch(type_of(fun))
     {
       case CLOSURE:
@@ -484,9 +506,12 @@ bool evaluator::peval2()
 {
   int foo;
 
+#if 0
+  // TODO:
   if(brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval2);
   else
+#endif
     switch(type_of(fun))
     {
       case CLOSURE:
@@ -545,19 +570,25 @@ bool evaluator::peval2()
  */
 void evaluator::bt()
 {
+#if 0
+  // TODO:
   int op = printlevel;
   printlevel = 2;
+#endif
   for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
-      xprint(control[i - 1].u.lisp, C_T);
+      file(_lisp).xprint(control[i - 1].u.lisp, C_T);
   }
+#if 0
+  // TODO:
   printlevel = op;
+#endif
 }
 
 bool evaluator::everr()
 {
-  expression = break0(expression);
+  // expression = break0(expression);
   cont = pop_func(); /* Discard one continuation. */
   cont = pop_func();
   return false;
@@ -936,7 +967,7 @@ PRIMITIVE evaluator::baktrace(lisp&)
     switch(control[i].type)
     {
       case CTRL_LISP:
-        xprint(control[i].u.lisp, C_T);
+        file(_lisp).xprint(control[i].u.lisp, C_T);
         break;
       case CTRL_POINT:
         fprintf(primerr, "destblock\n");

@@ -10,8 +10,10 @@ namespace lisp
 class debug
 {
 public:
-  debug();
+  debug(lisp&);
   ~debug() = default;
+private:
+  lisp& _lisp;
 };
 
 /* variables */

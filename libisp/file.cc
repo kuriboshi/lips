@@ -15,79 +15,108 @@ FILE* primerr;
 
 namespace lisp
 {
-PRIMITIVE xratom(LISPT file)
+PRIMITIVE file::xratom(LISPT file)
 {
+#if 0
   if(is_NIL(file))
     return ratom(primin);
   if(is_T(file))
     return ratom(stdin);
   check(file, FILET);
   return ratom(file->fileval());
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE readc(LISPT file)
+PRIMITIVE file::readc(LISPT file)
 {
+#if 0
   if(is_NIL(file))
-    return mknumber(getch(primin));
+    return _lisp.a().mknumber(getch(primin));
   if(is_T(file))
-    return mknumber(getch(stdin));
+    return _lisp.a().mknumber(getch(stdin));
   check(file, FILET);
-  return mknumber(getch(file->fileval()));
+  return _lisp.a().mknumber(getch(file->fileval()));
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE xread(LISPT file)
+PRIMITIVE file::xread(LISPT file)
 {
+#if 0
   if(is_NIL(file))
     return lispread(primin, 0);
   if(is_T(file))
     return lispread(stdin, 0);
   check(file, FILET);
   return lispread(file->fileval(), 0);
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE xprint(LISPT x, LISPT file)
+PRIMITIVE file::xprint(LISPT x, LISPT file)
 {
+#if 0
   if(is_NIL(file))
     return print(x, primout);
   if(is_T(file))
     return print(x, primerr);
   check(file, FILET);
   return print(x, file->fileval());
+#else
+  return C_NIL;
+#endif
 }
 
-bool loadfile(const char* lf)
+bool file::loadfile(const char* lf)
 {
+#if 0
   auto* foo = fopen(lf, "r");
   if(foo == nullptr)
     return false;
   for(auto rval = lispread(foo, 0); type_of(rval) != ENDOFFILE; rval = lispread(foo, 0))
   {
-    rval = evaluator::eval(rval);
+    rval = _lisp.e().eval(_lisp, rval);
   }
   fclose(foo);
   return true;
+#else
+  return false;
+#endif
 }
 
-PRIMITIVE load(LISPT f)
+PRIMITIVE file::load(LISPT f)
 {
+#if 0
   check2(f, STRING, SYMBOL);
   if(!loadfile(f->getstr()))
     return error(CANT_OPEN, f);
   return f;
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE xterpri(LISPT file)
+PRIMITIVE file::xterpri(LISPT file)
 {
+#if 0
   if(is_NIL(file))
     return terpri(primout);
   if(is_T(file))
     return terpri(primerr);
   check(file, FILET);
   return terpri(file->fileval());
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE prin1(LISPT x, LISPT file)
+PRIMITIVE file::prin1(LISPT x, LISPT file)
 {
+#if 0
   thisplevel = 0;
   if(is_NIL(file))
     return prin0(x, primout, 0);
@@ -95,10 +124,14 @@ PRIMITIVE prin1(LISPT x, LISPT file)
     return prin0(x, primerr, 0);
   check(file, FILET);
   return prin0(x, file->fileval(), 0);
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE prin2(LISPT x, LISPT file)
+PRIMITIVE file::prin2(LISPT x, LISPT file)
 {
+#if 0
   thisplevel = 0;
   if(is_NIL(file))
     return prin0(x, primout, 1);
@@ -106,21 +139,29 @@ PRIMITIVE prin2(LISPT x, LISPT file)
     return prin0(x, primerr, 1);
   check(file, FILET);
   return prin0(x, file->fileval(), 0);
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE plevel(LISPT newl)
+PRIMITIVE file::plevel(LISPT newl)
 {
+#if 0
   auto x = printlevel;
   if(!is_NIL(newl))
   {
     check(newl, INTEGER);
     printlevel = newl->intval();
   }
-  return mknumber(x);
+  return _lisp.a().mknumber(x);
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE spaces(LISPT n, LISPT file)
+PRIMITIVE file::spaces(LISPT n, LISPT file)
 {
+#if 0
   int i;
   FILE* f;
 
@@ -136,10 +177,14 @@ PRIMITIVE spaces(LISPT n, LISPT file)
   }
   for(i = n->intval(); i > 0; i--) putc(' ', f);
   return C_NIL;
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE xreadline(LISPT file)
+PRIMITIVE file::xreadline(LISPT file)
 {
+#if 0
   FILE* f;
 
   if(is_NIL(file))
@@ -152,10 +197,14 @@ PRIMITIVE xreadline(LISPT file)
     f = file->fileval();
   }
   return readline(f);
+#else
+  return C_NIL;
+#endif
 }
 
-PRIMITIVE cpprint(LISPT oname, LISPT file)
+PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 {
+#if 0
   FILE *f, *tagsfile, *cfile;
   char buf[120];
   const char* funn;
@@ -175,7 +224,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   check2(oname->symval().value, SUBR, FSUBR);
   funn = oname->symval().pname;
   if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
-    return error(CANT_OPEN, mkstring(TAGSFILE));
+    return error(CANT_OPEN, _lisp.a().mkstring(TAGSFILE));
   while(fgets(buf, 120, tagsfile) != nullptr)
     if(strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
     {
@@ -185,7 +234,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
       strcat(buf, fname);
       fclose(tagsfile);
       if((cfile = fopen(buf, "r")) == nullptr)
-        return error(CANT_OPEN, mkstring(buf));
+        return error(CANT_OPEN, _lisp.a().mkstring(buf));
       for(; line > 1; line--) fgets(buf, 120, cfile);
       fgets(buf, 120, cfile);
       putch('(', f, 0);
@@ -237,22 +286,25 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
     }
   fclose(tagsfile);
   return error(NOT_PRINTABLE, oname);
+#else
+  return C_NIL;
+#endif
 }
 
-file::file()
+file::file(lisp& lisp) : _lisp(lisp)
 {
-  mkprim(PN_LOAD, load, 1, SUBR);
-  mkprim(PN_PRIN1, prin1, 2, SUBR);
-  mkprim(PN_PRIN2, prin2, 2, SUBR);
-  mkprim(PN_PRINT, xprint, 2, SUBR);
-  mkprim(PN_PLEVEL, plevel, 1, SUBR);
-  mkprim(PN_RATOM, xratom, 1, SUBR);
-  mkprim(PN_READ, xread, 1, SUBR);
-  mkprim(PN_READC, readc, 1, SUBR);
-  mkprim(PN_READLINE, xreadline, 1, SUBR);
-  mkprim(PN_SPACES, spaces, 2, SUBR);
-  mkprim(PN_TERPRI, xterpri, 1, SUBR);
-  mkprim(PN_CPPRINT, cpprint, 2, SUBR);
+  _lisp.a().mkprim(PN_LOAD, ::lisp::load, 1, SUBR);
+  _lisp.a().mkprim(PN_PRIN1, ::lisp::prin1, 2, SUBR);
+  _lisp.a().mkprim(PN_PRIN2, ::lisp::prin2, 2, SUBR);
+  _lisp.a().mkprim(PN_PRINT, ::lisp::xprint, 2, SUBR);
+  _lisp.a().mkprim(PN_PLEVEL, ::lisp::plevel, 1, SUBR);
+  _lisp.a().mkprim(PN_RATOM, ::lisp::xratom, 1, SUBR);
+  _lisp.a().mkprim(PN_READ, ::lisp::xread, 1, SUBR);
+  _lisp.a().mkprim(PN_READC, ::lisp::readc, 1, SUBR);
+  _lisp.a().mkprim(PN_READLINE, ::lisp::xreadline, 1, SUBR);
+  _lisp.a().mkprim(PN_SPACES, ::lisp::spaces, 2, SUBR);
+  _lisp.a().mkprim(PN_TERPRI, ::lisp::xterpri, 1, SUBR);
+  _lisp.a().mkprim(PN_CPPRINT, ::lisp::cpprint, 2, SUBR);
   primin = stdin;
   primout = stdout;
   primerr = stderr;
