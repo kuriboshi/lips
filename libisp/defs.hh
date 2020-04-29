@@ -6,165 +6,169 @@
 
 #pragma once
 
-#define PN_RECLAIM "reclaim"       /* initiate garbage collection */
-#define PN_CONS "cons"             /* make a new cons cell */
-#define PN_PLUS "+"                /* add */
-#define PN_DIFFERENCE "-"          /* subtract */
-#define PN_TIMES "*"               /* multiply */
-#define PN_DIVIDE "/"              /* divide */
-#define PN_IPLUS "i+"              /* integer add */
-#define PN_IDIFFERENCE "i-"        /* integer subtract */
-#define PN_ITIMES "i*"             /* integer multiply */
-#define PN_IQUOTIENT "i/"          /* integer divide */
-#define PN_IREMAINDER "i%"         /* integer mod */
-#define PN_IMINUS "iminus"         /* integer change sign */
-#define PN_MINUS "minus"           /* change sign generic */
-#define PN_ADD1 "add1"             /* add one */
-#define PN_SUB1 "sub1"             /* subtract one */
-#define PN_ABS "abs"               /* absolute value */
-#define PN_FPLUS "f+"              /* float add */
-#define PN_FDIFFERENCE "f-"        /* float subtract */
-#define PN_FTIMES "f*"             /* float multiply */
-#define PN_FDIVIDE "f/"            /* float divide */
-#define PN_ITOF "itof"             /* integer to float */
-#define PN_GREATERP "greaterp"     /* t if greater than */
-#define PN_GEQ "geq"               /* t if greater or eq */
-#define PN_LESSP "lessp"           /* less than */
-#define PN_LEQ "leq"               /* less or eq */
-#define PN_ZEROP "zerop"           /* t if eq to 0 */
-#define PN_EQP "eqp"               /* number eq */
-#define PN_NEQP "neqp"             /* not eqp */
-#define PN_MINUSP "minusp"         /* t if negative */
-#define PN_FREECOUNT "freecount"   /* number of free cells */
-#define PN_EVALTRACE "evaltrace"   /*  */
-#define PN_OBARRAY "obarray"       /* return list of all atoms */
-#define PN_E "e"                   /* noeval version of eval */
-#define PN_EVAL "eval"             /* evaluate exp */
-#define PN_APPLY "apply"           /* apply function on args */
-#define PN_APPLYSTAR "apply*"      /* apply nospread */
-#define PN_EXPAND "expand"         /* expand wildcards */
-#define PN_TO "redir-to"           /* redirect to file */
-#define PN_FROM "redir-from"       /* redirect from file */
-#define PN_TOTO "append-to"        /* redirect appending to file */
-#define PN_PIPECMD "pipe-cmd"      /* pipe commands */
-#define PN_BACK "back"             /* run command in background */
-#define PN_STOP "stop-lips"        /* stop lips, return to superior */
-#define PN_REHASH "rehash"         /* recalculate hash table */
-#define PN_JOBS "jobs"             /* list jobs */
-#define PN_FG "fg"                 /* run job in foreground */
-#define PN_BG "bg"                 /* run job in background */
-#define PN_SETENV "setenv"         /* set environment variable */
-#define PN_GETENV "getenv"         /* get value of variable */
-#define PN_EXEC "exec"             /* overlay lips with command */
-#define PN_LOAD "load"             /* load file */
-#define PN_PRIN1 "prin1"           /* print without escapes */
-#define PN_PRIN2 "prin2"           /* print without new-line */
-#define PN_PRINT "print"           /* print */
-#define PN_PLEVEL "printlevel"     /* how deep to print */
-#define PN_RATOM "ratom"           /* read atom */
-#define PN_READ "read"             /* read expression */
-#define PN_READC "readc"           /* read characte */
-#define PN_READLINE "readline"     /* read a line */
-#define PN_SPACES "spaces"         /* print some spaces */
-#define PN_TERPRI "terpri"         /* print new-line */
-#define PN_CPPRINT "cpprint"       /* find and prettyprint c function */
-#define PN_AND "and"               /* and */
-#define PN_OR "or"                 /* or */
-#define PN_NOT "not"               /* not */
-#define PN_IF "if"                 /* if a then b else c */
-#define PN_SET "set"               /* set variable */
-#define PN_SETQ "setq"             /* set quoted variable */
-#define PN_SETQQ "setqq"           /* noeval set */
-#define PN_COND "cond"             /* cond */
-#define PN_WHILE "while"           /* while t */
-#define PN_PROGN "progn"           /* return last expression */
-#define PN_PROG1 "prog1"           /* return first expression */
-#define PN_PROG2 "prog2"           /* return second expression */
-#define PN_TOPOFSTACK "topofstack" /* return top of value stack */
-#define PN_ENVGET "envget"         /* examine environment */
-#define PN_BAKTRACE "baktrace"     /* control stack backtrace */
-#define PN_MAP "map"               /* map */
-#define PN_MAPC "mapc"             /* map on car */
-#define PN_MAPLIST "maplist"       /* map and build result */
-#define PN_MAPCAR "mapcar"         /* mapc and build result */
-#define PN_LISTP "listp"           /* t if cons */
-#define PN_NLISTP "nlistp"         /* not listp */
-#define PN_NEQ "neq"               /* not eq */
-#define PN_NUMBERP "numberp"       /* integer of float */
-#define PN_MEMB "memb"             /* t if a in l */
-#define PN_EQUAL "equal"           /* equal */
-#define PN_BOUNDP "boundp"         /* t if var bound */
-#define PN_LITATOM "litatom"       /* t if literal atom */
-#define PN_TYPEOF "typeof"         /* return type as an atom */
-#define PN_ATOM "atom"             /* t if atom */
-#define PN_ATTACH "attach"         /* attach object at front of list */
-#define PN_APPEND "append"         /* append lists */
-#define PN_CAR "car"               /* car */
-#define PN_CDR "cdr"               /* cdr */
-#define PN_CADR "cadr"
-#define PN_CDAR "cdar"
-#define PN_CAAR "caar"
-#define PN_CDDR "cddr"
-#define PN_CDDDR "cdddr"
-#define PN_CADDR "caddr"
-#define PN_CDADR "cdadr"
-#define PN_CAADR "caadr"
-#define PN_CDDAR "cddar"
-#define PN_CADAR "cadar"
-#define PN_CDAAR "cdaar"
-#define PN_CAAAR "caaar"
-#define PN_CLOSURE "closure" /* create static environment */
-#define PN_EQ "eq"           /* pointer equal */
-#define PN_ERROR "error"
-#define PN_LAMBDA "lambda"     /* create lambda object */
-#define PN_LENGTH "length"     /* length of list */
-#define PN_LIST "list"         /* make list of args */
-#define PN_NCONC "nconc"       /* destructive append */
-#define PN_NLAMBDA "nlambda"   /* make nlambda object */
-#define PN_NTH "nth"           /* nth car in list */
-#define PN_NULL "null"         /* t if nil */
-#define PN_QUOTE "quote"       /* don't eval arg */
-#define PN_RPLACA "rplaca"     /* replace car */
-#define PN_RPLACD "rplacd"     /* replace cdr */
-#define PN_TCONC "tconc"       /* add to end of list */
-#define PN_NTHD "nthd"         /* return nth cdr of list */
-#define PN_SETPLIST "setplist" /* set property list */
-#define PN_GETPLIST "getplist" /* get property list */
-#define PN_PUTPROP "putprop"   /* put property on atom */
-#define PN_GETPROP "getprop"   /* get property value */
-#define PN_REMPROP "remprop"   /* remove prop */
-#define PN_STRINGP "stringp"   /* t if string */
-#define PN_STREQ "streq"       /* string equal */
-#define PN_CONCAT "concat"     /* concatenate strings */
-#define PN_STRLEN "strlen"     /* length of string */
-#define PN_SUBSTR "substr"     /* get sub string */
-#define PN_SYMSTR "symstr"     /* make symbol a string */
-#define PN_STRCMP "strcmp"     /* compare strings */
-#define PN_PRINTHIST "??"      /* print history */
-#define PN_UXACCESS "access"   /* check file access */
-#define PN_UXALARM "alarm"     /* set alarm clock */
-#define PN_UXCHDIR "chdir"     /* change directory */
-#define PN_UXCHMOD "chmode"    /* change mode of file */
-#define PN_UXCLOSE "close"     /* close file */
-#define PN_UXCREAT "creat"     /* create file */
-#define PN_UXDUP "dup"         /* duplicate fileno */
-#define PN_UXERRNO "errno"     /* return latest error */
-#define PN_EXIT "exit"         /* exit lips */
-#define PN_UXGETUID "getuid"   /* get user id */
-#define PN_UXGETEUID "geteuid" /* get effective user id */
-#define PN_UXGETGID "getgid"   /* set group id */
-#define PN_UXGETEGID "getegid" /* get effective group id */
-#define PN_UXGETPID "getpid"   /* get process id */
-#define PN_UXKILL "killproc"   /* kill process */
-#define PN_UXLINK "link"       /* link file */
-#define PN_UXNICE "setnice"    /* set nice */
-#define PN_UXOPEN "open"       /* open file */
-#define PN_UXSETUID "setuid"   /* set user id */
-#define PN_UXSETGID "setgid"   /* set group id */
-#define PN_SIGNAL "signal"     /* install signal handler */
-#define PN_UXUNLINK "unlink"   /* unlink file */
-#define PN_DEFINE "define"     /* define function */
-#define PN_GETREP "getrep"     /* get function representation */
-#define PN_DE "de"             /* defile lambda function */
-#define PN_DF "df"             /* define nlambda function */
-#define PN_CD "cd"             /* change directory */
+namespace lisp
+{
+inline const char* PN_RECLAIM = "reclaim";       // initiate garbage collection
+inline const char* PN_CONS = "cons";             // make a new cons cell
+inline const char* PN_PLUS = "+";                // add
+inline const char* PN_DIFFERENCE = "-";          // subtract
+inline const char* PN_TIMES = "*";               // multiply
+inline const char* PN_DIVIDE = "/";              // divide
+inline const char* PN_IPLUS = "i+";              // integer add
+inline const char* PN_IDIFFERENCE = "i-";        // integer subtract
+inline const char* PN_ITIMES = "i*";             // integer multiply
+inline const char* PN_IQUOTIENT = "i/";          // integer divide
+inline const char* PN_IREMAINDER = "i%";         // integer mod
+inline const char* PN_IMINUS = "iminus";         // integer change sign
+inline const char* PN_MINUS = "minus";           // change sign generic
+inline const char* PN_ADD1 = "add1";             // add one
+inline const char* PN_SUB1 = "sub1";             // subtract one
+inline const char* PN_ABS = "abs";               // absolute value
+inline const char* PN_FPLUS = "f+";              // float add
+inline const char* PN_FDIFFERENCE = "f-";        // float subtract
+inline const char* PN_FTIMES = "f*";             // float multiply
+inline const char* PN_FDIVIDE = "f/";            // float divide
+inline const char* PN_ITOF = "itof";             // integer to float
+inline const char* PN_GREATERP = "greaterp";     // t if greater than
+inline const char* PN_GEQ = "geq";               // t if greater or eq
+inline const char* PN_LESSP = "lessp";           // less than
+inline const char* PN_LEQ = "leq";               // less or eq
+inline const char* PN_ZEROP = "zerop";           // t if eq to 0
+inline const char* PN_EQP = "eqp";               // number eq
+inline const char* PN_NEQP = "neqp";             // not eqp
+inline const char* PN_MINUSP = "minusp";         // t if negative
+inline const char* PN_FREECOUNT = "freecount";   // number of free cells
+inline const char* PN_EVALTRACE = "evaltrace";   //
+inline const char* PN_OBARRAY = "obarray";       // return list of all atoms
+inline const char* PN_E = "e";                   // noeval version of eval
+inline const char* PN_EVAL = "eval";             // evaluate exp
+inline const char* PN_APPLY = "apply";           // apply function on args
+inline const char* PN_APPLYSTAR = "apply*";      // apply nospread
+inline const char* PN_EXPAND = "expand";         // expand wildcards
+inline const char* PN_TO = "redir-to";           // redirect to file
+inline const char* PN_FROM = "redir-from";       // redirect from file
+inline const char* PN_TOTO = "append-to";        // redirect appending to file
+inline const char* PN_PIPECMD = "pipe-cmd";      // pipe commands
+inline const char* PN_BACK = "back";             // run command in background
+inline const char* PN_STOP = "stop-lips";        // stop lips, return to superior
+inline const char* PN_REHASH = "rehash";         // recalculate hash table
+inline const char* PN_JOBS = "jobs";             // list jobs
+inline const char* PN_FG = "fg";                 // run job in foreground
+inline const char* PN_BG = "bg";                 // run job in background
+inline const char* PN_SETENV = "setenv";         // set environment variable
+inline const char* PN_GETENV = "getenv";         // get value of variable
+inline const char* PN_EXEC = "exec";             // overlay lips with command
+inline const char* PN_LOAD = "load";             // load file
+inline const char* PN_PRIN1 = "prin1";           // print without escapes
+inline const char* PN_PRIN2 = "prin2";           // print without new-line
+inline const char* PN_PRINT = "print";           // print
+inline const char* PN_PLEVEL = "printlevel";     // how deep to print
+inline const char* PN_RATOM = "ratom";           // read atom
+inline const char* PN_READ = "read";             // read expression
+inline const char* PN_READC = "readc";           // read characte
+inline const char* PN_READLINE = "readline";     // read a line
+inline const char* PN_SPACES = "spaces";         // print some spaces
+inline const char* PN_TERPRI = "terpri";         // print new-line
+inline const char* PN_CPPRINT = "cpprint";       // find and prettyprint c function
+inline const char* PN_AND = "and";               // and
+inline const char* PN_OR = "or";                 // or
+inline const char* PN_NOT = "not";               // not
+inline const char* PN_IF = "if";                 // if a then b else c
+inline const char* PN_SET = "set";               // set variable
+inline const char* PN_SETQ = "setq";             // set quoted variable
+inline const char* PN_SETQQ = "setqq";           // noeval set
+inline const char* PN_COND = "cond";             // cond
+inline const char* PN_WHILE = "while";           // while t
+inline const char* PN_PROGN = "progn";           // return last expression
+inline const char* PN_PROG1 = "prog1";           // return first expression
+inline const char* PN_PROG2 = "prog2";           // return second expression
+inline const char* PN_TOPOFSTACK = "topofstack"; // return top of value stack
+inline const char* PN_ENVGET = "envget";         // examine environment
+inline const char* PN_BAKTRACE = "baktrace";     // control stack backtrace
+inline const char* PN_MAP = "map";               // map
+inline const char* PN_MAPC = "mapc";             // map on car
+inline const char* PN_MAPLIST = "maplist";       // map and build result
+inline const char* PN_MAPCAR = "mapcar";         // mapc and build result
+inline const char* PN_LISTP = "listp";           // t if cons
+inline const char* PN_NLISTP = "nlistp";         // not listp
+inline const char* PN_NEQ = "neq";               // not eq
+inline const char* PN_NUMBERP = "numberp";       // integer of float
+inline const char* PN_MEMB = "memb";             // t if a in l
+inline const char* PN_EQUAL = "equal";           // equal
+inline const char* PN_BOUNDP = "boundp";         // t if var bound
+inline const char* PN_LITATOM = "litatom";       // t if literal atom
+inline const char* PN_TYPEOF = "typeof";         // return type as an atom
+inline const char* PN_ATOM = "atom";             // t if atom
+inline const char* PN_ATTACH = "attach";         // attach object at front of list
+inline const char* PN_APPEND = "append";         // append lists
+inline const char* PN_CAR = "car";               // car
+inline const char* PN_CDR = "cdr";               // cdr
+inline const char* PN_CADR = "cadr";             // cadr
+inline const char* PN_CDAR = "cdar";             // cdar
+inline const char* PN_CAAR = "caar";             // caar
+inline const char* PN_CDDR = "cddr";             // cddr
+inline const char* PN_CDDDR = "cdddr";           // cdddr
+inline const char* PN_CADDR = "caddr";           // caddr
+inline const char* PN_CDADR = "cdadr";           // cdadr
+inline const char* PN_CAADR = "caadr";           // caadr
+inline const char* PN_CDDAR = "cddar";           // cddar
+inline const char* PN_CADAR = "cadar";           // cadar
+inline const char* PN_CDAAR = "cdaar";           // cdaar
+inline const char* PN_CAAAR = "caaar";           // caaar
+inline const char* PN_CLOSURE = "closure";       // create static environment
+inline const char* PN_EQ = "eq";                 // pointer equal
+inline const char* PN_ERROR = "error";           // error
+inline const char* PN_LAMBDA = "lambda";         // create lambda object
+inline const char* PN_LENGTH = "length";         // length of list
+inline const char* PN_LIST = "list";             // make list of args
+inline const char* PN_NCONC = "nconc";           // destructive append
+inline const char* PN_NLAMBDA = "nlambda";       // make nlambda object
+inline const char* PN_NTH = "nth";               // nth car in list
+inline const char* PN_NULL = "null";             // t if nil
+inline const char* PN_QUOTE = "quote";           // don't eval arg
+inline const char* PN_RPLACA = "rplaca";         // replace car
+inline const char* PN_RPLACD = "rplacd";         // replace cdr
+inline const char* PN_TCONC = "tconc";           // add to end of list
+inline const char* PN_NTHD = "nthd";             // return nth cdr of list
+inline const char* PN_SETPLIST = "setplist";     // set property list
+inline const char* PN_GETPLIST = "getplist";     // get property list
+inline const char* PN_PUTPROP = "putprop";       // put property on atom
+inline const char* PN_GETPROP = "getprop";       // get property value
+inline const char* PN_REMPROP = "remprop";       // remove prop
+inline const char* PN_STRINGP = "stringp";       // t if string
+inline const char* PN_STREQ = "streq";           // string equal
+inline const char* PN_CONCAT = "concat";         // concatenate strings
+inline const char* PN_STRLEN = "strlen";         // length of string
+inline const char* PN_SUBSTR = "substr";         // get sub string
+inline const char* PN_SYMSTR = "symstr";         // make symbol a string
+inline const char* PN_STRCMP = "strcmp";         // compare strings
+inline const char* PN_PRINTHIST = "??";          // print history
+inline const char* PN_UXACCESS = "access";       // check file access
+inline const char* PN_UXALARM = "alarm";         // set alarm clock
+inline const char* PN_UXCHDIR = "chdir";         // change directory
+inline const char* PN_UXCHMOD = "chmode";        // change mode of file
+inline const char* PN_UXCLOSE = "close";         // close file
+inline const char* PN_UXCREAT = "creat";         // create file
+inline const char* PN_UXDUP = "dup";             // duplicate fileno
+inline const char* PN_UXERRNO = "errno";         // return latest error
+inline const char* PN_EXIT = "exit";             // exit lips
+inline const char* PN_UXGETUID = "getuid";       // get user id
+inline const char* PN_UXGETEUID = "geteuid";     // get effective user id
+inline const char* PN_UXGETGID = "getgid";       // set group id
+inline const char* PN_UXGETEGID = "getegid";     // get effective group id
+inline const char* PN_UXGETPID = "getpid";       // get process id
+inline const char* PN_UXKILL = "killproc";       // kill process
+inline const char* PN_UXLINK = "link";           // link file
+inline const char* PN_UXNICE = "setnice";        // set nice
+inline const char* PN_UXOPEN = "open";           // open file
+inline const char* PN_UXSETUID = "setuid";       // set user id
+inline const char* PN_UXSETGID = "setgid";       // set group id
+inline const char* PN_SIGNAL = "signal";         // install signal handler
+inline const char* PN_UXUNLINK = "unlink";       // unlink file
+inline const char* PN_DEFINE = "define";         // define function
+inline const char* PN_GETREP = "getrep";         // get function representation
+inline const char* PN_DE = "de";                 // defile lambda function
+inline const char* PN_DF = "df";                 // define nlambda function
+inline const char* PN_CD = "cd";                 // change directory
+
+} // namespace lisp
