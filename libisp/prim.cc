@@ -28,7 +28,7 @@ static LISPT mkprim_(const char* pname, short nrpar, lisp_type type)
   return s;
 }
 
-void mkprim(const char* pname, LISPT (*fname)(void), short nrpar, lisp_type type)
+void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
 {
   mkprim_(pname, nrpar, type)->subrval().function0 = fname;
 }

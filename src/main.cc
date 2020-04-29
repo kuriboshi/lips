@@ -26,9 +26,9 @@ using namespace lisp;
 #define LIPSRC "/usr/local/lib/lipsrc"
 #endif
 
-extern void init_term(void);
-extern void end_term(void);
-extern void clearlbuf(void);
+extern void init_term();
+extern void end_term();
+extern void clearlbuf();
 extern void loadbuf(char*);
 
 char* progname; /* Name of the game. */

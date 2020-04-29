@@ -18,7 +18,7 @@ extern LISPT interactive;
 extern LISPT version;
 
 /* functions */
-extern void init_lisp(void);
+extern void init_lisp();
 extern void initcvar(LISPT*, const char*, LISPT);
 
 } // namespace lisp

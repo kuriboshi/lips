@@ -13,7 +13,7 @@ namespace lisp
 extern LISPT verboseflg;
 
 /* functions */
-extern void init_low(void);
+extern void init_low();
 
 // Primitives
 extern LISPT set(LISPT, LISPT);

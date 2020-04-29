@@ -74,7 +74,7 @@ struct symbol_t
 struct subr_t
 {
   // The type of internal c-functions
-  LISPT (*function0)(void);
+  LISPT (*function0)();
   LISPT (*function1)(LISPT);
   LISPT (*function2)(LISPT, LISPT);
   LISPT (*function3)(LISPT, LISPT, LISPT);

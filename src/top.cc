@@ -21,7 +21,7 @@ LISPT input_exp;               /* The input expression. */
 LISPT topexp;                  /* Transformed expression to evaluate. */
 LISPT alias_expanded;          /* For checking alias loops. */
 LISPT (*transformhook)(LISPT); /* Applied on input if non-nullptr. */
-void (*beforeprompt)(void);    /* Called before the prompt is printed. */
+void (*beforeprompt)();    /* Called before the prompt is printed. */
 
 static int printit; /* If the result will be printed. */
 

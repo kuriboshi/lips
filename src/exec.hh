@@ -12,8 +12,8 @@
 extern int insidefork;
 
 extern char* strsave(const char*);
-extern void printdone(void);
+extern void printdone();
 extern char* ltoa(int);
-extern void checkfork(void);
+extern void checkfork();
 extern int execcommand(lisp::LISPT, lisp::LISPT*);
-extern void init_exec(void);
+extern void init_exec();
