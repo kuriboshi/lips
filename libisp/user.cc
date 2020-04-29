@@ -86,7 +86,7 @@ static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
   check(name, SYMBOL);
   if(!ISNIL(pars) && TYPEOF(pars) != SYMBOL)
     check(pars, CONS);
-  LISPT foo = mklambda(pars, body, type);
+  LISPT foo = alloc::mklambda(pars, body, type);
   if(TYPEOF(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);

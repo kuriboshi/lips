@@ -304,6 +304,41 @@ PRIMITIVE alloc::freecount()
 }
 
 /*
+ * mkprim - Define the primitive with print name PNAME, to be the
+ *          C function FNAME with NRPAR number of parameters. TYPE
+ *          is the type of function: SUBR or FSUBR. If npar is negative
+ *          it means the function is halfspread.
+ */
+LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
+{
+  LISPT s = getobject();
+  LISPT f = intern(pname);
+  s->subrval().argcount = nrpar;
+  SET(f->symval().value, type, s);
+  return s;
+}
+
+void alloc::mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
+{
+  mkprim(pname, nrpar, type)->subrval().function0 = fname;
+}
+
+void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
+{
+  mkprim(pname, nrpar, type)->subrval().function1 = fname;
+}
+
+void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
+{
+  mkprim(pname, nrpar, type)->subrval().function2 = fname;
+}
+
+void alloc::mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+{
+  mkprim(pname, nrpar, type)->subrval().function3 = fname;
+}
+
+/*
  * mkstring - Strings are stored in a cons cell with car set to NIL and
  *            cdr is set to the string pointer.
  */
@@ -323,6 +358,49 @@ LISPT alloc::mknumber(int i)
   LISPT c = getobject();
   c->intval(i);
   return c;
+}
+
+/*
+ * mkarglist - builds a list out of the argument list ALIST given in a lambda
+ *             definition. This list may end in an atom if the function is
+ *             halfspread, or it could be an atom for a nospread
+ *             function. COUNT is set to the number of arguments and is
+ *             negative if halfspread or nospread.
+ */
+static LISPT mkarglis(LISPT alist, int& count)
+{
+  if(TYPEOF(alist) == CONS)
+  {
+    count++;
+    return cons(alist->car(), mkarglis(alist->cdr(), count));
+  }
+  else if(EQ(alist, C_NIL))
+    return C_NIL;
+  else
+  {
+    count = -(count + 1);
+    return cons(alist, C_NIL);
+  }
+}
+
+/*
+ * mklambda - Make a lambda object with the argument ARGS and definition DEF
+ *            and the type TYPE, wich is LAMBDA or NLAMBDA.
+ */
+LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
+{
+  save(args);
+  save(def);
+  LISPT s = getobject();
+  s->lamval().lambdarep = def;
+  int count = 0;
+  s->lamval().arglist = mkarglis(args, count);
+  s->lamval().argcnt = count;
+  LISPT t = nullptr;
+  SET(t, type, s);
+  lisp::unsave(def);
+  lisp::unsave(args);
+  return t;
 }
 
 /*

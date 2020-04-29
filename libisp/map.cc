@@ -53,7 +53,7 @@ PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
     else
       obj = apply(fn2, cons(obj, C_NIL));
   }
-  unsave(rval);
+  lisp::unsave(rval);
   return rval;
 }
 
@@ -76,7 +76,7 @@ PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
     else
       apply(fn2, cons(obj, C_NIL));
   }
-  unsave(rval);
+  lisp::unsave(rval);
   return rval;
 }
 

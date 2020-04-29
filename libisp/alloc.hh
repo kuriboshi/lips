@@ -72,6 +72,14 @@ public:
   /* functions */
   static LISPT intern(const char*);
   static LISPT getobject();
+
+  static LISPT mkprim(const char* pname, short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type);
+  static LISPT mklambda(LISPT args, LISPT def, lisp_type type);
+
   static LISPT mkstring(const char*);
   static LISPT mknumber(int);
   static LISPT mkatom(char*);
@@ -113,6 +121,10 @@ private:
 inline void init_alloc() { alloc::init_alloc(); }
 inline LISPT intern(const char* s) { return alloc::intern(s); }
 inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
+inline void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
+inline void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }
 inline LISPT mkstring(const char* s) { return alloc::mkstring(s); }
 inline LISPT mknumber(int i) { return alloc::mknumber(i); }
 inline LISPT mkatom(char* s) { return alloc::mkatom(s); }

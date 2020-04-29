@@ -10,59 +10,6 @@ extern void finish(int);
 
 namespace lisp
 {
-static int count;
-
-/*
- * mkprim - Define the primitive with print name PNAME, to be the
- *          C function FNAME with NRPAR number of parameters. TYPE
- *          is the type of function: SUBR or FSUBR. If npar is negative
- *          it means the function is halfspread.
- */
-static LISPT mkprim_(const char* pname, short nrpar, lisp_type type)
-{
-  LISPT s = getobject();
-  LISPT f = intern(pname);
-  s->subrval().argcount = nrpar;
-  SET(f->symval().value, type, s);
-  return s;
-}
-
-void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type)
-{
-  mkprim_(pname, nrpar, type)->subrval().function0 = fname;
-}
-
-void mkprim(const char* pname, LISPT (*fname)(LISPT), short nrpar, lisp_type type)
-{
-  mkprim_(pname, nrpar, type)->subrval().function1 = fname;
-}
-
-void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT), short nrpar, lisp_type type)
-{
-  mkprim_(pname, nrpar, type)->subrval().function2 = fname;
-}
-
-void mkprim(const char* pname, LISPT (*fname)(LISPT, LISPT, LISPT), short nrpar, lisp_type type)
-{
-  mkprim_(pname, nrpar, type)->subrval().function3 = fname;
-}
-
-/* 
- * nth - Return the N'th element in the list LIST. If N is greater than 
- *       the length of LIST,  return NIL.
- */
-LISPT nth(LISPT list, int n)
-{
-  LISPT l;
-
-  for(l = list; n > 1 && !ISNIL(l); n--, l = l->cdr())
-    ;
-  if(!ISNIL(l))
-    return l->car();
-  else
-    return C_NIL;
-}
-
 /* 
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
  *              indirect object,  return it.
@@ -97,49 +44,6 @@ LISPT closobj(LISPT vars)
   check(vars, CONS);
   check(vars->car(), SYMBOL);
   return cons(mkindirect(vars->car()->symval().value), closobj(vars->cdr()));
-}
-
-/* 
- * mkarglist - builds a list out of the argument list ALIST given in a 
- *             lambda definition. This list may end in an atom if the 
- *             function is halfspread, or it could be an atom for a 
- *             nospread function. COUNT is set to the number of arguments
- *             and is negative if halfspread or nospread.
- */
-static LISPT mkarglis(LISPT alist)
-{
-  if(TYPEOF(alist) == CONS)
-  {
-    count++;
-    return cons(alist->car(), mkarglis(alist->cdr()));
-  }
-  else if(EQ(alist, C_NIL))
-    return C_NIL;
-  else
-  {
-    count = -(count + 1);
-    return cons(alist, C_NIL);
-  }
-}
-
-/* 
- * mklambda - Make a lambda object with the argument ARGS and definition 
- *            DEF and the type TYPE,  wich is LAMBDA or NLAMBDA.
- */
-LISPT mklambda(LISPT args, LISPT def, lisp_type type)
-{
-  save(args);
-  save(def);
-  LISPT s = getobject();
-  s->lamval().lambdarep = def;
-  count = 0;
-  s->lamval().arglist = mkarglis(args);
-  s->lamval().argcnt = count;
-  LISPT t = nullptr;
-  SET(t, type, s);
-  unsave(def);
-  unsave(args);
-  return t;
 }
 
 PRIMITIVE car(LISPT a)
@@ -339,7 +243,7 @@ PRIMITIVE append(LISPT l)
       }
     }
   }
-  unsave(newl);
+  lisp::unsave(newl);
   return newl->cdr();
 }
 
@@ -352,9 +256,9 @@ PRIMITIVE null(LISPT a)
 
 PRIMITIVE quote(LISPT a) { return a; }
 
-PRIMITIVE lambda(LISPT a, LISPT f) { return mklambda(a, f, LAMBDA); }
+PRIMITIVE lambda(LISPT a, LISPT f) { return alloc::mklambda(a, f, LAMBDA); }
 
-PRIMITIVE nlambda(LISPT a, LISPT f) { return mklambda(a, f, NLAMBDA); }
+PRIMITIVE nlambda(LISPT a, LISPT f) { return alloc::mklambda(a, f, NLAMBDA); }
 
 PRIMITIVE list(LISPT l) { return l; }
 
@@ -385,6 +289,22 @@ PRIMITIVE closure(LISPT fun, LISPT vars)
   LISPT clos = nullptr;
   SET(clos, CLOSURE, c);
   return clos;
+}
+
+/*
+ * nth - Return the N'th element in the list LIST. If N is greater than the
+ *       length of LIST, return NIL.
+ */
+static LISPT nth(LISPT list, int n)
+{
+  LISPT l;
+
+  for(l = list; n > 1 && !ISNIL(l); n--, l = l->cdr())
+    ;
+  if(!ISNIL(l))
+    return l->car();
+  else
+    return C_NIL;
 }
 
 PRIMITIVE xnth(LISPT l, LISPT p)
