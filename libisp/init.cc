@@ -8,15 +8,6 @@
 
 namespace lisp
 {
-extern void init_arith();
-extern void init_file();
-extern void init_logic();
-extern void init_low();
-extern void init_map();
-extern void init_pred();
-extern void init_prop();
-extern void init_string();
-extern void init_user();
 
 /*
  * All lisp constants needed internally.
@@ -55,7 +46,7 @@ void initcvar(LISPT* cvar, const char* name, LISPT val)
 
 void init_lisp()
 {
-  init_alloc();
+  alloc::init();
 
   SET(C_T, TRUE, getobject());
 
@@ -124,18 +115,20 @@ void init_lisp()
   rstack = C_NIL;
   top = C_NIL;
 
-  init_prim();
-  init_arith();
-  init_ev();
-  init_debug();
-  init_pred();
-  init_user();
-  init_file();
-  init_prop();
-  init_string();
-  init_logic();
-  init_low();
-  init_map();
+  evaluator::init();
+
+  new arith;
+  new debug;
+  new file;
+  new logic;
+  new low;
+  new map;
+  new pred;
+  new prim;
+  new prop;
+  new string;
+  new unix;
+  new user;
 
   evaluator::undefhook = nullptr;
   evaluator::breakhook = nullptr;

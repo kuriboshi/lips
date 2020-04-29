@@ -239,7 +239,7 @@ PRIMITIVE cpprint(LISPT oname, LISPT file)
   return error(NOT_PRINTABLE, oname);
 }
 
-void init_file()
+file::file()
 {
   mkprim(PN_LOAD, load, 1, SUBR);
   mkprim(PN_PRIN1, prin1, 2, SUBR);

@@ -10,13 +10,11 @@
 namespace lisp
 {
 
-class user
+class map
 {
 public:
-  user();
-  ~user() = default;
+  map();
+  ~map() = default;
 };
 
-extern LISPT funeq(LISPT, LISPT);
-
-} // namespace lisp
+}

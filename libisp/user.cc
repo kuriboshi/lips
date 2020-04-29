@@ -5,7 +5,6 @@
  */
 
 #include "libisp.hh"
-#include "low.hh"
 
 namespace lisp
 {
@@ -98,7 +97,7 @@ PRIMITIVE de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, 
 
 PRIMITIVE df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
 
-void init_user()
+user::user()
 {
   mkprim(PN_DEFINE, define, 2, SUBR);
   mkprim(PN_GETREP, getrep, 1, SUBR);

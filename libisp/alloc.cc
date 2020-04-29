@@ -550,7 +550,7 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
  */
 void alloc::dzero() { destblockused = 0; }
 
-void alloc::init_alloc()
+void alloc::init()
 {
   for(auto i: {&top, &rstack, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
         &gcgag, &C_EOF})

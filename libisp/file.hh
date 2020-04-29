@@ -7,13 +7,19 @@
 
 #include <cstdio>
 
-/* variables */
 extern FILE* primin;
 extern FILE* primout;
 extern FILE* primerr;
 
 namespace lisp
 {
+class file
+{
+public:
+  file();
+  ~file() = default;
+};
+
 extern LISPT xratom(LISPT);
 extern LISPT readc(LISPT);
 extern LISPT xread(LISPT);

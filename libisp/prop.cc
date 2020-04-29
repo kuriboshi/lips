@@ -69,7 +69,7 @@ PRIMITIVE remprop(LISPT a, LISPT p)
   return r;
 }
 
-void init_prop()
+prop::prop()
 {
   mkprim(PN_SETPLIST, setplist, 2, SUBR);
   mkprim(PN_GETPLIST, getplist, 1, SUBR);

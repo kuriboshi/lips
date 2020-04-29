@@ -7,6 +7,14 @@
 
 namespace lisp
 {
+
+class debug
+{
+public:
+  debug();
+  ~debug() = default;
+};
+
 /* variables */
 extern int trace;
 
@@ -15,6 +23,5 @@ extern LISPT perror(int, LISPT);
 extern LISPT error(int, LISPT);
 extern LISPT syserr(LISPT);
 extern LISPT break0(LISPT);
-extern void init_debug();
 
 } // namespace lisp

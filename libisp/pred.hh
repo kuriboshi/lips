@@ -7,14 +7,14 @@
 
 namespace lisp
 {
-extern LISPT numberp(LISPT);
-extern LISPT listp(LISPT);
+class pred
+{
+public:
+  pred();
+  ~pred() = default;
+};
+
 extern LISPT memb(LISPT, LISPT);
 extern LISPT equal(LISPT, LISPT);
-extern LISPT nlistp(LISPT);
-extern LISPT neq(LISPT, LISPT);
-extern LISPT boundp(LISPT);
-extern LISPT litatom(LISPT);
-extern LISPT xtypeof(LISPT);
 
 } // namespace lisp

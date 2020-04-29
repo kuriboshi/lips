@@ -176,7 +176,7 @@ PRIMITIVE uxunlink(LISPT name)
   return mknumber(unlink(name->stringval()));
 }
 
-void init_unix()
+unix::unix()
 {
   mkprim(PN_UXACCESS, uxaccess, 2, SUBR);
   mkprim(PN_UXALARM, uxalarm, 1, SUBR);

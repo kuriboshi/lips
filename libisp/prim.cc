@@ -343,7 +343,7 @@ PRIMITIVE uxexit(LISPT status)
   return C_NIL;
 }
 
-void init_prim()
+prim::prim()
 {
   mkprim(PN_ATOM, atom, 1, SUBR);
   mkprim(PN_ATTACH, attach, 2, SUBR);

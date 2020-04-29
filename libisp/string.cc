@@ -98,7 +98,7 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   return mkstring(ns);
 }
 
-void init_string()
+string::string()
 {
   mkprim(PN_STRINGP, stringp, 1, SUBR);
   mkprim(PN_STREQ, streq, 2, SUBR);

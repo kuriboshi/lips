@@ -109,7 +109,7 @@ PRIMITIVE envget(LISPT e, LISPT n)
 #endif
 }
 
-void init_low()
+low::low()
 {
   mkprim(PN_SET, set, 2, SUBR);
   mkprim(PN_SETQ, setq, 2, FSUBR);

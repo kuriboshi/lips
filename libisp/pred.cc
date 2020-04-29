@@ -7,7 +7,6 @@
 #include <cstring>
 
 #include "libisp.hh"
-#include "user.hh"
 
 namespace lisp
 {
@@ -169,7 +168,7 @@ PRIMITIVE xtypeof(LISPT a)
   return C_NIL;
 }
 
-void init_pred()
+pred::pred()
 {
   mkprim(PN_LISTP, listp, 1, SUBR);
   mkprim(PN_NLISTP, nlistp, 1, SUBR);

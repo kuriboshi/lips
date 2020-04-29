@@ -8,7 +8,8 @@
 
 namespace lisp
 {
-PRIMITIVE map(LISPT obj, LISPT fn1, LISPT fn2)
+
+PRIMITIVE xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(TYPEOF(obj) == CONS)
   {
@@ -80,9 +81,9 @@ PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-void init_map()
+map::map()
 {
-  mkprim(PN_MAP, map, 3, SUBR);
+  mkprim(PN_MAP, xmap, 3, SUBR);
   mkprim(PN_MAPC, mapc, 3, SUBR);
   mkprim(PN_MAPLIST, maplist, 3, SUBR);
   mkprim(PN_MAPCAR, mapcar, 3, SUBR);

@@ -50,7 +50,7 @@ public:
 
   static void bt();
   static void unwind();
-  static void init_ev();
+  static void init();
 
   static int toctrl;
   static alloc::destblock_t* dest;
@@ -129,7 +129,6 @@ private:
 };
 
 inline void unwind() { evaluator::unwind(); }
-inline void init_ev() { evaluator::init_ev(); }
 inline void bt() { evaluator::bt(); }
 
 inline PRIMITIVE eval(LISPT expr) { return evaluator::eval(expr); }

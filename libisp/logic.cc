@@ -49,7 +49,7 @@ PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
   return eval(true_expr);
 }
 
-void init_logic()
+logic::logic()
 {
   mkprim(PN_AND, p_and, -1, FSUBR);
   mkprim(PN_OR, p_or, -1, FSUBR);

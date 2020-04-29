@@ -36,14 +36,18 @@ target_sources(libisp PRIVATE
   iter.hh
   libisp.hh
   lisp.hh
+  logic.hh
   low.hh
+  map.hh
   misc.hh
   os.hh
   pred.hh
   prim.hh
   prop.hh
   read.hh
+  string.hh
   user.hh
+  unix.hh
   version.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

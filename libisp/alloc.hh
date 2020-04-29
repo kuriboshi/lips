@@ -87,7 +87,7 @@ public:
   static destblock_t* dalloc(int);
   static void dfree(destblock_t*);
   static void dzero();
-  static void init_alloc();
+  static void init();
   static char* realmalloc(unsigned int);
   static void save(LISPT v) { savearray[savept++] = v; }
   static LISPT unsave() { return savearray[--savept]; }
@@ -118,7 +118,6 @@ private:
 
 };
 
-inline void init_alloc() { alloc::init_alloc(); }
 inline LISPT intern(const char* s) { return alloc::intern(s); }
 inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(a, b); }
 inline void mkprim(const char* pname, LISPT (*fname)(), short nrpar, lisp_type type) { alloc::mkprim(pname, fname, nrpar, type); }

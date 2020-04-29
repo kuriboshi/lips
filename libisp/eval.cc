@@ -1031,7 +1031,7 @@ PRIMITIVE evaluator::baktrace()
   return C_NIL;
 }
 
-void evaluator::init_ev()
+void evaluator::init()
 {
   alloc::add_mark_object(&evaluator::fun);
   alloc::add_mark_object(&evaluator::expression);

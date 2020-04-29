@@ -103,7 +103,7 @@ LISPT break0(LISPT exp)
   return pexp;
 }
 
-void init_debug()
+debug::debug()
 {
   mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
   messages[ERRNO(NO_MESSAGE)] = "";
