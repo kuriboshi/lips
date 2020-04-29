@@ -261,10 +261,6 @@ enum class num_type
   ILLEGAL2 = 5                  // Second argument is illegal
 };
 
-/* 
- * The result is one of the above constants depending on the types of the 
- * arguments.
- */
 inline num_type numtype(LISPT x, LISPT y)
 {
   if(TYPEOF(x) == FLOAT)
@@ -287,7 +283,7 @@ inline num_type numtype(LISPT x, LISPT y)
 }
 
 template<typename T, typename C>
-LISPT docheck(T x, T y, C cmp)
+inline LISPT docheck(T x, T y, C cmp)
 {
   if(cmp(x, y))
     return C_T;
@@ -299,19 +295,19 @@ inline void illegalreturn(LISPT a)
   error(ILLEGAL_ARG, a);
 }
 
-template<typename IComp, typename FComp>
-LISPT numcheck(LISPT x, LISPT y, IComp icmp, FComp fcmp)
+template<template<typename> typename Comparer>
+inline LISPT numcheck(LISPT x, LISPT y)
 {
   switch(numtype(x, y))
   {
     case num_type::FLOATFLOAT:
-      return docheck(x->floatval(), y->floatval(), fcmp);
+      return docheck(x->floatval(), y->floatval(), Comparer<double>());
     case num_type::FLOATINT:
-      return docheck(x->floatval(), (double)y->intval(), fcmp);
+      return docheck(x->floatval(), (double)y->intval(), Comparer<double>());
     case num_type::INTFLOAT:
-      return docheck((double)x->intval(), y->floatval(), fcmp);
+      return docheck((double)x->intval(), y->floatval(), Comparer<double>());
     case num_type::INTINT:
-      return docheck(x->intval(), y->intval(), icmp);
+      return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
       illegalreturn(x);
       break;
@@ -324,17 +320,17 @@ LISPT numcheck(LISPT x, LISPT y, IComp icmp, FComp fcmp)
   return error(BUG, C_NIL);
 }
 
-PRIMITIVE greaterp(LISPT x, LISPT y) { return numcheck(x, y, std::greater<int>(), std::greater<double>()); }
+PRIMITIVE greaterp(LISPT x, LISPT y) { return numcheck<std::greater>(x, y); }
 
-PRIMITIVE lessp(LISPT x, LISPT y) { return numcheck(x, y,  std::less<int>(), std::less<double>()); }
+PRIMITIVE lessp(LISPT x, LISPT y) { return numcheck<std::less>(x, y); }
 
-PRIMITIVE eqp(LISPT x, LISPT y) { return numcheck(x, y, std::equal_to<int>(), std::equal_to<double>()); }
+PRIMITIVE eqp(LISPT x, LISPT y) { return numcheck<std::equal_to>(x, y); }
 
-PRIMITIVE geq(LISPT x, LISPT y) { return numcheck(x, y, std::greater_equal<int>(), std::greater_equal<double>()); }
+PRIMITIVE geq(LISPT x, LISPT y) { return numcheck<std::greater_equal>(x, y); }
 
-PRIMITIVE leq(LISPT x, LISPT y) { return numcheck(x, y, std::less_equal<int>(), std::less_equal<double>()); }
+PRIMITIVE leq(LISPT x, LISPT y) { return numcheck<std::less_equal>(x, y); }
 
-PRIMITIVE neqp(LISPT x, LISPT y) { return numcheck(x, y, std::not_equal_to<int>(), std::not_equal_to<double>()); }
+PRIMITIVE neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(x, y); }
 
 PRIMITIVE zerop(LISPT x)
 {
