@@ -12,9 +12,9 @@ LISPT verboseflg;
 
 /*
 Dummy definition for cpprint.
-PRIMITIVE set(var, val)
+PRIMITIVE low::set(var, val)
 */
-PRIMITIVE set(LISPT var, LISPT val)
+PRIMITIVE low::set(LISPT var, LISPT val)
 {
   check(var, SYMBOL);
   if(EQ(var, CE_NIL) || EQ(var, CE_T))
@@ -28,21 +28,21 @@ PRIMITIVE set(LISPT var, LISPT val)
   return val;
 }
 
-PRIMITIVE setq(LISPT var, LISPT val) { return set(var, eval(val)); }
+PRIMITIVE low::setq(LISPT var, LISPT val) { return set(var, eval(_lisp, val)); }
 
-PRIMITIVE progn(LISPT lexp)
+PRIMITIVE low::progn(LISPT lexp)
 {
   if(is_NIL(lexp))
     return C_NIL;
   while(!is_NIL(lexp->cdr()))
   {
-    eval(lexp->car());
+    eval(_lisp, lexp->car());
     lexp = lexp->cdr();
   }
-  return eval(lexp->car());
+  return eval(_lisp, lexp->car());
 }
 
-PRIMITIVE cond(LISPT args)
+PRIMITIVE low::cond(LISPT args)
 {
   LISPT res = C_NIL;
   if(is_NIL(args))
@@ -51,7 +51,7 @@ PRIMITIVE cond(LISPT args)
   {
     LISPT alt = args->car();
     check(alt, CONS);
-    res = eval(alt->car());
+    res = eval(_lisp, alt->car());
     if(!is_NIL(res))
     {
       if(is_NIL(alt->cdr()))
@@ -66,29 +66,29 @@ PRIMITIVE cond(LISPT args)
   return C_NIL;
 }
 
-PRIMITIVE xwhile(LISPT pred, LISPT exp)
+PRIMITIVE low::xwhile(LISPT pred, LISPT exp)
 {
-  LISPT res = eval(pred);
+  LISPT res = eval(_lisp, pred);
   while(!is_NIL(res))
   {
     progn(exp);
-    res = eval(pred);
+    res = eval(_lisp, pred);
   }
   return C_NIL;
 }
 
-PRIMITIVE prog1(LISPT a1, LISPT) { return a1; }
+PRIMITIVE low::prog1(LISPT a1, LISPT) { return a1; }
 
-PRIMITIVE prog2(LISPT, LISPT a2, LISPT) { return a2; }
+PRIMITIVE low::prog2(LISPT, LISPT a2, LISPT) { return a2; }
 
 #if 0
-PRIMITIVE topofstack()
+PRIMITIVE low::topofstack()
 {
   return env;
 }
 #endif
 
-PRIMITIVE envget(LISPT e, LISPT n)
+PRIMITIVE low::envget(LISPT e, LISPT n)
 {
 #if 0
   LISPT foo;
@@ -109,21 +109,21 @@ PRIMITIVE envget(LISPT e, LISPT n)
 #endif
 }
 
-low::low()
+low::low(lisp& lisp) : _lisp(lisp)
 {
-  mkprim(PN_SET, set, 2, SUBR);
-  mkprim(PN_SETQ, setq, 2, FSUBR);
-  mkprim(PN_SETQQ, set, 2, FSUBR);
-  mkprim(PN_COND, cond, -1, FSUBR);
-  mkprim(PN_WHILE, xwhile, -2, FSUBR);
-  mkprim(PN_PROGN, progn, -1, FSUBR);
-  mkprim(PN_PROG1, prog1, -2, SUBR);
-  mkprim(PN_PROG2, prog2, -3, SUBR);
+  a().mkprim(PN_SET, ::lisp::set, 2, SUBR);
+  a().mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
+  a().mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
+  a().mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
+  a().mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
+  a().mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
+  a().mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
+  a().mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
 #if 0
-  mkprim(PN_TOPOFSTACK, topofstack,  0, SUBR);
+  a().mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
 #endif
-  mkprim(PN_ENVGET, envget, 2, SUBR);
-  initcvar(&verboseflg, "verboseflg", C_NIL);
+  a().mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
+  a().initcvar(&verboseflg, "verboseflg", C_NIL);
 }
 
 } // namespace lisp

@@ -4,6 +4,7 @@
 
 #include "lisp.hh"
 #include "alloc.hh"
+#include "low.hh"
 
 TEST_CASE("Create lisp object")
 {
@@ -30,5 +31,17 @@ TEST_CASE("Create lisp object")
   {
     auto lambda = lisp.a().mkatom("lambda");
     CHECK(lambda == lisp::C_LAMBDA);
+  }
+  SUBCASE("Set variable")
+  {
+    auto i = lisp.a().mkatom("i");
+    auto j = lisp.a().mkatom("j");
+    auto a = lisp.a().mkstring("a");
+    auto b = lisp.a().mkstring("b");
+    set(lisp, i, a);
+    set(lisp, j, b);
+    CHECK(i != j);
+    set(lisp, j, a);
+    CHECK(i != j);
   }
 }

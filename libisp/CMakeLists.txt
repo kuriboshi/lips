@@ -9,7 +9,7 @@ target_sources(libisp PRIVATE
   file.cc
   lisp.cc
   #logic.cc
-  #low.cc
+  low.cc
   #map.cc
   misc.cc
   #os.cc
@@ -36,7 +36,7 @@ target_sources(libisp PRIVATE
   #libisp.hh
   lisp.hh
   #logic.hh
-  #low.hh
+  low.hh
   #map.hh
   #misc.hh
   #os.hh
