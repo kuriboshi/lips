@@ -21,4 +21,14 @@ TEST_CASE("Create lisp object")
     auto hello1 = lisp1.a().intern("hello");
     CHECK(hello0 == hello1);
   }
+  SUBCASE("Check constants are the same as interned strings")
+  {
+    auto lambda = lisp.a().intern("lambda");
+    CHECK(lambda == lisp::C_LAMBDA);
+  }
+  SUBCASE("Check constants are the same as a local atom")
+  {
+    auto lambda = lisp.a().mkatom("lambda");
+    CHECK(lambda == lisp::C_LAMBDA);
+  }
 }

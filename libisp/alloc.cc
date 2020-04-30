@@ -8,7 +8,6 @@
 #include "alloc.hh"
 #include "error.hh"
 #include "eval.hh"
-#include "init.hh"
 
 // TODO:
 extern FILE* primerr;
@@ -495,7 +494,7 @@ LISPT alloc::intern(const char* str) { return puthash(str, globals, 0); }
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-LISPT alloc::mkatom(char* str)
+LISPT alloc::mkatom(const char* str)
 {
   // First we search for global interned atoms
   if(auto* ob = findatom(str, globals))

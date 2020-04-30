@@ -13,7 +13,6 @@
 #include "error.hh"
 #include "eval.hh"
 #include "file.hh"
-#include "init.hh"
 #include "iter.hh"
 #include "logic.hh"
 #include "low.hh"

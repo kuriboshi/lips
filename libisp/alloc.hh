@@ -99,7 +99,7 @@ public:
   LISPT mklambda(LISPT args, LISPT def, lisp_type type);
   LISPT mkstring(const char*);
   LISPT mknumber(int);
-  LISPT mkatom(char*);
+  LISPT mkatom(const char*);
   LISPT mkfloat(double);
 
   destblock_t* dalloc(int);

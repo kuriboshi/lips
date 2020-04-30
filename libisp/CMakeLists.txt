@@ -7,7 +7,6 @@ target_sources(libisp PRIVATE
   #arith.cc
   eval.cc
   file.cc
-  init.cc
   lisp.cc
   #logic.cc
   #low.cc
@@ -33,7 +32,6 @@ target_sources(libisp PRIVATE
   eval.hh
   #except.hh
   file.hh
-  init.hh
   #iter.hh
   #libisp.hh
   lisp.hh
