@@ -6,7 +6,6 @@
 
 #include <cstdio>
 #include "alloc.hh"
-#include "constants.hh"
 #include "error.hh"
 #include "eval.hh"
 #include "init.hh"
@@ -413,7 +412,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
 /*
  * Calculates hash value of string.
  */
-int alloc::hash(const char* str)
+int alloc::hash(const char* str) const
 {
   int sum = 0;
 
@@ -451,25 +450,33 @@ LISPT alloc::buildatom(const char* s, int cpy)
   return l;
 }
 
+alloc::obarray_t* alloc::findatom(const char* str, obarray_t* obarray[]) const
+{
+  auto hv = hash(str);
+  for(auto* ob = *(obarray + hv); ob; ob = ob->onext)
+  {
+    if(!strcmp(ob->sym->symval().pname, str))
+      return ob;
+  }
+  return nullptr;
+}
+
 /*
  * puthash - Puts an atom with printname STR in the hash array OBARRAY.
  *           If the atom is already in obarray, no new atom is created.
- *           Copy str if CPY is non-zero. Returns the atom.
+ *           Copy str if COPY is true. Returns the atom.
  */
-LISPT alloc::puthash(const char* str, obarray_t* obarray[], int cpy)
+LISPT alloc::puthash(const char* str, obarray_t* obarray[], bool copy)
 {
   int hv = hash(str);
-  obarray_t* ob;
-  for(ob = *(obarray + hv); ob; ob = ob->onext)
-  {
-    if(!strcmp(ob->sym->symval().pname, str))
-      return ob->sym;
-  }
+  obarray_t* ob = findatom(str, obarray);
+  if (ob != nullptr)
+    return ob->sym;
   ob = new obarray_t;
   if(ob == nullptr)
     return C_ERROR;
   ob->onext = obarray[hv];
-  ob->sym = buildatom(str, cpy);
+  ob->sym = buildatom(str, copy);
   if(EQ(ob->sym, C_ERROR))
   {
     delete ob;
@@ -480,15 +487,21 @@ LISPT alloc::puthash(const char* str, obarray_t* obarray[], int cpy)
 }
 
 /*
- * intern - Make interned symbol in hasharray obarray. Str is not copied
- *          so this is only used with constant strings during init.
+ * intern - Make interned symbol in hasharray obarray. Str is not copied so
+ *          this is only used with global constant strings during init.
  */
-LISPT alloc::intern(const char* str) { return puthash(str, obarray, 0); }
+LISPT alloc::intern(const char* str) { return puthash(str, globals, 0); }
 
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-LISPT alloc::mkatom(char* str) { return puthash(str, obarray, 1); }
+LISPT alloc::mkatom(char* str)
+{
+  // First we search for global interned atoms
+  if(auto* ob = findatom(str, globals))
+    return ob->sym;
+  return puthash(str, obarray, 1);
+}
 
 /* This isn't converted yet */
 /*
@@ -588,5 +601,7 @@ alloc::~alloc()
 {
   // TODO: Free all memory
 }
+
+alloc::obarray_t* alloc::globals[];
 
 } // namespace lisp

@@ -9,7 +9,6 @@
 #include "lisp.hh"
 #include "alloc.hh"
 #include "arith.hh"
-#include "constants.hh"
 #include "defs.hh"
 #include "error.hh"
 #include "eval.hh"

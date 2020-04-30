@@ -69,7 +69,8 @@ public:
   /* variables */
   LISPT savearray[SAVEARRAYSIZE];
   int savept = 0;
-  obarray_t* obarray[MAXHASH];
+  static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
+  obarray_t* obarray[MAXHASH]; // Atoms local to each interpreter instance
   LISPT freelist = nullptr;
   LISPT gcgag = nullptr; // Nonnil means print gc message.
 
@@ -124,9 +125,10 @@ private:
   int sweep();
   void mark(LISPT);
   LISPT doreclaim(int doconsargs, int incr);
-  int hash(const char* str);
+  int hash(const char* str) const;
   LISPT buildatom(const char* s, int cpy);
-  LISPT puthash(const char* str, obarray_t* obarray[], int cpy);
+  obarray_t* findatom(const char* str, obarray_t* obarray[]) const;
+  LISPT puthash(const char* str, obarray_t* obarray[], bool copy);
   LISPT mkprim(const char* pname, short nrpar, lisp_type type);
   LISPT mkarglis(LISPT alist, int& count);
 

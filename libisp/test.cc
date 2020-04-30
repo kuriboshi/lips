@@ -14,11 +14,11 @@ TEST_CASE("Create lisp object")
     auto hello1 = lisp.a().intern("hello");
     CHECK(hello0 == hello1);
   }
-  SUBCASE("intern from two different lisp objects should be different")
+  SUBCASE("intern from two different lisp objects should be the same")
   {
     lisp::lisp lisp1;
     auto hello0 = lisp.a().intern("hello");
     auto hello1 = lisp1.a().intern("hello");
-    CHECK(hello0 != hello1);
+    CHECK(hello0 == hello1);
   }
 }

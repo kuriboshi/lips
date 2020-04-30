@@ -55,7 +55,6 @@ enum lisp_type
 };
 
 inline constexpr auto C_NIL = nullptr;
-extern LISPT C_T;
 
 using BITS32 = int;
 

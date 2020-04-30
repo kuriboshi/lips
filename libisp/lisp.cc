@@ -11,7 +11,8 @@ namespace lisp
 lisp::lisp() : 
   _alloc(*new alloc(*this)),
   _eval(*new evaluator(*this))
-{}
+{
+}
 
 lisp::~lisp()
 {}
