@@ -67,7 +67,7 @@ rtinfo currentrt =
     0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, read::rmexcl, read::rmdquote, 0, 0, 0, 0, read::rmsquote, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, io::rmexcl, io::rmdquote, 0, 0, 0, 0, io::rmsquote, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -97,7 +97,7 @@ static char digits[] = {
  * INTEGERP returns nonzero if the characters in buffer BUF
  * represents an integer, and the result as a long in res.
  */
-bool read::integerp(char* buf, int* res)
+bool io::integerp(char* buf, int* res)
 {
   int d = 0;
   int sign = 1;
@@ -122,7 +122,7 @@ bool read::integerp(char* buf, int* res)
  * Returns nonzero if buffer BUF is a floating point constant.
  */
 #ifdef FLOATING
-bool read::floatp(char* buf)
+bool io::floatp(char* buf)
 {
   int state = 0;
   while(state >= 0 && *buf)
@@ -167,7 +167,7 @@ bool read::floatp(char* buf)
  * Find out if the buffer can be interpreted as numbers of
  * any kind.
  */
-LISPT read::parsebuf(char* buf)
+LISPT io::parsebuf(char* buf)
 {
   int longval;
 
@@ -183,7 +183,7 @@ LISPT read::parsebuf(char* buf)
 /*
  * Read an atom from FILE.
  */
-LISPT read::ratom(source* file)
+LISPT io::ratom(source* file)
 {
   int pos = 0;
 
@@ -234,7 +234,7 @@ LISPT read::ratom(source* file)
  * last cell of l with cdr set to original (cdr c).
  * If tailp is true, don't clobber car of c.
  */
-LISPT read::splice(LISPT c, LISPT l, int tailp)
+LISPT io::splice(LISPT c, LISPT l, int tailp)
 {
   LISPT t = c->cdr();
   if(type_of(l) != CONS)
@@ -268,7 +268,7 @@ LISPT read::splice(LISPT c, LISPT l, int tailp)
 /*
  * If you don't like goto's, keep your eyes shut.
  */
-LISPT read::lispread(source* file, int line)
+LISPT io::lispread(source* file, int line)
 {
   LISPT curr, temp, curatom;
   int curc;
@@ -431,7 +431,7 @@ tail:
  *   !*      - all arguments
  * others could be added easily.
  */
-LISPT read::rmexcl(read& ctx, source* file, LISPT, char)
+LISPT io::rmexcl(io& ctx, source* file, LISPT, char)
 {
 #if 0
   LISPT at, l;
@@ -489,7 +489,7 @@ LISPT read::rmexcl(read& ctx, source* file, LISPT, char)
   return C_NIL;
 }
 
-LISPT read::rmdquote(read& ctx, source* file, LISPT, char)
+LISPT io::rmdquote(io& ctx, source* file, LISPT, char)
 {
   char buf[MAXATOMSIZE];
   char c;
@@ -507,7 +507,7 @@ LISPT read::rmdquote(read& ctx, source* file, LISPT, char)
   return ctx.a().mkstring(buf);
 }
 
-LISPT read::rmsquote(read& ctx, source* file, LISPT, char)
+LISPT io::rmsquote(io& ctx, source* file, LISPT, char)
 {
   int c;
 
@@ -521,7 +521,7 @@ LISPT read::rmsquote(read& ctx, source* file, LISPT, char)
 }
 
 #if 0
-LISPT read::rmpipe(read& ctx, source*, LISPT curr, char)
+LISPT io::rmpipe(io& ctx, source*, LISPT curr, char)
 {
   LISPT t1, t2;
 
@@ -532,7 +532,7 @@ LISPT read::rmpipe(read& ctx, source*, LISPT curr, char)
   return t2;
 }
 
-LISPT read::rmredir(read& ctx, source* file, LISPT curr, char curc)
+LISPT io::rmredir(io& ctx, source* file, LISPT curr, char curc)
 {
   LISPT t1, t2;
   char c;
@@ -548,7 +548,7 @@ LISPT read::rmredir(read& ctx, source* file, LISPT curr, char curc)
   return t2;
 }
 
-LISPT read::rmbg(read& ctx, source*, LISPT curr, char)
+LISPT io::rmbg(io& ctx, source*, LISPT curr, char)
 {
   rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
   rplacd(curr, cons(C_NIL, CDR(curr)));
@@ -558,7 +558,7 @@ LISPT read::rmbg(read& ctx, source*, LISPT curr, char)
 /*
  * Handles user macros.
  */
-LISPT read::rmuser(read& ctx, source*, LISPT curr, char curc)
+LISPT io::rmuser(io& ctx, source*, LISPT curr, char curc)
 {
   if (is_NIL(userreadmacros[(int)curc]))
     return curr;
@@ -567,7 +567,7 @@ LISPT read::rmuser(read& ctx, source*, LISPT curr, char curc)
 }
 #endif
 
-LISPT read::readline(source* file)
+LISPT io::readline(source* file)
 {
   LISPT rd;
 
@@ -615,19 +615,19 @@ void pf(double d, sink* file)
   ps(ss, file, 0);
 }
 
-LISPT read::patom(LISPT x, sink* file, int esc)
+LISPT io::patom(LISPT x, sink* file, int esc)
 {
   ps(x->symval().pname, file, esc);
   return x;
 }
 
-LISPT read::terpri(sink* file)
+LISPT io::terpri(sink* file)
 {
   file->putch('\n', 0);
   return C_NIL;
 }
 
-LISPT read::prinbody(LISPT x, sink* file, int esc)
+LISPT io::prinbody(LISPT x, sink* file, int esc)
 {
   LISPT xx;
 
@@ -652,7 +652,7 @@ nxtelt:
   return x;
 }
 
-LISPT read::prin0(LISPT x, sink* file, int esc)
+LISPT io::prin0(LISPT x, sink* file, int esc)
 {
   switch(type_of(x))
   {
@@ -749,7 +749,7 @@ LISPT read::prin0(LISPT x, sink* file, int esc)
   return x;
 }
 
-LISPT read::print(LISPT x, sink* file)
+LISPT io::print(LISPT x, sink* file)
 {
   thisplevel = 0;
   prin0(x, file, 1);
@@ -757,7 +757,7 @@ LISPT read::print(LISPT x, sink* file)
   return x;
 }
 
-bool read::echoline = false; /* is true if ! has been used */
-char read::buf[];
+bool io::echoline = false; /* is true if ! has been used */
+char io::buf[];
 
 } // namespace lisp

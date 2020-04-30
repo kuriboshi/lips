@@ -7,6 +7,7 @@ target_sources(libisp PRIVATE
   #arith.cc
   eval.cc
   file.cc
+  io.cc
   lisp.cc
   #logic.cc
   low.cc
@@ -16,7 +17,6 @@ target_sources(libisp PRIVATE
   #pred.cc
   prim.cc
   #prop.cc
-  read.cc
   #string.cc
   #unix.cc
   #user.cc
@@ -32,6 +32,7 @@ target_sources(libisp PRIVATE
   eval.hh
   #except.hh
   file.hh
+  io.hh
   #iter.hh
   #libisp.hh
   lisp.hh
@@ -43,7 +44,6 @@ target_sources(libisp PRIVATE
   #pred.hh
   prim.hh
   #prop.hh
-  read.hh
   sink.hh
   source.hh
   #string.hh
