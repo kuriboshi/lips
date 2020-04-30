@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <string>
 #include "lisp.hh"
 
 namespace lisp
@@ -21,7 +22,7 @@ public:
   {
   public:
     source() {}
-    ~source() = default;
+    virtual ~source() = default;
 
     virtual int getch() = 0;
     virtual void ungetch(int) = 0;
@@ -91,7 +92,7 @@ public:
   {
   public:
     sink() {}
-    ~sink() = default;
+    virtual ~sink() = default;
 
     virtual void putch(int, int) = 0;
   };
@@ -135,6 +136,22 @@ public:
     }
 
     FILE* _file;
+  };
+
+  class stringsink : public sink
+  {
+  public:
+    stringsink() {}
+
+    std::string string() const { return _string; }
+
+    virtual void putch(int c, int) override
+    {
+      _string.push_back(static_cast<char>(c));
+    }
+
+  private:
+    std::string _string;
   };
 
   LISPT top = nullptr;             /* used for threading the input structure */

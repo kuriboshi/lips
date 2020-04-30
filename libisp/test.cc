@@ -1,5 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include <memory>
 #include <doctest/doctest.h>
 
 #include "lisp.hh"
@@ -44,11 +45,17 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
-    auto out = new lisp::io::filesink(stdout);
-    print(lisp, i, out);
-    print(lisp, j, out);
-    auto in = new lisp::io::stringsource("(hello)");
-    auto hello = lispread(lisp, in, false);
-    print(lisp, hello, out);
+    auto out0 = std::make_unique<lisp::io::stringsink>();
+    prin0(lisp, i, out0.get(), 0);
+    CHECK(out0->string() == std::string(i->stringval()));
+    auto out1 = std::make_unique<lisp::io::stringsink>();
+    prin0(lisp, j, out1.get(), 0);
+    CHECK(out1->string() == std::string(j->stringval()));
+    std::string s_hello{"(hello)"};
+    auto in = std::make_unique<lisp::io::stringsource>(s_hello.c_str());
+    auto hello = lispread(lisp, in.get(), false);
+    auto out2 = std::make_unique<lisp::io::stringsink>();
+    prin0(lisp, hello, out2.get(), 0);
+    CHECK(out2->string() == s_hello);
   }
 }

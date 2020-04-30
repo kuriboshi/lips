@@ -27,8 +27,6 @@ extern lisp::LISPT history;
 namespace lisp
 {
 
-LISPT prin0(LISPT, io::sink*, int);
-
 /* clang-format off */
 rtinfo currentrt = 
 {

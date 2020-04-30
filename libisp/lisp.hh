@@ -14,6 +14,10 @@
 #include <cstdio>
 #include "config.hh"
 
+#ifdef TRUE
+#undef TRUE
+#endif
+
 namespace lisp
 {
 class lisp;
