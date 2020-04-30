@@ -14,7 +14,7 @@ namespace lisp
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
  *              indirect object,  return it.
  */
-static LISPT mkindirect(LISPT obj)
+static LISPT mkindirect(lisp& l, LISPT obj)
 {
   LISPT iobj;
 
@@ -27,7 +27,7 @@ static LISPT mkindirect(LISPT obj)
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
   {
-    iobj = cons(C_NIL, obj);
+    iobj = cons(l, C_NIL, obj);
     iobj->settype(INDIRECT);
   }
   return iobj;
@@ -37,142 +37,142 @@ static LISPT mkindirect(LISPT obj)
  * closobj - builds a list of indirect pointers to the values of the 
  *           symbols in the list VARS. Used to construct a closure.
  */
-LISPT closobj(LISPT vars)
+LISPT prim::closobj(LISPT vars)
 {
   if(is_NIL(vars))
     return C_NIL;
   check(vars, CONS);
   check(vars->car(), SYMBOL);
-  return cons(mkindirect(vars->car()->symval().value), closobj(vars->cdr()));
+  return cons(_lisp, mkindirect(_lisp, vars->car()->symval().value), closobj(vars->cdr()));
 }
 
-PRIMITIVE car(LISPT a)
+PRIMITIVE prim::car(LISPT a)
 {
   if(type_of(a) == CONS)
     return a->car();
   return C_NIL;
 }
 
-PRIMITIVE cdr(LISPT a)
+PRIMITIVE prim::cdr(LISPT a)
 {
   if(type_of(a) == CONS)
     return a->cdr();
   return C_NIL;
 }
 
-PRIMITIVE cadr(LISPT a)
+PRIMITIVE prim::cadr(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(a->cdr());
   return C_NIL;
 }
 
-PRIMITIVE cdar(LISPT a)
+PRIMITIVE prim::cdar(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(a->car());
   return C_NIL;
 }
 
-PRIMITIVE caar(LISPT a)
+PRIMITIVE prim::caar(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(a->car());
   return C_NIL;
 }
 
-PRIMITIVE cddr(LISPT a)
+PRIMITIVE prim::cddr(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(a->cdr());
   return C_NIL;
 }
 
-PRIMITIVE cdddr(LISPT a)
+PRIMITIVE prim::cdddr(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(cdr(a->cdr()));
   return C_NIL;
 }
 
-PRIMITIVE caddr(LISPT a)
+PRIMITIVE prim::caddr(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(cdr(a->cdr()));
   return C_NIL;
 }
 
-PRIMITIVE cdadr(LISPT a)
+PRIMITIVE prim::cdadr(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(car(a->cdr()));
   return C_NIL;
 }
 
-PRIMITIVE caadr(LISPT a)
+PRIMITIVE prim::caadr(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(car(a->cdr()));
   return C_NIL;
 }
 
-PRIMITIVE cddar(LISPT a)
+PRIMITIVE prim::cddar(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(cdr(a->car()));
   return C_NIL;
 }
 
-PRIMITIVE cadar(LISPT a)
+PRIMITIVE prim::cadar(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(cdr(a->car()));
   return C_NIL;
 }
 
-PRIMITIVE cdaar(LISPT a)
+PRIMITIVE prim::cdaar(LISPT a)
 {
   if(type_of(a) == CONS)
     return cdr(car(a->car()));
   return C_NIL;
 }
 
-PRIMITIVE caaar(LISPT a)
+PRIMITIVE prim::caaar(LISPT a)
 {
   if(type_of(a) == CONS)
     return car(car(a->car()));
   return C_NIL;
 }
 
-PRIMITIVE rplaca(LISPT x, LISPT y)
+PRIMITIVE prim::rplaca(LISPT x, LISPT y)
 {
   check(x, CONS);
   x->car(y);
   return x;
 }
 
-PRIMITIVE rplacd(LISPT x, LISPT y)
+PRIMITIVE prim::rplacd(LISPT x, LISPT y)
 {
   check(x, CONS);
   x->cdr(y);
   return x;
 }
 
-PRIMITIVE eq(LISPT a, LISPT b)
+PRIMITIVE prim::eq(LISPT a, LISPT b)
 {
   if(EQ(a, b))
     return C_T;
   return C_NIL;
 }
 
-PRIMITIVE atom(LISPT a)
+PRIMITIVE prim::atom(LISPT a)
 {
   if(is_NIL(a) || is_T(a) || type_of(a) == SYMBOL || type_of(a) == INTEGER || type_of(a) == FLOAT)
     return C_T;
   return C_NIL;
 }
 
-PRIMITIVE nconc(LISPT l)
+PRIMITIVE prim::nconc(LISPT l)
 {
   LISPT cl;
 
@@ -198,38 +198,38 @@ PRIMITIVE nconc(LISPT l)
   return newl;
 }
 
-PRIMITIVE tconc(LISPT cell, LISPT obj)
+PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
 {
   if(is_NIL(cell))
   {
-    cell = cons(cons(obj, C_NIL), C_NIL);
+    cell = cons(_lisp, cons(_lisp, obj, C_NIL), C_NIL);
     return rplacd(cell, cell->car());
   }
   check(cell, CONS);
   if(type_of(cell->car()) != CONS)
   {
-    rplacd(cell, cons(obj, C_NIL));
+    rplacd(cell, cons(_lisp, obj, C_NIL));
     return rplaca(cell, cell->cdr());
   }
-  rplacd(cell->cdr(), cons(obj, C_NIL));
+  rplacd(cell->cdr(), cons(_lisp, obj, C_NIL));
   return rplacd(cell, cell->cdr()->cdr());
 }
 
-PRIMITIVE attach(LISPT obj, LISPT list)
+PRIMITIVE prim::attach(LISPT obj, LISPT list)
 {
   if(is_NIL(list))
-    return cons(obj, C_NIL);
+    return cons(_lisp, obj, C_NIL);
   check(list, CONS);
-  rplacd(list, cons(list->car(), list->cdr()));
+  rplacd(list, cons(_lisp, list->car(), list->cdr()));
   return rplaca(list, obj);
 }
 
-PRIMITIVE append(LISPT l)
+PRIMITIVE prim::append(LISPT l)
 {
   LISPT cl;
 
-  LISPT newl = cons(C_NIL, C_NIL);
-  save(newl);
+  LISPT newl = cons(_lisp, C_NIL, C_NIL);
+  a().save(newl);
   LISPT curp = newl;
   for(; !is_NIL(l); l = l->cdr())
   {
@@ -238,31 +238,31 @@ PRIMITIVE append(LISPT l)
       check(l->car(), CONS);
       for(cl = l->car(); !is_NIL(cl); cl = cl->cdr())
       {
-        rplacd(curp, cons(cl->car(), C_NIL));
+        rplacd(curp, cons(_lisp, cl->car(), C_NIL));
         curp = curp->cdr();
       }
     }
   }
-  lisp::unsave(newl);
+  newl = a().unsave();
   return newl->cdr();
 }
 
-PRIMITIVE null(LISPT a)
+PRIMITIVE prim::null(LISPT a)
 {
   if(EQ(a, C_NIL))
     return C_T;
   return C_NIL;
 }
 
-PRIMITIVE quote(LISPT a) { return a; }
+PRIMITIVE prim::quote(LISPT a) { return a; }
 
-PRIMITIVE lambda(LISPT a, LISPT f) { return alloc::mklambda(a, f, LAMBDA); }
+PRIMITIVE prim::lambda(LISPT x, LISPT f) { return a().mklambda(x, f, LAMBDA); }
 
-PRIMITIVE nlambda(LISPT a, LISPT f) { return alloc::mklambda(a, f, NLAMBDA); }
+PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return a().mklambda(x, f, NLAMBDA); }
 
-PRIMITIVE list(LISPT l) { return l; }
+PRIMITIVE prim::list(LISPT l) { return l; }
 
-PRIMITIVE length(LISPT l)
+PRIMITIVE prim::length(LISPT l)
 {
   int i = 0;
   while(!is_NIL(l) && type_of(l) == CONS)
@@ -270,14 +270,14 @@ PRIMITIVE length(LISPT l)
     l = l->cdr();
     i++;
   }
-  return mknumber(i);
+  return a().mknumber(i);
 }
 
-PRIMITIVE closure(LISPT fun, LISPT vars)
+PRIMITIVE prim::closure(LISPT fun, LISPT vars)
 {
-  save(fun);
-  save(vars);
-  LISPT c = getobject();
+  a().save(fun);
+  a().save(vars);
+  LISPT c = a().getobject();
   c->closval().cfunction = fun;
   c->closval().closed = vars;
   LISPT f = length(vars);
@@ -307,7 +307,7 @@ static LISPT nth(LISPT list, int n)
     return C_NIL;
 }
 
-PRIMITIVE xnth(LISPT l, LISPT p)
+PRIMITIVE prim::xnth(LISPT l, LISPT p)
 {
   check(p, INTEGER);
   if(is_NIL(l))
@@ -316,7 +316,7 @@ PRIMITIVE xnth(LISPT l, LISPT p)
   return nth(l, p->intval());
 }
 
-PRIMITIVE nthd(LISPT list, LISPT pos)
+PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 {
   check(pos, INTEGER);
   int p = pos->intval();
@@ -328,56 +328,58 @@ PRIMITIVE nthd(LISPT list, LISPT pos)
   return l;
 }
 
-PRIMITIVE xerror(LISPT mess)
+PRIMITIVE prim::xerror(LISPT mess)
 {
   check(mess, STRING);
   return error(USER_ERROR, mess);
 }
 
-PRIMITIVE uxexit(LISPT status)
+PRIMITIVE prim::uxexit(LISPT status)
 {
+#if 0
   if(is_NIL(status))
     finish(0);
   check(status, INTEGER);
   finish(status->intval());
+#endif
   return C_NIL;
 }
 
-prim::prim()
+prim::prim(lisp& lisp) : _lisp(lisp)
 {
-  mkprim(PN_ATOM, atom, 1, SUBR);
-  mkprim(PN_ATTACH, attach, 2, SUBR);
-  mkprim(PN_APPEND, append, -1, SUBR);
-  mkprim(PN_CAR, car, 1, SUBR);
-  mkprim(PN_CDR, cdr, 1, SUBR);
-  mkprim(PN_CADR, cadr, 1, SUBR);
-  mkprim(PN_CDAR, cdar, 1, SUBR);
-  mkprim(PN_CAAR, caar, 1, SUBR);
-  mkprim(PN_CDDR, cddr, 1, SUBR);
-  mkprim(PN_CDDDR, cdddr, 1, SUBR);
-  mkprim(PN_CADDR, caddr, 1, SUBR);
-  mkprim(PN_CDADR, cdadr, 1, SUBR);
-  mkprim(PN_CAADR, caadr, 1, SUBR);
-  mkprim(PN_CDDAR, cddar, 1, SUBR);
-  mkprim(PN_CADAR, cadar, 1, SUBR);
-  mkprim(PN_CDAAR, cdaar, 1, SUBR);
-  mkprim(PN_CAAAR, caaar, 1, SUBR);
-  mkprim(PN_CLOSURE, closure, 2, SUBR);
-  mkprim(PN_EQ, eq, 2, SUBR);
-  mkprim(PN_ERROR, xerror, -1, SUBR);
-  mkprim(PN_EXIT, uxexit, 1, SUBR);
-  mkprim(PN_LAMBDA, lambda, -2, FSUBR);
-  mkprim(PN_LENGTH, length, 1, SUBR);
-  mkprim(PN_LIST, list, -1, SUBR);
-  mkprim(PN_NCONC, nconc, -1, SUBR);
-  mkprim(PN_NLAMBDA, nlambda, -2, FSUBR);
-  mkprim(PN_NTH, xnth, 2, SUBR);
-  mkprim(PN_NULL, null, 1, SUBR);
-  mkprim(PN_QUOTE, quote, 1, FSUBR);
-  mkprim(PN_RPLACA, rplaca, 2, SUBR);
-  mkprim(PN_RPLACD, rplacd, 2, SUBR);
-  mkprim(PN_TCONC, tconc, 2, SUBR);
-  mkprim(PN_NTHD, nthd, 2, SUBR);
+  a().mkprim(PN_ATOM, ::lisp::atom, 1, SUBR);
+  a().mkprim(PN_ATTACH, ::lisp::attach, 2, SUBR);
+  a().mkprim(PN_APPEND, ::lisp::append, -1, SUBR);
+  a().mkprim(PN_CAR, ::lisp::car, 1, SUBR);
+  a().mkprim(PN_CDR, ::lisp::cdr, 1, SUBR);
+  a().mkprim(PN_CADR, ::lisp::cadr, 1, SUBR);
+  a().mkprim(PN_CDAR, ::lisp::cdar, 1, SUBR);
+  a().mkprim(PN_CAAR, ::lisp::caar, 1, SUBR);
+  a().mkprim(PN_CDDR, ::lisp::cddr, 1, SUBR);
+  a().mkprim(PN_CDDDR, ::lisp::cdddr, 1, SUBR);
+  a().mkprim(PN_CADDR, ::lisp::caddr, 1, SUBR);
+  a().mkprim(PN_CDADR, ::lisp::cdadr, 1, SUBR);
+  a().mkprim(PN_CAADR, ::lisp::caadr, 1, SUBR);
+  a().mkprim(PN_CDDAR, ::lisp::cddar, 1, SUBR);
+  a().mkprim(PN_CADAR, ::lisp::cadar, 1, SUBR);
+  a().mkprim(PN_CDAAR, ::lisp::cdaar, 1, SUBR);
+  a().mkprim(PN_CAAAR, ::lisp::caaar, 1, SUBR);
+  a().mkprim(PN_CLOSURE, ::lisp::closure, 2, SUBR);
+  a().mkprim(PN_EQ, ::lisp::eq, 2, SUBR);
+  a().mkprim(PN_ERROR, ::lisp::xerror, -1, SUBR);
+  a().mkprim(PN_EXIT, ::lisp::uxexit, 1, SUBR);
+  a().mkprim(PN_LAMBDA, ::lisp::lambda, -2, FSUBR);
+  a().mkprim(PN_LENGTH, ::lisp::length, 1, SUBR);
+  a().mkprim(PN_LIST, ::lisp::list, -1, SUBR);
+  a().mkprim(PN_NCONC, ::lisp::nconc, -1, SUBR);
+  a().mkprim(PN_NLAMBDA, ::lisp::nlambda, -2, FSUBR);
+  a().mkprim(PN_NTH, ::lisp::xnth, 2, SUBR);
+  a().mkprim(PN_NULL, ::lisp::null, 1, SUBR);
+  a().mkprim(PN_QUOTE, ::lisp::quote, 1, FSUBR);
+  a().mkprim(PN_RPLACA, ::lisp::rplaca, 2, SUBR);
+  a().mkprim(PN_RPLACD, ::lisp::rplacd, 2, SUBR);
+  a().mkprim(PN_TCONC, ::lisp::tconc, 2, SUBR);
+  a().mkprim(PN_NTHD, ::lisp::nthd, 2, SUBR);
 }
 
 } // namespace lisp

@@ -14,9 +14,9 @@ target_sources(libisp PRIVATE
   misc.cc
   #os.cc
   #pred.cc
-  #prim.cc
+  prim.cc
   #prop.cc
-  #read.cc
+  read.cc
   #string.cc
   #unix.cc
   #user.cc
@@ -38,12 +38,14 @@ target_sources(libisp PRIVATE
   #logic.hh
   low.hh
   #map.hh
-  #misc.hh
+  misc.hh
   #os.hh
   #pred.hh
-  #prim.hh
+  prim.hh
   #prop.hh
-  #read.hh
+  read.hh
+  sink.hh
+  source.hh
   #string.hh
   #user.hh
   #unix.hh

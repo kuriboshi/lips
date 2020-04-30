@@ -5,6 +5,7 @@
 #include "lisp.hh"
 #include "alloc.hh"
 #include "low.hh"
+#include "read.hh"
 
 TEST_CASE("Create lisp object")
 {
@@ -43,5 +44,11 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
+    auto out = new lisp::filesink(stdout);
+    print(lisp, i, out);
+    print(lisp, j, out);
+    auto in = new lisp::stringsource("(hello)");
+    auto hello = lispread(lisp, in, false);
+    print(lisp, hello, out);
   }
 }
