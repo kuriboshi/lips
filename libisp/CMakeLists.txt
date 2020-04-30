@@ -17,7 +17,7 @@ target_sources(libisp PRIVATE
   #pred.cc
   prim.cc
   #prop.cc
-  #string.cc
+  string.cc
   #unix.cc
   #user.cc
   version.cc
@@ -25,6 +25,7 @@ target_sources(libisp PRIVATE
 target_sources(libisp PRIVATE
   alloc.hh
   #arith.hh
+  base.hh
   #config.hh
   #constants.hh
   #defs.hh
@@ -44,7 +45,7 @@ target_sources(libisp PRIVATE
   #pred.hh
   prim.hh
   #prop.hh
-  #string.hh
+  string.hh
   #user.hh
   #unix.hh
   version.hh

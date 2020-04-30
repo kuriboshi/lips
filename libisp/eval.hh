@@ -6,16 +6,16 @@
 #pragma once
 
 #include "lisp.hh"
+#include "base.hh"
 
 namespace lisp
 {
-class evaluator
+class evaluator : public base
 {
 public:
   evaluator(lisp&);
-  ~evaluator();
+  ~evaluator() = default;
 
-public:
   using continuation_t = bool (evaluator::*)();
 
   /*
@@ -62,8 +62,6 @@ public:
   breakhook_t breakhook = nullptr; // Called before going into break.
 
 private:
-  alloc& a() { return _lisp.a(); }
-
   void push_lisp(LISPT);
   void push_point(alloc::destblock_t*);
   void push_func(continuation_t);
@@ -122,7 +120,6 @@ private:
   void abort(int m, LISPT v);
   void overflow();
 
-  lisp& _lisp;                       // Context
   LISPT fun = nullptr;               // Store current function being evaluated.
   LISPT expression = nullptr;        // Current expression.
   LISPT args = nullptr;              // Current arguments.

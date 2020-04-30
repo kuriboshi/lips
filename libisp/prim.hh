@@ -6,10 +6,11 @@
 #pragma once
 
 #include "lisp.hh"
+#include "base.hh"
 
 namespace lisp
 {
-class prim
+class prim : public base
 {
 public:
   prim(lisp& lisp);
@@ -50,9 +51,7 @@ public:
   LISPT uxexit(LISPT);
 
 private:
-  alloc& a() const { return _lisp.a(); }
   LISPT closobj(LISPT);
-  lisp& _lisp;
 };
 
 inline LISPT car(lisp& l, LISPT a) { return prim(l).car(a); }

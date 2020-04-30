@@ -291,20 +291,20 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 #endif
 }
 
-file::file(lisp& lisp) : _lisp(lisp)
+file::file(lisp& lisp) : base(lisp)
 {
-  _lisp.a().mkprim(PN_LOAD, ::lisp::load, 1, SUBR);
-  _lisp.a().mkprim(PN_PRIN1, ::lisp::prin1, 2, SUBR);
-  _lisp.a().mkprim(PN_PRIN2, ::lisp::prin2, 2, SUBR);
-  _lisp.a().mkprim(PN_PRINT, ::lisp::xprint, 2, SUBR);
-  _lisp.a().mkprim(PN_PLEVEL, ::lisp::plevel, 1, SUBR);
-  _lisp.a().mkprim(PN_RATOM, ::lisp::xratom, 1, SUBR);
-  _lisp.a().mkprim(PN_READ, ::lisp::xread, 1, SUBR);
-  _lisp.a().mkprim(PN_READC, ::lisp::readc, 1, SUBR);
-  _lisp.a().mkprim(PN_READLINE, ::lisp::xreadline, 1, SUBR);
-  _lisp.a().mkprim(PN_SPACES, ::lisp::spaces, 2, SUBR);
-  _lisp.a().mkprim(PN_TERPRI, ::lisp::xterpri, 1, SUBR);
-  _lisp.a().mkprim(PN_CPPRINT, ::lisp::cpprint, 2, SUBR);
+  mkprim(PN_LOAD, ::lisp::load, 1, SUBR);
+  mkprim(PN_PRIN1, ::lisp::prin1, 2, SUBR);
+  mkprim(PN_PRIN2, ::lisp::prin2, 2, SUBR);
+  mkprim(PN_PRINT, ::lisp::xprint, 2, SUBR);
+  mkprim(PN_PLEVEL, ::lisp::plevel, 1, SUBR);
+  mkprim(PN_RATOM, ::lisp::xratom, 1, SUBR);
+  mkprim(PN_READ, ::lisp::xread, 1, SUBR);
+  mkprim(PN_READC, ::lisp::readc, 1, SUBR);
+  mkprim(PN_READLINE, ::lisp::xreadline, 1, SUBR);
+  mkprim(PN_SPACES, ::lisp::spaces, 2, SUBR);
+  mkprim(PN_TERPRI, ::lisp::xterpri, 1, SUBR);
+  mkprim(PN_CPPRINT, ::lisp::cpprint, 2, SUBR);
   primin = stdin;
   primout = stdout;
   primerr = stderr;

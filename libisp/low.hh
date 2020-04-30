@@ -6,13 +6,14 @@
 #pragma once
 
 #include "lisp.hh"
+#include "base.hh"
 
 namespace lisp
 {
 /* variables */
 extern LISPT verboseflg;
 
-class low
+class low : public base
 {
 public:
   low(lisp&);
@@ -26,9 +27,6 @@ public:
   LISPT prog2(LISPT, LISPT, LISPT);
   LISPT topofstack();
   LISPT envget(LISPT, LISPT);
-private:
-  alloc& a() { return _lisp.a(); }
-  lisp& _lisp;
 };
 
 inline LISPT set(lisp& l, LISPT a, LISPT b) { return low(l).set(a, b); }

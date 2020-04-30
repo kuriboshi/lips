@@ -11,14 +11,14 @@
 namespace lisp
 {
 /* Return symbols print name as a string. */
-PRIMITIVE symstr(LISPT sym)
+PRIMITIVE string::symstr(LISPT sym)
 {
   check(sym, SYMBOL);
-  return mkstring(sym->symval().pname);
+  return a().mkstring(sym->symval().pname);
 }
 
 /* T if s is a string, NIL otherwise. */
-PRIMITIVE stringp(LISPT s)
+PRIMITIVE string::stringp(LISPT s)
 {
   if(type_of(s) == STRING)
     return C_T;
@@ -26,7 +26,7 @@ PRIMITIVE stringp(LISPT s)
 }
 
 /* T if both strings are equal */
-PRIMITIVE streq(LISPT s1, LISPT s2)
+PRIMITIVE string::streq(LISPT s1, LISPT s2)
 {
   check(s1, STRING);
   check(s2, STRING);
@@ -35,24 +35,24 @@ PRIMITIVE streq(LISPT s1, LISPT s2)
   return C_NIL;
 }
 
-PRIMITIVE strcomp(LISPT s1, LISPT s2)
+PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
 {
   check(s1, STRING);
   check(s2, STRING);
-  return mknumber(strcmp(s1->stringval(), s2->stringval()));
+  return a().mknumber(strcmp(s1->stringval(), s2->stringval()));
 }
 
 /* Concatenate arbitrary many strings to
    to one string */
-PRIMITIVE concat(LISPT strlist)
+PRIMITIVE string::concat(LISPT strlist)
 {
   int size = 0;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
     check(sl->car(), STRING);
-    size += strlen(sl->car()->stringval());
+    size += std::strlen(sl->car()->stringval());
   }
-  auto* ns = realmalloc((unsigned)size + 1);
+  auto* ns = a().realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
@@ -61,14 +61,14 @@ PRIMITIVE concat(LISPT strlist)
     strcat(ns, strlist->car()->stringval());
     strlist = strlist->cdr();
   }
-  return mkstring(ns);
+  return a().mkstring(ns);
 }
 
 /* Return string length of s */
-PRIMITIVE xstrlen(LISPT s)
+PRIMITIVE string::strlen(LISPT s)
 {
   check(s, STRING);
-  return mknumber(strlen(s->stringval()));
+  return a().mknumber(std::strlen(s->stringval()));
 }
 
 /* Extract a substring from start to end.
@@ -76,7 +76,7 @@ PRIMITIVE xstrlen(LISPT s)
    NIL. If end is one less than start the
    zero length string is returned. end equal
    to zero if start is equal to one is accepted. */
-PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
+PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
 {
   check(str, STRING);
   check(start, INTEGER);
@@ -84,10 +84,10 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
-  if(size < 0 || s > static_cast<int>(strlen(str->stringval())) || e > static_cast<int>(strlen(str->stringval()))
+  if(size < 0 || s > static_cast<int>(std::strlen(str->stringval())) || e > static_cast<int>(std::strlen(str->stringval()))
     || s <= 0 || e < 0)
     return C_NIL;
-  auto* ns = realmalloc((unsigned)size + 1);
+  auto* ns = a().realmalloc((unsigned)size + 1);
   if(ns == nullptr)
     return error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
@@ -95,18 +95,18 @@ PRIMITIVE substr(LISPT str, LISPT start, LISPT end)
   {
     ns[size] = *(str->stringval() + s - 1);
   }
-  return mkstring(ns);
+  return a().mkstring(ns);
 }
 
-string::string()
+string::string(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_STRINGP, stringp, 1, SUBR);
-  mkprim(PN_STREQ, streq, 2, SUBR);
-  mkprim(PN_CONCAT, concat, -1, SUBR);
-  mkprim(PN_STRLEN, xstrlen, 1, SUBR);
-  mkprim(PN_SUBSTR, substr, 3, SUBR);
-  mkprim(PN_SYMSTR, symstr, 1, SUBR);
-  mkprim(PN_STRCMP, strcomp, 2, SUBR);
+  mkprim(PN_STRINGP, ::lisp::stringp, 1, SUBR);
+  mkprim(PN_STREQ, ::lisp::streq, 2, SUBR);
+  mkprim(PN_CONCAT, ::lisp::concat, -1, SUBR);
+  mkprim(PN_STRLEN, ::lisp::strlen, 1, SUBR);
+  mkprim(PN_SUBSTR, ::lisp::substr, 3, SUBR);
+  mkprim(PN_SYMSTR, ::lisp::symstr, 1, SUBR);
+  mkprim(PN_STRCMP, ::lisp::strcomp, 2, SUBR);
 }
 
 } // namespace lisp

@@ -109,7 +109,7 @@ PRIMITIVE low::envget(LISPT e, LISPT n)
 #endif
 }
 
-low::low(lisp& lisp) : _lisp(lisp)
+low::low(lisp& lisp) : base(lisp)
 {
   a().mkprim(PN_SET, ::lisp::set, 2, SUBR);
   a().mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);

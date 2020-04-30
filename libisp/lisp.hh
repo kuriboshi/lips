@@ -267,8 +267,8 @@ class lisp
 public:
   lisp();
   ~lisp();
-  alloc& a() { return _alloc; }
-  evaluator& e() { return _eval; };
+  alloc& a() const { return _alloc; }
+  evaluator& e() const { return _eval; };
 
 private:
   alloc& _alloc;

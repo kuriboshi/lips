@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdio>
+#include "base.hh"
 
 extern FILE* primin;
 extern FILE* primout;
@@ -13,7 +14,7 @@ extern FILE* primerr;
 
 namespace lisp
 {
-class file
+class file : public base
 {
 public:
   file(lisp&);
@@ -33,9 +34,6 @@ public:
   LISPT cpprint(LISPT, LISPT);
 
   bool loadfile(const char*);
-
-private:
-  lisp& _lisp;
 };
 
 inline LISPT xratom(lisp& l, LISPT a) { return file(l).xratom(a); }

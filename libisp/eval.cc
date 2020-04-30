@@ -1047,16 +1047,16 @@ PRIMITIVE evaluator::baktrace(lisp&)
   return C_NIL;
 }
 
-evaluator::evaluator(lisp& lisp) : _lisp(lisp)
+evaluator::evaluator(lisp& lisp) : base(lisp)
 {
-  a().add_mark_object(&fun);
-  a().add_mark_object(&expression);
-  a().add_mark_object(&args);
-  a().mkprim(PN_E, ::lisp::eval, 1, FSUBR);
-  a().mkprim(PN_EVAL, ::lisp::eval, 1, SUBR);
-  a().mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
-  a().mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
-  a().mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
+  add_mark_object(&fun);
+  add_mark_object(&expression);
+  add_mark_object(&args);
+  mkprim(PN_E, ::lisp::eval, 1, FSUBR);
+  mkprim(PN_EVAL, ::lisp::eval, 1, SUBR);
+  mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
+  mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
+  mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
 }
 
 } // namespace lisp
