@@ -169,7 +169,7 @@ inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISP
 
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
 inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
-inline LISPT mkatom(lisp& l, char* s) { return l.a().mkatom(s); }
+inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 
 #if 0
