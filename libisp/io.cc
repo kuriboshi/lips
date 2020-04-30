@@ -27,7 +27,7 @@ extern lisp::LISPT history;
 namespace lisp
 {
 
-LISPT prin0(LISPT, sink*, int);
+LISPT prin0(LISPT, io::sink*, int);
 
 /* clang-format off */
 rtinfo currentrt = 
@@ -578,12 +578,12 @@ LISPT io::readline(source* file)
 }
 
 /* print the string s, on stream file */
-void ps(const char* s, sink* file, int esc)
+void ps(const char* s, io::sink* file, int esc)
 {
   while(*s) file->putch(*s++, esc);
 }
 
-void pi(int i, int base, sink* file)
+void pi(int i, int base, io::sink* file)
 {
   char ss[33];
   int sign;
@@ -607,7 +607,7 @@ void pi(int i, int base, sink* file)
   ps(ss + j + 1, file, 0);
 }
 
-void pf(double d, sink* file)
+void pf(double d, io::sink* file)
 {
   char ss[30];
 

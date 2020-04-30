@@ -44,10 +44,10 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
-    auto out = new lisp::filesink(stdout);
+    auto out = new lisp::io::filesink(stdout);
     print(lisp, i, out);
     print(lisp, j, out);
-    auto in = new lisp::stringsource("(hello)");
+    auto in = new lisp::io::stringsource("(hello)");
     auto hello = lispread(lisp, in, false);
     print(lisp, hello, out);
   }

@@ -6,8 +6,6 @@
 #pragma once
 
 #include "lisp.hh"
-#include "source.hh"
-#include "sink.hh"
 
 namespace lisp
 {
@@ -16,6 +14,128 @@ class io
 public:
   io(lisp& lisp) : _lisp(lisp) {}
   ~io() = default;
+
+  static inline constexpr char COMMENTCHAR = '#';
+
+  class source
+  {
+  public:
+    source() {}
+    ~source() = default;
+
+    virtual int getch() = 0;
+    virtual void ungetch(int) = 0;
+    virtual bool eoln() = 0;
+  };
+
+  class filesource: public source
+  {
+  public:
+    filesource(const char* filename)
+    {
+      _file = fopen(filename, "r");
+    }
+
+    virtual int getch() override
+    {
+      auto c = getc(_file);
+      if(c == COMMENTCHAR) /* Skip comments.  */
+        while((c = getc(_file)) != '\n')
+          ;
+      return c;
+    }
+    virtual void ungetch(int c) override
+    {
+      ungetc(c, _file);
+    }
+    virtual bool eoln() override
+    {
+      return false;
+    }
+
+  private:
+    FILE* _file;
+  };
+
+  class stringsource : public source
+  {
+  public:
+    stringsource(const char* string) : _string(string), _len(strlen(string)) {}
+
+    virtual int getch() override
+    {
+      if(_pos == _len)
+        return -1;
+      auto c = _string[_pos++];
+      if(c == COMMENTCHAR) /* Skip comments.  */
+        while((c = _string[_pos++]) != '\n')
+          ;
+      return c;
+    }
+    virtual void ungetch(int c) override
+    {
+      --_pos;
+    }
+    virtual bool eoln() override
+    {
+      return false;
+    }
+
+  private:
+    const char* _string;
+    int _pos = 0;
+    int _len = 0;
+  };
+
+  class sink
+  {
+  public:
+    sink() {}
+    ~sink() = default;
+
+    virtual void putch(int, int) = 0;
+  };
+
+  class filesink : public sink
+  {
+  public:
+    filesink(FILE* file) : _file(file) {}
+    filesink(const char* filename)
+    {
+      _file = fopen(filename, "w");
+    }
+
+    virtual void putch(int c, int esc) override
+    {
+      putch(c, _file, esc);
+    }
+
+  private:
+    // Put a character on stdout prefixing it with a ^ if it's a control
+    // character.
+    void pputc(int c, FILE* file)
+    {
+      if(c < 0x20 && c != '\n' && c != '\t')
+      {
+        putc('^', file);
+        putc(c + 0x40, file);
+      }
+      else
+        putc(c, file);
+    }
+
+    /*
+     * Put a character c, on stream file, escaping enabled if esc != 0.
+     */
+    void putch(int c, FILE* file, int esc)
+    {
+      if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
+        pputc('\\', file);
+      pputc(c, file);
+    }
+
+    FILE* _file;
+  };
 
   LISPT top = nullptr;             /* used for threading the input structure */
   LISPT rstack = nullptr;          /* partially built structure read stack */
@@ -68,7 +188,7 @@ private:
 struct rtinfo
 {
   unsigned char chclass[128];
-  LISPT (*rmacros[128])(io&, source*, LISPT, char);
+  LISPT (*rmacros[128])(io&, io::source*, LISPT, char);
 };
 
 /* variables */
@@ -97,13 +217,13 @@ inline bool isinsert(int c) { return (currentrt.chclass[c] & RMACRO) == INSERT; 
 inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; }
 inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
 
-inline LISPT ratom(lisp& l, source* f) { return io(l).ratom(f); }
-inline LISPT lispread(lisp& l, source* f, int i) { return io(l).lispread(f, i); }
-inline LISPT readline(lisp& l, source* f) { return io(l).readline(f); }
-inline LISPT patom(lisp& l, LISPT a, sink* f, int i) { return io(l).patom(a, f, i); }
-inline LISPT terpri(lisp& l, sink* f) { return io(l).terpri(f); }
-inline LISPT prinbody(lisp& l, LISPT a, sink* f, int i) { return io(l).prinbody(a, f, i); }
-inline LISPT prin0(lisp& l, LISPT a, sink* f, int i) { return io(l).prin0(a, f, i); }
-inline LISPT print(lisp& l, LISPT a, sink* f) { return io(l).print(a, f); }
+inline LISPT ratom(lisp& l, io::source* f) { return io(l).ratom(f); }
+inline LISPT lispread(lisp& l, io::source* f, int i) { return io(l).lispread(f, i); }
+inline LISPT readline(lisp& l, io::source* f) { return io(l).readline(f); }
+inline LISPT patom(lisp& l, LISPT a, io::sink* f, int i) { return io(l).patom(a, f, i); }
+inline LISPT terpri(lisp& l, io::sink* f) { return io(l).terpri(f); }
+inline LISPT prinbody(lisp& l, LISPT a, io::sink* f, int i) { return io(l).prinbody(a, f, i); }
+inline LISPT prin0(lisp& l, LISPT a, io::sink* f, int i) { return io(l).prin0(a, f, i); }
+inline LISPT print(lisp& l, LISPT a, io::sink* f) { return io(l).print(a, f); }
 
 } // namespace lisp

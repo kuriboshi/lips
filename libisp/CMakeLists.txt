@@ -44,8 +44,6 @@ target_sources(libisp PRIVATE
   #pred.hh
   prim.hh
   #prop.hh
-  sink.hh
-  source.hh
   #string.hh
   #user.hh
   #unix.hh
