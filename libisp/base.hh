@@ -12,8 +12,9 @@ namespace lisp
 class base
 {
 public:
-  base(lisp& lisp) : _lisp(lisp) {}
+  base(lisp& lisp): _lisp(lisp) {}
   virtual ~base() = default;
+
 protected:
   void add_mark_object(LISPT* o) { a().add_mark_object(o); }
   void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
@@ -37,4 +38,4 @@ protected:
   lisp& _lisp;
 };
 
-}
+} // namespace lisp

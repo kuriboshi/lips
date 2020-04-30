@@ -7,10 +7,7 @@
 
 namespace lisp
 {
-
-lisp::lisp() : 
-  _alloc(*new alloc(*this)),
-  _eval(*new evaluator(*this))
+lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 {
   set(C_T, TRUE, a().getobject());
 
@@ -100,8 +97,7 @@ lisp::lisp() :
   e().breakhook = nullptr;
 }
 
-lisp::~lisp()
-{}
+lisp::~lisp() {}
 
 //
 // All lisp constants needed internally.

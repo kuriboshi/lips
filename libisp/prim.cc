@@ -345,7 +345,7 @@ PRIMITIVE prim::uxexit(LISPT status)
   return C_NIL;
 }
 
-prim::prim(lisp& lisp) : base(lisp)
+prim::prim(lisp& lisp): base(lisp)
 {
   mkprim(PN_ATOM, ::lisp::atom, 1, SUBR);
   mkprim(PN_ATTACH, ::lisp::attach, 2, SUBR);

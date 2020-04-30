@@ -13,7 +13,7 @@ namespace lisp
 class io
 {
 public:
-  io(lisp& lisp) : _lisp(lisp) {}
+  io(lisp& lisp): _lisp(lisp) {}
   ~io() = default;
 
   static inline constexpr char COMMENTCHAR = '#';
@@ -32,10 +32,7 @@ public:
   class filesource: public source
   {
   public:
-    filesource(const char* filename)
-    {
-      _file = fopen(filename, "r");
-    }
+    filesource(const char* filename) { _file = fopen(filename, "r"); }
 
     virtual int getch() override
     {
@@ -45,23 +42,17 @@ public:
           ;
       return c;
     }
-    virtual void ungetch(int c) override
-    {
-      ungetc(c, _file);
-    }
-    virtual bool eoln() override
-    {
-      return false;
-    }
+    virtual void ungetch(int c) override { ungetc(c, _file); }
+    virtual bool eoln() override { return false; }
 
   private:
     FILE* _file;
   };
 
-  class stringsource : public source
+  class stringsource: public source
   {
   public:
-    stringsource(const char* string) : _string(string), _len(strlen(string)) {}
+    stringsource(const char* string): _string(string), _len(strlen(string)) {}
 
     virtual int getch() override
     {
@@ -73,14 +64,8 @@ public:
           ;
       return c;
     }
-    virtual void ungetch(int c) override
-    {
-      --_pos;
-    }
-    virtual bool eoln() override
-    {
-      return false;
-    }
+    virtual void ungetch(int c) override { --_pos; }
+    virtual bool eoln() override { return false; }
 
   private:
     const char* _string;
@@ -97,19 +82,13 @@ public:
     virtual void putch(int, int) = 0;
   };
 
-  class filesink : public sink
+  class filesink: public sink
   {
   public:
-    filesink(FILE* file) : _file(file) {}
-    filesink(const char* filename)
-    {
-      _file = fopen(filename, "w");
-    }
+    filesink(FILE* file): _file(file) {}
+    filesink(const char* filename) { _file = fopen(filename, "w"); }
 
-    virtual void putch(int c, int esc) override
-    {
-      putch(c, _file, esc);
-    }
+    virtual void putch(int c, int esc) override { putch(c, _file, esc); }
 
   private:
     // Put a character on stdout prefixing it with a ^ if it's a control
@@ -138,27 +117,24 @@ public:
     FILE* _file;
   };
 
-  class stringsink : public sink
+  class stringsink: public sink
   {
   public:
     stringsink() {}
 
     std::string string() const { return _string; }
 
-    virtual void putch(int c, int) override
-    {
-      _string.push_back(static_cast<char>(c));
-    }
+    virtual void putch(int c, int) override { _string.push_back(static_cast<char>(c)); }
 
   private:
     std::string _string;
   };
 
-  LISPT top = nullptr;             /* used for threading the input structure */
-  LISPT rstack = nullptr;          /* partially built structure read stack */
-  int printlevel = 0;    /* maximum print level */
-  int thisplevel = 0;        /* during print, print level */
-  static bool echoline; /* is true if ! has been used */
+  LISPT top = nullptr;    /* used for threading the input structure */
+  LISPT rstack = nullptr; /* partially built structure read stack */
+  int printlevel = 0;     /* maximum print level */
+  int thisplevel = 0;     /* during print, print level */
+  static bool echoline;   /* is true if ! has been used */
 
   void pushr(LISPT w) { rstack = cons(_lisp, w, rstack); }
   void popr(LISPT& w)

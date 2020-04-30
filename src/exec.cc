@@ -23,7 +23,7 @@
 using namespace lisp;
 
 inline constexpr int MAXARGS = 256;
-inline constexpr int EXECHASH =  1023; /* Hash table size for commands */
+inline constexpr int EXECHASH = 1023; /* Hash table size for commands */
 inline constexpr auto DEFAULT_SHELL = "/bin/sh";
 
 extern char** environ;

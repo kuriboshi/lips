@@ -10,10 +10,10 @@
 
 namespace lisp
 {
-inline constexpr auto PN_RECLAIM = "reclaim";       // initiate garbage collection
-inline constexpr auto PN_CONS = "cons";             // make a new cons cell
-inline constexpr auto PN_FREECOUNT = "freecount";   // number of free cells
-inline constexpr auto PN_OBARRAY = "obarray";       // return list of all atoms
+inline constexpr auto PN_RECLAIM = "reclaim";     // initiate garbage collection
+inline constexpr auto PN_CONS = "cons";           // make a new cons cell
+inline constexpr auto PN_FREECOUNT = "freecount"; // number of free cells
+inline constexpr auto PN_OBARRAY = "obarray";     // return list of all atoms
 
 class evaluator;
 
@@ -70,7 +70,7 @@ public:
   LISPT savearray[SAVEARRAYSIZE];
   int savept = 0;
   static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
-  obarray_t* obarray[MAXHASH]; // Atoms local to each interpreter instance
+  obarray_t* obarray[MAXHASH];        // Atoms local to each interpreter instance
   LISPT freelist = nullptr;
   LISPT gcgag = nullptr; // Nonnil means print gc message.
 
@@ -118,7 +118,7 @@ public:
   void add_mark_object(LISPT* o) { markobjs.push_back(o); }
 
 private:
-  lisp& _lisp;                  // Context
+  lisp& _lisp; // Context
 
   evaluator& e() { return _lisp.e(); }
   conscells_t* newpage();
@@ -134,9 +134,9 @@ private:
 
   LISPT foo1 = nullptr; // Protect arguments of cons when gc.
   LISPT foo2 = nullptr;
-  conscells_t* conscells = nullptr;               // Cons cell storage.
+  conscells_t* conscells = nullptr;     // Cons cell storage.
   destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
-  int destblockused = 0;                    // Index to last slot in destblock.
+  int destblockused = 0;                // Index to last slot in destblock.
   std::vector<LISPT*> markobjs;
 };
 
@@ -146,10 +146,7 @@ inline LISPT xobarray(lisp& l) { return l.a().xobarray(l); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(l); }
 
 inline LISPT intern(lisp& l, const char* s) { return l.a().intern(s); }
-inline void initcvar(lisp& l, LISPT* cvar, const char* name, LISPT var)
-{
-  return l.a().initcvar(cvar, name, var);
-}
+inline void initcvar(lisp& l, LISPT* cvar, const char* name, LISPT var) { return l.a().initcvar(cvar, name, var); }
 inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
 {
   l.a().mkprim(pname, fname, nrpar, type);

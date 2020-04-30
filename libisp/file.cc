@@ -291,7 +291,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 #endif
 }
 
-file::file(lisp& lisp) : base(lisp)
+file::file(lisp& lisp): base(lisp)
 {
   mkprim(PN_LOAD, ::lisp::load, 1, SUBR);
   mkprim(PN_PRIN1, ::lisp::prin1, 2, SUBR);

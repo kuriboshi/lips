@@ -10,7 +10,7 @@
 
 namespace lisp
 {
-class evaluator : public base
+class evaluator: public base
 {
 public:
   evaluator(lisp&);

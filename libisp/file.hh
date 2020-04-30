@@ -14,7 +14,7 @@ extern FILE* primerr;
 
 namespace lisp
 {
-class file : public base
+class file: public base
 {
 public:
   file(lisp&);
@@ -38,7 +38,7 @@ public:
 
 inline LISPT xratom(lisp& l, LISPT a) { return file(l).xratom(a); }
 inline LISPT readc(lisp& l, LISPT a) { return file(l).readc(a); }
-inline LISPT xread(lisp& l, LISPT a) {return file(l).xread(a); }
+inline LISPT xread(lisp& l, LISPT a) { return file(l).xread(a); }
 inline LISPT xprint(lisp& l, LISPT a, LISPT b) { return file(l).xprint(a, b); }
 inline LISPT load(lisp& l, LISPT a) { return file(l).load(a); }
 inline LISPT xterpri(lisp& l, LISPT a) { return file(l).xterpri(a); }

@@ -253,12 +253,12 @@ PRIMITIVE sub1(LISPT a)
 
 enum class num_type
 {
-  FLOATFLOAT = 0,               // Both arguments are float
-  FLOATINT = 1,                 // One float and one int
-  INTFLOAT = 2,                 // One int and one float
-  INTINT = 3,                   // Both are ints
-  ILLEGAL1 = 4,                 // First argument is illegal
-  ILLEGAL2 = 5                  // Second argument is illegal
+  FLOATFLOAT = 0, // Both arguments are float
+  FLOATINT = 1,   // One float and one int
+  INTFLOAT = 2,   // One int and one float
+  INTINT = 3,     // Both are ints
+  ILLEGAL1 = 4,   // First argument is illegal
+  ILLEGAL2 = 5    // Second argument is illegal
 };
 
 inline num_type numtype(LISPT x, LISPT y)
@@ -290,10 +290,7 @@ inline LISPT docheck(T x, T y, C cmp)
   return C_NIL;
 }
 
-inline void illegalreturn(LISPT a)
-{
-  error(ILLEGAL_ARG, a);
-}
+inline void illegalreturn(LISPT a) { error(ILLEGAL_ARG, a); }
 
 template<template<typename> typename Comparer>
 inline LISPT numcheck(LISPT x, LISPT y)

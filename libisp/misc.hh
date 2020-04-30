@@ -12,6 +12,7 @@ class debug
 public:
   debug(lisp&);
   ~debug() = default;
+
 private:
   lisp& _lisp;
 };

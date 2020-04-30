@@ -10,7 +10,7 @@
 
 namespace lisp
 {
-class prim : public base
+class prim: public base
 {
 public:
   prim(lisp& lisp);

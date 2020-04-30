@@ -84,8 +84,8 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
-  if(size < 0 || s > static_cast<int>(std::strlen(str->stringval())) || e > static_cast<int>(std::strlen(str->stringval()))
-    || s <= 0 || e < 0)
+  if(size < 0 || s > static_cast<int>(std::strlen(str->stringval()))
+    || e > static_cast<int>(std::strlen(str->stringval())) || s <= 0 || e < 0)
     return C_NIL;
   auto* ns = a().realmalloc((unsigned)size + 1);
   if(ns == nullptr)
@@ -98,7 +98,7 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   return a().mkstring(ns);
 }
 
-string::string(lisp& lisp) : base(lisp)
+string::string(lisp& lisp): base(lisp)
 {
   mkprim(PN_STRINGP, ::lisp::stringp, 1, SUBR);
   mkprim(PN_STREQ, ::lisp::streq, 2, SUBR);

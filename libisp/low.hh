@@ -13,7 +13,7 @@ namespace lisp
 /* variables */
 extern LISPT verboseflg;
 
-class low : public base
+class low: public base
 {
 public:
   low(lisp&);

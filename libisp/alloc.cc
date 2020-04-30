@@ -469,7 +469,7 @@ LISPT alloc::puthash(const char* str, obarray_t* obarray[], bool copy)
 {
   int hv = hash(str);
   obarray_t* ob = findatom(str, obarray);
-  if (ob != nullptr)
+  if(ob != nullptr)
     return ob->sym;
   ob = new obarray_t;
   if(ob == nullptr)
@@ -569,7 +569,7 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
  */
 void alloc::dzero() { destblockused = 0; }
 
-alloc::alloc(lisp& lisp) : _lisp(lisp)
+alloc::alloc(lisp& lisp): _lisp(lisp)
 {
 #if 0
   // TODO: Fix me

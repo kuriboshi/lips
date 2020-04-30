@@ -9,7 +9,7 @@
 
 namespace lisp
 {
-class string : public base
+class string: public base
 {
 public:
   string(lisp&);

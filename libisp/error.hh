@@ -12,7 +12,6 @@
 
 namespace lisp
 {
-
 inline constexpr int PRINT_ARG = 1 << 8;
 inline constexpr int NOT_A = 1 << 9;
 
