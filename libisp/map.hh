@@ -15,6 +15,7 @@ class map : public base
 public:
   map(lisp&);
   ~map() = default;
+  static void init();
 
   LISPT xmap(LISPT, LISPT, LISPT);
   LISPT mapc(LISPT, LISPT, LISPT);

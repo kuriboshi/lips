@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "lisp.hh"
 #include "base.hh"
 
 namespace lisp
@@ -14,6 +15,8 @@ class string: public base
 public:
   string(lisp&);
   ~string() = default;
+  static void init();
+
   LISPT symstr(LISPT);
   LISPT stringp(LISPT);
   LISPT streq(LISPT, LISPT);

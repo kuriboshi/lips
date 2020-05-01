@@ -15,6 +15,7 @@ class unix : public base
 public:
   unix(lisp&);
   ~unix() = default;
+  static void init();
 
   LISPT uxerrno();
   LISPT uxaccess(LISPT name, LISPT mode);

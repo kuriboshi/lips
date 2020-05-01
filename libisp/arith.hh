@@ -14,6 +14,7 @@ class arith : public base
 {
 public:
   arith(lisp&);
+  static void init();
 
   LISPT plus(LISPT);
   LISPT iplus(LISPT);

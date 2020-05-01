@@ -15,6 +15,7 @@ class prim: public base
 public:
   prim(lisp& lisp);
   ~prim() = default;
+  static void init();
 
   LISPT car(LISPT);
   LISPT cdr(LISPT);

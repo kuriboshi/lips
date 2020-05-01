@@ -109,21 +109,23 @@ PRIMITIVE low::envget(LISPT e, LISPT n)
 #endif
 }
 
-low::low(lisp& lisp): base(lisp)
+low::low(lisp& lisp): base(lisp) {}
+
+void low::init()
 {
-  mkprim(PN_SET, ::lisp::set, 2, SUBR);
-  mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
-  mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
-  mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
-  mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
-  mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
-  mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
-  mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
+  alloc::mkprim(PN_SET, ::lisp::set, 2, SUBR);
+  alloc::mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
+  alloc::mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
+  alloc::mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
+  alloc::mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
+  alloc::mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
+  alloc::mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
+  alloc::mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
 #if 0
-  mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
+  alloc::mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
 #endif
-  mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
-  initcvar(_lisp, &verboseflg, "verboseflg", C_NIL);
+  alloc::mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
+  alloc::initcvar(&verboseflg, "verboseflg", C_NIL);
 }
 
 } // namespace lisp

@@ -15,6 +15,7 @@ class logic : public base
 public:
   logic(lisp&);
   ~logic() = default;
+  static void init();
 
   LISPT p_and(LISPT);
   LISPT p_or(LISPT);

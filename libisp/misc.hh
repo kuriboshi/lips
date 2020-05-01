@@ -5,16 +5,17 @@
 
 #pragma once
 
+#include "lisp.hh"
+#include "base.hh"
+
 namespace lisp
 {
-class debug
+class debug : public base
 {
 public:
   debug(lisp&);
   ~debug() = default;
-
-private:
-  lisp& _lisp;
+  static void init();
 };
 
 /* variables */

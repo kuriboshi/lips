@@ -18,6 +18,8 @@ class low: public base
 public:
   low(lisp&);
   ~low() = default;
+  static void init();
+
   LISPT set(LISPT, LISPT);
   LISPT setq(LISPT, LISPT);
   LISPT progn(LISPT);

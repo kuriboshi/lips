@@ -15,6 +15,8 @@ class prop : public base
 public:
   prop(lisp&);
   ~prop() = default;
+  static void init();
+
   LISPT setplist(LISPT, LISPT);
   LISPT getplist(LISPT);
   LISPT putprop(LISPT, LISPT, LISPT);

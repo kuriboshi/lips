@@ -147,7 +147,7 @@ inline LISPT xobarray(lisp& l) { return l.a().xobarray(l); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(l); }
 
 inline LISPT intern(lisp& l, const char* s) { return l.a().intern(s); }
-inline void initcvar(lisp& l, LISPT* cvar, const char* name, LISPT var) { return l.a().initcvar(cvar, name, var); }
+inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
 inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }

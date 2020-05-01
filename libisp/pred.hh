@@ -15,6 +15,7 @@ class pred : public base
 public:
   pred(lisp&);
   ~pred() = default;
+  static void init();
 
   LISPT numberp(LISPT);
   LISPT listp(LISPT);

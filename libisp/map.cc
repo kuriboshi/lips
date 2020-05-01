@@ -80,12 +80,14 @@ PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-map::map(lisp& lisp) : base(lisp)
+map::map(lisp& lisp) : base(lisp) {}
+
+void map::init()
 {
-  mkprim(PN_MAP, ::lisp::xmap, 3, SUBR);
-  mkprim(PN_MAPC, ::lisp::mapc, 3, SUBR);
-  mkprim(PN_MAPLIST, ::lisp::maplist, 3, SUBR);
-  mkprim(PN_MAPCAR, ::lisp::mapcar, 3, SUBR);
+  alloc::mkprim(PN_MAP, ::lisp::xmap, 3, SUBR);
+  alloc::mkprim(PN_MAPC, ::lisp::mapc, 3, SUBR);
+  alloc::mkprim(PN_MAPLIST, ::lisp::maplist, 3, SUBR);
+  alloc::mkprim(PN_MAPCAR, ::lisp::mapcar, 3, SUBR);
 }
 
 } // namespace lisp

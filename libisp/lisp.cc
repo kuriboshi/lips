@@ -68,30 +68,30 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   CE_NIL->setq(C_NIL);
   CE_T->setq(C_T);
 
-  initcvar(*this, &topprompt, "prompt", a().mkstring("!_"));
-  initcvar(*this, &promptform, "promptform", C_NIL);
-  initcvar(*this, &brkprompt, "brkprompt", a().mkstring("!:"));
-  initcvar(*this, &currentbase, "base", a().mknumber(10L));
-  initcvar(*this, &interactive, "interactive", C_NIL);
-  initcvar(*this, &version, "version", a().mkstring(VERSION));
+  initcvar(&topprompt, "prompt", a().mkstring("!_"));
+  initcvar(&promptform, "promptform", C_NIL);
+  initcvar(&brkprompt, "brkprompt", a().mkstring("!:"));
+  initcvar(&currentbase, "base", a().mknumber(10L));
+  initcvar(&interactive, "interactive", C_NIL);
+  initcvar(&version, "version", a().mkstring(VERSION));
 
 #if 0
   rstack = C_NIL;
   top = C_NIL;
 #endif
 
-  new arith(*this);
-  new debug(*this);
-  new file(*this);
-  new logic(*this);
-  new low(*this);
-  new map(*this);
-  new pred(*this);
-  new prim(*this);
-  new prop(*this);
-  new string(*this);
-  new unix(*this);
-  new user(*this);
+  arith::init();
+  debug::init();
+  file::init();
+  logic::init();
+  low::init();
+  map::init();
+  pred::init();
+  prim::init();
+  prop::init();
+  string::init();
+  unix::init();
+  user::init();
 
   e().undefhook = nullptr;
   e().breakhook = nullptr;

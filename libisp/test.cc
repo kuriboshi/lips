@@ -13,12 +13,14 @@
 TEST_CASE("Create lisp object")
 {
   lisp::lisp lisp;
+
   SUBCASE("intern should return the same object for the same string")
   {
     auto hello0 = intern(lisp, "hello");
     auto hello1 = intern(lisp, "hello");
     CHECK(hello0 == hello1);
   }
+
   SUBCASE("intern from two different lisp objects should be the same")
   {
     lisp::lisp lisp1;
@@ -26,16 +28,19 @@ TEST_CASE("Create lisp object")
     auto hello1 = intern(lisp1, "hello");
     CHECK(hello0 == hello1);
   }
+
   SUBCASE("Check constants are the same as interned strings")
   {
     auto lambda = intern(lisp, "lambda");
     CHECK(lambda == lisp::C_LAMBDA);
   }
+
   SUBCASE("Check constants are the same as a local atom")
   {
     auto lambda = mkatom(lisp, "lambda");
     CHECK(lambda == lisp::C_LAMBDA);
   }
+
   SUBCASE("Set variable")
   {
     auto i = mkatom(lisp, "i");
@@ -64,15 +69,20 @@ TEST_CASE("Create lisp object")
 
 TEST_CASE("Evaluator")
 {
+  lisp::lisp lisp;
+
   SUBCASE("Evaluate variable")
   {
-    lisp::lisp lisp;
     auto var = mkatom(lisp, "i");
     auto val = mknumber(lisp, 123);
     set(lisp, var, val);
     auto r0 = eval(lisp, var);
     CHECK(r0->intval() == 123);
-    auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, r0, cons(lisp, mknumber(lisp, 1), nullptr)));
+  }
+
+  SUBCASE("Evaluate simple expression: (+ 123 1)")
+  {
+    auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
     auto out0 = std::make_unique<lisp::io::stringsink>();
     prin0(lisp, e1, out0.get(), 0);
     CHECK(out0->string() == std::string("(+ 123 1)"));

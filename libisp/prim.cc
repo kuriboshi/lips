@@ -345,41 +345,43 @@ PRIMITIVE prim::uxexit(LISPT status)
   return C_NIL;
 }
 
-prim::prim(lisp& lisp): base(lisp)
+prim::prim(lisp& lisp): base(lisp) {}
+
+void prim::init()
 {
-  mkprim(PN_ATOM, ::lisp::atom, 1, SUBR);
-  mkprim(PN_ATTACH, ::lisp::attach, 2, SUBR);
-  mkprim(PN_APPEND, ::lisp::append, -1, SUBR);
-  mkprim(PN_CAR, ::lisp::car, 1, SUBR);
-  mkprim(PN_CDR, ::lisp::cdr, 1, SUBR);
-  mkprim(PN_CADR, ::lisp::cadr, 1, SUBR);
-  mkprim(PN_CDAR, ::lisp::cdar, 1, SUBR);
-  mkprim(PN_CAAR, ::lisp::caar, 1, SUBR);
-  mkprim(PN_CDDR, ::lisp::cddr, 1, SUBR);
-  mkprim(PN_CDDDR, ::lisp::cdddr, 1, SUBR);
-  mkprim(PN_CADDR, ::lisp::caddr, 1, SUBR);
-  mkprim(PN_CDADR, ::lisp::cdadr, 1, SUBR);
-  mkprim(PN_CAADR, ::lisp::caadr, 1, SUBR);
-  mkprim(PN_CDDAR, ::lisp::cddar, 1, SUBR);
-  mkprim(PN_CADAR, ::lisp::cadar, 1, SUBR);
-  mkprim(PN_CDAAR, ::lisp::cdaar, 1, SUBR);
-  mkprim(PN_CAAAR, ::lisp::caaar, 1, SUBR);
-  mkprim(PN_CLOSURE, ::lisp::closure, 2, SUBR);
-  mkprim(PN_EQ, ::lisp::eq, 2, SUBR);
-  mkprim(PN_ERROR, ::lisp::xerror, -1, SUBR);
-  mkprim(PN_EXIT, ::lisp::uxexit, 1, SUBR);
-  mkprim(PN_LAMBDA, ::lisp::lambda, -2, FSUBR);
-  mkprim(PN_LENGTH, ::lisp::length, 1, SUBR);
-  mkprim(PN_LIST, ::lisp::list, -1, SUBR);
-  mkprim(PN_NCONC, ::lisp::nconc, -1, SUBR);
-  mkprim(PN_NLAMBDA, ::lisp::nlambda, -2, FSUBR);
-  mkprim(PN_NTH, ::lisp::xnth, 2, SUBR);
-  mkprim(PN_NULL, ::lisp::null, 1, SUBR);
-  mkprim(PN_QUOTE, ::lisp::quote, 1, FSUBR);
-  mkprim(PN_RPLACA, ::lisp::rplaca, 2, SUBR);
-  mkprim(PN_RPLACD, ::lisp::rplacd, 2, SUBR);
-  mkprim(PN_TCONC, ::lisp::tconc, 2, SUBR);
-  mkprim(PN_NTHD, ::lisp::nthd, 2, SUBR);
+  alloc::mkprim(PN_ATOM, ::lisp::atom, 1, SUBR);
+  alloc::mkprim(PN_ATTACH, ::lisp::attach, 2, SUBR);
+  alloc::mkprim(PN_APPEND, ::lisp::append, -1, SUBR);
+  alloc::mkprim(PN_CAR, ::lisp::car, 1, SUBR);
+  alloc::mkprim(PN_CDR, ::lisp::cdr, 1, SUBR);
+  alloc::mkprim(PN_CADR, ::lisp::cadr, 1, SUBR);
+  alloc::mkprim(PN_CDAR, ::lisp::cdar, 1, SUBR);
+  alloc::mkprim(PN_CAAR, ::lisp::caar, 1, SUBR);
+  alloc::mkprim(PN_CDDR, ::lisp::cddr, 1, SUBR);
+  alloc::mkprim(PN_CDDDR, ::lisp::cdddr, 1, SUBR);
+  alloc::mkprim(PN_CADDR, ::lisp::caddr, 1, SUBR);
+  alloc::mkprim(PN_CDADR, ::lisp::cdadr, 1, SUBR);
+  alloc::mkprim(PN_CAADR, ::lisp::caadr, 1, SUBR);
+  alloc::mkprim(PN_CDDAR, ::lisp::cddar, 1, SUBR);
+  alloc::mkprim(PN_CADAR, ::lisp::cadar, 1, SUBR);
+  alloc::mkprim(PN_CDAAR, ::lisp::cdaar, 1, SUBR);
+  alloc::mkprim(PN_CAAAR, ::lisp::caaar, 1, SUBR);
+  alloc::mkprim(PN_CLOSURE, ::lisp::closure, 2, SUBR);
+  alloc::mkprim(PN_EQ, ::lisp::eq, 2, SUBR);
+  alloc::mkprim(PN_ERROR, ::lisp::xerror, -1, SUBR);
+  alloc::mkprim(PN_EXIT, ::lisp::uxexit, 1, SUBR);
+  alloc::mkprim(PN_LAMBDA, ::lisp::lambda, -2, FSUBR);
+  alloc::mkprim(PN_LENGTH, ::lisp::length, 1, SUBR);
+  alloc::mkprim(PN_LIST, ::lisp::list, -1, SUBR);
+  alloc::mkprim(PN_NCONC, ::lisp::nconc, -1, SUBR);
+  alloc::mkprim(PN_NLAMBDA, ::lisp::nlambda, -2, FSUBR);
+  alloc::mkprim(PN_NTH, ::lisp::xnth, 2, SUBR);
+  alloc::mkprim(PN_NULL, ::lisp::null, 1, SUBR);
+  alloc::mkprim(PN_QUOTE, ::lisp::quote, 1, FSUBR);
+  alloc::mkprim(PN_RPLACA, ::lisp::rplaca, 2, SUBR);
+  alloc::mkprim(PN_RPLACD, ::lisp::rplacd, 2, SUBR);
+  alloc::mkprim(PN_TCONC, ::lisp::tconc, 2, SUBR);
+  alloc::mkprim(PN_NTHD, ::lisp::nthd, 2, SUBR);
 }
 
 } // namespace lisp

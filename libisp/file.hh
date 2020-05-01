@@ -19,6 +19,7 @@ class file: public base
 public:
   file(lisp&);
   ~file() = default;
+  static void init();
 
   LISPT xratom(LISPT);
   LISPT readc(LISPT);

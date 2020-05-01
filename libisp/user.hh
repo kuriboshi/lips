@@ -15,6 +15,7 @@ class user : public base
 public:
   user(lisp&);
   ~user() = default;
+  static void init();
 
   LISPT getrep(LISPT);
   LISPT define(LISPT, LISPT);

@@ -111,9 +111,11 @@ LISPT break0(LISPT exp)
 }
 #endif
 
-debug::debug(lisp& lisp): _lisp(lisp)
+debug::debug(lisp& lisp): base(lisp) {}
+
+void debug::init()
 {
-  mkprim(_lisp, PN_EVALTRACE, evaltrace, 1, SUBR);
+  alloc::mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
   messages[error_code(NO_MESSAGE)] = "";
   messages[error_code(ILLEGAL_ARG)] = "Illegal argument";
   messages[error_code(DIVIDE_ZERO)] = "Divide by zero";
