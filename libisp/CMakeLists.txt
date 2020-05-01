@@ -11,7 +11,7 @@ target_sources(libisp PRIVATE
   lisp.cc
   logic.cc
   low.cc
-  #map.cc
+  map.cc
   misc.cc
   #os.cc
   #pred.cc
@@ -33,12 +33,12 @@ target_sources(libisp PRIVATE
   except.hh
   file.hh
   io.hh
-  #iter.hh
-  #libisp.hh
+  iter.hh
+  libisp.hh
   lisp.hh
-  #logic.hh
+  logic.hh
   low.hh
-  #map.hh
+  map.hh
   misc.hh
   #os.hh
   #pred.hh

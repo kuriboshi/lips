@@ -8,84 +8,84 @@
 
 namespace lisp
 {
-PRIMITIVE xmap(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == CONS)
   {
-    apply(fn1, cons(obj, C_NIL));
+    apply(_lisp, fn1, cons(_lisp, obj, C_NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, obj);
+      obj = apply(_lisp, fn2, obj);
   }
   return C_NIL;
 }
 
-PRIMITIVE mapc(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == CONS)
   {
-    apply(fn1, cons(obj->car(), C_NIL));
+    apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(fn2, cons(obj, C_NIL));
+      apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
   }
   return C_NIL;
 }
 
-PRIMITIVE maplist(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
   if(type_of(obj) == CONS)
   {
-    tmp = cons(apply(fn1, cons(obj, C_NIL)), C_NIL);
+    tmp = cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj, C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  save(rval);
+  a().save(rval);
   while(type_of(obj) == CONS)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj, C_NIL)), C_NIL));
+    rplacd(_lisp, tmp, cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj, C_NIL)), C_NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, cons(obj, C_NIL));
+      obj = apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
   }
-  lisp::unsave(rval);
+  rval = a().unsave();
   return rval;
 }
 
-PRIMITIVE mapcar(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
   if(type_of(obj) == CONS)
   {
-    tmp = cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL);
+    tmp = cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  save(rval);
+  a().save(rval);
   while(type_of(obj) == CONS)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj->car(), C_NIL)), C_NIL));
+    rplacd(_lisp, tmp, cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL)), C_NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(fn2, cons(obj, C_NIL));
+      apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
   }
-  lisp::unsave(rval);
+  rval = a().unsave();
   return rval;
 }
 
-map::map()
+map::map(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_MAP, xmap, 3, SUBR);
-  mkprim(PN_MAPC, mapc, 3, SUBR);
-  mkprim(PN_MAPLIST, maplist, 3, SUBR);
-  mkprim(PN_MAPCAR, mapcar, 3, SUBR);
+  mkprim(PN_MAP, ::lisp::xmap, 3, SUBR);
+  mkprim(PN_MAPC, ::lisp::mapc, 3, SUBR);
+  mkprim(PN_MAPLIST, ::lisp::maplist, 3, SUBR);
+  mkprim(PN_MAPCAR, ::lisp::mapcar, 3, SUBR);
 }
 
 } // namespace lisp
