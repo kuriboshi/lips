@@ -76,7 +76,7 @@ TEST_CASE("Evaluator")
     auto out0 = std::make_unique<lisp::io::stringsink>();
     prin0(lisp, e1, out0.get(), 0);
     CHECK(out0->string() == std::string("(+ 123 1)"));
-    // auto r1 = eval(lisp, e1);
-    // CHECK(r1->intval() == 124);
+    auto r1 = eval(lisp, e1);
+    CHECK(r1->intval() == 124);
   }
 }

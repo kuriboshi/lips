@@ -80,18 +80,18 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   top = C_NIL;
 #endif
 
-  // new arith(l);
+  new arith(*this);
   new debug(*this);
   new file(*this);
-  // new logic(l);
-  // new low(l);
-  // new map(l);
-  // new pred(l);
-  // new prim(l);
-  // new prop(l);
-  // new string(l);
-  // new unix(l);
-  // new user(l);
+  new logic(*this);
+  new low(*this);
+  new map(*this);
+  new pred(*this);
+  new prim(*this);
+  new prop(*this);
+  new string(*this);
+  new unix(*this);
+  new user(*this);
 
   e().undefhook = nullptr;
   e().breakhook = nullptr;
