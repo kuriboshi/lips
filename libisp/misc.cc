@@ -113,7 +113,7 @@ LISPT break0(LISPT exp)
 
 debug::debug(lisp& lisp): _lisp(lisp)
 {
-  _lisp.a().mkprim(PN_EVALTRACE, evaltrace, 1, SUBR);
+  mkprim(_lisp, PN_EVALTRACE, evaltrace, 1, SUBR);
   messages[error_code(NO_MESSAGE)] = "";
   messages[error_code(ILLEGAL_ARG)] = "Illegal argument";
   messages[error_code(DIVIDE_ZERO)] = "Divide by zero";

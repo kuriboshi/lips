@@ -8,12 +8,12 @@
 
 namespace lisp
 {
-PRIMITIVE p_and(LISPT l)
+PRIMITIVE logic::p_and(LISPT l)
 {
   LISPT foo = C_T;
   while(!is_NIL(l))
   {
-    foo = eval(l->car());
+    foo = eval(_lisp, l->car());
     if(is_NIL(foo))
       return foo;
     l = l->cdr();
@@ -21,12 +21,12 @@ PRIMITIVE p_and(LISPT l)
   return foo;
 }
 
-PRIMITIVE p_or(LISPT l)
+PRIMITIVE logic::p_or(LISPT l)
 {
   LISPT foo = C_NIL;
   while(!is_NIL(l))
   {
-    foo = eval(l->car());
+    foo = eval(_lisp, l->car());
     if(!is_NIL(foo))
       return foo;
     l = l->cdr();
@@ -34,27 +34,27 @@ PRIMITIVE p_or(LISPT l)
   return foo;
 }
 
-PRIMITIVE p_not(LISPT x)
+PRIMITIVE logic::p_not(LISPT x)
 {
   if(is_NIL(x))
     return C_T;
   return C_NIL;
 }
 
-PRIMITIVE xif(LISPT pred, LISPT true_expr, LISPT false_expr)
+PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  LISPT foo = eval(pred);
+  LISPT foo = eval(_lisp, pred);
   if(is_NIL(foo))
-    return progn(false_expr);
-  return eval(true_expr);
+    return progn(_lisp, false_expr);
+  return eval(_lisp, true_expr);
 }
 
-logic::logic()
+logic::logic(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_AND, p_and, -1, FSUBR);
-  mkprim(PN_OR, p_or, -1, FSUBR);
-  mkprim(PN_NOT, p_not, 1, SUBR);
-  mkprim(PN_IF, xif, -3, FSUBR);
+  mkprim(PN_AND, ::lisp::p_and, -1, FSUBR);
+  mkprim(PN_OR, ::lisp::p_or, -1, FSUBR);
+  mkprim(PN_NOT, ::lisp::p_not, 1, SUBR);
+  mkprim(PN_IF, ::lisp::xif, -3, FSUBR);
 }
 
 } // namespace lisp

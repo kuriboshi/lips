@@ -9,7 +9,7 @@ target_sources(libisp PRIVATE
   file.cc
   io.cc
   lisp.cc
-  #logic.cc
+  logic.cc
   low.cc
   #map.cc
   misc.cc
@@ -27,10 +27,10 @@ target_sources(libisp PRIVATE
   arith.hh
   base.hh
   config.hh
-  #defs.hh
-  #error.hh
+  defs.hh
+  error.hh
   eval.hh
-  #except.hh
+  except.hh
   file.hh
   io.hh
   #iter.hh

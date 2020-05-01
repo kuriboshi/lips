@@ -164,6 +164,7 @@ inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISP
   l.a().mkprim(pname, fname, nrpar, type);
 }
 
+inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
 inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
 inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }

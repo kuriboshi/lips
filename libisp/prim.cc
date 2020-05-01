@@ -256,9 +256,9 @@ PRIMITIVE prim::null(LISPT a)
 
 PRIMITIVE prim::quote(LISPT a) { return a; }
 
-PRIMITIVE prim::lambda(LISPT x, LISPT f) { return a().mklambda(x, f, LAMBDA); }
+PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(_lisp, x, f, LAMBDA); }
 
-PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return a().mklambda(x, f, NLAMBDA); }
+PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(_lisp, x, f, NLAMBDA); }
 
 PRIMITIVE prim::list(LISPT l) { return l; }
 
@@ -270,7 +270,7 @@ PRIMITIVE prim::length(LISPT l)
     l = l->cdr();
     i++;
   }
-  return a().mknumber(i);
+  return mknumber(_lisp, i);
 }
 
 PRIMITIVE prim::closure(LISPT fun, LISPT vars)

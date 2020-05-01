@@ -14,7 +14,7 @@ namespace lisp
 PRIMITIVE string::symstr(LISPT sym)
 {
   check(sym, SYMBOL);
-  return a().mkstring(sym->symval().pname);
+  return mkstring(_lisp, sym->symval().pname);
 }
 
 /* T if s is a string, NIL otherwise. */
@@ -39,7 +39,7 @@ PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
 {
   check(s1, STRING);
   check(s2, STRING);
-  return a().mknumber(strcmp(s1->stringval(), s2->stringval()));
+  return mknumber(_lisp, strcmp(s1->stringval(), s2->stringval()));
 }
 
 /* Concatenate arbitrary many strings to
@@ -61,14 +61,14 @@ PRIMITIVE string::concat(LISPT strlist)
     strcat(ns, strlist->car()->stringval());
     strlist = strlist->cdr();
   }
-  return a().mkstring(ns);
+  return mkstring(_lisp, ns);
 }
 
 /* Return string length of s */
 PRIMITIVE string::strlen(LISPT s)
 {
   check(s, STRING);
-  return a().mknumber(std::strlen(s->stringval()));
+  return mknumber(_lisp, std::strlen(s->stringval()));
 }
 
 /* Extract a substring from start to end.
@@ -95,7 +95,7 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   {
     ns[size] = *(str->stringval() + s - 1);
   }
-  return a().mkstring(ns);
+  return mkstring(_lisp, ns);
 }
 
 string::string(lisp& lisp): base(lisp)

@@ -57,7 +57,7 @@ PRIMITIVE arith::iplus(LISPT l)
     check(*i, INTEGER);
     sum += (**i).intval();
   }
-  return a().mknumber(sum);
+  return mknumber(_lisp, sum);
 }
 
 PRIMITIVE arith::fplus(LISPT l)
@@ -71,7 +71,7 @@ PRIMITIVE arith::fplus(LISPT l)
     sum = sum + l->car()->floatval();
     l = l->cdr();
   }
-  return a().mkfloat(sum);
+  return mkfloat(_lisp, sum);
 }
 
 PRIMITIVE arith::difference(LISPT a, LISPT b)

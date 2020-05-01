@@ -33,11 +33,11 @@ PRIMITIVE file::readc(LISPT file)
 {
 #if 0
   if(is_NIL(file))
-    return _lisp.a().mknumber(getch(primin));
+    return mknumber(_lisp, getch(primin));
   if(is_T(file))
-    return _lisp.a().mknumber(getch(stdin));
+    return mknumber(_lisp, getch(stdin));
   check(file, FILET);
-  return _lisp.a().mknumber(getch(file->fileval()));
+  return mknumber(_lisp, getch(file->fileval()));
 #else
   return C_NIL;
 #endif
@@ -153,7 +153,7 @@ PRIMITIVE file::plevel(LISPT newl)
     check(newl, INTEGER);
     printlevel = newl->intval();
   }
-  return _lisp.a().mknumber(x);
+  return mknumber(_lisp, x);
 #else
   return C_NIL;
 #endif
@@ -224,7 +224,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
   check2(oname->symval().value, SUBR, FSUBR);
   funn = oname->symval().pname;
   if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
-    return error(CANT_OPEN, _lisp.a().mkstring(TAGSFILE));
+    return error(CANT_OPEN, mkstring(_lisp, TAGSFILE));
   while(fgets(buf, 120, tagsfile) != nullptr)
     if(strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
     {
@@ -234,7 +234,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
       strcat(buf, fname);
       fclose(tagsfile);
       if((cfile = fopen(buf, "r")) == nullptr)
-        return error(CANT_OPEN, _lisp.a().mkstring(buf));
+        return error(CANT_OPEN, mkstring(_lisp, buf));
       for(; line > 1; line--) fgets(buf, 120, cfile);
       fgets(buf, 120, cfile);
       putch('(', f, 0);

@@ -169,12 +169,12 @@ LISPT io::parsebuf(char* buf)
   int longval;
 
   if(integerp(buf, &longval))
-    return a().mknumber(longval);
+    return mknumber(_lisp, longval);
 #ifdef FLOATING
   else if(floatp(buf))
-    return a().mkfloat(atof(buf));
+    return mkfloat(_lisp, atof(buf));
 #endif /* FLOATING */
-  return a().mkatom(buf);
+  return mkatom(_lisp, buf);
 }
 
 /*
@@ -195,7 +195,7 @@ LISPT io::ratom(source* file)
     {
       buf[pos++] = c;
       buf[pos] = NUL;
-      return a().mkatom(buf);
+      return mkatom(_lisp, buf);
     }
     else
     {
@@ -501,7 +501,7 @@ LISPT io::rmdquote(io& ctx, source* file, LISPT, char)
     c = file->getch();
   }
   buf[pos] = NUL;
-  return ctx.a().mkstring(buf);
+  return mkstring(ctx._lisp, buf);
 }
 
 LISPT io::rmsquote(io& ctx, source* file, LISPT, char)
