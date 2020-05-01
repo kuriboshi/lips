@@ -10,7 +10,7 @@
 
 namespace lisp
 {
-PRIMITIVE numberp(LISPT a)
+PRIMITIVE pred::numberp(LISPT a)
 {
   switch(type_of(a))
   {
@@ -26,7 +26,7 @@ PRIMITIVE numberp(LISPT a)
   }
 }
 
-PRIMITIVE listp(LISPT a)
+PRIMITIVE pred::listp(LISPT a)
 {
   if(type_of(a) == CONS)
     return a;
@@ -34,7 +34,7 @@ PRIMITIVE listp(LISPT a)
     return C_NIL;
 }
 
-PRIMITIVE memb(LISPT x, LISPT l)
+PRIMITIVE pred::memb(LISPT x, LISPT l)
 {
   while(!EQ(l, C_NIL))
   {
@@ -45,7 +45,7 @@ PRIMITIVE memb(LISPT x, LISPT l)
   return C_NIL;
 }
 
-PRIMITIVE equal(LISPT l1, LISPT l2)
+PRIMITIVE pred::equal(LISPT l1, LISPT l2)
 {
   LISPT x;
 
@@ -84,7 +84,7 @@ PRIMITIVE equal(LISPT l1, LISPT l2)
   return C_NIL;
 }
 
-PRIMITIVE nlistp(LISPT a)
+PRIMITIVE pred::nlistp(LISPT a)
 {
   if(type_of(a) != CONS)
     return a;
@@ -92,7 +92,7 @@ PRIMITIVE nlistp(LISPT a)
     return C_NIL;
 }
 
-PRIMITIVE neq(LISPT a, LISPT b)
+PRIMITIVE pred::neq(LISPT a, LISPT b)
 {
   if(!EQ(a, b))
     return C_T;
@@ -100,7 +100,7 @@ PRIMITIVE neq(LISPT a, LISPT b)
     return C_NIL;
 }
 
-PRIMITIVE boundp(LISPT a)
+PRIMITIVE pred::boundp(LISPT a)
 {
   if(type_of(a) != SYMBOL)
     return C_NIL;
@@ -110,7 +110,7 @@ PRIMITIVE boundp(LISPT a)
     return C_NIL;
 }
 
-PRIMITIVE litatom(LISPT a)
+PRIMITIVE pred::litatom(LISPT a)
 {
   if(type_of(a) == SYMBOL)
     return C_T;
@@ -118,7 +118,7 @@ PRIMITIVE litatom(LISPT a)
     return C_NIL;
 }
 
-PRIMITIVE xtypeof(LISPT a)
+PRIMITIVE pred::xtypeof(LISPT a)
 {
   switch(type_of(a))
   {
@@ -168,17 +168,17 @@ PRIMITIVE xtypeof(LISPT a)
   return C_NIL;
 }
 
-pred::pred()
+pred::pred(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_LISTP, listp, 1, SUBR);
-  mkprim(PN_NLISTP, nlistp, 1, SUBR);
-  mkprim(PN_NEQ, neq, 2, SUBR);
-  mkprim(PN_NUMBERP, numberp, 1, SUBR);
-  mkprim(PN_MEMB, memb, 2, SUBR);
-  mkprim(PN_EQUAL, equal, 2, SUBR);
-  mkprim(PN_BOUNDP, boundp, 1, SUBR);
-  mkprim(PN_LITATOM, litatom, 1, SUBR);
-  mkprim(PN_TYPEOF, xtypeof, 1, SUBR);
+  mkprim(PN_LISTP, ::lisp::listp, 1, SUBR);
+  mkprim(PN_NLISTP, ::lisp::nlistp, 1, SUBR);
+  mkprim(PN_NEQ, ::lisp::neq, 2, SUBR);
+  mkprim(PN_NUMBERP, ::lisp::numberp, 1, SUBR);
+  mkprim(PN_MEMB, ::lisp::memb, 2, SUBR);
+  mkprim(PN_EQUAL, ::lisp::equal, 2, SUBR);
+  mkprim(PN_BOUNDP, ::lisp::boundp, 1, SUBR);
+  mkprim(PN_LITATOM, ::lisp::litatom, 1, SUBR);
+  mkprim(PN_TYPEOF, ::lisp::xtypeof, 1, SUBR);
 }
 
 } // namespace lisp

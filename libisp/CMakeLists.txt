@@ -13,10 +13,10 @@ target_sources(libisp PRIVATE
   low.cc
   map.cc
   misc.cc
-  #os.cc
-  #pred.cc
+  os.cc
+  pred.cc
   prim.cc
-  #prop.cc
+  prop.cc
   string.cc
   #unix.cc
   #user.cc
@@ -40,10 +40,10 @@ target_sources(libisp PRIVATE
   low.hh
   map.hh
   misc.hh
-  #os.hh
-  #pred.hh
+  os.hh
+  pred.hh
   prim.hh
-  #prop.hh
+  prop.hh
   string.hh
   #user.hh
   #unix.hh
