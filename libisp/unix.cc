@@ -15,37 +15,35 @@
 
 namespace lisp
 {
-LISPT sighandler[NSIG - 1];
+PRIMITIVE unix::uxerrno() { return mknumber(_lisp, errno); }
 
-PRIMITIVE uxerrno() { return mknumber(errno); }
-
-PRIMITIVE uxaccess(LISPT name, LISPT mode)
+PRIMITIVE unix::uxaccess(LISPT name, LISPT mode)
 {
   check(name, STRING);
   check(mode, INTEGER);
-  return mknumber(access(name->stringval(), mode->intval()));
+  return mknumber(_lisp, access(name->stringval(), mode->intval()));
 }
 
-PRIMITIVE uxalarm(LISPT seconds)
+PRIMITIVE unix::uxalarm(LISPT seconds)
 {
   check(seconds, INTEGER);
-  return mknumber(alarm(seconds->intval()));
+  return mknumber(_lisp, alarm(seconds->intval()));
 }
 
-PRIMITIVE uxchdir(LISPT dirname)
+PRIMITIVE unix::uxchdir(LISPT dirname)
 {
   check(dirname, STRING);
-  return mknumber(chdir(dirname->stringval()));
+  return mknumber(_lisp, chdir(dirname->stringval()));
 }
 
-PRIMITIVE uxchmod(LISPT name, LISPT mode)
+PRIMITIVE unix::uxchmod(LISPT name, LISPT mode)
 {
   check(name, STRING);
   check(mode, INTEGER);
-  return mknumber(chmod(name->stringval(), mode->intval()));
+  return mknumber(_lisp, chmod(name->stringval(), mode->intval()));
 }
 
-PRIMITIVE uxclose(LISPT fildes)
+PRIMITIVE unix::uxclose(LISPT fildes)
 {
   check(fildes, FILET);
   if(fclose(fildes->fileval()) == -1)
@@ -54,7 +52,7 @@ PRIMITIVE uxclose(LISPT fildes)
     return C_T;
 }
 
-PRIMITIVE uxcreat(LISPT name, LISPT mode)
+PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
@@ -64,46 +62,46 @@ PRIMITIVE uxcreat(LISPT name, LISPT mode)
   if(i < 0)
     return C_NIL;
   else
-    return mknumber(i);
+    return mknumber(_lisp, i);
 }
 
-PRIMITIVE uxdup(LISPT fildes)
+PRIMITIVE unix::uxdup(LISPT fildes)
 {
   check(fildes, INTEGER);
-  return mknumber(dup(fildes->intval()));
+  return mknumber(_lisp, dup(fildes->intval()));
 }
 
-PRIMITIVE uxgetuid() { return mknumber(getuid()); }
+PRIMITIVE unix::uxgetuid() { return mknumber(_lisp, getuid()); }
 
-PRIMITIVE uxgeteuid() { return mknumber(geteuid()); }
+PRIMITIVE unix::uxgeteuid() { return mknumber(_lisp, geteuid()); }
 
-PRIMITIVE uxgetgid() { return mknumber(getgid()); }
+PRIMITIVE unix::uxgetgid() { return mknumber(_lisp, getgid()); }
 
-PRIMITIVE uxgetegid() { return mknumber(getegid()); }
+PRIMITIVE unix::uxgetegid() { return mknumber(_lisp, getegid()); }
 
-PRIMITIVE uxgetpid() { return mknumber(getpid()); }
+PRIMITIVE unix::uxgetpid() { return mknumber(_lisp, getpid()); }
 
-PRIMITIVE uxkill(LISPT pid, LISPT sig)
+PRIMITIVE unix::uxkill(LISPT pid, LISPT sig)
 {
   check(pid, INTEGER);
   check(sig, INTEGER);
-  return mknumber(kill(pid->intval(), sig->intval()));
+  return mknumber(_lisp, kill(pid->intval(), sig->intval()));
 }
 
-PRIMITIVE uxlink(LISPT name1, LISPT name2)
+PRIMITIVE unix::uxlink(LISPT name1, LISPT name2)
 {
   check(name1, STRING);
   check(name2, STRING);
-  return mknumber(link(name1->stringval(), name2->stringval()));
+  return mknumber(_lisp, link(name1->stringval(), name2->stringval()));
 }
 
-PRIMITIVE uxnice(LISPT incr)
+PRIMITIVE unix::uxnice(LISPT incr)
 {
   check(incr, INTEGER);
-  return mknumber(nice(incr->intval()));
+  return mknumber(_lisp, nice(incr->intval()));
 }
 
-PRIMITIVE uxopen(LISPT name, LISPT mode)
+PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
 {
   const char* openmode = nullptr;
 
@@ -126,27 +124,28 @@ PRIMITIVE uxopen(LISPT name, LISPT mode)
   if(!f)
     return error(CANT_OPEN, name);
   LISPT newfile = nullptr;
-  set(newfile, FILET, getobject());
+  set(newfile, FILET, getobject(_lisp));
   newfile->fileval(f);
   return newfile;
 }
 
-PRIMITIVE uxsetuid(LISPT uid)
+PRIMITIVE unix::uxsetuid(LISPT uid)
 {
   check(uid, INTEGER);
-  return mknumber(setuid(uid->intval()));
+  return mknumber(_lisp, setuid(uid->intval()));
 }
 
-PRIMITIVE uxsetgid(LISPT gid)
+PRIMITIVE unix::uxsetgid(LISPT gid)
 {
   check(gid, INTEGER);
-  return mknumber(setgid(gid->intval()));
+  return mknumber(_lisp, setgid(gid->intval()));
 }
 
-/*ARGSUSED*/
-void sighandle(int sig) { eval(sighandler[sig]); }
+#if 0
+LISPT unix::sighandler[];
+void unix::sighandle(int sig) { eval(_lisp, sighandler[sig]); }
 
-PRIMITIVE uxsignal(LISPT sig, LISPT fun)
+PRIMITIVE unix::uxsignal(LISPT sig, LISPT fun)
 {
   check(sig, INTEGER);
 
@@ -169,36 +168,39 @@ PRIMITIVE uxsignal(LISPT sig, LISPT fun)
   }
   return C_T;
 }
+#endif
 
-PRIMITIVE uxunlink(LISPT name)
+PRIMITIVE unix::uxunlink(LISPT name)
 {
   check(name, STRING);
-  return mknumber(unlink(name->stringval()));
+  return mknumber(_lisp, unlink(name->stringval()));
 }
 
-unix::unix()
+unix::unix(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_UXACCESS, uxaccess, 2, SUBR);
-  mkprim(PN_UXALARM, uxalarm, 1, SUBR);
-  mkprim(PN_UXCHDIR, uxchdir, 1, SUBR);
-  mkprim(PN_UXCHMOD, uxchmod, 2, SUBR);
-  mkprim(PN_UXCLOSE, uxclose, 1, SUBR);
-  mkprim(PN_UXCREAT, uxcreat, 2, SUBR);
-  mkprim(PN_UXDUP, uxdup, 1, SUBR);
-  mkprim(PN_UXERRNO, uxerrno, 0, SUBR);
-  mkprim(PN_UXGETUID, uxgetuid, 0, SUBR);
-  mkprim(PN_UXGETEUID, uxgeteuid, 0, SUBR);
-  mkprim(PN_UXGETGID, uxgetgid, 0, SUBR);
-  mkprim(PN_UXGETEGID, uxgetegid, 0, SUBR);
-  mkprim(PN_UXGETPID, uxgetpid, 0, SUBR);
-  mkprim(PN_UXKILL, uxkill, 2, SUBR);
-  mkprim(PN_UXLINK, uxlink, 2, SUBR);
-  mkprim(PN_UXNICE, uxnice, 1, SUBR);
-  mkprim(PN_UXOPEN, uxopen, 2, SUBR);
-  mkprim(PN_UXSETUID, uxsetuid, 1, SUBR);
-  mkprim(PN_UXSETGID, uxsetgid, 1, SUBR);
-  mkprim(PN_SIGNAL, uxsignal, 2, SUBR);
-  mkprim(PN_UXUNLINK, uxunlink, 1, SUBR);
+  mkprim(PN_UXACCESS, ::lisp::uxaccess, 2, SUBR);
+  mkprim(PN_UXALARM, ::lisp::uxalarm, 1, SUBR);
+  mkprim(PN_UXCHDIR, ::lisp::uxchdir, 1, SUBR);
+  mkprim(PN_UXCHMOD, ::lisp::uxchmod, 2, SUBR);
+  mkprim(PN_UXCLOSE, ::lisp::uxclose, 1, SUBR);
+  mkprim(PN_UXCREAT, ::lisp::uxcreat, 2, SUBR);
+  mkprim(PN_UXDUP, ::lisp::uxdup, 1, SUBR);
+  mkprim(PN_UXERRNO, ::lisp::uxerrno, 0, SUBR);
+  mkprim(PN_UXGETUID, ::lisp::uxgetuid, 0, SUBR);
+  mkprim(PN_UXGETEUID, ::lisp::uxgeteuid, 0, SUBR);
+  mkprim(PN_UXGETGID, ::lisp::uxgetgid, 0, SUBR);
+  mkprim(PN_UXGETEGID, ::lisp::uxgetegid, 0, SUBR);
+  mkprim(PN_UXGETPID, ::lisp::uxgetpid, 0, SUBR);
+  mkprim(PN_UXKILL, ::lisp::uxkill, 2, SUBR);
+  mkprim(PN_UXLINK, ::lisp::uxlink, 2, SUBR);
+  mkprim(PN_UXNICE, ::lisp::uxnice, 1, SUBR);
+  mkprim(PN_UXOPEN, ::lisp::uxopen, 2, SUBR);
+  mkprim(PN_UXSETUID, ::lisp::uxsetuid, 1, SUBR);
+  mkprim(PN_UXSETGID, ::lisp::uxsetgid, 1, SUBR);
+#if 0
+  mkprim(PN_SIGNAL, ::lisp::uxsignal, 2, SUBR);
+#endif
+  mkprim(PN_UXUNLINK, ::lisp::uxunlink, 1, SUBR);
 }
 
 } // namespace lisp

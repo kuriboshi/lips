@@ -18,8 +18,8 @@ target_sources(libisp PRIVATE
   prim.cc
   prop.cc
   string.cc
-  #unix.cc
-  #user.cc
+  unix.cc
+  user.cc
   version.cc
 )
 target_sources(libisp PRIVATE
@@ -45,8 +45,8 @@ target_sources(libisp PRIVATE
   prim.hh
   prop.hh
   string.hh
-  #user.hh
-  #unix.hh
+  user.hh
+  unix.hh
   version.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

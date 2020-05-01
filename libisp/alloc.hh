@@ -170,8 +170,9 @@ inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
 inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 
+inline LISPT getobject(lisp& l) { return l.a().getobject(); }
+
 #if 0
-inline LISPT getobject() { return alloc::getobject(); }
 inline alloc::destblock_t* dalloc(int i) { return alloc::dalloc(i); }
 inline void dfree(alloc::destblock_t* d) { alloc::dfree(d); }
 inline void dzero() { alloc::dzero(); }

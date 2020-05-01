@@ -73,7 +73,7 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
       break;
     case LAMBDA:
     case NLAMBDA:
-      return funeq(l1, l2);
+      return funeq(_lisp, l1, l2);
       break;
     case INTEGER:
       return (l1->intval() == l2->intval() ? C_T : C_NIL);

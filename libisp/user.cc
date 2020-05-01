@@ -8,15 +8,15 @@
 
 namespace lisp
 {
-static LISPT getargs(LISPT al)
+LISPT user::getargs(LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
   else
-    return cons(al->car(), getargs(al->cdr()));
+    return cons(_lisp, al->car(), getargs(al->cdr()));
 }
 
-PRIMITIVE getrep(LISPT fun)
+PRIMITIVE user::getrep(LISPT fun)
 {
   LISPT args;
 
@@ -30,11 +30,11 @@ PRIMITIVE getrep(LISPT fun)
   else
     args = x.arglist;
   if(type_of(fun) == LAMBDA)
-    return cons(C_LAMBDA, cons(args, x.lambdarep));
-  return cons(C_NLAMBDA, cons(args, x.lambdarep));
+    return cons(_lisp, C_LAMBDA, cons(_lisp, args, x.lambdarep));
+  return cons(_lisp, C_NLAMBDA, cons(_lisp, args, x.lambdarep));
 }
 
-LISPT funeq(LISPT f1, LISPT f2)
+LISPT user::funeq(LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
     return C_T;
@@ -42,12 +42,12 @@ LISPT funeq(LISPT f1, LISPT f2)
   {
     LISPT t1 = f1->lamval().arglist;
     LISPT t2 = f2->lamval().arglist;
-    LISPT tmp = equal(t1, t2);
+    LISPT tmp = equal(_lisp, t1, t2);
     if(!is_NIL(tmp))
     {
       t1 = f1->lamval().lambdarep;
       t2 = f2->lamval().lambdarep;
-      tmp = equal(t1, t2);
+      tmp = equal(_lisp, t1, t2);
       if(!is_NIL(tmp))
         return C_T;
     }
@@ -55,7 +55,7 @@ LISPT funeq(LISPT f1, LISPT f2)
   return C_NIL;
 }
 
-static LISPT checkfn(LISPT name, LISPT lam)
+LISPT user::checkfn(LISPT name, LISPT lam)
 {
   if(type_of(name->getopval()) != UNBOUND)
     if(type_of(name->getopval()) == LAMBDA || type_of(name->getopval()) == NLAMBDA)
@@ -63,15 +63,15 @@ static LISPT checkfn(LISPT name, LISPT lam)
       LISPT t = funeq(name->getopval(), lam);
       if(is_NIL(t))
       {
-        putprop(name, C_OLDDEF, name->getopval());
+        putprop(_lisp, name, C_OLDDEF, name->getopval());
         if(!is_NIL(verboseflg))
-          xprint(cons(name, cons(C_REDEFINED, C_NIL)), C_NIL);
+          xprint(_lisp, cons(_lisp, name, cons(_lisp, C_REDEFINED, C_NIL)), C_NIL);
       }
     }
   return C_NIL;
 }
 
-PRIMITIVE define(LISPT name, LISPT lam)
+PRIMITIVE user::define(LISPT name, LISPT lam)
 {
   check(name, SYMBOL);
   check2(lam, LAMBDA, NLAMBDA);
@@ -80,29 +80,29 @@ PRIMITIVE define(LISPT name, LISPT lam)
   return name;
 }
 
-static LISPT def(LISPT name, LISPT pars, LISPT body, lisp_type type)
+LISPT user::def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
   check(name, SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != SYMBOL)
     check(pars, CONS);
-  LISPT foo = alloc::mklambda(pars, body, type);
+  LISPT foo = mklambda(_lisp, pars, body, type);
   if(type_of(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);
   name->setopval(foo);
-  return cons(name, C_NIL);
+  return cons(_lisp, name, C_NIL);
 }
 
-PRIMITIVE de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, LAMBDA); }
+PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, LAMBDA); }
 
-PRIMITIVE df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
+PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
 
-user::user()
+user::user(lisp& lisp) : base(lisp)
 {
-  mkprim(PN_DEFINE, define, 2, SUBR);
-  mkprim(PN_GETREP, getrep, 1, SUBR);
-  mkprim(PN_DE, de, -3, FSUBR);
-  mkprim(PN_DF, df, -3, FSUBR);
+  mkprim(PN_DEFINE, ::lisp::define, 2, SUBR);
+  mkprim(PN_GETREP, ::lisp::getrep, 1, SUBR);
+  mkprim(PN_DE, ::lisp::de, -3, FSUBR);
+  mkprim(PN_DF, ::lisp::df, -3, FSUBR);
 }
 
 } // namespace lisp
