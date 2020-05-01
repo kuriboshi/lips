@@ -316,10 +316,10 @@ PRIMITIVE alloc::freecount(lisp&)
  */
 LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
 {
-  LISPT s = getobject();
+  LISPT s = new lisp_t;
   LISPT f = intern(pname);
-  s->subrval().argcount = nrpar;
   set(f->symval().value, type, s);
+  s->subrval().argcount = nrpar;
   return s;
 }
 
@@ -366,11 +366,11 @@ LISPT alloc::mknumber(int i)
 }
 
 /*
- * mkarglist - builds a list out of the argument list ALIST given in a lambda
- *             definition. This list may end in an atom if the function is
- *             halfspread, or it could be an atom for a nospread
- *             function. COUNT is set to the number of arguments and is
- *             negative if halfspread or nospread.
+ * mkarglis - builds a list out of the argument list ALIST given in a lambda
+ *            definition. This list may end in an atom if the function is
+ *            halfspread, or it could be an atom for a nospread function. COUNT
+ *            is set to the number of arguments and is negative if halfspread
+ *            or nospread.
  */
 LISPT alloc::mkarglis(LISPT alist, int& count)
 {
@@ -411,7 +411,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
 /*
  * Calculates hash value of string.
  */
-int alloc::hash(const char* str) const
+int alloc::hash(const char* str)
 {
   int sum = 0;
 
@@ -423,16 +423,13 @@ int alloc::hash(const char* str) const
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-LISPT alloc::buildatom(const char* s, int cpy)
+LISPT alloc::buildatom(const char* s, bool copy, LISPT newatom)
 {
   static LISPT unbound = nullptr;
-
   if(unbound == nullptr)
-    set(unbound, UNBOUND, getobject());
-  LISPT newatom = getobject();
-  if(newatom == C_ERROR)
-    return C_ERROR;
-  if(cpy)
+    set(unbound, UNBOUND, new lisp_t);
+
+  if(copy)
   {
     auto* pname = realmalloc((unsigned)strlen(s) + 1);
     if(pname == nullptr)
@@ -449,9 +446,8 @@ LISPT alloc::buildatom(const char* s, int cpy)
   return l;
 }
 
-alloc::obarray_t* alloc::findatom(const char* str, obarray_t* obarray[]) const
+alloc::obarray_t* alloc::findatom(int hv, const char* str, obarray_t* obarray[])
 {
-  auto hv = hash(str);
   for(auto* ob = *(obarray + hv); ob; ob = ob->onext)
   {
     if(!strcmp(ob->sym->symval().pname, str))
@@ -465,17 +461,13 @@ alloc::obarray_t* alloc::findatom(const char* str, obarray_t* obarray[]) const
  *           If the atom is already in obarray, no new atom is created.
  *           Copy str if COPY is true. Returns the atom.
  */
-LISPT alloc::puthash(const char* str, obarray_t* obarray[], bool copy)
+LISPT alloc::puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom)
 {
-  int hv = hash(str);
-  obarray_t* ob = findatom(str, obarray);
-  if(ob != nullptr)
-    return ob->sym;
-  ob = new obarray_t;
+  auto* ob = new obarray_t;
   if(ob == nullptr)
     return C_ERROR;
   ob->onext = obarray[hv];
-  ob->sym = buildatom(str, copy);
+  ob->sym = buildatom(str, copy, newatom);
   if(EQ(ob->sym, C_ERROR))
   {
     delete ob;
@@ -489,7 +481,13 @@ LISPT alloc::puthash(const char* str, obarray_t* obarray[], bool copy)
  * intern - Make interned symbol in hasharray obarray. Str is not copied so
  *          this is only used with global constant strings during init.
  */
-LISPT alloc::intern(const char* str) { return puthash(str, globals, 0); }
+LISPT alloc::intern(const char* str)
+{
+  auto hv = hash(str);
+  if(auto* ob = findatom(hv, str, globals))
+    return ob->sym;
+  return puthash(hv, str, globals, 0, new lisp_t);
+}
 
 /*
  * mkatom - Generates interned symbol like intern but copy str.
@@ -497,9 +495,12 @@ LISPT alloc::intern(const char* str) { return puthash(str, globals, 0); }
 LISPT alloc::mkatom(const char* str)
 {
   // First we search for global interned atoms
-  if(auto* ob = findatom(str, globals))
+  auto hv = hash(str);
+  if(auto* ob = findatom(hv, str, globals))
     return ob->sym;
-  return puthash(str, obarray, 1);
+  if(auto* ob = findatom(hv, str, obarray))
+    return ob->sym;
+  return puthash(hv, str, obarray, 1, getobject());
 }
 
 /* This isn't converted yet */

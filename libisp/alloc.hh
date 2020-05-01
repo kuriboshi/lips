@@ -23,14 +23,14 @@ public:
   alloc(lisp&);
   ~alloc();
 
-  static const int CONSCELLS = 1000;     // Number of cells in each block
-  static const int DESTBLOCKSIZE = 3000; // Size of destination block area
-  static const int MINCONSES = 2000;     // Minimum number of cells after gc
-  static const int SAVEARRAYSIZE = 1000; // Size of gc save array
-  static const int MAXHASH = 255;        // Max number of hash buckets
+  static constexpr int CONSCELLS = 1000;     // Number of cells in each block
+  static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
+  static constexpr int MINCONSES = 2000;     // Minimum number of cells after gc
+  static constexpr int SAVEARRAYSIZE = 1000; // Size of gc save array
+  static constexpr int MAXHASH = 255;        // Max number of hash buckets
 
-  static const int NOCONSARGS = 0; // Don't reclaim arguments of cons
-  static const int CONSARGS = 1;   // Reclaim called from cons
+  static constexpr int NOCONSARGS = 0; // Don't reclaim arguments of cons
+  static constexpr int CONSARGS = 1;   // Reclaim called from cons
 
   struct conscells_t
   {
@@ -66,7 +66,6 @@ public:
     obarray_t* onext;
   };
 
-  /* variables */
   LISPT savearray[SAVEARRAYSIZE];
   int savept = 0;
   static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
@@ -74,8 +73,6 @@ public:
   LISPT freelist = nullptr;
   LISPT gcgag = nullptr; // Nonnil means print gc message.
 
-  /* functions */
-  LISPT intern(const char*);
   LISPT getobject();
 
   /*
@@ -84,18 +81,20 @@ public:
    * Whenever CVAR is changed the corresponding lisp variable changes
    * and vice versa.
    */
-  void initcvar(LISPT* cvar, const char* name, LISPT val)
+  static void initcvar(LISPT* cvar, const char* name, LISPT val)
   {
     LISPT t = intern(name);
-    set(t->symval().value, CVARIABLE, getobject());
+    set(t->symval().value, CVARIABLE, new lisp_t);
     t->symval().value->cvarval(cvar);
     *cvar = val;
   }
 
-  void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type);
-  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type);
-  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type);
-  void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type);
+  static LISPT intern(const char*);
+  static void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type);
+
   LISPT mklambda(LISPT args, LISPT def, lisp_type type);
   LISPT mkstring(const char*);
   LISPT mknumber(int);
@@ -106,7 +105,6 @@ public:
   void dfree(destblock_t*);
   void dzero();
 
-  char* realmalloc(unsigned int);
   void save(LISPT v) { savearray[savept++] = v; }
   LISPT unsave() { return savearray[--savept]; }
 
@@ -117,6 +115,8 @@ public:
 
   void add_mark_object(LISPT* o) { markobjs.push_back(o); }
 
+  static char* realmalloc(unsigned int);
+
 private:
   lisp& _lisp; // Context
 
@@ -125,12 +125,13 @@ private:
   int sweep();
   void mark(LISPT);
   LISPT doreclaim(int doconsargs, int incr);
-  int hash(const char* str) const;
-  LISPT buildatom(const char* s, int cpy);
-  obarray_t* findatom(const char* str, obarray_t* obarray[]) const;
-  LISPT puthash(const char* str, obarray_t* obarray[], bool copy);
-  LISPT mkprim(const char* pname, short nrpar, lisp_type type);
   LISPT mkarglis(LISPT alist, int& count);
+
+  static LISPT buildatom(const char* s, bool copy, LISPT newatom);
+  static obarray_t* findatom(int hv, const char* str, obarray_t* obarray[]);
+  static int hash(const char* str);
+  static LISPT puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom);
+  static LISPT mkprim(const char* pname, short nrpar, lisp_type type);
 
   LISPT foo1 = nullptr; // Protect arguments of cons when gc.
   LISPT foo2 = nullptr;
@@ -147,22 +148,6 @@ inline LISPT freecount(lisp& l) { return l.a().freecount(l); }
 
 inline LISPT intern(lisp& l, const char* s) { return l.a().intern(s); }
 inline void initcvar(lisp& l, LISPT* cvar, const char* name, LISPT var) { return l.a().initcvar(cvar, name, var); }
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
-{
-  l.a().mkprim(pname, fname, nrpar, type);
-}
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
-{
-  l.a().mkprim(pname, fname, nrpar, type);
-}
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
-{
-  l.a().mkprim(pname, fname, nrpar, type);
-}
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
-{
-  l.a().mkprim(pname, fname, nrpar, type);
-}
 
 inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
@@ -171,6 +156,23 @@ inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
+
+inline void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
+inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+{
+  alloc::mkprim(pname, fname, nrpar, type);
+}
 
 #if 0
 inline alloc::destblock_t* dalloc(int i) { return alloc::dalloc(i); }
