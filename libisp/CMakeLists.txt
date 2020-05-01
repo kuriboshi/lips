@@ -4,7 +4,7 @@
 add_library(libisp)
 target_sources(libisp PRIVATE
   alloc.cc
-  #arith.cc
+  arith.cc
   eval.cc
   file.cc
   io.cc
@@ -24,10 +24,9 @@ target_sources(libisp PRIVATE
 )
 target_sources(libisp PRIVATE
   alloc.hh
-  #arith.hh
+  arith.hh
   base.hh
-  #config.hh
-  #constants.hh
+  config.hh
   #defs.hh
   #error.hh
   eval.hh
