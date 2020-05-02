@@ -12,7 +12,7 @@ target_sources(libisp PRIVATE
   logic.cc
   low.cc
   map.cc
-  misc.cc
+  debug.cc
   os.cc
   pred.cc
   prim.cc
@@ -39,7 +39,7 @@ target_sources(libisp PRIVATE
   logic.hh
   low.hh
   map.hh
-  misc.hh
+  debug.hh
   os.hh
   pred.hh
   prim.hh
