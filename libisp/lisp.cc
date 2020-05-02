@@ -3,6 +3,7 @@
 // Copyright 2020 Krister Joas
 //
 
+#include <cstdio>
 #include "libisp.hh"
 
 namespace lisp
@@ -75,6 +76,10 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&interactive, "interactive", C_NIL);
   initcvar(&version, "version", a().mkstring(VERSION));
 
+  _primout = new file_t(new io::filesink(stdout));
+  _primerr = new file_t(new io::filesink(stderr));
+  _primin = new file_t(new io::filesource(stdin));
+
 #if 0
   rstack = C_NIL;
   top = C_NIL;
@@ -98,6 +103,10 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 }
 
 lisp::~lisp() {}
+
+void lisp::primout(file_t& f) { delete _primout; _primout = &f; }
+void lisp::primerr(file_t& f) { delete _primerr; _primerr = &f; }
+void lisp::primin(file_t& f) { delete _primin; _primin = &f; }
 
 //
 // All lisp constants needed internally.

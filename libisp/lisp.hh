@@ -24,6 +24,7 @@ class lisp;
 class evaluator;
 class alloc;
 struct lisp_t;
+struct file_t;
 using LISPT = struct lisp_t*;
 
 /*
@@ -185,7 +186,7 @@ struct lisp_t
     closure_t l_closure;
     // UNBOUND
     // alloc::destblock_t* l_environ;
-    FILE* l_filet;
+    file_t* l_filet;
     // TRUE
     LISPT l_free;
     // ENDOFFILE
@@ -228,8 +229,8 @@ struct lisp_t
     type = FLOAT;
   }
   cons_t& consval() { return u.l_cons; }
-  FILE* fileval() { return u.l_filet; }
-  void fileval(FILE* f) { u.l_filet = f; }
+  file_t* fileval() { return u.l_filet; }
+  void fileval(file_t* f) { u.l_filet = f; }
   void* cpointval() { return u.l_cpointer; }
   void setq(LISPT y) { u.l_symbol.value = y; }
   void setopval(LISPT y) { setq(y); }
@@ -270,9 +271,19 @@ public:
   alloc& a() const { return _alloc; }
   evaluator& e() const { return _eval; };
 
+  file_t& primout() const { return *_primout; }
+  file_t& primerr() const { return *_primerr; }
+  file_t& primin() const { return *_primin; }
+  void primout(file_t&);
+  void primerr(file_t&);
+  void primin(file_t&);
+
 private:
   alloc& _alloc;
   evaluator& _eval;
+  file_t* _primout = nullptr;
+  file_t* _primerr = nullptr;
+  file_t* _primin = nullptr;
 };
 
 // Variables

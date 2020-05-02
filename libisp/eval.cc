@@ -25,8 +25,6 @@ void evaluator::reset()
 LISPT evaluator::printwhere()
 {
   LISPT foo = C_NIL;
-#if 0
-  // TODO:
   for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::evlam0)
@@ -36,16 +34,15 @@ LISPT evaluator::printwhere()
           && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
-          fprintf(primerr, " [in ");
+          _lisp.primerr().printf(" [in ");
           file(_lisp).prin2(foo->car(), C_T);
-          pputc(']', primerr);
+          _lisp.primerr().putch(']');
           goto out;
         }
       }
   }
 out:
-  pputc('\n', primerr);
-#endif
+  _lisp.primerr().putch('\n');
   return foo;
 }
 
@@ -107,7 +104,6 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
   if(mess != 0)
   {
 #if 0
-    // TODO:
     perror(mess, fault);
 #endif
     printwhere();
@@ -358,12 +354,7 @@ void evaluator::do_unbound(continuation_t continuation)
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
-#if 0
-  // TODO:
-  LISPT al = getprop(expression->car(), C_AUTOLOAD);
-#else
-  LISPT al = C_NIL;
-#endif
+  LISPT al = getprop(_lisp, expression->car(), C_AUTOLOAD);
   if(!is_NIL(al))
   {
     push_lisp(expression);
@@ -385,6 +376,7 @@ void evaluator::do_unbound(continuation_t continuation)
 #if 0
     // TODO:
     expression = findalias(expression);
+#endif
     if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
       && type_of(expression->car()->symvalue()) == UNBOUND)
     {
@@ -393,14 +385,10 @@ void evaluator::do_unbound(continuation_t continuation)
     }
     else
     {
-#endif
       fun = expression->car();
       args = expression->cdr();
       cont = continuation;
-#if 0
-      // TODO:
     }
-#endif
   }
 }
 
@@ -409,6 +397,7 @@ bool evaluator::do_default(continuation_t continuation)
 #if 0
   // TODO:
   expression = findalias(expression);
+#endif
   if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
     && type_of(expression->car()->symvalue()) == UNBOUND)
   {
@@ -416,7 +405,6 @@ bool evaluator::do_default(continuation_t continuation)
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
     return true;
   }
-#endif
   return false;
 }
 

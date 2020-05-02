@@ -46,10 +46,9 @@ PRIMITIVE unix::uxchmod(LISPT name, LISPT mode)
 PRIMITIVE unix::uxclose(LISPT fildes)
 {
   check(fildes, FILET);
-  if(fclose(fildes->fileval()) == -1)
-    return C_NIL;
-  else
+  if(fildes->fileval()->close())
     return C_T;
+  return C_NIL;
 }
 
 PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
@@ -103,24 +102,28 @@ PRIMITIVE unix::uxnice(LISPT incr)
 
 PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
 {
-  const char* openmode = nullptr;
+  bool readmode = true;
+  bool appendmode = false;
 
   check(name, STRING);
-  if(is_NIL(mode))
-    openmode = "r";
-  else
+  if(!is_NIL(mode))
   {
     check(mode, SYMBOL);
     if(EQ(mode, C_READ))
-      openmode = "r";
+      readmode = true;
     else if(EQ(mode, C_WRITE))
-      openmode = "w";
+      readmode = false;
     else if(EQ(mode, C_APPEND))
-      openmode = "a";
+    {
+      readmode = false;
+      appendmode = true;
+    }
     else
       return error(UNKNOWN_REQUEST, mode);
   }
-  auto* f = fopen(name->stringval(), openmode);
+  auto* f = readmode
+    ? new file_t(new io::filesource(name->stringval()))
+    : new file_t(new io::filesink(name->stringval(), appendmode));
   if(!f)
     return error(CANT_OPEN, name);
   LISPT newfile = nullptr;

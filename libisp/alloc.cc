@@ -8,11 +8,7 @@
 #include "alloc.hh"
 #include "error.hh"
 #include "eval.hh"
-
-// TODO:
-extern FILE* primerr;
-extern FILE* primout;
-extern FILE* primin;
+#include "io.hh"
 
 #if 0
 // TODO:
@@ -173,7 +169,7 @@ void alloc::mark(LISPT x)
 LISPT alloc::doreclaim(int doconsargs, int incr)
 {
   if(is_NIL(gcgag))
-    fprintf(primerr, "garbage collecting\n");
+    _lisp.primerr().printf("garbage collecting\n");
 #ifdef FLOATING
   for(int i = 0; i < 4; i++) floats.marks[i] = 0;
   point = 31;
@@ -238,7 +234,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
     while(incr-- > 0); /* At least one page more */
   }
   if(is_NIL(gcgag))
-    fprintf(primerr, "%d cells freed\n", nrfreed);
+    _lisp.primerr().printf("%d cells freed\n", nrfreed);
   return C_NIL;
 }
 
@@ -583,7 +579,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   conscells = newpage(); /* Allocate one page of storage */
   if(conscells == nullptr)
   {
-    fprintf(stderr, "Sorry, no memory for cons cells\n");
+    _lisp.primerr().printf("Sorry, no memory for cons cells\n");
 #if 0
     // TODO:
     finish(1);

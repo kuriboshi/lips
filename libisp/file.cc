@@ -6,12 +6,9 @@
 
 #include "libisp.hh"
 
-extern int getch(FILE*);
-extern void putch(int, FILE*, int);
-
-FILE* primin;
-FILE* primout;
-FILE* primerr;
+std::FILE* primin;
+std::FILE* primout;
+std::FILE* primerr;
 
 namespace lisp
 {

@@ -90,3 +90,13 @@ TEST_CASE("Evaluator")
     CHECK(r1->intval() == 124);
   }
 }
+
+TEST_CASE("Basic I/O")
+{
+  lisp::lisp lisp;
+
+  auto out0 = std::make_unique<lisp::io::stringsink>();
+  lisp.primout(*new lisp::file_t(out0.get()));
+  lisp.primout().printf("hello world %d", 123);
+  CHECK(out0->string() == std::string("hello world 123"));
+}

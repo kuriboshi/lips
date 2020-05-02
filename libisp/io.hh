@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include <string>
 #include "lisp.hh"
 
@@ -27,11 +28,13 @@ public:
     virtual int getch() = 0;
     virtual void ungetch(int) = 0;
     virtual bool eoln() = 0;
+    virtual bool close() = 0;
   };
 
   class filesource: public source
   {
   public:
+    filesource(std::FILE* file) { _file = file; }
     filesource(const char* filename) { _file = fopen(filename, "r"); }
 
     virtual int getch() override
@@ -44,6 +47,12 @@ public:
     }
     virtual void ungetch(int c) override { ungetc(c, _file); }
     virtual bool eoln() override { return false; }
+    virtual bool close() override
+    {
+      if(std::fclose(_file) == -1)
+        return false;
+      return true;
+    }
 
   private:
     FILE* _file;
@@ -66,6 +75,7 @@ public:
     }
     virtual void ungetch(int c) override { --_pos; }
     virtual bool eoln() override { return false; }
+    virtual bool close() override { return true; }
 
   private:
     const char* _string;
@@ -79,21 +89,30 @@ public:
     sink() {}
     virtual ~sink() = default;
 
-    virtual void putch(int, int) = 0;
+    virtual void putch(int, bool esc = false) = 0;
+    virtual void puts(const char*) = 0;
+    virtual bool close() = 0;
   };
 
   class filesink: public sink
   {
   public:
-    filesink(FILE* file): _file(file) {}
-    filesink(const char* filename) { _file = fopen(filename, "w"); }
+    filesink(std::FILE* file): _file(file) {}
+    filesink(const char* filename, bool append = false) { _file = fopen(filename, append ? "a" : "w"); }
 
-    virtual void putch(int c, int esc) override { putch(c, _file, esc); }
+    virtual void putch(int c, bool esc) override { putch(c, _file, esc); }
+    virtual void puts(const char* s) override { std::fputs(s, _file); }
+    virtual bool close() override
+    {
+      if(std::fclose(_file) == -1)
+        return false;
+      return true;
+    }
 
   private:
     // Put a character on stdout prefixing it with a ^ if it's a control
     // character.
-    void pputc(int c, FILE* file)
+    void pputc(int c, std::FILE* file)
     {
       if(c < 0x20 && c != '\n' && c != '\t')
       {
@@ -107,14 +126,14 @@ public:
     /*
      * Put a character c, on stream file, escaping enabled if esc != 0.
      */
-    void putch(int c, FILE* file, int esc)
+    void putch(int c, std::FILE* file, bool esc)
     {
-      if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
+      if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
         pputc('\\', file);
       pputc(c, file);
     }
 
-    FILE* _file;
+    std::FILE* _file;
   };
 
   class stringsink: public sink
@@ -124,7 +143,9 @@ public:
 
     std::string string() const { return _string; }
 
-    virtual void putch(int c, int) override { _string.push_back(static_cast<char>(c)); }
+    virtual void putch(int c, bool) override { _string.push_back(static_cast<char>(c)); }
+    virtual void puts(const char* s) override { _string.append(s); }
+    virtual bool close() override { return true; }
 
   private:
     std::string _string;
@@ -182,6 +203,40 @@ struct rtinfo
 {
   unsigned char chclass[128];
   LISPT (*rmacros[128])(io&, io::source*, LISPT, char);
+};
+
+struct file_t
+{
+  file_t(io::source* source) : source(source) {}
+  file_t(io::sink* sink) : sink(sink) {}
+  ~file_t()
+  {
+    delete source;
+    delete sink;
+  }
+
+  io::source* source = nullptr;
+  io::sink* sink = nullptr;
+
+  void printf(const char* format, ...)
+  {
+    va_list ap;
+    va_start(ap, format);
+    char* ret;
+    vasprintf(&ret, format, ap);
+    va_end(ap);
+    sink->puts(ret);
+  }
+  void putch(char c) { sink->putch(c); }
+
+  bool close()
+  {
+    if(source)
+      return source->close();
+    else if(sink)
+      return sink->close();
+    return false;
+  }
 };
 
 /* variables */
