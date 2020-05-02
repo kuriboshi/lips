@@ -136,7 +136,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   prim::init();
   prop::init();
   string::init();
-  unix::init();
+  posix::init();
   user::init();
 
   e().undefhook = nullptr;

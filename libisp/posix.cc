@@ -15,35 +15,35 @@
 
 namespace lisp
 {
-PRIMITIVE unix::uxerrno() { return mknumber(_lisp, errno); }
+PRIMITIVE posix::uxerrno() { return mknumber(_lisp, errno); }
 
-PRIMITIVE unix::uxaccess(LISPT name, LISPT mode)
+PRIMITIVE posix::uxaccess(LISPT name, LISPT mode)
 {
   _lisp.check(name, STRING);
   _lisp.check(mode, INTEGER);
   return mknumber(_lisp, access(name->stringval(), mode->intval()));
 }
 
-PRIMITIVE unix::uxalarm(LISPT seconds)
+PRIMITIVE posix::uxalarm(LISPT seconds)
 {
   _lisp.check(seconds, INTEGER);
   return mknumber(_lisp, alarm(seconds->intval()));
 }
 
-PRIMITIVE unix::uxchdir(LISPT dirname)
+PRIMITIVE posix::uxchdir(LISPT dirname)
 {
   _lisp.check(dirname, STRING);
   return mknumber(_lisp, chdir(dirname->stringval()));
 }
 
-PRIMITIVE unix::uxchmod(LISPT name, LISPT mode)
+PRIMITIVE posix::uxchmod(LISPT name, LISPT mode)
 {
   _lisp.check(name, STRING);
   _lisp.check(mode, INTEGER);
   return mknumber(_lisp, chmod(name->stringval(), mode->intval()));
 }
 
-PRIMITIVE unix::uxclose(LISPT fildes)
+PRIMITIVE posix::uxclose(LISPT fildes)
 {
   _lisp.check(fildes, FILET);
   if(fildes->fileval()->close())
@@ -51,7 +51,7 @@ PRIMITIVE unix::uxclose(LISPT fildes)
   return C_NIL;
 }
 
-PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
+PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
@@ -64,43 +64,43 @@ PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
     return mknumber(_lisp, i);
 }
 
-PRIMITIVE unix::uxdup(LISPT fildes)
+PRIMITIVE posix::uxdup(LISPT fildes)
 {
   _lisp.check(fildes, INTEGER);
   return mknumber(_lisp, dup(fildes->intval()));
 }
 
-PRIMITIVE unix::uxgetuid() { return mknumber(_lisp, getuid()); }
+PRIMITIVE posix::uxgetuid() { return mknumber(_lisp, getuid()); }
 
-PRIMITIVE unix::uxgeteuid() { return mknumber(_lisp, geteuid()); }
+PRIMITIVE posix::uxgeteuid() { return mknumber(_lisp, geteuid()); }
 
-PRIMITIVE unix::uxgetgid() { return mknumber(_lisp, getgid()); }
+PRIMITIVE posix::uxgetgid() { return mknumber(_lisp, getgid()); }
 
-PRIMITIVE unix::uxgetegid() { return mknumber(_lisp, getegid()); }
+PRIMITIVE posix::uxgetegid() { return mknumber(_lisp, getegid()); }
 
-PRIMITIVE unix::uxgetpid() { return mknumber(_lisp, getpid()); }
+PRIMITIVE posix::uxgetpid() { return mknumber(_lisp, getpid()); }
 
-PRIMITIVE unix::uxkill(LISPT pid, LISPT sig)
+PRIMITIVE posix::uxkill(LISPT pid, LISPT sig)
 {
   _lisp.check(pid, INTEGER);
   _lisp.check(sig, INTEGER);
   return mknumber(_lisp, kill(pid->intval(), sig->intval()));
 }
 
-PRIMITIVE unix::uxlink(LISPT name1, LISPT name2)
+PRIMITIVE posix::uxlink(LISPT name1, LISPT name2)
 {
   _lisp.check(name1, STRING);
   _lisp.check(name2, STRING);
   return mknumber(_lisp, link(name1->stringval(), name2->stringval()));
 }
 
-PRIMITIVE unix::uxnice(LISPT incr)
+PRIMITIVE posix::uxnice(LISPT incr)
 {
   _lisp.check(incr, INTEGER);
   return mknumber(_lisp, nice(incr->intval()));
 }
 
-PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
+PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
 {
   bool readmode = true;
   bool appendmode = false;
@@ -132,23 +132,23 @@ PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
   return newfile;
 }
 
-PRIMITIVE unix::uxsetuid(LISPT uid)
+PRIMITIVE posix::uxsetuid(LISPT uid)
 {
   _lisp.check(uid, INTEGER);
   return mknumber(_lisp, setuid(uid->intval()));
 }
 
-PRIMITIVE unix::uxsetgid(LISPT gid)
+PRIMITIVE posix::uxsetgid(LISPT gid)
 {
   _lisp.check(gid, INTEGER);
   return mknumber(_lisp, setgid(gid->intval()));
 }
 
 #if 0
-LISPT unix::sighandler[];
-void unix::sighandle(int sig) { eval(_lisp, sighandler[sig]); }
+LISPT posix::sighandler[];
+void posix::sighandle(int sig) { eval(_lisp, sighandler[sig]); }
 
-PRIMITIVE unix::uxsignal(LISPT sig, LISPT fun)
+PRIMITIVE posix::uxsignal(LISPT sig, LISPT fun)
 {
   check(sig, INTEGER);
 
@@ -173,15 +173,15 @@ PRIMITIVE unix::uxsignal(LISPT sig, LISPT fun)
 }
 #endif
 
-PRIMITIVE unix::uxunlink(LISPT name)
+PRIMITIVE posix::uxunlink(LISPT name)
 {
   _lisp.check(name, STRING);
   return mknumber(_lisp, unlink(name->stringval()));
 }
 
-unix::unix(lisp& lisp) : base(lisp) {}
+posix::posix(lisp& lisp) : base(lisp) {}
 
-void unix::init()
+void posix::init()
 {
   alloc::mkprim(PN_UXACCESS, ::lisp::uxaccess, 2, SUBR);
   alloc::mkprim(PN_UXALARM, ::lisp::uxalarm, 1, SUBR);

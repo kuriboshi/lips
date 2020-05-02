@@ -14,11 +14,11 @@ target_sources(libisp PRIVATE
   map.cc
   debug.cc
   os.cc
+  posix.cc
   pred.cc
   prim.cc
   prop.cc
   string.cc
-  unix.cc
   user.cc
   version.cc
 )
@@ -41,12 +41,12 @@ target_sources(libisp PRIVATE
   map.hh
   debug.hh
   os.hh
+  posix.hh
   pred.hh
   prim.hh
   prop.hh
   string.hh
   user.hh
-  unix.hh
   version.hh
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -10,11 +10,11 @@
 
 namespace lisp
 {
-class unix : public base
+class posix : public base
 {
 public:
-  unix(lisp&);
-  ~unix() = default;
+  posix(lisp&);
+  ~posix() = default;
   static void init();
 
   LISPT uxerrno();
@@ -48,28 +48,28 @@ private:
 #endif
 };
 
-inline LISPT uxerrno(lisp& l) { return unix(l).uxerrno(); }
-inline LISPT uxaccess(lisp& l, LISPT name, LISPT mode) { return unix(l).uxaccess(name, mode); }
-inline LISPT uxalarm(lisp& l, LISPT seconds) { return unix(l).uxalarm(seconds); }
-inline LISPT uxchdir(lisp& l, LISPT dirname) { return unix(l).uxchdir(dirname); }
-inline LISPT uxchmod(lisp& l, LISPT name, LISPT mode) { return unix(l).uxchmod(name, mode); }
-inline LISPT uxclose(lisp& l, LISPT fildes) { return unix(l).uxclose(fildes); }
-inline LISPT uxcreat(lisp& l, LISPT name, LISPT mode) { return unix(l).uxcreat(name, mode); }
-inline LISPT uxdup(lisp& l, LISPT fildes) { return unix(l).uxdup(fildes); }
-inline LISPT uxgetuid(lisp& l) { return unix(l).uxgetuid(); }
-inline LISPT uxgeteuid(lisp& l) { return unix(l).uxgeteuid(); }
-inline LISPT uxgetgid(lisp& l) { return unix(l).uxgetgid(); }
-inline LISPT uxgetegid(lisp& l) { return unix(l).uxgetegid(); }
-inline LISPT uxgetpid(lisp& l) { return unix(l).uxgetpid(); }
-inline LISPT uxkill(lisp& l, LISPT pid, LISPT sig) { return unix(l).uxkill(pid, sig); }
-inline LISPT uxlink(lisp& l, LISPT name1, LISPT name2) { return unix(l).uxlink(name1, name2); }
-inline LISPT uxnice(lisp& l, LISPT incr) { return unix(l).uxnice(incr); }
-inline LISPT uxopen(lisp& l, LISPT name, LISPT mode) { return unix(l).uxopen(name, mode); }
-inline LISPT uxsetuid(lisp& l, LISPT uid) { return unix(l).uxsetuid(uid); }
-inline LISPT uxsetgid(lisp& l, LISPT gid) { return unix(l).uxsetgid(gid); }
+inline LISPT uxerrno(lisp& l) { return posix(l).uxerrno(); }
+inline LISPT uxaccess(lisp& l, LISPT name, LISPT mode) { return posix(l).uxaccess(name, mode); }
+inline LISPT uxalarm(lisp& l, LISPT seconds) { return posix(l).uxalarm(seconds); }
+inline LISPT uxchdir(lisp& l, LISPT dirname) { return posix(l).uxchdir(dirname); }
+inline LISPT uxchmod(lisp& l, LISPT name, LISPT mode) { return posix(l).uxchmod(name, mode); }
+inline LISPT uxclose(lisp& l, LISPT fildes) { return posix(l).uxclose(fildes); }
+inline LISPT uxcreat(lisp& l, LISPT name, LISPT mode) { return posix(l).uxcreat(name, mode); }
+inline LISPT uxdup(lisp& l, LISPT fildes) { return posix(l).uxdup(fildes); }
+inline LISPT uxgetuid(lisp& l) { return posix(l).uxgetuid(); }
+inline LISPT uxgeteuid(lisp& l) { return posix(l).uxgeteuid(); }
+inline LISPT uxgetgid(lisp& l) { return posix(l).uxgetgid(); }
+inline LISPT uxgetegid(lisp& l) { return posix(l).uxgetegid(); }
+inline LISPT uxgetpid(lisp& l) { return posix(l).uxgetpid(); }
+inline LISPT uxkill(lisp& l, LISPT pid, LISPT sig) { return posix(l).uxkill(pid, sig); }
+inline LISPT uxlink(lisp& l, LISPT name1, LISPT name2) { return posix(l).uxlink(name1, name2); }
+inline LISPT uxnice(lisp& l, LISPT incr) { return posix(l).uxnice(incr); }
+inline LISPT uxopen(lisp& l, LISPT name, LISPT mode) { return posix(l).uxopen(name, mode); }
+inline LISPT uxsetuid(lisp& l, LISPT uid) { return posix(l).uxsetuid(uid); }
+inline LISPT uxsetgid(lisp& l, LISPT gid) { return posix(l).uxsetgid(gid); }
 #if 0
-inline LISPT uxsignal(lisp& l, LISPT sig, LISPT fun) { return unix(l).uxsignal(sig, fun); }
+inline LISPT uxsignal(lisp& l, LISPT sig, LISPT fun) { return posix(l).uxsignal(sig, fun); }
 #endif
-inline LISPT uxunlink(lisp& l, LISPT name) { return unix(l).uxunlink(name); }
+inline LISPT uxunlink(lisp& l, LISPT name) { return posix(l).uxunlink(name); }
 
 } // namespace lisp
