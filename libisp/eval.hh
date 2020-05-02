@@ -52,6 +52,8 @@ public:
   void bt();
   void unwind();
   void init();
+  int trace() const { return _trace; }
+  void trace(int t) { _trace = t; }
 
   alloc::destblock_t* dest = nullptr; // Current destination being built.
 
@@ -126,6 +128,7 @@ private:
   bool noeval = false;               // Don't evaluate arguments.
   continuation_t cont = nullptr;     // Current continuation.
   alloc::destblock_t* env = nullptr; // Current environment.
+  int _trace = 0;
 };
 
 #if 0

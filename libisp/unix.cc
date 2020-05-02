@@ -19,33 +19,33 @@ PRIMITIVE unix::uxerrno() { return mknumber(_lisp, errno); }
 
 PRIMITIVE unix::uxaccess(LISPT name, LISPT mode)
 {
-  check(name, STRING);
-  check(mode, INTEGER);
+  _lisp.check(name, STRING);
+  _lisp.check(mode, INTEGER);
   return mknumber(_lisp, access(name->stringval(), mode->intval()));
 }
 
 PRIMITIVE unix::uxalarm(LISPT seconds)
 {
-  check(seconds, INTEGER);
+  _lisp.check(seconds, INTEGER);
   return mknumber(_lisp, alarm(seconds->intval()));
 }
 
 PRIMITIVE unix::uxchdir(LISPT dirname)
 {
-  check(dirname, STRING);
+  _lisp.check(dirname, STRING);
   return mknumber(_lisp, chdir(dirname->stringval()));
 }
 
 PRIMITIVE unix::uxchmod(LISPT name, LISPT mode)
 {
-  check(name, STRING);
-  check(mode, INTEGER);
+  _lisp.check(name, STRING);
+  _lisp.check(mode, INTEGER);
   return mknumber(_lisp, chmod(name->stringval(), mode->intval()));
 }
 
 PRIMITIVE unix::uxclose(LISPT fildes)
 {
-  check(fildes, FILET);
+  _lisp.check(fildes, FILET);
   if(fildes->fileval()->close())
     return C_T;
   return C_NIL;
@@ -55,8 +55,8 @@ PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
-  check(name, STRING);
-  check(mode, INTEGER);
+  _lisp.check(name, STRING);
+  _lisp.check(mode, INTEGER);
   i = creat(name->stringval(), mode->intval());
   if(i < 0)
     return C_NIL;
@@ -66,7 +66,7 @@ PRIMITIVE unix::uxcreat(LISPT name, LISPT mode)
 
 PRIMITIVE unix::uxdup(LISPT fildes)
 {
-  check(fildes, INTEGER);
+  _lisp.check(fildes, INTEGER);
   return mknumber(_lisp, dup(fildes->intval()));
 }
 
@@ -82,21 +82,21 @@ PRIMITIVE unix::uxgetpid() { return mknumber(_lisp, getpid()); }
 
 PRIMITIVE unix::uxkill(LISPT pid, LISPT sig)
 {
-  check(pid, INTEGER);
-  check(sig, INTEGER);
+  _lisp.check(pid, INTEGER);
+  _lisp.check(sig, INTEGER);
   return mknumber(_lisp, kill(pid->intval(), sig->intval()));
 }
 
 PRIMITIVE unix::uxlink(LISPT name1, LISPT name2)
 {
-  check(name1, STRING);
-  check(name2, STRING);
+  _lisp.check(name1, STRING);
+  _lisp.check(name2, STRING);
   return mknumber(_lisp, link(name1->stringval(), name2->stringval()));
 }
 
 PRIMITIVE unix::uxnice(LISPT incr)
 {
-  check(incr, INTEGER);
+  _lisp.check(incr, INTEGER);
   return mknumber(_lisp, nice(incr->intval()));
 }
 
@@ -105,10 +105,10 @@ PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
   bool readmode = true;
   bool appendmode = false;
 
-  check(name, STRING);
+  _lisp.check(name, STRING);
   if(!is_NIL(mode))
   {
-    check(mode, SYMBOL);
+    _lisp.check(mode, SYMBOL);
     if(EQ(mode, C_READ))
       readmode = true;
     else if(EQ(mode, C_WRITE))
@@ -119,13 +119,13 @@ PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
       appendmode = true;
     }
     else
-      return error(UNKNOWN_REQUEST, mode);
+      return _lisp.error(UNKNOWN_REQUEST, mode);
   }
   auto* f = readmode
     ? new file_t(new io::filesource(name->stringval()))
     : new file_t(new io::filesink(name->stringval(), appendmode));
   if(!f)
-    return error(CANT_OPEN, name);
+    return _lisp.error(CANT_OPEN, name);
   LISPT newfile = nullptr;
   set(newfile, FILET, getobject(_lisp));
   newfile->fileval(f);
@@ -134,13 +134,13 @@ PRIMITIVE unix::uxopen(LISPT name, LISPT mode)
 
 PRIMITIVE unix::uxsetuid(LISPT uid)
 {
-  check(uid, INTEGER);
+  _lisp.check(uid, INTEGER);
   return mknumber(_lisp, setuid(uid->intval()));
 }
 
 PRIMITIVE unix::uxsetgid(LISPT gid)
 {
-  check(gid, INTEGER);
+  _lisp.check(gid, INTEGER);
   return mknumber(_lisp, setgid(gid->intval()));
 }
 
@@ -175,7 +175,7 @@ PRIMITIVE unix::uxsignal(LISPT sig, LISPT fun)
 
 PRIMITIVE unix::uxunlink(LISPT name)
 {
-  check(name, STRING);
+  _lisp.check(name, STRING);
   return mknumber(_lisp, unlink(name->stringval()));
 }
 

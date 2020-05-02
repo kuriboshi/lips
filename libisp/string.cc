@@ -13,7 +13,7 @@ namespace lisp
 /* Return symbols print name as a string. */
 PRIMITIVE string::symstr(LISPT sym)
 {
-  check(sym, SYMBOL);
+  _lisp.check(sym, SYMBOL);
   return mkstring(_lisp, sym->symval().pname);
 }
 
@@ -28,8 +28,8 @@ PRIMITIVE string::stringp(LISPT s)
 /* T if both strings are equal */
 PRIMITIVE string::streq(LISPT s1, LISPT s2)
 {
-  check(s1, STRING);
-  check(s2, STRING);
+  _lisp.check(s1, STRING);
+  _lisp.check(s2, STRING);
   if(!strcmp(s1->stringval(), s2->stringval()))
     return C_T;
   return C_NIL;
@@ -37,8 +37,8 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
 
 PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
 {
-  check(s1, STRING);
-  check(s2, STRING);
+  _lisp.check(s1, STRING);
+  _lisp.check(s2, STRING);
   return mknumber(_lisp, strcmp(s1->stringval(), s2->stringval()));
 }
 
@@ -49,12 +49,12 @@ PRIMITIVE string::concat(LISPT strlist)
   int size = 0;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
-    check(sl->car(), STRING);
+    _lisp.check(sl->car(), STRING);
     size += std::strlen(sl->car()->stringval());
   }
   auto* ns = a().realmalloc((unsigned)size + 1);
   if(ns == nullptr)
-    return error(OUT_OF_MEMORY, C_NIL);
+    return _lisp.error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
   while(!is_NIL(strlist))
   {
@@ -67,7 +67,7 @@ PRIMITIVE string::concat(LISPT strlist)
 /* Return string length of s */
 PRIMITIVE string::strlen(LISPT s)
 {
-  check(s, STRING);
+  _lisp.check(s, STRING);
   return mknumber(_lisp, std::strlen(s->stringval()));
 }
 
@@ -78,9 +78,9 @@ PRIMITIVE string::strlen(LISPT s)
    to zero if start is equal to one is accepted. */
 PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
 {
-  check(str, STRING);
-  check(start, INTEGER);
-  check(end, INTEGER);
+  _lisp.check(str, STRING);
+  _lisp.check(start, INTEGER);
+  _lisp.check(end, INTEGER);
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
@@ -89,7 +89,7 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
     return C_NIL;
   auto* ns = a().realmalloc((unsigned)size + 1);
   if(ns == nullptr)
-    return error(OUT_OF_MEMORY, C_NIL);
+    return _lisp.error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
   for(size = 0; s <= e; s++, size++)
   {

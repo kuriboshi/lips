@@ -53,16 +53,16 @@ TEST_CASE("Create lisp object")
     set(lisp, j, a);
     CHECK(i != j);
     auto out0 = std::make_unique<lisp::io::stringsink>();
-    prin0(lisp, i, out0.get(), 0);
+    prin0(lisp, i, out0.get());
     CHECK(out0->string() == std::string(i->stringval()));
     auto out1 = std::make_unique<lisp::io::stringsink>();
-    prin0(lisp, j, out1.get(), 0);
+    prin0(lisp, j, out1.get());
     CHECK(out1->string() == std::string(j->stringval()));
     std::string s_hello{"(hello)"};
     auto in = std::make_unique<lisp::io::stringsource>(s_hello.c_str());
     auto hello = lispread(lisp, in.get(), false);
     auto out2 = std::make_unique<lisp::io::stringsink>();
-    prin0(lisp, hello, out2.get(), 0);
+    prin0(lisp, hello, out2.get());
     CHECK(out2->string() == s_hello);
   }
 }
@@ -84,7 +84,7 @@ TEST_CASE("Evaluator")
   {
     auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
     auto out0 = std::make_unique<lisp::io::stringsink>();
-    prin0(lisp, e1, out0.get(), 0);
+    prin0(lisp, e1, out0.get());
     CHECK(out0->string() == std::string("(+ 123 1)"));
     auto r1 = eval(lisp, e1);
     CHECK(r1->intval() == 124);

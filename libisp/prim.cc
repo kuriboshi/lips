@@ -41,8 +41,8 @@ LISPT prim::closobj(LISPT vars)
 {
   if(is_NIL(vars))
     return C_NIL;
-  check(vars, CONS);
-  check(vars->car(), SYMBOL);
+  _lisp.check(vars, CONS);
+  _lisp.check(vars->car(), SYMBOL);
   return cons(_lisp, mkindirect(_lisp, vars->car()->symval().value), closobj(vars->cdr()));
 }
 
@@ -146,14 +146,14 @@ PRIMITIVE prim::caaar(LISPT a)
 
 PRIMITIVE prim::rplaca(LISPT x, LISPT y)
 {
-  check(x, CONS);
+  _lisp.check(x, CONS);
   x->car(y);
   return x;
 }
 
 PRIMITIVE prim::rplacd(LISPT x, LISPT y)
 {
-  check(x, CONS);
+  _lisp.check(x, CONS);
   x->cdr(y);
   return x;
 }
@@ -182,7 +182,7 @@ PRIMITIVE prim::nconc(LISPT l)
   {
     if(!is_NIL(l->car()))
     {
-      check(l->car(), CONS);
+      _lisp.check(l->car(), CONS);
       if(is_NIL(curp))
       {
         curp = l->car();
@@ -205,7 +205,7 @@ PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
     cell = cons(_lisp, cons(_lisp, obj, C_NIL), C_NIL);
     return rplacd(cell, cell->car());
   }
-  check(cell, CONS);
+  _lisp.check(cell, CONS);
   if(type_of(cell->car()) != CONS)
   {
     rplacd(cell, cons(_lisp, obj, C_NIL));
@@ -219,7 +219,7 @@ PRIMITIVE prim::attach(LISPT obj, LISPT list)
 {
   if(is_NIL(list))
     return cons(_lisp, obj, C_NIL);
-  check(list, CONS);
+  _lisp.check(list, CONS);
   rplacd(list, cons(_lisp, list->car(), list->cdr()));
   return rplaca(list, obj);
 }
@@ -235,7 +235,7 @@ PRIMITIVE prim::append(LISPT l)
   {
     if(!is_NIL(l->car()))
     {
-      check(l->car(), CONS);
+      _lisp.check(l->car(), CONS);
       for(cl = l->car(); !is_NIL(cl); cl = cl->cdr())
       {
         rplacd(curp, cons(_lisp, cl->car(), C_NIL));
@@ -309,20 +309,20 @@ static LISPT nth(LISPT list, int n)
 
 PRIMITIVE prim::xnth(LISPT l, LISPT p)
 {
-  check(p, INTEGER);
+  _lisp.check(p, INTEGER);
   if(is_NIL(l))
     return C_NIL;
-  check(l, CONS);
+  _lisp.check(l, CONS);
   return nth(l, p->intval());
 }
 
 PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 {
-  check(pos, INTEGER);
+  _lisp.check(pos, INTEGER);
   int p = pos->intval();
   if(is_NIL(list))
     return C_NIL;
-  check(list, CONS);
+  _lisp.check(list, CONS);
   LISPT l;
   for(l = list; type_of(l) == CONS && p > 1; l = l->cdr()) p--;
   return l;
@@ -330,8 +330,8 @@ PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 
 PRIMITIVE prim::xerror(LISPT mess)
 {
-  check(mess, STRING);
-  return error(USER_ERROR, mess);
+  _lisp.check(mess, STRING);
+  return _lisp.error(USER_ERROR, mess);
 }
 
 PRIMITIVE prim::uxexit(LISPT status)

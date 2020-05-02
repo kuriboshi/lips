@@ -44,7 +44,7 @@ char* alloc::realmalloc(unsigned int size)
   char* cp = (char*)malloc(size);
   if(cp == nullptr)
   {
-    error(OUT_OF_MEMORY, C_NIL);
+    // error(OUT_OF_MEMORY, C_NIL);
     return nullptr;
   }
   return cp;
@@ -250,7 +250,7 @@ PRIMITIVE alloc::reclaim(lisp&, LISPT incr) /* Number of blocks to increase with
     i = 0;
   else
   {
-    check(incr, INTEGER);
+    _lisp.check(incr, INTEGER);
     i = incr->intval();
   }
   doreclaim(NOCONSARGS, i);
@@ -568,18 +568,23 @@ void alloc::dzero() { destblockused = 0; }
 
 alloc::alloc(lisp& lisp): _lisp(lisp)
 {
-#if 0
-  // TODO: Fix me
-  for(auto i: {&top, &rstack, &verboseflg, &topprompt, &promptform, &brkprompt, &currentbase, &interactive, &version,
-        &gcgag, &C_EOF})
-    add_mark_object(i);
-#endif
+  // add_mark_object(&top);
+  // add_mark_object(&rstack);
+  // add_mark_object(&verboseflg);
+  add_mark_object(&topprompt);
+  add_mark_object(&promptform);
+  add_mark_object(&brkprompt);
+  add_mark_object(&currentbase);
+  add_mark_object(&interactive);
+  add_mark_object(&version);
+  add_mark_object(&gcgag);
+  add_mark_object(&C_EOF);
   destblockused = 0;
   conscells = nullptr;
   conscells = newpage(); /* Allocate one page of storage */
   if(conscells == nullptr)
   {
-    _lisp.primerr().printf("Sorry, no memory for cons cells\n");
+    _lisp.primerr().printf("Cons cells memory exhausted\n");
 #if 0
     // TODO:
     finish(1);

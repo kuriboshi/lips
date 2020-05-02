@@ -116,11 +116,11 @@ PRIMITIVE file::prin1(LISPT x, LISPT file)
 #if 0
   thisplevel = 0;
   if(is_NIL(file))
-    return prin0(x, primout, 0);
+    return prin0(x, primout, false);
   if(is_T(file))
-    return prin0(x, primerr, 0);
+    return prin0(x, primerr, false);
   check(file, FILET);
-  return prin0(x, file->fileval(), 0);
+  return prin0(x, file->fileval(), false);
 #else
   return C_NIL;
 #endif
@@ -131,11 +131,11 @@ PRIMITIVE file::prin2(LISPT x, LISPT file)
 #if 0
   thisplevel = 0;
   if(is_NIL(file))
-    return prin0(x, primout, 1);
+    return prin0(x, primout, true);
   if(is_T(file))
-    return prin0(x, primerr, 1);
+    return prin0(x, primerr, true);
   check(file, FILET);
-  return prin0(x, file->fileval(), 0);
+  return prin0(x, file->fileval(), false);
 #else
   return C_NIL;
 #endif
@@ -181,22 +181,18 @@ PRIMITIVE file::spaces(LISPT n, LISPT file)
 
 PRIMITIVE file::xreadline(LISPT file)
 {
-#if 0
-  FILE* f;
+  file_t* f = nullptr;
 
   if(is_NIL(file))
-    f = primin;
+    f = &_lisp.primin();
   else if(is_T(file))
-    f = stdin;
+    f = &_lisp.primin(); // Should be stdin
   else
   {
-    check(file, FILET);
+    _lisp.check(file, FILET);
     f = file->fileval();
   }
-  return readline(f);
-#else
-  return C_NIL;
-#endif
+  return readline(_lisp, f->source);
 }
 
 PRIMITIVE file::cpprint(LISPT oname, LISPT file)

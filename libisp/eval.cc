@@ -5,6 +5,7 @@
  */
 
 #include "libisp.hh"
+#include "except.hh"
 
 // extern lisp::LISPT findalias(lisp::LISPT);
 // extern void pputc(int, FILE*);
@@ -52,7 +53,7 @@ out:
  */
 void evaluator::abort(int m, LISPT v)
 {
-  error(m, v);
+  _lisp.error(m, v);
   printwhere();
   unwind();
   throw lisp_error("abort");
@@ -103,9 +104,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 {
   if(mess != 0)
   {
-#if 0
-    perror(mess, fault);
-#endif
+    _lisp.perror(mess, fault);
     printwhere();
   }
   if(breakhook != nullptr)
@@ -281,9 +280,9 @@ bool evaluator::ev0()
 bool evaluator::peval()
 {
 #ifdef TRACE
-  if(trace)
+  if(_trace)
     file(_lisp).xprint(expression, C_T);
-#endif /* TRACE */
+#endif
   push_lisp(expression);
   push_func(&evaluator::ev0);
   switch(type_of(expression))

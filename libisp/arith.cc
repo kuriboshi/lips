@@ -31,7 +31,7 @@ PRIMITIVE arith::plus(LISPT l)
       else if(type_of(l->car()) == FLOAT)
         fsum += l->car()->floatval();
       else
-        return error(ILLEGAL_ARG, l->car());
+        return _lisp.error(ILLEGAL_ARG, l->car());
     }
     else if(type_of(l->car()) == INTEGER)
       sum += l->car()->intval();
@@ -41,7 +41,7 @@ PRIMITIVE arith::plus(LISPT l)
       fsum = l->car()->floatval() + (double)sum;
     }
     else
-      return error(ILLEGAL_ARG, l->car());
+      return _lisp.error(ILLEGAL_ARG, l->car());
     l = l->cdr();
   }
   if(f)
@@ -54,7 +54,7 @@ PRIMITIVE arith::iplus(LISPT l)
   int sum = 0;
   for(auto i = begin(l); i != end(l); ++i)
   {
-    check(*i, INTEGER);
+    _lisp.check(*i, INTEGER);
     sum += (**i).intval();
   }
   return mknumber(_lisp, sum);
@@ -62,12 +62,12 @@ PRIMITIVE arith::iplus(LISPT l)
 
 PRIMITIVE arith::fplus(LISPT l)
 {
-  check(l->car(), FLOAT);
+  _lisp.check(l->car(), FLOAT);
   auto sum = l->car()->floatval();
   l = l->cdr();
   while(type_of(l) == CONS)
   {
-    check(l->car(), FLOAT);
+    _lisp.check(l->car(), FLOAT);
     sum = sum + l->car()->floatval();
     l = l->cdr();
   }
@@ -76,8 +76,8 @@ PRIMITIVE arith::fplus(LISPT l)
 
 PRIMITIVE arith::difference(LISPT a, LISPT b)
 {
-  check2(a, INTEGER, FLOAT);
-  check2(b, INTEGER, FLOAT);
+  _lisp.check2(a, INTEGER, FLOAT);
+  _lisp.check2(b, INTEGER, FLOAT);
   if(type_of(a) == INTEGER)
     if(type_of(b) == INTEGER)
       return mknumber(_lisp, a->intval() - b->intval());
@@ -90,15 +90,15 @@ PRIMITIVE arith::difference(LISPT a, LISPT b)
 
 PRIMITIVE arith::idifference(LISPT a, LISPT b)
 {
-  check(a, INTEGER);
-  check(b, INTEGER);
+  _lisp.check(a, INTEGER);
+  _lisp.check(b, INTEGER);
   return mknumber(_lisp, a->intval() - b->intval());
 }
 
 PRIMITIVE arith::fdifference(LISPT a, LISPT b)
 {
-  check(a, FLOAT);
-  check(b, FLOAT);
+  _lisp.check(a, FLOAT);
+  _lisp.check(b, FLOAT);
   return mkfloat(_lisp, a->floatval() - b->floatval());
 }
 
@@ -117,7 +117,7 @@ PRIMITIVE arith::ltimes(LISPT l)
       else if(type_of(l->car()) == FLOAT)
         fprod *= l->car()->floatval();
       else
-        return error(ILLEGAL_ARG, l->car());
+        return _lisp.error(ILLEGAL_ARG, l->car());
     }
     else if(type_of(l->car()) == INTEGER)
       prod *= l->car()->intval();
@@ -127,7 +127,7 @@ PRIMITIVE arith::ltimes(LISPT l)
       fprod = l->car()->floatval() * (double)prod;
     }
     else
-      return error(ILLEGAL_ARG, l->car());
+      return _lisp.error(ILLEGAL_ARG, l->car());
     l = l->cdr();
   }
   if(f)
@@ -137,12 +137,12 @@ PRIMITIVE arith::ltimes(LISPT l)
 
 PRIMITIVE arith::itimes(LISPT l)
 {
-  check(l->car(), INTEGER);
+  _lisp.check(l->car(), INTEGER);
   auto prod = l->car()->intval();
   l = l->cdr();
   while(type_of(l) == CONS)
   {
-    check(l->car(), INTEGER);
+    _lisp.check(l->car(), INTEGER);
     prod = prod * l->car()->intval();
     l = l->cdr();
   }
@@ -151,12 +151,12 @@ PRIMITIVE arith::itimes(LISPT l)
 
 PRIMITIVE arith::ftimes(LISPT l)
 {
-  check(l->car(), FLOAT);
+  _lisp.check(l->car(), FLOAT);
   auto prod = l->car()->floatval();
   l = l->cdr();
   while(type_of(l) == CONS)
   {
-    check(l->car(), FLOAT);
+    _lisp.check(l->car(), FLOAT);
     prod = prod * l->car()->floatval();
     l = l->cdr();
   }
@@ -165,8 +165,8 @@ PRIMITIVE arith::ftimes(LISPT l)
 
 PRIMITIVE arith::divide(LISPT a, LISPT b)
 {
-  check2(a, INTEGER, FLOAT);
-  check2(b, INTEGER, FLOAT);
+  _lisp.check2(a, INTEGER, FLOAT);
+  _lisp.check2(b, INTEGER, FLOAT);
   if(type_of(a) == INTEGER)
     if(type_of(b) == INTEGER)
       return mknumber(_lisp, a->intval() / b->intval());
@@ -181,34 +181,34 @@ PRIMITIVE arith::divide(LISPT a, LISPT b)
 
 PRIMITIVE arith::iquotient(LISPT a, LISPT b)
 {
-  check(a, INTEGER);
-  check(b, INTEGER);
+  _lisp.check(a, INTEGER);
+  _lisp.check(b, INTEGER);
   if(b->intval() == 0)
-    return error(DIVIDE_ZERO, C_NIL);
+    return _lisp.error(DIVIDE_ZERO, C_NIL);
   return mknumber(_lisp, a->intval() / b->intval());
 }
 
 PRIMITIVE arith::iremainder(LISPT a, LISPT b)
 {
-  check(a, INTEGER);
-  check(b, INTEGER);
+  _lisp.check(a, INTEGER);
+  _lisp.check(b, INTEGER);
   if(b->intval() == 0)
-    return error(DIVIDE_ZERO, C_NIL);
+    return _lisp.error(DIVIDE_ZERO, C_NIL);
   return mknumber(_lisp, a->intval() % b->intval());
 }
 
 PRIMITIVE arith::fdivide(LISPT a, LISPT b)
 {
-  check(a, FLOAT);
-  check(b, FLOAT);
+  _lisp.check(a, FLOAT);
+  _lisp.check(b, FLOAT);
   if(b->floatval() == 0.0)
-    return error(DIVIDE_ZERO, C_NIL);
+    return _lisp.error(DIVIDE_ZERO, C_NIL);
   return mkfloat(_lisp, a->floatval() / b->floatval());
 }
 
 PRIMITIVE arith::minus(LISPT a)
 {
-  check2(a, FLOAT, INTEGER);
+  _lisp.check2(a, FLOAT, INTEGER);
   if(type_of(a) == INTEGER)
     return mknumber(_lisp, -a->intval());
   return mkfloat(_lisp, -a->floatval());
@@ -216,7 +216,7 @@ PRIMITIVE arith::minus(LISPT a)
 
 PRIMITIVE arith::iminus(LISPT a)
 {
-  check(a, INTEGER);
+  _lisp.check(a, INTEGER);
   return mknumber(_lisp, -a->intval());
 }
 
@@ -224,7 +224,7 @@ PRIMITIVE arith::absval(LISPT i)
 {
   int sign;
 
-  check(i, INTEGER);
+  _lisp.check(i, INTEGER);
   if(i->intval() < 0)
     sign = -1;
   else
@@ -234,19 +234,19 @@ PRIMITIVE arith::absval(LISPT i)
 
 PRIMITIVE arith::itof(LISPT i)
 {
-  check(i, INTEGER);
+  _lisp.check(i, INTEGER);
   return mkfloat(_lisp, (double)i->intval());
 }
 
 PRIMITIVE arith::add1(LISPT a)
 {
-  check(a, INTEGER);
+  _lisp.check(a, INTEGER);
   return mknumber(_lisp, a->intval() + 1);
 }
 
 PRIMITIVE arith::sub1(LISPT a)
 {
-  check(a, INTEGER);
+  _lisp.check(a, INTEGER);
   return mknumber(_lisp, a->intval() - 1);
 }
 
@@ -289,10 +289,10 @@ inline LISPT docheck(T x, T y, C cmp)
   return C_NIL;
 }
 
-inline void illegalreturn(LISPT a) { error(ILLEGAL_ARG, a); }
+inline void illegalreturn(lisp& l, LISPT a) { l.error(ILLEGAL_ARG, a); }
 
 template<template<typename> typename Comparer>
-inline LISPT numcheck(LISPT x, LISPT y)
+inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
 {
   switch(numtype(x, y))
   {
@@ -305,28 +305,28 @@ inline LISPT numcheck(LISPT x, LISPT y)
     case num_type::INTINT:
       return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
-      illegalreturn(x);
+      illegalreturn(l, x);
       break;
     case num_type::ILLEGAL2:
-      illegalreturn(y);
+      illegalreturn(l, y);
       break;
     default:
       break;
   }
-  return error(BUG, C_NIL);
+  return l.error(BUG, C_NIL);
 }
 
-PRIMITIVE arith::greaterp(LISPT x, LISPT y) { return numcheck<std::greater>(x, y); }
+PRIMITIVE arith::greaterp(LISPT x, LISPT y) { return numcheck<std::greater>(_lisp, x, y); }
 
-PRIMITIVE arith::lessp(LISPT x, LISPT y) { return numcheck<std::less>(x, y); }
+PRIMITIVE arith::lessp(LISPT x, LISPT y) { return numcheck<std::less>(_lisp, x, y); }
 
-PRIMITIVE arith::eqp(LISPT x, LISPT y) { return numcheck<std::equal_to>(x, y); }
+PRIMITIVE arith::eqp(LISPT x, LISPT y) { return numcheck<std::equal_to>(_lisp, x, y); }
 
-PRIMITIVE arith::geq(LISPT x, LISPT y) { return numcheck<std::greater_equal>(x, y); }
+PRIMITIVE arith::geq(LISPT x, LISPT y) { return numcheck<std::greater_equal>(_lisp, x, y); }
 
-PRIMITIVE arith::leq(LISPT x, LISPT y) { return numcheck<std::less_equal>(x, y); }
+PRIMITIVE arith::leq(LISPT x, LISPT y) { return numcheck<std::less_equal>(_lisp, x, y); }
 
-PRIMITIVE arith::neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(x, y); }
+PRIMITIVE arith::neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(_lisp, x, y); }
 
 PRIMITIVE arith::zerop(LISPT x)
 {
@@ -351,7 +351,7 @@ PRIMITIVE arith::minusp(LISPT x)
     else
       return C_NIL;
   }
-  return error(ILLEGAL_ARG, x);
+  return _lisp.error(ILLEGAL_ARG, x);
 }
 
 arith::arith(lisp& lisp) : base(lisp) {}

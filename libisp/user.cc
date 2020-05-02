@@ -73,8 +73,8 @@ LISPT user::checkfn(LISPT name, LISPT lam)
 
 PRIMITIVE user::define(LISPT name, LISPT lam)
 {
-  check(name, SYMBOL);
-  check2(lam, LAMBDA, NLAMBDA);
+  _lisp.check(name, SYMBOL);
+  _lisp.check2(lam, LAMBDA, NLAMBDA);
   checkfn(name, lam);
   name->setopval(lam);
   return name;
@@ -82,9 +82,9 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
 
 LISPT user::def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
-  check(name, SYMBOL);
+  _lisp.check(name, SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != SYMBOL)
-    check(pars, CONS);
+    _lisp.check(pars, CONS);
   LISPT foo = mklambda(_lisp, pars, body, type);
   if(type_of(foo) == ERROR)
     return C_NIL;

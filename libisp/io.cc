@@ -15,7 +15,7 @@ extern lisp::LISPT history;
     if(line || is_NIL(top->car())) \
       return C_EOF; \
     else \
-      return error(UNEXPECTED_EOF, C_NIL); \
+      return _lisp.error(UNEXPECTED_EOF, C_NIL); \
   }
 
 #define GETCH(file) \
@@ -257,7 +257,7 @@ LISPT io::splice(LISPT c, LISPT l, int tailp)
 
 /*
  * LISPREAD reads a lisp expression from file FILE. If LINE
- * is nonzero then it is assumed that it was called from READLINE.
+ * is true then it is assumed that it was called from READLINE.
  * READLINE initializes by itself TOP so that an extra level of
  * parentheses is in effect. An explicit stack is used to store
  * TOP when LISPREAD recurses.
@@ -265,7 +265,7 @@ LISPT io::splice(LISPT c, LISPT l, int tailp)
 /*
  * If you don't like goto's, keep your eyes shut.
  */
-LISPT io::lispread(source* file, int line)
+LISPT io::lispread(source* file, bool line)
 {
   LISPT curr, temp, curatom;
   int curc;
@@ -514,7 +514,7 @@ LISPT io::rmsquote(io& ctx, source* file, LISPT, char)
     return C_QUOTE;
   }
   file->ungetch(c);
-  return cons(ctx._lisp, C_QUOTE, cons(ctx._lisp, ctx.lispread(file, 0), C_NIL));
+  return cons(ctx._lisp, C_QUOTE, cons(ctx._lisp, ctx.lispread(file, false), C_NIL));
 }
 
 #if 0
@@ -570,7 +570,7 @@ LISPT io::readline(source* file)
 
   top = cons(_lisp, C_NIL, C_NIL); /* Init first paren level */
   rplaca(_lisp, top, cons(_lisp, C_NIL, top));
-  rd = lispread(file, 1);
+  rd = lispread(file, true);
   return rd;
 }
 
@@ -612,7 +612,7 @@ void pf(double d, io::sink* file)
   ps(ss, file, 0);
 }
 
-LISPT io::patom(LISPT x, sink* file, int esc)
+LISPT io::patom(LISPT x, sink* file, bool esc)
 {
   ps(x->symval().pname, file, esc);
   return x;
@@ -624,7 +624,7 @@ LISPT io::terpri(sink* file)
   return C_NIL;
 }
 
-LISPT io::prinbody(LISPT x, sink* file, int esc)
+LISPT io::prinbody(LISPT x, sink* file, bool esc)
 {
   LISPT xx;
 
@@ -649,7 +649,7 @@ nxtelt:
   return x;
 }
 
-LISPT io::prin0(LISPT x, sink* file, int esc)
+LISPT io::prin0(LISPT x, sink* file, bool esc)
 {
   switch(type_of(x))
   {
@@ -749,7 +749,7 @@ LISPT io::prin0(LISPT x, sink* file, int esc)
 LISPT io::print(LISPT x, sink* file)
 {
   thisplevel = 0;
-  prin0(x, file, 1);
+  prin0(x, file, true);
   terpri(file);
   return x;
 }

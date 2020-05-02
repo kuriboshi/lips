@@ -11,6 +11,7 @@
 
 namespace lisp
 {
+class lisp;
 class io
 {
 public:
@@ -29,6 +30,7 @@ public:
     virtual void ungetch(int) = 0;
     virtual bool eoln() = 0;
     virtual bool close() = 0;
+    virtual const char* getline() = 0;
   };
 
   class filesource: public source
@@ -46,12 +48,34 @@ public:
       return c;
     }
     virtual void ungetch(int c) override { ungetc(c, _file); }
-    virtual bool eoln() override { return false; }
+    virtual bool eoln() override
+    {
+      while(true)
+      {
+        auto c = getc(_file);
+        if(feof(_file))
+          return true;
+        if(c != ' ' && c != '\t' && c != '\n')
+          return false;
+        if (c == '\n')
+          return true;
+      }
+      return true;
+    }
     virtual bool close() override
     {
       if(std::fclose(_file) == -1)
         return false;
       return true;
+    }
+    virtual const char* getline() override
+    {
+      char* buf = nullptr;
+      std::size_t size = 0;
+      auto rv = ::getline(&buf, &size, _file);
+      if(rv == -1)
+        return nullptr;
+      return buf;
     }
 
   private:
@@ -76,6 +100,7 @@ public:
     virtual void ungetch(int c) override { --_pos; }
     virtual bool eoln() override { return false; }
     virtual bool close() override { return true; }
+    virtual const char* getline() override { return _string; }
 
   private:
     const char* _string;
@@ -174,7 +199,7 @@ public:
   LISPT parsebuf(char*);
   LISPT ratom(source*);
   LISPT splice(LISPT c, LISPT, int tailp);
-  LISPT lispread(source*, int line);
+  LISPT lispread(source*, bool line = false);
   static LISPT rmexcl(io&, source*, LISPT, char);
   static LISPT rmdquote(io&, source*, LISPT, char);
   static LISPT rmsquote(io&, source*, LISPT, char);
@@ -188,10 +213,10 @@ public:
 #endif
 
   LISPT readline(source*);
-  LISPT patom(LISPT, sink*, int esc);
+  LISPT patom(LISPT, sink*, bool esc = false);
   LISPT terpri(sink*);
-  LISPT prinbody(LISPT, sink*, int esc);
-  LISPT prin0(LISPT, sink*, int esc);
+  LISPT prinbody(LISPT, sink*, bool esc = false);
+  LISPT prin0(LISPT, sink*, bool esc = false);
   LISPT print(LISPT, sink*);
 
 private:
@@ -266,12 +291,12 @@ inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; 
 inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
 
 inline LISPT ratom(lisp& l, io::source* f) { return io(l).ratom(f); }
-inline LISPT lispread(lisp& l, io::source* f, int i) { return io(l).lispread(f, i); }
+inline LISPT lispread(lisp& l, io::source* f, bool i = false) { return io(l).lispread(f, i); }
 inline LISPT readline(lisp& l, io::source* f) { return io(l).readline(f); }
 inline LISPT patom(lisp& l, LISPT a, io::sink* f, int i) { return io(l).patom(a, f, i); }
 inline LISPT terpri(lisp& l, io::sink* f) { return io(l).terpri(f); }
 inline LISPT prinbody(lisp& l, LISPT a, io::sink* f, int i) { return io(l).prinbody(a, f, i); }
-inline LISPT prin0(lisp& l, LISPT a, io::sink* f, int i) { return io(l).prin0(a, f, i); }
+inline LISPT prin0(lisp& l, LISPT a, io::sink* f, bool i = false) { return io(l).prin0(a, f, i); }
 inline LISPT print(lisp& l, LISPT a, io::sink* f) { return io(l).print(a, f); }
 
 } // namespace lisp

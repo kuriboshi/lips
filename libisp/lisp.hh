@@ -12,7 +12,9 @@
  */
 
 #include <cstdio>
+#include <functional>
 #include "config.hh"
+#include "error.hh"
 
 #ifdef TRUE
 #undef TRUE
@@ -278,6 +280,28 @@ public:
   void primerr(file_t&);
   void primin(file_t&);
 
+  LISPT perror(int, LISPT);
+  LISPT error(int, LISPT);
+  LISPT syserr(LISPT);
+  LISPT break0(LISPT);
+
+  void check(LISPT arg, lisp_type type)
+  {
+    if(type_of(arg) != type)
+      error(NOT_A | type, arg);
+  }
+
+  void check2(LISPT arg, lisp_type type0, lisp_type type1)
+  {
+    if(type_of(arg) != type0 && type_of(arg) != type1)
+      error(ILLEGAL_ARG, arg);
+  }
+
+  // void repl(LISPT prompt, std::function<int(LISPT*)> f);
+  using breakfun_t = int(*)(lisp&, LISPT*);
+  void repl(LISPT prompt, breakfun_t f);
+  LISPT pexp = nullptr;
+
 private:
   alloc& _alloc;
   evaluator& _eval;
@@ -285,6 +309,14 @@ private:
   file_t* _primerr = nullptr;
   file_t* _primin = nullptr;
 };
+
+inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }
+inline LISPT error(lisp& l, int i, LISPT a) { return l.error(i, a); }
+inline LISPT syserr(lisp& l, LISPT a) { return l.syserr(a); }
+inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
+
+inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
+inline void check2(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check2(arg, type0, type1); }
 
 // Variables
 extern LISPT currentbase;

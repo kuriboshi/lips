@@ -16,9 +16,9 @@ PRIMITIVE low::set(var, val)
 */
 PRIMITIVE low::set(LISPT var, LISPT val)
 {
-  check(var, SYMBOL);
+  _lisp.check(var, SYMBOL);
   if(EQ(var, CE_NIL) || EQ(var, CE_T))
-    return error(ATTEMPT_TO_RESET, var);
+    return _lisp.error(ATTEMPT_TO_RESET, var);
   if(type_of(var->symval().value) == INDIRECT)
     var->symval().value->indirectval() = val;
   else if(type_of(var->symval().value) == CVARIABLE)
@@ -50,7 +50,7 @@ PRIMITIVE low::cond(LISPT args)
   while(is_NIL(res))
   {
     LISPT alt = args->car();
-    check(alt, CONS);
+    _lisp.check(alt, CONS);
     res = eval(_lisp, alt->car());
     if(!is_NIL(res))
     {

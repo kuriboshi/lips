@@ -6,10 +6,6 @@
 
 #pragma once
 
-#include "lisp.hh"
-#include "except.hh"
-#include "misc.hh"
-
 namespace lisp
 {
 inline constexpr int PRINT_ARG = 1 << 8;
@@ -45,18 +41,6 @@ inline constexpr int AMBIGUOUS = (PRINT_ARG | 27);
 inline constexpr int USER_ERROR = (PRINT_ARG | 28);
 inline constexpr int MAXMESSAGE = 29;
 
-inline int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
-
-inline void check(LISPT arg, lisp_type type)
-{
-  if(type_of(arg) != type)
-    error(NOT_A | type, arg);
-}
-
-inline void check2(LISPT arg, lisp_type type0, lisp_type type1)
-{
-  if(type_of(arg) != type0 && type_of(arg) != type1)
-    error(ILLEGAL_ARG, arg);
-}
+inline constexpr int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
 
 } // namespace lisp
