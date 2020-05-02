@@ -10,6 +10,16 @@
 
 namespace lisp
 {
+inline constexpr auto PN_LISTP = "listp";           // t if cons
+inline constexpr auto PN_NLISTP = "nlistp";         // not listp
+inline constexpr auto PN_NEQ = "neq";               // not eq
+inline constexpr auto PN_NUMBERP = "numberp";       // integer of float
+inline constexpr auto PN_MEMB = "memb";             // t if a in l
+inline constexpr auto PN_EQUAL = "equal";           // equal
+inline constexpr auto PN_BOUNDP = "boundp";         // t if var bound
+inline constexpr auto PN_LITATOM = "litatom";       // t if literal atom
+inline constexpr auto PN_TYPEOF = "typeof";         // return type as an atom
+
 class pred : public base
 {
 public:

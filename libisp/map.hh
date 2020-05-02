@@ -10,6 +10,11 @@
 
 namespace lisp
 {
+inline constexpr auto PN_MAP = "map";               // map
+inline constexpr auto PN_MAPC = "mapc";             // map on car
+inline constexpr auto PN_MAPLIST = "maplist";       // map and build result
+inline constexpr auto PN_MAPCAR = "mapcar";         // mapc and build result
+
 class map : public base
 {
 public:

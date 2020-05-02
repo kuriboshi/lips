@@ -10,6 +10,8 @@
 
 namespace lisp
 {
+inline constexpr auto PN_EVALTRACE = "evaltrace";   // evaltrace
+
 class debug : public base
 {
 public:

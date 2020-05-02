@@ -10,6 +10,34 @@
 
 namespace lisp
 {
+inline constexpr auto PN_PLUS = "+";                // add
+inline constexpr auto PN_DIFFERENCE = "-";          // subtract
+inline constexpr auto PN_TIMES = "*";               // multiply
+inline constexpr auto PN_DIVIDE = "/";              // divide
+inline constexpr auto PN_IPLUS = "i+";              // integer add
+inline constexpr auto PN_IDIFFERENCE = "i-";        // integer subtract
+inline constexpr auto PN_ITIMES = "i*";             // integer multiply
+inline constexpr auto PN_IQUOTIENT = "i/";          // integer divide
+inline constexpr auto PN_IREMAINDER = "i%";         // integer mod
+inline constexpr auto PN_IMINUS = "iminus";         // integer change sign
+inline constexpr auto PN_MINUS = "minus";           // change sign generic
+inline constexpr auto PN_ADD1 = "add1";             // add one
+inline constexpr auto PN_SUB1 = "sub1";             // subtract one
+inline constexpr auto PN_ABS = "abs";               // absolute value
+inline constexpr auto PN_FPLUS = "f+";              // float add
+inline constexpr auto PN_FDIFFERENCE = "f-";        // float subtract
+inline constexpr auto PN_FTIMES = "f*";             // float multiply
+inline constexpr auto PN_FDIVIDE = "f/";            // float divide
+inline constexpr auto PN_ITOF = "itof";             // integer to float
+inline constexpr auto PN_GREATERP = "greaterp";     // t if greater than
+inline constexpr auto PN_GEQ = "geq";               // t if greater or eq
+inline constexpr auto PN_LESSP = "lessp";           // less than
+inline constexpr auto PN_LEQ = "leq";               // less or eq
+inline constexpr auto PN_ZEROP = "zerop";           // t if eq to 0
+inline constexpr auto PN_EQP = "eqp";               // number eq
+inline constexpr auto PN_NEQP = "neqp";             // not eqp
+inline constexpr auto PN_MINUSP = "minusp";         // t if negative
+
 class arith : public base
 {
 public:

@@ -10,6 +10,11 @@
 
 namespace lisp
 {
+inline constexpr auto PN_AND = "and";               // and
+inline constexpr auto PN_OR = "or";                 // or
+inline constexpr auto PN_NOT = "not";               // not
+inline constexpr auto PN_IF = "if";                 // if a then b else c
+
 class logic : public base
 {
 public:

@@ -10,6 +10,14 @@
 
 namespace lisp
 {
+inline constexpr auto PN_STRINGP = "stringp";       // t if string
+inline constexpr auto PN_STREQ = "streq";           // string equal
+inline constexpr auto PN_CONCAT = "concat";         // concatenate strings
+inline constexpr auto PN_STRLEN = "strlen";         // length of string
+inline constexpr auto PN_SUBSTR = "substr";         // get sub string
+inline constexpr auto PN_SYMSTR = "symstr";         // make symbol a string
+inline constexpr auto PN_STRCMP = "strcmp";         // compare strings
+
 class string: public base
 {
 public:

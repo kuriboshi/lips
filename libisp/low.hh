@@ -10,6 +10,17 @@
 
 namespace lisp
 {
+inline constexpr auto PN_SET = "set";               // set variable
+inline constexpr auto PN_SETQ = "setq";             // set quoted variable
+inline constexpr auto PN_SETQQ = "setqq";           // noeval set
+inline constexpr auto PN_COND = "cond";             // cond
+inline constexpr auto PN_WHILE = "while";           // while t
+inline constexpr auto PN_PROGN = "progn";           // return last expression
+inline constexpr auto PN_PROG1 = "prog1";           // return first expression
+inline constexpr auto PN_PROG2 = "prog2";           // return second expression
+inline constexpr auto PN_TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr auto PN_ENVGET = "envget";         // examine environment
+
 /* variables */
 extern LISPT verboseflg;
 

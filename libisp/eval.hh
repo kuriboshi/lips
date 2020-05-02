@@ -10,6 +10,12 @@
 
 namespace lisp
 {
+inline constexpr auto PN_E = "e";                   // noeval version of eval
+inline constexpr auto PN_EVAL = "eval";             // evaluate exp
+inline constexpr auto PN_APPLY = "apply";           // apply function on args
+inline constexpr auto PN_APPLYSTAR = "apply*";      // apply nospread
+inline constexpr auto PN_BAKTRACE = "baktrace";     // control stack backtrace
+
 class evaluator: public base
 {
 public:
