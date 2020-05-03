@@ -12,7 +12,7 @@ extern lisp::LISPT history;
 #define CHECKEOF(c) \
   if((c) == EOF) \
   { \
-    if(line || is_NIL(top->car())) \
+    if(line || is_NIL(_lisp.top->car())) \
       return C_EOF; \
     else \
       return _lisp.error(UNEXPECTED_EOF, C_NIL); \
@@ -182,6 +182,7 @@ LISPT io::parsebuf(char* buf)
  */
 LISPT io::ratom(file_t& file)
 {
+  char buffer[MAXATOMSIZE];
   int pos = 0;
 
   int c = file.getch();
@@ -193,31 +194,31 @@ LISPT io::ratom(file_t& file)
       ;
     else if(isbrk(c))
     {
-      buf[pos++] = c;
-      buf[pos] = NUL;
-      return mkatom(_lisp, buf);
+      buffer[pos++] = c;
+      buffer[pos] = NUL;
+      return mkatom(_lisp, buffer);
     }
     else
     {
       while(1)
       {
         if(c == EOF)
-          return parsebuf(buf);
+          return parsebuf(buffer);
         if(c == '\\')
           c = file.getch();
         if(pos < MAXATOMSIZE)
-          buf[pos++] = c;
+          buffer[pos++] = c;
         c = file.getch();
         if(isbrk(c))
         {
           file.ungetch(c);
-          buf[pos] = NUL;
-          return parsebuf(buf);
+          buffer[pos] = NUL;
+          return parsebuf(buffer);
         }
         else if(issepr(c))
         {
-          buf[pos] = NUL;
-          return parsebuf(buf);
+          buffer[pos] = NUL;
+          return parsebuf(buffer);
         }
       }
     }
@@ -272,25 +273,25 @@ LISPT io::lispread(file_t& file, bool line)
 
   if(!line)
   {
-    top = cons(_lisp, C_NIL, C_NIL);
-    curr = top;
+    _lisp.top = cons(_lisp, C_NIL, C_NIL);
+    curr = _lisp.top;
   }
   else
-    curr = top->car();
+    curr = _lisp.top->car();
 head:
   GETCH(file);
   if(isinsert(curc))
   {
-    pushr(top);
+    pushr(_lisp.top);
     rplaca(_lisp, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
-    popr(top);
+    popr(_lisp.top);
     goto check;
   }
   else if(issplice(curc))
   {
-    pushr(top);
+    pushr(_lisp.top);
     temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
-    popr(top);
+    popr(_lisp.top);
     curr = splice(curr, temp, 0);
     goto check;
   }
@@ -316,17 +317,17 @@ head:
   check:
     if(is_NIL(curr->cdr()))
     {
-      temp = top->car();
-      top = C_NIL;
+      temp = _lisp.top->car();
+      _lisp.top = C_NIL;
       return temp;
     }
-    else if(line && file.eoln() && EQ(curr->cdr(), top))
+    else if(line && file.eoln() && EQ(curr->cdr(), _lisp.top))
       goto addparen;
     else
       goto tail;
   }
 tail:
-  if(line && file.eoln() && EQ(curr->cdr(), top))
+  if(line && file.eoln() && EQ(curr->cdr(), _lisp.top))
     goto addparen;
   GETCH(file);
   if(isinsert(curc))
@@ -334,16 +335,16 @@ tail:
     temp = curr->cdr();
     rplacd(_lisp, curr, cons(_lisp, C_NIL, temp));
     curr = curr->cdr();
-    pushr(top);
+    pushr(_lisp.top);
     rplaca(_lisp, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
-    popr(top);
+    popr(_lisp.top);
     goto tail;
   }
   else if(issplice(curc))
   {
-    pushr(top);
+    pushr(_lisp.top);
     temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
-    popr(top);
+    popr(_lisp.top);
     curr = splice(curr, temp, 1);
     goto tail;
   }
@@ -488,7 +489,7 @@ LISPT io::rmexcl(io& ctx, file_t& file, LISPT, char)
 
 LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
 {
-  char buf[MAXATOMSIZE];
+  char buffer[MAXATOMSIZE];
   char c;
   int pos = 0;
 
@@ -497,11 +498,11 @@ LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
   {
     if(c == '\\')
       c = file.getch();
-    buf[pos++] = c;
+    buffer[pos++] = c;
     c = file.getch();
   }
-  buf[pos] = NUL;
-  return mkstring(ctx._lisp, buf);
+  buffer[pos] = NUL;
+  return mkstring(ctx._lisp, buffer);
 }
 
 LISPT io::rmsquote(io& ctx, file_t& file, LISPT, char)
@@ -568,8 +569,8 @@ LISPT io::readline(file_t& file)
 {
   LISPT rd;
 
-  top = cons(_lisp, C_NIL, C_NIL); /* Init first paren level */
-  rplaca(_lisp, top, cons(_lisp, C_NIL, top));
+  _lisp.top = cons(_lisp, C_NIL, C_NIL); /* Init first paren level */
+  rplaca(_lisp, _lisp.top, cons(_lisp, C_NIL, _lisp.top));
   rd = lispread(file, true);
   return rd;
 }
@@ -654,8 +655,8 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
   switch(type_of(x))
   {
     case CONS:
-      thisplevel++;
-      if(thisplevel <= printlevel || printlevel <= 0)
+      _lisp.thisplevel++;
+      if(_lisp.thisplevel <= _lisp.printlevel || _lisp.printlevel <= 0)
       {
         file.putch('(');
         prinbody(x, file, esc);
@@ -663,7 +664,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       }
       else
         file.putch('&');
-      thisplevel--;
+      _lisp.thisplevel--;
       break;
     case SYMBOL:
       return patom(x, file, esc);
@@ -748,17 +749,10 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
 
 LISPT io::print(LISPT x, file_t& file)
 {
-  thisplevel = 0;
+  _lisp.thisplevel = 0;
   prin0(x, file, true);
   terpri(file);
   return x;
 }
-
-LISPT io::top = nullptr;
-LISPT io::rstack = nullptr;
-int io::printlevel = 0;
-int io::thisplevel = 0;
-bool io::echoline = false;
-char io::buf[];
 
 } // namespace lisp

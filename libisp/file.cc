@@ -76,7 +76,7 @@ PRIMITIVE file::xterpri(LISPT file)
 
 PRIMITIVE file::prin1(LISPT x, LISPT file)
 {
-  io::thisplevel = 0;
+  _lisp.thisplevel = 0;
   if(is_NIL(file))
     return prin0(_lisp, x, _lisp.primout(), false);
   if(is_T(file))
@@ -87,7 +87,7 @@ PRIMITIVE file::prin1(LISPT x, LISPT file)
 
 PRIMITIVE file::prin2(LISPT x, LISPT file)
 {
-  io::thisplevel = 0;
+  _lisp.thisplevel = 0;
   if(is_NIL(file))
     return prin0(_lisp, x, _lisp.primout(), true);
   if(is_T(file))
@@ -98,11 +98,11 @@ PRIMITIVE file::prin2(LISPT x, LISPT file)
 
 PRIMITIVE file::plevel(LISPT newl)
 {
-  auto x = io::printlevel;
+  auto x = _lisp.printlevel;
   if(!is_NIL(newl))
   {
     _lisp.check(newl, INTEGER);
-    io::printlevel = newl->intval();
+    _lisp.printlevel = newl->intval();
   }
   return a().mknumber(x);
 }

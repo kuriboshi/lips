@@ -123,6 +123,9 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   _stderr = new file_t(new io::filesink(::stderr));
   _stdin = new file_t(new io::filesource(::stdin));
 
+  a().add_mark_object(&top);
+  a().add_mark_object(&rstack);
+
   arith::init();
   debug::init();
   file::init();

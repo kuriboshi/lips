@@ -19,6 +19,7 @@ class io
 public:
   io(lisp& lisp): _lisp(lisp) {}
   ~io() = default;
+  static void init();
 
   static inline constexpr char COMMENTCHAR = '#';
 
@@ -180,23 +181,15 @@ public:
     std::string _string;
   };
 
-  static LISPT top;;    /* used for threading the input structure */
-  static LISPT rstack; /* partially built structure read stack */
-  static int printlevel;     /* maximum print level */
-  static int thisplevel;     /* during print, print level */
-  static bool echoline;   /* is true if ! has been used */
-
-  void pushr(LISPT w) { rstack = cons(_lisp, w, rstack); }
+  void pushr(LISPT w) { _lisp.rstack = cons(_lisp, w, _lisp.rstack); }
   void popr(LISPT& w)
   {
-    w = rstack->car();
-    rstack = rstack->cdr();
+    w = _lisp.rstack->car();
+    _lisp.rstack = _lisp.rstack->cdr();
   }
 
   static constexpr int NUL = '\0';
   static constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
-
-  static char buf[MAXATOMSIZE];
 
   bool integerp(char*, int* res);
   bool floatp(char*);

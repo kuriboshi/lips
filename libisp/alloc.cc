@@ -219,8 +219,8 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
         break;
     }
   }
-  if(savept)
-    for(int i = savept; i; i--) mark(savearray[i - 1]);
+  for(auto i: savearray)
+      mark(i);
   int nrfreed = sweep();
   /*
    * A new page is allocated if the number of conses is lower
@@ -568,8 +568,6 @@ void alloc::dzero() { destblockused = 0; }
 
 alloc::alloc(lisp& lisp): _lisp(lisp)
 {
-  add_mark_object(&io::top);
-  add_mark_object(&io::rstack);
   add_mark_object(&verboseflg);
   add_mark_object(&topprompt);
   add_mark_object(&promptform);

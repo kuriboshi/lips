@@ -551,14 +551,14 @@ bool evaluator::peval2()
  */
 void evaluator::bt()
 {
-  int op = io::printlevel;
-  io::printlevel = 2;
+  int op = _lisp.printlevel;
+  _lisp.printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
       file(_lisp).xprint(control[i - 1].u.lisp, C_T);
   }
-  io::printlevel = op;
+  _lisp.printlevel = op;
 }
 
 bool evaluator::everr()

@@ -304,6 +304,13 @@ public:
   void repl(LISPT prompt, breakfun_t f);
   LISPT pexp = nullptr;
 
+  // Used by lisp::io
+  LISPT top = nullptr;
+  LISPT rstack = nullptr;
+  int printlevel = 0;
+  int thisplevel = 0;
+  bool echoline = false;
+
 private:
   alloc& _alloc;
   evaluator& _eval;
