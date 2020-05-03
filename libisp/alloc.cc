@@ -568,9 +568,9 @@ void alloc::dzero() { destblockused = 0; }
 
 alloc::alloc(lisp& lisp): _lisp(lisp)
 {
-  // add_mark_object(&top);
-  // add_mark_object(&rstack);
-  // add_mark_object(&verboseflg);
+  add_mark_object(&io::top);
+  add_mark_object(&io::rstack);
+  add_mark_object(&verboseflg);
   add_mark_object(&topprompt);
   add_mark_object(&promptform);
   add_mark_object(&brkprompt);
@@ -592,6 +592,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
+  initcvar(&verboseflg, "verboseflg", C_NIL);
   mkprim(PN_RECLAIM, ::lisp::reclaim, 1, SUBR);
   mkprim(PN_CONS, ::lisp::cons, 2, SUBR);
   mkprim(PN_FREECOUNT, ::lisp::freecount, 0, SUBR);
@@ -604,5 +605,6 @@ alloc::~alloc()
 }
 
 alloc::obarray_t* alloc::globals[];
+LISPT alloc::verboseflg = nullptr;
 
 } // namespace lisp

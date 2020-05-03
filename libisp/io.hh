@@ -179,8 +179,8 @@ public:
     std::string _string;
   };
 
-  LISPT top = nullptr;    /* used for threading the input structure */
-  LISPT rstack = nullptr; /* partially built structure read stack */
+  static LISPT top;;    /* used for threading the input structure */
+  static LISPT rstack; /* partially built structure read stack */
   static int printlevel;     /* maximum print level */
   static int thisplevel;     /* during print, print level */
   static bool echoline;   /* is true if ! has been used */

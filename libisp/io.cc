@@ -754,9 +754,11 @@ LISPT io::print(LISPT x, sink& file)
   return x;
 }
 
-bool io::echoline = false;
-char io::buf[];
+LISPT io::top = nullptr;
+LISPT io::rstack = nullptr;
 int io::printlevel = 0;
 int io::thisplevel = 0;
+bool io::echoline = false;
+char io::buf[];
 
 } // namespace lisp

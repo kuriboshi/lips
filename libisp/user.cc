@@ -5,6 +5,7 @@
  */
 
 #include "libisp.hh"
+#include "alloc.hh"
 
 namespace lisp
 {
@@ -64,7 +65,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       if(is_NIL(t))
       {
         putprop(_lisp, name, C_OLDDEF, name->getopval());
-        if(!is_NIL(verboseflg))
+        if(!is_NIL(alloc::verboseflg))
           xprint(_lisp, cons(_lisp, name, cons(_lisp, C_REDEFINED, C_NIL)), C_NIL);
       }
     }

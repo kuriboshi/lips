@@ -21,9 +21,6 @@ inline constexpr auto PN_PROG2 = "prog2";           // return second expression
 inline constexpr auto PN_TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto PN_ENVGET = "envget";         // examine environment
 
-/* variables */
-extern LISPT verboseflg;
-
 class low: public base
 {
 public:

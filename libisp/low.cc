@@ -8,8 +8,6 @@
 
 namespace lisp
 {
-LISPT verboseflg;
-
 /*
 Dummy definition for cpprint.
 PRIMITIVE low::set(var, val)
@@ -125,7 +123,6 @@ void low::init()
   alloc::mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
 #endif
   alloc::mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
-  alloc::initcvar(&verboseflg, "verboseflg", C_NIL);
 }
 
 } // namespace lisp

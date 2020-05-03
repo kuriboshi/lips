@@ -15,5 +15,7 @@ static int macro(lisp::lisp& l, lisp::LISPT*)
 int main()
 {
   lisp::lisp lisp;
-  lisp.repl(mkstring(lisp, "> "), [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
+  auto prompt = mkstring(lisp, "> ");
+  lisp.a().add_mark_object(&prompt);
+  lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
 }

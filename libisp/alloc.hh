@@ -66,9 +66,10 @@ public:
     obarray_t* onext;
   };
 
+  static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
+  static LISPT verboseflg;
   LISPT savearray[SAVEARRAYSIZE];
   int savept = 0;
-  static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
   obarray_t* obarray[MAXHASH];        // Atoms local to each interpreter instance
   LISPT freelist = nullptr;
   LISPT gcgag = nullptr; // Nonnil means print gc message.
