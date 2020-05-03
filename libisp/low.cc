@@ -79,34 +79,6 @@ PRIMITIVE low::prog1(LISPT a1, LISPT) { return a1; }
 
 PRIMITIVE low::prog2(LISPT, LISPT a2, LISPT) { return a2; }
 
-#if 0
-PRIMITIVE low::topofstack()
-{
-  return env;
-}
-#endif
-
-PRIMITIVE low::envget(LISPT e, LISPT n)
-{
-#if 0
-  LISPT foo;
-  
-  CHECK(e, ENVIRON);
-  CHECK(n, INTEGER);
-  if (INTVAL(n) <= 0)
-    foo = cons(CAR(ENVVAL(e)), mknumber(CDR(ENVVAL(e))));
-  else
-    if (INTVAL(n) <= INTVAL(CDR(e)))
-      foo = cons (CAR(ENVVAL(e) + INTVAL(n)),
-		  CDR(ENVVAL(e) + INTVAL(n)));
-    else
-      foo = C_NIL;
-  return foo;
-#else
-  return e;
-#endif
-}
-
 low::low(lisp& lisp): base(lisp) {}
 
 void low::init()
@@ -119,10 +91,6 @@ void low::init()
   alloc::mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
   alloc::mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
   alloc::mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
-#if 0
-  alloc::mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
-#endif
-  alloc::mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
 }
 
 } // namespace lisp

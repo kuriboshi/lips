@@ -5,8 +5,7 @@
  */
 
 #include "libisp.hh"
-
-extern void finish(int);
+#include "except.hh"
 
 namespace lisp
 {
@@ -336,12 +335,10 @@ PRIMITIVE prim::xerror(LISPT mess)
 
 PRIMITIVE prim::uxexit(LISPT status)
 {
-#if 0
   if(is_NIL(status))
-    finish(0);
-  check(status, INTEGER);
-  finish(status->intval());
-#endif
+    throw lisp_finish("prim::uxexit called", 0);
+  l.check(status, INTEGER);
+  throw lisp_finish("prim::uxexit called", status->intval());
   return C_NIL;
 }
 

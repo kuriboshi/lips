@@ -22,4 +22,11 @@ public:
   lisp_reset(): lisp_error("reset") {}
 };
 
+class lisp_finish: std::runtime_error
+{
+public:
+  lisp_finish(const std::string& message, int code): std::runtime_error(message), exit_code(code) {}
+  int exit_code;
+};
+
 } // namespace lisp

@@ -37,24 +37,6 @@ public:
     conscells_t* next;
   };
 
-  enum class block_type
-  {
-    EMPTY = 0,
-    LISPT,
-    ENVIRON
-  };
-
-  struct destblock_t
-  {
-    block_type type = block_type::EMPTY;
-    union
-    {
-      LISPT d_lisp;
-      int d_integer;
-      destblock_t* d_environ;
-    } var, val;
-  };
-
   /*
    * Each hashbucket contains a symbol and a pointer to the next
    * symbol in that bucket.

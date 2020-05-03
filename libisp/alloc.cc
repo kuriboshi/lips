@@ -9,11 +9,7 @@
 #include "error.hh"
 #include "eval.hh"
 #include "io.hh"
-
-#if 0
-// TODO:
-extern void finish(int);
-#endif
+#include "except.hh"
 
 namespace lisp
 {
@@ -538,7 +534,7 @@ again:
  * dalloc - Allocates a destination block of size size. Returns nullptr if
  *          no more space available.
  */
-alloc::destblock_t* alloc::dalloc(int size)
+destblock_t* alloc::dalloc(int size)
 {
   if(size <= DESTBLOCKSIZE - destblockused)
   {
@@ -583,10 +579,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   if(conscells == nullptr)
   {
     _lisp.primerr().printf("Cons cells memory exhausted\n");
-#if 0
-    // TODO:
-    finish(1);
-#endif
+    throw lisp_finish("Cons cells memory exhausted", 1);
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);

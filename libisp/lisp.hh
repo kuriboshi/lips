@@ -162,6 +162,24 @@ struct closure_t
   short count;
 };
 
+enum class block_type
+{
+  EMPTY = 0,
+  LISPT,
+  ENVIRON
+};
+
+struct destblock_t
+{
+  block_type type = block_type::EMPTY;
+  union
+  {
+    LISPT d_lisp;
+    int d_integer;
+    destblock_t* d_environ;
+  } var, val;
+};
+
 struct lisp_t
 {
   lisp_t() {}
@@ -187,7 +205,7 @@ struct lisp_t
     lambda_t l_lambda;
     closure_t l_closure;
     // UNBOUND
-    // alloc::destblock_t* l_environ;
+    destblock_t* l_environ;
     file_t* l_filet;
     // TRUE
     LISPT l_free;
@@ -238,6 +256,8 @@ struct lisp_t
   void setopval(LISPT y) { setq(y); }
   LISPT getopval() { return symvalue(); }
   const char* getstr() { return type == STRING ? stringval() : symval().pname; }
+  destblock_t* envval() { return u.l_environ; }
+  void envval(destblock_t* env) { u.l_environ = env; }
 
   /*
    * Some more or less helpfull functions
@@ -250,10 +270,6 @@ struct lisp_t
 
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
 inline lisp_type type_of(LISPT a) { return a == nullptr ? NIL : a->type; }
-
-#if 0
-inline alloc::destblock_t* ENVVAL(LISPT e) { return e->u.l_environ; }
-#endif
 
 inline void set(LISPT& a, lisp_type t, LISPT p)
 {
@@ -310,6 +326,10 @@ public:
   int printlevel = 0;
   int thisplevel = 0;
   bool echoline = false;
+
+  // Used by the interprete
+  bool brkflg = false;
+  bool interrupt = false;
 
 private:
   alloc& _alloc;

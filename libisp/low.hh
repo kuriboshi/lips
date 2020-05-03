@@ -35,8 +35,6 @@ public:
   LISPT xwhile(LISPT, LISPT);
   LISPT prog1(LISPT, LISPT);
   LISPT prog2(LISPT, LISPT, LISPT);
-  LISPT topofstack();
-  LISPT envget(LISPT, LISPT);
 };
 
 inline LISPT set(lisp& l, LISPT a, LISPT b) { return low(l).set(a, b); }
@@ -47,9 +45,5 @@ inline LISPT xwhile(lisp& l, LISPT a, LISPT b) { return low(l).xwhile(a, b); }
 inline LISPT progn(lisp& l, LISPT a) { return low(l).progn(a); }
 inline LISPT prog1(lisp& l, LISPT a, LISPT b) { return low(l).prog1(a, b); }
 inline LISPT prog2(lisp& l, LISPT a, LISPT b, LISPT c) { return low(l).prog2(a, b, c); }
-#if 0
-inline LISPT topofstack(lisp& l) { return low(l).topofstack(); }
-#endif
-inline LISPT envget(lisp& l, LISPT a, LISPT b) { return low(l).envget(a, b); }
 
 } // namespace lisp

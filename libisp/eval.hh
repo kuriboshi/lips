@@ -40,7 +40,7 @@ public:
     union
     {
       continuation_t f_point;
-      alloc::destblock_t* point;
+      destblock_t* point;
       LISPT lisp;
     } u;
   };
@@ -54,6 +54,8 @@ public:
   PRIMITIVE eval(LISPT);
   PRIMITIVE apply(LISPT, LISPT);
   PRIMITIVE baktrace();
+  PRIMITIVE topofstack();
+  PRIMITIVE envget(LISPT, LISPT);
 
   void bt();
   void unwind();
@@ -61,7 +63,7 @@ public:
   int trace() const { return _trace; }
   void trace(int t) { _trace = t; }
 
-  alloc::destblock_t* dest = nullptr; // Current destination being built.
+  destblock_t* dest = nullptr; // Current destination being built.
 
   using undefhook_t = int (*)(LISPT, LISPT*);
   undefhook_t undefhook = nullptr; // Called in case of undefined function.
@@ -69,20 +71,19 @@ public:
   using breakhook_t = void (*)();
   breakhook_t breakhook = nullptr; // Called before going into break.
 
-  static bool brkflg;
-  static bool interrupt;
+  struct destblock_t* environment() const { return env; }
 
 private:
   void push_lisp(LISPT);
   LISPT pop_lisp();
-  void push_point(alloc::destblock_t*);
-  alloc::destblock_t* pop_point();
+  void push_point(destblock_t*);
+  destblock_t* pop_point();
   void push_func(continuation_t);
   continuation_t pop_func();
-  alloc::destblock_t* pop_env();
+  destblock_t* pop_env();
 
   void xbreak(int mess, LISPT fault, continuation_t next);
-  alloc::destblock_t* mkdestblock(int);
+  destblock_t* mkdestblock(int);
   void storevar(LISPT v, int i);
   void send(LISPT a);
   LISPT receive();
@@ -137,12 +138,14 @@ private:
   LISPT args = nullptr;              // Current arguments.
   bool noeval = false;               // Don't evaluate arguments.
   continuation_t cont = nullptr;     // Current continuation.
-  alloc::destblock_t* env = nullptr; // Current environment.
+  destblock_t* env = nullptr; // Current environment.
   int _trace = 0;
 };
 
 inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
 inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
 inline LISPT baktrace(lisp& l) { return l.e().baktrace(); }
+inline LISPT topofstack(lisp& l) { return l.e().topofstack(); }
+inline LISPT envget(lisp& l, LISPT a, LISPT b) { return l.e().envget(a, b); }
 
 } // namespace lisp

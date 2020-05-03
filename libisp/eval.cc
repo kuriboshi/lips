@@ -8,9 +8,6 @@
 #include "except.hh"
 
 // extern lisp::LISPT findalias(lisp::LISPT);
-// extern void pputc(int, FILE*);
-// extern bool brkflg;
-// extern bool interrupt;
 
 namespace lisp
 {
@@ -74,7 +71,7 @@ void evaluator::push_lisp(LISPT a)
     overflow();
 }
 
-void evaluator::push_point(alloc::destblock_t* d)
+void evaluator::push_point(destblock_t* d)
 {
   control[toctrl].type = CTRL_POINT;
   control[toctrl++].u.point = d;
@@ -92,7 +89,7 @@ void evaluator::push_func(continuation_t f)
 
 LISPT evaluator::pop_lisp() { return control[--toctrl].u.lisp; }
 
-alloc::destblock_t* evaluator::pop_point() { return control[--toctrl].u.point; }
+destblock_t* evaluator::pop_point() { return control[--toctrl].u.point; }
 
 evaluator::continuation_t evaluator::pop_func() { return control[--toctrl].u.f_point; }
 
@@ -120,22 +117,22 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
  * mkdestblock - creates a new destination block of size
  *               's' and initializes it.
  */
-alloc::destblock_t* evaluator::mkdestblock(int s)
+destblock_t* evaluator::mkdestblock(int s)
 {
   auto dest = a.dalloc(s + 1);
   dest[0].var.d_integer = s;
   dest[0].val.d_integer = s;
-  dest[0].type = alloc::block_type::EMPTY;
+  dest[0].type = block_type::EMPTY;
   return dest;
 }
 
 void evaluator::storevar(LISPT v, int i)
 {
   dest[i].var.d_lisp = v;
-  dest[i].type = alloc::block_type::LISPT;
+  dest[i].type = block_type::LISPT;
 }
 
-alloc::destblock_t* evaluator::pop_env()
+destblock_t* evaluator::pop_env()
 {
   a.dfree(env);
   return pop_point();
@@ -411,9 +408,9 @@ bool evaluator::peval1()
 {
   int foo;
 
-  if(brkflg)
+  if(l.brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval1);
-  else if(interrupt)
+  else if(l.interrupt)
     abort(NO_MESSAGE, C_NIL);
   else
     switch(type_of(fun))
@@ -490,7 +487,7 @@ bool evaluator::peval2()
 {
   int foo;
 
-  if(brkflg)
+  if(l.brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval2);
   else
     switch(type_of(fun))
@@ -799,7 +796,7 @@ void evaluator::link()
 {
   dest[0].var.d_environ = env;
   // dest[0].val.d_integer contains the number of var/val pairs
-  dest[0].type = alloc::block_type::ENVIRON;
+  dest[0].type = block_type::ENVIRON;
   env = dest;
   for(auto i = dest[0].val.d_integer; i > 0; i--)
   {
@@ -1022,6 +1019,32 @@ PRIMITIVE evaluator::baktrace()
   return C_NIL;
 }
 
+PRIMITIVE evaluator::topofstack()
+{
+  auto x = a.getobject();
+  x->type= ENVIRON;
+  x->envval(l.e().environment());
+  return x;
+}
+
+PRIMITIVE evaluator::envget(LISPT e, LISPT n)
+{
+  LISPT foo = nullptr;
+#if 0
+  l.check(e, ENVIRON);
+  l.check(n, INTEGER);
+  if(n->intval() <= 0)
+    foo = cons(l, e->envval()->car(), mknumber(l, e->envval()->cdr()));
+  else
+    if(n->intval() <= e->cdr()->intval())
+      foo = cons(l, e->envval()->car() + n->intval(),
+        e->envval()->cdr() + n->intval());
+    else
+      foo = C_NIL;
+#endif
+  return foo;
+}
+
 evaluator::evaluator(lisp& lisp) : base(lisp)
 {
   add_mark_object(&fun);
@@ -1032,9 +1055,8 @@ evaluator::evaluator(lisp& lisp) : base(lisp)
   mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
   mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
   mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
+  mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
+  mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
 }
-
-bool evaluator::brkflg = false;
-bool evaluator::interrupt = false;
 
 } // namespace lisp
