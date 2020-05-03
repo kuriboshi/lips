@@ -12,7 +12,6 @@
  */
 
 #include <cstdio>
-#include <functional>
 #include "config.hh"
 #include "error.hh"
 
@@ -298,7 +297,6 @@ public:
       error(ILLEGAL_ARG, arg);
   }
 
-  // void repl(LISPT prompt, std::function<int(LISPT*)> f);
   using breakfun_t = int(*)(lisp&, LISPT*);
   void repl(LISPT prompt, breakfun_t f);
   LISPT pexp = nullptr;

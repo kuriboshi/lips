@@ -213,7 +213,6 @@ LISPT lisp::break0(LISPT exp)
   return pexp;
 }
 
-// void lisp::repl(LISPT prompt, std::function<int(LISPT*)> f)
 void lisp::repl(LISPT prompt, breakfun_t f)
 {
   while(true)
