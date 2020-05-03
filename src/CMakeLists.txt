@@ -6,6 +6,7 @@ target_sources(lips PRIVATE
   exec.cc
   glob.cc
   main.cc
+  os.cc
   term.cc
   top.cc
 )
@@ -13,6 +14,7 @@ target_sources(lips PRIVATE
   exec.hh
   glob.hh
   main.hh
+  os.hh
   top.hh
 )
 target_link_libraries(lips PRIVATE libisp)

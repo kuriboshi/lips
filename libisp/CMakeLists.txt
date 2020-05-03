@@ -13,7 +13,6 @@ target_sources(libisp PRIVATE
   low.cc
   map.cc
   debug.cc
-  os.cc
   posix.cc
   pred.cc
   prim.cc
@@ -40,7 +39,6 @@ target_sources(libisp PRIVATE
   low.hh
   map.hh
   debug.hh
-  os.hh
   posix.hh
   pred.hh
   prim.hh
