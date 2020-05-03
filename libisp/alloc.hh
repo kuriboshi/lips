@@ -108,10 +108,10 @@ public:
   void save(LISPT v) { savearray[savept++] = v; }
   LISPT unsave() { return savearray[--savept]; }
 
-  PRIMITIVE reclaim(lisp&, LISPT incr); /* Number of blocks to increase with */
-  PRIMITIVE cons(lisp&, LISPT, LISPT);
-  PRIMITIVE xobarray(lisp&);
-  PRIMITIVE freecount(lisp&);
+  PRIMITIVE reclaim(LISPT incr); /* Number of blocks to increase with */
+  PRIMITIVE cons(LISPT, LISPT);
+  PRIMITIVE xobarray();
+  PRIMITIVE freecount();
 
   void add_mark_object(LISPT* o) { markobjs.push_back(o); }
 
@@ -141,13 +141,12 @@ private:
   std::vector<LISPT*> markobjs;
 };
 
-inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(l, a, b); }
-inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(l, a); }
-inline LISPT xobarray(lisp& l) { return l.a().xobarray(l); }
-inline LISPT freecount(lisp& l) { return l.a().freecount(l); }
+inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
+inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(a); }
+inline LISPT xobarray(lisp& l) { return l.a().xobarray(); }
+inline LISPT freecount(lisp& l) { return l.a().freecount(); }
 
 inline LISPT intern(lisp& l, const char* s) { return l.a().intern(s); }
-inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
 inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
@@ -157,6 +156,7 @@ inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 
+inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 inline void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
 {
   alloc::mkprim(pname, fname, nrpar, type);
@@ -173,19 +173,5 @@ inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISP
 {
   alloc::mkprim(pname, fname, nrpar, type);
 }
-
-#if 0
-inline alloc::destblock_t* dalloc(int i) { return alloc::dalloc(i); }
-inline void dfree(alloc::destblock_t* d) { alloc::dfree(d); }
-inline void dzero() { alloc::dzero(); }
-inline char* realmalloc(unsigned int u) { return alloc::realmalloc(u); }
-
-/*
- * A simple way of protecting internal lisp objects from
- * the garbage collector.
- */
-inline void save(LISPT v) { alloc::save(v); }
-inline void unsave(LISPT& v) { v = alloc::unsave(); }
-#endif
 
 } // namespace lisp

@@ -111,7 +111,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  file(_lisp).xprint(a().cons(_lisp, fault, a().cons(_lisp, C_BROKEN, C_NIL)), C_T);
+  file(_lisp).xprint(a().cons(fault, a().cons(C_BROKEN, C_NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -194,7 +194,7 @@ LISPT evaluator::call(LISPT fun)
 Dummy definition for the pretty printer.
 PRIMITIVE eval(LISPT expr)
 */
-PRIMITIVE evaluator::eval(lisp&, LISPT expr)
+PRIMITIVE evaluator::eval(LISPT expr)
 {
   /* 
    * Set the current expression to `expr' and push the current
@@ -239,7 +239,7 @@ bool evaluator::eval0()
 Dummy definition for the pretty printer.
 PRIMITIVE apply(f, a)
 */
-PRIMITIVE evaluator::apply(lisp&, LISPT f, LISPT x)
+PRIMITIVE evaluator::apply(LISPT f, LISPT x)
 {
   push_point(dest);
   dest = mkdestblock(1);
@@ -247,7 +247,7 @@ PRIMITIVE evaluator::apply(lisp&, LISPT f, LISPT x)
   fun = f;
   push_lisp(args);
   args = x;
-  expression = a().cons(_lisp, f, x);
+  expression = a().cons(f, x);
   push_func(&evaluator::apply0);
   cont = &evaluator::peval2;
   while(!(this->*cont)())
@@ -678,7 +678,7 @@ bool evaluator::evlis1()
 
 bool evaluator::evlis2()
 {
-  LISPT x = a().cons(_lisp, receive(), C_NIL);
+  LISPT x = a().cons(receive(), C_NIL);
   send(x);
   cont = pop_func();
   return false;
@@ -700,7 +700,7 @@ bool evaluator::evlis4()
   LISPT x = receive();
   a().dfree(dest);
   dest = pop_point();
-  x = a().cons(_lisp, receive(), x);
+  x = a().cons(receive(), x);
   send(x);
   cont = pop_func();
   return false;
@@ -946,7 +946,7 @@ bool evaluator::evseq3()
   return false;
 }
 
-PRIMITIVE evaluator::baktrace(lisp&)
+PRIMITIVE evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {

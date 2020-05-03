@@ -242,7 +242,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
  * reclaim - Lips function reclaim interface. incr is the number of pages
  *           to inrease storage with.
  */
-PRIMITIVE alloc::reclaim(lisp&, LISPT incr) /* Number of blocks to increase with */
+PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 {
   int i;
 
@@ -272,7 +272,7 @@ LISPT alloc::getobject()
  * cons - Builds a cons cell out of arguments A and B. Reclaims space
  *        and allocates new blocks if necessary.
  */
-PRIMITIVE alloc::cons(lisp&, LISPT a, LISPT b)
+PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   if(is_NIL(freelist))
   {
@@ -289,15 +289,15 @@ PRIMITIVE alloc::cons(lisp&, LISPT a, LISPT b)
   return f;
 }
 
-PRIMITIVE alloc::xobarray(lisp& ctx)
+PRIMITIVE alloc::xobarray()
 {
   LISPT o = C_NIL;
   for(int i = 0; i < MAXHASH; i++)
-    for(auto* l = obarray[i]; l; l = l->onext) o = cons(ctx, l->sym, o);
+    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
   return o;
 }
 
-PRIMITIVE alloc::freecount(lisp&)
+PRIMITIVE alloc::freecount()
 {
   int i = 0;
   for(auto l = freelist; l->intval(); l = l->cdr()) i++;
@@ -373,14 +373,14 @@ LISPT alloc::mkarglis(LISPT alist, int& count)
   if(type_of(alist) == CONS)
   {
     count++;
-    return cons(_lisp, alist->car(), mkarglis(alist->cdr(), count));
+    return cons(alist->car(), mkarglis(alist->cdr(), count));
   }
   else if(EQ(alist, C_NIL))
     return C_NIL;
   else
   {
     count = -(count + 1);
-    return cons(_lisp, alist, C_NIL);
+    return cons(alist, C_NIL);
   }
 }
 

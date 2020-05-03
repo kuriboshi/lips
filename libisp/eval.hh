@@ -51,9 +51,9 @@ public:
 
   void reset();
 
-  PRIMITIVE eval(lisp&, LISPT);
-  PRIMITIVE apply(lisp&, LISPT, LISPT);
-  PRIMITIVE baktrace(lisp&);
+  PRIMITIVE eval(LISPT);
+  PRIMITIVE apply(LISPT, LISPT);
+  PRIMITIVE baktrace();
 
   void bt();
   void unwind();
@@ -71,12 +71,13 @@ public:
 
 private:
   void push_lisp(LISPT);
-  void push_point(alloc::destblock_t*);
-  void push_func(continuation_t);
   LISPT pop_lisp();
+  void push_point(alloc::destblock_t*);
   alloc::destblock_t* pop_point();
-  alloc::destblock_t* pop_env();
+  void push_func(continuation_t);
   continuation_t pop_func();
+  alloc::destblock_t* pop_env();
+
   void xbreak(int mess, LISPT fault, continuation_t next);
   alloc::destblock_t* mkdestblock(int);
   void storevar(LISPT v, int i);
@@ -85,8 +86,8 @@ private:
   void next();
   LISPT call(LISPT fun);
   bool evalhook(LISPT exp);
-  void do_unbound(continuation_t continuation);
-  bool do_default(continuation_t continuation);
+  void do_unbound(continuation_t);
+  bool do_default(continuation_t);
   void link();
   void restore_env();
 
@@ -137,13 +138,8 @@ private:
   int _trace = 0;
 };
 
-#if 0
-inline void unwind() { evaluator::unwind(); }
-inline void bt() { evaluator::bt(); }
-#endif
-
-inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(l, expr); }
-inline LISPT apply(lisp& l, LISPT f, LISPT a) { return l.e().apply(l, f, a); }
-inline LISPT baktrace(lisp& l) { return l.e().baktrace(l); }
+inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
+inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
+inline LISPT baktrace(lisp& l) { return l.e().baktrace(); }
 
 } // namespace lisp
