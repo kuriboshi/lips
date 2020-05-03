@@ -6,177 +6,129 @@
 
 #include "libisp.hh"
 
-std::FILE* primin;
-std::FILE* primout;
-std::FILE* primerr;
-
 namespace lisp
 {
 PRIMITIVE file::xratom(LISPT file)
 {
-#if 0
   if(is_NIL(file))
-    return ratom(primin);
+    return ratom(_lisp, *_lisp.primin().source);
   if(is_T(file))
-    return ratom(stdin);
-  check(file, FILET);
-  return ratom(file->fileval());
-#else
-  return C_NIL;
-#endif
+    return ratom(_lisp, *_lisp.stdin().source);
+  _lisp.check(file, FILET);
+  return ratom(_lisp, *file->fileval()->source);
 }
 
 PRIMITIVE file::readc(LISPT file)
 {
-#if 0
   if(is_NIL(file))
-    return mknumber(_lisp, getch(primin));
+    return a().mknumber(_lisp.primin().source->getch());
   if(is_T(file))
-    return mknumber(_lisp, getch(stdin));
-  check(file, FILET);
-  return mknumber(_lisp, getch(file->fileval()));
-#else
-  return C_NIL;
-#endif
+    return a().mknumber(_lisp.stdin().source->getch());
+  _lisp.check(file, FILET);
+  return a().mknumber(file->fileval()->source->getch());
 }
 
 PRIMITIVE file::xread(LISPT file)
 {
-#if 0
   if(is_NIL(file))
-    return lispread(primin, 0);
+    return lispread(_lisp, *_lisp.primin().source, false);
   if(is_T(file))
-    return lispread(stdin, 0);
-  check(file, FILET);
-  return lispread(file->fileval(), 0);
-#else
-  return C_NIL;
-#endif
+    return lispread(_lisp, *_lisp.stdin().source, false);
+  _lisp.check(file, FILET);
+  return lispread(_lisp, *file->fileval()->source, false);
 }
 
 PRIMITIVE file::xprint(LISPT x, LISPT file)
 {
-#if 0
   if(is_NIL(file))
-    return print(x, primout);
+    return print(_lisp, x, *_lisp.primout().sink);
   if(is_T(file))
-    return print(x, primerr);
-  check(file, FILET);
-  return print(x, file->fileval());
-#else
-  return C_NIL;
-#endif
+    return print(_lisp, x, *_lisp.primerr().sink);
+  _lisp.check(file, FILET);
+  return print(_lisp, x, *file->fileval()->sink);
 }
 
 bool file::loadfile(const char* lf)
 {
-#if 0
-  auto* foo = fopen(lf, "r");
+  auto* foo = new io::filesource(lf);
   if(foo == nullptr)
     return false;
-  for(auto rval = lispread(foo, 0); type_of(rval) != ENDOFFILE; rval = lispread(foo, 0))
+  for(auto rval = lispread(_lisp, *foo, false); type_of(rval) != ENDOFFILE; rval = lispread(_lisp, *foo, false))
   {
-    rval = _lisp.e().eval(_lisp, rval);
+    rval = _lisp.e().eval(rval);
   }
-  fclose(foo);
+  delete foo;
   return true;
-#else
-  return false;
-#endif
 }
 
 PRIMITIVE file::load(LISPT f)
 {
-#if 0
-  check2(f, STRING, SYMBOL);
+  _lisp.check2(f, STRING, SYMBOL);
   if(!loadfile(f->getstr()))
-    return error(CANT_OPEN, f);
+    return _lisp.error(CANT_OPEN, f);
   return f;
-#else
-  return C_NIL;
-#endif
 }
 
 PRIMITIVE file::xterpri(LISPT file)
 {
-#if 0
   if(is_NIL(file))
-    return terpri(primout);
+    return terpri(_lisp, *_lisp.primout().sink);
   if(is_T(file))
-    return terpri(primerr);
-  check(file, FILET);
-  return terpri(file->fileval());
-#else
-  return C_NIL;
-#endif
+    return terpri(_lisp, *_lisp.primerr().sink);
+  _lisp.check(file, FILET);
+  return terpri(_lisp, *file->fileval()->sink);
 }
 
 PRIMITIVE file::prin1(LISPT x, LISPT file)
 {
-#if 0
-  thisplevel = 0;
+  io::thisplevel = 0;
   if(is_NIL(file))
-    return prin0(x, primout, false);
+    return prin0(_lisp, x, *_lisp.primout().sink, false);
   if(is_T(file))
-    return prin0(x, primerr, false);
-  check(file, FILET);
-  return prin0(x, file->fileval(), false);
-#else
-  return C_NIL;
-#endif
+    return prin0(_lisp, x, *_lisp.primerr().sink, false);
+  _lisp.check(file, FILET);
+  return prin0(_lisp, x, *file->fileval()->sink, false);
 }
 
 PRIMITIVE file::prin2(LISPT x, LISPT file)
 {
-#if 0
-  thisplevel = 0;
+  io::thisplevel = 0;
   if(is_NIL(file))
-    return prin0(x, primout, true);
+    return prin0(_lisp, x, *_lisp.primout().sink, true);
   if(is_T(file))
-    return prin0(x, primerr, true);
-  check(file, FILET);
-  return prin0(x, file->fileval(), false);
-#else
-  return C_NIL;
-#endif
+    return prin0(_lisp, x, *_lisp.primerr().sink, true);
+  _lisp.check(file, FILET);
+  return prin0(_lisp, x, *file->fileval()->sink, false);
 }
 
 PRIMITIVE file::plevel(LISPT newl)
 {
-#if 0
-  auto x = printlevel;
+  auto x = io::printlevel;
   if(!is_NIL(newl))
   {
-    check(newl, INTEGER);
-    printlevel = newl->intval();
+    _lisp.check(newl, INTEGER);
+    io::printlevel = newl->intval();
   }
-  return mknumber(_lisp, x);
-#else
-  return C_NIL;
-#endif
+  return a().mknumber(x);
 }
 
 PRIMITIVE file::spaces(LISPT n, LISPT file)
 {
-#if 0
   int i;
-  FILE* f;
+  file_t* f;
 
-  check(n, INTEGER);
+  _lisp.check(n, INTEGER);
   if(is_NIL(file))
-    f = primout;
+    f = &_lisp.primout();
   else if(is_T(file))
-    f = primerr;
+    f = &_lisp.primerr();
   else
   {
-    check(file, FILET);
+    _lisp.check(file, FILET);
     f = file->fileval();
   }
-  for(i = n->intval(); i > 0; i--) putc(' ', f);
+  for(i = n->intval(); i > 0; i--) f->sink->putch(' ');
   return C_NIL;
-#else
-  return C_NIL;
-#endif
 }
 
 PRIMITIVE file::xreadline(LISPT file)
@@ -192,7 +144,7 @@ PRIMITIVE file::xreadline(LISPT file)
     _lisp.check(file, FILET);
     f = file->fileval();
   }
-  return readline(_lisp, f->source);
+  return readline(_lisp, *f->source);
 }
 
 PRIMITIVE file::cpprint(LISPT oname, LISPT file)
@@ -300,9 +252,6 @@ void file::init()
   alloc::mkprim(PN_SPACES, ::lisp::spaces, 2, SUBR);
   alloc::mkprim(PN_TERPRI, ::lisp::xterpri, 1, SUBR);
   alloc::mkprim(PN_CPPRINT, ::lisp::cpprint, 2, SUBR);
-  primin = stdin;
-  primout = stdout;
-  primerr = stderr;
 }
 
 } // namespace lisp

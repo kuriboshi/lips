@@ -116,9 +116,12 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&interactive, "interactive", C_NIL);
   initcvar(&version, "version", a().mkstring(VERSION));
 
-  _primout = new file_t(new io::filesink(stdout));
-  _primerr = new file_t(new io::filesink(stderr));
-  _primin = new file_t(new io::filesource(stdin));
+  _primout = new file_t(new io::filesink(::stdout));
+  _primerr = new file_t(new io::filesink(::stderr));
+  _primin = new file_t(new io::filesource(::stdin));
+  _stdout = new file_t(new io::filesink(::stdout));
+  _stderr = new file_t(new io::filesink(::stderr));
+  _stdin = new file_t(new io::filesource(::stdin));
 
 #if 0
   rstack = C_NIL;
@@ -217,13 +220,13 @@ void lisp::repl(LISPT prompt, breakfun_t f)
 {
   while(true)
   {
-    prin0(*this, prompt, primout().sink);
+    prin0(*this, prompt, *primout().sink);
     auto* buf = primin().source->getline();
     if(buf == nullptr)
       break;
     auto in = std::make_unique<io::stringsource>(buf);
-    auto expr = lispread(*this, in.get(), false);
-    print(*this, eval(*this, expr), primout().sink);
+    auto expr = lispread(*this, *in.get(), false);
+    print(*this, eval(*this, expr), *primout().sink);
   }
 }
 

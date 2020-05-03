@@ -37,8 +37,9 @@ public:
   class filesource: public source
   {
   public:
-    filesource(std::FILE* file) { _file = file; }
-    filesource(const char* filename) { _file = fopen(filename, "r"); }
+    filesource(std::FILE* file) : _file(file), _owner(false) {}
+    filesource(const char* filename) : _file(fopen(filename, "r")), _owner(true) {}
+    ~filesource() { if(_owner) fclose(_file); }
 
     virtual int getch() override
     {
@@ -80,7 +81,8 @@ public:
     }
 
   private:
-    FILE* _file;
+    std::FILE* _file;
+    bool _owner = false;
   };
 
   class stringsource: public source
@@ -179,8 +181,8 @@ public:
 
   LISPT top = nullptr;    /* used for threading the input structure */
   LISPT rstack = nullptr; /* partially built structure read stack */
-  int printlevel = 0;     /* maximum print level */
-  int thisplevel = 0;     /* during print, print level */
+  static int printlevel;     /* maximum print level */
+  static int thisplevel;     /* during print, print level */
   static bool echoline;   /* is true if ! has been used */
 
   void pushr(LISPT w) { rstack = cons(_lisp, w, rstack); }
@@ -198,27 +200,27 @@ public:
   bool integerp(char*, int* res);
   bool floatp(char*);
   LISPT parsebuf(char*);
-  LISPT ratom(source*);
+  LISPT ratom(source&);
   LISPT splice(LISPT c, LISPT, int tailp);
-  LISPT lispread(source*, bool line = false);
-  static LISPT rmexcl(io&, source*, LISPT, char);
-  static LISPT rmdquote(io&, source*, LISPT, char);
-  static LISPT rmsquote(io&, source*, LISPT, char);
-  static LISPT rmpipe(io&, source*, LISPT, char);
-  static LISPT rmredir(io&, source*, LISPT, char);
-  static LISPT rmbg(io&, source*, LISPT, char);
-  static LISPT rmuser(io&, source*, LISPT, char);
+  LISPT lispread(source&, bool line = false);
+  static LISPT rmexcl(io&, source&, LISPT, char);
+  static LISPT rmdquote(io&, source&, LISPT, char);
+  static LISPT rmsquote(io&, source&, LISPT, char);
+  static LISPT rmpipe(io&, source&, LISPT, char);
+  static LISPT rmredir(io&, source&, LISPT, char);
+  static LISPT rmbg(io&, source&, LISPT, char);
+  static LISPT rmuser(io&, source&, LISPT, char);
 
 #if 0
   static LISPT userreadmacros[128];
 #endif
 
-  LISPT readline(source*);
-  LISPT patom(LISPT, sink*, bool esc = false);
-  LISPT terpri(sink*);
-  LISPT prinbody(LISPT, sink*, bool esc = false);
-  LISPT prin0(LISPT, sink*, bool esc = false);
-  LISPT print(LISPT, sink*);
+  LISPT readline(source&);
+  LISPT patom(LISPT, sink&, bool esc = false);
+  LISPT terpri(sink&);
+  LISPT prinbody(LISPT, sink&, bool esc = false);
+  LISPT prin0(LISPT, sink&, bool esc = false);
+  LISPT print(LISPT, sink&);
 
 private:
   alloc& a() { return _lisp.a(); }
@@ -228,7 +230,7 @@ private:
 struct rtinfo
 {
   unsigned char chclass[128];
-  LISPT (*rmacros[128])(io&, io::source*, LISPT, char);
+  LISPT (*rmacros[128])(io&, io::source&, LISPT, char);
 };
 
 struct file_t
@@ -268,7 +270,6 @@ struct file_t
 /* variables */
 extern LISPT top;
 extern LISPT rstack;
-extern int printlevel;
 extern int thisplevel;
 extern bool echoline;
 extern struct rtinfo currentrt;
@@ -291,13 +292,13 @@ inline bool isinsert(int c) { return (currentrt.chclass[c] & RMACRO) == INSERT; 
 inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; }
 inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
 
-inline LISPT ratom(lisp& l, io::source* f) { return io(l).ratom(f); }
-inline LISPT lispread(lisp& l, io::source* f, bool i = false) { return io(l).lispread(f, i); }
-inline LISPT readline(lisp& l, io::source* f) { return io(l).readline(f); }
-inline LISPT patom(lisp& l, LISPT a, io::sink* f, int i) { return io(l).patom(a, f, i); }
-inline LISPT terpri(lisp& l, io::sink* f) { return io(l).terpri(f); }
-inline LISPT prinbody(lisp& l, LISPT a, io::sink* f, int i) { return io(l).prinbody(a, f, i); }
-inline LISPT prin0(lisp& l, LISPT a, io::sink* f, bool i = false) { return io(l).prin0(a, f, i); }
-inline LISPT print(lisp& l, LISPT a, io::sink* f) { return io(l).print(a, f); }
+inline LISPT ratom(lisp& l, io::source& f) { return io(l).ratom(f); }
+inline LISPT lispread(lisp& l, io::source& f, bool i = false) { return io(l).lispread(f, i); }
+inline LISPT readline(lisp& l, io::source& f) { return io(l).readline(f); }
+inline LISPT patom(lisp& l, LISPT a, io::sink& f, int i) { return io(l).patom(a, f, i); }
+inline LISPT terpri(lisp& l, io::sink& f) { return io(l).terpri(f); }
+inline LISPT prinbody(lisp& l, LISPT a, io::sink& f, int i) { return io(l).prinbody(a, f, i); }
+inline LISPT prin0(lisp& l, LISPT a, io::sink& f, bool i = false) { return io(l).prin0(a, f, i); }
+inline LISPT print(lisp& l, LISPT a, io::sink& f) { return io(l).print(a, f); }
 
 } // namespace lisp

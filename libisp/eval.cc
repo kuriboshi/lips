@@ -411,14 +411,11 @@ bool evaluator::peval1()
 {
   int foo;
 
-#if 0
-  // TODO:
   if(brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval1);
   else if(interrupt)
     abort(NO_MESSAGE, C_NIL);
   else
-#endif
     switch(type_of(fun))
     {
       case CLOSURE:
@@ -493,12 +490,9 @@ bool evaluator::peval2()
 {
   int foo;
 
-#if 0
-  // TODO:
   if(brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval2);
   else
-#endif
     switch(type_of(fun))
     {
       case CLOSURE:
@@ -557,20 +551,14 @@ bool evaluator::peval2()
  */
 void evaluator::bt()
 {
-#if 0
-  // TODO:
-  int op = printlevel;
-  printlevel = 2;
-#endif
+  int op = io::printlevel;
+  io::printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
       file(_lisp).xprint(control[i - 1].u.lisp, C_T);
   }
-#if 0
-  // TODO:
-  printlevel = op;
-#endif
+  io::printlevel = op;
 }
 
 bool evaluator::everr()
@@ -950,84 +938,84 @@ PRIMITIVE evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
-    fprintf(primerr, "%d: ", i);
+    _lisp.primerr().printf("%d: ", i);
     switch(control[i].type)
     {
       case CTRL_LISP:
         file(_lisp).xprint(control[i].u.lisp, C_T);
         break;
       case CTRL_POINT:
-        fprintf(primerr, "destblock\n");
+        _lisp.primerr().printf("destblock\n");
         break;
       case CTRL_FUNC:
         if(control[i].u.f_point == &evaluator::ev0)
-          fprintf(primerr, "ev0\n");
+          _lisp.primerr().printf("ev0\n");
         else if(control[i].u.f_point == &evaluator::peval)
-          fprintf(primerr, "peval\n");
+          _lisp.primerr().printf("peval\n");
         else if(control[i].u.f_point == &evaluator::peval1)
-          fprintf(primerr, "peval1\n");
+          _lisp.primerr().printf("peval1\n");
         else if(control[i].u.f_point == &evaluator::peval2)
-          fprintf(primerr, "peval2\n");
+          _lisp.primerr().printf("peval2\n");
         else if(control[i].u.f_point == &evaluator::ev0)
-          fprintf(primerr, "ev0\n");
+          _lisp.primerr().printf("ev0\n");
         else if(control[i].u.f_point == &evaluator::ev1)
-          fprintf(primerr, "ev1\n");
+          _lisp.primerr().printf("ev1\n");
         else if(control[i].u.f_point == &evaluator::ev2)
-          fprintf(primerr, "ev2\n");
+          _lisp.primerr().printf("ev2\n");
         else if(control[i].u.f_point == &evaluator::ev3)
-          fprintf(primerr, "ev3\n");
+          _lisp.primerr().printf("ev3\n");
         else if(control[i].u.f_point == &evaluator::ev4)
-          fprintf(primerr, "ev4\n");
+          _lisp.primerr().printf("ev4\n");
         else if(control[i].u.f_point == &evaluator::evlam0)
-          fprintf(primerr, "evlam0\n");
+          _lisp.primerr().printf("evlam0\n");
         else if(control[i].u.f_point == &evaluator::evlam1)
-          fprintf(primerr, "evlam1\n");
+          _lisp.primerr().printf("evlam1\n");
         else if(control[i].u.f_point == &evaluator::ev9)
-          fprintf(primerr, "ev9\n");
+          _lisp.primerr().printf("ev9\n");
         else if(control[i].u.f_point == &evaluator::ev11)
-          fprintf(primerr, "ev11\n");
+          _lisp.primerr().printf("ev11\n");
         else if(control[i].u.f_point == &evaluator::ev3p)
-          fprintf(primerr, "ev3p\n");
+          _lisp.primerr().printf("ev3p\n");
         else if(control[i].u.f_point == &evaluator::evalargs)
-          fprintf(primerr, "evalargs\n");
+          _lisp.primerr().printf("evalargs\n");
         else if(control[i].u.f_point == &evaluator::noevarg)
-          fprintf(primerr, "noevarg\n");
+          _lisp.primerr().printf("noevarg\n");
         else if(control[i].u.f_point == &evaluator::evlam)
-          fprintf(primerr, "evlam\n");
+          _lisp.primerr().printf("evlam\n");
         else if(control[i].u.f_point == &evaluator::spread)
-          fprintf(primerr, "spread\n");
+          _lisp.primerr().printf("spread\n");
         else if(control[i].u.f_point == &evaluator::evlis)
-          fprintf(primerr, "evlis\n");
+          _lisp.primerr().printf("evlis\n");
         else if(control[i].u.f_point == &evaluator::evlis1)
-          fprintf(primerr, "evlis1\n");
+          _lisp.primerr().printf("evlis1\n");
         else if(control[i].u.f_point == &evaluator::evlis2)
-          fprintf(primerr, "evlis2\n");
+          _lisp.primerr().printf("evlis2\n");
         else if(control[i].u.f_point == &evaluator::evlis3)
-          fprintf(primerr, "evlis3\n");
+          _lisp.primerr().printf("evlis3\n");
         else if(control[i].u.f_point == &evaluator::evlis4)
-          fprintf(primerr, "evlis4\n");
+          _lisp.primerr().printf("evlis4\n");
         else if(control[i].u.f_point == &evaluator::noev9)
-          fprintf(primerr, "noev9\n");
+          _lisp.primerr().printf("noev9\n");
         else if(control[i].u.f_point == &evaluator::evsequence)
-          fprintf(primerr, "evsequence\n");
+          _lisp.primerr().printf("evsequence\n");
         else if(control[i].u.f_point == &evaluator::evseq1)
-          fprintf(primerr, "evseq1\n");
+          _lisp.primerr().printf("evseq1\n");
         else if(control[i].u.f_point == &evaluator::evseq3)
-          fprintf(primerr, "evseq3\n");
+          _lisp.primerr().printf("evseq3\n");
         else if(control[i].u.f_point == &evaluator::evclosure)
-          fprintf(primerr, "evclosure\n");
+          _lisp.primerr().printf("evclosure\n");
         else if(control[i].u.f_point == &evaluator::evclosure1)
-          fprintf(primerr, "evclosure1\n");
+          _lisp.primerr().printf("evclosure1\n");
         else if(control[i].u.f_point == &evaluator::eval0)
-          fprintf(primerr, "eval0\n");
+          _lisp.primerr().printf("eval0\n");
         else if(control[i].u.f_point == &evaluator::apply0)
-          fprintf(primerr, "apply0\n");
+          _lisp.primerr().printf("apply0\n");
         else if(control[i].u.f_point == &evaluator::everr)
-          fprintf(primerr, "everr\n");
+          _lisp.primerr().printf("everr\n");
         else if(control[i].u.f_point == &evaluator::lookup)
-          fprintf(primerr, "lookup\n");
+          _lisp.primerr().printf("lookup\n");
         else
-          fprintf(stderr, "Unknown control stack element\n");
+          _lisp.stderr().printf("Unknown control stack element\n");
         break;
     }
   }
@@ -1045,5 +1033,8 @@ evaluator::evaluator(lisp& lisp) : base(lisp)
   mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
   mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
 }
+
+bool evaluator::brkflg = false;
+bool evaluator::interrupt = false;
 
 } // namespace lisp

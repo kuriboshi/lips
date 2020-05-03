@@ -8,10 +8,6 @@
 #include <cstdio>
 #include "base.hh"
 
-extern FILE* primin;
-extern FILE* primout;
-extern FILE* primerr;
-
 namespace lisp
 {
 inline constexpr auto PN_LOAD = "load";             // load file

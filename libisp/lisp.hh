@@ -279,6 +279,9 @@ public:
   void primout(file_t&);
   void primerr(file_t&);
   void primin(file_t&);
+  file_t& stdout() const { return *_stdout; }
+  file_t& stderr() const { return *_stderr; }
+  file_t& stdin() const { return *_stdin; }
 
   LISPT perror(int, LISPT);
   LISPT error(int, LISPT);
@@ -307,6 +310,9 @@ private:
   file_t* _primout = nullptr;
   file_t* _primerr = nullptr;
   file_t* _primin = nullptr;
+  file_t* _stdout = nullptr;
+  file_t* _stderr = nullptr;
+  file_t* _stdin = nullptr;
 };
 
 inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }

@@ -69,6 +69,9 @@ public:
   using breakhook_t = void (*)();
   breakhook_t breakhook = nullptr; // Called before going into break.
 
+  static bool brkflg;
+  static bool interrupt;
+
 private:
   void push_lisp(LISPT);
   LISPT pop_lisp();
