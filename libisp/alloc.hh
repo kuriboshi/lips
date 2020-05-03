@@ -26,7 +26,6 @@ public:
   static constexpr int CONSCELLS = 1000;     // Number of cells in each block
   static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
   static constexpr int MINCONSES = 2000;     // Minimum number of cells after gc
-  static constexpr int SAVEARRAYSIZE = 1000; // Size of gc save array
   static constexpr int MAXHASH = 255;        // Max number of hash buckets
 
   static constexpr int NOCONSARGS = 0; // Don't reclaim arguments of cons
@@ -67,20 +66,19 @@ public:
   };
 
   static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
-  static LISPT verboseflg;
-  LISPT savearray[SAVEARRAYSIZE];
+  static LISPT verboseflg;            // If T then some events will be more verbose (gc and function redefinitions)
+  std::vector<LISPT> savearray; // Stack of objects which needs to be protected from gc
   int savept = 0;
   obarray_t* obarray[MAXHASH];        // Atoms local to each interpreter instance
-  LISPT freelist = nullptr;
-  LISPT gcgag = nullptr; // Nonnil means print gc message.
+  LISPT freelist = nullptr;           // List of free objects
+  LISPT gcgag = nullptr;              // Nonnil means print gc message
 
   LISPT getobject();
 
   /*
-   * Initializes a lisp symbol with the pname NAME to contain the same
-   * value as the C variable that CVAR points to. CVAR is set to VAL.
-   * Whenever CVAR is changed the corresponding lisp variable changes
-   * and vice versa.
+   * Initializes a lisp symbol with the pname NAME to contain the same value as
+   * the C variable that CVAR points to. CVAR is set to VAL.  Whenever CVAR is
+   * changed the corresponding lisp variable changes and vice versa.
    */
   static void initcvar(LISPT* cvar, const char* name, LISPT val)
   {
@@ -106,8 +104,8 @@ public:
   void dfree(destblock_t*);
   void dzero();
 
-  void save(LISPT v) { savearray[savept++] = v; }
-  LISPT unsave() { return savearray[--savept]; }
+  void save(LISPT v) { savearray.push_back(v); }
+  LISPT unsave() { auto val = savearray.back(); savearray.pop_back(); return val; }
 
   PRIMITIVE reclaim(LISPT incr); /* Number of blocks to increase with */
   PRIMITIVE cons(LISPT, LISPT);
