@@ -9,15 +9,16 @@
 #include <cstdarg>
 #include <string>
 #include "lisp.hh"
+#include "base.hh"
 
 namespace lisp
 {
 class lisp;
 struct file_t;
-class io
+class io : public base
 {
 public:
-  io(lisp& lisp): _lisp(lisp) {}
+  io(lisp& lisp): base(lisp) {}
   ~io() = default;
   static void init();
 
@@ -217,10 +218,6 @@ public:
 #if 0
   static LISPT userreadmacros[128];
 #endif
-
-private:
-  alloc& a() { return _lisp.a(); }
-  lisp& _lisp;
 };
 
 struct rtinfo
