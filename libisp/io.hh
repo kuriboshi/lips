@@ -182,11 +182,11 @@ public:
     std::string _string;
   };
 
-  void pushr(LISPT w) { _lisp.rstack = cons(_lisp, w, _lisp.rstack); }
+  void pushr(LISPT w) { l.rstack = cons(l, w, l.rstack); }
   void popr(LISPT& w)
   {
-    w = _lisp.rstack->car();
-    _lisp.rstack = _lisp.rstack->cdr();
+    w = l.rstack->car();
+    l.rstack = l.rstack->cdr();
   }
 
   static constexpr int NUL = '\0';
@@ -194,7 +194,7 @@ public:
 
   bool integerp(char*, int* res);
   bool floatp(char*);
-  LISPT splice(LISPT c, LISPT, int tailp);
+  LISPT splice(LISPT, LISPT, bool);
   LISPT parsebuf(char*);
 
   LISPT ratom(file_t&);

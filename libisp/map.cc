@@ -12,11 +12,11 @@ PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == CONS)
   {
-    apply(_lisp, fn1, cons(_lisp, obj, C_NIL));
+    apply(l, fn1, cons(l, obj, C_NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(_lisp, fn2, obj);
+      obj = apply(l, fn2, obj);
   }
   return C_NIL;
 }
@@ -25,11 +25,11 @@ PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == CONS)
   {
-    apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL));
+    apply(l, fn1, cons(l, obj->car(), C_NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
+      apply(l, fn2, cons(l, obj, C_NIL));
   }
   return C_NIL;
 }
@@ -39,21 +39,21 @@ PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
   LISPT tmp = C_NIL;
   if(type_of(obj) == CONS)
   {
-    tmp = cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj, C_NIL)), C_NIL);
+    tmp = cons(l, apply(l, fn1, cons(l, obj, C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  a().save(rval);
+  a.save(rval);
   while(type_of(obj) == CONS)
   {
-    rplacd(_lisp, tmp, cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj, C_NIL)), C_NIL));
+    rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj, C_NIL)), C_NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
+      obj = apply(l, fn2, cons(l, obj, C_NIL));
   }
-  rval = a().unsave();
+  rval = a.unsave();
   return rval;
 }
 
@@ -62,21 +62,21 @@ PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   LISPT tmp = C_NIL;
   if(type_of(obj) == CONS)
   {
-    tmp = cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL)), C_NIL);
+    tmp = cons(l, apply(l, fn1, cons(l, obj->car(), C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  a().save(rval);
+  a.save(rval);
   while(type_of(obj) == CONS)
   {
-    rplacd(_lisp, tmp, cons(_lisp, apply(_lisp, fn1, cons(_lisp, obj->car(), C_NIL)), C_NIL));
+    rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj->car(), C_NIL)), C_NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(_lisp, fn2, cons(_lisp, obj, C_NIL));
+      apply(l, fn2, cons(l, obj, C_NIL));
   }
-  rval = a().unsave();
+  rval = a.unsave();
   return rval;
 }
 

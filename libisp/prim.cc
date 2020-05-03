@@ -41,9 +41,9 @@ LISPT prim::closobj(LISPT vars)
 {
   if(is_NIL(vars))
     return C_NIL;
-  _lisp.check(vars, CONS);
-  _lisp.check(vars->car(), SYMBOL);
-  return cons(_lisp, mkindirect(_lisp, vars->car()->symval().value), closobj(vars->cdr()));
+  l.check(vars, CONS);
+  l.check(vars->car(), SYMBOL);
+  return cons(l, mkindirect(l, vars->car()->symval().value), closobj(vars->cdr()));
 }
 
 PRIMITIVE prim::car(LISPT a)
@@ -146,14 +146,14 @@ PRIMITIVE prim::caaar(LISPT a)
 
 PRIMITIVE prim::rplaca(LISPT x, LISPT y)
 {
-  _lisp.check(x, CONS);
+  l.check(x, CONS);
   x->car(y);
   return x;
 }
 
 PRIMITIVE prim::rplacd(LISPT x, LISPT y)
 {
-  _lisp.check(x, CONS);
+  l.check(x, CONS);
   x->cdr(y);
   return x;
 }
@@ -172,25 +172,25 @@ PRIMITIVE prim::atom(LISPT a)
   return C_NIL;
 }
 
-PRIMITIVE prim::nconc(LISPT l)
+PRIMITIVE prim::nconc(LISPT x)
 {
   LISPT cl;
 
   LISPT newl = C_NIL;
   LISPT curp = newl;
-  for(; !is_NIL(l); l = l->cdr())
+  for(; !is_NIL(x); x = x->cdr())
   {
-    if(!is_NIL(l->car()))
+    if(!is_NIL(x->car()))
     {
-      _lisp.check(l->car(), CONS);
+      l.check(x->car(), CONS);
       if(is_NIL(curp))
       {
-        curp = l->car();
+        curp = x->car();
         newl = curp;
       }
       else
-        rplacd(curp, l->car());
-      for(cl = l->car(); !is_NIL(cl->cdr()); cl = cl->cdr())
+        rplacd(curp, x->car());
+      for(cl = x->car(); !is_NIL(cl->cdr()); cl = cl->cdr())
         ;
       curp = cl;
     }
@@ -202,48 +202,48 @@ PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
 {
   if(is_NIL(cell))
   {
-    cell = cons(_lisp, cons(_lisp, obj, C_NIL), C_NIL);
+    cell = cons(l, cons(l, obj, C_NIL), C_NIL);
     return rplacd(cell, cell->car());
   }
-  _lisp.check(cell, CONS);
+  l.check(cell, CONS);
   if(type_of(cell->car()) != CONS)
   {
-    rplacd(cell, cons(_lisp, obj, C_NIL));
+    rplacd(cell, cons(l, obj, C_NIL));
     return rplaca(cell, cell->cdr());
   }
-  rplacd(cell->cdr(), cons(_lisp, obj, C_NIL));
+  rplacd(cell->cdr(), cons(l, obj, C_NIL));
   return rplacd(cell, cell->cdr()->cdr());
 }
 
 PRIMITIVE prim::attach(LISPT obj, LISPT list)
 {
   if(is_NIL(list))
-    return cons(_lisp, obj, C_NIL);
-  _lisp.check(list, CONS);
-  rplacd(list, cons(_lisp, list->car(), list->cdr()));
+    return cons(l, obj, C_NIL);
+  l.check(list, CONS);
+  rplacd(list, cons(l, list->car(), list->cdr()));
   return rplaca(list, obj);
 }
 
-PRIMITIVE prim::append(LISPT l)
+PRIMITIVE prim::append(LISPT x)
 {
   LISPT cl;
 
-  LISPT newl = cons(_lisp, C_NIL, C_NIL);
-  a().save(newl);
+  LISPT newl = cons(l, C_NIL, C_NIL);
+  a.save(newl);
   LISPT curp = newl;
-  for(; !is_NIL(l); l = l->cdr())
+  for(; !is_NIL(x); x = x->cdr())
   {
-    if(!is_NIL(l->car()))
+    if(!is_NIL(x->car()))
     {
-      _lisp.check(l->car(), CONS);
-      for(cl = l->car(); !is_NIL(cl); cl = cl->cdr())
+      l.check(x->car(), CONS);
+      for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
       {
-        rplacd(curp, cons(_lisp, cl->car(), C_NIL));
+        rplacd(curp, cons(l, cl->car(), C_NIL));
         curp = curp->cdr();
       }
     }
   }
-  newl = a().unsave();
+  newl = a.unsave();
   return newl->cdr();
 }
 
@@ -254,30 +254,30 @@ PRIMITIVE prim::null(LISPT a)
   return C_NIL;
 }
 
-PRIMITIVE prim::quote(LISPT a) { return a; }
+PRIMITIVE prim::quote(LISPT x) { return x; }
 
-PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(_lisp, x, f, LAMBDA); }
+PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, LAMBDA); }
 
-PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(_lisp, x, f, NLAMBDA); }
+PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, NLAMBDA); }
 
-PRIMITIVE prim::list(LISPT l) { return l; }
+PRIMITIVE prim::list(LISPT x) { return x; }
 
-PRIMITIVE prim::length(LISPT l)
+PRIMITIVE prim::length(LISPT x)
 {
   int i = 0;
-  while(!is_NIL(l) && type_of(l) == CONS)
+  while(!is_NIL(x) && type_of(x) == CONS)
   {
-    l = l->cdr();
+    x = x->cdr();
     i++;
   }
-  return mknumber(_lisp, i);
+  return mknumber(l, i);
 }
 
 PRIMITIVE prim::closure(LISPT fun, LISPT vars)
 {
-  a().save(fun);
-  a().save(vars);
-  LISPT c = a().getobject();
+  a.save(fun);
+  a.save(vars);
+  LISPT c = a.getobject();
   c->closval().cfunction = fun;
   c->closval().closed = vars;
   LISPT f = length(vars);
@@ -307,22 +307,22 @@ static LISPT nth(LISPT list, int n)
     return C_NIL;
 }
 
-PRIMITIVE prim::xnth(LISPT l, LISPT p)
+PRIMITIVE prim::xnth(LISPT x, LISPT p)
 {
-  _lisp.check(p, INTEGER);
-  if(is_NIL(l))
+  l.check(p, INTEGER);
+  if(is_NIL(x))
     return C_NIL;
-  _lisp.check(l, CONS);
-  return nth(l, p->intval());
+  l.check(x, CONS);
+  return nth(x, p->intval());
 }
 
 PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 {
-  _lisp.check(pos, INTEGER);
+  l.check(pos, INTEGER);
   int p = pos->intval();
   if(is_NIL(list))
     return C_NIL;
-  _lisp.check(list, CONS);
+  l.check(list, CONS);
   LISPT l;
   for(l = list; type_of(l) == CONS && p > 1; l = l->cdr()) p--;
   return l;
@@ -330,8 +330,8 @@ PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 
 PRIMITIVE prim::xerror(LISPT mess)
 {
-  _lisp.check(mess, STRING);
-  return _lisp.error(USER_ERROR, mess);
+  l.check(mess, STRING);
+  return l.error(USER_ERROR, mess);
 }
 
 PRIMITIVE prim::uxexit(LISPT status)

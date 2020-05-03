@@ -13,8 +13,8 @@ namespace lisp
 /* Return symbols print name as a string. */
 PRIMITIVE string::symstr(LISPT sym)
 {
-  _lisp.check(sym, SYMBOL);
-  return mkstring(_lisp, sym->symval().pname);
+  l.check(sym, SYMBOL);
+  return mkstring(l, sym->symval().pname);
 }
 
 /* T if s is a string, NIL otherwise. */
@@ -28,8 +28,8 @@ PRIMITIVE string::stringp(LISPT s)
 /* T if both strings are equal */
 PRIMITIVE string::streq(LISPT s1, LISPT s2)
 {
-  _lisp.check(s1, STRING);
-  _lisp.check(s2, STRING);
+  l.check(s1, STRING);
+  l.check(s2, STRING);
   if(!strcmp(s1->stringval(), s2->stringval()))
     return C_T;
   return C_NIL;
@@ -37,9 +37,9 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
 
 PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
 {
-  _lisp.check(s1, STRING);
-  _lisp.check(s2, STRING);
-  return mknumber(_lisp, strcmp(s1->stringval(), s2->stringval()));
+  l.check(s1, STRING);
+  l.check(s2, STRING);
+  return mknumber(l, strcmp(s1->stringval(), s2->stringval()));
 }
 
 /* Concatenate arbitrary many strings to
@@ -49,26 +49,26 @@ PRIMITIVE string::concat(LISPT strlist)
   int size = 0;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
-    _lisp.check(sl->car(), STRING);
+    l.check(sl->car(), STRING);
     size += std::strlen(sl->car()->stringval());
   }
-  auto* ns = a().realmalloc((unsigned)size + 1);
+  auto* ns = a.realmalloc((unsigned)size + 1);
   if(ns == nullptr)
-    return _lisp.error(OUT_OF_MEMORY, C_NIL);
+    return l.error(OUT_OF_MEMORY, C_NIL);
   ns[0] = '\0';
   while(!is_NIL(strlist))
   {
     strcat(ns, strlist->car()->stringval());
     strlist = strlist->cdr();
   }
-  return mkstring(_lisp, ns);
+  return mkstring(l, ns);
 }
 
 /* Return string length of s */
 PRIMITIVE string::strlen(LISPT s)
 {
-  _lisp.check(s, STRING);
-  return mknumber(_lisp, std::strlen(s->stringval()));
+  l.check(s, STRING);
+  return mknumber(l, std::strlen(s->stringval()));
 }
 
 /* Extract a substring from start to end.
@@ -78,24 +78,24 @@ PRIMITIVE string::strlen(LISPT s)
    to zero if start is equal to one is accepted. */
 PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
 {
-  _lisp.check(str, STRING);
-  _lisp.check(start, INTEGER);
-  _lisp.check(end, INTEGER);
+  l.check(str, STRING);
+  l.check(start, INTEGER);
+  l.check(end, INTEGER);
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
   if(size < 0 || s > static_cast<int>(std::strlen(str->stringval()))
     || e > static_cast<int>(std::strlen(str->stringval())) || s <= 0 || e < 0)
     return C_NIL;
-  auto* ns = a().realmalloc((unsigned)size + 1);
+  auto* ns = a.realmalloc((unsigned)size + 1);
   if(ns == nullptr)
-    return _lisp.error(OUT_OF_MEMORY, C_NIL);
+    return l.error(OUT_OF_MEMORY, C_NIL);
   ns[size] = '\0';
   for(size = 0; s <= e; s++, size++)
   {
     ns[size] = *(str->stringval() + s - 1);
   }
-  return mkstring(_lisp, ns);
+  return mkstring(l, ns);
 }
 
 string::string(lisp& lisp): base(lisp) {}

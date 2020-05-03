@@ -16,7 +16,7 @@ namespace lisp
 {
 void evaluator::reset()
 {
-  a().dzero();
+  a.dzero();
   toctrl = 0;
   fun = C_NIL;
   args = C_NIL;
@@ -35,15 +35,15 @@ LISPT evaluator::printwhere()
           && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
-          _lisp.primerr().printf(" [in ");
-          file(_lisp).prin2(foo->car(), C_T);
-          _lisp.primerr().putch(']');
+          l.primerr().printf(" [in ");
+          file(l).prin2(foo->car(), C_T);
+          l.primerr().putch(']');
           goto out;
         }
       }
   }
 out:
-  _lisp.primerr().putch('\n');
+  l.primerr().putch('\n');
   return foo;
 }
 
@@ -53,7 +53,7 @@ out:
  */
 void evaluator::abort(int m, LISPT v)
 {
-  _lisp.error(m, v);
+  l.error(m, v);
   printwhere();
   unwind();
   throw lisp_error("abort");
@@ -104,14 +104,14 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 {
   if(mess != 0)
   {
-    _lisp.perror(mess, fault);
+    l.perror(mess, fault);
     printwhere();
   }
   if(breakhook != nullptr)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  file(_lisp).xprint(a().cons(fault, a().cons(C_BROKEN, C_NIL)), C_T);
+  file(l).xprint(a.cons(fault, a.cons(C_BROKEN, C_NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -122,7 +122,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
  */
 alloc::destblock_t* evaluator::mkdestblock(int s)
 {
-  auto dest = a().dalloc(s + 1);
+  auto dest = a.dalloc(s + 1);
   dest[0].var.d_integer = s;
   dest[0].val.d_integer = s;
   dest[0].type = alloc::block_type::EMPTY;
@@ -137,7 +137,7 @@ void evaluator::storevar(LISPT v, int i)
 
 alloc::destblock_t* evaluator::pop_env()
 {
-  a().dfree(env);
+  a.dfree(env);
   return pop_point();
 }
 
@@ -166,19 +166,19 @@ LISPT evaluator::call(LISPT fun)
   switch(fun->subrval().argcount)
   {
     case 0:
-      foo = (*(fun->subrval().function0))(_lisp);
+      foo = (*(fun->subrval().function0))(l);
       break;
     case 1:
     case -1:
-      foo = (*(fun->subrval().function1))(_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function1))(l, dest[1].val.d_lisp);
       break;
     case 2:
     case -2:
-      foo = (*(fun->subrval().function2))(_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function2))(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
     case -3:
-      foo = (*(fun->subrval().function3))(_lisp, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      foo = (*(fun->subrval().function3))(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
@@ -231,7 +231,7 @@ PRIMITIVE evaluator::eval(LISPT expr)
 
 bool evaluator::eval0()
 {
-  a().dfree(dest);
+  a.dfree(dest);
   return true;
 }
 
@@ -247,7 +247,7 @@ PRIMITIVE evaluator::apply(LISPT f, LISPT x)
   fun = f;
   push_lisp(args);
   args = x;
-  expression = a().cons(f, x);
+  expression = a.cons(f, x);
   push_func(&evaluator::apply0);
   cont = &evaluator::peval2;
   while(!(this->*cont)())
@@ -259,7 +259,7 @@ PRIMITIVE evaluator::apply(LISPT f, LISPT x)
 
 bool evaluator::apply0()
 {
-  a().dfree(dest);
+  a.dfree(dest);
   args = pop_lisp();
   fun = pop_lisp();
   return true;
@@ -281,7 +281,7 @@ bool evaluator::peval()
 {
 #ifdef TRACE
   if(_trace)
-    file(_lisp).xprint(expression, C_T);
+    file(l).xprint(expression, C_T);
 #endif
   push_lisp(expression);
   push_func(&evaluator::ev0);
@@ -353,12 +353,12 @@ void evaluator::do_unbound(continuation_t continuation)
    * load the definition from a file.  If that doesn't succeed, then
    * the symbol is undefined.
    */
-  LISPT al = getprop(_lisp, expression->car(), C_AUTOLOAD);
+  LISPT al = getprop(l, expression->car(), C_AUTOLOAD);
   if(!is_NIL(al))
   {
     push_lisp(expression);
     push_point(dest);
-    file(_lisp).load(al);
+    file(l).load(al);
     dest = pop_point();
     expression = pop_lisp();
     fun = expression->car()->symvalue();
@@ -551,14 +551,14 @@ bool evaluator::peval2()
  */
 void evaluator::bt()
 {
-  int op = _lisp.printlevel;
-  _lisp.printlevel = 2;
+  int op = l.printlevel;
+  l.printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
-      file(_lisp).xprint(control[i - 1].u.lisp, C_T);
+      file(l).xprint(control[i - 1].u.lisp, C_T);
   }
-  _lisp.printlevel = op;
+  l.printlevel = op;
 }
 
 bool evaluator::everr()
@@ -666,7 +666,7 @@ bool evaluator::evlis1()
 
 bool evaluator::evlis2()
 {
-  LISPT x = a().cons(receive(), C_NIL);
+  LISPT x = a.cons(receive(), C_NIL);
   send(x);
   cont = pop_func();
   return false;
@@ -686,9 +686,9 @@ bool evaluator::evlis3()
 bool evaluator::evlis4()
 {
   LISPT x = receive();
-  a().dfree(dest);
+  a.dfree(dest);
   dest = pop_point();
-  x = a().cons(receive(), x);
+  x = a.cons(receive(), x);
   send(x);
   cont = pop_func();
   return false;
@@ -754,7 +754,7 @@ bool evaluator::ev2()
   try
   {
     auto foo = call(fun);
-    a().dfree(dest);
+    a.dfree(dest);
     dest = pop_point();
     send(foo);
     cont = pop_func();
@@ -938,84 +938,84 @@ PRIMITIVE evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
-    _lisp.primerr().printf("%d: ", i);
+    l.primerr().printf("%d: ", i);
     switch(control[i].type)
     {
       case CTRL_LISP:
-        file(_lisp).xprint(control[i].u.lisp, C_T);
+        file(l).xprint(control[i].u.lisp, C_T);
         break;
       case CTRL_POINT:
-        _lisp.primerr().printf("destblock\n");
+        l.primerr().printf("destblock\n");
         break;
       case CTRL_FUNC:
         if(control[i].u.f_point == &evaluator::ev0)
-          _lisp.primerr().printf("ev0\n");
+          l.primerr().printf("ev0\n");
         else if(control[i].u.f_point == &evaluator::peval)
-          _lisp.primerr().printf("peval\n");
+          l.primerr().printf("peval\n");
         else if(control[i].u.f_point == &evaluator::peval1)
-          _lisp.primerr().printf("peval1\n");
+          l.primerr().printf("peval1\n");
         else if(control[i].u.f_point == &evaluator::peval2)
-          _lisp.primerr().printf("peval2\n");
+          l.primerr().printf("peval2\n");
         else if(control[i].u.f_point == &evaluator::ev0)
-          _lisp.primerr().printf("ev0\n");
+          l.primerr().printf("ev0\n");
         else if(control[i].u.f_point == &evaluator::ev1)
-          _lisp.primerr().printf("ev1\n");
+          l.primerr().printf("ev1\n");
         else if(control[i].u.f_point == &evaluator::ev2)
-          _lisp.primerr().printf("ev2\n");
+          l.primerr().printf("ev2\n");
         else if(control[i].u.f_point == &evaluator::ev3)
-          _lisp.primerr().printf("ev3\n");
+          l.primerr().printf("ev3\n");
         else if(control[i].u.f_point == &evaluator::ev4)
-          _lisp.primerr().printf("ev4\n");
+          l.primerr().printf("ev4\n");
         else if(control[i].u.f_point == &evaluator::evlam0)
-          _lisp.primerr().printf("evlam0\n");
+          l.primerr().printf("evlam0\n");
         else if(control[i].u.f_point == &evaluator::evlam1)
-          _lisp.primerr().printf("evlam1\n");
+          l.primerr().printf("evlam1\n");
         else if(control[i].u.f_point == &evaluator::ev9)
-          _lisp.primerr().printf("ev9\n");
+          l.primerr().printf("ev9\n");
         else if(control[i].u.f_point == &evaluator::ev11)
-          _lisp.primerr().printf("ev11\n");
+          l.primerr().printf("ev11\n");
         else if(control[i].u.f_point == &evaluator::ev3p)
-          _lisp.primerr().printf("ev3p\n");
+          l.primerr().printf("ev3p\n");
         else if(control[i].u.f_point == &evaluator::evalargs)
-          _lisp.primerr().printf("evalargs\n");
+          l.primerr().printf("evalargs\n");
         else if(control[i].u.f_point == &evaluator::noevarg)
-          _lisp.primerr().printf("noevarg\n");
+          l.primerr().printf("noevarg\n");
         else if(control[i].u.f_point == &evaluator::evlam)
-          _lisp.primerr().printf("evlam\n");
+          l.primerr().printf("evlam\n");
         else if(control[i].u.f_point == &evaluator::spread)
-          _lisp.primerr().printf("spread\n");
+          l.primerr().printf("spread\n");
         else if(control[i].u.f_point == &evaluator::evlis)
-          _lisp.primerr().printf("evlis\n");
+          l.primerr().printf("evlis\n");
         else if(control[i].u.f_point == &evaluator::evlis1)
-          _lisp.primerr().printf("evlis1\n");
+          l.primerr().printf("evlis1\n");
         else if(control[i].u.f_point == &evaluator::evlis2)
-          _lisp.primerr().printf("evlis2\n");
+          l.primerr().printf("evlis2\n");
         else if(control[i].u.f_point == &evaluator::evlis3)
-          _lisp.primerr().printf("evlis3\n");
+          l.primerr().printf("evlis3\n");
         else if(control[i].u.f_point == &evaluator::evlis4)
-          _lisp.primerr().printf("evlis4\n");
+          l.primerr().printf("evlis4\n");
         else if(control[i].u.f_point == &evaluator::noev9)
-          _lisp.primerr().printf("noev9\n");
+          l.primerr().printf("noev9\n");
         else if(control[i].u.f_point == &evaluator::evsequence)
-          _lisp.primerr().printf("evsequence\n");
+          l.primerr().printf("evsequence\n");
         else if(control[i].u.f_point == &evaluator::evseq1)
-          _lisp.primerr().printf("evseq1\n");
+          l.primerr().printf("evseq1\n");
         else if(control[i].u.f_point == &evaluator::evseq3)
-          _lisp.primerr().printf("evseq3\n");
+          l.primerr().printf("evseq3\n");
         else if(control[i].u.f_point == &evaluator::evclosure)
-          _lisp.primerr().printf("evclosure\n");
+          l.primerr().printf("evclosure\n");
         else if(control[i].u.f_point == &evaluator::evclosure1)
-          _lisp.primerr().printf("evclosure1\n");
+          l.primerr().printf("evclosure1\n");
         else if(control[i].u.f_point == &evaluator::eval0)
-          _lisp.primerr().printf("eval0\n");
+          l.primerr().printf("eval0\n");
         else if(control[i].u.f_point == &evaluator::apply0)
-          _lisp.primerr().printf("apply0\n");
+          l.primerr().printf("apply0\n");
         else if(control[i].u.f_point == &evaluator::everr)
-          _lisp.primerr().printf("everr\n");
+          l.primerr().printf("everr\n");
         else if(control[i].u.f_point == &evaluator::lookup)
-          _lisp.primerr().printf("lookup\n");
+          l.primerr().printf("lookup\n");
         else
-          _lisp.stderr().printf("Unknown control stack element\n");
+          l.stderr().printf("Unknown control stack element\n");
         break;
     }
   }

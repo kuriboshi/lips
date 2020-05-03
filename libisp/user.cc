@@ -14,7 +14,7 @@ LISPT user::getargs(LISPT al)
   if(is_NIL(al->cdr()))
     return al->car();
   else
-    return cons(_lisp, al->car(), getargs(al->cdr()));
+    return cons(l, al->car(), getargs(al->cdr()));
 }
 
 PRIMITIVE user::getrep(LISPT fun)
@@ -31,8 +31,8 @@ PRIMITIVE user::getrep(LISPT fun)
   else
     args = x.arglist;
   if(type_of(fun) == LAMBDA)
-    return cons(_lisp, C_LAMBDA, cons(_lisp, args, x.lambdarep));
-  return cons(_lisp, C_NLAMBDA, cons(_lisp, args, x.lambdarep));
+    return cons(l, C_LAMBDA, cons(l, args, x.lambdarep));
+  return cons(l, C_NLAMBDA, cons(l, args, x.lambdarep));
 }
 
 LISPT user::funeq(LISPT f1, LISPT f2)
@@ -43,12 +43,12 @@ LISPT user::funeq(LISPT f1, LISPT f2)
   {
     LISPT t1 = f1->lamval().arglist;
     LISPT t2 = f2->lamval().arglist;
-    LISPT tmp = equal(_lisp, t1, t2);
+    LISPT tmp = equal(l, t1, t2);
     if(!is_NIL(tmp))
     {
       t1 = f1->lamval().lambdarep;
       t2 = f2->lamval().lambdarep;
-      tmp = equal(_lisp, t1, t2);
+      tmp = equal(l, t1, t2);
       if(!is_NIL(tmp))
         return C_T;
     }
@@ -64,9 +64,9 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       LISPT t = funeq(name->getopval(), lam);
       if(is_NIL(t))
       {
-        putprop(_lisp, name, C_OLDDEF, name->getopval());
-        if(!is_NIL(_lisp.a().verboseflg))
-          xprint(_lisp, cons(_lisp, name, cons(_lisp, C_REDEFINED, C_NIL)), C_NIL);
+        putprop(l, name, C_OLDDEF, name->getopval());
+        if(!is_NIL(a.verboseflg))
+          xprint(l, cons(l, name, cons(l, C_REDEFINED, C_NIL)), C_NIL);
       }
     }
   return C_NIL;
@@ -74,8 +74,8 @@ LISPT user::checkfn(LISPT name, LISPT lam)
 
 PRIMITIVE user::define(LISPT name, LISPT lam)
 {
-  _lisp.check(name, SYMBOL);
-  _lisp.check2(lam, LAMBDA, NLAMBDA);
+  l.check(name, SYMBOL);
+  l.check2(lam, LAMBDA, NLAMBDA);
   checkfn(name, lam);
   name->setopval(lam);
   return name;
@@ -83,15 +83,15 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
 
 LISPT user::def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
-  _lisp.check(name, SYMBOL);
+  l.check(name, SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != SYMBOL)
-    _lisp.check(pars, CONS);
-  LISPT foo = mklambda(_lisp, pars, body, type);
+    l.check(pars, CONS);
+  LISPT foo = mklambda(l, pars, body, type);
   if(type_of(foo) == ERROR)
     return C_NIL;
   checkfn(name, foo);
   name->setopval(foo);
-  return cons(_lisp, name, C_NIL);
+  return cons(l, name, C_NIL);
 }
 
 PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, LAMBDA); }

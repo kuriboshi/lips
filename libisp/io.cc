@@ -12,10 +12,10 @@ extern lisp::LISPT history;
 #define CHECKEOF(c) \
   if((c) == EOF) \
   { \
-    if(line || is_NIL(_lisp.top->car())) \
+    if(line || is_NIL(l.top->car())) \
       return C_EOF; \
     else \
-      return _lisp.error(UNEXPECTED_EOF, C_NIL); \
+      return l.error(UNEXPECTED_EOF, C_NIL); \
   }
 
 #define GETCH(file) \
@@ -169,12 +169,12 @@ LISPT io::parsebuf(char* buf)
   int longval;
 
   if(integerp(buf, &longval))
-    return mknumber(_lisp, longval);
+    return mknumber(l, longval);
 #ifdef FLOATING
   else if(floatp(buf))
-    return mkfloat(_lisp, atof(buf));
+    return mkfloat(l, atof(buf));
 #endif /* FLOATING */
-  return mkatom(_lisp, buf);
+  return mkatom(l, buf);
 }
 
 /*
@@ -196,7 +196,7 @@ LISPT io::ratom(file_t& file)
     {
       buffer[pos++] = c;
       buffer[pos] = NUL;
-      return mkatom(_lisp, buffer);
+      return mkatom(l, buffer);
     }
     else
     {
@@ -227,33 +227,32 @@ LISPT io::ratom(file_t& file)
 }
 
 /*
- * Splice list l into c keeping cdr of c. If l is not a
- * list put it in car of c and return c, otherwise return
- * last cell of l with cdr set to original (cdr c).
- * If tailp is true, don't clobber car of c.
+ * Splice list y into x keeping cdr of x. If y is not a list put it in car of x
+ * and return x, otherwise return last cell of y with cdr set to original (cdr
+ * x).  If tailp is true, don't clobber car of x.
  */
-LISPT io::splice(LISPT c, LISPT l, int tailp)
+LISPT io::splice(LISPT x, LISPT y, bool tailp)
 {
-  LISPT t = c->cdr();
-  if(type_of(l) != CONS)
+  LISPT t = x->cdr();
+  if(type_of(x) != CONS)
   {
     if(tailp)
-      rplacd(_lisp, c, a().cons(l, t));
+      rplacd(l, x, a.cons(y, t));
     else
-      rplaca(_lisp, c, l);
-    return c;
+      rplaca(l, x, y);
+    return x;
   }
   if(!tailp)
   {
-    rplaca(_lisp, c, l->car());
-    l = l->cdr();
+    rplaca(l, x, y->car());
+    y = y->cdr();
   }
-  if(is_NIL(l))
-    return c;
-  rplacd(_lisp, c, l);
+  if(is_NIL(y))
+    return x;
+  rplacd(l, x, y);
   LISPT t2 = C_NIL;
-  for(; type_of(l) == CONS; l = l->cdr()) t2 = l;
-  return rplacd(_lisp, t2, t);
+  for(; type_of(y) == CONS; y = y->cdr()) t2 = y;
+  return rplacd(l, t2, t);
 }
 
 /*
@@ -273,78 +272,78 @@ LISPT io::lispread(file_t& file, bool line)
 
   if(!line)
   {
-    _lisp.top = cons(_lisp, C_NIL, C_NIL);
-    curr = _lisp.top;
+    l.top = cons(l, C_NIL, C_NIL);
+    curr = l.top;
   }
   else
-    curr = _lisp.top->car();
+    curr = l.top->car();
 head:
   GETCH(file);
   if(isinsert(curc))
   {
-    pushr(_lisp.top);
-    rplaca(_lisp, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
-    popr(_lisp.top);
+    pushr(l.top);
+    rplaca(l, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
+    popr(l.top);
     goto check;
   }
   else if(issplice(curc))
   {
-    pushr(_lisp.top);
+    pushr(l.top);
     temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
-    popr(_lisp.top);
+    popr(l.top);
     curr = splice(curr, temp, 0);
     goto check;
   }
   else if(curc == '(')
   {
   head2:
-    rplaca(_lisp, curr, cons(_lisp, C_NIL, C_NIL));
-    rplacd(_lisp, curr->car(), curr);
+    rplaca(l, curr, cons(l, C_NIL, C_NIL));
+    rplacd(l, curr->car(), curr);
     curr = curr->car();
     goto head;
   }
   else if(curc == ')')
   {
     curr = curr->cdr();
-    rplaca(_lisp, curr, C_NIL);
+    rplaca(l, curr, C_NIL);
     goto check;
   }
   else
   {
     file.ungetch(curc);
     curatom = ratom(file);
-    rplaca(_lisp, curr, curatom);
+    rplaca(l, curr, curatom);
   check:
     if(is_NIL(curr->cdr()))
     {
-      temp = _lisp.top->car();
-      _lisp.top = C_NIL;
+      temp = l.top->car();
+      l.top = C_NIL;
       return temp;
     }
-    else if(line && file.eoln() && EQ(curr->cdr(), _lisp.top))
+    else if(line && file.eoln() && EQ(curr->cdr(), l.top))
       goto addparen;
     else
       goto tail;
   }
 tail:
-  if(line && file.eoln() && EQ(curr->cdr(), _lisp.top))
+  if(line && file.eoln() && EQ(curr->cdr(), l.top))
     goto addparen;
   GETCH(file);
   if(isinsert(curc))
   {
     temp = curr->cdr();
-    rplacd(_lisp, curr, cons(_lisp, C_NIL, temp));
+    rplacd(l, curr, cons(l, C_NIL, temp));
     curr = curr->cdr();
-    pushr(_lisp.top);
-    rplaca(_lisp, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
-    popr(_lisp.top);
+    pushr(l.top);
+    rplaca(l, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
+    popr(l.top);
     goto tail;
   }
   else if(issplice(curc))
   {
-    pushr(_lisp.top);
+    pushr(l.top);
     temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
-    popr(_lisp.top);
+    popr(l.top);
     curr = splice(curr, temp, 1);
     goto tail;
   }
@@ -357,16 +356,16 @@ tail:
   {
   addparen:
     temp = curr->cdr();
-    rplacd(_lisp, curr, C_NIL);
+    rplacd(l, curr, C_NIL);
     curr = temp;
     goto check;
   }
   else if(curc == '(')
   {
     temp = curr->cdr();
-    rplacd(_lisp, curr, cons(_lisp, C_NIL, C_NIL));
+    rplacd(l, curr, cons(l, C_NIL, C_NIL));
     curr = curr->cdr();
-    rplacd(_lisp, curr, temp);
+    rplacd(l, curr, temp);
     goto head2;
   }
   else if(curc == '.')
@@ -392,12 +391,12 @@ tail:
     GETCH(file);
     if(curc != ')')
     {
-      rplacd(_lisp, curr, cons(_lisp, C_DOT, cons(_lisp, C_NIL, temp)));
+      rplacd(l, curr, cons(l, C_DOT, cons(l, C_NIL, temp)));
       curr = curr->cdr()->cdr();
-      rplaca(_lisp, curr, curatom);
+      rplaca(l, curr, curatom);
       goto another;
     }
-    rplacd(_lisp, curr, curatom);
+    rplacd(l, curr, curatom);
     curr = temp;
     goto check;
   }
@@ -409,9 +408,9 @@ tail:
     curatom = ratom(file);
   insert:
     temp = curr->cdr();
-    rplacd(_lisp, curr, cons(_lisp, C_NIL, temp));
+    rplacd(l, curr, cons(l, C_NIL, temp));
     curr = curr->cdr();
-    rplaca(_lisp, curr, curatom);
+    rplaca(l, curr, curatom);
     goto tail;
   }
 }
@@ -502,7 +501,7 @@ LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
     c = file.getch();
   }
   buffer[pos] = NUL;
-  return mkstring(ctx._lisp, buffer);
+  return mkstring(ctx.l, buffer);
 }
 
 LISPT io::rmsquote(io& ctx, file_t& file, LISPT, char)
@@ -515,7 +514,7 @@ LISPT io::rmsquote(io& ctx, file_t& file, LISPT, char)
     return C_QUOTE;
   }
   file.ungetch(c);
-  return cons(ctx._lisp, C_QUOTE, cons(ctx._lisp, ctx.lispread(file, false), C_NIL));
+  return cons(ctx.l, C_QUOTE, cons(ctx.l, ctx.lispread(file, false), C_NIL));
 }
 
 #if 0
@@ -569,8 +568,8 @@ LISPT io::readline(file_t& file)
 {
   LISPT rd;
 
-  _lisp.top = cons(_lisp, C_NIL, C_NIL); /* Init first paren level */
-  rplaca(_lisp, _lisp.top, cons(_lisp, C_NIL, _lisp.top));
+  l.top = cons(l, C_NIL, C_NIL); /* Init first paren level */
+  rplaca(l, l.top, cons(l, C_NIL, l.top));
   rd = lispread(file, true);
   return rd;
 }
@@ -655,8 +654,8 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
   switch(type_of(x))
   {
     case CONS:
-      _lisp.thisplevel++;
-      if(_lisp.thisplevel <= _lisp.printlevel || _lisp.printlevel <= 0)
+      l.thisplevel++;
+      if(l.thisplevel <= l.printlevel || l.printlevel <= 0)
       {
         file.putch('(');
         prinbody(x, file, esc);
@@ -664,7 +663,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       }
       else
         file.putch('&');
-      _lisp.thisplevel--;
+      l.thisplevel--;
       break;
     case SYMBOL:
       return patom(x, file, esc);
@@ -749,7 +748,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
 
 LISPT io::print(LISPT x, file_t& file)
 {
-  _lisp.thisplevel = 0;
+  l.thisplevel = 0;
   prin0(x, file, true);
   terpri(file);
   return x;

@@ -8,28 +8,28 @@
 
 namespace lisp
 {
-PRIMITIVE logic::p_and(LISPT l)
+PRIMITIVE logic::p_and(LISPT x)
 {
   LISPT foo = C_T;
-  while(!is_NIL(l))
+  while(!is_NIL(x))
   {
-    foo = eval(_lisp, l->car());
+    foo = eval(l, x->car());
     if(is_NIL(foo))
       return foo;
-    l = l->cdr();
+    x = x->cdr();
   }
   return foo;
 }
 
-PRIMITIVE logic::p_or(LISPT l)
+PRIMITIVE logic::p_or(LISPT x)
 {
   LISPT foo = C_NIL;
-  while(!is_NIL(l))
+  while(!is_NIL(x))
   {
-    foo = eval(_lisp, l->car());
+    foo = eval(l, x->car());
     if(!is_NIL(foo))
       return foo;
-    l = l->cdr();
+    x = x->cdr();
   }
   return foo;
 }
@@ -43,10 +43,10 @@ PRIMITIVE logic::p_not(LISPT x)
 
 PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  LISPT foo = eval(_lisp, pred);
+  LISPT foo = eval(l, pred);
   if(is_NIL(foo))
-    return progn(_lisp, false_expr);
-  return eval(_lisp, true_expr);
+    return progn(l, false_expr);
+  return eval(l, true_expr);
 }
 
 logic::logic(lisp& lisp) : base(lisp) {}
