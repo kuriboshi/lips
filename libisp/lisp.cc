@@ -123,11 +123,6 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   _stderr = new file_t(new io::filesink(::stderr));
   _stdin = new file_t(new io::filesource(::stdin));
 
-#if 0
-  rstack = C_NIL;
-  top = C_NIL;
-#endif
-
   arith::init();
   debug::init();
   file::init();
@@ -220,13 +215,13 @@ void lisp::repl(LISPT prompt, breakfun_t f)
 {
   while(true)
   {
-    prin0(*this, prompt, *primout().sink);
+    prin0(*this, prompt, primout());
     auto* buf = primin().source->getline();
     if(buf == nullptr)
       break;
-    auto in = std::make_unique<io::stringsource>(buf);
+    auto in = std::make_unique<file_t>(new io::stringsource(buf));
     auto expr = lispread(*this, *in.get(), false);
-    print(*this, eval(*this, expr), *primout().sink);
+    print(*this, eval(*this, expr), primout());
   }
 }
 

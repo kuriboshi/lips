@@ -13,6 +13,7 @@
 namespace lisp
 {
 class lisp;
+struct file_t;
 class io
 {
 public:
@@ -199,28 +200,30 @@ public:
 
   bool integerp(char*, int* res);
   bool floatp(char*);
-  LISPT parsebuf(char*);
-  LISPT ratom(source&);
   LISPT splice(LISPT c, LISPT, int tailp);
-  LISPT lispread(source&, bool line = false);
-  static LISPT rmexcl(io&, source&, LISPT, char);
-  static LISPT rmdquote(io&, source&, LISPT, char);
-  static LISPT rmsquote(io&, source&, LISPT, char);
-  static LISPT rmpipe(io&, source&, LISPT, char);
-  static LISPT rmredir(io&, source&, LISPT, char);
-  static LISPT rmbg(io&, source&, LISPT, char);
-  static LISPT rmuser(io&, source&, LISPT, char);
+  LISPT parsebuf(char*);
+
+  LISPT ratom(file_t&);
+  LISPT lispread(file_t&, bool line = false);
+  LISPT readline(file_t&);
+
+  LISPT patom(LISPT, file_t&, bool esc = false);
+  LISPT terpri(file_t&);
+  LISPT prinbody(LISPT, file_t&, bool esc = false);
+  LISPT prin0(LISPT, file_t&, bool esc = false);
+  LISPT print(LISPT, file_t&);
+
+  static LISPT rmexcl(io&, file_t&, LISPT, char);
+  static LISPT rmdquote(io&, file_t&, LISPT, char);
+  static LISPT rmsquote(io&, file_t&, LISPT, char);
+  static LISPT rmpipe(io&, file_t&, LISPT, char);
+  static LISPT rmredir(io&, file_t&, LISPT, char);
+  static LISPT rmbg(io&, file_t&, LISPT, char);
+  static LISPT rmuser(io&, file_t&, LISPT, char);
 
 #if 0
   static LISPT userreadmacros[128];
 #endif
-
-  LISPT readline(source&);
-  LISPT patom(LISPT, sink&, bool esc = false);
-  LISPT terpri(sink&);
-  LISPT prinbody(LISPT, sink&, bool esc = false);
-  LISPT prin0(LISPT, sink&, bool esc = false);
-  LISPT print(LISPT, sink&);
 
 private:
   alloc& a() { return _lisp.a(); }
@@ -230,7 +233,7 @@ private:
 struct rtinfo
 {
   unsigned char chclass[128];
-  LISPT (*rmacros[128])(io&, io::source&, LISPT, char);
+  LISPT (*rmacros[128])(io&, file_t&, LISPT, char);
 };
 
 struct file_t
@@ -246,6 +249,15 @@ struct file_t
   io::source* source = nullptr;
   io::sink* sink = nullptr;
 
+  // io::source
+  int getch() { return source->getch(); }
+  void ungetch(int c) { source->ungetch(c); }
+  bool eoln() { return source->eoln(); }
+  const char* getline() { return source->getline(); }
+  // io::sink
+  void putch(char c, bool esc = false) { sink->putch(c, esc); }
+  void puts(const char* s) { sink->puts(s); }
+
   void printf(const char* format, ...)
   {
     va_list ap;
@@ -255,7 +267,6 @@ struct file_t
     va_end(ap);
     sink->puts(ret);
   }
-  void putch(char c) { sink->putch(c); }
 
   bool close()
   {
@@ -286,13 +297,13 @@ inline bool isinsert(int c) { return (currentrt.chclass[c] & RMACRO) == INSERT; 
 inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; }
 inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
 
-inline LISPT ratom(lisp& l, io::source& f) { return io(l).ratom(f); }
-inline LISPT lispread(lisp& l, io::source& f, bool i = false) { return io(l).lispread(f, i); }
-inline LISPT readline(lisp& l, io::source& f) { return io(l).readline(f); }
-inline LISPT patom(lisp& l, LISPT a, io::sink& f, int i) { return io(l).patom(a, f, i); }
-inline LISPT terpri(lisp& l, io::sink& f) { return io(l).terpri(f); }
-inline LISPT prinbody(lisp& l, LISPT a, io::sink& f, int i) { return io(l).prinbody(a, f, i); }
-inline LISPT prin0(lisp& l, LISPT a, io::sink& f, bool i = false) { return io(l).prin0(a, f, i); }
-inline LISPT print(lisp& l, LISPT a, io::sink& f) { return io(l).print(a, f); }
+inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
+inline LISPT lispread(lisp& l, file_t& f, bool i = false) { return io(l).lispread(f, i); }
+inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
+inline LISPT patom(lisp& l, LISPT a, file_t& f, int i) { return io(l).patom(a, f, i); }
+inline LISPT terpri(lisp& l, file_t& f) { return io(l).terpri(f); }
+inline LISPT prinbody(lisp& l, LISPT a, file_t& f, int i) { return io(l).prinbody(a, f, i); }
+inline LISPT prin0(lisp& l, LISPT a, file_t& f, bool i = false) { return io(l).prin0(a, f, i); }
+inline LISPT print(lisp& l, LISPT a, file_t& f) { return io(l).print(a, f); }
 
 } // namespace lisp

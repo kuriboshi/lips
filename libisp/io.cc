@@ -180,7 +180,7 @@ LISPT io::parsebuf(char* buf)
 /*
  * Read an atom from FILE.
  */
-LISPT io::ratom(source& file)
+LISPT io::ratom(file_t& file)
 {
   int pos = 0;
 
@@ -265,7 +265,7 @@ LISPT io::splice(LISPT c, LISPT l, int tailp)
 /*
  * If you don't like goto's, keep your eyes shut.
  */
-LISPT io::lispread(source& file, bool line)
+LISPT io::lispread(file_t& file, bool line)
 {
   LISPT curr, temp, curatom;
   int curc;
@@ -428,7 +428,7 @@ tail:
  *   !*      - all arguments
  * others could be added easily.
  */
-LISPT io::rmexcl(io& ctx, source& file, LISPT, char)
+LISPT io::rmexcl(io& ctx, file_t& file, LISPT, char)
 {
 #if 0
   LISPT at, l;
@@ -486,7 +486,7 @@ LISPT io::rmexcl(io& ctx, source& file, LISPT, char)
   return C_NIL;
 }
 
-LISPT io::rmdquote(io& ctx, source& file, LISPT, char)
+LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
 {
   char buf[MAXATOMSIZE];
   char c;
@@ -504,7 +504,7 @@ LISPT io::rmdquote(io& ctx, source& file, LISPT, char)
   return mkstring(ctx._lisp, buf);
 }
 
-LISPT io::rmsquote(io& ctx, source& file, LISPT, char)
+LISPT io::rmsquote(io& ctx, file_t& file, LISPT, char)
 {
   int c;
 
@@ -564,7 +564,7 @@ LISPT io::rmuser(io& ctx, source*, LISPT curr, char curc)
 }
 #endif
 
-LISPT io::readline(source& file)
+LISPT io::readline(file_t& file)
 {
   LISPT rd;
 
@@ -575,12 +575,12 @@ LISPT io::readline(source& file)
 }
 
 /* print the string s, on stream file */
-void ps(const char* s, io::sink& file, int esc)
+void ps(const char* s, file_t& file, bool esc)
 {
   while(*s) file.putch(*s++, esc);
 }
 
-void pi(int i, int base, io::sink& file)
+void pi(int i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -604,7 +604,7 @@ void pi(int i, int base, io::sink& file)
   ps(ss + j + 1, file, 0);
 }
 
-void pf(double d, io::sink& file)
+void pf(double d, file_t& file)
 {
   char ss[30];
 
@@ -612,19 +612,19 @@ void pf(double d, io::sink& file)
   ps(ss, file, 0);
 }
 
-LISPT io::patom(LISPT x, sink& file, bool esc)
+LISPT io::patom(LISPT x, file_t& file, bool esc)
 {
   ps(x->symval().pname, file, esc);
   return x;
 }
 
-LISPT io::terpri(sink& file)
+LISPT io::terpri(file_t& file)
 {
-  file.putch('\n', 0);
+  file.putch('\n');
   return C_NIL;
 }
 
-LISPT io::prinbody(LISPT x, sink& file, bool esc)
+LISPT io::prinbody(LISPT x, file_t& file, bool esc)
 {
   LISPT xx;
 
@@ -635,21 +635,21 @@ nxtelt:
     ;
   else if(type_of(xx->cdr()) == CONS)
   {
-    file.putch(' ', 0);
+    file.putch(' ');
     xx = xx->cdr();
     goto nxtelt;
   }
   else
   {
-    file.putch(' ', 0);
-    file.putch('.', 0);
-    file.putch(' ', 0);
+    file.putch(' ');
+    file.putch('.');
+    file.putch(' ');
     prin0(xx->cdr(), file, esc);
   }
   return x;
 }
 
-LISPT io::prin0(LISPT x, sink& file, bool esc)
+LISPT io::prin0(LISPT x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
@@ -657,12 +657,12 @@ LISPT io::prin0(LISPT x, sink& file, bool esc)
       thisplevel++;
       if(thisplevel <= printlevel || printlevel <= 0)
       {
-        file.putch('(', 0);
+        file.putch('(');
         prinbody(x, file, esc);
-        file.putch(')', 0);
+        file.putch(')');
       }
       else
-        file.putch('&', 0);
+        file.putch('&');
       thisplevel--;
       break;
     case SYMBOL:
@@ -679,7 +679,7 @@ LISPT io::prin0(LISPT x, sink& file, bool esc)
       ps("nil", file, 0);
       break;
     case TRUE:
-      file.putch('t', 0);
+      file.putch('t');
       break;
     case INTEGER:
       pi(x->intval(), currentbase->intval(), file);
@@ -690,9 +690,9 @@ LISPT io::prin0(LISPT x, sink& file, bool esc)
     case STRING:
       if(esc)
       {
-        file.putch('"', 0);
+        file.putch('"');
         ps(x->stringval(), file, esc);
-        file.putch('"', 0);
+        file.putch('"');
       }
       else
         ps(x->stringval(), file, 0);
@@ -746,7 +746,7 @@ LISPT io::prin0(LISPT x, sink& file, bool esc)
   return x;
 }
 
-LISPT io::print(LISPT x, sink& file)
+LISPT io::print(LISPT x, file_t& file)
 {
   thisplevel = 0;
   prin0(x, file, true);
