@@ -605,6 +605,5 @@ alloc::~alloc()
 }
 
 alloc::obarray_t* alloc::globals[];
-LISPT alloc::verboseflg = nullptr;
 
 } // namespace lisp
