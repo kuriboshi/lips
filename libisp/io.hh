@@ -267,14 +267,8 @@ struct file_t
   }
 };
 
-/* variables */
-extern LISPT top;
-extern LISPT rstack;
-extern int thisplevel;
-extern bool echoline;
 extern struct rtinfo currentrt;
 
-/* functions */
 enum char_class
 {
   SEPR = 001,   // seperator
