@@ -50,9 +50,17 @@ PRIMITIVE file::xprint(LISPT x, LISPT file)
 
 bool file::loadfile(const char* lf)
 {
-  auto foo = std::make_unique<file_t>(new io::filesource(lf));
-  for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != ENDOFFILE; rval = lispread(l, *foo.get(), false))
-    rval = e.eval(rval);
+  try
+  {
+    auto foo = std::make_unique<file_t>(new io::filesource(lf));
+    for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != ENDOFFILE; rval = lispread(l, *foo.get(), false))
+      rval = e.eval(rval);
+
+  }
+  catch (const lisp_error&)
+  {
+    return false;
+  }
   return true;
 }
 

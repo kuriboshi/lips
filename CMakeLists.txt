@@ -31,4 +31,4 @@ fetchcontent_declare(doctest
 make_available(doctest)
 
 add_subdirectory(libisp)
-# add_subdirectory(src)
+add_subdirectory(src)

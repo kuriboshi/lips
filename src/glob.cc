@@ -16,6 +16,8 @@
 #include "exec.hh"
 #include "glob.hh"
 
+extern lisp::lisp* L;
+
 using namespace lisp;
 
 inline constexpr int TICKS = 64;
@@ -170,7 +172,7 @@ const char* extilde(const char* w, int rep)
     if(pw == nullptr)
     {
       if(rep)
-        error(NO_USER, a().mkstring(s));
+        L->error(NO_USER, mkstring(*L, s));
       return nullptr;
     }
     strncpy(s, pw->pw_dir, MAXNAMLEN);
@@ -200,7 +202,7 @@ static bool walkfiles(const char* wild, int all, int report)
   if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
   {
     if(report)
-      error(NO_DIRECTORY, a().mkstring(r));
+      L->error(NO_DIRECTORY, mkstring(*L, r));
     return false;
   }
   while((rdir = readdir(odir)) != nullptr)
@@ -235,19 +237,17 @@ static bool walkfiles(const char* wild, int all, int report)
   }
   closedir(odir);
   if(!result && report)
-    error(NO_MATCH, mkstring(wild));
+    L->error(NO_MATCH, mkstring(*L, wild));
   return result;
 }
 
 static LISPT buildlist()
 {
   char** r;
-  LISPT l;
-
-  l = C_NIL;
+  LISPT l = C_NIL;
   for(r = globarr; r < globp; r++)
   {
-    l = cons(a().mkstring(*r), l);
+    l = cons(*L, mkstring(*L, *r), l);
     free(*r);
   }
   free(globarr);
@@ -263,7 +263,7 @@ static int comp(const void* a, const void* b)
 LISPT expandfiles(const char* wild, int all, int report, int sort)
 {
   if(*wild == '/' && *(wild + 1) == '\0')
-    return cons(a().mkstring(wild), C_NIL);
+    return cons(*L, mkstring(*L, wild), C_NIL);
   if(*wild == '/')
     strcpy(r, "/");
   else
@@ -282,18 +282,18 @@ LISPT expandfiles(const char* wild, int all, int report, int sort)
  * Lisp function expand. Expand all files matching wild
  * in directory dir.
  */
-PRIMITIVE expand(LISPT wild, LISPT rep, LISPT all)
+PRIMITIVE expand(::lisp::lisp& l, LISPT wild, LISPT rep, LISPT all)
 {
   const char* wstr;
   int r = 0;
 
   if(is_NIL(rep))
     r = 1;
-  check2(wild, STRING, SYMBOL);
+  l.check2(wild, STRING, SYMBOL);
   wstr = extilde(wild->getstr(), r);
   if(wstr == nullptr)
     return C_NIL;
   return expandfiles(wstr, is_NIL(all) ? 0 : 1, r, 0);
 }
 
-LISPT glob(LISPT wild) { return expand(wild, 0, 0); }
+LISPT glob(LISPT wild) { return expand(*L, wild, 0, 0); }

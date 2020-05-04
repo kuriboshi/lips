@@ -67,23 +67,6 @@ extern LISPT C_SYMBOL;
 extern LISPT C_UNBOUND;
 extern LISPT C_WRITE;
 
-// extern LISPT C_ALIAS;
-// extern LISPT C_AMPER;
-// extern LISPT C_BACK;
-// extern LISPT C_BAR;
-// extern LISPT C_EXCL;
-// extern LISPT C_EXEC;
-// extern LISPT C_FROM;
-// extern LISPT C_GGT;
-// extern LISPT C_GT;
-// extern LISPT C_LT;
-// extern LISPT C_OLDVAL;
-// extern LISPT C_PIPE;
-// extern LISPT C_PROGN;
-// extern LISPT C_SEMI;
-// extern LISPT C_TO;
-// extern LISPT C_TOTO;
-
 /* This is used to recognize c-functions for cpprint */
 using PRIMITIVE = LISPT;
 
@@ -353,7 +336,6 @@ inline void check2(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.che
 // Variables
 extern LISPT currentbase;
 extern LISPT topprompt;
-extern LISPT promptform;
 extern LISPT brkprompt;
 extern LISPT interactive;
 extern LISPT version;

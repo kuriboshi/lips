@@ -16,11 +16,10 @@
 #include <errno.h>
 
 #include <libisp.hh>
+#include <except.hh>
 #include "main.hh"
 #include "exec.hh"
 #include "top.hh"
-
-using namespace lisp;
 
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
@@ -29,16 +28,34 @@ using namespace lisp;
 extern void init_term();
 extern void end_term();
 extern void clearlbuf();
-extern void loadbuf(char*);
+
+lisp::lisp* L;
+
+using namespace lisp;
 
 char* progname;      /* Name of the game. */
-bool brkflg = false; /* 1 means break at next call to peval1. */
-bool interrupt;
 int mypgrp;             /* lips process group. */
-struct options options; /* Structure for all options. */
+options_t options; /* Structure for all options. */
 LISPT path;             /* Search path for executables. */
 LISPT home;             /* Home directory. */
 LISPT globsort;         /* To sort or not during globbing. */
+
+LISPT C_ALIAS;
+LISPT C_AMPER;
+LISPT C_BACK;
+LISPT C_BAR;
+LISPT C_EXCL;
+LISPT C_EXEC;
+LISPT C_FROM;
+LISPT C_GGT;
+LISPT C_GT;
+LISPT C_LT;
+LISPT C_OLDVAL;
+LISPT C_PIPE;
+LISPT C_PROGN;
+LISPT C_SEMI;
+LISPT C_TO;
+LISPT C_TOTO;
 
 /* graceful death */
 void finish(int stat)
@@ -48,10 +65,9 @@ void finish(int stat)
 }
 
 #ifdef FANCY_SIGNALS
-static int getuser(FILE* f, int def)
+static int getuser(int def)
 {
 #ifdef SELECT
-  int c;
   fd_set readfs;
   struct timeval timeout;
 
@@ -62,19 +78,19 @@ static int getuser(FILE* f, int def)
   switch(select(FD_SETSIZE, &readfs, nullptr, nullptr, &timeout))
   {
     case -1:
-      fprintf(primerr, "(error in select %d) ", errno);
-      c = 'n';
+      L->primerr().printf("(error in select %d) ", errno);
+      return 'n';
       break;
     case 0:
-      c = def;
+      return def;
       break;
     default:
-      c = getc(f);
+      return L->primin().getch();
       break;
   }
-  return c;
+  return def;
 #else
-  return getc(f);
+  return L->primin().getch();
 #endif
 }
 
@@ -86,28 +102,26 @@ static int getuser(FILE* f, int def)
  */
 void core(int sig)
 {
-  int c;
-
   init_term();
   if(insidefork)
   {
-    fprintf(primerr, " -- (in fork) core dumped\n");
+    L->primerr().printf(" -- (in fork) core dumped\n");
     killpg(getpgrp(), sig);
   }
-  fprintf(primerr, " -- Continue? ");
-  fflush(primerr);
-  c = getuser(stdin, 'y');
-  while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser(stdin, 'y');
+  L->primerr().printf(" -- Continue? ");
+  L->primerr().flush();
+  int c = getuser('y');
+  while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
   if((islower(c) ? c : tolower(c)) == 'n')
   {
-    fprintf(primerr, "No\n");
-    fprintf(primerr, "Core dump? ");
-    fflush(primerr);
-    c = getuser(stdin, 'y');
-    while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser(stdin, 'y');
+    L->primerr().printf("No\n");
+    L->primerr().printf("Core dump? ");
+    L->primerr().flush();
+    c = getuser('y');
+    while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
     if((islower(c) ? c : tolower(c)) == 'n')
     {
-      fprintf(primerr, "No\n");
+      L->primerr().printf("No\n");
       finish(0);
     }
     else
@@ -120,9 +134,9 @@ void core(int sig)
   }
   else
   {
-    fprintf(primerr, "Yes\n");
-    fprintf(primerr, "Warning: continued after signal %d.\n", sig);
-    fprintf(primerr, "Save your work and exit.\n");
+    L->primerr().printf("Yes\n");
+    L->primerr().printf("Warning: continued after signal %d.\n", sig);
+    L->primerr().printf("Save your work and exit.\n");
     end_term();
     throw lisp_error("continue after signal");
   }
@@ -133,8 +147,8 @@ void onintr(int)
 {
   if(insidefork)
     exit(0);
-  fprintf(primerr, "^C\n");
-  unwind();
+  L->primerr().puts("^C\n");
+  L->e().unwind();
   clearlbuf();
   throw lisp_error("onintr");
 }
@@ -142,25 +156,25 @@ void onintr(int)
 #ifdef FANCY_SIGNALS
 void onquit(int)
 {
-  fprintf(primerr, "Quit!");
+  L->primerr().puts("Quit!");
   core(SIGQUIT);
 }
 
 void onbus(int)
 {
-  fprintf(primerr, "%s: Bus error!", progname);
+  L->primerr().printf("%s: Bus error!", progname);
   core(SIGBUS);
 }
 
 void onsegv(int)
 {
-  fprintf(primerr, "%s: Segmentation violation!", progname);
+  L->primerr().printf("%s: Segmentation violation!", progname);
   core(SIGSEGV);
 }
 
 void onill(int)
 {
-  fprintf(primerr, "%s: Illegal instruction!", progname);
+  L->primerr().printf("%s: Illegal instruction!", progname);
   core(SIGILL);
 }
 
@@ -171,7 +185,7 @@ void onhup() { exit(0); }
  * The stop key means to break inside a lisp expression. The
  * brkflg is checked on every entry to eval.
  */
-void onstop(int) { brkflg = true; }
+void onstop(int) { L->brkflg = true; }
 
 static void fixpgrp()
 {
@@ -188,7 +202,7 @@ LISPT mungepath(char* pstr)
   char *ps, *s;
   LISPT p;
 
-  ps = realmalloc((unsigned)(strlen(pstr) + 1));
+  ps = L->a().realmalloc((unsigned)(strlen(pstr) + 1));
   if(ps == nullptr)
   {
     fprintf(stderr, "No more memory, can't munge path.\n");
@@ -202,7 +216,7 @@ LISPT mungepath(char* pstr)
     *s = '\0';
     for(; s >= ps && *s != ':'; s--)
       ;
-    p = cons(mkstring(s + 1), p);
+    p = cons(*L, mkstring(*L, s + 1), p);
   }
   free(ps);
   return p;
@@ -217,7 +231,7 @@ void onbreak()
 void promptfun()
 {
   tcsetpgrp(0, mypgrp); /* Get control of tty */
-  insidefork = 0;
+  insidefork = false;
   /*
    * Check for jobs that are finished and print them.
    */
@@ -225,99 +239,93 @@ void promptfun()
   printdone();
 }
 
-static LISPT put_end(LISPT list, LISPT obj, int conc)
+static LISPT put_end(LISPT list, LISPT obj, bool conc)
 {
-  LISPT t;
-
   if(is_NIL(list))
+  {
     if(conc)
       return obj;
-    else
-      return cons(obj, C_NIL);
-  else
-    for(t = list; type_of(t->cdr()) == CONS; t = t->cdr())
-      ;
+    return cons(*L, obj, C_NIL);
+  }
+  LISPT t;
+  for(t = list; type_of(t->cdr()) == CONS; t = t->cdr())
+    ;
   if(conc)
-    rplacd(t, obj);
+    rplacd(*L, t, obj);
   else
-    rplacd(t, cons(obj, C_NIL));
+    rplacd(*L, t, cons(*L, obj, C_NIL));
   return list;
 }
 
 static LISPT transform(LISPT list)
 {
-  LISPT tl;
-  LISPT res;
-  LISPT ll;
-  int conc;
-
-  tl = C_NIL;
-  res = C_NIL;
-  conc = 0;
-  for(ll = list; type_of(ll) == CONS; ll = ll->cdr())
+  LISPT tl = C_NIL;
+  LISPT res = C_NIL;
+  bool conc = false;
+  for(LISPT ll = list; type_of(ll) == CONS; ll = ll->cdr())
   {
     if(type_of(ll->car()) == CONS)
       tl = put_end(tl, transform(ll->car()), conc);
     else if(EQ(ll->car(), C_BAR))
     {
       if(is_NIL(res))
-        res = cons(C_PIPE, cons(tl, C_NIL));
+        res = cons(*L, C_PIPE, cons(*L, tl, C_NIL));
       else
-        res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_PIPE, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 0;
+      conc = false;
     }
     else if(EQ(ll->car(), C_SEMI))
     {
       if(is_NIL(res))
-        res = cons(C_PROGN, cons(tl, C_NIL));
+        res = cons(*L, C_PROGN, cons(*L, tl, C_NIL));
       else
-        res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_PROGN, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 0;
+      conc = false;
     }
     else if(EQ(ll->car(), C_GT))
     {
       if(is_NIL(res))
-        res = cons(C_TO, cons(tl, C_NIL));
+        res = cons(*L, C_TO, cons(*L, tl, C_NIL));
       else
-        res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_TO, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 1;
+      conc = true;
     }
     else if(EQ(ll->car(), C_GGT))
     {
       if(is_NIL(res))
-        res = cons(C_TOTO, cons(tl, C_NIL));
+        res = cons(*L, C_TOTO, cons(*L, tl, C_NIL));
       else
-        res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_TOTO, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 1;
+      conc = true;
     }
     else if(EQ(ll->car(), C_LT))
     {
       if(is_NIL(res))
-        res = cons(C_FROM, cons(tl, C_NIL));
+        res = cons(*L, C_FROM, cons(*L, tl, C_NIL));
       else
-        res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_FROM, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 1;
+      conc = true;
     }
     else if(EQ(ll->car(), C_AMPER))
     {
       if(is_NIL(res))
-        res = cons(C_BACK, cons(tl, C_NIL));
+        res = cons(*L, C_BACK, cons(*L, tl, C_NIL));
       else
-        res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(*L, C_BACK, cons(*L, put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
-      conc = 1;
+      conc = true;
     }
     else
-      tl = put_end(tl, ll->car(), 0);
+      tl = put_end(tl, ll->car(), false);
   }
   if(is_NIL(res))
     return tl;
-  else if(!is_NIL(tl))
+  if(!is_NIL(tl))
     res = put_end(res, tl, conc);
   return res;
 }
@@ -329,20 +337,38 @@ static void init()
 
   fixpgrp();
 
-  init_lisp();
-  init_hist();
+  L = new ::lisp::lisp();
+
+  C_ALIAS = alloc::intern("alias");
+  C_AMPER = alloc::intern("&");
+  C_BACK = alloc::intern(PN_BACK);
+  C_BAR = alloc::intern("|");
+  C_EXCL = alloc::intern("!");
+  C_EXEC = alloc::intern(PN_EXEC);
+  C_FROM = alloc::intern(PN_FROM);
+  C_GGT = alloc::intern(">>");
+  C_GT = alloc::intern(">");
+  C_LT = alloc::intern("<");
+  C_OLDVAL = alloc::intern("oldval");
+  C_PIPE = alloc::intern(PN_PIPECMD);
+  C_PROGN = alloc::intern(PN_PROGN);
+  C_SEMI = alloc::intern(";");
+  C_TO = alloc::intern(PN_TO);
+  C_TOTO = alloc::intern(PN_TOTO);
+
+  top::init();
 
   initcvar(&path, "path", mungepath(getenv("PATH")));
-  initcvar(&home, "home", mkstring(getenv("HOME")));
-  alloc::add_mark_object(&path);
-  alloc::add_mark_object(&home);
+  initcvar(&home, "home", mkstring(*L, getenv("HOME")));
+  L->a().add_mark_object(&path);
+  L->a().add_mark_object(&home);
 
   initcvar(&globsort, "globsort", C_T);
   transformhook = transform;
   beforeprompt = promptfun;
-  evaluator::breakhook = onbreak;
+  L->e().breakhook = onbreak;
 
-  init_exec();
+  exec::init();
 }
 
 /*
@@ -350,7 +376,7 @@ static void init()
  */
 static void loadinit(const char* initfile)
 {
-  if(!loadfile(initfile))
+  if(!loadfile(*L, initfile))
     printf("Can't open file %s\n", initfile); /* System init file. */
 }
 
@@ -360,63 +386,60 @@ static void loadinit(const char* initfile)
  */
 LISPT greet(LISPT who)
 {
-  struct passwd* pws;
-  char loadf[256];
   const char* s;
-
   if(is_NIL(who))
     s = getenv("USER");
   else
     s = who->stringval();
   if(s == nullptr)
     return C_NIL;
-  pws = getpwnam(s);
+  struct passwd* pws = getpwnam(s);
   if(pws == nullptr)
     return C_NIL;
+  char loadf[256];
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
-  loadfile(loadf);
+  loadfile(*L, loadf);
   return C_T;
 }
 
-/*ARGSUSED*/
 int main(int argc, char* const* argv)
 {
+  options.debug = false;
+  options.version = false;
+  options.fast = false;
+  options.interactive = false;
+  options.command = false;
   int option;
-
-  options.debug = 0;
-  options.version = 0;
-  options.fast = 0;
-  options.interactive = 0;
-  options.command = 0;
   while((option = getopt(argc, argv, "c:fvid")) != EOF)
   {
     switch(option)
     {
       case 'c':
-        options.command = 1;
-        loadbuf(optarg);
+        options.command = true;
+        // TODO: Read expression from command line and evaluate
+        // loadbuf(optarg);
         break;
       case 'f':
-        options.fast = 1;
+        options.fast = true;
         break;
       case 'v':
-        options.version = 1;
+        options.version = true;
         break;
       case 'i':
-        options.interactive = 1;
+        options.interactive = true;
         break;
       case 'd':
-        options.debug = 1;
+        options.debug = true;
         break;
       default:
-        fprintf(primerr, "usage: -fvic [arguments]\n");
+        L->primerr().puts("usage: -fvic [arguments]\n");
         exit(1);
         break;
     }
   }
   if(!options.interactive && !options.command)
-    options.interactive = isatty(0) ? 1 : 0;
+    options.interactive = isatty(0);
   if(options.version)
     printf("%s\n", VERSION);
   progname = argv[0];
@@ -455,7 +478,7 @@ int main(int argc, char* const* argv)
   {
     try
     {
-      evaluator::reset();
+      L->e().reset();
       if(toploop(&topprompt, nullptr))
         break;
     }
@@ -464,6 +487,11 @@ int main(int argc, char* const* argv)
     catch(const lisp_error& error)
     {
       printf("error: %s\n", error.what());
+    }
+    catch(const lisp_finish& fin)
+    {
+      L->stderr().printf("finish: %s", fin.what());
+      finish(fin.exit_code);
     }
   }
   finish(0);

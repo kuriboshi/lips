@@ -92,25 +92,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   C_UNBOUND = intern("unbound");
   C_WRITE = intern("write");
 
-  // C_ALIAS = intern("alias");
-  // C_AMPER = intern("&");
-  // C_BACK = intern(PN_BACK);
-  // C_BAR = intern("|");
-  // C_EXCL = intern("!");
-  // C_EXEC = intern(PN_EXEC);
-  // C_FROM = intern(PN_FROM);
-  // C_GGT = intern(">>");
-  // C_GT = intern(">");
-  // C_LT = intern("<");
-  // C_OLDVAL = intern("oldval");
-  // C_PIPE = intern(PN_PIPECMD);
-  // C_PROGN = intern(PN_PROGN);
-  // C_SEMI = intern(";");
-  // C_TO = intern(PN_TO);
-  // C_TOTO = intern(PN_TOTO);
-
   initcvar(&topprompt, "prompt", a().mkstring("!_"));
-  initcvar(&promptform, "promptform", C_NIL);
   initcvar(&brkprompt, "brkprompt", a().mkstring("!:"));
   initcvar(&currentbase, "base", a().mknumber(10L));
   initcvar(&interactive, "interactive", C_NIL);
@@ -234,12 +216,8 @@ void lisp::repl(LISPT prompt, breakfun_t f)
 LISPT C_T;
 LISPT CE_NIL;
 LISPT CE_T;
-LISPT C_ALIAS;
-LISPT C_AMPER;
 LISPT C_APPEND;
 LISPT C_AUTOLOAD;
-LISPT C_BACK;
-LISPT C_BAR;
 LISPT C_BIGNUM;
 LISPT C_BROKEN;
 LISPT C_BT;
@@ -250,42 +228,29 @@ LISPT C_ENDOFFILE;
 LISPT C_ENVIRON;
 LISPT C_EOF;
 LISPT C_ERROR;
-LISPT C_EXCL;
-LISPT C_EXEC;
 LISPT C_FILE;
 LISPT C_FLOAT;
 LISPT C_FREE;
-LISPT C_FROM;
 LISPT C_FSUBR;
-LISPT C_GGT;
 LISPT C_GO;
-LISPT C_GT;
 LISPT C_INDIRECT;
 LISPT C_INTEGER;
 LISPT C_LAMBDA;
-LISPT C_LT;
 LISPT C_NLAMBDA;
 LISPT C_OLDDEF;
-LISPT C_OLDVAL;
-LISPT C_PIPE;
-LISPT C_PROGN;
 LISPT C_QUOTE;
 LISPT C_READ;
 LISPT C_REDEFINED;
 LISPT C_RESET;
 LISPT C_RETURN;
-LISPT C_SEMI;
 LISPT C_STRING;
 LISPT C_SUBR;
 LISPT C_SYMBOL;
-LISPT C_TO;
-LISPT C_TOTO;
 LISPT C_UNBOUND;
 LISPT C_WRITE;
 
 LISPT currentbase; // Conversion base for print of integer.
 LISPT topprompt;   // Normal prompt.
-LISPT promptform;  // Evaluated before printing the prompt.
 LISPT brkprompt;   // Prompt in break.
 LISPT interactive; // Nonnil if interactive lips.
 LISPT version;     // Is set to the version string.

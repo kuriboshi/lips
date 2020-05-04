@@ -10,6 +10,7 @@
 #include <string>
 #include "lisp.hh"
 #include "base.hh"
+#include "except.hh"
 
 namespace lisp
 {
@@ -41,7 +42,12 @@ public:
   {
   public:
     filesource(std::FILE* file) : _file(file), _owner(false) {}
-    filesource(const char* filename) : _file(fopen(filename, "r")), _owner(true) {}
+    filesource(const char* filename) : _file(fopen(filename, "r")), _owner(true)
+    {
+      // TODO: Throw different exception
+      if(!_file)
+        throw lisp_error("Can't open file");
+    }
     ~filesource() { if(_owner) fclose(_file); }
 
     virtual int getch() override
@@ -122,6 +128,8 @@ public:
 
     virtual void putch(int, bool esc = false) = 0;
     virtual void puts(const char*) = 0;
+    virtual void terpri() = 0;
+    virtual void flush() {}
     virtual bool close() = 0;
   };
 
@@ -133,6 +141,8 @@ public:
 
     virtual void putch(int c, bool esc) override { putch(c, _file, esc); }
     virtual void puts(const char* s) override { std::fputs(s, _file); }
+    virtual void terpri() override { putch('\n', _file, false); }
+    virtual void flush() override { fflush(_file); }
     virtual bool close() override
     {
       if(std::fclose(_file) == -1)
@@ -176,6 +186,7 @@ public:
 
     virtual void putch(int c, bool) override { _string.push_back(static_cast<char>(c)); }
     virtual void puts(const char* s) override { _string.append(s); }
+    virtual void terpri() override { _string.push_back('\n'); }
     virtual bool close() override { return true; }
 
   private:
@@ -247,6 +258,8 @@ struct file_t
   // io::sink
   void putch(char c, bool esc = false) { sink->putch(c, esc); }
   void puts(const char* s) { sink->puts(s); }
+  void terpri() { sink->terpri(); }
+  void flush() { sink->flush(); }
 
   void printf(const char* format, ...)
   {

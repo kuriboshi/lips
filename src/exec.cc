@@ -16,9 +16,13 @@
 #include <string.h>
 
 #include <libisp.hh>
+#include <except.hh>
 #include "glob.hh"
 #include "main.hh"
 #include "top.hh"
+#include "exec.hh"
+
+extern lisp::lisp* L;
 
 using namespace lisp;
 
@@ -80,7 +84,7 @@ char* strsave(const char* str)
 {
   if(str == nullptr)
     return nullptr;
-  auto* newstr = realmalloc((unsigned)strlen(str) + 1);
+  auto* newstr = L->a().realmalloc((unsigned)strlen(str) + 1);
   if(newstr == nullptr)
     return nullptr;
   strcpy(newstr, str);
@@ -118,8 +122,8 @@ static void printjob(job_t* job)
       strcat(buffer, " (core dumped)");
   }
   strcat(buffer, "\t");
-  fputs(buffer, primout);
-  xprint(job->exp, C_NIL);
+  L->primout().puts(buffer);
+  xprint(*L, job->exp, C_NIL);
 }
 #endif
 
@@ -231,7 +235,7 @@ static int mfork()
     if(insidefork)
       fprintf(stderr, "%s\n", strerror(errno));
     else
-      syserr(C_NIL);
+      syserr(*L, C_NIL);
     return pid;
   }
   recordjob(pid, 0);
@@ -308,7 +312,7 @@ static char** makeexec(LISPT command)
           ok = 1;
         if(i == 0)
         {
-          error(AMBIGUOUS, com->car());
+          error(*L, AMBIGUOUS, com->car());
           return nullptr;
         }
         files = expandfiles(c, 0, 0, 1);
@@ -330,19 +334,19 @@ static char** makeexec(LISPT command)
     }
     else if(type_of(com->car()) == CONS)
     {
-      rplaca(com, eval(com->car()));
+      rplaca(*L, com, eval(*L, com->car()));
       goto again;
     }
     else
     {
-      error(ILLEGAL_ARG, com->car());
+      error(*L, ILLEGAL_ARG, com->car());
       return nullptr;
     }
   }
   args[i] = nullptr;
   if(ok == 1)
   {
-    error(NO_MATCH, command->cdr());
+    error(*L, NO_MATCH, command->cdr());
     return nullptr;
   }
   return args;
@@ -366,7 +370,7 @@ static UNION_WAIT waitfork(int pid)
   } while(pid && pid != wpid && wpid != -1);
   if(WIFSIGNALED(wstat))
   {
-    unwind();
+    L->e().unwind();
     throw lisp_error("waitfork");
   }
   return wstat;
@@ -386,13 +390,13 @@ void checkfork()
 }
 
 /* 
- * exec - Forks (if not already in a fork, in which case it works as 
- *        execve, overlaying the current process), and execs NAME with
- *        original command in COMMAND. It then waits for the process to
- *        return (using waitfork). Exec either returns T or ERROR depending
- *        success or failure for some reason.
+ * execute - Forks (if not already in a fork, in which case it works as execve,
+ *           overlaying the current process), and execs NAME with original
+ *           command in COMMAND. It then waits for the process to return (using
+ *           waitfork). Exec either returns T or ERROR depending success or
+ *           failure for some reason.
  */
-static LISPT exec(const char* name, LISPT command)
+static LISPT execute(const char* name, LISPT command)
 {
   char** args;
   int pid;
@@ -419,7 +423,7 @@ static LISPT exec(const char* name, LISPT command)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(*L, WEXITSTATUS(status));
 }
 
 /* 
@@ -475,7 +479,7 @@ int execcommand(LISPT exp, LISPT* res)
     return -1;
   if(*command == '/' || strpbrk(command, "/") != nullptr)
   {
-    if(EQ(exec(command, exp), C_ERROR))
+    if(EQ(execute(command, exp), C_ERROR))
       return -1;
     else
       return 1;
@@ -501,7 +505,7 @@ int execcommand(LISPT exp, LISPT* res)
     {
       strcat(comdir, "/");
       strcat(comdir, command);
-      if(EQ(exec(comdir, exp), C_ERROR))
+      if(EQ(execute(comdir, exp), C_ERROR))
         return -1;
       else
         return 1;
@@ -519,123 +523,123 @@ int execcommand(LISPT exp, LISPT* res)
 static void setenviron(const char* var, const char* val)
 {
 #ifdef PUTENV
-  auto* env = realmalloc((unsigned)strlen(var) + strlen(val) + 2);
+  auto* env = L->a().realmalloc((unsigned)strlen(var) + strlen(val) + 2);
   strcpy(env, var);
   strcat(env, "=");
   strcat(env, val);
   putenv(env);
 #else
-  auto* var_ = realmalloc((unsigned)strlen(var) + 1);
-  auto* val_ = realmalloc((unsigned)strlen(val) + 1);
+  auto* var_ = L->a().realmalloc((unsigned)strlen(var) + 1);
+  auto* val_ = L->a().realmalloc((unsigned)strlen(val) + 1);
   setenv(strcpy(var_, var), strcpy(val_, val), 1);
 #endif
 }
 
 /* Primitives */
 
-PRIMITIVE to(LISPT cmd, LISPT file, LISPT filed)
+PRIMITIVE exec::to(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
 
   if(is_NIL(cmd))
     return C_NIL;
-  check2(file, STRING, SYMBOL);
+  l.check2(file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    check(filed, INTEGER);
+    l.check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr(), 0644)) == -1)
-    return syserr(file);
+    return syserr(l, file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      fprintf(stderr, "%s\n", strerror(errno));
+      l.stderr().printf("%s\n", strerror(errno));
       exit(1);
     }
-    eval(cmd);
+    eval(l, cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE toto(LISPT cmd, LISPT file, LISPT filed)
+PRIMITIVE exec::toto(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
 
   if(is_NIL(cmd))
     return C_NIL;
-  check2(file, STRING, SYMBOL);
+  check2(*L, file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    check(filed, INTEGER);
+    check(*L, filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
-    return syserr(file);
+    return syserr(*L, file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      fprintf(stderr, "%s\n", strerror(errno));
+      L->stderr().printf("%s\n", strerror(errno));
       exit(1);
     }
-    eval(cmd);
+    eval(*L, cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(*L, WEXITSTATUS(status));
 }
 
-PRIMITIVE from(LISPT cmd, LISPT file, LISPT filed)
+PRIMITIVE exec::from(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
 
   if(is_NIL(cmd))
     return C_NIL;
-  check2(file, STRING, SYMBOL);
+  l.check2(file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 0;
   else
   {
-    check(filed, INTEGER);
+    l.check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr(), O_RDONLY)) == -1)
-    return syserr(file);
+    return syserr(l, file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      fprintf(stderr, "%s\n", strerror(errno));
+      l.stderr().printf("%s\n", strerror(errno));
       exit(1);
     }
-    eval(cmd);
+    eval(l, cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE pipecmd(LISPT cmds)
+PRIMITIVE exec::pipecmd(LISPT cmds)
 {
   int pd[2];
   int pid;
@@ -644,7 +648,7 @@ PRIMITIVE pipecmd(LISPT cmds)
   if(is_NIL(cmds))
     return C_NIL;
   if(is_NIL(cmds->cdr()))
-    return eval(cmds->car());
+    return eval(l, cmds->car());
   if((pid = mfork()) == 0)
   {
     pipe(pd);
@@ -653,10 +657,10 @@ PRIMITIVE pipecmd(LISPT cmds)
       close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        fprintf(stderr, "%s\n", strerror(errno));
+        l.stderr().printf("%s\n", strerror(errno));
         exit(1);
       }
-      eval(cmds->car());
+      eval(l, cmds->car());
       exit(0);
     }
     else if(pid < 0)
@@ -665,20 +669,20 @@ PRIMITIVE pipecmd(LISPT cmds)
     close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      fprintf(stderr, "%s\n", strerror(errno));
+      l.stderr().printf("%s\n", strerror(errno));
       exit(1);
     }
-    eval(cmds->car());
+    eval(l, cmds->car());
     status = waitfork(pid);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE back(LISPT l)
+PRIMITIVE exec::back(LISPT x)
 {
   int pid;
 
@@ -687,23 +691,23 @@ PRIMITIVE back(LISPT l)
     pgrp = getpid();
     insidefork = 1;
     preparefork();
-    eval(l);
+    eval(l, x);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   recordjob(pid, 1);
   printf("[%d] %d\n", joblist->jobnum, pid);
-  return mknumber(pid);
+  return mknumber(l, pid);
 }
 
-PRIMITIVE stop()
+PRIMITIVE exec::stop()
 {
   kill(0, SIGSTOP);
   return C_T;
 }
 
-PRIMITIVE rehash()
+PRIMITIVE exec::rehash()
 {
   DIR* odir;
   struct dirent* rdir;
@@ -718,7 +722,7 @@ PRIMITIVE rehash()
       continue;
     else
     {
-      check2(p->car(), STRING, SYMBOL);
+      l.check2(p->car(), STRING, SYMBOL);
       sdir = p->car()->getstr();
     }
     if((odir = opendir(sdir)) == nullptr)
@@ -733,7 +737,7 @@ PRIMITIVE rehash()
   return C_NIL;
 }
 
-PRIMITIVE jobs()
+PRIMITIVE exec::jobs()
 {
 #ifdef JOB_CONTROL
   for(auto* j = joblist; j; j = j->next) printjob(j);
@@ -741,7 +745,7 @@ PRIMITIVE jobs()
   return C_NIL;
 }
 
-PRIMITIVE fg(LISPT job)
+PRIMITIVE exec::fg(LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -754,7 +758,7 @@ PRIMITIVE fg(LISPT job)
   }
   else
   {
-    check(job, INTEGER);
+    l.check(job, INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -767,17 +771,17 @@ PRIMITIVE fg(LISPT job)
     tcsetpgrp(1, pgrp);
     if(WIFSTOPPED(j->status))
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber(pgrp));
+        return syserr(l, mknumber(l, pgrp));
     j->status = 0;
     j->background = 0;
     auto status = waitfork(j->procid);
-    return mknumber(WEXITSTATUS(status));
+    return mknumber(l, WEXITSTATUS(status));
   }
-  return error(NO_SUCH_JOB, job);
+  return l.error(NO_SUCH_JOB, job);
 #endif
 }
 
-PRIMITIVE bg(LISPT job)
+PRIMITIVE exec::bg(LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -790,7 +794,7 @@ PRIMITIVE bg(LISPT job)
   }
   else
   {
-    check(job, INTEGER);
+    l.check(job, INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -804,35 +808,32 @@ PRIMITIVE bg(LISPT job)
     tcsetpgrp(1, pgrp);
     if(!j->background)
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber(pgrp));
+        return syserr(l, mknumber(l, pgrp));
     j->background = 1;
     return C_T;
   }
-  return error(NO_SUCH_JOB, job);
+  return l.error(NO_SUCH_JOB, job);
 #endif
 }
 
-PRIMITIVE p_setenv(LISPT var, LISPT val)
+PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
 {
-  check2(var, STRING, SYMBOL);
-  check2(val, STRING, SYMBOL);
+  l.check2(var, STRING, SYMBOL);
+  l.check2(val, STRING, SYMBOL);
   setenviron(var->getstr(), val->getstr());
   return var;
 }
 
-PRIMITIVE getenviron(LISPT var)
+PRIMITIVE exec::getenviron(LISPT var)
 {
-  char* s;
-
-  check2(var, STRING, SYMBOL);
-  s = getenv(var->getstr());
+  l.check2(var, STRING, SYMBOL);
+  char* s = getenv(var->getstr());
   if(s == nullptr)
     return C_NIL;
-  else
-    return mkstring(s);
+  return mkstring(l, s);
 }
 
-PRIMITIVE cd(LISPT dir, LISPT emess)
+PRIMITIVE exec::cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -847,16 +848,14 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
   if(is_NIL(ndir))
   {
     if(is_NIL(emess))
-      return error(NO_MATCH, dir);
-    else
-      return C_NIL;
+      return l.error(NO_MATCH, dir);
+    return C_NIL;
   }
   if(chdir(ndir->getstr()) == -1)
   {
     if(is_NIL(emess))
-      return syserr(dir);
-    else
-      return C_NIL;
+      return syserr(l, dir);
+    return C_NIL;
   }
   else
   {
@@ -865,9 +864,10 @@ PRIMITIVE cd(LISPT dir, LISPT emess)
     free(wd);
     return C_T;
   }
+  return ndir; // TODO: Is this correct?
 }
 
-PRIMITIVE doexec(LISPT cmd)
+PRIMITIVE exec::doexec(LISPT cmd)
 {
   LISPT res;
 
@@ -883,23 +883,25 @@ PRIMITIVE doexec(LISPT cmd)
   return C_NIL;
 }
 
-void init_exec()
+exec::exec(lisp& lisp) : base(lisp) {}
+
+void exec::init()
 {
-  mkprim(PN_EXPAND, expand, 3, SUBR);
-  mkprim(PN_TO, to, 3, FSUBR);
-  mkprim(PN_FROM, from, 3, FSUBR);
-  mkprim(PN_TOTO, toto, 3, FSUBR);
-  mkprim(PN_PIPECMD, pipecmd, -1, FSUBR);
-  mkprim(PN_BACK, back, -1, FSUBR);
-  mkprim(PN_STOP, stop, 0, FSUBR);
-  mkprim(PN_CD, cd, 2, FSUBR);
-  mkprim(PN_REHASH, rehash, 0, FSUBR);
-  mkprim(PN_JOBS, jobs, 0, FSUBR);
-  mkprim(PN_FG, fg, 1, FSUBR);
-  mkprim(PN_BG, bg, 1, FSUBR);
-  mkprim(PN_SETENV, p_setenv, 2, FSUBR);
-  mkprim(PN_GETENV, getenviron, 1, FSUBR);
-  mkprim(PN_EXEC, doexec, -1, FSUBR);
-  rehash();
-  evaluator::undefhook = execcommand;
+  // mkprim(PN_EXPAND, expand, 3, SUBR);
+  alloc::mkprim(PN_TO, ::lisp::to, 3, FSUBR);
+  alloc::mkprim(PN_FROM, ::lisp::from, 3, FSUBR);
+  alloc::mkprim(PN_TOTO, ::lisp::toto, 3, FSUBR);
+  alloc::mkprim(PN_PIPECMD, ::lisp::pipecmd, -1, FSUBR);
+  alloc::mkprim(PN_BACK, ::lisp::back, -1, FSUBR);
+  alloc::mkprim(PN_STOP, ::lisp::stop, 0, FSUBR);
+  alloc::mkprim(PN_CD, ::lisp::cd, 2, FSUBR);
+  alloc::mkprim(PN_REHASH, ::lisp::rehash, 0, FSUBR);
+  alloc::mkprim(PN_JOBS, ::lisp::jobs, 0, FSUBR);
+  alloc::mkprim(PN_FG, ::lisp::fg, 1, FSUBR);
+  alloc::mkprim(PN_BG, ::lisp::bg, 1, FSUBR);
+  alloc::mkprim(PN_SETENV, ::lisp::p_setenv, 2, FSUBR);
+  alloc::mkprim(PN_GETENV, ::lisp::getenviron, 1, FSUBR);
+  alloc::mkprim(PN_EXEC, ::lisp::doexec, -1, FSUBR);
+  ::lisp::rehash(*L);
+  L->e().undefhook = execcommand;
 }

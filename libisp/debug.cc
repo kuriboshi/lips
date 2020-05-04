@@ -10,8 +10,6 @@
 
 using namespace lisp;
 
-extern bool toploop(LISPT*, int (*)(LISPT*));
-
 namespace lisp
 {
 PRIMITIVE evaltrace(lisp& l, LISPT state)

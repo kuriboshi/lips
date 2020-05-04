@@ -566,7 +566,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
 {
   add_mark_object(&verboseflg);
   add_mark_object(&topprompt);
-  add_mark_object(&promptform);
   add_mark_object(&brkprompt);
   add_mark_object(&currentbase);
   add_mark_object(&interactive);

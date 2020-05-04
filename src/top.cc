@@ -5,25 +5,22 @@
  */
 
 #include <libisp.hh>
+#include <except.hh>
 #include "main.hh"
+#include "top.hh"
+
+extern lisp::lisp* L;
 
 using namespace lisp;
 
-#define PROMPTLENGTH 80
-
-extern void pputc(int, FILE*);
+inline constexpr int PROMPTLENGTH = 80;
 
 char current_prompt[PROMPTLENGTH];
-LISPT history;                 /* Holds the history list. */
-LISPT histnum;                 /* Current event number. */
-LISPT histmax;                 /* Maximum number of events to save. */
 LISPT input_exp;               /* The input expression. */
-LISPT topexp;                  /* Transformed expression to evaluate. */
 LISPT alias_expanded;          /* For checking alias loops. */
 LISPT (*transformhook)(LISPT); /* Applied on input if non-nullptr. */
 void (*beforeprompt)();        /* Called before the prompt is printed. */
-
-static bool printit = false; /* If the result will be printed. */
+LISPT promptform;  // Evaluated before printing the prompt.
 
 /*
  * History functions.
@@ -31,49 +28,46 @@ static bool printit = false; /* If the result will be printed. */
 /*
  * Print the history list.
  */
-static void phist()
+void top::phist()
 {
   LISPT hl;
 
   for(hl = history; !is_NIL(hl); hl = hl->cdr())
   {
     printf("%d.\t", hl->car()->car()->intval());
-    prinbody(hl->car()->cdr(), stdout, 1);
-    pputc('\n', primout);
+    prinbody(*L, hl->car()->cdr(), L->stdout(), true);
+    L->primout().terpri();
   }
 }
 
 /*
  * Add event to history list.
  */
-static void addhist(LISPT what)
+void top::addhist(LISPT what)
 {
-  history = cons(cons(histnum, what), history);
-  histnum = add1(histnum);
+  history = cons(*L, cons(*L, histnum, what), history);
+  histnum = add1(*L, histnum);
 }
 
 /*
  * Remove last event from history list.
  */
-static void remhist()
+void top::remhist()
 {
   history = history->cdr();
-  histnum = sub1(histnum);
+  histnum = sub1(*L, histnum);
 }
 
 /*
  * Trim history list to keep it shorter than histmax.
  */
-static void trimhist()
+void top::trimhist()
 {
-  LISPT hl;
-  int i;
-
-  hl = history;
-  for(i = 0; i < histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
+  LISPT hl = history;
+  for(int i = 0; i < histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
     ;
   if(!is_NIL(hl))
-    rplacd(hl, C_NIL);
+    rplacd(*L, hl, C_NIL);
 }
 
 /*
@@ -105,7 +99,7 @@ LISPT histget(int num, LISPT hlist)
   return C_NIL;
 }
 
-PRIMITIVE printhist()
+PRIMITIVE top::printhist()
 {
   remhist(); /* Removes itself from history. */
   phist();
@@ -116,8 +110,7 @@ static LISPT transform(LISPT list)
 {
   if(transformhook != nullptr)
     return (*transformhook)(list);
-  else
-    return list;
+  return list;
 }
 
 /*
@@ -130,21 +123,18 @@ static LISPT transform(LISPT list)
  */
 LISPT findalias(LISPT exp)
 {
-  LISPT alias;
-  LISPT rval;
-
-  rval = exp;
-  while(1)
+  auto rval = exp;
+  while(true)
   {
     if(type_of(rval) == CONS && type_of(rval->car()) == SYMBOL)
     {
-      alias = getprop(rval->car(), C_ALIAS);
+      auto alias = getprop(*L, rval->car(), C_ALIAS);
       if(!is_NIL(alias) && (is_NIL(alias_expanded) || !EQ(rval->car(), alias_expanded->car())))
       {
-        if(!is_NIL(memb(rval->car(), alias_expanded)))
+        if(!is_NIL(memb(*L, rval->car(), alias_expanded)))
           throw lisp_error("Alias loop");
-        alias_expanded = cons(rval->car(), alias_expanded);
-        rval = append(cons(alias, cons(rval->cdr(), C_NIL)));
+        alias_expanded = cons(*L, rval->car(), alias_expanded);
+        rval = append(*L, cons(*L, alias, cons(*L, rval->cdr(), C_NIL)));
       }
       else
         break;
@@ -171,7 +161,7 @@ void promptprint(LISPT prompt)
     {
       if(s[i] == '!')
       {
-        sprintf(buf, "%d", histnum->intval());
+        sprintf(buf, "%d", top::histnum->intval());
         strcat(current_prompt, buf);
         continue;
       }
@@ -188,27 +178,26 @@ void promptprint(LISPT prompt)
 
 bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
 {
-  while(1)
+  while(true)
   {
-    brkflg = false;
-    interrupt = false;
-    printit = false;
-    echoline = false;
+    bool printit = false;       // If the result will be printed.
+
+    L->echoline = false;
     if(beforeprompt != nullptr)
       (*beforeprompt)();
-    /*
-       * Evaluate promptform and print prompt.
-       */
+    //
+    // Evaluate promptform and print prompt.
+    //
     if(options.interactive)
     {
-      if(type_of(eval(promptform)) == ERROR)
+      if(type_of(eval(*L, promptform)) == ERROR)
       {
-        xprint(mkstring("Error in promptform, reset to nil"), C_T);
+        xprint(*L, mkstring(*L, "Error in promptform, reset to nil"), C_T);
         promptform = C_NIL;
       }
       promptprint(*tprompt);
     }
-    input_exp = xreadline(C_T);
+    LISPT input_exp = xreadline(*L, C_T);
     if(macrofun)
       switch((*macrofun)(&input_exp))
       {
@@ -223,36 +212,42 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       return true;
     if(EQ(input_exp->car(), C_NIL))
       continue;
-    addhist(input_exp);
-    if(echoline)
+    top::addhist(input_exp);
+    if(L->echoline)
     {
-      prinbody(input_exp, stdout, 1);
-      pputc('\n', primout);
+      prinbody(*L, input_exp, L->stdout(), 1);
+      L->primout().terpri();
     }
-    topexp = transform(input_exp);
+    LISPT topexp = transform(input_exp);
     if(type_of(topexp->car()) == CONS)
     {
       topexp = topexp->car();
       printit = true;
     }
     alias_expanded = C_NIL;
-    topexp = eval(topexp);
+    topexp = eval(*L, topexp);
     if(printit)
-      xprint(topexp, C_T);
+      xprint(*L, topexp, C_T);
     if(!options.interactive && options.command)
       return false;
-    trimhist();
+    top::trimhist();
   }
 }
 
-void init_hist()
+void top::init()
 {
-  alloc::add_mark_object(&history);
-  alloc::add_mark_object(&histnum);
-  alloc::add_mark_object(&histmax);
-  alloc::add_mark_object(&alias_expanded);
-  initcvar(&history, "history", C_NIL);
-  initcvar(&histnum, "histnum", mknumber(1L));
-  initcvar(&histmax, "histmax", mknumber(100L));
-  mkprim(PN_PRINTHIST, printhist, 0, FSUBR);
+  L->a().add_mark_object(&top::history);
+  L->a().add_mark_object(&top::histnum);
+  L->a().add_mark_object(&top::histmax);
+  L->a().add_mark_object(&alias_expanded);
+  L->a().add_mark_object(&promptform);
+  initcvar(&top::history, "history", C_NIL);
+  initcvar(&top::histnum, "histnum", mknumber(*L, 1L));
+  initcvar(&top::histmax, "histmax", mknumber(*L, 100L));
+  initcvar(&promptform, "promptform", C_NIL);
+  alloc::mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, 0, FSUBR);
 }
+
+LISPT top::history = nullptr;
+LISPT top::histnum = nullptr;
+LISPT top::histmax = nullptr;

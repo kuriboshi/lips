@@ -141,15 +141,15 @@ inline void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_t
 {
   alloc::mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
 {
   alloc::mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
 {
   alloc::mkprim(pname, fname, nrpar, type);
 }
-inline void mkprim(lisp& l, const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
 {
   alloc::mkprim(pname, fname, nrpar, type);
 }
