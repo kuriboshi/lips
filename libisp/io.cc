@@ -287,17 +287,13 @@ head:
       l.top = C_NIL;
       return temp;
     }
-#if 0
     else if(line && file.eoln() && EQ(curr->cdr(), l.top))
       goto addparen;
-#endif
     goto tail;
   }
 tail:
-#if 0
   if(line && file.eoln() && EQ(curr->cdr(), l.top))
     goto addparen;
-#endif
   {
     auto [eof, c] = getchar(l, file, line);
     if(eof)
@@ -329,7 +325,7 @@ tail:
   }
   else if(curc == ')')
   {
-    // addparen:
+  addparen:
     temp = curr->cdr();
     rplacd(l, curr, C_NIL);
     curr = temp;
@@ -479,13 +475,9 @@ LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
 
 LISPT io::readline(file_t& file)
 {
-#if 0
   l.top = cons(l, C_NIL, C_NIL); /* Init first paren level */
   rplaca(l, l.top, cons(l, C_NIL, l.top));
   LISPT rd = lispread(file, true);
-#else
-  LISPT rd = lispread(file, false);
-#endif
   return rd;
 }
 

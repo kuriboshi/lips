@@ -139,9 +139,8 @@ void term_source::putch(int c, FILE* file, int esc)
 }
 
 /*
- * Get a character from stream file.  If it's from a terminal, buffer input
- * with procedure getline, and get characters from linebuffer.  If it's not
- * from a terminal do io the standard way.
+ * Get a character.  Buffer input with procedure getline, and get characters
+ * from linebuffer.
  */
 int term_source::getch()
 {
@@ -169,7 +168,7 @@ int term_source::getch()
 void term_source::ungetch(int)
 {
   if(position > 0)
-    position--;
+    --position;
 }
 
 /*
@@ -192,7 +191,7 @@ bool term_source::firstnotlp()
  */
 void term_source::delonechar()
 {
-  linepos--;
+  --linepos;
   putc('\b', stdout);
   putc(' ', stdout);
   putc('\b', stdout);
@@ -209,13 +208,10 @@ void term_source::delonechar()
  */
 bool term_source::onlyblanks()
 {
-  int i = linepos;
-
-  while(i > 0)
+  for(int i = linepos; i > 0; --i)
   {
     if(!issepr(*L, (int)linebuffer[i]))
       return false;
-    i--;
   }
   return true;
 }
@@ -236,17 +232,21 @@ int term_source::outc(int c)
  */
 void term_source::retype(int all)
 {
-  int i;
 #ifdef TERMCAP
-  int nl = 0, l = 1;
+  int nl = 0;
 
   if(!nocap)
   {
-    l = 0;
-    for(i = 1; i < linepos; i++)
+    int l = 1;
+    for(int i = 0; i < linepos; i++)
+    {
       if(linebuffer[i] == '\n')
-        nl = i, l++;
-    for(l = all ? l : 1; l; l--)
+      {
+        nl = i;
+        ++l;
+      }
+    }
+    for(l = (all ? l : 1); l; l--)
     {
       if(all == 2)
       {
@@ -261,12 +261,14 @@ void term_source::retype(int all)
     if(nl == 0)
       fputs(current_prompt, stdout);
     if(all != 2)
-      for(i = nl + 1; i < linepos; i++)
+    {
+      for(int i = nl; i < linepos; i++)
       {
         if(linebuffer[i] == '\n')
           tputs(cleol, 1, outc);
         pputc(linebuffer[i], stdout);
       }
+    }
     tputs(cleol, 1, outc);
   }
   else
@@ -275,18 +277,19 @@ void term_source::retype(int all)
     if(all == 0)
     {
       putc('\r', stdout);
-      for(i = linepos - 1; i > 0 && linebuffer[i] != '\n'; i--)
+      int i = linepos;
+      for(; i >= 0 && linebuffer[i] != '\n'; --i)
         ;
       if(i == 0)
         fputs(current_prompt, stdout);
-      for(i++; i < linepos; i++) pputc(linebuffer[i], stdout);
+      for(++i; i < linepos; i++) pputc(linebuffer[i], stdout);
     }
     else if(all == 1)
     {
       pputc(CRPRNT, stdout);
       pputc('\n', stdout);
       fputs(current_prompt, stdout);
-      for(i = 1; i < linepos; i++) pputc(linebuffer[i], stdout);
+      for(int i = 0; i < linepos; ++i) pputc(linebuffer[i], stdout);
     }
     else
     {
@@ -305,7 +308,7 @@ static char* last;
 
 char* term_source::mkexstr()
 {
-  int i = linepos - 1;
+  int i = linepos;
 
   last = word + BUFSIZ - 1;
   *last-- = '\0';
@@ -560,9 +563,8 @@ const char* term_source::getline()
     exit(1);
   }
   position = 0;
-  linepos = 1;
+  linepos = 0;
   origpar = parcount;
-  linebuffer[0] = ' ';
   while(1)
   {
     if(escaped)
@@ -573,7 +575,7 @@ const char* term_source::getline()
     switch(key_tab[(int)c])
     {
       case term_fun::T_EOF:
-        if(linepos == 1)
+        if(linepos == 0)
         {
           linebuffer[linepos++] = EOF;
           return nullptr;
@@ -583,7 +585,7 @@ const char* term_source::getline()
         break;
       case term_fun::T_KILL:
         retype(2);
-        linepos = 1;
+        linepos = 0;
         parcount = origpar;
         escaped = 0;
         instring = 0;
@@ -613,15 +615,15 @@ const char* term_source::getline()
         break;
       case term_fun::T_ERASE:
         escaped = 0;
-        if(linepos > 1 && linebuffer[linepos - 1] == '\n')
+        if(linepos > 0 && linebuffer[linepos] == '\n')
         {
-          linepos--;
+          --linepos;
           retype(0);
         }
-        else if(linepos > 1)
+        else if(linepos > 0)
         {
           delonechar();
-          if(linebuffer[linepos - 1] == '\\')
+          if(linebuffer[linepos] == '\\')
             escaped = 2;
           else
           {
@@ -677,13 +679,13 @@ const char* term_source::getline()
         }
         else
         {
-          scan(linepos - 1);
+          scan(linepos);
           blink();
         }
         break;
       case term_fun::T_NEWLINE:
         pputc('\n', stdout);
-        if(linepos == 1 || onlyblanks())
+        if(linepos == 0 || onlyblanks())
         {
           linebuffer[0] = '(';
           linebuffer[linepos++] = ')';
@@ -706,7 +708,7 @@ const char* term_source::getline()
  */
 bool term_source::eoln()
 {
-  for(int i = position; i < linepos; i++)
+  for(int i = position; i < linepos; ++i)
   {
     if(linebuffer[i] != ' ' && linebuffer[i] != '\t' && linebuffer[i] != '\n')
       return false;

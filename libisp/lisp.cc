@@ -12,11 +12,32 @@
 namespace lisp
 {
 const char* messages[MAXMESSAGE];
-/* Some standard messages, all of them not necessarily used */
-const char* errmess[] = {"Not NIL", "Not a symbol", "Not an integer", "Not a bignum", "Not a float",
-  "Not indirect", "Not a long", "Not a list", "Not a string", "Not SUBR", "Not FSUBR", "Not LAMBDA", "Not NLAMBDA",
-  "Not a closure", "Not unbound", "Not an environment", "Not a file pointer", "Not T", "Not free", "Not EOF",
-  "Not an ERROR", "Not a hash table"};
+// Some standard messages, all of them not necessarily used
+// clang-format off
+const char* errmess[] = {
+  "Not NIL",
+  "Not a symbol",
+  "Not an integer",
+  "Not a bignum",
+  "Not a float",
+  "Not indirect",
+  "Not a cons cell",
+  "Not a string",
+  "Not SUBR",
+  "Not FSUBR",
+  "Not LAMBDA",
+  "Not NLAMBDA",
+  "Not a closure",
+  "Not unbound",
+  "Not an environment",
+  "Not a file pointer",
+  "Not T",
+  "Not free",
+  "Not EOF",
+  "Not an ERROR",
+  "Not a hash table"
+};
+// clang-format on
 }
 
 namespace lisp
