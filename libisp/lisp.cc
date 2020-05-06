@@ -120,6 +120,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   string::init();
   posix::init();
   user::init();
+  io::init(*this);
 
   e().undefhook = nullptr;
   e().breakhook = nullptr;

@@ -251,6 +251,24 @@ struct lisp_t
   void unmark() { gcmark = false; }
 };
 
+enum char_class
+{
+  NONE = 0,
+  SEPR = 001,   // seperator
+  BRK = 002,    // break character
+  INSERT = 004, // insert read macro
+  SPLICE = 010, // splice read macro
+  INFIX = 014,  // infix read macro
+  RMACRO = 014  // read macro mask
+};
+
+struct rtinfo
+{
+  enum char_class chclass[128];
+  using rmacro_t = LISPT(*)(lisp&, file_t&, LISPT, char);
+  rmacro_t rmacros[128];
+};
+
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
 inline lisp_type type_of(LISPT a) { return a == nullptr ? NIL : a->type; }
 
@@ -313,6 +331,66 @@ public:
   // Used by the interprete
   bool brkflg = false;
   bool interrupt = false;
+
+  /* clang-format off */
+  rtinfo currentrt =
+  {
+    {
+      /* NUL SOH STX ETX EOT ENQ ACK BEL */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* BS  HT  NL  VT  NP  CR  SO  SI  */
+      NONE, SEPR, SEPR, NONE, NONE, NONE, NONE, NONE,
+      /* DLE DC1 DC2 DC3 DC4 NAK SYN ETB */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* CAN EM  SUB ESC FS  GS  RS  US  */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* SP  !   "   #   $   %   &   '   */
+      SEPR, /*SPLICE*/NONE, /*INSERT*/NONE, NONE, NONE, NONE, BRK, /*INSERT*/NONE,
+      /* (   )   *   +   ,   -   .   /   */
+      BRK, BRK, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* 0   1   2   3   4   5   6   7   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* 8   9   :   ;   <   =   >   ?   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* @   A   B   C   D   E   F   G   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* H   I   J   K   L   M   N   O   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* P   Q   R   S   T   U   V   W   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* X   Y   Z   [   \   ]   ^   _   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* `   a   b   c   d   e   f   g   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* h   i   j   k   l   m   n   o   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* p   q   r   s   t   u   v   w   */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+      /* x   y   z   {   |   }   ~   DEL */
+      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE },
+    { 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, /*io::rmexcl*/0, /*io::rmdquote*/0, 0, 0, 0, 0, /*io::rmsquote*/0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0 }
+  };
+  /* clang-format on */
+  void set_read_table(unsigned char c, enum char_class chcls, rtinfo::rmacro_t macro)
+  {
+    currentrt.chclass[static_cast<int>(c)] = chcls;
+    currentrt.rmacros[static_cast<int>(c)] = macro;
+  }
 
 private:
   alloc& _alloc;

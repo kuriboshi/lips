@@ -234,6 +234,74 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
   }
 }
 
+/*
+ * Redo read macro:
+ *   !!      - last command
+ *   !-n     - the n'th previous command
+ *   !n      - command n
+ *   !s      - command with prefix s
+ *   !$      - last argument
+ *   !*      - all arguments
+ * others could be added easily.
+ */
+LISPT io::rmexcl(lisp& l, file_t& file, LISPT, char)
+{
+#if 0
+  LISPT at;
+
+  int c = file.getch();
+  if(issepr(c))
+    return C_EXCL;
+  echoline = true;
+  LISPT tmp = histget(0L, history);
+  if(type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
+    tmp = tmp->car();
+  switch(c)
+  {
+    case '!':
+      return histget(0L, history);
+      break;
+    case '$':
+      while(type_of(tmp->cdr()) == CONS) tmp = tmp->cdr();
+      return tmp;
+      break;
+    case '*':
+      return tmp->cdr();
+      break;
+    case '\n':
+      echoline = false;
+      return C_EXCL;
+      break;
+    default:
+      file.ungetch(c);
+      at = ctx.ratom(file);
+      if(type_of(at) == INTEGER)
+      {
+        tmp = histget(at->intval(), history);
+        return tmp;
+      }
+      if(type_of(at) == SYMBOL)
+      {
+        for(auto h = history; !is_NIL(l); h = h->cdr())
+        {
+          tmp = histget(0L, h);
+          if(!is_NIL(tmp) && type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
+            tmp = tmp->car();
+          if(!strncmp(tmp->car()->getstr(), at->getstr(), strlen(at->getstr())))
+            return histget(0L, h);
+        }
+        return C_NIL;
+      }
+      else
+      {
+        error(EVENT_NOT_FOUND, at);
+        return C_NIL;
+      }
+  }
+#endif
+  return C_NIL;
+}
+
 void top::init()
 {
   L->a().add_mark_object(&top::history);

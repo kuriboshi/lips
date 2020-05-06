@@ -9,69 +9,31 @@
 extern lisp::LISPT histget(int, lisp::LISPT);
 extern lisp::LISPT history;
 
-#define CHECKEOF(c) \
-  if((c) == EOF) \
-  { \
-    if(line || is_NIL(l.top->car())) \
-      return C_EOF; \
-    else \
-      return l.error(UNEXPECTED_EOF, C_NIL); \
-  }
-
-#define GETCH(file) \
-  do \
-    curc = file.getch(); \
-  while(curc != EOF && issepr(curc)); \
-  CHECKEOF(curc);
-
 namespace lisp
 {
-/* clang-format off */
-rtinfo currentrt = 
+inline bool checkeof(lisp& l, int c, bool line)
 {
+  if(c == EOF)
   {
-/* NUL SOH STX ETX EOT ENQ ACK BEL */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* BS  HT  NL  VT  NP  CR  SO  SI  */
-    0, SEPR, SEPR, 0, 0, 0, 0, 0,
-/* DLE DC1 DC2 DC3 DC4 NAK SYN ETB */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* CAN EM  SUB ESC FS  GS  RS  US  */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* SP  !   "   #   $   %   &   '   */
-    SEPR, SPLICE, INSERT, 0, 0, 0, BRK, INSERT,
-/* (   )   *   +   ,   -   .   /   */
-    BRK, BRK, 0, 0, 0, 0, 0, 0,
-/* 0   1   2   3   4   5   6   7   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* 8   9   :   ;   <   =   >   ?   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* @   A   B   C   D   E   F   G   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* H   I   J   K   L   M   N   O   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* P   Q   R   S   T   U   V   W   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* X   Y   Z   [   \   ]   ^   _   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* `   a   b   c   d   e   f   g   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* h   i   j   k   l   m   n   o   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* p   q   r   s   t   u   v   w   */
-    0, 0, 0, 0, 0, 0, 0, 0,
-/* x   y   z   {   |   }   ~   DEL */
-    0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, io::rmexcl, io::rmdquote, 0, 0, 0, 0, io::rmsquote, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-};
+    if(line || is_NIL(l.top->car()))
+      return true;
+    l.error(UNEXPECTED_EOF, C_NIL);
+  }
+  return false;
+}
 
+inline std::pair<bool, int> getchar(lisp& l, file_t& file, bool line)
+{
+  int curc = 0;
+  do
+    curc = file.getch();
+  while(curc != EOF && issepr(l, curc));
+  if(checkeof(l, curc, line))
+    return std::make_pair(true, curc);
+  return std::make_pair(false, curc);
+}
+
+/* clang-format off */
 /*
  * This state table parses a floating point number.
  */
@@ -190,9 +152,9 @@ LISPT io::ratom(file_t& file)
   {
     if(c == EOF)
       return C_EOF;
-    else if(issepr(c))
+    else if(issepr(l, c))
       ;
-    else if(isbrk(c))
+    else if(isbrk(l, c))
     {
       buffer[pos++] = c;
       buffer[pos] = NUL;
@@ -209,13 +171,13 @@ LISPT io::ratom(file_t& file)
         if(pos < MAXATOMSIZE)
           buffer[pos++] = c;
         c = file.getch();
-        if(isbrk(c))
+        if(isbrk(l, c))
         {
           file.ungetch(c);
           buffer[pos] = NUL;
           return parsebuf(buffer);
         }
-        else if(issepr(c))
+        else if(issepr(l, c))
         {
           buffer[pos] = NUL;
           return parsebuf(buffer);
@@ -278,18 +240,23 @@ LISPT io::lispread(file_t& file, bool line)
   else
     curr = l.top->car();
 head:
-  GETCH(file);
-  if(isinsert(curc))
+  {
+    auto [eof, c] = getchar(l, file, line);
+    if(eof)
+      return C_EOF;
+    curc = c;
+  }
+  if(isinsert(l, curc))
   {
     pushr(l.top);
-    rplaca(l, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
+    rplaca(l, curr, (*l.currentrt.rmacros[curc])(l, file, curr, curc));
     popr(l.top);
     goto check;
   }
-  else if(issplice(curc))
+  else if(issplice(l, curc))
   {
     pushr(l.top);
-    temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
+    temp = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
     popr(l.top);
     curr = splice(curr, temp, 0);
     goto check;
@@ -328,28 +295,33 @@ head:
 tail:
   if(line && file.eoln() && EQ(curr->cdr(), l.top))
     goto addparen;
-  GETCH(file);
-  if(isinsert(curc))
+  {
+    auto [eof, c] = getchar(l, file, line);
+    if(eof)
+      return C_EOF;
+    curc = c;
+  }
+  if(isinsert(l, curc))
   {
     temp = curr->cdr();
     rplacd(l, curr, cons(l, C_NIL, temp));
     curr = curr->cdr();
     pushr(l.top);
-    rplaca(l, curr, (*currentrt.rmacros[curc])(*this, file, curr, curc));
+    rplaca(l, curr, (*l.currentrt.rmacros[curc])(l, file, curr, curc));
     popr(l.top);
     goto tail;
   }
-  else if(issplice(curc))
+  else if(issplice(l, curc))
   {
     pushr(l.top);
-    temp = (*currentrt.rmacros[curc])(*this, file, curr, curc);
+    temp = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
     popr(l.top);
     curr = splice(curr, temp, 1);
     goto tail;
   }
-  else if(isinfix(curc))
+  else if(isinfix(l, curc))
   {
-    curr = (*currentrt.rmacros[curc])(*this, file, curr, curc);
+    curr = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
     goto head;
   }
   else if(curc == ')')
@@ -371,8 +343,9 @@ tail:
   else if(curc == '.')
   {
     curc = file.getch();
-    CHECKEOF(curc);
-    if(!issepr(curc) && !isbrk(curc))
+    if(checkeof(l, curc, line))
+      return C_EOF;
+    if(!issepr(l, curc) && !isbrk(l, curc))
     {
       file.ungetch(curc);
       file.ungetch('.'); /* cross your fingers */
@@ -384,11 +357,16 @@ tail:
       curatom = C_DOT;
       goto insert;
     }
-    if(isbrk(curc))
+    if(isbrk(l, curc))
       file.ungetch(curc);
     curatom = ratom(file);
     temp = curr->cdr();
-    GETCH(file);
+    {
+      auto [eof, c] = getchar(l, file, line);
+      if(eof)
+        return C_EOF;
+      curc = c;
+    }
     if(curc != ')')
     {
       rplacd(l, curr, cons(l, C_DOT, cons(l, C_NIL, temp)));
@@ -418,75 +396,7 @@ tail:
 /*
  * Read macros.
  */
-/*
- * Redo read macro:
- *   !!      - last command
- *   !-n     - the n'th previous command
- *   !n      - command n
- *   !s      - command with prefix s
- *   !$      - last argument
- *   !*      - all arguments
- * others could be added easily.
- */
-LISPT io::rmexcl(io& ctx, file_t& file, LISPT, char)
-{
-#if 0
-  LISPT at, l;
-
-  int c = file.getch();
-  if(issepr(c))
-    return C_EXCL;
-  echoline = true;
-  LISPT tmp = histget(0L, history);
-  if(type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
-    tmp = tmp->car();
-  switch(c)
-  {
-    case '!':
-      return histget(0L, history);
-      break;
-    case '$':
-      while(type_of(tmp->cdr()) == CONS) tmp = tmp->cdr();
-      return tmp;
-      break;
-    case '*':
-      return tmp->cdr();
-      break;
-    case '\n':
-      echoline = false;
-      return C_EXCL;
-      break;
-    default:
-      file.ungetch(c);
-      at = ctx.ratom(file);
-      if(type_of(at) == INTEGER)
-      {
-        tmp = histget(at->intval(), history);
-        return tmp;
-      }
-      if(type_of(at) == SYMBOL)
-      {
-        for(l = history; !is_NIL(l); l = l->cdr())
-        {
-          tmp = histget(0L, l);
-          if(!is_NIL(tmp) && type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
-            tmp = tmp->car();
-          if(!strncmp(tmp->car()->getstr(), at->getstr(), strlen(at->getstr())))
-            return histget(0L, l);
-        }
-        return C_NIL;
-      }
-      else
-      {
-        error(EVENT_NOT_FOUND, at);
-        return C_NIL;
-      }
-  }
-#endif
-  return C_NIL;
-}
-
-LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
+LISPT io::rmdquote(lisp& l, file_t& file, LISPT, char)
 {
   char buffer[MAXATOMSIZE];
   char c;
@@ -501,65 +411,65 @@ LISPT io::rmdquote(io& ctx, file_t& file, LISPT, char)
     c = file.getch();
   }
   buffer[pos] = NUL;
-  return mkstring(ctx.l, buffer);
+  return mkstring(l, buffer);
 }
 
-LISPT io::rmsquote(io& ctx, file_t& file, LISPT, char)
+LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
 {
   int c;
 
-  if((c = file.getch()) == ')' || issepr(c))
+  if((c = file.getch()) == ')' || issepr(l, c))
   {
     file.ungetch(c);
     return C_QUOTE;
   }
   file.ungetch(c);
-  return cons(ctx.l, C_QUOTE, cons(ctx.l, ctx.lispread(file, false), C_NIL));
+  return cons(l, C_QUOTE, cons(l, io(l).lispread(file, false), C_NIL));
 }
 
 #if 0
-LISPT io::rmpipe(io& ctx, source*, LISPT curr, char)
+LISPT io::rmpipe(lisp& l, file_t&, LISPT curr, char)
 {
   LISPT t1, t2;
 
-  t1 = CDR(curr);
+  t1 = curr->cdr();
   rplaca(
-    t1, cons(C_PIPE, cons(CAR(CDR(curr)), cons(t2 = cons(C_NIL, t1), C_NIL))));
-  rplacd(curr, C_NIL);
+    t1, cons(l, C_PIPE, cons(l, curr->cdr()->car(), cons(l, t2 = cons(l, C_NIL, t1), C_NIL))));
+  rplacd(l, curr, C_NIL);
   return t2;
 }
 
-LISPT io::rmredir(io& ctx, source& file, LISPT curr, char curc)
+LISPT io::rmredir(lisp& l, file_t& file, LISPT curr, char curc)
 {
   LISPT t1, t2;
   char c;
 
-  t1 = CDR(curr);
+  t1 = curr->cdr();
   c = file.getch();
-  rplaca(t1,
-    cons((curc == '<') ? C_FROM : ((c == '>') ? C_TOTO : C_TO),
-      cons(CAR(CDR(curr)), t2 = cons(C_NIL, t1))));
+  rplaca(l, t1,
+    cons(l, (curc == '<') ? C_FROM : ((c == '>') ? C_TOTO : C_TO),
+      cons(l, curr->cdr()->car(), t2 = cons(l, C_NIL, t1))));
   if (!(c == '>' || curc == '>'))
     file.ungetch(c);
-  rplacd(curr, C_NIL);
+  rplacd(l, curr, C_NIL);
   return t2;
 }
 
-LISPT io::rmbg(io& ctx, source*, LISPT curr, char)
+LISPT io::rmbg(lisp& l, file_t*, LISPT curr, char)
 {
-  rplaca(CDR(curr), cons(C_BACK, CAR(CDR(curr))));
-  rplacd(curr, cons(C_NIL, CDR(curr)));
-  return CDR(curr);
+  rplaca(l, curr->cd(), cons(l, C_BACK, curr->cdr()->car()));
+  rplacd(l, curr, cons(l, C_NIL, curr->cdr()));
+  return curr->cdr();
 }
 
 /*
  * Handles user macros.
  */
-LISPT io::rmuser(io& ctx, source*, LISPT curr, char curc)
+LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
 {
-  if (is_NIL(userreadmacros[(int)curc]))
+  if (is_NIL(userreadmacros[static_cast<int>(curc)]))
     return curr;
-  curr = apply(userreadmacros[(int)curc], curr);
+  curr = apply(userreadmacros[static_cast<int>(curc)], curr);
   return curr;
 }
 #endif
@@ -752,6 +662,12 @@ LISPT io::print(LISPT x, file_t& file)
   prin0(x, file, true);
   terpri(file);
   return x;
+}
+
+void io::init(lisp& l)
+{
+  l.set_read_table('"', INSERT, io::rmdquote);
+  l.set_read_table('\'', INSERT, io::rmsquote);
 }
 
 } // namespace lisp

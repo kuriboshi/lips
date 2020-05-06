@@ -364,10 +364,13 @@ static UNION_WAIT waitfork(int pid)
 
   do
   {
-    wpid = wait3(&wstat, WUNTRACED, nullptr);
+    UNION_WAIT stat;
+    wpid = wait3(&stat, WUNTRACED, nullptr);
     if(wpid != -1 && !insidefork)
-      collectjob(wpid, wstat);
-  } while(pid && pid != wpid && wpid != -1);
+      collectjob(wpid, stat);
+    if(wpid == pid)
+        wstat = stat;
+  } while(errno == EINTR || (pid != 0 && pid != wpid && wpid != -1));
   if(WIFSIGNALED(wstat))
   {
     L->e().unwind();

@@ -26,8 +26,7 @@
 #include "os.hh"
 
 extern lisp::lisp* L;
-
-using namespace lisp;
+bool lips_getline(lisp::lisp&, std::FILE*);
 
 extern void finish(int);
 
@@ -74,8 +73,6 @@ static const char *curup, *curfwd; /* Various term cap strings.  */
 static const char *cleol, *curdn;
 static bool nocap = false; /* true if insufficient term cap. */
 #endif
-
-bool lips_getline(FILE*);
 
 void cleanup(int) { finish(0); }
 
@@ -182,7 +179,7 @@ void putch(int c, FILE* file, int esc)
  * with procedure getline, and get characters from linebuffer.  If it's not
  * from a terminal do io the standard way.
  */
-int getch(FILE* file)
+int getch(lisp::lisp& l, FILE* file)
 {
   int c;
 
@@ -200,7 +197,7 @@ gotlin:
   else
   {
     init_term();
-    if(lips_getline(file) == 0)
+    if(lips_getline(l, file) == 0)
     {
       end_term();
       return EOF;
@@ -229,10 +226,10 @@ void ungetch(int c, FILE* file)
  * Skips separators in the beginning of the line and returns true if the first
  * non-separator character is a left parenthesis, zero otherwise.
  */
-static bool firstnotlp()
+static bool firstnotlp(lisp::lisp& l)
 {
   int i = 1;
-  for(; i < position && issepr((int)linebuffer[i]); i++)
+  for(; i < position && issepr(l, (int)linebuffer[i]); i++)
     ;
   if(linebuffer[i] == '(')
     return false;
@@ -260,13 +257,13 @@ static void delonechar()
 /*
  * Returns zero if the line contains only separators.
  */
-static bool onlyblanks()
+static bool onlyblanks(lisp::lisp& l)
 {
   int i = linepos;
 
   while(i > 0)
   {
-    if(!issepr((int)linebuffer[i]))
+    if(!issepr(l, (int)linebuffer[i]))
       return false;
     i--;
   }
@@ -356,14 +353,14 @@ static void retype(int all)
 static char word[BUFSIZ];
 static char* last;
 
-char* mkexstr()
+char* mkexstr(lisp::lisp& l)
 {
   int i = linepos - 1;
 
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!issepr((int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while(!issepr(l, (int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
@@ -376,15 +373,15 @@ static void fillrest(const char* word)
   }
 }
 
+using LISPT = lisp::LISPT;
+
 static bool checkchar(LISPT words, int pos, int* c)
 {
-  LISPT l;
-
-  l = words;
-  *c = (l->car()->getstr())[pos];
-  for(; !is_NIL(l); l = l->cdr())
+  LISPT w = words;
+  *c = (w->car()->getstr())[pos];
+  for(; !is_NIL(w); w = w->cdr())
   {
-    if(*c != (l->car()->getstr())[pos])
+    if(*c != (w->car()->getstr())[pos])
       return false;
   }
   return true;
@@ -410,7 +407,7 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
 
   if(strncmp(files->car()->getstr(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(*L, C_NIL, C_NIL); !is_NIL(files); files = files->cdr())
+  for(stripped = cons(*L, lisp::C_NIL, lisp::C_NIL); !is_NIL(files); files = files->cdr())
   {
     s = files->car()->getstr() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
@@ -620,7 +617,7 @@ void blink()
  * matching right paren.  Typing just a return puts a right paren in the buffer
  * as well as the newline.  Returns zero if anything goes wrong.
  */
-bool lips_getline(FILE* file)
+bool lips_getline(lisp::lisp& l, std::FILE* file)
 {
   char c;
   const char *s, *t;
@@ -644,7 +641,7 @@ bool lips_getline(FILE* file)
     if(escaped)
       escaped--;
     fflush(stdout);
-    if(readchar(file, &c) == 0)
+    if(lisp::readchar(file, &c) == 0)
       return false;
     switch(key_tab[(int)c])
     {
@@ -668,7 +665,7 @@ bool lips_getline(FILE* file)
         retype(1);
         break;
       case term_fun::T_TAB:
-        s = mkexstr();
+        s = mkexstr(l);
         t = extilde(s, 0);
         if(t == nullptr)
         {
@@ -676,13 +673,13 @@ bool lips_getline(FILE* file)
           break;
         }
         ex = expandfiles(t, 0, 0, 1);
-        if(type_of(ex) == CONS && strlen(s) > 1)
+        if(type_of(ex) == lisp::CONS && strlen(s) > 1)
           ex = strip(ex, t, s);
-        if(type_of(ex) == CONS && is_NIL(ex->cdr()))
+        if(type_of(ex) == lisp::CONS && is_NIL(ex->cdr()))
           fillrest(ex->car()->getstr());
         else
         {
-          if(type_of(ex) == CONS)
+          if(type_of(ex) == lisp::CONS)
             complete(ex);
           putc(BELL, stdout);
         }
@@ -745,7 +742,7 @@ bool lips_getline(FILE* file)
             linebuffer[0] = '(';
             parcount = 0; /* in case it was negative */
           }
-          else if(firstnotlp())
+          else if(firstnotlp(l))
             break; /* paren expression not first (for readline) */
           linebuffer[linepos++] = '\n';
           pputc('\n', stdout);
@@ -759,7 +756,7 @@ bool lips_getline(FILE* file)
         break;
       case term_fun::T_NEWLINE:
         pputc('\n', stdout);
-        if(linepos == 1 || onlyblanks())
+        if(linepos == 1 || onlyblanks(l))
         {
           linebuffer[0] = '(';
           linebuffer[linepos++] = ')';

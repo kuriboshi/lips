@@ -16,12 +16,13 @@ namespace lisp
 {
 class lisp;
 struct file_t;
+
 class io : public base
 {
 public:
   io(lisp& lisp): base(lisp) {}
   ~io() = default;
-  static void init();
+  static void init(lisp&);
 
   static inline constexpr char COMMENTCHAR = '#';
 
@@ -52,24 +53,24 @@ public:
 
     virtual int getch() override
     {
-      auto c = getc(_file);
-      if(c == COMMENTCHAR) /* Skip comments.  */
-        while((c = getc(_file)) != '\n')
+      _curc = getc(_file);
+      if(_curc == COMMENTCHAR) /* Skip comments.  */
+        while((_curc = getc(_file)) != '\n')
           ;
-      return c;
+      return _curc;
     }
     virtual void ungetch(int c) override { ungetc(c, _file); }
     virtual bool eoln() override
     {
       while(true)
       {
-        auto c = getc(_file);
         if(feof(_file))
           return true;
-        if(c != ' ' && c != '\t' && c != '\n')
+        if(_curc != ' ' && _curc != '\t' && _curc != '\n')
           return false;
-        if (c == '\n')
+        if (_curc == '\n')
           return true;
+        _curc = getc(_file);
       }
       return true;
     }
@@ -92,6 +93,7 @@ public:
   private:
     std::FILE* _file;
     bool _owner = false;
+    int _curc = 0;
   };
 
   class stringsource: public source
@@ -218,23 +220,17 @@ public:
   LISPT prin0(LISPT, file_t&, bool esc = false);
   LISPT print(LISPT, file_t&);
 
-  static LISPT rmexcl(io&, file_t&, LISPT, char);
-  static LISPT rmdquote(io&, file_t&, LISPT, char);
-  static LISPT rmsquote(io&, file_t&, LISPT, char);
-  static LISPT rmpipe(io&, file_t&, LISPT, char);
-  static LISPT rmredir(io&, file_t&, LISPT, char);
-  static LISPT rmbg(io&, file_t&, LISPT, char);
-  static LISPT rmuser(io&, file_t&, LISPT, char);
+  static LISPT rmexcl(lisp&, file_t&, LISPT, char);
+  static LISPT rmdquote(lisp&, file_t&, LISPT, char);
+  static LISPT rmsquote(lisp&, file_t&, LISPT, char);
+  static LISPT rmpipe(lisp&, file_t&, LISPT, char);
+  static LISPT rmredir(lisp&, file_t&, LISPT, char);
+  static LISPT rmbg(lisp&, file_t&, LISPT, char);
+  static LISPT rmuser(lisp&, file_t&, LISPT, char);
 
 #if 0
   static LISPT userreadmacros[128];
 #endif
-};
-
-struct rtinfo
-{
-  unsigned char chclass[128];
-  LISPT (*rmacros[128])(io&, file_t&, LISPT, char);
 };
 
 struct file_t
@@ -281,24 +277,12 @@ struct file_t
   }
 };
 
-extern struct rtinfo currentrt;
-
-enum char_class
-{
-  SEPR = 001,   // seperator
-  BRK = 002,    // break character
-  INSERT = 004, // insert read macro
-  SPLICE = 010, // splice read macro
-  INFIX = 014,  // infix read macro
-  RMACRO = 014  // read macro mask
-};
-
-inline bool issepr(int c) { return (currentrt.chclass[c] & SEPR) == SEPR; }
-inline bool isbrk(int c) { return (currentrt.chclass[c] & BRK) == BRK; }
-inline bool isrm(int c) { return (currentrt.chclass[c] & RMACRO) == RMACRO; }
-inline bool isinsert(int c) { return (currentrt.chclass[c] & RMACRO) == INSERT; }
-inline bool issplice(int c) { return (currentrt.chclass[c] & RMACRO) == SPLICE; }
-inline bool isinfix(int c) { return (currentrt.chclass[c] & RMACRO) == INFIX; }
+inline bool issepr(lisp& l, int c) { return (l.currentrt.chclass[c] & SEPR) == SEPR; }
+inline bool isbrk(lisp& l, int c) { return (l.currentrt.chclass[c] & BRK) == BRK; }
+inline bool isrm(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == RMACRO; }
+inline bool isinsert(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == INSERT; }
+inline bool issplice(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == SPLICE; }
+inline bool isinfix(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == INFIX; }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool i = false) { return io(l).lispread(f, i); }
