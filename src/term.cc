@@ -94,9 +94,9 @@ void term_source::init_term()
         curfwd = tgetstr(const_cast<char*>("nd"), &termc);
         cleol = tgetstr(const_cast<char*>("ce"), &termc);
         if(!curup || !curfwd || !cleol)
-          nocap = 1;
+          nocap = true;
         else
-          nocap = 0;
+          nocap = false;
       }
 #endif
     init_keymap();
@@ -237,7 +237,7 @@ void term_source::retype(int all)
 
   if(!nocap)
   {
-    int l = 1;
+    int l = 0;
     for(int i = 0; i < linepos; i++)
     {
       if(linebuffer[i] == '\n')
@@ -377,23 +377,19 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
  */
 void term_source::scan(int begin)
 {
-  int line, cpos;
-  int pos;
   int escape;
-  paren_blink state;
-  int parcount, pars;
 
-  line = 0;
-  cpos = 0;
-  state = paren_blink::NORMAL;
-  parcount = 0;
-  pars = 0;
+  int line = 0;
+  int cpos = 0;
+  paren_blink state = paren_blink::NORMAL;
+  int parcount = 0;
+  int pars = 0;
   parpos.cpos = 0;
   parpos.line = 0;
   currentpos.cpos = 0;
   currentpos.line = 0;
   currentpos.line_start = nullptr;
-  for(pos = begin; pos > 0; pos--)
+  for(int pos = begin; pos > 0; pos--)
   {
     int cur = linebuffer[pos];
     cpos++;
@@ -411,10 +407,10 @@ void term_source::scan(int begin)
       if(parpos.line == line)
       {
         parpos.cpos = cpos - parpos.cpos - 1;
-        parpos.line_start = &linebuffer[pos + 1];
+        parpos.line_start = &linebuffer[pos];
       }
       if(currentpos.line_start == nullptr)
-        currentpos.line_start = &linebuffer[pos + 1];
+        currentpos.line_start = &linebuffer[pos];
       cpos = 0;
       line++;
     }
@@ -474,7 +470,7 @@ void term_source::scan(int begin)
   if(line == 0)
   {
     currentpos.cpos += strlen(current_prompt);
-    currentpos.line_start = linebuffer + 1;
+    currentpos.line_start = linebuffer;
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)
@@ -496,17 +492,14 @@ void term_source::nput(const char* str, int ntim)
  */
 void term_source::blink()
 {
+  if(nocap)
+    return; // Requires termcap and enough capability
+  scan(linepos - 1);
 #ifdef TERMCAP
-  int ldiff;
-  int cdiff;
-  struct timeval timeout;
-  fd_set rfds;
   int i;
 
-  if(nocap)
-    return; /* Sorry, no blink.  */
-  ldiff = currentpos.line - parpos.line;
-  cdiff = parpos.cpos - currentpos.cpos;
+  int ldiff = currentpos.line - parpos.line;
+  int cdiff = parpos.cpos - currentpos.cpos;
   nput(curup, ldiff);
   if(cdiff < 0)
   {
@@ -515,14 +508,16 @@ void term_source::blink()
     else
     {
       putc('\r', stdout);
-      nput(curfwd, parpos.cpos); /* This is realy silly.  */
+      nput(curfwd, parpos.cpos); /* This is really silly.  */
     }
   }
   else
     nput(curfwd, cdiff);
   fflush(stdout);
+  struct timeval timeout;
   timeout.tv_sec = 1L;
   timeout.tv_usec = 0L;
+  fd_set rfds;
   FD_SET(1, &rfds);
   select(1, &rfds, nullptr, nullptr, &timeout);
   nput(curdn, ldiff); /* Goes to beginning of line.  */
@@ -679,7 +674,6 @@ const char* term_source::getline()
         }
         else
         {
-          scan(linepos);
           blink();
         }
         break;
