@@ -10,11 +10,10 @@
  * terminal in cbreak and no echo mode.
  */
 
-#include <signal.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <termios.h>
-#include <string.h>
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
 #ifdef TERMCAP
 #include <term.h>
 #endif
@@ -24,59 +23,15 @@
 #include "main.hh"
 #include "glob.hh"
 #include "os.hh"
+#include "term.hh"
 
 extern lisp::lisp* L;
-bool lips_getline(lisp::lisp&, std::FILE*);
 
 extern void finish(int);
 
-inline constexpr int NUM_KEYS = 256;
-inline constexpr char COMMENTCHAR = '#';
+void term_source::cleanup(int) { throw lisp::lisp_finish("cleanup", 1); }
 
-#ifndef BELL
-#define BELL '\007'
-#endif
-
-/*
- * Terminal functions.  Each constant stands for a function provided by the
- * line editor.
- */
-enum class term_fun
-{
-  T_INSERT = 0,
-  T_ERASE,
-  T_RETYPE,
-  T_KILL,
-  T_EOF,
-  T_TAB,
-  T_LEFTPAR,
-  T_RIGHTPAR,
-  T_NEWLINE,
-  T_STRING,
-  T_ESCAPE
-};
-
-/*
- * Variables for terminal characteristics, old and new.
- */
-static struct termios newterm, oldterm;
-
-static char linebuffer[BUFSIZ];         /* Line buffer for terminal input.  */
-static int parcount = 0;                /* Counts paranthesis.  */
-static int linepos = 0;                 /* End of line buffer.  */
-static int position = 0;                /* Current position in line buffer.  */
-static enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
-
-#ifdef TERMCAP
-static char tcap[128];             /* Buffer for terminal capabilties.  */
-static const char *curup, *curfwd; /* Various term cap strings.  */
-static const char *cleol, *curdn;
-static bool nocap = false; /* true if insufficient term cap. */
-#endif
-
-void cleanup(int) { finish(0); }
-
-void clearlbuf()
+void term_source::clearlbuf()
 {
   linepos = 0;
   parcount = 0;
@@ -85,7 +40,7 @@ void clearlbuf()
 /*
  * Set up keymap.
  */
-void init_keymap()
+void term_source::init_keymap()
 {
   int i;
 
@@ -103,8 +58,12 @@ void init_keymap()
   key_tab[(int)'"'] = term_fun::T_STRING;
 }
 
+term_source::term_source()
+{
+}
+
 /* Init terminal to CBREAK and no ECHO.  */
-void init_term()
+void term_source::init_term()
 {
   static int initialized = 0;
 #ifdef TERMCAP
@@ -116,8 +75,8 @@ void init_term()
   if(!initialized)
   {
     tcgetattr(0, &oldterm);
-    signal(SIGINT, cleanup);  /* temporary handle */
-    signal(SIGTERM, cleanup); /* exit gracefully */
+    std::signal(SIGINT, cleanup);  /* temporary handle */
+    std::signal(SIGTERM, cleanup); /* exit gracefully */
     newterm = oldterm;
     newterm.c_lflag &= (unsigned)~ECHO;
     newterm.c_lflag &= (unsigned)~ICANON;
@@ -146,14 +105,19 @@ void init_term()
   tcsetattr(0, TCSANOW, &newterm);
 }
 
+term_source::~term_source()
+{
+  end_term();
+}
+
 /* Reset terminal to previous value */
-void end_term() { tcsetattr(0, TCSANOW, &oldterm); }
+void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
 
 /*
  * Put a character on stdout prefixing it with a ^ if it's
  * a control character.
  */
-void pputc(int c, FILE* file)
+void term_source::pputc(int c, FILE* file)
 {
   if(c < 0x20 && c != '\n' && c != '\t')
   {
@@ -167,7 +131,7 @@ void pputc(int c, FILE* file)
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-void putch(int c, FILE* file, int esc)
+void term_source::putch(int c, FILE* file, int esc)
 {
   if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -179,31 +143,22 @@ void putch(int c, FILE* file, int esc)
  * with procedure getline, and get characters from linebuffer.  If it's not
  * from a terminal do io the standard way.
  */
-int getch(lisp::lisp& l, FILE* file)
+int term_source::getch()
 {
-  int c;
-
-  if(!isatty(fileno(file)))
+  while(true)
   {
-    c = getc(file);
-    if(c == COMMENTCHAR) /* Skip comments.  */
-      while((c = getc(file)) != '\n')
-        ;
-    return c;
-  }
-gotlin:
-  if(position < linepos)
-    return linebuffer[position++];
-  else
-  {
-    init_term();
-    if(lips_getline(l, file) == 0)
+    if(position < linepos)
+      return linebuffer[position++];
+    else
     {
+      init_term();
+      if(getline() == nullptr)
+      {
+        end_term();
+        return EOF;
+      }
       end_term();
-      return EOF;
     }
-    end_term();
-    goto gotlin;
   }
 }
 
@@ -211,25 +166,20 @@ gotlin:
  * Unget a character.  If reading from a terminal, just push it back in the
  * buffer, if not, do an ungetc.
  */
-void ungetch(int c, FILE* file)
+void term_source::ungetch(int)
 {
-  if(isatty(fileno(file)))
-  {
-    if(position > 0)
-      position--;
-  }
-  else
-    ungetc(c, file);
+  if(position > 0)
+    position--;
 }
 
 /*
  * Skips separators in the beginning of the line and returns true if the first
  * non-separator character is a left parenthesis, zero otherwise.
  */
-static bool firstnotlp(lisp::lisp& l)
+bool term_source::firstnotlp()
 {
   int i = 1;
-  for(; i < position && issepr(l, (int)linebuffer[i]); i++)
+  for(; i < position && issepr(*L, (int)linebuffer[i]); i++)
     ;
   if(linebuffer[i] == '(')
     return false;
@@ -240,7 +190,7 @@ static bool firstnotlp(lisp::lisp& l)
  * Delete one character the easy way by sending backspace - space - backspace.
  * Do it twice if it was a control character.
  */
-static void delonechar()
+void term_source::delonechar()
 {
   linepos--;
   putc('\b', stdout);
@@ -257,13 +207,13 @@ static void delonechar()
 /*
  * Returns zero if the line contains only separators.
  */
-static bool onlyblanks(lisp::lisp& l)
+bool term_source::onlyblanks()
 {
   int i = linepos;
 
   while(i > 0)
   {
-    if(!issepr(l, (int)linebuffer[i]))
+    if(!issepr(*L, (int)linebuffer[i]))
       return false;
     i--;
   }
@@ -273,7 +223,7 @@ static bool onlyblanks(lisp::lisp& l)
 /*
  * Output a character on stdout, used only in tputs.
  */
-int outc(int c)
+int term_source::outc(int c)
 {
   putc(c, stdout);
   return c;
@@ -284,7 +234,7 @@ int outc(int c)
  *          complete line, including prompt.  It ALL is 2 just delete all
  *          lines.  Used for ctrl-u kill.
  */
-static void retype(int all)
+void term_source::retype(int all)
 {
   int i;
 #ifdef TERMCAP
@@ -353,18 +303,18 @@ static void retype(int all)
 static char word[BUFSIZ];
 static char* last;
 
-char* mkexstr(lisp::lisp& l)
+char* term_source::mkexstr()
 {
   int i = linepos - 1;
 
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!issepr(l, (int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while(!issepr(*L, (int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
   return ++last;
 }
 
-static void fillrest(const char* word)
+void term_source::fillrest(const char* word)
 {
   for(word += strlen(last) - 1; *word; word++)
   {
@@ -375,7 +325,7 @@ static void fillrest(const char* word)
 
 using LISPT = lisp::LISPT;
 
-static bool checkchar(LISPT words, int pos, int* c)
+bool term_source::checkchar(LISPT words, int pos, int* c)
 {
   LISPT w = words;
   *c = (w->car()->getstr())[pos];
@@ -387,7 +337,7 @@ static bool checkchar(LISPT words, int pos, int* c)
   return true;
 }
 
-static void complete(LISPT words)
+void term_source::complete(LISPT words)
 {
   int pos;
   int c = 1;
@@ -400,7 +350,7 @@ static void complete(LISPT words)
   }
 }
 
-static LISPT strip(LISPT files, const char* prefix, const char* suffix)
+LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
 {
   LISPT stripped;
   const char* s;
@@ -417,35 +367,12 @@ static LISPT strip(LISPT files, const char* prefix, const char* suffix)
 }
 
 /*
- * Routines for paren blinking.
- */
-enum class paren_blink
-{
-  NORMAL,
-  INSTRING,
-  EXITSTRING,
-  STARTSTRING,
-  LEFTPAR,
-  RIGHTPAR
-};
-
-struct curpos
-{
-  int cpos;
-  int line;
-  char* line_start;
-};
-
-static struct curpos parpos;     /* Saves position of matching par.  */
-static struct curpos currentpos; /* Current position.  */
-
-/*
  * Scans backwards and tries to find a matching left parenthesis skipping
  * strings and escapes.  It records its finding in parpos.  It also updates
  * where the cursor is now in currentpos, so it can find its way back.  BEGIN
  * is the position in linebuffer from where to start searching.
  */
-static void scan(int begin)
+void term_source::scan(int begin)
 {
   int line, cpos;
   int pos;
@@ -554,7 +481,7 @@ static void scan(int begin)
 /*
  * Puts the string STR on stdout NTIM times using tputs.
  */
-void nput(const char* str, int ntim)
+void term_source::nput(const char* str, int ntim)
 {
 #ifdef TERMCAP
   for(; ntim > 0; ntim--) tputs(str, 1, outc);
@@ -564,7 +491,7 @@ void nput(const char* str, int ntim)
 /*
  * Blink matching paren.
  */
-void blink()
+void term_source::blink()
 {
 #ifdef TERMCAP
   int ldiff;
@@ -617,7 +544,7 @@ void blink()
  * matching right paren.  Typing just a return puts a right paren in the buffer
  * as well as the newline.  Returns zero if anything goes wrong.
  */
-bool lips_getline(lisp::lisp& l, std::FILE* file)
+const char* term_source::getline()
 {
   char c;
   const char *s, *t;
@@ -641,15 +568,15 @@ bool lips_getline(lisp::lisp& l, std::FILE* file)
     if(escaped)
       escaped--;
     fflush(stdout);
-    if(lisp::readchar(file, &c) == 0)
-      return false;
+    if(lisp::readchar(stdin, &c) == 0)
+      return nullptr;
     switch(key_tab[(int)c])
     {
       case term_fun::T_EOF:
         if(linepos == 1)
         {
           linebuffer[linepos++] = EOF;
-          return true;
+          return nullptr;
         }
         pputc(c, stdout);
         linebuffer[linepos++] = EOF;
@@ -665,7 +592,7 @@ bool lips_getline(lisp::lisp& l, std::FILE* file)
         retype(1);
         break;
       case term_fun::T_TAB:
-        s = mkexstr(l);
+        s = mkexstr();
         t = extilde(s, 0);
         if(t == nullptr)
         {
@@ -742,11 +669,11 @@ bool lips_getline(lisp::lisp& l, std::FILE* file)
             linebuffer[0] = '(';
             parcount = 0; /* in case it was negative */
           }
-          else if(firstnotlp(l))
+          else if(firstnotlp())
             break; /* paren expression not first (for readline) */
           linebuffer[linepos++] = '\n';
           pputc('\n', stdout);
-          return true;
+          return linebuffer;
         }
         else
         {
@@ -756,14 +683,14 @@ bool lips_getline(lisp::lisp& l, std::FILE* file)
         break;
       case term_fun::T_NEWLINE:
         pputc('\n', stdout);
-        if(linepos == 1 || onlyblanks(l))
+        if(linepos == 1 || onlyblanks())
         {
           linebuffer[0] = '(';
           linebuffer[linepos++] = ')';
         }
         linebuffer[linepos++] = '\n';
         if(parcount <= 0 && !instring)
-          return true;
+          return linebuffer;
         break;
       case term_fun::T_INSERT:
         pputc(c, stdout);
@@ -777,13 +704,9 @@ bool lips_getline(lisp::lisp& l, std::FILE* file)
  * Return true if currently at end of line, or at end of line after skipping
  * blanks.
  */
-bool eoln(FILE* file)
+bool term_source::eoln()
 {
-  int i;
-
-  if(!isatty(fileno(file)))
-    return false;
-  for(i = position; i < linepos; i++)
+  for(int i = position; i < linepos; i++)
   {
     if(linebuffer[i] != ' ' && linebuffer[i] != '\t' && linebuffer[i] != '\n')
       return false;

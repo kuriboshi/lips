@@ -15,6 +15,7 @@ target_sources(lips PRIVATE
   glob.hh
   main.hh
   os.hh
+  term.hh
   top.hh
 )
 target_link_libraries(lips PRIVATE libisp)

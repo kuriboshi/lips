@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstring>
 #include <libisp.hh>
 #include <except.hh>
 #include "main.hh"
@@ -17,10 +18,6 @@ inline constexpr int PROMPTLENGTH = 80;
 
 char current_prompt[PROMPTLENGTH];
 LISPT input_exp;               /* The input expression. */
-LISPT alias_expanded;          /* For checking alias loops. */
-LISPT (*transformhook)(LISPT); /* Applied on input if non-nullptr. */
-void (*beforeprompt)();        /* Called before the prompt is printed. */
-LISPT promptform;  // Evaluated before printing the prompt.
 
 /*
  * History functions.
@@ -74,7 +71,7 @@ void top::trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-LISPT histget(int num, LISPT hlist)
+LISPT top::histget(int num, LISPT hlist)
 {
   if(num < 0)
   {
@@ -106,7 +103,7 @@ PRIMITIVE top::printhist()
   return C_NIL;
 }
 
-static LISPT transform(LISPT list)
+LISPT top::transform(LISPT list)
 {
   if(transformhook != nullptr)
     return (*transformhook)(list);
@@ -121,7 +118,7 @@ static LISPT transform(LISPT list)
  * on the list alias_expanded. One indirection is allowed in order
  * to permit 'alias ls ls -F'.
  */
-LISPT findalias(LISPT exp)
+LISPT top::findalias(LISPT exp)
 {
   auto rval = exp;
   while(true)
@@ -145,7 +142,7 @@ LISPT findalias(LISPT exp)
   return transform(rval);
 }
 
-void promptprint(LISPT prompt)
+void top::promptprint(LISPT prompt)
 {
   int i;
   const char* s;
@@ -176,12 +173,10 @@ void promptprint(LISPT prompt)
   printf("%s", current_prompt);
 }
 
-bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
+bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
 {
   while(true)
   {
-    bool printit = false;       // If the result will be printed.
-
     L->echoline = false;
     if(beforeprompt != nullptr)
       (*beforeprompt)();
@@ -197,7 +192,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       }
       promptprint(*tprompt);
     }
-    LISPT input_exp = xreadline(*L, C_T);
+    LISPT input_exp = readline(*L, file);
     if(macrofun)
       switch((*macrofun)(&input_exp))
       {
@@ -218,6 +213,7 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
       prinbody(*L, input_exp, L->stdout(), 1);
       L->primout().terpri();
     }
+    bool printit = false;       // If the result will be printed.
     LISPT topexp = transform(input_exp);
     if(type_of(topexp->car()) == CONS)
     {
@@ -244,15 +240,14 @@ bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*))
  *   !*      - all arguments
  * others could be added easily.
  */
-LISPT io::rmexcl(lisp& l, file_t& file, LISPT, char)
+LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
 {
-#if 0
   LISPT at;
 
   int c = file.getch();
-  if(issepr(c))
+  if(issepr(l, c))
     return C_EXCL;
-  echoline = true;
+  l.echoline = true;
   LISPT tmp = histget(0L, history);
   if(type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
     tmp = tmp->car();
@@ -269,12 +264,12 @@ LISPT io::rmexcl(lisp& l, file_t& file, LISPT, char)
       return tmp->cdr();
       break;
     case '\n':
-      echoline = false;
+      l.echoline = false;
       return C_EXCL;
       break;
     default:
       file.ungetch(c);
-      at = ctx.ratom(file);
+      at = io(l).ratom(file);
       if(type_of(at) == INTEGER)
       {
         tmp = histget(at->intval(), history);
@@ -282,23 +277,22 @@ LISPT io::rmexcl(lisp& l, file_t& file, LISPT, char)
       }
       if(type_of(at) == SYMBOL)
       {
-        for(auto h = history; !is_NIL(l); h = h->cdr())
+        for(auto h = history; !is_NIL(h); h = h->cdr())
         {
           tmp = histget(0L, h);
           if(!is_NIL(tmp) && type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
             tmp = tmp->car();
-          if(!strncmp(tmp->car()->getstr(), at->getstr(), strlen(at->getstr())))
+          if(!strncmp(tmp->car()->getstr(), at->getstr(), std::strlen(at->getstr())))
             return histget(0L, h);
         }
         return C_NIL;
       }
       else
       {
-        error(EVENT_NOT_FOUND, at);
+        l.error(EVENT_NOT_FOUND, at);
         return C_NIL;
       }
   }
-#endif
   return C_NIL;
 }
 
@@ -314,8 +308,13 @@ void top::init()
   initcvar(&top::histmax, "histmax", mknumber(*L, 100L));
   initcvar(&promptform, "promptform", C_NIL);
   alloc::mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, 0, FSUBR);
+  L->set_read_table('!', SPLICE, top::rmexcl);
 }
 
 LISPT top::history = nullptr;
 LISPT top::histnum = nullptr;
 LISPT top::histmax = nullptr;
+LISPT (*top::transformhook)(LISPT) = nullptr;
+void (*top::beforeprompt)() = nullptr;
+LISPT top::alias_expanded = nullptr;
+LISPT top::promptform = nullptr;

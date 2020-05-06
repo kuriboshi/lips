@@ -20,14 +20,11 @@
 #include "main.hh"
 #include "exec.hh"
 #include "top.hh"
+#include "term.hh"
 
 #ifndef LIPSRC
 #define LIPSRC "/usr/local/lib/lipsrc"
 #endif
-
-extern void init_term();
-extern void end_term();
-extern void clearlbuf();
 
 lisp::lisp* L;
 
@@ -57,12 +54,20 @@ LISPT C_SEMI;
 LISPT C_TO;
 LISPT C_TOTO;
 
-/* graceful death */
-void finish(int stat)
+class the_end
 {
-  end_term();
-  exit(stat);
-}
+public:
+  the_end(term_source& source) : _source(source) {}
+  ~the_end() {}
+  /* graceful death */
+  void finish(int stat)
+  {
+    _source.end_term();
+    exit(stat);
+  }
+private:
+  term_source& _source;
+};
 
 #ifdef FANCY_SIGNALS
 static int getuser(int def)
@@ -102,7 +107,7 @@ static int getuser(int def)
  */
 void core(int sig)
 {
-  init_term();
+  // init_term();
   if(insidefork)
   {
     L->primerr().printf(" -- (in fork) core dumped\n");
@@ -122,13 +127,13 @@ void core(int sig)
     if((islower(c) ? c : tolower(c)) == 'n')
     {
       L->primerr().printf("No\n");
-      finish(0);
+      throw lisp_finish("core", 0);
     }
     else
     {
       signal(sig, SIG_DFL);
       printf("Yes\n");
-      end_term();
+      // end_term();
       killpg(mypgrp, sig);
     }
   }
@@ -137,7 +142,7 @@ void core(int sig)
     L->primerr().printf("Yes\n");
     L->primerr().printf("Warning: continued after signal %d.\n", sig);
     L->primerr().printf("Save your work and exit.\n");
-    end_term();
+    // end_term();
     throw lisp_error("continue after signal");
   }
 }
@@ -149,7 +154,6 @@ void onintr(int)
     exit(0);
   L->primerr().puts("^C\n");
   L->e().unwind();
-  clearlbuf();
   throw lisp_error("onintr");
 }
 
@@ -206,7 +210,7 @@ LISPT mungepath(char* pstr)
   if(ps == nullptr)
   {
     fprintf(stderr, "No more memory, can't munge path.\n");
-    finish(1);
+    throw lisp_finish("mungepath", 1);
   }
   strcpy(ps, pstr);
   p = C_NIL;
@@ -364,8 +368,8 @@ static void init()
   L->a().add_mark_object(&home);
 
   initcvar(&globsort, "globsort", C_T);
-  transformhook = transform;
-  beforeprompt = promptfun;
+  top::transformhook = transform;
+  top::beforeprompt = promptfun;
   L->e().breakhook = onbreak;
 
   exec::init();
@@ -405,6 +409,9 @@ LISPT greet(LISPT who)
 
 int main(int argc, char* const* argv)
 {
+  auto* source = new term_source;
+  auto terminal = std::make_unique<file_t>(source);
+  auto end = std::make_unique<the_end>(*source);
   options.debug = false;
   options.version = false;
   options.fast = false;
@@ -479,20 +486,21 @@ int main(int argc, char* const* argv)
     try
     {
       L->e().reset();
-      if(toploop(&topprompt, nullptr))
+      if(top::toploop(&topprompt, nullptr, *terminal.get()))
         break;
     }
     catch(const lisp_reset&)
     {}
     catch(const lisp_error& error)
     {
+      source->clearlbuf();
       printf("error: %s\n", error.what());
     }
     catch(const lisp_finish& fin)
     {
       L->stderr().printf("finish: %s", fin.what());
-      finish(fin.exit_code);
+      end->finish(fin.exit_code);
     }
   }
-  finish(0);
+  end->finish(0);
 }
