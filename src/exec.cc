@@ -370,7 +370,7 @@ static UNION_WAIT waitfork(int pid)
     if(wpid != -1 && !insidefork)
       collectjob(wpid, stat);
     if(wpid == pid)
-        wstat = stat;
+      wstat = stat;
   } while(errno == EINTR || (pid != 0 && pid != wpid && wpid != -1));
   if(WIFSIGNALED(wstat))
   {
@@ -887,7 +887,7 @@ PRIMITIVE exec::doexec(LISPT cmd)
   return C_NIL;
 }
 
-exec::exec(lisp& lisp) : base(lisp) {}
+exec::exec(lisp& lisp): base(lisp) {}
 
 void exec::init()
 {

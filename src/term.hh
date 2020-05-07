@@ -10,7 +10,7 @@
 
 #include <io.hh>
 
-class term_source : public lisp::io::source
+class term_source: public lisp::io::source
 {
 public:
   term_source();
@@ -46,7 +46,7 @@ private:
   void nput(const char* str, int ntim);
   void blink();
   void clearscr();
-  
+
   static inline constexpr int NUM_KEYS = 256;
   static inline constexpr char COMMENTCHAR = '#';
   static inline constexpr char BELL = '\007';
@@ -107,7 +107,7 @@ private:
   enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
 
 #ifdef TERMCAP
-  char tcap[128];             /* Buffer for terminal capabilties.  */
+  char tcap[128]; /* Buffer for terminal capabilties.  */
   const char* curup = nullptr;
   const char* curfwd = nullptr; /* Various term cap strings.  */
   const char* cleol = nullptr;
@@ -115,5 +115,4 @@ private:
   const char* clear = nullptr;
   bool nocap = false; /* true if insufficient term cap. */
 #endif
-
 };

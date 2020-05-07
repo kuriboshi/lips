@@ -31,8 +31,8 @@
 lisp::lisp* L;
 
 std::jmp_buf jumper;
-int mypgrp;             /* lips process group. */
-char* progname;      /* Name of the game. */
+int mypgrp;     /* lips process group. */
+char* progname; /* Name of the game. */
 
 void onintr(int sig)
 {
@@ -179,7 +179,7 @@ void init_all_signals()
   signal(SIGSEGV, onsegv);
 #endif
   int sig = setjmp(jumper);
-  if (sig == 0)
+  if(sig == 0)
     return;
   switch(sig)
   {
@@ -194,9 +194,9 @@ void init_all_signals()
 using namespace lisp;
 
 options_t options; /* Structure for all options. */
-LISPT path;             /* Search path for executables. */
-LISPT home;             /* Home directory. */
-LISPT globsort;         /* To sort or not during globbing. */
+LISPT path;        /* Search path for executables. */
+LISPT home;        /* Home directory. */
+LISPT globsort;    /* To sort or not during globbing. */
 
 LISPT C_ALIAS;
 LISPT C_AMPER;
@@ -218,7 +218,7 @@ LISPT C_TOTO;
 class the_end
 {
 public:
-  the_end(term_source& source) : _source(source) {}
+  the_end(term_source& source): _source(source) {}
   ~the_end() {}
   /* graceful death */
   void finish(int stat)
@@ -226,6 +226,7 @@ public:
     _source.end_term();
     exit(stat);
   }
+
 private:
   term_source& _source;
 };

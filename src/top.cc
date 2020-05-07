@@ -18,7 +18,7 @@ using namespace lisp;
 inline constexpr int PROMPTLENGTH = 80;
 
 char current_prompt[PROMPTLENGTH];
-LISPT input_exp;               /* The input expression. */
+LISPT input_exp; /* The input expression. */
 
 /*
  * History functions.
@@ -216,7 +216,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
       prinbody(*L, input_exp, L->stdout(), 1);
       L->primout().terpri();
     }
-    bool printit = false;       // If the result will be printed.
+    bool printit = false; // If the result will be printed.
     LISPT topexp = transform(input_exp);
     if(type_of(topexp->car()) == CONS)
     {
@@ -310,7 +310,8 @@ void top::init()
   initcvar(&top::histnum, "histnum", mknumber(*L, 1L));
   initcvar(&top::histmax, "histmax", mknumber(*L, 100L));
   initcvar(&promptform, "promptform", C_NIL);
-  alloc::mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, 0, FSUBR);
+  alloc::mkprim(
+    PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, 0, FSUBR);
   L->set_read_table('!', SPLICE, top::rmexcl);
 }
 

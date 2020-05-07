@@ -11,7 +11,7 @@
 
 namespace lisp
 {
-inline constexpr auto PN_PRINTHIST = "??";          // print history
+inline constexpr auto PN_PRINTHIST = "??"; // print history
 
 class top: public base
 {
@@ -34,9 +34,9 @@ public:
   static void addhist(LISPT);
   static void remhist();
   static void trimhist();
-  static LISPT history;         // Holds the history list.
-  static LISPT histnum;         // Current event number.
-  static LISPT histmax;         // Maximum number of events to save.
+  static LISPT history; // Holds the history list.
+  static LISPT histnum; // Current event number.
+  static LISPT histmax; // Maximum number of events to save.
 
   // Read table functions
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
@@ -45,11 +45,11 @@ public:
   static void (*beforeprompt)();        // Called before the prompt is printed.
 
 private:
-  static LISPT alias_expanded;  //For checking alias loops.
-  static LISPT promptform;      // Evaluated before printing the prompt.
+  static LISPT alias_expanded; //For checking alias loops.
+  static LISPT promptform;     // Evaluated before printing the prompt.
 };
 
-}
+} // namespace lisp
 
 extern char current_prompt[];
 extern lisp::LISPT input_exp;
