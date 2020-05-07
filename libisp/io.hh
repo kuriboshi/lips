@@ -235,6 +235,10 @@ public:
 #if 0
   static LISPT userreadmacros[128];
 #endif
+
+private:
+  bool checkeof(lisp& l, int c, bool line);
+  std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
 
 struct file_t

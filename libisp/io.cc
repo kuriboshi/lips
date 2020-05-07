@@ -6,33 +6,8 @@
 
 #include "libisp.hh"
 
-extern lisp::LISPT histget(int, lisp::LISPT);
-extern lisp::LISPT history;
-
 namespace lisp
 {
-inline bool checkeof(lisp& l, int c, bool line)
-{
-  if(c == EOF)
-  {
-    if(line || is_NIL(l.top->car()))
-      return true;
-    l.error(UNEXPECTED_EOF, C_NIL);
-  }
-  return false;
-}
-
-inline std::pair<bool, int> getchar(lisp& l, file_t& file, bool line)
-{
-  int curc = 0;
-  do
-    curc = file.getch();
-  while(curc != EOF && issepr(l, curc));
-  if(checkeof(l, curc, line))
-    return std::make_pair(true, curc);
-  return std::make_pair(false, curc);
-}
-
 /* clang-format off */
 /*
  * This state table parses a floating point number.
@@ -667,6 +642,28 @@ void io::init(lisp& l)
 {
   l.set_read_table('"', INSERT, io::rmdquote);
   l.set_read_table('\'', INSERT, io::rmsquote);
+}
+
+bool io::checkeof(lisp& l, int c, bool line)
+{
+  if(c == EOF)
+  {
+    if(line || is_NIL(l.top->car()))
+      return true;
+    l.error(UNEXPECTED_EOF, C_NIL);
+  }
+  return false;
+}
+
+std::pair<bool, int> io::getchar(lisp& l, file_t& file, bool line)
+{
+  int curc = 0;
+  do
+    curc = file.getch();
+  while(curc != EOF && issepr(l, curc));
+  if(checkeof(l, curc, line))
+    return std::make_pair(true, curc);
+  return std::make_pair(false, curc);
 }
 
 } // namespace lisp
