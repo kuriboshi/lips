@@ -11,6 +11,7 @@
  * libisp should only include libisp.h.
  */
 
+#include <variant>
 #include <cstdio>
 #include "config.hh"
 #include "error.hh"
@@ -24,9 +25,12 @@ namespace lisp
 class lisp;
 class evaluator;
 class alloc;
-struct lisp_t;
 class file_t;
+
+struct lisp_t;
 using LISPT = struct lisp_t*;
+
+class vlisp_t;
 
 /*
  * All lisp constants used internally.
@@ -94,7 +98,7 @@ enum lisp_type
   ENDOFFILE, /* returned from read at end of file */
   ERROR,     /* returned from primitive when an error
                 occured */
-  HASHTAB,   /* contains hased data table */
+  HASHTAB,   /* contains hashed data table */
   CVARIABLE, /* is a pointer to c-variable */
   CPOINTER,  /* general c pointer */
   USER,      /* user defined type */
@@ -107,16 +111,16 @@ using BITS32 = int;
 // The cons cell
 struct cons_t
 {
-  LISPT car;
-  LISPT cdr;
+  LISPT car = C_NIL;
+  LISPT cdr = C_NIL;
 };
 
 struct symbol_t
 {
-  const char* pname; /* The printname of the atom */
-  LISPT value;
-  LISPT plist;  /* The property list */
-  LISPT topval; /* Holds top value (not used yet) */
+  const char* pname = nullptr;  // The printname of the atom
+  LISPT value = C_NIL;
+  LISPT plist = C_NIL;          // The property list
+  LISPT topval = C_NIL;         // Holds top value (not used yet)
 };
 
 struct subr_t
@@ -126,23 +130,23 @@ struct subr_t
   LISPT (*function1)(lisp&, LISPT);
   LISPT (*function2)(lisp&, LISPT, LISPT);
   LISPT (*function3)(lisp&, LISPT, LISPT, LISPT);
-  short argcount; // Negative argcount indicates that arguments should not be
-                  // evaluated
+  short argcount = 0; // Negative argcount indicates that arguments should not
+                      // be evaluated
 };
 
 struct lambda_t
 {
-  LISPT lambdarep;
-  LISPT arglist;
-  short argcnt;
+  LISPT lambdarep = C_NIL;
+  LISPT arglist = C_NIL;
+  short argcnt = 0;
 };
 
 struct closure_t
 {
-  LISPT cfunction;
-  LISPT closed;
-  LISPT cvalues;
-  short count;
+  LISPT cfunction = C_NIL;
+  LISPT closed = C_NIL;
+  LISPT cvalues = C_NIL;
+  short count = 0;
 };
 
 enum class block_type
@@ -163,6 +167,96 @@ struct destblock_t
   } var, val;
 };
 
+using indirect_t = LISPT;
+using free_t = LISPT;
+using cvariable_t = LISPT*;
+
+#ifdef LISP_T_VARIANT
+struct lisp_t
+{
+  lisp_t() {}
+  ~lisp_t() {}
+  lisp_t(const vlisp_t&) = delete;
+
+  bool gcmark = false;
+  enum lisp_type type = NIL;
+  // One entry for each type.  Types that has no, or just one value are
+  // indicated by a comment.
+  std::variant<
+    std::monostate,             // NIL (0)
+    symbol_t,                   // SYMBOL (1)
+    int,                        // INTEGER (2)
+    double,                     // FLOAT (3)
+    indirect_t,                 // INDIRECT (4)
+    cons_t,                     // CONS (5)
+    char*,                      // STRING (6)
+    subr_t,                     // SUBR (7)
+    lambda_t,                   // LAMBDA (8)
+    closure_t,                  // CLOSURE (9)
+    destblock_t*,               // ENVIRON (10)
+    file_t*,                    // FILE (11)
+    free_t,                     // FREE (12)
+    cvariable_t,                // CVARIABLE (13)
+    void*                       // CPOINTER (14)
+    > u;
+  symbol_t& symval() { return std::get<symbol_t>(u); }
+  void symval(symbol_t x) { type = SYMBOL; u = x; }
+  LISPT symvalue() { return std::get<symbol_t>(u).value; }
+  void symvalue(LISPT x) { std::get<symbol_t>(u).value = x; }
+  void setq(LISPT y) { std::get<symbol_t>(u).value = y; }
+  void setopval(LISPT y) { setq(y); }
+  LISPT getopval() { return symvalue(); }
+  int intval() { return std::get<int>(u); }
+  void intval(int x)
+  {
+    type = INTEGER;
+    u = x;
+  }
+  double floatval() { return std::get<double>(u); }
+  void floatval(double f)
+  {
+    type = FLOAT;
+    u = f;
+  }
+  indirect_t& indirectval() { return std::get<4>(u); }
+  cons_t& consval() { return std::get<cons_t>(u); }
+  void consval(cons_t x) { type = CONS; u = x; }
+  LISPT car() { return std::get<cons_t>(u).car; }
+  LISPT cdr() { return std::get<cons_t>(u).cdr; }
+  void car(LISPT x) { std::get<cons_t>(u).car = x; }
+  void cdr(LISPT x) { std::get<cons_t>(u).cdr = x; }
+  const char* stringval() const { return std::get<char*>(u); }
+  void stringval(char* s)
+  {
+    type = STRING;
+    u = s;
+  }
+  subr_t& subrval() { return std::get<subr_t>(u); }
+  void subrval(subr_t x, lisp_type t) { type = t; u = x; }
+  lambda_t& lamval() { return std::get<lambda_t>(u); }
+  void lamval(lambda_t x) { type = LAMBDA; u = x; }
+  closure_t& closval() { return std::get<closure_t>(u); }
+  destblock_t* envval() { return std::get<destblock_t*>(u); }
+  void envval(destblock_t* env) { type = ENVIRON; u = env; }
+  file_t* fileval() { return std::get<file_t*>(u); }
+  void fileval(file_t* f) { type = FILET; u = f; }
+  free_t& freeval() { return std::get<12>(u); }
+  void freeval(LISPT x) { type = FREE; u.emplace<12>(x); }
+  cvariable_t cvarval() const { return std::get<cvariable_t>(u); }
+  void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
+  void* cpointval() { return std::get<void*>(u); }
+
+  const char* getstr() const { return type == STRING ? stringval() : std::get<symbol_t>(u).pname; }
+
+  /*
+   * Some more or less helpfull functions
+   */
+  void settype(lisp_type t) { type = t; }
+  bool marked() { return gcmark; }
+  void mark() { gcmark = true; }
+  void unmark() { gcmark = false; }
+};
+#else
 struct lisp_t
 {
   lisp_t() {}
@@ -250,6 +344,7 @@ struct lisp_t
   void mark() { gcmark = true; }
   void unmark() { gcmark = false; }
 };
+#endif
 
 enum char_class
 {

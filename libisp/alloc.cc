@@ -86,7 +86,9 @@ int alloc::sweep()
     free(f->cpointval());
   i++; /* Check *next* cell */
   for(; cc; cc = cc->next, i = 0)
+  {
     for(; i < CONSCELLS; i++)
+    {
       if(!cc->cells[i].gcmark)
       {
         nrfreed++;
@@ -95,14 +97,17 @@ int alloc::sweep()
 	   */
         if(type_of(f) == CPOINTER)
           free(f->cpointval());
-        set(f->freeval(), FREE, &cc->cells[i]);
+        f->freeval(&cc->cells[i]);
+        f->unmark();
         f = f->freeval();
       }
       else
       {
         cc->cells[i].gcmark = 0;
       }
-  f->freeval() = C_NIL;
+    }
+  }
+  f->freeval(C_NIL);
   return nrfreed;
 }
 
@@ -277,9 +282,9 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
     doreclaim(CONSARGS, 0L);
   }
 
-  LISPT f = nullptr;
-  set(f, CONS, freelist);
+  LISPT f = freelist;
   freelist = freelist->freeval();
+  f->consval(cons_t());
   f->car(a);
   f->cdr(b);
   return f;
@@ -309,6 +314,7 @@ PRIMITIVE alloc::freecount()
 LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
 {
   LISPT s = new lisp_t;
+  s->subrval(subr_t(), type);
   LISPT f = intern(pname);
   set(f->symval().value, type, s);
   s->subrval().argcount = nrpar;
@@ -389,6 +395,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
   save(args);
   save(def);
   LISPT s = getobject();
+  s->lamval(lambda_t());
   s->lamval().lambdarep = def;
   int count = 0;
   s->lamval().arglist = mkarglis(args, count);
@@ -421,6 +428,7 @@ LISPT alloc::buildatom(const char* s, bool copy, LISPT newatom)
   if(unbound == nullptr)
     set(unbound, UNBOUND, new lisp_t);
 
+  newatom->symval(symbol_t());
   if(copy)
   {
     auto* pname = realmalloc((unsigned)strlen(s) + 1);
