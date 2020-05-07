@@ -191,7 +191,7 @@ struct lisp_t
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
-    file_t*,                    // FILE (11)
+    std::unique_ptr<file_t>,    // FILE (11)
     free_t,                     // FREE (12)
     cvariable_t,                // CVARIABLE (13)
     void*                       // CPOINTER (14)
@@ -237,8 +237,8 @@ struct lisp_t
   closure_t& closval() { return std::get<closure_t>(u); }
   destblock_t* envval() { return std::get<destblock_t*>(u); }
   void envval(destblock_t* env) { type = ENVIRON; u = env; }
-  file_t* fileval() { return std::get<file_t*>(u); }
-  void fileval(file_t* f) { type = FILET; u = f; }
+  file_t& fileval() { return *std::get<std::unique_ptr<file_t>>(u).get(); }
+  void fileval(std::unique_ptr<file_t> f) { type = FILET; u = std::move(f); }
   free_t& freeval() { return std::get<12>(u); }
   void freeval(LISPT x) { type = FREE; u.emplace<12>(x); }
   cvariable_t cvarval() const { return std::get<cvariable_t>(u); }

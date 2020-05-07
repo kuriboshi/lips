@@ -215,22 +215,6 @@ LISPT C_SEMI;
 LISPT C_TO;
 LISPT C_TOTO;
 
-class the_end
-{
-public:
-  the_end(term_source& source): _source(source) {}
-  ~the_end() {}
-  /* graceful death */
-  void finish(int stat)
-  {
-    _source.end_term();
-    exit(stat);
-  }
-
-private:
-  term_source& _source;
-};
-
 /*
  * Processes the environment variable PATH and returns a list
  * of all directories in PATH.
@@ -443,9 +427,8 @@ LISPT greet(LISPT who)
 
 int main(int argc, char* const* argv)
 {
-  auto* source = new term_source;
-  auto terminal = std::make_unique<file_t>(source);
-  auto end = std::make_unique<the_end>(*source);
+  auto source = std::make_unique<term_source>();
+  auto terminal = std::make_unique<file_t>(std::move(source));
   options.debug = false;
   options.version = false;
   options.fast = false;
@@ -522,8 +505,8 @@ int main(int argc, char* const* argv)
     catch(const lisp_finish& fin)
     {
       L->stderr().printf("finish: %s", fin.what());
-      end->finish(fin.exit_code);
+      return fin.exit_code;
     }
   }
-  end->finish(0);
+  return 0;
 }

@@ -10,6 +10,15 @@
 #include "low.hh"
 #include "io.hh"
 
+namespace
+{
+template<typename T>
+std::string to_string(T& sink)
+{
+  return static_cast<lisp::io::string_sink&>(sink).string();
+}
+}
+
 TEST_CASE("Create lisp object")
 {
   lisp::lisp lisp;
@@ -44,21 +53,21 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
-    auto sink0 = new lisp::io::string_sink;
-    auto out0 = std::make_unique<lisp::file_t>(sink0);
+    auto sink0 = std::make_unique<lisp::io::string_sink>();
+    auto out0 = std::make_unique<lisp::file_t>(std::move(sink0));
     prin0(lisp, i, *out0.get());
-    CHECK(sink0->string() == std::string(i->getstr()));
-    auto sink1 = new lisp::io::string_sink;
-    auto out1 = std::make_unique<lisp::file_t>(sink1);
+    CHECK(to_string(out0->sink()) == std::string(i->getstr()));
+    auto sink1 = std::make_unique<lisp::io::string_sink>();
+    auto out1 = std::make_unique<lisp::file_t>(std::move(sink1));
     prin0(lisp, j, *out1.get());
-    CHECK(sink1->string() == std::string(j->getstr()));
+    CHECK(to_string(out1->sink()) == std::string(j->getstr()));
     std::string s_hello{"(hello)"};
-    auto in = std::make_unique<lisp::file_t>(new lisp::io::string_source(s_hello.c_str()));
+    auto in = std::make_unique<lisp::file_t>(std::make_unique<lisp::io::string_source>(s_hello.c_str()));
     auto hello = lispread(lisp, *in.get(), false);
-    auto sink2 = new lisp::io::string_sink;
-    auto out2 = std::make_unique<lisp::file_t>(sink2);
+    auto sink2 = std::make_unique<lisp::io::string_sink>();
+    auto out2 = std::make_unique<lisp::file_t>(std::move(sink2));
     prin0(lisp, hello, *out2.get());
-    CHECK(sink2->string() == s_hello);
+    CHECK(to_string(out2->sink()) == s_hello);
   }
 }
 
@@ -78,10 +87,10 @@ TEST_CASE("Evaluator")
   SUBCASE("Evaluate simple expression: (+ 123 1)")
   {
     auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
-    auto sink0 = new lisp::io::string_sink;
-    auto out0 = std::make_unique<lisp::file_t>(sink0);
+    auto sink0 = std::make_unique<lisp::io::string_sink>();
+    auto out0 = std::make_unique<lisp::file_t>(std::move(sink0));
     prin0(lisp, e1, *out0.get());
-    CHECK(sink0->string() == std::string("(+ 123 1)"));
+    CHECK(to_string(out0->sink()) == std::string("(+ 123 1)"));
     auto r1 = eval(lisp, e1);
     CHECK(r1->intval() == 124);
   }
@@ -92,9 +101,9 @@ TEST_CASE("Basic I/O")
   lisp::lisp lisp;
 
   auto out0 = std::make_unique<lisp::io::string_sink>();
-  lisp.primout(*new lisp::file_t(out0.get()));
+  lisp.primout(*new lisp::file_t(std::move(out0)));
   lisp.primout().printf("hello world %d", 123);
-  CHECK(out0->string() == std::string("hello world 123"));
+  CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
 
 TEST_CASE("Check size of lisp_t object")

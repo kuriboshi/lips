@@ -240,29 +240,27 @@ private:
   std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
 
-class file_t
+class file_t final
 {
 public:
-  file_t(io::source* source): source(source) {}
-  file_t(io::sink* sink): sink(sink) {}
-  file_t(io::source* source, io::sink* sink): source(source), sink(sink) {}
-  ~file_t()
-  {
-    delete source;
-    delete sink;
-  }
+  file_t(std::unique_ptr<io::source> source): _source(std::move(source)) {}
+  file_t(std::unique_ptr<io::sink> sink): _sink(std::move(sink)) {}
+  file_t(std::unique_ptr<io::source> source, std::unique_ptr<io::sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
+  ~file_t() {}
 
   // io::source
-  int getch() { ptrcheck(source); return source->getch(); }
-  void ungetch(int c) { ptrcheck(source); source->ungetch(c); }
-  bool eoln() { ptrcheck(source); return source->eoln(); }
-  const char* getline() { ptrcheck(source); return source->getline(); }
+  io::source& source() { return *_source.get(); }
+  int getch() { ptrcheck(_source); return _source->getch(); }
+  void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
+  bool eoln() { ptrcheck(_source); return _source->eoln(); }
+  const char* getline() { ptrcheck(_source); return _source->getline(); }
 
   // io::sink
-  void putch(char c, bool esc = false) { ptrcheck(sink); sink->putch(c, esc); }
-  void puts(const char* s) { ptrcheck(sink); sink->puts(s); }
-  void terpri() { ptrcheck(sink); sink->terpri(); }
-  void flush() { ptrcheck(sink); sink->flush(); }
+  io::sink& sink() { return *_sink.get(); }
+  void putch(char c, bool esc = false) { ptrcheck(_sink); _sink->putch(c, esc); }
+  void puts(const char* s) { ptrcheck(_sink); _sink->puts(s); }
+  void terpri() { ptrcheck(_sink); _sink->terpri(); }
+  void flush() { ptrcheck(_sink); _sink->flush(); }
 
   void printf(const char* format, ...)
   {
@@ -271,41 +269,28 @@ public:
     char* ret;
     vasprintf(&ret, format, ap);
     va_end(ap);
-    sink->puts(ret);
+    _sink->puts(ret);
   }
 
   bool close()
   {
-    auto a = close(source);
-    auto b = close(sink);
-    return a && b;
+    _source.release();
+    _sink.release();
+    return true;
   }
 
 private:
-  io::source* source = nullptr;
-  io::sink* sink = nullptr;
+  std::unique_ptr<io::source> _source;
+  std::unique_ptr<io::sink> _sink;
 
-  bool close(io::source* source)
+  void ptrcheck(const std::unique_ptr<io::source>&) const
   {
-    if(source)
-      return source->close();
-    return true;
-  }
-  bool close(io::sink* sink)
-  {
-    if(sink)
-      return sink->close();
-    return false;
-  }
-
-  void ptrcheck(io::source* source)
-  {
-    if(source == nullptr)
+    if(!_source)
       throw lisp_error("file_t: No source");
   }
-  void ptrcheck(io::sink* sink)
+  void ptrcheck(const std::unique_ptr<io::sink>&) const
   {
-    if(sink == nullptr)
+    if(!_sink)
       throw lisp_error("file_t: No sink");
   }
 };

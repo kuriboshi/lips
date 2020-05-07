@@ -46,7 +46,7 @@ PRIMITIVE posix::uxchmod(LISPT name, LISPT mode)
 PRIMITIVE posix::uxclose(LISPT fildes)
 {
   l.check(fildes, FILET);
-  if(fildes->fileval()->close())
+  if(fildes->fileval().close())
     return C_T;
   return C_NIL;
 }
@@ -121,13 +121,13 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
     else
       return l.error(UNKNOWN_REQUEST, mode);
   }
-  auto* f = readmode ? new file_t(new io::file_source(name->stringval()))
-                     : new file_t(new io::file_sink(name->stringval(), appendmode));
+  auto f = readmode ? std::make_unique<file_t>(std::make_unique<io::file_source>(name->stringval()))
+    : std::make_unique<file_t>(std::make_unique<io::file_sink>(name->stringval(), appendmode));
   if(!f)
     return l.error(CANT_OPEN, name);
   LISPT newfile = nullptr;
   set(newfile, FILET, getobject(l));
-  newfile->fileval(f);
+  newfile->fileval(std::move(f));
   return newfile;
 }
 
