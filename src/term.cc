@@ -14,6 +14,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
+#include <csetjmp>
 #ifdef TERMCAP
 #include <term.h>
 #endif
@@ -26,10 +27,6 @@
 #include "term.hh"
 
 extern lisp::lisp* L;
-
-extern void finish(int);
-
-void term_source::cleanup(int) { throw lisp::lisp_finish("cleanup", 1); }
 
 void term_source::clearlbuf()
 {
@@ -66,18 +63,11 @@ term_source::term_source()
 /* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
 {
-  static int initialized = 0;
-#ifdef TERMCAP
-  char bp[1024];
-  char* termc = tcap;
-  char* term;
-#endif
+  static bool initialized = false;
 
   if(!initialized)
   {
     tcgetattr(0, &oldterm);
-    std::signal(SIGINT, cleanup);  /* temporary handle */
-    std::signal(SIGTERM, cleanup); /* exit gracefully */
     newterm = oldterm;
     newterm.c_lflag &= (unsigned)~ECHO;
     newterm.c_lflag &= (unsigned)~ICANON;
@@ -87,7 +77,10 @@ void term_source::init_term()
 #ifdef TERMCAP
     curup = nullptr;
     curfwd = nullptr;
-    if((term = getenv("TERM")) != nullptr)
+    char* termc = tcap;
+    if(auto* term = getenv("TERM"); term != nullptr)
+    {
+      char bp[1024];
       if(tgetent(bp, term) == 1)
       {
         clear = tgetstr(const_cast<char*>("cl"), &termc);
@@ -100,9 +93,10 @@ void term_source::init_term()
         else
           nocap = false;
       }
+    }
 #endif
     init_keymap();
-    initialized = 1;
+    initialized = true;
   }
   tcsetattr(0, TCSANOW, &newterm);
 }
@@ -718,3 +712,5 @@ bool term_source::eoln()
   }
   return true;
 }
+
+struct termios term_source::oldterm;

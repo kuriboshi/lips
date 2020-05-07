@@ -14,18 +14,19 @@ class term_source : public lisp::io::source
 public:
   term_source();
   virtual ~term_source();
+
+  // io::source
   virtual int getch() override;
   virtual void ungetch(int) override;
   virtual bool eoln() override;
   virtual bool close() override { return true; }
   virtual const char* getline() override;
 
-  void end_term();
+  static void end_term();
   void clearlbuf();
 
 private:
   bool getline(lisp::lisp&);
-  static void cleanup(int);
   void init_keymap();
   void init_term();
   void pputc(int c, FILE* file);
@@ -96,7 +97,7 @@ private:
    * Variables for terminal characteristics, old and new.
    */
   struct termios newterm;
-  struct termios oldterm;
+  static struct termios oldterm;
 
   char linebuffer[BUFSIZ];         /* Line buffer for terminal input.  */
   int parcount = 0;                /* Counts paranthesis.  */

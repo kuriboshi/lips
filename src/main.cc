@@ -4,16 +4,17 @@
  *
  */
 
+#include <csetjmp>
+#include <csignal>
+#include <cstdlib>
+#include <cerrno>
 #include <sys/types.h>
 #ifdef SELECT
 #include <sys/select.h>
 #endif
 #include <ctype.h>
-#include <signal.h>
 #include <pwd.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
 
 #include <libisp.hh>
 #include <except.hh>
@@ -28,46 +29,34 @@
 
 lisp::lisp* L;
 
-using namespace lisp;
-
-char* progname;      /* Name of the game. */
+std::jmp_buf jumper;
 int mypgrp;             /* lips process group. */
-options_t options; /* Structure for all options. */
-LISPT path;             /* Search path for executables. */
-LISPT home;             /* Home directory. */
-LISPT globsort;         /* To sort or not during globbing. */
+char* progname;      /* Name of the game. */
 
-LISPT C_ALIAS;
-LISPT C_AMPER;
-LISPT C_BACK;
-LISPT C_BAR;
-LISPT C_EXCL;
-LISPT C_EXEC;
-LISPT C_FROM;
-LISPT C_GGT;
-LISPT C_GT;
-LISPT C_LT;
-LISPT C_OLDVAL;
-LISPT C_PIPE;
-LISPT C_PROGN;
-LISPT C_SEMI;
-LISPT C_TO;
-LISPT C_TOTO;
-
-class the_end
+void onintr(int sig)
 {
-public:
-  the_end(term_source& source) : _source(source) {}
-  ~the_end() {}
-  /* graceful death */
-  void finish(int stat)
-  {
-    _source.end_term();
-    exit(stat);
-  }
-private:
-  term_source& _source;
-};
+  if(insidefork)
+    exit(0);
+#if 0
+  L->primerr().puts("^C\n");
+  L->e().unwind();
+  throw lisp::lisp_reset();
+#else
+  std::longjmp(jumper, sig);
+#endif
+}
+
+/*
+ * The stop key means to break inside a lisp expression. The
+ * brkflg is checked on every entry to eval.
+ */
+void onstop(int) { L->brkflg = true; }
+
+static void fixpgrp()
+{
+  mypgrp = getpgrp();
+  tcsetpgrp(0, mypgrp);
+}
 
 #ifdef FANCY_SIGNALS
 static int getuser(int def)
@@ -127,13 +116,13 @@ void core(int sig)
     if((islower(c) ? c : tolower(c)) == 'n')
     {
       L->primerr().printf("No\n");
-      throw lisp_finish("core", 0);
+      throw lisp::lisp_finish("core", 0);
     }
     else
     {
       signal(sig, SIG_DFL);
       printf("Yes\n");
-      // end_term();
+      term_source::end_term();
       killpg(mypgrp, sig);
     }
   }
@@ -142,60 +131,103 @@ void core(int sig)
     L->primerr().printf("Yes\n");
     L->primerr().printf("Warning: continued after signal %d.\n", sig);
     L->primerr().printf("Save your work and exit.\n");
-    // end_term();
-    throw lisp_error("continue after signal");
+    term_source::end_term();
+    throw lisp::lisp_error("continue after signal");
   }
 }
-#endif
 
-void onintr(int)
-{
-  if(insidefork)
-    exit(0);
-  L->primerr().puts("^C\n");
-  L->e().unwind();
-  throw lisp_error("onintr");
-}
-
-#ifdef FANCY_SIGNALS
-void onquit(int)
+void onquit(int sig)
 {
   L->primerr().puts("Quit!");
-  core(SIGQUIT);
+  std::longjmp(jumper, sig);
 }
 
-void onbus(int)
+void onbus(int sig)
 {
   L->primerr().printf("%s: Bus error!", progname);
-  core(SIGBUS);
+  std::longjmp(jumper, sig);
 }
 
-void onsegv(int)
+void onsegv(int sig)
 {
   L->primerr().printf("%s: Segmentation violation!", progname);
-  core(SIGSEGV);
+  std::longjmp(jumper, sig);
 }
 
-void onill(int)
+void onill(int sig)
 {
   L->primerr().printf("%s: Illegal instruction!", progname);
-  core(SIGILL);
+  std::longjmp(jumper, sig);
 }
 
 void onhup() { exit(0); }
 #endif
 
-/*
- * The stop key means to break inside a lisp expression. The
- * brkflg is checked on every entry to eval.
- */
-void onstop(int) { L->brkflg = true; }
-
-static void fixpgrp()
+void init_all_signals()
 {
-  mypgrp = getpgrp();
-  tcsetpgrp(0, mypgrp);
+  signal(SIGINT, onintr);
+  signal(SIGHUP, SIG_DFL);
+  signal(SIGTSTP, onstop);
+#ifdef FANCY_SIGNALS
+  signal(SIGQUIT, onquit);
+  signal(SIGILL, onill);
+#ifdef SIGEMT
+  signal(SIGEMT, onill);
+#endif
+  signal(SIGBUS, onbus);
+  signal(SIGSEGV, onsegv);
+#endif
+  int sig = setjmp(jumper);
+  if (sig == 0)
+    return;
+  switch(sig)
+  {
+    case SIGINT:
+      throw lisp::lisp_reset();
+    default:
+      core(sig);
+      break;
+  }
 }
+
+using namespace lisp;
+
+options_t options; /* Structure for all options. */
+LISPT path;             /* Search path for executables. */
+LISPT home;             /* Home directory. */
+LISPT globsort;         /* To sort or not during globbing. */
+
+LISPT C_ALIAS;
+LISPT C_AMPER;
+LISPT C_BACK;
+LISPT C_BAR;
+LISPT C_EXCL;
+LISPT C_EXEC;
+LISPT C_FROM;
+LISPT C_GGT;
+LISPT C_GT;
+LISPT C_LT;
+LISPT C_OLDVAL;
+LISPT C_PIPE;
+LISPT C_PROGN;
+LISPT C_SEMI;
+LISPT C_TO;
+LISPT C_TOTO;
+
+class the_end
+{
+public:
+  the_end(term_source& source) : _source(source) {}
+  ~the_end() {}
+  /* graceful death */
+  void finish(int stat)
+  {
+    _source.end_term();
+    exit(stat);
+  }
+private:
+  term_source& _source;
+};
 
 /*
  * Processes the environment variable PATH and returns a list
@@ -456,21 +488,6 @@ int main(int argc, char* const* argv)
    */
   init();
   interactive = options.interactive ? C_T : C_NIL;
-  if(!options.debug && options.interactive)
-  {
-    signal(SIGINT, onintr);
-    signal(SIGHUP, SIG_DFL);
-    signal(SIGTSTP, onstop);
-#ifdef FANCY_SIGNALS
-    signal(SIGQUIT, onquit);
-    signal(SIGILL, onill);
-#ifdef SIGEMT
-    signal(SIGEMT, onill);
-#endif
-    signal(SIGBUS, onbus);
-    signal(SIGSEGV, onsegv);
-#endif
-  }
   if(!options.fast)
   {
     try
@@ -485,12 +502,16 @@ int main(int argc, char* const* argv)
   {
     try
     {
+      if(!options.debug && options.interactive)
+        init_all_signals();
       L->e().reset();
       if(top::toploop(&topprompt, nullptr, *terminal.get()))
         break;
     }
     catch(const lisp_reset&)
-    {}
+    {
+      printf("^C\n");
+    }
     catch(const lisp_error& error)
     {
       source->clearlbuf();
