@@ -25,7 +25,7 @@ class lisp;
 class evaluator;
 class alloc;
 struct lisp_t;
-struct file_t;
+class file_t;
 using LISPT = struct lisp_t*;
 
 /*

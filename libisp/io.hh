@@ -15,7 +15,6 @@
 namespace lisp
 {
 class lisp;
-struct file_t;
 
 class io: public base
 {
@@ -23,8 +22,6 @@ public:
   io(lisp& lisp): base(lisp) {}
   ~io() = default;
   static void init(lisp&);
-
-  static inline constexpr char COMMENTCHAR = '#';
 
   class source
   {
@@ -39,17 +36,17 @@ public:
     virtual const char* getline() = 0;
   };
 
-  class filesource: public source
+  class file_source: public source
   {
   public:
-    filesource(std::FILE* file): _file(file), _owner(false) {}
-    filesource(const char* filename): _file(fopen(filename, "r")), _owner(true)
+    file_source(std::FILE* file): _file(file), _owner(false) {}
+    file_source(const char* filename): _file(fopen(filename, "r")), _owner(true)
     {
       // TODO: Throw different exception
       if(!_file)
         throw lisp_error("Can't open file");
     }
-    ~filesource()
+    ~file_source()
     {
       if(_owner)
         fclose(_file);
@@ -100,10 +97,10 @@ public:
     int _curc = 0;
   };
 
-  class stringsource: public source
+  class string_source: public source
   {
   public:
-    stringsource(const char* string): _string(string), _len(strlen(string)) {}
+    string_source(const char* string): _string(string), _len(strlen(string)) {}
 
     virtual int getch() override
     {
@@ -139,11 +136,11 @@ public:
     virtual bool close() = 0;
   };
 
-  class filesink: public sink
+  class file_sink: public sink
   {
   public:
-    filesink(std::FILE* file): _file(file) {}
-    filesink(const char* filename, bool append = false) { _file = fopen(filename, append ? "a" : "w"); }
+    file_sink(std::FILE* file): _file(file) {}
+    file_sink(const char* filename, bool append = false) { _file = fopen(filename, append ? "a" : "w"); }
 
     virtual void putch(int c, bool esc) override { putch(c, _file, esc); }
     virtual void puts(const char* s) override { std::fputs(s, _file); }
@@ -183,10 +180,10 @@ public:
     std::FILE* _file;
   };
 
-  class stringsink: public sink
+  class string_sink: public sink
   {
   public:
-    stringsink() {}
+    string_sink() {}
 
     std::string string() const { return _string; }
 
@@ -206,11 +203,13 @@ public:
     l.rstack = l.rstack->cdr();
   }
 
-  static constexpr int NUL = '\0';
-  static constexpr int MAXATOMSIZE = 128; /* max length of atom read can handle */
+  static inline constexpr int NUL = '\0';
+  static inline constexpr int MAXATOMSIZE = 128; // Max length of atom read can handle
+  static inline constexpr char COMMENTCHAR = '#';
 
   bool integerp(char*, int* res);
   bool floatp(char*);
+
   LISPT splice(LISPT, LISPT, bool);
   LISPT parsebuf(char*);
 
@@ -219,10 +218,10 @@ public:
   LISPT readline(file_t&);
 
   LISPT patom(LISPT, file_t&, bool esc = false);
-  LISPT terpri(file_t&);
   LISPT prinbody(LISPT, file_t&, bool esc = false);
   LISPT prin0(LISPT, file_t&, bool esc = false);
   LISPT print(LISPT, file_t&);
+  LISPT terpri(file_t&);
 
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
   static LISPT rmdquote(lisp&, file_t&, LISPT, char);
@@ -241,29 +240,29 @@ private:
   std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
 
-struct file_t
+class file_t
 {
+public:
   file_t(io::source* source): source(source) {}
   file_t(io::sink* sink): sink(sink) {}
+  file_t(io::source* source, io::sink* sink): source(source), sink(sink) {}
   ~file_t()
   {
     delete source;
     delete sink;
   }
 
-  io::source* source = nullptr;
-  io::sink* sink = nullptr;
-
   // io::source
-  int getch() { return source->getch(); }
-  void ungetch(int c) { source->ungetch(c); }
-  bool eoln() { return source->eoln(); }
-  const char* getline() { return source->getline(); }
+  int getch() { ptrcheck(source); return source->getch(); }
+  void ungetch(int c) { ptrcheck(source); source->ungetch(c); }
+  bool eoln() { ptrcheck(source); return source->eoln(); }
+  const char* getline() { ptrcheck(source); return source->getline(); }
+
   // io::sink
-  void putch(char c, bool esc = false) { sink->putch(c, esc); }
-  void puts(const char* s) { sink->puts(s); }
-  void terpri() { sink->terpri(); }
-  void flush() { sink->flush(); }
+  void putch(char c, bool esc = false) { ptrcheck(sink); sink->putch(c, esc); }
+  void puts(const char* s) { ptrcheck(sink); sink->puts(s); }
+  void terpri() { ptrcheck(sink); sink->terpri(); }
+  void flush() { ptrcheck(sink); sink->flush(); }
 
   void printf(const char* format, ...)
   {
@@ -277,11 +276,37 @@ struct file_t
 
   bool close()
   {
+    auto a = close(source);
+    auto b = close(sink);
+    return a && b;
+  }
+
+private:
+  io::source* source = nullptr;
+  io::sink* sink = nullptr;
+
+  bool close(io::source* source)
+  {
     if(source)
       return source->close();
-    else if(sink)
+    return true;
+  }
+  bool close(io::sink* sink)
+  {
+    if(sink)
       return sink->close();
     return false;
+  }
+
+  void ptrcheck(io::source* source)
+  {
+    if(source == nullptr)
+      throw lisp_error("file_t: No source");
+  }
+  void ptrcheck(io::sink* sink)
+  {
+    if(sink == nullptr)
+      throw lisp_error("file_t: No sink");
   }
 };
 

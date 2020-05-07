@@ -21,11 +21,11 @@ PRIMITIVE file::xratom(LISPT file)
 PRIMITIVE file::readc(LISPT file)
 {
   if(is_NIL(file))
-    return a.mknumber(l.primin().source->getch());
+    return a.mknumber(l.primin().getch());
   if(is_T(file))
-    return a.mknumber(l.stdin().source->getch());
+    return a.mknumber(l.stdin().getch());
   l.check(file, FILET);
-  return a.mknumber(file->fileval()->source->getch());
+  return a.mknumber(file->fileval()->getch());
 }
 
 PRIMITIVE file::xread(LISPT file)
@@ -52,7 +52,7 @@ bool file::loadfile(const char* lf)
 {
   try
   {
-    auto foo = std::make_unique<file_t>(new io::filesource(lf));
+    auto foo = std::make_unique<file_t>(new io::file_source(lf));
     for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != ENDOFFILE; rval = lispread(l, *foo.get(), false))
       rval = e.eval(rval);
   }
@@ -129,7 +129,7 @@ PRIMITIVE file::spaces(LISPT n, LISPT file)
     l.check(file, FILET);
     f = file->fileval();
   }
-  for(i = n->intval(); i > 0; i--) f->sink->putch(' ');
+  for(i = n->intval(); i > 0; i--) f->putch(' ');
   return C_NIL;
 }
 

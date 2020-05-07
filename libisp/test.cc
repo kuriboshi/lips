@@ -52,18 +52,18 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
-    auto sink0 = new lisp::io::stringsink;
+    auto sink0 = new lisp::io::string_sink;
     auto out0 = std::make_unique<lisp::file_t>(sink0);
     prin0(lisp, i, *out0.get());
     CHECK(sink0->string() == std::string(i->stringval()));
-    auto sink1 = new lisp::io::stringsink;
+    auto sink1 = new lisp::io::string_sink;
     auto out1 = std::make_unique<lisp::file_t>(sink1);
     prin0(lisp, j, *out1.get());
     CHECK(sink1->string() == std::string(j->stringval()));
     std::string s_hello{"(hello)"};
-    auto in = std::make_unique<lisp::file_t>(new lisp::io::stringsource(s_hello.c_str()));
+    auto in = std::make_unique<lisp::file_t>(new lisp::io::string_source(s_hello.c_str()));
     auto hello = lispread(lisp, *in.get(), false);
-    auto sink2 = new lisp::io::stringsink;
+    auto sink2 = new lisp::io::string_sink;
     auto out2 = std::make_unique<lisp::file_t>(sink2);
     prin0(lisp, hello, *out2.get());
     CHECK(sink2->string() == s_hello);
@@ -86,7 +86,7 @@ TEST_CASE("Evaluator")
   SUBCASE("Evaluate simple expression: (+ 123 1)")
   {
     auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
-    auto sink0 = new lisp::io::stringsink;
+    auto sink0 = new lisp::io::string_sink;
     auto out0 = std::make_unique<lisp::file_t>(sink0);
     prin0(lisp, e1, *out0.get());
     CHECK(sink0->string() == std::string("(+ 123 1)"));
@@ -99,7 +99,7 @@ TEST_CASE("Basic I/O")
 {
   lisp::lisp lisp;
 
-  auto out0 = std::make_unique<lisp::io::stringsink>();
+  auto out0 = std::make_unique<lisp::io::string_sink>();
   lisp.primout(*new lisp::file_t(out0.get()));
   lisp.primout().printf("hello world %d", 123);
   CHECK(out0->string() == std::string("hello world 123"));

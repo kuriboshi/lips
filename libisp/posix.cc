@@ -121,8 +121,8 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
     else
       return l.error(UNKNOWN_REQUEST, mode);
   }
-  auto* f = readmode ? new file_t(new io::filesource(name->stringval()))
-                     : new file_t(new io::filesink(name->stringval(), appendmode));
+  auto* f = readmode ? new file_t(new io::file_source(name->stringval()))
+                     : new file_t(new io::file_sink(name->stringval(), appendmode));
   if(!f)
     return l.error(CANT_OPEN, name);
   LISPT newfile = nullptr;
