@@ -487,7 +487,7 @@ static void ps(const char* s, file_t& file, bool esc)
   while(*s) file.putch(*s++, esc);
 }
 
-static void pi(int i, int base, file_t& file)
+static void pi(long i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -524,7 +524,7 @@ static void pp(const char* s, file_t& file, LISPT x)
 {
   ps(s, file, 0);
   ps(" ", file, 0);
-  pi(x->intval(), 16L, file);
+  pi((long)&x, 16L, file);
   ps(">", file, 0);
 }
 
