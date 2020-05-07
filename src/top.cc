@@ -192,7 +192,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
       }
       promptprint(*tprompt);
     }
-    LISPT input_exp = readline(*L, file);
+    input_exp = readline(*L, file);
     if(is_NIL(input_exp))
       continue;
     if(macrofun)
