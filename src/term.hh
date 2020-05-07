@@ -43,6 +43,7 @@ private:
   void scan(int begin);
   void nput(const char* str, int ntim);
   void blink();
+  void clearscr();
   
   static inline constexpr int NUM_KEYS = 256;
   static inline constexpr char COMMENTCHAR = '#';
@@ -77,6 +78,7 @@ private:
     T_INSERT = 0,
     T_ERASE,
     T_RETYPE,
+    T_CLEAR,
     T_KILL,
     T_EOF,
     T_TAB,
@@ -104,10 +106,11 @@ private:
 
 #ifdef TERMCAP
   char tcap[128];             /* Buffer for terminal capabilties.  */
-  const char *curup = nullptr;
-  const char *curfwd = nullptr; /* Various term cap strings.  */
-  const char *cleol = nullptr;
+  const char* curup = nullptr;
+  const char* curfwd = nullptr; /* Various term cap strings.  */
+  const char* cleol = nullptr;
   const char* curdn = nullptr;
+  const char* clear = nullptr;
   bool nocap = false; /* true if insufficient term cap. */
 #endif
 

@@ -46,11 +46,12 @@ void term_source::init_keymap()
 
   for(i = NUM_KEYS - 1; i; i--) key_tab[i] = term_fun::T_INSERT;
   key_tab[CERASE] = term_fun::T_ERASE;
-  key_tab[CTRL('h')] = term_fun::T_ERASE;
+  key_tab[CTRL('H')] = term_fun::T_ERASE;
   key_tab[CRPRNT] = term_fun::T_RETYPE;
+  key_tab[CTRL('L')] = term_fun::T_CLEAR;
   key_tab[CKILL] = term_fun::T_KILL;
   key_tab[CEOF] = term_fun::T_EOF;
-  key_tab[CTRL('i')] = term_fun::T_TAB;
+  key_tab[CTRL('I')] = term_fun::T_TAB;
   key_tab[(int)'('] = term_fun::T_LEFTPAR;
   key_tab[(int)')'] = term_fun::T_RIGHTPAR;
   key_tab[(int)'\n'] = term_fun::T_NEWLINE;
@@ -89,6 +90,7 @@ void term_source::init_term()
     if((term = getenv("TERM")) != nullptr)
       if(tgetent(bp, term) == 1)
       {
+        clear = tgetstr(const_cast<char*>("cl"), &termc);
         curup = tgetstr(const_cast<char*>("up"), &termc);
         curdn = "\n";
         curfwd = tgetstr(const_cast<char*>("nd"), &termc);
@@ -531,6 +533,11 @@ void term_source::blink()
 #endif
 }
 
+void term_source::clearscr()
+{
+  tputs(clear, 1, outc);
+}
+
 /*
  * Get a line from stdin.  Do line editing functions such as kill line, retype
  * line and delete character.  Count parethesis pairs and terminate line if
@@ -581,6 +588,10 @@ const char* term_source::getline()
         instring = 0;
         break;
       case term_fun::T_RETYPE:
+        retype(1);
+        break;
+      case term_fun::T_CLEAR:
+        clearscr();
         retype(1);
         break;
       case term_fun::T_TAB:
