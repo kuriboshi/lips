@@ -57,9 +57,7 @@ void term_source::init_keymap()
   key_tab[(int)'"'] = term_fun::T_STRING;
 }
 
-term_source::term_source()
-{
-}
+term_source::term_source() {}
 
 /* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
@@ -102,10 +100,7 @@ void term_source::init_term()
   tcsetattr(0, TCSANOW, &newterm);
 }
 
-term_source::~term_source()
-{
-  end_term();
-}
+term_source::~term_source() { end_term(); }
 
 /* Reset terminal to previous value */
 void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
@@ -311,7 +306,7 @@ char* term_source::mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!issepr(*L, (int)linebuffer[i]) && i >= 0) *last-- = linebuffer[i--];
+  while(!issepr(*L, (int)linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
   return ++last;
 }
 
@@ -528,10 +523,7 @@ void term_source::blink()
 #endif
 }
 
-void term_source::clearscr()
-{
-  tputs(clear, 1, outc);
-}
+void term_source::clearscr() { tputs(clear, 1, outc); }
 
 /*
  * Get a line from stdin.  Do line editing functions such as kill line, retype
