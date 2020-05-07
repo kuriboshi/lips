@@ -7,6 +7,7 @@
 #pragma once
 
 #include <termios.h>
+
 #include <io.hh>
 
 class term_source : public lisp::io::source

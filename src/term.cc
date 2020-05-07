@@ -11,13 +11,14 @@
  */
 
 #include <unistd.h>
+#ifdef TERMCAP
+#include <term.h>
+#endif
+
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
 #include <csetjmp>
-#ifdef TERMCAP
-#include <term.h>
-#endif
 
 #include <libisp.hh>
 #include "top.hh"

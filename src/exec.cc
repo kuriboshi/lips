@@ -10,10 +10,11 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <signal.h>
-#include <string.h>
+
+#include <cstdlib>
+#include <cerrno>
+#include <csignal>
+#include <cstring>
 
 #include <libisp.hh>
 #include <except.hh>

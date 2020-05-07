@@ -8,8 +8,9 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <pwd.h>
-#include <string.h>
-#include <stdlib.h>
+
+#include <cstring>
+#include <cstdlib>
 
 #include <libisp.hh>
 #include "main.hh"
