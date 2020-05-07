@@ -482,12 +482,12 @@ LISPT io::readline(file_t& file)
 }
 
 /* print the string s, on stream file */
-void ps(const char* s, file_t& file, bool esc)
+static void ps(const char* s, file_t& file, bool esc)
 {
   while(*s) file.putch(*s++, esc);
 }
 
-void pi(int i, int base, file_t& file)
+static void pi(int i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -511,12 +511,21 @@ void pi(int i, int base, file_t& file)
   ps(ss + j + 1, file, 0);
 }
 
-void pf(double d, file_t& file)
+static void pf(double d, file_t& file)
 {
   char ss[30];
 
   sprintf(ss, "%#g", d);
   ps(ss, file, 0);
+}
+
+// Print pointer type object
+static void pp(const char* s, file_t& file, LISPT x)
+{
+  ps(s, file, 0);
+  ps(" ", file, 0);
+  pi(x->intval(), 16L, file);
+  ps(">", file, 0);
 }
 
 LISPT io::patom(LISPT x, file_t& file, bool esc)
@@ -577,10 +586,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       break;
     case CPOINTER:
       if(x->cpointval() != nullptr)
-      {
-        ps("#<pointer", file, 0);
-        goto ppoint;
-      }
+        pp("#<pointer", file, x);
       break;
     case NIL:
       ps("nil", file, 0);
@@ -605,44 +611,40 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
         ps(x->stringval(), file, 0);
       break;
     case CLOSURE:
-      ps("#<closure", file, 0);
-      goto ppoint;
+      pp("#<closure", file, x);
+      break;
     case LAMBDA:
-      ps("#<lambda", file, 0);
-      goto ppoint;
+      pp("#<lambda", file, x);
+      break;
     case NLAMBDA:
-      ps("#<nlambda", file, 0);
-      goto ppoint;
+      pp("#<nlambda", file, x);
+      break;
     case INDIRECT:
-      ps("#<indirect", file, 0);
-      goto ppoint;
+      pp("#<indirect", file, x);
+      break;
     case SUBR:
-      ps("#<subr", file, 0);
-      goto ppoint;
+      pp("#<subr", file, x);
+      break;
     case FSUBR:
-      ps("#<fsubr", file, 0);
-      goto ppoint;
+      pp("#<fsubr", file, x);
+      break;
     case UNBOUND:
       ps("#<unbound>", file, 0);
       break;
     case ENVIRON:
-      ps("#<environ", file, 0);
-      goto ppoint;
+      pp("#<environ", file, x);
+      break;
     case FREE:
-      ps("#<free", file, 0);
-      goto ppoint;
+      pp("#<free", file, x);
+      break;
     case ENDOFFILE:
-      ps("#<endoffile", file, 0);
-      goto ppoint;
+      pp("#<endoffile", file, x);
+      break;
     case FILET:
-      ps("#<file", file, 0);
-      goto ppoint;
+      pp("#<file", file, x);
+      break;
     case ERROR:
-      ps("#<error", file, 0);
-    ppoint:
-      ps(" ", file, 0);
-      pi(x->intval(), 16L, file);
-      ps(">", file, 0);
+      pp("#<error", file, x);
       break;
     default:
       ps("#<illegal ", file, 0);
