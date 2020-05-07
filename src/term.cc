@@ -93,7 +93,7 @@ void term_source::init_term()
         curdn = "\n";
         curfwd = tgetstr(const_cast<char*>("nd"), &termc);
         cleol = tgetstr(const_cast<char*>("ce"), &termc);
-        if(!curup || !curfwd || !cleol)
+        if(!curup || !curdn || !curfwd || !cleol)
           nocap = true;
         else
           nocap = false;
@@ -266,7 +266,8 @@ void term_source::retype(int all)
       {
         if(linebuffer[i] == '\n')
           tputs(cleol, 1, outc);
-        pputc(linebuffer[i], stdout);
+        else
+          pputc(linebuffer[i], stdout);
       }
     }
     tputs(cleol, 1, outc);
@@ -370,30 +371,25 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
 }
 
 /*
- * Scans backwards and tries to find a matching left parenthesis skipping
- * strings and escapes.  It records its finding in parpos.  It also updates
- * where the cursor is now in currentpos, so it can find its way back.  BEGIN
- * is the position in linebuffer from where to start searching.
+ * Scans backwards and try to find a matching left parenthesis skipping strings
+ * and escapes.  It records its finding in parpos.  It also updates where the
+ * cursor is now in currentpos, so it can find its way back.  BEGIN is the
+ * position in linebuffer from where to start searching.
  */
 void term_source::scan(int begin)
 {
-  int escape;
-
   int line = 0;
   int cpos = 0;
   paren_blink state = paren_blink::NORMAL;
   int parcount = 0;
-  int pars = 0;
-  parpos.cpos = 0;
-  parpos.line = 0;
-  currentpos.cpos = 0;
-  currentpos.line = 0;
-  currentpos.line_start = nullptr;
-  for(int pos = begin; pos > 0; pos--)
+  bool pars = false;
+  parpos = {0, 0, nullptr};
+  currentpos = {0, 0, nullptr};
+  for(int pos = begin; pos >= 0; --pos)
   {
     int cur = linebuffer[pos];
-    cpos++;
-    escape = 0;
+    ++cpos;
+    int escape = 0;
     if(cur == '"' && state == paren_blink::INSTRING)
       state = paren_blink::EXITSTRING;
     else if(cur == '"' && state == paren_blink::NORMAL)
@@ -406,7 +402,7 @@ void term_source::scan(int begin)
     {
       if(parpos.line == line)
       {
-        parpos.cpos = cpos - parpos.cpos - 1;
+        parpos.cpos = cpos - parpos.cpos;
         parpos.line_start = &linebuffer[pos];
       }
       if(currentpos.line_start == nullptr)
@@ -414,7 +410,7 @@ void term_source::scan(int begin)
       cpos = 0;
       line++;
     }
-    while(linebuffer[pos - 1] == '\\')
+    while(linebuffer[pos] == '\\')
     {
       escape++;
       pos--;
@@ -461,7 +457,7 @@ void term_source::scan(int begin)
       parpos.line_start = &linebuffer[pos];
       parpos.cpos = cpos;
       parpos.line = line;
-      pars = 1;
+      pars = true;
     }
     if(line == 0)
       currentpos.cpos++;
@@ -520,7 +516,6 @@ void term_source::blink()
   fd_set rfds;
   FD_SET(1, &rfds);
   select(1, &rfds, nullptr, nullptr, &timeout);
-  nput(curdn, ldiff); /* Goes to beginning of line.  */
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
   {
@@ -610,7 +605,7 @@ const char* term_source::getline()
         break;
       case term_fun::T_ERASE:
         escaped = 0;
-        if(linepos > 0 && linebuffer[linepos] == '\n')
+        if(linepos > 0 && linebuffer[linepos - 1] == '\n')
         {
           --linepos;
           retype(0);
@@ -681,7 +676,8 @@ const char* term_source::getline()
         pputc('\n', stdout);
         if(linepos == 0 || onlyblanks())
         {
-          linebuffer[0] = '(';
+          linepos = 0;
+          linebuffer[linepos++] = '(';
           linebuffer[linepos++] = ')';
         }
         linebuffer[linepos++] = '\n';
