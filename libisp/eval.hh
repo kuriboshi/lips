@@ -10,11 +10,11 @@
 
 namespace lisp
 {
-inline constexpr auto PN_E = "e";                   // noeval version of eval
-inline constexpr auto PN_EVAL = "eval";             // evaluate exp
-inline constexpr auto PN_APPLY = "apply";           // apply function on args
-inline constexpr auto PN_APPLYSTAR = "apply*";      // apply nospread
-inline constexpr auto PN_BAKTRACE = "baktrace";     // control stack backtrace
+inline constexpr auto PN_E = "e";               // noeval version of eval
+inline constexpr auto PN_EVAL = "eval";         // evaluate exp
+inline constexpr auto PN_APPLY = "apply";       // apply function on args
+inline constexpr auto PN_APPLYSTAR = "apply*";  // apply nospread
+inline constexpr auto PN_BAKTRACE = "baktrace"; // control stack backtrace
 
 class evaluator: public base
 {
@@ -133,12 +133,12 @@ private:
   void abort(int m, LISPT v);
   void overflow();
 
-  LISPT fun = nullptr;               // Store current function being evaluated.
-  LISPT expression = nullptr;        // Current expression.
-  LISPT args = nullptr;              // Current arguments.
-  bool noeval = false;               // Don't evaluate arguments.
-  continuation_t cont = nullptr;     // Current continuation.
-  destblock_t* env = nullptr; // Current environment.
+  LISPT fun = nullptr;           // Store current function being evaluated.
+  LISPT expression = nullptr;    // Current expression.
+  LISPT args = nullptr;          // Current arguments.
+  bool noeval = false;           // Don't evaluate arguments.
+  continuation_t cont = nullptr; // Current continuation.
+  destblock_t* env = nullptr;    // Current environment.
   int _trace = 0;
 };
 

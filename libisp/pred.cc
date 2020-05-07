@@ -168,7 +168,7 @@ PRIMITIVE pred::xtypeof(LISPT a)
   return C_NIL;
 }
 
-pred::pred(lisp& lisp) : base(lisp) {}
+pred::pred(lisp& lisp): base(lisp) {}
 
 void pred::init()
 {

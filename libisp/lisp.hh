@@ -265,7 +265,7 @@ enum char_class
 struct rtinfo
 {
   enum char_class chclass[128];
-  using rmacro_t = LISPT(*)(lisp&, file_t&, LISPT, char);
+  using rmacro_t = LISPT (*)(lisp&, file_t&, LISPT, char);
   rmacro_t rmacros[128];
 };
 
@@ -317,7 +317,7 @@ public:
       error(ILLEGAL_ARG, arg);
   }
 
-  using breakfun_t = int(*)(lisp&, LISPT*);
+  using breakfun_t = int (*)(lisp&, LISPT*);
   void repl(LISPT prompt, breakfun_t f);
   LISPT pexp = nullptr;
 

@@ -10,12 +10,12 @@
 
 namespace lisp
 {
-inline constexpr auto PN_DEFINE = "define";         // define function
-inline constexpr auto PN_GETREP = "getrep";         // get function representation
-inline constexpr auto PN_DE = "de";                 // defile lambda function
-inline constexpr auto PN_DF = "df";                 // define nlambda function
+inline constexpr auto PN_DEFINE = "define"; // define function
+inline constexpr auto PN_GETREP = "getrep"; // get function representation
+inline constexpr auto PN_DE = "de";         // defile lambda function
+inline constexpr auto PN_DF = "df";         // define nlambda function
 
-class user : public base
+class user: public base
 {
 public:
   user(lisp&);

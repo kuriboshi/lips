@@ -239,8 +239,8 @@ LISPT io::lispread(file_t& file, bool line)
   }
   else
     curr = l.top->car();
-head:
   {
+  head:
     auto [eof, c] = getchar(l, file, line);
     if(eof)
       return C_EOF;

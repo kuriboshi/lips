@@ -122,7 +122,8 @@ void alloc::mark(LISPT x)
       mark(x->cdr());
       break;
 #ifdef FLOATING
-    case FLOAT: {
+    case FLOAT:
+    {
       int y = &FLOATVAL(x) - &floats.fdata[0];
       floats.marks[(y / 32)] |= 1 << (31 - y % 32);
       break;
@@ -215,8 +216,7 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
         break;
     }
   }
-  for(auto i: savearray)
-      mark(i);
+  for(auto i: savearray) mark(i);
   int nrfreed = sweep();
   /*
    * A new page is allocated if the number of conses is lower

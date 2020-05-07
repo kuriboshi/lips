@@ -10,39 +10,39 @@
 
 namespace lisp
 {
-inline constexpr auto PN_ATOM = "atom";             // t if atom
-inline constexpr auto PN_CAR = "car";               // car
-inline constexpr auto PN_CDR = "cdr";               // cdr
-inline constexpr auto PN_CADR = "cadr";             // cadr
-inline constexpr auto PN_CDAR = "cdar";             // cdar
-inline constexpr auto PN_CAAR = "caar";             // caar
-inline constexpr auto PN_CDDR = "cddr";             // cddr
-inline constexpr auto PN_CDDDR = "cdddr";           // cdddr
-inline constexpr auto PN_CADDR = "caddr";           // caddr
-inline constexpr auto PN_CDADR = "cdadr";           // cdadr
-inline constexpr auto PN_CAADR = "caadr";           // caadr
-inline constexpr auto PN_CDDAR = "cddar";           // cddar
-inline constexpr auto PN_CADAR = "cadar";           // cadar
-inline constexpr auto PN_CDAAR = "cdaar";           // cdaar
-inline constexpr auto PN_CAAAR = "caaar";           // caaar
-inline constexpr auto PN_CLOSURE = "closure";       // create static environment
-inline constexpr auto PN_EQ = "eq";                 // pointer equal
-inline constexpr auto PN_ERROR = "error";           // error
-inline constexpr auto PN_LAMBDA = "lambda";         // create lambda object
-inline constexpr auto PN_LENGTH = "length";         // length of list
-inline constexpr auto PN_LIST = "list";             // make list of args
-inline constexpr auto PN_NCONC = "nconc";           // destructive append
-inline constexpr auto PN_NLAMBDA = "nlambda";       // make nlambda object
-inline constexpr auto PN_NTH = "nth";               // nth car in list
-inline constexpr auto PN_NULL = "null";             // t if nil
-inline constexpr auto PN_QUOTE = "quote";           // don't eval arg
-inline constexpr auto PN_RPLACA = "rplaca";         // replace car
-inline constexpr auto PN_RPLACD = "rplacd";         // replace cdr
-inline constexpr auto PN_TCONC = "tconc";           // add to end of list
-inline constexpr auto PN_NTHD = "nthd";             // return nth cdr of list
-inline constexpr auto PN_ATTACH = "attach";         // attach object at front of list
-inline constexpr auto PN_APPEND = "append";         // append lists
-inline constexpr auto PN_EXIT = "exit";             // exit lips
+inline constexpr auto PN_ATOM = "atom";       // t if atom
+inline constexpr auto PN_CAR = "car";         // car
+inline constexpr auto PN_CDR = "cdr";         // cdr
+inline constexpr auto PN_CADR = "cadr";       // cadr
+inline constexpr auto PN_CDAR = "cdar";       // cdar
+inline constexpr auto PN_CAAR = "caar";       // caar
+inline constexpr auto PN_CDDR = "cddr";       // cddr
+inline constexpr auto PN_CDDDR = "cdddr";     // cdddr
+inline constexpr auto PN_CADDR = "caddr";     // caddr
+inline constexpr auto PN_CDADR = "cdadr";     // cdadr
+inline constexpr auto PN_CAADR = "caadr";     // caadr
+inline constexpr auto PN_CDDAR = "cddar";     // cddar
+inline constexpr auto PN_CADAR = "cadar";     // cadar
+inline constexpr auto PN_CDAAR = "cdaar";     // cdaar
+inline constexpr auto PN_CAAAR = "caaar";     // caaar
+inline constexpr auto PN_CLOSURE = "closure"; // create static environment
+inline constexpr auto PN_EQ = "eq";           // pointer equal
+inline constexpr auto PN_ERROR = "error";     // error
+inline constexpr auto PN_LAMBDA = "lambda";   // create lambda object
+inline constexpr auto PN_LENGTH = "length";   // length of list
+inline constexpr auto PN_LIST = "list";       // make list of args
+inline constexpr auto PN_NCONC = "nconc";     // destructive append
+inline constexpr auto PN_NLAMBDA = "nlambda"; // make nlambda object
+inline constexpr auto PN_NTH = "nth";         // nth car in list
+inline constexpr auto PN_NULL = "null";       // t if nil
+inline constexpr auto PN_QUOTE = "quote";     // don't eval arg
+inline constexpr auto PN_RPLACA = "rplaca";   // replace car
+inline constexpr auto PN_RPLACD = "rplacd";   // replace cdr
+inline constexpr auto PN_TCONC = "tconc";     // add to end of list
+inline constexpr auto PN_NTHD = "nthd";       // return nth cdr of list
+inline constexpr auto PN_ATTACH = "attach";   // attach object at front of list
+inline constexpr auto PN_APPEND = "append";   // append lists
+inline constexpr auto PN_EXIT = "exit";       // exit lips
 
 class prim: public base
 {

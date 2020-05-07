@@ -8,5 +8,4 @@
 
 namespace lisp
 {
-
 } // namespace lisp

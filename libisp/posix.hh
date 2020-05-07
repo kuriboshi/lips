@@ -10,29 +10,29 @@
 
 namespace lisp
 {
-inline constexpr auto PN_UXACCESS = "access";       // check file access
-inline constexpr auto PN_UXALARM = "alarm";         // set alarm clock
-inline constexpr auto PN_UXCHDIR = "chdir";         // change directory
-inline constexpr auto PN_UXCHMOD = "chmode";        // change mode of file
-inline constexpr auto PN_UXCLOSE = "close";         // close file
-inline constexpr auto PN_UXCREAT = "creat";         // create file
-inline constexpr auto PN_UXDUP = "dup";             // duplicate fileno
-inline constexpr auto PN_UXERRNO = "errno";         // return latest error
-inline constexpr auto PN_UXGETUID = "getuid";       // get user id
-inline constexpr auto PN_UXGETEUID = "geteuid";     // get effective user id
-inline constexpr auto PN_UXGETGID = "getgid";       // set group id
-inline constexpr auto PN_UXGETEGID = "getegid";     // get effective group id
-inline constexpr auto PN_UXGETPID = "getpid";       // get process id
-inline constexpr auto PN_UXKILL = "killproc";       // kill process
-inline constexpr auto PN_UXLINK = "link";           // link file
-inline constexpr auto PN_UXNICE = "setnice";        // set nice
-inline constexpr auto PN_UXOPEN = "open";           // open file
-inline constexpr auto PN_UXSETUID = "setuid";       // set user id
-inline constexpr auto PN_UXSETGID = "setgid";       // set group id
-inline constexpr auto PN_SIGNAL = "signal";         // install signal handler
-inline constexpr auto PN_UXUNLINK = "unlink";       // unlink file
+inline constexpr auto PN_UXACCESS = "access";   // check file access
+inline constexpr auto PN_UXALARM = "alarm";     // set alarm clock
+inline constexpr auto PN_UXCHDIR = "chdir";     // change directory
+inline constexpr auto PN_UXCHMOD = "chmode";    // change mode of file
+inline constexpr auto PN_UXCLOSE = "close";     // close file
+inline constexpr auto PN_UXCREAT = "creat";     // create file
+inline constexpr auto PN_UXDUP = "dup";         // duplicate fileno
+inline constexpr auto PN_UXERRNO = "errno";     // return latest error
+inline constexpr auto PN_UXGETUID = "getuid";   // get user id
+inline constexpr auto PN_UXGETEUID = "geteuid"; // get effective user id
+inline constexpr auto PN_UXGETGID = "getgid";   // set group id
+inline constexpr auto PN_UXGETEGID = "getegid"; // get effective group id
+inline constexpr auto PN_UXGETPID = "getpid";   // get process id
+inline constexpr auto PN_UXKILL = "killproc";   // kill process
+inline constexpr auto PN_UXLINK = "link";       // link file
+inline constexpr auto PN_UXNICE = "setnice";    // set nice
+inline constexpr auto PN_UXOPEN = "open";       // open file
+inline constexpr auto PN_UXSETUID = "setuid";   // set user id
+inline constexpr auto PN_UXSETGID = "setgid";   // set group id
+inline constexpr auto PN_SIGNAL = "signal";     // install signal handler
+inline constexpr auto PN_UXUNLINK = "unlink";   // unlink file
 
-class posix : public base
+class posix: public base
 {
 public:
   posix(lisp&);

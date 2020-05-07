@@ -69,7 +69,7 @@ PRIMITIVE prop::remprop(LISPT x, LISPT p)
   return r;
 }
 
-prop::prop(lisp& lisp) : base(lisp) {}
+prop::prop(lisp& lisp): base(lisp) {}
 
 void prop::init()
 {

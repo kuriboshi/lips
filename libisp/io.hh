@@ -17,7 +17,7 @@ namespace lisp
 class lisp;
 struct file_t;
 
-class io : public base
+class io: public base
 {
 public:
   io(lisp& lisp): base(lisp) {}
@@ -42,14 +42,18 @@ public:
   class filesource: public source
   {
   public:
-    filesource(std::FILE* file) : _file(file), _owner(false) {}
-    filesource(const char* filename) : _file(fopen(filename, "r")), _owner(true)
+    filesource(std::FILE* file): _file(file), _owner(false) {}
+    filesource(const char* filename): _file(fopen(filename, "r")), _owner(true)
     {
       // TODO: Throw different exception
       if(!_file)
         throw lisp_error("Can't open file");
     }
-    ~filesource() { if(_owner) fclose(_file); }
+    ~filesource()
+    {
+      if(_owner)
+        fclose(_file);
+    }
 
     virtual int getch() override
     {
@@ -68,7 +72,7 @@ public:
           return true;
         if(_curc != ' ' && _curc != '\t' && _curc != '\n')
           return false;
-        if (_curc == '\n')
+        if(_curc == '\n')
           return true;
         _curc = getc(_file);
       }
@@ -235,8 +239,8 @@ public:
 
 struct file_t
 {
-  file_t(io::source* source) : source(source) {}
-  file_t(io::sink* sink) : sink(sink) {}
+  file_t(io::source* source): source(source) {}
+  file_t(io::sink* sink): sink(sink) {}
   ~file_t()
   {
     delete source;

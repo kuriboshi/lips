@@ -98,7 +98,7 @@ PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, 
 
 PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
 
-user::user(lisp& lisp) : base(lisp) {}
+user::user(lisp& lisp): base(lisp) {}
 
 void user::init()
 {

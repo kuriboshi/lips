@@ -10,13 +10,13 @@
 
 namespace lisp
 {
-inline constexpr auto PN_SETPLIST = "setplist";     // set property list
-inline constexpr auto PN_GETPLIST = "getplist";     // get property list
-inline constexpr auto PN_PUTPROP = "putprop";       // put property on atom
-inline constexpr auto PN_GETPROP = "getprop";       // get property value
-inline constexpr auto PN_REMPROP = "remprop";       // remove prop
+inline constexpr auto PN_SETPLIST = "setplist"; // set property list
+inline constexpr auto PN_GETPLIST = "getplist"; // get property list
+inline constexpr auto PN_PUTPROP = "putprop";   // put property on atom
+inline constexpr auto PN_GETPROP = "getprop";   // get property value
+inline constexpr auto PN_REMPROP = "remprop";   // remove prop
 
-class prop : public base
+class prop: public base
 {
 public:
   prop(lisp&);

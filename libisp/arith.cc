@@ -352,7 +352,7 @@ PRIMITIVE arith::minusp(LISPT x)
   return l.error(ILLEGAL_ARG, x);
 }
 
-arith::arith(lisp& lisp) : base(lisp) {}
+arith::arith(lisp& lisp): base(lisp) {}
 
 void arith::init()
 {

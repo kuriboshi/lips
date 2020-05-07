@@ -10,18 +10,18 @@
 
 namespace lisp
 {
-inline constexpr auto PN_LOAD = "load";             // load file
-inline constexpr auto PN_PRIN1 = "prin1";           // print without escapes
-inline constexpr auto PN_PRIN2 = "prin2";           // print without new-line
-inline constexpr auto PN_PRINT = "print";           // print
-inline constexpr auto PN_PLEVEL = "printlevel";     // how deep to print
-inline constexpr auto PN_RATOM = "ratom";           // read atom
-inline constexpr auto PN_READ = "read";             // read expression
-inline constexpr auto PN_READC = "readc";           // read characte
-inline constexpr auto PN_READLINE = "readline";     // read a line
-inline constexpr auto PN_SPACES = "spaces";         // print some spaces
-inline constexpr auto PN_TERPRI = "terpri";         // print new-line
-inline constexpr auto PN_CPPRINT = "cpprint";       // find and prettyprint c function
+inline constexpr auto PN_LOAD = "load";         // load file
+inline constexpr auto PN_PRIN1 = "prin1";       // print without escapes
+inline constexpr auto PN_PRIN2 = "prin2";       // print without new-line
+inline constexpr auto PN_PRINT = "print";       // print
+inline constexpr auto PN_PLEVEL = "printlevel"; // how deep to print
+inline constexpr auto PN_RATOM = "ratom";       // read atom
+inline constexpr auto PN_READ = "read";         // read expression
+inline constexpr auto PN_READC = "readc";       // read characte
+inline constexpr auto PN_READLINE = "readline"; // read a line
+inline constexpr auto PN_SPACES = "spaces";     // print some spaces
+inline constexpr auto PN_TERPRI = "terpri";     // print new-line
+inline constexpr auto PN_CPPRINT = "cpprint";   // find and prettyprint c function
 
 class file: public base
 {

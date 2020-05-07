@@ -1022,7 +1022,7 @@ PRIMITIVE evaluator::baktrace()
 PRIMITIVE evaluator::topofstack()
 {
   auto x = a.getobject();
-  x->type= ENVIRON;
+  x->type = ENVIRON;
   x->envval(l.e().environment());
   return x;
 }
@@ -1045,7 +1045,7 @@ PRIMITIVE evaluator::envget(LISPT e, LISPT n)
   return foo;
 }
 
-evaluator::evaluator(lisp& lisp) : base(lisp)
+evaluator::evaluator(lisp& lisp): base(lisp)
 {
   add_mark_object(&fun);
   add_mark_object(&expression);
@@ -1055,7 +1055,7 @@ evaluator::evaluator(lisp& lisp) : base(lisp)
   mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
   mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
   mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
-  mkprim(PN_TOPOFSTACK, ::lisp::topofstack,  0, SUBR);
+  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, 0, SUBR);
   mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
 }
 

@@ -80,7 +80,7 @@ PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-map::map(lisp& lisp) : base(lisp) {}
+map::map(lisp& lisp): base(lisp) {}
 
 void map::init()
 {

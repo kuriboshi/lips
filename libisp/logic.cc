@@ -49,7 +49,7 @@ PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
   return eval(l, true_expr);
 }
 
-logic::logic(lisp& lisp) : base(lisp) {}
+logic::logic(lisp& lisp): base(lisp) {}
 
 void logic::init()
 {
