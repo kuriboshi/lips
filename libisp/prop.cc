@@ -73,11 +73,11 @@ prop::prop(lisp& lisp): base(lisp) {}
 
 void prop::init()
 {
-  alloc::mkprim(PN_SETPLIST, ::lisp::setplist, 2, SUBR);
-  alloc::mkprim(PN_GETPLIST, ::lisp::getplist, 1, SUBR);
-  alloc::mkprim(PN_PUTPROP, ::lisp::putprop, 3, SUBR);
-  alloc::mkprim(PN_GETPROP, ::lisp::getprop, 2, SUBR);
-  alloc::mkprim(PN_REMPROP, ::lisp::remprop, 2, SUBR);
+  mkprim(PN_SETPLIST, ::lisp::setplist, 2, SUBR);
+  mkprim(PN_GETPLIST, ::lisp::getplist, 1, SUBR);
+  mkprim(PN_PUTPROP, ::lisp::putprop, 3, SUBR);
+  mkprim(PN_GETPROP, ::lisp::getprop, 2, SUBR);
+  mkprim(PN_REMPROP, ::lisp::remprop, 2, SUBR);
 }
 
 } // namespace lisp

@@ -128,10 +128,20 @@ using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
 
 struct subr_t
 {
+  enum subr_type {
+    S_EVAL,
+    S_NOEVAL
+  };
+  enum spread_type {
+    S_SPREAD,
+    S_NOSPREAD
+  };
+  subr_t(char argcount, subr_type subr, spread_type spread) : argcount(argcount), subr(subr), spread(spread) {}
   // The type of internal c-functions
   std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
-  short argcount = 0; // Negative argcount indicates that arguments should not
-                      // be evaluated
+  char argcount = 0;
+  subr_type subr;
+  spread_type spread;
 };
 
 struct lambda_t
@@ -232,7 +242,6 @@ struct lisp_t
   }
   subr_t& subrval() { return *std::get<subr_t*>(u); }
   void subrval(subr_t* x) { type = SUBR; u = x; }
-  void fsubrval(subr_t* x) { type = FSUBR; u = x; }
   lambda_t& lamval() { return std::get<lambda_t>(u); }
   void lamval(lambda_t x) { type = LAMBDA; u = x; }
   void nlamval(lambda_t x) { type = NLAMBDA; u = x; }

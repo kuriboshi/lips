@@ -83,14 +83,14 @@ low::low(lisp& lisp): base(lisp) {}
 
 void low::init()
 {
-  alloc::mkprim(PN_SET, ::lisp::set, 2, SUBR);
-  alloc::mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
-  alloc::mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
-  alloc::mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
-  alloc::mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
-  alloc::mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
-  alloc::mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
-  alloc::mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
+  mkprim(PN_SET, ::lisp::set, 2, SUBR);
+  mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
+  mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
+  mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
+  mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
+  mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
+  mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
+  mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
 }
 
 } // namespace lisp

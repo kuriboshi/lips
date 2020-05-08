@@ -67,10 +67,11 @@ public:
   }
 
   static LISPT intern(const char*);
-  static void mkprim(const char* pname, func0_t fname, short nrpar, lisp_type type);
-  static void mkprim(const char* pname, func1_t fname, short nrpar, lisp_type type);
-  static void mkprim(const char* pname, func2_t fname, short nrpar, lisp_type type);
-  static void mkprim(const char* pname, func3_t fname, short nrpar, lisp_type type);
+
+  static void mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type, subr_t::spread_type);
+  static void mkprim(const char* pname, func1_t fname, char argcount, subr_t::subr_type, subr_t::spread_type);
+  static void mkprim(const char* pname, func2_t fname, char argcount, subr_t::subr_type, subr_t::spread_type);
+  static void mkprim(const char* pname, func3_t fname, char argcount, subr_t::subr_type, subr_t::spread_type);
 
   LISPT mklambda(LISPT args, LISPT def, lisp_type type);
   LISPT mkstring(const char*);
@@ -113,7 +114,7 @@ private:
   static obarray_t* findatom(int hv, const char* str, obarray_t* obarray[]);
   static int hash(const char* str);
   static LISPT puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom);
-  static LISPT mkprim(const char* pname, short nrpar, lisp_type type);
+  static LISPT mkprim(const char* pname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread);
 
   conscells_t* conscells = nullptr;     // Cons cell storage.
   destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
@@ -138,21 +139,42 @@ inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 
 inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
-inline void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, func0_t fname, short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  alloc::mkprim(pname, fname, static_cast<char>(std::abs(nrpar)), type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
+    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, func1_t fname, short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  alloc::mkprim(pname, fname, static_cast<char>(std::abs(nrpar)), type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
+    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, func2_t fname, short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  alloc::mkprim(pname, fname, static_cast<char>(std::abs(nrpar)), type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
+    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
 }
-inline void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+inline void mkprim(const char* pname, func3_t fname, short nrpar, lisp_type type)
 {
-  alloc::mkprim(pname, fname, nrpar, type);
+  alloc::mkprim(pname, fname, static_cast<char>(std::abs(nrpar)), type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
+    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
+}
+
+inline void mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+{
+  alloc::mkprim(pname, fname, argcount, subr, spread);
+}
+inline void mkprim(const char* pname, func1_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+{
+  alloc::mkprim(pname, fname, argcount, subr, spread);
+}
+inline void mkprim(const char* pname, func2_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+{
+  alloc::mkprim(pname, fname, argcount, subr, spread);
+}
+inline void mkprim(const char* pname, func3_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+{
+  alloc::mkprim(pname, fname, argcount, subr, spread);
 }
 
 } // namespace lisp

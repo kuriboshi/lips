@@ -102,10 +102,10 @@ user::user(lisp& lisp): base(lisp) {}
 
 void user::init()
 {
-  alloc::mkprim(PN_DEFINE, ::lisp::define, 2, SUBR);
-  alloc::mkprim(PN_GETREP, ::lisp::getrep, 1, SUBR);
-  alloc::mkprim(PN_DE, ::lisp::de, -3, FSUBR);
-  alloc::mkprim(PN_DF, ::lisp::df, -3, FSUBR);
+  mkprim(PN_DEFINE, ::lisp::define, 2, SUBR);
+  mkprim(PN_GETREP, ::lisp::getrep, 1, SUBR);
+  mkprim(PN_DE, ::lisp::de, -3, FSUBR);
+  mkprim(PN_DF, ::lisp::df, -3, FSUBR);
 }
 
 } // namespace lisp

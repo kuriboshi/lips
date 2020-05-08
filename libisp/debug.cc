@@ -26,6 +26,6 @@ PRIMITIVE evaltrace(lisp& l, LISPT state)
 
 debug::debug(lisp& lisp): base(lisp) {}
 
-void debug::init() { alloc::mkprim(PN_EVALTRACE, evaltrace, 1, SUBR); }
+void debug::init() { mkprim(PN_EVALTRACE, evaltrace, 1, SUBR); }
 
 } // namespace lisp

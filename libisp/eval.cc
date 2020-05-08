@@ -404,8 +404,6 @@ bool evaluator::do_default(continuation_t continuation)
 
 bool evaluator::peval1()
 {
-  int foo;
-
   if(l.brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval1);
   else if(l.interrupt)
@@ -420,40 +418,27 @@ bool evaluator::peval1()
       case SUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
-        if((foo = fun->subrval().argcount) < 0)
+        dest = mkdestblock(fun->subrval().argcount);
+        noeval = fun->subrval().subr == subr_t::S_NOEVAL;
+        if(fun->subrval().spread == subr_t::S_SPREAD)
         {
-          dest = mkdestblock(-foo);
-          push_func(&evaluator::noevarg);
-          cont = &evaluator::evlis;
+          if(!noeval)
+          {
+            push_func(&evaluator::noevarg);
+            cont = &evaluator::evlis;
+          }
+          else
+            cont = &evaluator::spread;
         }
         else
-        {
-          dest = mkdestblock(foo);
-          noeval = 0;
           cont = &evaluator::evalargs;
-        }
-        break;
-      case FSUBR:
-        push_point(dest);
-        push_func(&evaluator::ev2);
-        if((foo = fun->subrval().argcount) < 0)
-        {
-          dest = mkdestblock(-foo);
-          cont = &evaluator::spread;
-        }
-        else
-        {
-          dest = mkdestblock(foo);
-          noeval = 1;
-          cont = &evaluator::evalargs;
-        }
         break;
       case LAMBDA:
-        noeval = 0;
+        noeval = false;
         cont = &evaluator::evlam;
         break;
       case NLAMBDA:
-        noeval = 1;
+        noeval = true;
         cont = &evaluator::evlam;
         break;
       case CONS:
@@ -483,8 +468,6 @@ bool evaluator::peval1()
 
 bool evaluator::peval2()
 {
-  int foo;
-
   if(l.brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval2);
   else
@@ -495,24 +478,18 @@ bool evaluator::peval2()
         cont = &evaluator::evclosure;
         break;
       case SUBR:
-      case FSUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
-        if((foo = fun->subrval().argcount) < 0)
-        {
-          dest = mkdestblock(-foo);
+        noeval = fun->subrval().subr == subr_t::S_NOEVAL;
+        dest = mkdestblock(fun->subrval().argcount);
+        if(fun->subrval().spread == subr_t::S_SPREAD)
           cont = &evaluator::spread;
-        }
         else
-        {
-          dest = mkdestblock(foo);
-          noeval = 1;
           cont = &evaluator::evalargs;
-        }
         break;
       case LAMBDA:
       case NLAMBDA:
-        noeval = 1;
+        noeval = true;
         cont = &evaluator::evlam;
         break;
       case CONS:

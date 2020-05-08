@@ -306,39 +306,33 @@ PRIMITIVE alloc::freecount()
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
+LISPT alloc::mkprim(const char* pname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   LISPT s = new lisp_t;
-  if(type == SUBR)
-    s->subrval(new subr_t);
-  else if(type == FSUBR)
-    s->fsubrval(new subr_t);
-  else
-    throw lisp_error("mkprim called with wrong type");
+  s->subrval(new subr_t(argcount, subr, spread));
   LISPT f = intern(pname);
-  set(f->symval().value, type, s);
-  s->subrval().argcount = nrpar;
+  set(f->symval().value, SUBR, s);
   return s;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, nrpar, type)->subrval().f = fname;
+  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, nrpar, type)->subrval().f = fname;
+  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, nrpar, type)->subrval().f = fname;
+  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
+void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, nrpar, type)->subrval().f = fname;
+  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
 /*
@@ -400,8 +394,8 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
   int count = 0;
   s->lamval().arglist = mkarglis(args, count);
   s->lamval().argcnt = count;
-  LISPT t = nullptr;
-  set(t, type, s);
+  LISPT t = s;
+  t->type = type;
   def = unsave();
   args = unsave();
   return t;
@@ -580,6 +574,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   add_mark_object(&version);
   add_mark_object(&gcgag);
   add_mark_object(&C_EOF);
+
   destblockused = 0;
   conscells = nullptr;
   conscells = newpage(); /* Allocate one page of storage */

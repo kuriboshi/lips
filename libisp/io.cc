@@ -600,9 +600,6 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
     case SUBR:
       pp("#<subr", file, x);
       break;
-    case FSUBR:
-      pp("#<fsubr", file, x);
-      break;
     case UNBOUND:
       ps("#<unbound>", file, 0);
       break;

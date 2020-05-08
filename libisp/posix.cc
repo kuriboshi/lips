@@ -182,29 +182,29 @@ posix::posix(lisp& lisp): base(lisp) {}
 
 void posix::init()
 {
-  alloc::mkprim(PN_UXACCESS, ::lisp::uxaccess, 2, SUBR);
-  alloc::mkprim(PN_UXALARM, ::lisp::uxalarm, 1, SUBR);
-  alloc::mkprim(PN_UXCHDIR, ::lisp::uxchdir, 1, SUBR);
-  alloc::mkprim(PN_UXCHMOD, ::lisp::uxchmod, 2, SUBR);
-  alloc::mkprim(PN_UXCLOSE, ::lisp::uxclose, 1, SUBR);
-  alloc::mkprim(PN_UXCREAT, ::lisp::uxcreat, 2, SUBR);
-  alloc::mkprim(PN_UXDUP, ::lisp::uxdup, 1, SUBR);
-  alloc::mkprim(PN_UXERRNO, ::lisp::uxerrno, 0, SUBR);
-  alloc::mkprim(PN_UXGETUID, ::lisp::uxgetuid, 0, SUBR);
-  alloc::mkprim(PN_UXGETEUID, ::lisp::uxgeteuid, 0, SUBR);
-  alloc::mkprim(PN_UXGETGID, ::lisp::uxgetgid, 0, SUBR);
-  alloc::mkprim(PN_UXGETEGID, ::lisp::uxgetegid, 0, SUBR);
-  alloc::mkprim(PN_UXGETPID, ::lisp::uxgetpid, 0, SUBR);
-  alloc::mkprim(PN_UXKILL, ::lisp::uxkill, 2, SUBR);
-  alloc::mkprim(PN_UXLINK, ::lisp::uxlink, 2, SUBR);
-  alloc::mkprim(PN_UXNICE, ::lisp::uxnice, 1, SUBR);
-  alloc::mkprim(PN_UXOPEN, ::lisp::uxopen, 2, SUBR);
-  alloc::mkprim(PN_UXSETUID, ::lisp::uxsetuid, 1, SUBR);
-  alloc::mkprim(PN_UXSETGID, ::lisp::uxsetgid, 1, SUBR);
+  mkprim(PN_UXACCESS, ::lisp::uxaccess, 2, SUBR);
+  mkprim(PN_UXALARM, ::lisp::uxalarm, 1, SUBR);
+  mkprim(PN_UXCHDIR, ::lisp::uxchdir, 1, SUBR);
+  mkprim(PN_UXCHMOD, ::lisp::uxchmod, 2, SUBR);
+  mkprim(PN_UXCLOSE, ::lisp::uxclose, 1, SUBR);
+  mkprim(PN_UXCREAT, ::lisp::uxcreat, 2, SUBR);
+  mkprim(PN_UXDUP, ::lisp::uxdup, 1, SUBR);
+  mkprim(PN_UXERRNO, ::lisp::uxerrno, 0, SUBR);
+  mkprim(PN_UXGETUID, ::lisp::uxgetuid, 0, SUBR);
+  mkprim(PN_UXGETEUID, ::lisp::uxgeteuid, 0, SUBR);
+  mkprim(PN_UXGETGID, ::lisp::uxgetgid, 0, SUBR);
+  mkprim(PN_UXGETEGID, ::lisp::uxgetegid, 0, SUBR);
+  mkprim(PN_UXGETPID, ::lisp::uxgetpid, 0, SUBR);
+  mkprim(PN_UXKILL, ::lisp::uxkill, 2, SUBR);
+  mkprim(PN_UXLINK, ::lisp::uxlink, 2, SUBR);
+  mkprim(PN_UXNICE, ::lisp::uxnice, 1, SUBR);
+  mkprim(PN_UXOPEN, ::lisp::uxopen, 2, SUBR);
+  mkprim(PN_UXSETUID, ::lisp::uxsetuid, 1, SUBR);
+  mkprim(PN_UXSETGID, ::lisp::uxsetgid, 1, SUBR);
 #if 0
-  alloc::mkprim(PN_SIGNAL, ::lisp::uxsignal, 2, SUBR);
+  mkprim(PN_SIGNAL, ::lisp::uxsignal, 2, SUBR);
 #endif
-  alloc::mkprim(PN_UXUNLINK, ::lisp::uxunlink, 1, SUBR);
+  mkprim(PN_UXUNLINK, ::lisp::uxunlink, 1, SUBR);
 }
 
 } // namespace lisp

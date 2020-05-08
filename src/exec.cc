@@ -892,20 +892,20 @@ exec::exec(lisp& lisp): base(lisp) {}
 void exec::init()
 {
   // mkprim(PN_EXPAND, expand, 3, SUBR);
-  alloc::mkprim(PN_TO, ::lisp::to, 3, FSUBR);
-  alloc::mkprim(PN_FROM, ::lisp::from, 3, FSUBR);
-  alloc::mkprim(PN_TOTO, ::lisp::toto, 3, FSUBR);
-  alloc::mkprim(PN_PIPECMD, ::lisp::pipecmd, -1, FSUBR);
-  alloc::mkprim(PN_BACK, ::lisp::back, -1, FSUBR);
-  alloc::mkprim(PN_STOP, ::lisp::stop, 0, FSUBR);
-  alloc::mkprim(PN_CD, ::lisp::cd, 2, FSUBR);
-  alloc::mkprim(PN_REHASH, ::lisp::rehash, 0, FSUBR);
-  alloc::mkprim(PN_JOBS, ::lisp::jobs, 0, FSUBR);
-  alloc::mkprim(PN_FG, ::lisp::fg, 1, FSUBR);
-  alloc::mkprim(PN_BG, ::lisp::bg, 1, FSUBR);
-  alloc::mkprim(PN_SETENV, ::lisp::p_setenv, 2, FSUBR);
-  alloc::mkprim(PN_GETENV, ::lisp::getenviron, 1, FSUBR);
-  alloc::mkprim(PN_EXEC, ::lisp::doexec, -1, FSUBR);
+  mkprim(PN_TO, ::lisp::to, 3, FSUBR);
+  mkprim(PN_FROM, ::lisp::from, 3, FSUBR);
+  mkprim(PN_TOTO, ::lisp::toto, 3, FSUBR);
+  mkprim(PN_PIPECMD, ::lisp::pipecmd, -1, FSUBR);
+  mkprim(PN_BACK, ::lisp::back, -1, FSUBR);
+  mkprim(PN_STOP, ::lisp::stop, 0, FSUBR);
+  mkprim(PN_CD, ::lisp::cd, 2, FSUBR);
+  mkprim(PN_REHASH, ::lisp::rehash, 0, FSUBR);
+  mkprim(PN_JOBS, ::lisp::jobs, 0, FSUBR);
+  mkprim(PN_FG, ::lisp::fg, 1, FSUBR);
+  mkprim(PN_BG, ::lisp::bg, 1, FSUBR);
+  mkprim(PN_SETENV, ::lisp::p_setenv, 2, FSUBR);
+  mkprim(PN_GETENV, ::lisp::getenviron, 1, FSUBR);
+  mkprim(PN_EXEC, ::lisp::doexec, -1, FSUBR);
   ::lisp::rehash(*L);
   L->e().undefhook = execcommand;
 }

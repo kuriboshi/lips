@@ -356,33 +356,35 @@ arith::arith(lisp& lisp): base(lisp) {}
 
 void arith::init()
 {
-  alloc::mkprim(PN_PLUS, ::lisp::plus, -1, SUBR);
-  alloc::mkprim(PN_DIFFERENCE, ::lisp::difference, 2, SUBR);
-  alloc::mkprim(PN_TIMES, ::lisp::ltimes, -1, SUBR);
-  alloc::mkprim(PN_DIVIDE, ::lisp::divide, 2, SUBR);
-  alloc::mkprim(PN_IPLUS, ::lisp::iplus, -1, SUBR);
-  alloc::mkprim(PN_IDIFFERENCE, ::lisp::idifference, 2, SUBR);
-  alloc::mkprim(PN_ITIMES, ::lisp::itimes, -1, SUBR);
-  alloc::mkprim(PN_IQUOTIENT, ::lisp::iquotient, 2, SUBR);
-  alloc::mkprim(PN_IREMAINDER, ::lisp::iremainder, 2, SUBR);
-  alloc::mkprim(PN_IMINUS, ::lisp::iminus, 1, SUBR);
-  alloc::mkprim(PN_MINUS, ::lisp::minus, 1, SUBR);
-  alloc::mkprim(PN_ADD1, ::lisp::add1, 1, SUBR);
-  alloc::mkprim(PN_SUB1, ::lisp::sub1, 1, SUBR);
-  alloc::mkprim(PN_FPLUS, ::lisp::fplus, -1, SUBR);
-  alloc::mkprim(PN_FDIFFERENCE, ::lisp::fdifference, 2, SUBR);
-  alloc::mkprim(PN_FTIMES, ::lisp::ftimes, -1, SUBR);
-  alloc::mkprim(PN_FDIVIDE, ::lisp::fdivide, 2, SUBR);
-  alloc::mkprim(PN_ITOF, ::lisp::itof, 1, SUBR);
-  alloc::mkprim(PN_GREATERP, ::lisp::greaterp, 2, SUBR);
-  alloc::mkprim(PN_GEQ, ::lisp::geq, 2, SUBR);
-  alloc::mkprim(PN_LESSP, ::lisp::lessp, 2, SUBR);
-  alloc::mkprim(PN_LEQ, ::lisp::leq, 2, SUBR);
-  alloc::mkprim(PN_ZEROP, ::lisp::zerop, 1, SUBR);
-  alloc::mkprim(PN_EQP, ::lisp::eqp, 2, SUBR);
-  alloc::mkprim(PN_NEQP, ::lisp::neqp, 2, SUBR);
-  alloc::mkprim(PN_MINUSP, ::lisp::minusp, 1, SUBR);
-  alloc::mkprim(PN_ABS, ::lisp::absval, 1, SUBR);
+  // clang-format off
+  mkprim(PN_PLUS,        ::lisp::plus,        1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_DIFFERENCE,  ::lisp::difference,  2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TIMES,       ::lisp::ltimes,      1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_DIVIDE,      ::lisp::divide,      2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_IPLUS,       ::lisp::iplus,       1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_IDIFFERENCE, ::lisp::idifference, 2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_ITIMES,      ::lisp::itimes,      1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_IQUOTIENT,   ::lisp::iquotient,   2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_IREMAINDER,  ::lisp::iremainder,  2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_IMINUS,      ::lisp::iminus,      1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MINUS,       ::lisp::minus,       1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_ADD1,        ::lisp::add1,        1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SUB1,        ::lisp::sub1,        1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FPLUS,       ::lisp::fplus,       1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_FDIFFERENCE, ::lisp::fdifference, 2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FTIMES,      ::lisp::ftimes,      1, subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_FDIVIDE,     ::lisp::fdivide,     2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_ITOF,        ::lisp::itof,        1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_GREATERP,    ::lisp::greaterp,    2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_GEQ,         ::lisp::geq,         2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_LESSP,       ::lisp::lessp,       2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_LEQ,         ::lisp::leq,         2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_ZEROP,       ::lisp::zerop,       1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_EQP,         ::lisp::eqp,         2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_NEQP,        ::lisp::neqp,        2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MINUSP,      ::lisp::minusp,      1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_ABS,         ::lisp::absval,      1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp
