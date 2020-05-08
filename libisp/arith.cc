@@ -76,8 +76,8 @@ PRIMITIVE arith::fplus(LISPT x)
 
 PRIMITIVE arith::difference(LISPT x, LISPT y)
 {
-  l.check2(x, INTEGER, FLOAT);
-  l.check2(y, INTEGER, FLOAT);
+  l.check(x, INTEGER, FLOAT);
+  l.check(y, INTEGER, FLOAT);
   if(type_of(x) == INTEGER)
     if(type_of(y) == INTEGER)
       return mknumber(l, x->intval() - y->intval());
@@ -165,8 +165,8 @@ PRIMITIVE arith::ftimes(LISPT x)
 
 PRIMITIVE arith::divide(LISPT x, LISPT y)
 {
-  l.check2(x, INTEGER, FLOAT);
-  l.check2(y, INTEGER, FLOAT);
+  l.check(x, INTEGER, FLOAT);
+  l.check(y, INTEGER, FLOAT);
   if(type_of(x) == INTEGER)
     if(type_of(y) == INTEGER)
       return mknumber(l, x->intval() / y->intval());
@@ -206,7 +206,7 @@ PRIMITIVE arith::fdivide(LISPT x, LISPT y)
 
 PRIMITIVE arith::minus(LISPT x)
 {
-  l.check2(x, FLOAT, INTEGER);
+  l.check(x, FLOAT, INTEGER);
   if(type_of(x) == INTEGER)
     return mknumber(l, -x->intval());
   return mkfloat(l, -x->floatval());

@@ -316,7 +316,7 @@ public:
       error(NOT_A | type, arg);
   }
 
-  void check2(LISPT arg, lisp_type type0, lisp_type type1)
+  void check(LISPT arg, lisp_type type0, lisp_type type1)
   {
     if(type_of(arg) != type0 && type_of(arg) != type1)
       error(ILLEGAL_ARG, arg);
@@ -414,7 +414,7 @@ inline LISPT syserr(lisp& l, LISPT a) { return l.syserr(a); }
 inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
 
 inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
-inline void check2(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check2(arg, type0, type1); }
+inline void check(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check(arg, type0, type1); }
 
 // Variables
 extern LISPT currentbase;

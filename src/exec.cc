@@ -548,7 +548,7 @@ PRIMITIVE exec::to(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  l.check2(file, STRING, SYMBOL);
+  l.check(file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
@@ -582,12 +582,12 @@ PRIMITIVE exec::toto(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  check2(*L, file, STRING, SYMBOL);
+  l.check(file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    check(*L, filed, INTEGER);
+    l.check(filed, INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
@@ -616,7 +616,7 @@ PRIMITIVE exec::from(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  l.check2(file, STRING, SYMBOL);
+  l.check(file, STRING, SYMBOL);
   if(is_NIL(filed))
     oldfd = 0;
   else
@@ -726,7 +726,7 @@ PRIMITIVE exec::rehash()
       continue;
     else
     {
-      l.check2(p->car(), STRING, SYMBOL);
+      l.check(p->car(), STRING, SYMBOL);
       sdir = p->car()->getstr();
     }
     if((odir = opendir(sdir)) == nullptr)
@@ -822,15 +822,15 @@ PRIMITIVE exec::bg(LISPT job)
 
 PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
 {
-  l.check2(var, STRING, SYMBOL);
-  l.check2(val, STRING, SYMBOL);
+  l.check(var, STRING, SYMBOL);
+  l.check(val, STRING, SYMBOL);
   setenviron(var->getstr(), val->getstr());
   return var;
 }
 
 PRIMITIVE exec::getenviron(LISPT var)
 {
-  l.check2(var, STRING, SYMBOL);
+  l.check(var, STRING, SYMBOL);
   char* s = getenv(var->getstr());
   if(s == nullptr)
     return C_NIL;

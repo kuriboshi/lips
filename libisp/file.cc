@@ -65,7 +65,7 @@ bool file::loadfile(const char* lf)
 
 PRIMITIVE file::load(LISPT f)
 {
-  l.check2(f, STRING, SYMBOL);
+  l.check(f, STRING, SYMBOL);
   if(!loadfile(f->getstr()))
     return l.error(CANT_OPEN, f);
   return f;
@@ -162,7 +162,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
     f = file->fileval();
   }
   check(oname, SYMBOL);
-  check2(oname->symval().value, SUBR, FSUBR);
+  check(oname->symval().value, SUBR, FSUBR);
   funn = oname->symval().pname;
   if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
     return error(CANT_OPEN, mkstring(_lisp, TAGSFILE));

@@ -75,7 +75,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
 PRIMITIVE user::define(LISPT name, LISPT lam)
 {
   l.check(name, SYMBOL);
-  l.check2(lam, LAMBDA, NLAMBDA);
+  l.check(lam, LAMBDA, NLAMBDA);
   checkfn(name, lam);
   name->setopval(lam);
   return name;
