@@ -169,12 +169,10 @@ void term_source::ungetch(int)
  */
 bool term_source::firstnotlp()
 {
-  int i = 1;
+  int i = 0;
   for(; i < position && issepr(*L, (int)linebuffer[i]); i++)
     ;
-  if(linebuffer[i] == '(')
-    return false;
-  return true;
+  return linebuffer[i] != '(';
 }
 
 /*
@@ -666,9 +664,7 @@ const char* term_source::getline()
           return linebuffer;
         }
         else
-        {
           blink();
-        }
         break;
       case term_fun::T_NEWLINE:
         pputc('\n', stdout);
