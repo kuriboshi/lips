@@ -314,7 +314,12 @@ PRIMITIVE alloc::freecount()
 LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
 {
   LISPT s = new lisp_t;
-  s->subrval(subr_t(), type);
+  if(type == SUBR)
+    s->subrval(new subr_t);
+  else if(type == FSUBR)
+    s->fsubrval(new subr_t);
+  else
+    throw lisp_error("mkprim called with wrong type");
   LISPT f = intern(pname);
   set(f->symval().value, type, s);
   s->subrval().argcount = nrpar;

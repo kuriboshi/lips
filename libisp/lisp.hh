@@ -187,7 +187,7 @@ struct lisp_t
     indirect_t,                 // INDIRECT (4)
     cons_t,                     // CONS (5)
     char*,                      // STRING (6)
-    subr_t,                     // SUBR (7)
+    subr_t*,                    // SUBR (7)
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
@@ -228,10 +228,12 @@ struct lisp_t
     type = STRING;
     u = s;
   }
-  subr_t& subrval() { return std::get<subr_t>(u); }
-  void subrval(subr_t x, lisp_type t) { type = t; u = x; }
+  subr_t& subrval() { return *std::get<subr_t*>(u); }
+  void subrval(subr_t* x) { type = SUBR; u = x; }
+  void fsubrval(subr_t* x) { type = FSUBR; u = x; }
   lambda_t& lamval() { return std::get<lambda_t>(u); }
   void lamval(lambda_t x) { type = LAMBDA; u = x; }
+  void nlamval(lambda_t x) { type = NLAMBDA; u = x; }
   closure_t& closval() { return std::get<closure_t>(u); }
   destblock_t* envval() { return std::get<destblock_t*>(u); }
   void envval(destblock_t* env) { type = ENVIRON; u = env; }

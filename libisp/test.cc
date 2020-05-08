@@ -107,5 +107,5 @@ TEST_CASE("Basic I/O")
 
 TEST_CASE("Check size of lisp_t object")
 {
-  CHECK(sizeof(lisp::lisp_t) == 56);
+  CHECK(sizeof(lisp::lisp_t) == 48);
 }
