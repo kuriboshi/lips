@@ -104,3 +104,8 @@ TEST_CASE("Basic I/O")
   lisp.primout().printf("hello world %d", 123);
   CHECK(out0->string() == std::string("hello world 123"));
 }
+
+TEST_CASE("Check size of lisp_t object")
+{
+  CHECK(sizeof(lisp::lisp_t) == 56);
+}
