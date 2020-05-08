@@ -49,7 +49,6 @@ target_sources(libisp PRIVATE
 )
 target_include_directories(libisp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(libisp PUBLIC -Wall -Werror)
-target_compile_definitions(libisp PUBLIC LISP_T_VARIANT)
 target_link_libraries(libisp doctest)
 add_executable(testlibisp test.cc)
 target_link_libraries(testlibisp libisp)

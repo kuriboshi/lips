@@ -30,8 +30,6 @@ class file_t;
 struct lisp_t;
 using LISPT = struct lisp_t*;
 
-class vlisp_t;
-
 /*
  * All lisp constants used internally.
  */
@@ -171,12 +169,11 @@ using indirect_t = LISPT;
 using free_t = LISPT;
 using cvariable_t = LISPT*;
 
-#ifdef LISP_T_VARIANT
 struct lisp_t
 {
   lisp_t() {}
   ~lisp_t() {}
-  lisp_t(const vlisp_t&) = delete;
+  lisp_t(const lisp_t&) = delete;
 
   bool gcmark = false;
   enum lisp_type type = NIL;
@@ -256,95 +253,6 @@ struct lisp_t
   void mark() { gcmark = true; }
   void unmark() { gcmark = false; }
 };
-#else
-struct lisp_t
-{
-  lisp_t() {}
-  ~lisp_t() {}
-  lisp_t(const lisp_t&) = delete;
-
-  bool gcmark = false;
-  enum lisp_type type = NIL;
-  union
-  {
-    // One entry for each type.  Types that has no, or just one value are
-    // indicated by a comment.
-
-    // NIL
-    symbol_t l_symbol;
-    int l_integer;
-    int* l_bignum;
-    double l_float;
-    LISPT l_indirect;
-    cons_t l_cons;
-    char* l_string;
-    subr_t l_subr;
-    lambda_t l_lambda;
-    closure_t l_closure;
-    // UNBOUND
-    destblock_t* l_environ;
-    file_t* l_filet;
-    // TRUE
-    LISPT l_free;
-    // ENDOFFILE
-    // ERROR
-    // HASHTAB
-    LISPT* l_cvariable;
-    void* l_cpointer;
-    // USER
-  } u;
-  symbol_t& symval() { return u.l_symbol; }
-  LISPT& freeval() { return u.l_free; }
-  LISPT* cvarval() { return u.l_cvariable; }
-  void cvarval(LISPT* x) { u.l_cvariable = x; }
-  LISPT& indirectval() { return u.l_indirect; }
-  LISPT car() { return u.l_cons.car; }
-  LISPT cdr() { return u.l_cons.cdr; }
-  void car(LISPT x) { u.l_cons.car = x; }
-  void cdr(LISPT x) { u.l_cons.cdr = x; }
-  lambda_t& lamval() { return u.l_lambda; }
-  closure_t& closval() { return u.l_closure; }
-  subr_t& subrval() { return u.l_subr; }
-  LISPT symvalue() { return u.l_symbol.value; }
-  void symvalue(LISPT x) { u.l_symbol.value = x; }
-  const char* stringval() { return u.l_string; }
-  void stringval(char* s)
-  {
-    u.l_string = s;
-    type = STRING;
-  }
-  int intval() { return u.l_integer; }
-  void intval(int x)
-  {
-    u.l_integer = x;
-    type = INTEGER;
-  }
-  double floatval() { return u.l_float; }
-  void floatval(double f)
-  {
-    u.l_float = f;
-    type = FLOAT;
-  }
-  cons_t& consval() { return u.l_cons; }
-  file_t* fileval() { return u.l_filet; }
-  void fileval(file_t* f) { u.l_filet = f; }
-  void* cpointval() { return u.l_cpointer; }
-  void setq(LISPT y) { u.l_symbol.value = y; }
-  void setopval(LISPT y) { setq(y); }
-  LISPT getopval() { return symvalue(); }
-  const char* getstr() { return type == STRING ? stringval() : symval().pname; }
-  destblock_t* envval() { return u.l_environ; }
-  void envval(destblock_t* env) { u.l_environ = env; }
-
-  /*
-   * Some more or less helpfull functions
-   */
-  void settype(lisp_type t) { type = t; }
-  bool marked() { return gcmark; }
-  void mark() { gcmark = true; }
-  void unmark() { gcmark = false; }
-};
-#endif
 
 enum char_class
 {
