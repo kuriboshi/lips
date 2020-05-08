@@ -55,11 +55,11 @@ TEST_CASE("Create lisp object")
     auto sink0 = new lisp::io::string_sink;
     auto out0 = std::make_unique<lisp::file_t>(sink0);
     prin0(lisp, i, *out0.get());
-    CHECK(sink0->string() == std::string(i->stringval()));
+    CHECK(sink0->string() == std::string(i->getstr()));
     auto sink1 = new lisp::io::string_sink;
     auto out1 = std::make_unique<lisp::file_t>(sink1);
     prin0(lisp, j, *out1.get());
-    CHECK(sink1->string() == std::string(j->stringval()));
+    CHECK(sink1->string() == std::string(j->getstr()));
     std::string s_hello{"(hello)"};
     auto in = std::make_unique<lisp::file_t>(new lisp::io::string_source(s_hello.c_str()));
     auto hello = lispread(lisp, *in.get(), false);
