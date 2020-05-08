@@ -108,7 +108,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  file(l).xprint(a.cons(fault, a.cons(C_BROKEN, C_NIL)), C_T);
+  file(l).xprint(cons(l, fault, cons(l, C_BROKEN, C_NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -244,7 +244,7 @@ PRIMITIVE evaluator::apply(LISPT f, LISPT x)
   fun = f;
   push_lisp(args);
   args = x;
-  expression = a.cons(f, x);
+  expression = cons(l, f, x);
   push_func(&evaluator::apply0);
   cont = &evaluator::peval2;
   while(!(this->*cont)())
@@ -663,7 +663,7 @@ bool evaluator::evlis1()
 
 bool evaluator::evlis2()
 {
-  LISPT x = a.cons(receive(), C_NIL);
+  LISPT x = cons(l, receive(), C_NIL);
   send(x);
   cont = pop_func();
   return false;
@@ -685,7 +685,7 @@ bool evaluator::evlis4()
   LISPT x = receive();
   a.dfree(dest);
   dest = pop_point();
-  x = a.cons(receive(), x);
+  x = cons(l, receive(), x);
   send(x);
   cont = pop_func();
   return false;

@@ -174,7 +174,7 @@ LISPT io::splice(LISPT x, LISPT y, bool tailp)
   if(type_of(x) != CONS)
   {
     if(tailp)
-      rplacd(l, x, a.cons(y, t));
+      rplacd(l, x, cons(l, y, t));
     else
       rplaca(l, x, y);
     return x;
