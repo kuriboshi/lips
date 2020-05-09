@@ -168,7 +168,7 @@ void alloc::mark(LISPT x)
  *	       sweep up garbage.  Argument doconsargs is nonzero
  *	       
  */
-LISPT alloc::doreclaim(int doconsargs, int incr)
+LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
     _lisp.primerr().printf("garbage collecting\n");
@@ -179,11 +179,6 @@ LISPT alloc::doreclaim(int doconsargs, int incr)
 #endif /* FLOATING */
   if(C_T != nullptr)
     C_T->mark();
-  if(doconsargs)
-  {
-    mark(foo1);
-    mark(foo2);
-  }
   if(e().dest != nullptr)
     for(int i = e().dest[0].val.d_integer; i > 0; i--)
     {
@@ -254,14 +249,14 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     _lisp.check(incr, INTEGER);
     i = incr->intval();
   }
-  doreclaim(NOCONSARGS, i);
+  doreclaim(i);
   return C_NIL;
 }
 
 LISPT alloc::getobject()
 {
   if(is_NIL(freelist))
-    doreclaim(NOCONSARGS, 0L);
+    doreclaim();
 
   LISPT f = nullptr;
   set(f, CONS, freelist);
@@ -277,9 +272,9 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   if(is_NIL(freelist))
   {
-    foo1 = a;
-    foo2 = b;
-    doreclaim(CONSARGS, 0L);
+    mark(a);
+    mark(b);
+    doreclaim();
   }
 
   LISPT f = freelist;
@@ -532,7 +527,7 @@ again:
     }
   if(p0 == 4)
   {
-    doreclaim(NOCONSARGS, 0L);
+    doreclaim();
     goto again;
   }
   SET(rval, FLOAT, &floats.fdata[p0 * 32 + (31 - point)]);

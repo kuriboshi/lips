@@ -28,9 +28,6 @@ public:
   static constexpr int MINCONSES = 2000;     // Minimum number of cells after gc
   static constexpr int MAXHASH = 255;        // Max number of hash buckets
 
-  static constexpr int NOCONSARGS = 0; // Don't reclaim arguments of cons
-  static constexpr int CONSARGS = 1;   // Reclaim called from cons
-
   struct conscells_t
   {
     lisp_t cells[CONSCELLS];
@@ -109,7 +106,7 @@ private:
   conscells_t* newpage();
   int sweep();
   void mark(LISPT);
-  LISPT doreclaim(int doconsargs, int incr);
+  LISPT doreclaim(int incr = 0);
   LISPT mkarglis(LISPT alist, int& count);
 
   static LISPT buildatom(const char* s, bool copy, LISPT newatom);
@@ -118,8 +115,6 @@ private:
   static LISPT puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom);
   static LISPT mkprim(const char* pname, short nrpar, lisp_type type);
 
-  LISPT foo1 = nullptr; // Protect arguments of cons when gc.
-  LISPT foo2 = nullptr;
   conscells_t* conscells = nullptr;     // Cons cell storage.
   destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
   int destblockused = 0;                // Index to last slot in destblock.
