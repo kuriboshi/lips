@@ -320,17 +320,17 @@ void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr
   mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func1_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func2_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func3_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, argcount, subr, spread)->subrval().f = fname;
 }
@@ -586,10 +586,10 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
   initcvar(&verboseflg, "verboseflg", C_NIL);
-  mkprim(PN_RECLAIM, ::lisp::reclaim, 1, SUBR);
-  mkprim(PN_CONS, ::lisp::cons, 2, SUBR);
-  mkprim(PN_FREECOUNT, ::lisp::freecount, 0, SUBR);
-  mkprim(PN_OBARRAY, ::lisp::xobarray, 0, SUBR);
+  mkprim(PN_RECLAIM,   ::lisp::reclaim,   1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CONS,      ::lisp::cons,      2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FREECOUNT, ::lisp::freecount, 0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_OBARRAY,   ::lisp::xobarray,  0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
 }
 
 alloc::~alloc()
