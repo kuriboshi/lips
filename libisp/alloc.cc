@@ -306,33 +306,33 @@ PRIMITIVE alloc::freecount()
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-LISPT alloc::mkprim(const char* pname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+LISPT alloc::mkprim(const char* pname, subr_t* subr)
 {
   LISPT s = new lisp_t;
-  s->subrval(new subr_t(argcount, subr, spread));
+  s->subrval(subr);
   LISPT f = intern(pname);
   set(f->symval().value, SUBR, s);
   return s;
 }
 
-void alloc::mkprim(const char* pname, func0_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
+  mkprim(pname, new subr_t(0, subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func1_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
+  mkprim(pname, new subr_t(1, subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func2_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
+  mkprim(pname, new subr_t(2, subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func3_t fname, char argcount, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const char* pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, argcount, subr, spread)->subrval().f = fname;
+  mkprim(pname, new subr_t(3, subr, spread))->subrval().f = fname;
 }
 
 /*
@@ -587,10 +587,10 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   initcvar(&gcgag, "gcgag", C_NIL);
   initcvar(&verboseflg, "verboseflg", C_NIL);
   // clang-format off
-  mkprim(PN_RECLAIM,   ::lisp::reclaim,   1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_CONS,      ::lisp::cons,      2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_FREECOUNT, ::lisp::freecount, 0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_OBARRAY,   ::lisp::xobarray,  0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CONS,      ::lisp::cons,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
   // clang-format on
 }
 
