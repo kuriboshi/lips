@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <cstdarg>
+#include <cstring>
 #include <string>
 #include "lisp.hh"
 #include "base.hh"
@@ -145,7 +146,7 @@ private:
 class string_source: public io_source
 {
 public:
-  string_source(const char* string): _string(string), _len(strlen(string)) {}
+  string_source(const char* string): _string(string), _len(std::strlen(string)) {}
 
   virtual int getch() override
   {
