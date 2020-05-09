@@ -14,24 +14,16 @@ TEST_CASE("Create lisp object")
 {
   lisp::lisp lisp;
 
-  SUBCASE("intern should return the same object for the same string")
+  SUBCASE("Multiple calls to intern should return the same object for the same string")
   {
-    auto hello0 = intern(lisp, "hello");
-    auto hello1 = intern(lisp, "hello");
-    CHECK(hello0 == hello1);
-  }
-
-  SUBCASE("intern from two different lisp objects should be the same")
-  {
-    lisp::lisp lisp1;
-    auto hello0 = intern(lisp, "hello");
-    auto hello1 = intern(lisp1, "hello");
+    auto hello0 = lisp::intern("hello");
+    auto hello1 = lisp::intern("hello");
     CHECK(hello0 == hello1);
   }
 
   SUBCASE("Check constants are the same as interned strings")
   {
-    auto lambda = intern(lisp, "lambda");
+    auto lambda = lisp::intern("lambda");
     CHECK(lambda == lisp::C_LAMBDA);
   }
 
