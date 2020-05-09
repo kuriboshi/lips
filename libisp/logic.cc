@@ -53,10 +53,12 @@ logic::logic(lisp& lisp): base(lisp) {}
 
 void logic::init()
 {
-  mkprim(PN_AND, ::lisp::p_and, -1, FSUBR);
-  mkprim(PN_OR, ::lisp::p_or, -1, FSUBR);
-  mkprim(PN_NOT, ::lisp::p_not, 1, SUBR);
-  mkprim(PN_IF, ::lisp::xif, -3, FSUBR);
+  // clang-format off
+  mkprim(PN_AND, ::lisp::p_and, subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_OR,  ::lisp::p_or,  subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_NOT, ::lisp::p_not, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_IF,  ::lisp::xif,   subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

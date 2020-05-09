@@ -891,21 +891,23 @@ exec::exec(lisp& lisp): base(lisp) {}
 
 void exec::init()
 {
-  // mkprim(PN_EXPAND, expand, 3, SUBR);
-  mkprim(PN_TO, ::lisp::to, 3, FSUBR);
-  mkprim(PN_FROM, ::lisp::from, 3, FSUBR);
-  mkprim(PN_TOTO, ::lisp::toto, 3, FSUBR);
-  mkprim(PN_PIPECMD, ::lisp::pipecmd, -1, FSUBR);
-  mkprim(PN_BACK, ::lisp::back, -1, FSUBR);
-  mkprim(PN_STOP, ::lisp::stop, 0, FSUBR);
-  mkprim(PN_CD, ::lisp::cd, 2, FSUBR);
-  mkprim(PN_REHASH, ::lisp::rehash, 0, FSUBR);
-  mkprim(PN_JOBS, ::lisp::jobs, 0, FSUBR);
-  mkprim(PN_FG, ::lisp::fg, 1, FSUBR);
-  mkprim(PN_BG, ::lisp::bg, 1, FSUBR);
-  mkprim(PN_SETENV, ::lisp::p_setenv, 2, FSUBR);
-  mkprim(PN_GETENV, ::lisp::getenviron, 1, FSUBR);
-  mkprim(PN_EXEC, ::lisp::doexec, -1, FSUBR);
+  // clang-format off
+  // mkprim(PN_EXPAND, expand, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TO,      ::lisp::to,         subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FROM,    ::lisp::from,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TOTO,    ::lisp::toto,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PIPECMD, ::lisp::pipecmd,    subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_BACK,    ::lisp::back,       subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_STOP,    ::lisp::stop,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CD,      ::lisp::cd,         subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_REHASH,  ::lisp::rehash,     subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_JOBS,    ::lisp::jobs,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FG,      ::lisp::fg,         subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_BG,      ::lisp::bg,         subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SETENV,  ::lisp::p_setenv,   subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_GETENV,  ::lisp::getenviron, subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_EXEC,    ::lisp::doexec,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  // clang-format on
   ::lisp::rehash(*L);
   L->e().undefhook = execcommand;
 }

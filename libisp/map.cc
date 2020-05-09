@@ -84,10 +84,12 @@ map::map(lisp& lisp): base(lisp) {}
 
 void map::init()
 {
-  mkprim(PN_MAP, ::lisp::xmap, 3, SUBR);
-  mkprim(PN_MAPC, ::lisp::mapc, 3, SUBR);
-  mkprim(PN_MAPLIST, ::lisp::maplist, 3, SUBR);
-  mkprim(PN_MAPCAR, ::lisp::mapcar, 3, SUBR);
+  // clang-format off
+  mkprim(PN_MAP,     ::lisp::xmap,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MAPC,    ::lisp::mapc,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MAPLIST, ::lisp::maplist, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MAPCAR,  ::lisp::mapcar,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

@@ -102,10 +102,12 @@ user::user(lisp& lisp): base(lisp) {}
 
 void user::init()
 {
-  mkprim(PN_DEFINE, ::lisp::define, 2, SUBR);
-  mkprim(PN_GETREP, ::lisp::getrep, 1, SUBR);
-  mkprim(PN_DE, ::lisp::de, -3, FSUBR);
-  mkprim(PN_DF, ::lisp::df, -3, FSUBR);
+  // clang-format off
+  mkprim(PN_DEFINE, ::lisp::define, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_GETREP, ::lisp::getrep, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_DE,     ::lisp::de,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_DF,     ::lisp::df,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

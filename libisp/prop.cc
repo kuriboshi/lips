@@ -73,11 +73,13 @@ prop::prop(lisp& lisp): base(lisp) {}
 
 void prop::init()
 {
-  mkprim(PN_SETPLIST, ::lisp::setplist, 2, SUBR);
-  mkprim(PN_GETPLIST, ::lisp::getplist, 1, SUBR);
-  mkprim(PN_PUTPROP, ::lisp::putprop, 3, SUBR);
-  mkprim(PN_GETPROP, ::lisp::getprop, 2, SUBR);
-  mkprim(PN_REMPROP, ::lisp::remprop, 2, SUBR);
+  // clang-format off
+  mkprim(PN_SETPLIST, ::lisp::setplist, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_GETPLIST, ::lisp::getplist, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PUTPROP,  ::lisp::putprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_GETPROP,  ::lisp::getprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_REMPROP,  ::lisp::remprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

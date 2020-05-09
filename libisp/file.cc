@@ -236,18 +236,20 @@ file::file(lisp& lisp): base(lisp) {}
 
 void file::init()
 {
-  mkprim(PN_LOAD, ::lisp::load, 1, SUBR);
-  mkprim(PN_PRIN1, ::lisp::prin1, 2, SUBR);
-  mkprim(PN_PRIN2, ::lisp::prin2, 2, SUBR);
-  mkprim(PN_PRINT, ::lisp::xprint, 2, SUBR);
-  mkprim(PN_PLEVEL, ::lisp::plevel, 1, SUBR);
-  mkprim(PN_RATOM, ::lisp::xratom, 1, SUBR);
-  mkprim(PN_READ, ::lisp::xread, 1, SUBR);
-  mkprim(PN_READC, ::lisp::readc, 1, SUBR);
-  mkprim(PN_READLINE, ::lisp::xreadline, 1, SUBR);
-  mkprim(PN_SPACES, ::lisp::spaces, 2, SUBR);
-  mkprim(PN_TERPRI, ::lisp::xterpri, 1, SUBR);
-  mkprim(PN_CPPRINT, ::lisp::cpprint, 2, SUBR);
+  // clang-format off
+  mkprim(PN_LOAD,     ::lisp::load,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PRIN1,    ::lisp::prin1,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PRIN2,    ::lisp::prin2,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PRINT,    ::lisp::xprint,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PLEVEL,   ::lisp::plevel,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_RATOM,    ::lisp::xratom,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_READ,     ::lisp::xread,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_READC,    ::lisp::readc,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_READLINE, ::lisp::xreadline, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SPACES,   ::lisp::spaces,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TERPRI,   ::lisp::xterpri,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CPPRINT,  ::lisp::cpprint,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

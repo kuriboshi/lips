@@ -310,7 +310,7 @@ void top::init()
   initcvar(&top::histnum, "histnum", mknumber(*L, 1L));
   initcvar(&top::histmax, "histmax", mknumber(*L, 100L));
   initcvar(&promptform, "promptform", C_NIL);
-  mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, 0, FSUBR);
+  mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
   L->set_read_table('!', SPLICE, top::rmexcl);
 }
 

@@ -172,15 +172,17 @@ pred::pred(lisp& lisp): base(lisp) {}
 
 void pred::init()
 {
-  mkprim(PN_LISTP, ::lisp::listp, 1, SUBR);
-  mkprim(PN_NLISTP, ::lisp::nlistp, 1, SUBR);
-  mkprim(PN_NEQ, ::lisp::neq, 2, SUBR);
-  mkprim(PN_NUMBERP, ::lisp::numberp, 1, SUBR);
-  mkprim(PN_MEMB, ::lisp::memb, 2, SUBR);
-  mkprim(PN_EQUAL, ::lisp::equal, 2, SUBR);
-  mkprim(PN_BOUNDP, ::lisp::boundp, 1, SUBR);
-  mkprim(PN_LITATOM, ::lisp::litatom, 1, SUBR);
-  mkprim(PN_TYPEOF, ::lisp::xtypeof, 1, SUBR);
+  // clang-format off
+  mkprim(PN_LISTP,   ::lisp::listp,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_NLISTP,  ::lisp::nlistp,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_NEQ,     ::lisp::neq,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_NUMBERP, ::lisp::numberp, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_MEMB,    ::lisp::memb,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_EQUAL,   ::lisp::equal,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_BOUNDP,  ::lisp::boundp,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_LITATOM, ::lisp::litatom, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TYPEOF,  ::lisp::xtypeof, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

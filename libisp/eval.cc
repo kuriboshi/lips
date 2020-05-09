@@ -1025,13 +1025,15 @@ evaluator::evaluator(lisp& lisp): base(lisp)
   add_mark_object(&fun);
   add_mark_object(&expression);
   add_mark_object(&args);
-  mkprim(PN_E, ::lisp::eval, 1, FSUBR);
-  mkprim(PN_EVAL, ::lisp::eval, 1, SUBR);
-  mkprim(PN_APPLY, ::lisp::apply, 2, SUBR);
-  mkprim(PN_APPLYSTAR, ::lisp::apply, -2, SUBR);
-  mkprim(PN_BAKTRACE, ::lisp::baktrace, 0, SUBR);
-  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, 0, SUBR);
-  mkprim(PN_ENVGET, ::lisp::envget, 2, SUBR);
+  // clang-format off
+  mkprim(PN_E,          ::lisp::eval,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_EVAL,       ::lisp::eval,       subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_APPLY,      ::lisp::apply,      subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_APPLYSTAR,  ::lisp::apply,      subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_BAKTRACE,   ::lisp::baktrace,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_ENVGET,     ::lisp::envget,     subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

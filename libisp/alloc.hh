@@ -139,27 +139,6 @@ inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 
 inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
-inline void mkprim(const char* pname, func0_t fname, short nrpar, lisp_type type)
-{
-  alloc::mkprim(pname, fname, type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
-    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
-}
-inline void mkprim(const char* pname, func1_t fname, short nrpar, lisp_type type)
-{
-  alloc::mkprim(pname, fname, type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
-    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
-}
-inline void mkprim(const char* pname, func2_t fname, short nrpar, lisp_type type)
-{
-  alloc::mkprim(pname, fname, type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
-    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
-}
-inline void mkprim(const char* pname, func3_t fname, short nrpar, lisp_type type)
-{
-  alloc::mkprim(pname, fname, type == SUBR ? subr_t::S_EVAL : subr_t::S_NOEVAL,
-    nrpar < 0 ? subr_t::S_SPREAD : subr_t::S_NOSPREAD);
-}
-
 inline void mkprim(const char* pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   alloc::mkprim(pname, fname, subr, spread);

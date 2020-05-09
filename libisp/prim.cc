@@ -346,39 +346,41 @@ prim::prim(lisp& lisp): base(lisp) {}
 
 void prim::init()
 {
-  mkprim(PN_ATOM, ::lisp::atom, 1, SUBR);
-  mkprim(PN_ATTACH, ::lisp::attach, 2, SUBR);
-  mkprim(PN_APPEND, ::lisp::append, -1, SUBR);
-  mkprim(PN_CAR, ::lisp::car, 1, SUBR);
-  mkprim(PN_CDR, ::lisp::cdr, 1, SUBR);
-  mkprim(PN_CADR, ::lisp::cadr, 1, SUBR);
-  mkprim(PN_CDAR, ::lisp::cdar, 1, SUBR);
-  mkprim(PN_CAAR, ::lisp::caar, 1, SUBR);
-  mkprim(PN_CDDR, ::lisp::cddr, 1, SUBR);
-  mkprim(PN_CDDDR, ::lisp::cdddr, 1, SUBR);
-  mkprim(PN_CADDR, ::lisp::caddr, 1, SUBR);
-  mkprim(PN_CDADR, ::lisp::cdadr, 1, SUBR);
-  mkprim(PN_CAADR, ::lisp::caadr, 1, SUBR);
-  mkprim(PN_CDDAR, ::lisp::cddar, 1, SUBR);
-  mkprim(PN_CADAR, ::lisp::cadar, 1, SUBR);
-  mkprim(PN_CDAAR, ::lisp::cdaar, 1, SUBR);
-  mkprim(PN_CAAAR, ::lisp::caaar, 1, SUBR);
-  mkprim(PN_CLOSURE, ::lisp::closure, 2, SUBR);
-  mkprim(PN_EQ, ::lisp::eq, 2, SUBR);
-  mkprim(PN_ERROR, ::lisp::xerror, -1, SUBR);
-  mkprim(PN_EXIT, ::lisp::uxexit, 1, SUBR);
-  mkprim(PN_LAMBDA, ::lisp::lambda, -2, FSUBR);
-  mkprim(PN_LENGTH, ::lisp::length, 1, SUBR);
-  mkprim(PN_LIST, ::lisp::list, -1, SUBR);
-  mkprim(PN_NCONC, ::lisp::nconc, -1, SUBR);
-  mkprim(PN_NLAMBDA, ::lisp::nlambda, -2, FSUBR);
-  mkprim(PN_NTH, ::lisp::xnth, 2, SUBR);
-  mkprim(PN_NULL, ::lisp::null, 1, SUBR);
-  mkprim(PN_QUOTE, ::lisp::quote, 1, FSUBR);
-  mkprim(PN_RPLACA, ::lisp::rplaca, 2, SUBR);
-  mkprim(PN_RPLACD, ::lisp::rplacd, 2, SUBR);
-  mkprim(PN_TCONC, ::lisp::tconc, 2, SUBR);
-  mkprim(PN_NTHD, ::lisp::nthd, 2, SUBR);
+  // clang-format off
+  mkprim(PN_ATOM,    ::lisp::atom,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_ATTACH,  ::lisp::attach,  subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_APPEND,  ::lisp::append,  subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_CAR,     ::lisp::car,     subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDR,     ::lisp::cdr,     subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CADR,    ::lisp::cadr,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDAR,    ::lisp::cdar,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CAAR,    ::lisp::caar,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDDR,    ::lisp::cddr,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDDDR,   ::lisp::cdddr,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CADDR,   ::lisp::caddr,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDADR,   ::lisp::cdadr,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CAADR,   ::lisp::caadr,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDDAR,   ::lisp::cddar,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CADAR,   ::lisp::cadar,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CDAAR,   ::lisp::cdaar,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CAAAR,   ::lisp::caaar,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_CLOSURE, ::lisp::closure, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_EQ,      ::lisp::eq,      subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_ERROR,   ::lisp::xerror,  subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_EXIT,    ::lisp::uxexit,  subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_LAMBDA,  ::lisp::lambda,  subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_LENGTH,  ::lisp::length,  subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_LIST,    ::lisp::list,    subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_NCONC,   ::lisp::nconc,   subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_NLAMBDA, ::lisp::nlambda, subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_NTH,     ::lisp::xnth,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_NULL,    ::lisp::null,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_QUOTE,   ::lisp::quote,   subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_RPLACA,  ::lisp::rplaca,  subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_RPLACD,  ::lisp::rplacd,  subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_TCONC,   ::lisp::tconc,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_NTHD,    ::lisp::nthd,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

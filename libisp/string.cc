@@ -102,13 +102,15 @@ string::string(lisp& lisp): base(lisp) {}
 
 void string::init()
 {
-  mkprim(PN_STRINGP, ::lisp::stringp, 1, SUBR);
-  mkprim(PN_STREQ, ::lisp::streq, 2, SUBR);
-  mkprim(PN_CONCAT, ::lisp::concat, -1, SUBR);
-  mkprim(PN_STRLEN, ::lisp::strlen, 1, SUBR);
-  mkprim(PN_SUBSTR, ::lisp::substr, 3, SUBR);
-  mkprim(PN_SYMSTR, ::lisp::symstr, 1, SUBR);
-  mkprim(PN_STRCMP, ::lisp::strcomp, 2, SUBR);
+  // clang-format off
+  mkprim(PN_STRINGP, ::lisp::stringp, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_STREQ,   ::lisp::streq,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CONCAT,  ::lisp::concat,  subr_t::S_EVAL, subr_t::S_SPREAD);
+  mkprim(PN_STRLEN,  ::lisp::strlen,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SUBSTR,  ::lisp::substr,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SYMSTR,  ::lisp::symstr,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_STRCMP,  ::lisp::strcomp, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 } // namespace lisp

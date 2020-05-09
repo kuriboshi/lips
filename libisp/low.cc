@@ -83,14 +83,16 @@ low::low(lisp& lisp): base(lisp) {}
 
 void low::init()
 {
-  mkprim(PN_SET, ::lisp::set, 2, SUBR);
-  mkprim(PN_SETQ, ::lisp::setq, 2, FSUBR);
-  mkprim(PN_SETQQ, ::lisp::set, 2, FSUBR);
-  mkprim(PN_COND, ::lisp::cond, -1, FSUBR);
-  mkprim(PN_WHILE, ::lisp::xwhile, -2, FSUBR);
-  mkprim(PN_PROGN, ::lisp::progn, -1, FSUBR);
-  mkprim(PN_PROG1, ::lisp::prog1, -2, SUBR);
-  mkprim(PN_PROG2, ::lisp::prog2, -3, SUBR);
+  // clang-format off
+  mkprim(PN_SET,   ::lisp::set,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_SETQ,  ::lisp::setq,   subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SETQQ, ::lisp::set,    subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_COND,  ::lisp::cond,   subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_WHILE, ::lisp::xwhile, subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_PROGN, ::lisp::progn,  subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_PROG1, ::lisp::prog1,  subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_PROG2, ::lisp::prog2,  subr_t::S_EVAL,   subr_t::S_SPREAD);
+  // clang-format on
 }
 
 } // namespace lisp
