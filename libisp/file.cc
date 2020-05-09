@@ -190,7 +190,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
       std::size_t i;
       for(i = 0; buf[i] != '(' && i < sizeof(buf); i++)
         ;
-      if((acnt = oname->symval().value->subrval().argcount) == -1)
+      if((acnt = oname->symval().value->subrval().argcount()) == -1)
         i++;
       for(; buf[i] != ')' && i < sizeof(buf); i++)
         if(buf[i] != ',')

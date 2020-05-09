@@ -136,10 +136,11 @@ struct subr_t
     S_SPREAD,
     S_NOSPREAD
   };
-  subr_t(char argcount, subr_type subr, spread_type spread) : argcount(argcount), subr(subr), spread(spread) {}
-  // The type of internal c-functions
+
+  subr_t(subr_type subr, spread_type spread) : subr(subr), spread(spread) {}
+  constexpr std::size_t argcount() const noexcept { return f.index() - 1; }
+
   std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
-  char argcount = 0;
   subr_type subr;
   spread_type spread;
 };

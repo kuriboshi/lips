@@ -158,21 +158,18 @@ void evaluator::next()
  */
 LISPT evaluator::call(LISPT fun)
 {
-  switch(fun->subrval().argcount)
+  switch(fun->subrval().argcount())
   {
     case 0:
       return std::get<func0_t>(fun->subrval().f)(l);
       break;
     case 1:
-    case -1:
       return std::get<func1_t>(fun->subrval().f)(l, dest[1].val.d_lisp);
       break;
     case 2:
-    case -2:
       return std::get<func2_t>(fun->subrval().f)(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
-    case -3:
       return std::get<func3_t>(fun->subrval().f)(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
@@ -418,7 +415,7 @@ bool evaluator::peval1()
       case SUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
-        dest = mkdestblock(fun->subrval().argcount);
+        dest = mkdestblock(fun->subrval().argcount());
         noeval = fun->subrval().subr == subr_t::S_NOEVAL;
         if(fun->subrval().spread == subr_t::S_SPREAD)
         {
@@ -481,7 +478,7 @@ bool evaluator::peval2()
         push_point(dest);
         push_func(&evaluator::ev2);
         noeval = fun->subrval().subr == subr_t::S_NOEVAL;
-        dest = mkdestblock(fun->subrval().argcount);
+        dest = mkdestblock(fun->subrval().argcount());
         if(fun->subrval().spread == subr_t::S_SPREAD)
           cont = &evaluator::spread;
         else

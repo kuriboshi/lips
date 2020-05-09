@@ -317,22 +317,22 @@ LISPT alloc::mkprim(const char* pname, subr_t* subr)
 
 void alloc::mkprim(const char* pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(0, subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(1, subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(2, subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(3, subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
 /*
