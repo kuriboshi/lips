@@ -323,22 +323,22 @@ LISPT alloc::mkprim(const char* pname, short nrpar, lisp_type type)
 
 void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type)
 {
-  mkprim(pname, nrpar, type)->subrval().function0 = fname;
+  mkprim(pname, nrpar, type)->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type)
 {
-  mkprim(pname, nrpar, type)->subrval().function1 = fname;
+  mkprim(pname, nrpar, type)->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type)
 {
-  mkprim(pname, nrpar, type)->subrval().function2 = fname;
+  mkprim(pname, nrpar, type)->subrval().f = fname;
 }
 
 void alloc::mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type)
 {
-  mkprim(pname, nrpar, type)->subrval().function3 = fname;
+  mkprim(pname, nrpar, type)->subrval().f = fname;
 }
 
 /*

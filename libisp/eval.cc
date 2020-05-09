@@ -158,29 +158,27 @@ void evaluator::next()
  */
 LISPT evaluator::call(LISPT fun)
 {
-  LISPT foo = C_NIL;
-
   switch(fun->subrval().argcount)
   {
     case 0:
-      foo = (*(fun->subrval().function0))(l);
+      return std::get<func0_t>(fun->subrval().f)(l);
       break;
     case 1:
     case -1:
-      foo = (*(fun->subrval().function1))(l, dest[1].val.d_lisp);
+      return std::get<func1_t>(fun->subrval().f)(l, dest[1].val.d_lisp);
       break;
     case 2:
     case -2:
-      foo = (*(fun->subrval().function2))(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return std::get<func2_t>(fun->subrval().f)(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
     case -3:
-      foo = (*(fun->subrval().function3))(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return std::get<func3_t>(fun->subrval().f)(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;
   }
-  return foo;
+  return C_NIL;
 }
 
 /*

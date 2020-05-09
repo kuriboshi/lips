@@ -121,13 +121,15 @@ struct symbol_t
   LISPT topval = C_NIL;         // Holds top value (not used yet)
 };
 
+using func0_t = LISPT (*)(lisp&);
+using func1_t = LISPT (*)(lisp&, LISPT);
+using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
+using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
+
 struct subr_t
 {
   // The type of internal c-functions
-  LISPT (*function0)(lisp&);
-  LISPT (*function1)(lisp&, LISPT);
-  LISPT (*function2)(lisp&, LISPT, LISPT);
-  LISPT (*function3)(lisp&, LISPT, LISPT, LISPT);
+  std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
   short argcount = 0; // Negative argcount indicates that arguments should not
                       // be evaluated
 };

@@ -67,10 +67,10 @@ public:
   }
 
   static LISPT intern(const char*);
-  static void mkprim(const char* pname, LISPT (*fname)(lisp&), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT), short nrpar, lisp_type type);
-  static void mkprim(const char* pname, LISPT (*fname)(lisp&, LISPT, LISPT, LISPT), short nrpar, lisp_type type);
+  static void mkprim(const char* pname, func0_t fname, short nrpar, lisp_type type);
+  static void mkprim(const char* pname, func1_t fname, short nrpar, lisp_type type);
+  static void mkprim(const char* pname, func2_t fname, short nrpar, lisp_type type);
+  static void mkprim(const char* pname, func3_t fname, short nrpar, lisp_type type);
 
   LISPT mklambda(LISPT args, LISPT def, lisp_type type);
   LISPT mkstring(const char*);
