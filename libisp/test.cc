@@ -15,7 +15,7 @@ namespace
 template<typename T>
 std::string to_string(T& sink)
 {
-  return static_cast<lisp::io::string_sink&>(sink).string();
+  return static_cast<lisp::string_sink&>(sink).string();
 }
 }
 
@@ -53,18 +53,18 @@ TEST_CASE("Create lisp object")
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
-    auto sink0 = std::make_unique<lisp::io::string_sink>();
+    auto sink0 = std::make_unique<lisp::string_sink>();
     auto out0 = std::make_unique<lisp::file_t>(std::move(sink0));
     prin0(lisp, i, *out0.get());
     CHECK(to_string(out0->sink()) == std::string(i->getstr()));
-    auto sink1 = std::make_unique<lisp::io::string_sink>();
+    auto sink1 = std::make_unique<lisp::string_sink>();
     auto out1 = std::make_unique<lisp::file_t>(std::move(sink1));
     prin0(lisp, j, *out1.get());
     CHECK(to_string(out1->sink()) == std::string(j->getstr()));
     std::string s_hello{"(hello)"};
-    auto in = std::make_unique<lisp::file_t>(std::make_unique<lisp::io::string_source>(s_hello.c_str()));
+    auto in = std::make_unique<lisp::file_t>(std::make_unique<lisp::string_source>(s_hello.c_str()));
     auto hello = lispread(lisp, *in.get(), false);
-    auto sink2 = std::make_unique<lisp::io::string_sink>();
+    auto sink2 = std::make_unique<lisp::string_sink>();
     auto out2 = std::make_unique<lisp::file_t>(std::move(sink2));
     prin0(lisp, hello, *out2.get());
     CHECK(to_string(out2->sink()) == s_hello);
@@ -87,7 +87,7 @@ TEST_CASE("Evaluator")
   SUBCASE("Evaluate simple expression: (+ 123 1)")
   {
     auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
-    auto sink0 = std::make_unique<lisp::io::string_sink>();
+    auto sink0 = std::make_unique<lisp::string_sink>();
     auto out0 = std::make_unique<lisp::file_t>(std::move(sink0));
     prin0(lisp, e1, *out0.get());
     CHECK(to_string(out0->sink()) == std::string("(+ 123 1)"));
@@ -100,7 +100,7 @@ TEST_CASE("Basic I/O")
 {
   lisp::lisp lisp;
 
-  auto out0 = std::make_unique<lisp::io::string_sink>();
+  auto out0 = std::make_unique<lisp::string_sink>();
   lisp.primout(*new lisp::file_t(std::move(out0)));
   lisp.primout().printf("hello world %d", 123);
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));

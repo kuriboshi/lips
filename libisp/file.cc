@@ -52,7 +52,7 @@ bool file::loadfile(const char* lf)
 {
   try
   {
-    auto foo = std::make_unique<file_t>(std::make_unique<io::file_source>(lf));
+    auto foo = std::make_unique<file_t>(std::make_unique<file_source>(lf));
     for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != ENDOFFILE; rval = lispread(l, *foo.get(), false))
       rval = e.eval(rval);
   }

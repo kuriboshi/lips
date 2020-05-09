@@ -10,7 +10,7 @@
 
 #include <io.hh>
 
-class term_source: public lisp::io::source
+class term_source: public lisp::io_source
 {
 public:
   term_source();

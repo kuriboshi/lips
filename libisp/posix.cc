@@ -121,8 +121,8 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
     else
       return l.error(UNKNOWN_REQUEST, mode);
   }
-  auto f = readmode ? std::make_unique<file_t>(std::make_unique<io::file_source>(name->stringval()))
-    : std::make_unique<file_t>(std::make_unique<io::file_sink>(name->stringval(), appendmode));
+  auto f = readmode ? std::make_unique<file_t>(std::make_unique<file_source>(name->stringval()))
+    : std::make_unique<file_t>(std::make_unique<file_sink>(name->stringval(), appendmode));
   if(!f)
     return l.error(CANT_OPEN, name);
   LISPT newfile = nullptr;

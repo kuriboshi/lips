@@ -119,12 +119,12 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&interactive, "interactive", C_NIL);
   initcvar(&version, "version", a().mkstring(VERSION));
 
-  _primout = new file_t(std::make_unique<io::file_sink>(::stdout));
-  _primerr = new file_t(std::make_unique<io::file_sink>(::stderr));
-  _primin = new file_t(std::make_unique<io::file_source>(::stdin));
-  _stdout = new file_t(std::make_unique<io::file_sink>(::stdout));
-  _stderr = new file_t(std::make_unique<io::file_sink>(::stderr));
-  _stdin = new file_t(std::make_unique<io::file_source>(::stdin));
+  _primout = new file_t(std::make_unique<file_sink>(::stdout));
+  _primerr = new file_t(std::make_unique<file_sink>(::stderr));
+  _primin = new file_t(std::make_unique<file_source>(::stdin));
+  _stdout = new file_t(std::make_unique<file_sink>(::stdout));
+  _stderr = new file_t(std::make_unique<file_sink>(::stderr));
+  _stdin = new file_t(std::make_unique<file_source>(::stdin));
 
   a().add_mark_object(&top);
   a().add_mark_object(&rstack);
@@ -238,7 +238,7 @@ void lisp::repl(LISPT prompt, breakfun_t f)
     auto* buf = primin().getline();
     if(buf == nullptr)
       break;
-    auto in = std::make_unique<file_t>(std::make_unique<io::string_source>(buf));
+    auto in = std::make_unique<file_t>(std::make_unique<string_source>(buf));
     auto expr = lispread(*this, *in.get(), false);
     print(*this, eval(*this, expr), primout());
   }
