@@ -586,10 +586,12 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
   initcvar(&verboseflg, "verboseflg", C_NIL);
+  // clang-format off
   mkprim(PN_RECLAIM,   ::lisp::reclaim,   1, subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_CONS,      ::lisp::cons,      2, subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_FREECOUNT, ::lisp::freecount, 0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_OBARRAY,   ::lisp::xobarray,  0, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
 }
 
 alloc::~alloc()
