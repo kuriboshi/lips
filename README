@@ -1,9 +1,0 @@
-Lips -- lisp shell
-
-Copyright (c) 1988-1989, 1992, 2020 Krister Joas.
-
-This is version 130 of lips (lisp shell) as of 1992-01-29.
-
-Change Makefile and config.h as needed and type make. If all went well,
-copy lipscode/example.lipsrc to your home directory and make your
-personal changes.
