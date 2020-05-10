@@ -564,7 +564,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
         pp("#<pointer", file, x);
       break;
     case NIL:
-      ps("nil", file, 0);
+      ps("nil", file, false);
       break;
     case TRUE:
       file.putch('t');
@@ -583,7 +583,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
         file.putch('"');
       }
       else
-        ps(x->stringval(), file, 0);
+        ps(x->stringval(), file, false);
       break;
     case CLOSURE:
       pp("#<closure", file, x);
@@ -601,7 +601,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       pp("#<subr", file, x);
       break;
     case UNBOUND:
-      ps("#<unbound>", file, 0);
+      ps("#<unbound>", file, false);
       break;
     case ENVIRON:
       pp("#<environ", file, x);
@@ -619,10 +619,9 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       pp("#<error", file, x);
       break;
     default:
-      ps("#<illegal ", file, 0);
+      ps("#<illegal ", file, false);
       pi(type_of(x), currentbase->intval(), file);
-      pi(x->intval(), 16L, file);
-      ps(">", file, 0);
+      pp("", file, x);
   }
   return x;
 }
