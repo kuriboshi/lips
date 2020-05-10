@@ -12,13 +12,6 @@
 
 namespace
 {
-inline lisp::LISPT eval(lisp::lisp& l, std::string expr)
-{
-  lisp::file_t in(expr);
-  auto e = lispread(l, in, false);
-  return eval(l, e);
-}
-
 template<typename T>
 std::string to_string(T& sink)
 {
@@ -121,6 +114,8 @@ TEST_CASE("Check size of lisp_t object")
 {
   CHECK(sizeof(lisp::lisp_t::u) == 40);
 }
+
+using lisp::eval;
 
 TEST_CASE("Arithmetic functions")
 {
@@ -301,5 +296,65 @@ TEST_CASE("Arithmetic functions")
   {
     auto r = eval(l, "(minusp -5)");
     CHECK(is_T(r));
+  }
+}
+
+TEST_CASE("Primary function tests")
+{
+  lisp::lisp l;
+  SUBCASE("CAR and CDR")
+  {
+    SUBCASE("CAR")
+    {
+      auto a = lisp::eval(l, "(car (cons 1 2))");
+      CHECK(a->intval() == 1);
+    }
+    SUBCASE("CDR")
+    {
+      auto b = lisp::eval(l, "(cdr (cons 1 2))");
+      CHECK(b->intval() == 2);
+    }
+  }
+  SUBCASE("LAMBDA and NLAMBDA")
+  {
+    SUBCASE("LAMBDA - basic case")
+    {
+      auto a = lisp::eval(l, "(setq f (lambda () \"hello\"))");
+      auto b = lisp::eval(l, "(f)");
+      CHECK(type_of(b) == lisp::STRING);
+      CHECK(strcmp(b->stringval(), "hello") == 0);
+    }
+    SUBCASE("LAMBDA - one argument")
+    {
+      auto a = lisp::eval(l, "(setq f (lambda (x) (cons x nil)))");
+      auto b = lisp::eval(l, "(f 10)");
+      CHECK(type_of(b) == lisp::CONS);
+      CHECK(type_of(b->car()) == lisp::INTEGER);
+      CHECK(b->car()->intval() == 10);
+    }
+    SUBCASE("LAMBDA - spread case")
+    {
+      auto a = lisp::eval(l, "(setq f (lambda x (cadr x)))");
+      auto b = lisp::eval(l, "(f 1 2)");
+      CHECK(type_of(b) == lisp::INTEGER);
+      CHECK(b->intval() == 2);
+    }
+    SUBCASE("LAMBDA - half spread")
+    {
+      auto a = lisp::eval(l, "(setq f (lambda (a . x) (list a (cadr x))))");
+      auto b = lisp::eval(l, "(f 0 1 2)");
+      CHECK(type_of(b) == lisp::CONS);
+      CHECK(type_of(b->car()) == lisp::INTEGER);
+      CHECK(b->car()->intval() == 0);
+      CHECK(type_of(b->cdr()->car()) == lisp::INTEGER);
+      CHECK(b->cdr()->car()->intval() == 2);
+    }
+    SUBCASE("NLAMBDA - basic case")
+    {
+      auto a = lisp::eval(l, "(setq f (nlambda (a) a))");
+      auto b = lisp::eval(l, "(f x)");
+      CHECK(type_of(b) == lisp::SYMBOL);
+      CHECK(strcmp(b->symval().pname, "x") == 0);
+    }
   }
 }
