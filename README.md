@@ -11,10 +11,10 @@ storing and processing structured data.
 
 The old C code has been modernised and gradually parts have been
 converted to C++.  Originally the lisp shell part was meant to be a
-separate extension to a more generic, embedable lisp interpreter.
+separate extension to a more generic, embeddable lisp interpreter.
 However, that goal was never fully realised.  That goal is now a
 priority and I view the shell extension as an example of how the
-embedable lisp interpreter can be used.
+embeddable lisp interpreter can be used.
 
 # Requirements
 
