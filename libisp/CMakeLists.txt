@@ -26,7 +26,6 @@ target_sources(libisp PRIVATE
   alloc.hh
   arith.hh
   base.hh
-  config.hh
   defs.hh
   error.hh
   eval.hh

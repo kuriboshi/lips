@@ -27,8 +27,34 @@ endfunction()
 
 fetchcontent_declare(doctest
   URL https://github.com/onqtam/doctest/archive/2.3.7.tar.gz)
-
 make_available(doctest)
 
 add_subdirectory(libisp)
 add_subdirectory(src)
+
+# Define TRACE if you want to be able to trace calls to peval.  Useful
+# for debugging.
+target_compile_definitions(libisp PRIVATE TRACE)
+
+# If this isn't defined you can't read floating point numbers.
+# target_compile_definitions(libisp PRIVATE FLOATING)
+
+# Defines where the source is for cpprint.
+#target_compile_definitions(libisp PRIVATE "LIPSLIB=\"/usr/local/src/lips\"")
+
+# File that is used to find source code for primitives.
+#target_compile_definitions(libisp PRIVATE "TAGSFILE=\"/usr/local/src/lips/src/Tags\"")
+
+# Defining this will use the select call to handle default answer in
+# getuser().
+target_compile_definitions(lips PRIVATE SELECT)
+
+# Define this to enable job control, requires SIGCHLD, sigblock...
+target_compile_definitions(lips PRIVATE JOB_CONTROL)
+
+# Defining this includes code to take care of signals and ask if the
+# core should be dumped or not.
+target_compile_definitions(lips PRIVATE FANCY_SIGNALS)
+
+# Global init file.
+#target_compile_definitions(lips PRIVATE "LIPSRC=\"/usr/local/lib/lipsrc\"")

@@ -145,7 +145,7 @@ PRIMITIVE file::xreadline(LISPT file)
 
 PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 {
-#if 0
+#if defined(LIPSLIB) && defined(TAGSFILE)
   FILE *f, *tagsfile, *cfile;
   char buf[120];
   const char* funn;

@@ -24,10 +24,6 @@
 #include "top.hh"
 #include "term.hh"
 
-#ifndef LIPSRC
-#define LIPSRC "/usr/local/lib/lipsrc"
-#endif
-
 lisp::lisp* L;
 
 std::jmp_buf jumper;
@@ -393,6 +389,7 @@ static void init()
   exec::init();
 }
 
+#ifdef LIPSRC
 /*
  * Loads the file INITFILE.
  */
@@ -401,6 +398,7 @@ static void loadinit(const char* initfile)
   if(!loadfile(*L, initfile))
     printf("Can't open file %s\n", initfile); /* System init file. */
 }
+#endif
 
 /*
  * Greet user who, or if who is nil, $USER. This means loading
@@ -477,7 +475,9 @@ int main(int argc, char* const* argv)
   {
     try
     {
+#ifdef LIPSRC
       loadinit(LIPSRC);
+#endif
       greet(C_NIL);
     }
     catch(const lisp_error& error)

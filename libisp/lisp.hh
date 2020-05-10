@@ -14,7 +14,6 @@
 #include <variant>
 #include <memory>
 #include <cstdio>
-#include "config.hh"
 #include "error.hh"
 
 #ifdef TRUE
