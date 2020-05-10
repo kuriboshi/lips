@@ -425,8 +425,7 @@ LISPT greet(LISPT who)
 
 int main(int argc, char* const* argv)
 {
-  auto source = std::make_unique<term_source>();
-  auto terminal = std::make_unique<file_t>(std::move(source));
+  auto terminal = std::make_unique<file_t>(std::make_unique<term_source>());
   options.debug = false;
   options.version = false;
   options.fast = false;
@@ -499,7 +498,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_error& error)
     {
-      source->clearlbuf();
+      static_cast<term_source&>(terminal->source()).clearlbuf();
       printf("error: %s\n", error.what());
     }
     catch(const lisp_finish& fin)
