@@ -7,6 +7,7 @@
 
 #include "lisp.hh"
 #include "base.hh"
+#include "io.hh"
 
 namespace lisp
 {
@@ -143,6 +144,12 @@ private:
 };
 
 inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
+inline LISPT eval(lisp& l, std::string expr)
+{
+  file_t in(expr);
+  auto e = lispread(l, in, false);
+  return eval(l, e);
+}
 inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
 inline LISPT baktrace(lisp& l) { return l.e().baktrace(); }
 inline LISPT topofstack(lisp& l) { return l.e().topofstack(); }
