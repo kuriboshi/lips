@@ -3,6 +3,7 @@
 // Copyright 2020 Krister Joas
 //
 
+#include <iostream>
 #include "libisp.hh"
 #include "except.hh"
 
@@ -17,5 +18,21 @@ int main()
   lisp::lisp lisp;
   auto prompt = mkstring(lisp, "> ");
   lisp.a().add_mark_object(&prompt);
-  lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
+  while(true)
+  {
+    try
+    {
+      lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
+      // If we return normally from repl we exit the program
+      return 0;
+    }
+    catch(const lisp::lisp_error& ex)
+    {
+      std::cout << ex.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+      std::cout << ex.what() << std::endl;
+    }
+  }
 }
