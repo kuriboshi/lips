@@ -503,9 +503,8 @@ LISPT alloc::mkatom(const char* str)
  */
 LISPT alloc::mkfloat(double num)
 {
-  LISPT rval = nullptr;
-
 #ifdef FLOATING
+  LISPT rval = nullptr;
 again:
   while(p0 < 4)
     if((floats.marks[p0] & (1 << point)) == 0)
@@ -528,7 +527,8 @@ again:
   floats.marks[p0] |= 1 << point;
   *((double*)POINTER(rval)) = num;
 #endif /* FLOATING */
-  set(rval, FLOAT, getobject());
+  LISPT rval = getobject();
+  rval->floatval(num);
   return rval;
 }
 
