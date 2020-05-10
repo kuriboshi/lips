@@ -478,10 +478,10 @@ void term_source::nput(const char* str, int ntim)
  */
 void term_source::blink()
 {
+#ifdef TERMCAP
   if(nocap)
     return; // Requires termcap and enough capability
   scan(linepos - 1);
-#ifdef TERMCAP
   int i;
 
   int ldiff = currentpos.line - parpos.line;
@@ -527,7 +527,7 @@ void term_source::clearscr() { tputs(clear, 1, outc); }
  * Get a line from stdin.  Do line editing functions such as kill line, retype
  * line and delete character.  Count parethesis pairs and terminate line if
  * matching right paren.  Typing just a return puts a right paren in the buffer
- * as well as the newline.  Returns zero if anything goes wrong.
+ * as well as the newline.  Returns empty optional on EOF.
  */
 std::optional<std::string> term_source::getline()
 {
@@ -547,20 +547,20 @@ std::optional<std::string> term_source::getline()
   position = 0;
   linepos = 0;
   origpar = parcount;
-  while(1)
+  while(true)
   {
     if(escaped)
       escaped--;
     fflush(stdout);
     if(lisp::readchar(stdin, &c) == 0)
-      return nullptr;
-    switch(key_tab[(int)c])
+      return {};
+    switch(key_tab[static_cast<int>(c)])
     {
       case term_fun::T_EOF:
         if(linepos == 0)
         {
           linebuffer[linepos++] = EOF;
-          return nullptr;
+          return {};
         }
         pputc(c, stdout);
         linebuffer[linepos++] = EOF;
