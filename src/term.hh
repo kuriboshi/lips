@@ -21,7 +21,7 @@ public:
   virtual void ungetch(int) override;
   virtual bool eoln() override;
   virtual bool close() override { return true; }
-  virtual const char* getline() override;
+  virtual std::optional<std::string> getline() override;
 
   static void end_term();
   void clearlbuf();

@@ -143,7 +143,7 @@ int term_source::getch()
     else
     {
       init_term();
-      if(getline() == nullptr)
+      if(!getline())
       {
         end_term();
         return EOF;
@@ -529,7 +529,7 @@ void term_source::clearscr() { tputs(clear, 1, outc); }
  * matching right paren.  Typing just a return puts a right paren in the buffer
  * as well as the newline.  Returns zero if anything goes wrong.
  */
-const char* term_source::getline()
+std::optional<std::string> term_source::getline()
 {
   char c;
   const char *s, *t;

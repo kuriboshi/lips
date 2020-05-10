@@ -10,15 +10,15 @@
 #include "low.hh"
 #include "io.hh"
 
-inline lisp::LISPT eval(lisp::lisp& l, const std::string& expr)
+namespace
 {
-  auto in = std::make_unique<lisp::file_t>(std::make_unique<lisp::string_source>(expr.c_str()));
-  auto e = lispread(l, *in.get(), false);
+inline lisp::LISPT eval(lisp::lisp& l, std::string expr)
+{
+  lisp::file_t in(expr);
+  auto e = lispread(l, in, false);
   return eval(l, e);
 }
 
-namespace
-{
 template<typename T>
 std::string to_string(T& sink)
 {
@@ -55,26 +55,30 @@ TEST_CASE("Create lisp object")
     auto j = mkatom(lisp, "j");
     auto a = mkstring(lisp, "a");
     auto b = mkstring(lisp, "b");
+
     set(lisp, i, a);
     set(lisp, j, b);
     CHECK(i != j);
     set(lisp, j, a);
     CHECK(i != j);
+
     auto sink0 = std::make_unique<lisp::string_sink>();
-    auto out0 = std::make_unique<lisp::file_t>(std::move(sink0));
-    prin0(lisp, i, *out0.get());
-    CHECK(to_string(out0->sink()) == std::string(i->getstr()));
+    lisp::file_t out0(std::move(sink0));
+    prin0(lisp, i, out0);
+    CHECK(to_string(out0.sink()) == std::string(i->getstr()));
+
     auto sink1 = std::make_unique<lisp::string_sink>();
-    auto out1 = std::make_unique<lisp::file_t>(std::move(sink1));
-    prin0(lisp, j, *out1.get());
-    CHECK(to_string(out1->sink()) == std::string(j->getstr()));
+    lisp::file_t out1(std::move(sink1));
+    prin0(lisp, j, out1);
+    CHECK(to_string(out1.sink()) == std::string(j->getstr()));
+
     std::string s_hello{"(hello)"};
-    auto in = std::make_unique<lisp::file_t>(std::make_unique<lisp::string_source>(s_hello.c_str()));
-    auto hello = lispread(lisp, *in.get(), false);
+    lisp::file_t in(s_hello);
+    auto hello = lispread(lisp, in, false);
     auto sink2 = std::make_unique<lisp::string_sink>();
-    auto out2 = std::make_unique<lisp::file_t>(std::move(sink2));
-    prin0(lisp, hello, *out2.get());
-    CHECK(to_string(out2->sink()) == s_hello);
+    lisp::file_t out2(std::move(sink2));
+    prin0(lisp, hello, out2);
+    CHECK(to_string(out2.sink()) == s_hello);
   }
 }
 

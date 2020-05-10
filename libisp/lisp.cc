@@ -235,10 +235,10 @@ void lisp::repl(LISPT prompt, breakfun_t f)
   while(true)
   {
     prin0(*this, prompt, primout());
-    auto* buf = primin().getline();
-    if(buf == nullptr)
+    auto buf = primin().getline();
+    if(!buf)
       break;
-    auto in = std::make_unique<file_t>(std::make_unique<string_source>(buf));
+    auto in = std::make_unique<file_t>(*buf);
     auto expr = lispread(*this, *in.get(), false);
     print(*this, eval(*this, expr), primout());
   }

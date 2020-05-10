@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
+#include <optional>
 #include <string>
 #include "lisp.hh"
 #include "base.hh"
@@ -79,7 +80,7 @@ public:
   virtual void ungetch(int) = 0;
   virtual bool eoln() = 0;
   virtual bool close() = 0;
-  virtual const char* getline() = 0;
+  virtual std::optional<std::string> getline() = 0;
 };
 
 class file_source: public io_source
@@ -127,14 +128,14 @@ public:
       return false;
     return true;
   }
-  virtual const char* getline() override
+  virtual std::optional<std::string> getline() override
   {
     char* buf = nullptr;
     std::size_t size = 0;
     auto rv = ::getline(&buf, &size, _file);
     if(rv == -1)
-      return nullptr;
-    return buf;
+      return {};
+    return std::string(buf);
   }
 
 private:
@@ -146,27 +147,27 @@ private:
 class string_source: public io_source
 {
 public:
-  string_source(const char* string): _string(string), _len(std::strlen(string)) {}
+  string_source(const char* string): _string(string) {}
+  string_source(std::string string): _string(string) {}
 
   virtual int getch() override
   {
-    if(_pos == _len)
+    if(_pos == _string.length())
       return -1;
     auto c = _string[_pos++];
     if(c == COMMENTCHAR) /* Skip comments.  */
-      while((c = _string[_pos++]) != '\n')
+      while(_pos != _string.length() && (c = _string[_pos++]) != '\n')
         ;
     return c;
   }
   virtual void ungetch(int c) override { --_pos; }
   virtual bool eoln() override { return false; }
   virtual bool close() override { return true; }
-  virtual const char* getline() override { return _string; }
+  virtual std::optional<std::string> getline() override { return _string; }
 
 private:
-  const char* _string;
+  std::string _string;
   int _pos = 0;
-  int _len = 0;
 };
 
 class io_sink
@@ -248,6 +249,7 @@ public:
   file_t(std::unique_ptr<io_source> source): _source(std::move(source)) {}
   file_t(std::unique_ptr<io_sink> sink): _sink(std::move(sink)) {}
   file_t(std::unique_ptr<io_source> source, std::unique_ptr<io_sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
+  file_t(std::string source): _source(std::make_unique<string_source>(source)) {}
   ~file_t() {}
 
   // io_source
@@ -255,7 +257,7 @@ public:
   int getch() { ptrcheck(_source); return _source->getch(); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   bool eoln() { ptrcheck(_source); return _source->eoln(); }
-  const char* getline() { ptrcheck(_source); return _source->getline(); }
+  std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
 
   // io_sink
   io_sink& sink() { return *_sink.get(); }
