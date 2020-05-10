@@ -51,7 +51,7 @@ target_include_directories(libisp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/libisp>
   )
-target_compile_options(libisp PUBLIC -Wall -Werror)
+target_compile_options(libisp PRIVATE -Wall -Werror)
 target_link_libraries(libisp doctest)
 add_executable(testlibisp test.cc)
 target_link_libraries(testlibisp libisp)
