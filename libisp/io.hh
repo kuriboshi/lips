@@ -86,13 +86,15 @@ public:
 class file_source: public io_source
 {
 public:
-  file_source(std::FILE* file): _file(file), _owner(false) {}
-  file_source(const char* filename): _file(fopen(filename, "r")), _owner(true)
+  enum class mode_t
   {
-    // TODO: Throw different exception
-    if(!_file)
-      throw lisp_error("Can't open file");
-  }
+    READ,
+    WRITE,
+    APPEND
+  };
+
+  file_source(std::FILE* file): _file(file), _owner(false) {}
+  file_source(const std::string& filename, mode_t = mode_t::READ);
   ~file_source()
   {
     if(_owner)
