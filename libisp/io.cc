@@ -566,7 +566,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
     case NIL:
       ps("nil", file, false);
       break;
-    case TRUE:
+    case T:
       file.putch('t');
       break;
     case INTEGER:

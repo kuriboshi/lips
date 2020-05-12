@@ -152,7 +152,7 @@ PRIMITIVE pred::xtypeof(LISPT a)
       return C_UNBOUND;
     case ENVIRON:
       return C_ENVIRON;
-    case TRUE:
+    case T:
       return C_T;
     case FREE:
       return C_FREE;

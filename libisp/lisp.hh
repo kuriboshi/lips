@@ -16,10 +16,6 @@
 #include <cstdio>
 #include "error.hh"
 
-#ifdef TRUE
-#undef TRUE
-#endif
-
 namespace lisp
 {
 class lisp;
@@ -90,7 +86,7 @@ enum lisp_type
   UNBOUND,   /* unbound indicator */
   ENVIRON,   /* environment stack type for gc use */
   FILET,     /* file pointer */
-  TRUE,      /* the truth object */
+  T,         /* the truth object */
   FREE,      /* an object on the freelist, used for
                 consistency checks */
   ENDOFFILE, /* returned from read at end of file */
@@ -296,7 +292,7 @@ inline void set(LISPT& a, lisp_type t, LISPT p)
   a->unmark();
 }
 
-inline bool is_T(LISPT x) { return type_of(x) == TRUE; }
+inline bool is_T(LISPT x) { return type_of(x) == T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == NIL; }
 
 class lisp

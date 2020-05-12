@@ -74,7 +74,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
   auto intern = [this](const char* s) { return a().intern(s); };
 
-  set(C_T, TRUE, a().getobject());
+  set(C_T, T, a().getobject());
   CE_NIL = intern("nil");
   CE_NIL->setq(C_NIL);
   CE_T = intern("t");
