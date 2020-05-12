@@ -341,9 +341,15 @@ public:
   int thisplevel = 0;
   bool echoline = false;
 
-  // Used by the interprete
+  // Used by the interpreter
   bool brkflg = false;
   bool interrupt = false;
+
+  LISPT currentbase = nullptr;
+  LISPT topprompt = nullptr;
+  LISPT brkprompt = nullptr;
+  LISPT verbose = nullptr;
+  LISPT version = nullptr;
 
   /* clang-format off */
   rtinfo currentrt =
@@ -423,12 +429,5 @@ inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
 
 inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
 inline void check(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check(arg, type0, type1); }
-
-// Variables
-extern LISPT currentbase;
-extern LISPT topprompt;
-extern LISPT brkprompt;
-extern LISPT interactive;
-extern LISPT version;
 
 } // namespace lisp

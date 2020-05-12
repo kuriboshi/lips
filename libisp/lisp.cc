@@ -116,7 +116,6 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&topprompt, "prompt", a().mkstring("!_"));
   initcvar(&brkprompt, "brkprompt", a().mkstring("!:"));
   initcvar(&currentbase, "base", a().mknumber(10L));
-  initcvar(&interactive, "interactive", C_NIL);
   initcvar(&version, "version", a().mkstring(VERSION));
 
   _primout = new file_t(std::make_unique<file_sink>(::stdout));
@@ -282,11 +281,5 @@ LISPT C_SUBR;
 LISPT C_SYMBOL;
 LISPT C_UNBOUND;
 LISPT C_WRITE;
-
-LISPT currentbase; // Conversion base for print of integer.
-LISPT topprompt;   // Normal prompt.
-LISPT brkprompt;   // Prompt in break.
-LISPT interactive; // Nonnil if interactive lips.
-LISPT version;     // Is set to the version string.
 
 } // namespace lisp

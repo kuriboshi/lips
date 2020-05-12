@@ -570,7 +570,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       file.putch('t');
       break;
     case INTEGER:
-      pi(x->intval(), currentbase->intval(), file);
+      pi(x->intval(), l.currentbase->intval(), file);
       break;
     case FLOAT:
       pf(x->floatval(), file);
@@ -620,7 +620,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       break;
     default:
       ps("#<illegal ", file, false);
-      pi(type_of(x), currentbase->intval(), file);
+      pi(type_of(x), l.currentbase->intval(), file);
       pp("", file, x);
   }
   return x;

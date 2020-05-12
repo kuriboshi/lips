@@ -45,7 +45,6 @@ public:
   };
 
   static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
-  LISPT verboseflg = nullptr;         // If T then some events will be more verbose (gc and function redefinitions)
   std::vector<LISPT> savearray;       // Stack of objects which needs to be protected from gc
   obarray_t* obarray[MAXHASH];        // Atoms local to each interpreter instance
   LISPT freelist = nullptr;           // List of free objects

@@ -566,12 +566,11 @@ void alloc::dzero() { destblockused = 0; }
 
 alloc::alloc(lisp& lisp): _lisp(lisp)
 {
-  add_mark_object(&verboseflg);
-  add_mark_object(&topprompt);
-  add_mark_object(&brkprompt);
-  add_mark_object(&currentbase);
-  add_mark_object(&interactive);
-  add_mark_object(&version);
+  add_mark_object(&_lisp.topprompt);
+  add_mark_object(&_lisp.brkprompt);
+  add_mark_object(&_lisp.currentbase);
+  add_mark_object(&_lisp.version);
+  add_mark_object(&_lisp.verbose);
   add_mark_object(&gcgag);
   add_mark_object(&C_EOF);
 
@@ -585,7 +584,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
-  initcvar(&verboseflg, "verboseflg", C_NIL);
   // clang-format off
   mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_CONS,      ::lisp::cons,      subr_t::S_EVAL, subr_t::S_NOSPREAD);

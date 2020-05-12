@@ -65,7 +65,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       if(is_NIL(t))
       {
         putprop(l, name, C_OLDDEF, name->getopval());
-        if(!is_NIL(a.verboseflg))
+        if(!is_NIL(l.verbose))
           xprint(l, cons(l, name, cons(l, C_REDEFINED, C_NIL)), C_NIL);
       }
     }

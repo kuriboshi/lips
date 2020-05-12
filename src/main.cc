@@ -469,7 +469,6 @@ int main(int argc, char* const* argv)
    * Init shell and lisp interpreter.
    */
   init();
-  interactive = options.interactive ? C_T : C_NIL;
   if(!options.fast)
   {
     try
@@ -489,7 +488,7 @@ int main(int argc, char* const* argv)
       if(!options.debug && options.interactive)
         init_all_signals();
       L->e().reset();
-      if(top::toploop(&topprompt, nullptr, *terminal.get()))
+      if(top::toploop(&L->topprompt, nullptr, *terminal.get()))
         break;
     }
     catch(const lisp_reset&)
