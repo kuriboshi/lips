@@ -47,8 +47,9 @@ target_sources(lisp PRIVATE
   user.hh
   version.hh
 )
+get_filename_component(_parent ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 target_include_directories(lisp PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${_parent}>
   $<INSTALL_INTERFACE:include/libisp>
   )
 target_compile_options(lisp PRIVATE -Wall -Werror)
