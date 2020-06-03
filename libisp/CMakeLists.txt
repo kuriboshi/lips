@@ -1,9 +1,9 @@
 #
 # Copyright 2020 Krister Joas
 #
-add_library(libisp)
-add_library(lips::libisp ALIAS libisp)
-target_sources(libisp PRIVATE
+add_library(lisp)
+add_library(lips::lisp ALIAS lisp)
+target_sources(lisp PRIVATE
   alloc.cc
   arith.cc
   eval.cc
@@ -22,7 +22,7 @@ target_sources(libisp PRIVATE
   user.cc
   version.cc
 )
-target_sources(libisp PRIVATE
+target_sources(lisp PRIVATE
   alloc.hh
   arith.hh
   base.hh
@@ -47,21 +47,13 @@ target_sources(libisp PRIVATE
   user.hh
   version.hh
 )
-target_include_directories(libisp PUBLIC
+target_include_directories(lisp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include/libisp>
   )
-target_compile_options(libisp PRIVATE -Wall -Werror)
-target_link_libraries(libisp doctest)
-add_executable(testlibisp test.cc)
-target_link_libraries(testlibisp libisp)
+target_compile_options(lisp PRIVATE -Wall -Werror)
+target_link_libraries(lisp doctest)
+add_executable(test test.cc)
+target_link_libraries(test lisp)
 add_executable(main main.cc)
-target_link_libraries(main libisp)
-
-include(GNUInstallDirs)
-install(TARGETS libisp
-  EXPORT libisp)
-install(EXPORT libisp
-  NAMESPACE libisp::
-  FILE libispConfig.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+target_link_libraries(main lisp)

@@ -6,55 +6,59 @@ cmake_minimum_required(VERSION 3.13.0)
 project(lips VERSION 0.2.0)
 set(CMAKE_CXX_STANDARD 17)
 
-include(FetchContent)
+option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
+option(ENABLE_FLOATING "Enable reading floating point values" OFF)
+option(ENABLE_SELECT "Enable using select when asking about core dumps" ON)
+option(ENABLE_JOB_CONTROL "Enable job control in the shell" ON)
+option(ENABLE_FANCY_SIGNALS "Enable catching signals and offer to skip dumping core" ON)
+option(ENABLE_CPPRINT "Enable ability to print source code of primitives" OFF)
+option(ENABLE_LIPSRC "Enable loading a global lipsrc file" OFF)
 
-function(make_available _NAME)
-  fetchcontent_getproperties(${_NAME})
-  string(TOLOWER ${_NAME} _name)
-  if(NOT ${_name}_POPULATED)
-    fetchcontent_populate(${_NAME})
-    if(EXISTS "${${_name}_SOURCE_DIR}/CMakeLists.txt")
-      add_subdirectory(${${_name}_SOURCE_DIR} ${${_name}_BINARY_DIR} EXCLUDE_FROM_ALL)
-    else()
-      # If there is no CMakeLists.txt we assume a header only library
-      add_library(${_name} INTERFACE IMPORTED)
-      target_include_directories(${_name} INTERFACE "${${_name}_SOURCE_DIR}/include")
-    endif()
-  endif()
-  # Force the SOURCE_DIR variable into parent scope
-  set(${_name}_SOURCE_DIR "${${_name}_SOURCE_DIR}" PARENT_SCOPE)
-endfunction()
+set(LIPS_SOURCE_LOCATION "${CMAKE_INSTALL_PREFIX}/src/lips" CACHE
+  STRING "Where to install source code for cpprint")
 
-fetchcontent_declare(doctest
-  URL https://github.com/onqtam/doctest/archive/2.3.7.tar.gz)
-make_available(doctest)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(external)
 
 add_subdirectory(libisp)
 add_subdirectory(src)
 
-# Define TRACE if you want to be able to trace calls to peval.  Useful
-# for debugging.
-target_compile_definitions(libisp PRIVATE TRACE)
+if(ENABLE_TRACE)
+  # Enable ability to trace calls to peval.
+  target_compile_definitions(lisp PRIVATE TRACE)
+endif()
 
-# If this isn't defined you can't read floating point numbers.
-# target_compile_definitions(libisp PRIVATE FLOATING)
+if(ENABLE_FLOATING)
+  target_compile_definitions(lisp PRIVATE FLOATING)
+endif()
 
-# Defines where the source is for cpprint.
-#target_compile_definitions(libisp PRIVATE "LIPSLIB=\"/usr/local/src/lips\"")
+if(ENABLE_SELECT)
+  target_compile_definitions(lips PRIVATE SELECT)
+endif()
 
-# File that is used to find source code for primitives.
-#target_compile_definitions(libisp PRIVATE "TAGSFILE=\"/usr/local/src/lips/src/Tags\"")
+if(ENABLE_JOB_CONTROL)
+  target_compile_definitions(lips PRIVATE JOB_CONTROL)
+endif()
 
-# Defining this will use the select call to handle default answer in
-# getuser().
-target_compile_definitions(lips PRIVATE SELECT)
+if(ENABLE_FANCY_SIGNALS)
+  target_compile_definitions(lips PRIVATE FANCY_SIGNALS)
+endif()
 
-# Define this to enable job control, requires SIGCHLD, sigblock...
-target_compile_definitions(lips PRIVATE JOB_CONTROL)
+if(ENABLE_CPPRINT)
+  # Defines where the source is for cpprint.
+  target_compile_definitions(lisp PRIVATE "LIPSLIB=\"${LIPS_SOURCE_LOCATION}\"")
+  # File that is used to find source code for primitives.
+  target_compile_definitions(lisp PRIVATE "TAGSFILE=\"${LIPS_SOURCE_LOCATION}/Tags\"")
+endif()
 
-# Defining this includes code to take care of signals and ask if the
-# core should be dumped or not.
-target_compile_definitions(lips PRIVATE FANCY_SIGNALS)
+if(ENABLE_LIPSRC)
+  target_compile_definitions(lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/lipsrc\"")
+endif()
 
-# Global init file.
-#target_compile_definitions(lips PRIVATE "LIPSRC=\"/usr/local/lib/lipsrc\"")
+include(GNUInstallDirs)
+install(TARGETS lisp
+  EXPORT lisp)
+install(EXPORT lisp
+  NAMESPACE lisp::
+  FILE lispConfig.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)

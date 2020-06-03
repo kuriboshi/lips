@@ -18,7 +18,7 @@ target_sources(lips PRIVATE
   term.hh
   top.hh
 )
-target_link_libraries(lips PRIVATE libisp)
+target_link_libraries(lips PRIVATE lisp)
 target_compile_options(lips PRIVATE -Wall -Werror)
 
 find_package(Curses)
