@@ -17,8 +17,8 @@
 #include <cerrno>
 #include <cctype>
 
-#include <libisp.hh>
-#include <except.hh>
+#include <libisp/libisp.hh>
+#include <libisp/except.hh>
 #include "main.hh"
 #include "exec.hh"
 #include "top.hh"
@@ -34,13 +34,7 @@ void onintr(int sig)
 {
   if(insidefork)
     exit(0);
-#if 0
-  L->primerr().puts("^C\n");
-  L->e().unwind();
-  throw lisp::lisp_reset();
-#else
   std::longjmp(jumper, sig);
-#endif
 }
 
 /*

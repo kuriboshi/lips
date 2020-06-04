@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libisp.hh>
+#include <libisp/libisp.hh>
 
 extern const char* extilde(const char*, int);
 extern lisp::LISPT expandfiles(const char*, int, int, int);

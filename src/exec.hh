@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <lisp.hh>
-#include <base.hh>
+#include <libisp/lisp.hh>
+#include <libisp/base.hh>
 
 namespace lisp
 {

@@ -6,8 +6,8 @@
 
 #include <cstring>
 
-#include <libisp.hh>
-#include <except.hh>
+#include <libisp/libisp.hh>
+#include <libisp/except.hh>
 #include "main.hh"
 #include "top.hh"
 

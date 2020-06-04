@@ -20,7 +20,7 @@
 #include <cstring>
 #include <csetjmp>
 
-#include <libisp.hh>
+#include <libisp/libisp.hh>
 #include "top.hh"
 #include "main.hh"
 #include "glob.hh"
