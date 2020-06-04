@@ -207,7 +207,8 @@ private:
   // character.
   void pputc(int c, std::FILE* file)
   {
-    if(c < 0x20 && c != '\n' && c != '\t')
+    // Need to generalize this
+    if(c >= 0 && c <= 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
     {
       putc('^', file);
       putc(c + 0x40, file);
@@ -301,12 +302,13 @@ private:
   }
 };
 
-inline bool issepr(lisp& l, int c) { return (l.currentrt.chclass[c] & SEPR) == SEPR; }
-inline bool isbrk(lisp& l, int c) { return (l.currentrt.chclass[c] & BRK) == BRK; }
-inline bool isrm(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == RMACRO; }
-inline bool isinsert(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == INSERT; }
-inline bool issplice(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == SPLICE; }
-inline bool isinfix(lisp& l, int c) { return (l.currentrt.chclass[c] & RMACRO) == INFIX; }
+inline bool isascii(int c) { return c >= 0 && c <= 127; }
+inline bool issepr(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SEPR; }
+inline bool isbrk(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::BRK; }
+inline bool isctrl(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::CTRL; }
+inline bool isinsert(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INSERT; }
+inline bool issplice(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SPLICE; }
+inline bool isinfix(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INFIX; }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool i = false) { return io(l).lispread(f, i); }

@@ -636,8 +636,8 @@ LISPT io::print(LISPT x, file_t& file)
 
 void io::init(lisp& l)
 {
-  l.set_read_table('"', INSERT, io::rmdquote);
-  l.set_read_table('\'', INSERT, io::rmsquote);
+  l.set_read_table('"', char_class::INSERT, io::rmdquote);
+  l.set_read_table('\'', char_class::INSERT, io::rmsquote);
 }
 
 bool io::checkeof(lisp& l, int c, bool line)

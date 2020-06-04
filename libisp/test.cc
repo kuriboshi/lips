@@ -9,6 +9,7 @@
 #include "eval.hh"
 #include "low.hh"
 #include "io.hh"
+#include "file.hh"
 
 namespace
 {
@@ -72,6 +73,54 @@ TEST_CASE("Create lisp object")
     lisp::file_t out2(std::move(sink2));
     prin0(lisp, hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);
+  }
+
+  SUBCASE("Read from utf-8")
+  {
+    std::string s_nihongo{"\"日本語\"\n"};
+    lisp::file_t in{s_nihongo};
+    auto nihongo = lispread(lisp, in, false);
+    auto sink = std::make_unique<lisp::string_sink>();
+    lisp::file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+  }
+
+  SUBCASE("Read from utf-8 2")
+  {
+    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    lisp::file_t in{s_nihongo};
+    auto nihongo = lispread(lisp, in, false);
+    auto sink = std::make_unique<lisp::string_sink>();
+    lisp::file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+  }
+
+  SUBCASE("Read utf-8 from file")
+  {
+    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    {
+      std::ofstream o{"test.lisp"};
+      o << s_nihongo;
+    }
+    auto f = lisp::file_t(std::make_unique<lisp::file_source>("test.lisp"));
+    auto nihongo = lispread(lisp, f, false);
+    auto sink = std::make_unique<lisp::string_sink>();
+    lisp::file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+    std::cout << "lisp::xprint: ";
+    lisp::prin2(lisp, lisp::mkstring(lisp, s_nihongo.c_str()), lisp::C_NIL);
+    std::cout << "From file: " << s_nihongo.c_str() << std::endl;
+  }
+
+  SUBCASE("Reise box")
+  {
+    auto s = lisp::mkstring(lisp, "ライゼボツクス");
+    std::cout << "lisp::xprint: ";
+    lisp::xprint(lisp, s, lisp::C_NIL);
+    std::cout << "Reise box: " << '"' << s->stringval() << '"' << std::endl;
   }
 }
 

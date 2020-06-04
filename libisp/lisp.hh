@@ -264,15 +264,15 @@ struct lisp_t
   void unmark() { gcmark = false; }
 };
 
-enum char_class
+enum class char_class
 {
   NONE = 0,
-  SEPR = 001,   // seperator
-  BRK = 002,    // break character
-  INSERT = 004, // insert read macro
-  SPLICE = 010, // splice read macro
-  INFIX = 014,  // infix read macro
-  RMACRO = 014  // read macro mask
+  SEPR,                         // seperator
+  BRK,                          // break character
+  CTRL,                         // controll character - escaped when printed
+  INSERT,                       // insert read macro
+  SPLICE,                       // splice read macro
+  INFIX                         // infix read macro
 };
 
 struct rtinfo
@@ -355,39 +355,73 @@ public:
   rtinfo currentrt =
   {
     {
-      /* NUL SOH STX ETX EOT ENQ ACK BEL */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* BS  HT  NL  VT  NP  CR  SO  SI  */
-      NONE, SEPR, SEPR, NONE, NONE, NONE, NONE, NONE,
-      /* DLE DC1 DC2 DC3 DC4 NAK SYN ETB */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* CAN EM  SUB ESC FS  GS  RS  US  */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* SP  !   "   #   $   %   &   '   */
-      SEPR, /*SPLICE*/NONE, /*INSERT*/NONE, NONE, NONE, NONE, BRK, /*INSERT*/NONE,
-      /* (   )   *   +   ,   -   .   /   */
-      BRK, BRK, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* 0   1   2   3   4   5   6   7   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* 8   9   :   ;   <   =   >   ?   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* @   A   B   C   D   E   F   G   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* H   I   J   K   L   M   N   O   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* P   Q   R   S   T   U   V   W   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* X   Y   Z   [   \   ]   ^   _   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* `   a   b   c   d   e   f   g   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* h   i   j   k   l   m   n   o   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* p   q   r   s   t   u   v   w   */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
-      /* x   y   z   {   |   }   ~   DEL */
-      NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE },
-    { 0, 0, 0, 0, 0, 0, 0, 0,
+      // NUL SOH STX ETX
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // EOT ENQ ACK BEL
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // BS  HT  NL  VT
+      char_class::CTRL, char_class::SEPR, char_class::SEPR, char_class::CTRL,
+      // NP  CR  SO  SI
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // DLE DC1 DC2 DC3
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // DC4 NAK SYN ETB
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // CAN EM SUB ESC
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // FS GS RS US
+      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
+      // SP  !   "   #
+      char_class::SEPR, char_class::/*SPLICE*/NONE, char_class::/*INSERT*/NONE, char_class::NONE,
+      // $   %   &   '
+      char_class::NONE, char_class::NONE, char_class::BRK, char_class::/*INSERT*/NONE,
+      // (   )   *   +
+      char_class::BRK, char_class::BRK, char_class::NONE, char_class::NONE,
+      // ,   -   .   /
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // 0   1   2   3
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // 4   5   6   7
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // 8   9   :   ;
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // <   =   >   ?
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // @   A   B   C
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // D   E   F   G
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // H   I   J   K
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // L   M   N   O
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // P   Q   R   S
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // T   U   V   W
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // X   Y   Z   [
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // \   ]   ^   _
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // `   a   b   c
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // d   e   f   g
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // h   i   j   k
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // l   m   n   o
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // p   q   r   s
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // t   u   v   w
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // x   y   z   {
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
+      // |   }   ~   DEL
+      char_class::NONE, char_class::NONE, char_class::NONE, char_class::CTRL
+    },
+    {
+      0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
@@ -402,7 +436,8 @@ public:
       0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0 }
+      0, 0, 0, 0, 0, 0, 0, 0
+    }
   };
   /* clang-format on */
   void set_read_table(unsigned char c, enum char_class chcls, rtinfo::rmacro_t macro)
