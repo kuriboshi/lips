@@ -208,7 +208,7 @@ private:
   void pputc(int c, std::FILE* file)
   {
     // Need to generalize this
-    if(c >= 0 && c <= 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
+    if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
     {
       putc('^', file);
       putc(c + 0x40, file);
