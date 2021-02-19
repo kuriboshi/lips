@@ -17,7 +17,7 @@ public:
   virtual ~term_source();
 
   // io::source
-  virtual int getch() override;
+  virtual int getch(bool inside_string) override;
   virtual void ungetch(int) override;
   virtual bool eoln() override;
   virtual bool close() override { return true; }

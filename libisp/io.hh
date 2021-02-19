@@ -257,7 +257,7 @@ public:
 
   // io_source
   io_source& source() { return *_source.get(); }
-  int getch(bool inside_string) { ptrcheck(_source); return _source->getch(inside_string); }
+  int getch(bool inside_string = false) { ptrcheck(_source); return _source->getch(inside_string); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   bool eoln() { ptrcheck(_source); return _source->eoln(); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
