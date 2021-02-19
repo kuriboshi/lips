@@ -372,17 +372,18 @@ tail:
  */
 LISPT io::rmdquote(lisp& l, file_t& file, LISPT, char)
 {
-  char buffer[MAXATOMSIZE];
+  // FIXME: Need to be dynamic to handle arbitrary long strings.
+  char buffer[10240];
   char c;
   int pos = 0;
 
-  c = file.getch();
-  while(c != '"' && pos < MAXATOMSIZE)
+  c = file.getch(true);
+  while(c != '"' && pos < 10240)
   {
     if(c == '\\')
-      c = file.getch();
+      c = file.getch(true);
     buffer[pos++] = c;
-    c = file.getch();
+    c = file.getch(true);
   }
   buffer[pos] = NUL;
   return mkstring(l, buffer);

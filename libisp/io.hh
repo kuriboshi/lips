@@ -76,7 +76,7 @@ public:
 
   static inline constexpr char COMMENTCHAR = '#';
 
-  virtual int getch() = 0;
+  virtual int getch(bool inside_string = false) = 0;
   virtual void ungetch(int) = 0;
   virtual bool eoln() = 0;
   virtual bool close() = 0;
@@ -101,10 +101,10 @@ public:
       fclose(_file);
   }
 
-  virtual int getch() override
+  virtual int getch(bool inside_string) override
   {
     _curc = getc(_file);
-    if(_curc == COMMENTCHAR) /* Skip comments.  */
+    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
       while((_curc = getc(_file)) != '\n')
         ;
     return _curc;
@@ -152,12 +152,12 @@ public:
   string_source(const char* string): _string(string) {}
   string_source(std::string string): _string(string) {}
 
-  virtual int getch() override
+  virtual int getch(bool inside_string) override
   {
     if(_pos == _string.length())
       return -1;
     auto c = _string[_pos++];
-    if(c == COMMENTCHAR) /* Skip comments.  */
+    if(!inside_string && c == COMMENTCHAR) /* Skip comments.  */
       while(_pos != _string.length() && (c = _string[_pos++]) != '\n')
         ;
     return c;
@@ -257,7 +257,7 @@ public:
 
   // io_source
   io_source& source() { return *_source.get(); }
-  int getch() { ptrcheck(_source); return _source->getch(); }
+  int getch(bool inside_string) { ptrcheck(_source); return _source->getch(inside_string); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   bool eoln() { ptrcheck(_source); return _source->eoln(); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
