@@ -74,31 +74,58 @@ public:
 };
 
 inline LISPT plus(lisp& l, LISPT a) { return arith(l).plus(a); }
+inline LISPT plus(LISPT a) { return arith(lisp::current()).plus(a); }
 inline LISPT iplus(lisp& l, LISPT a) { return arith(l).iplus(a); }
+inline LISPT iplus(LISPT a) { return arith(lisp::current()).iplus(a); }
 inline LISPT fplus(lisp& l, LISPT a) { return arith(l).fplus(a); }
+inline LISPT fplus(LISPT a) { return arith(lisp::current()).fplus(a); }
 inline LISPT difference(lisp& l, LISPT a, LISPT b) { return arith(l).difference(a, b); }
+inline LISPT difference(LISPT a, LISPT b) { return arith(lisp::current()).difference(a, b); }
 inline LISPT idifference(lisp& l, LISPT a, LISPT b) { return arith(l).idifference(a, b); }
+inline LISPT idifference(LISPT a, LISPT b) { return arith(lisp::current()).idifference(a, b); }
 inline LISPT fdifference(lisp& l, LISPT a, LISPT b) { return arith(l).fdifference(a, b); }
+inline LISPT fdifference(LISPT a, LISPT b) { return arith(lisp::current()).fdifference(a, b); }
 inline LISPT ltimes(lisp& l, LISPT a) { return arith(l).ltimes(a); }
+inline LISPT ltimes(LISPT a) { return arith(lisp::current()).ltimes(a); }
 inline LISPT itimes(lisp& l, LISPT a) { return arith(l).itimes(a); }
+inline LISPT itimes(LISPT a) { return arith(lisp::current()).itimes(a); }
 inline LISPT ftimes(lisp& l, LISPT a) { return arith(l).ftimes(a); }
+inline LISPT ftimes(LISPT a) { return arith(lisp::current()).ftimes(a); }
 inline LISPT divide(lisp& l, LISPT a, LISPT b) { return arith(l).divide(a, b); }
+inline LISPT divide(LISPT a, LISPT b) { return arith(lisp::current()).divide(a, b); }
 inline LISPT iquotient(lisp& l, LISPT a, LISPT b) { return arith(l).iquotient(a, b); }
+inline LISPT iquotient(LISPT a, LISPT b) { return arith(lisp::current()).iquotient(a, b); }
 inline LISPT iremainder(lisp& l, LISPT a, LISPT b) { return arith(l).iremainder(a, b); }
+inline LISPT iremainder(LISPT a, LISPT b) { return arith(lisp::current()).iremainder(a, b); }
 inline LISPT fdivide(lisp& l, LISPT a, LISPT b) { return arith(l).fdivide(a, b); }
+inline LISPT fdivide(LISPT a, LISPT b) { return arith(lisp::current()).fdivide(a, b); }
 inline LISPT minus(lisp& l, LISPT a) { return arith(l).minus(a); }
+inline LISPT minus(LISPT a) { return arith(lisp::current()).minus(a); }
 inline LISPT iminus(lisp& l, LISPT a) { return arith(l).iminus(a); }
+inline LISPT iminus(LISPT a) { return arith(lisp::current()).iminus(a); }
 inline LISPT absval(lisp& l, LISPT i) { return arith(l).absval(i); }
+inline LISPT absval(LISPT i) { return arith(lisp::current()).absval(i); }
 inline LISPT itof(lisp& l, LISPT i) { return arith(l).itof(i); }
+inline LISPT itof(LISPT i) { return arith(lisp::current()).itof(i); }
 inline LISPT add1(lisp& l, LISPT a) { return arith(l).add1(a); }
+inline LISPT add1(LISPT a) { return arith(lisp::current()).add1(a); }
 inline LISPT sub1(lisp& l, LISPT a) { return arith(l).sub1(a); }
+inline LISPT sub1(LISPT a) { return arith(lisp::current()).sub1(a); }
 inline LISPT greaterp(lisp& l, LISPT x, LISPT y) { return arith(l).greaterp(x, y); }
+inline LISPT greaterp(LISPT x, LISPT y) { return arith(lisp::current()).greaterp(x, y); }
 inline LISPT lessp(lisp& l, LISPT x, LISPT y) { return arith(l).lessp(x, y); }
+inline LISPT lessp(LISPT x, LISPT y) { return arith(lisp::current()).lessp(x, y); }
 inline LISPT eqp(lisp& l, LISPT x, LISPT y) { return arith(l).eqp(x, y); }
+inline LISPT eqp(LISPT x, LISPT y) { return arith(lisp::current()).eqp(x, y); }
 inline LISPT geq(lisp& l, LISPT x, LISPT y) { return arith(l).geq(x, y); }
+inline LISPT geq(LISPT x, LISPT y) { return arith(lisp::current()).geq(x, y); }
 inline LISPT leq(lisp& l, LISPT x, LISPT y) { return arith(l).leq(x, y); }
+inline LISPT leq(LISPT x, LISPT y) { return arith(lisp::current()).leq(x, y); }
 inline LISPT neqp(lisp& l, LISPT x, LISPT y) { return arith(l).neqp(x, y); }
+inline LISPT neqp(LISPT x, LISPT y) { return arith(lisp::current()).neqp(x, y); }
 inline LISPT zerop(lisp& l, LISPT x) { return arith(l).zerop(x); }
+inline LISPT zerop(LISPT x) { return arith(lisp::current()).zerop(x); }
 inline LISPT minusp(lisp& l, LISPT x) { return arith(l).minusp(x); }
+inline LISPT minusp(LISPT x) { return arith(lisp::current()).minusp(x); }
 
 } // namespace lisp

@@ -144,6 +144,9 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
   e().undefhook = nullptr;
   e().breakhook = nullptr;
+
+  if(_current == nullptr)
+    _current = this;
 }
 
 lisp::~lisp() {}
@@ -242,6 +245,8 @@ void lisp::repl(LISPT prompt, breakfun_t f)
     print(*this, eval(*this, expr), primout());
   }
 }
+
+lisp* lisp::_current = nullptr;
 
 //
 // All lisp constants needed internally.

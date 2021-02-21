@@ -39,13 +39,22 @@ public:
 };
 
 inline LISPT numberp(lisp& l, LISPT a) { return pred(l).numberp(a); }
+inline LISPT numberp(LISPT a) { return pred(lisp::current()).numberp(a); }
 inline LISPT listp(lisp& l, LISPT a) { return pred(l).listp(a); }
+inline LISPT listp(LISPT a) { return pred(lisp::current()).listp(a); }
 inline LISPT memb(lisp& l, LISPT x, LISPT y) { return pred(l).memb(x, y); }
+inline LISPT memb(LISPT x, LISPT y) { return pred(lisp::current()).memb(x, y); }
 inline LISPT equal(lisp& l, LISPT l1, LISPT l2) { return pred(l).equal(l1, l2); }
+inline LISPT equal(LISPT l1, LISPT l2) { return pred(lisp::current()).equal(l1, l2); }
 inline LISPT nlistp(lisp& l, LISPT a) { return pred(l).nlistp(a); }
+inline LISPT nlistp(LISPT a) { return pred(lisp::current()).nlistp(a); }
 inline LISPT neq(lisp& l, LISPT a, LISPT b) { return pred(l).neq(a, b); }
+inline LISPT neq(LISPT a, LISPT b) { return pred(lisp::current()).neq(a, b); }
 inline LISPT boundp(lisp& l, LISPT a) { return pred(l).boundp(a); }
+inline LISPT boundp(LISPT a) { return pred(lisp::current()).boundp(a); }
 inline LISPT litatom(lisp& l, LISPT a) { return pred(l).litatom(a); }
+inline LISPT litatom(LISPT a) { return pred(lisp::current()).litatom(a); }
 inline LISPT xtypeof(lisp& l, LISPT a) { return pred(l).xtypeof(a); }
+inline LISPT xtypeof(LISPT a) { return pred(lisp::current()).xtypeof(a); }
 
 } // namespace lisp

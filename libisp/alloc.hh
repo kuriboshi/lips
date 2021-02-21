@@ -122,19 +122,29 @@ private:
 };
 
 inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
+inline LISPT cons(LISPT a, LISPT b) { return cons(lisp::current(), a, b); }
 inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(a); }
+inline LISPT reclaim(LISPT a) { return reclaim(lisp::current(), a); }
 inline LISPT xobarray(lisp& l) { return l.a().xobarray(); }
+inline LISPT xobarray() { return xobarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(); }
+inline LISPT freecount() { return freecount(lisp::current()); }
 
 inline LISPT intern(const char* s) { return alloc::intern(s); }
 
 inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
+inline LISPT mklambda(LISPT args, LISPT def, lisp_type type) { return mklambda(lisp::current(), args, def, type); }
 inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
+inline LISPT mkstring(const char* s) { return mkstring(lisp::current(), s); }
 inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
+inline LISPT mknumber(int i) { return mknumber(lisp::current(), i); }
 inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }
+inline LISPT mkatom(const char* s) { return mkatom(lisp::current(), s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
+inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
+inline LISPT getobject() { return getobject(lisp::current()); }
 
 inline void initcvar(LISPT* cvar, const char* name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 

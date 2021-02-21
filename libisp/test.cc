@@ -162,6 +162,21 @@ TEST_CASE("Basic I/O")
 TEST_CASE("Check size of lisp_t object")
 {
   CHECK(sizeof(lisp::lisp_t::u) == 40);
+  std::cout << "sizeof(std::monostate) = " << sizeof(std::monostate) << '\n';
+  std::cout << "sizeof(lisp::symbol_t) = " << sizeof(lisp::symbol_t) << '\n';
+  std::cout << "sizeof(int) = " << sizeof(int) << '\n';
+  std::cout << "sizeof(double) = " << sizeof(double) << '\n';
+  std::cout << "sizeof(lisp::indirect_t) = " << sizeof(lisp::indirect_t) << '\n';
+  std::cout << "sizeof(lisp::cons_t) = " << sizeof(lisp::cons_t) << '\n';
+  std::cout << "sizeof(char*) = " << sizeof(char*) << '\n';
+  std::cout << "sizeof(lisp::subr_t*) = " << sizeof(lisp::subr_t*) << '\n';
+  std::cout << "sizeof(lisp::lambda_t) = " << sizeof(lisp::lambda_t) << '\n';
+  std::cout << "sizeof(lisp::closure_t) = " << sizeof(lisp::closure_t) << '\n';
+  std::cout << "sizeof(lisp::destblock_t*) = " << sizeof(lisp::destblock_t*) << '\n';
+  std::cout << "sizeof(std::unique_ptr<lisp::file_t>) = " << sizeof(std::unique_ptr<lisp::file_t>) << '\n';
+  std::cout << "sizeof(lisp::free_t) = " << sizeof(lisp::free_t) << '\n';
+  std::cout << "sizeof(lisp::cvariable_t) = " << sizeof(lisp::cvariable_t) << '\n';
+  std::cout << "sizeof(void*) = " << sizeof(void*) << '\n';
 }
 
 using lisp::eval;

@@ -144,15 +144,21 @@ private:
 };
 
 inline LISPT eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
+inline LISPT eval(LISPT expr) { return eval(lisp::current(), expr); }
 inline LISPT eval(lisp& l, std::string expr)
 {
   file_t in(expr);
   auto e = lispread(l, in, false);
   return eval(l, e);
 }
+inline LISPT eval(std::string expr) { return eval(lisp::current(), expr); }
 inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
+inline LISPT apply(LISPT fun, LISPT args) { return apply(lisp::current(), fun, args); }
 inline LISPT baktrace(lisp& l) { return l.e().baktrace(); }
+inline LISPT baktrace() { return baktrace(lisp::current()); }
 inline LISPT topofstack(lisp& l) { return l.e().topofstack(); }
+inline LISPT topofstack() { return topofstack(lisp::current()); }
 inline LISPT envget(lisp& l, LISPT a, LISPT b) { return l.e().envget(a, b); }
+inline LISPT envget(LISPT a, LISPT b) { return envget(lisp::current(), a, b); }
 
 } // namespace lisp

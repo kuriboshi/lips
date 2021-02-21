@@ -311,12 +311,20 @@ inline bool issplice(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[
 inline bool isinfix(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INFIX; }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
+inline LISPT ratom(file_t& f) { return io(lisp::current()).ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool i = false) { return io(l).lispread(f, i); }
+inline LISPT lispread(file_t& f, bool i = false) { return io(lisp::current()).lispread(f, i); }
 inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
+inline LISPT readline(file_t& f) { return io(lisp::current()).readline(f); }
 inline LISPT patom(lisp& l, LISPT a, file_t& f, int i) { return io(l).patom(a, f, i); }
+inline LISPT patom(LISPT a, file_t& f, int i) { return io(lisp::current()).patom(a, f, i); }
 inline LISPT terpri(lisp& l, file_t& f) { return io(l).terpri(f); }
+inline LISPT terpri(file_t& f) { return io(lisp::current()).terpri(f); }
 inline LISPT prinbody(lisp& l, LISPT a, file_t& f, int i) { return io(l).prinbody(a, f, i); }
+inline LISPT prinbody(LISPT a, file_t& f, int i) { return io(lisp::current()).prinbody(a, f, i); }
 inline LISPT prin0(lisp& l, LISPT a, file_t& f, bool i = false) { return io(l).prin0(a, f, i); }
+inline LISPT prin0(LISPT a, file_t& f, bool i = false) { return io(lisp::current()).prin0(a, f, i); }
 inline LISPT print(lisp& l, LISPT a, file_t& f) { return io(l).print(a, f); }
+inline LISPT print(LISPT a, file_t& f) { return io(lisp::current()).print(a, f); }
 
 } // namespace lisp

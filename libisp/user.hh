@@ -35,9 +35,14 @@ private:
 };
 
 inline LISPT funeq(lisp& l, LISPT a, LISPT b) { return user(l).funeq(a, b); }
+inline LISPT funeq(LISPT a, LISPT b) { return user(lisp::current()).funeq(a, b); }
 inline LISPT getrep(lisp& l, LISPT a) { return user(l).getrep(a); }
+inline LISPT getrep(LISPT a) { return user(lisp::current()).getrep(a); }
 inline LISPT define(lisp& l, LISPT a, LISPT b) { return user(l).define(a, b); }
+inline LISPT define(LISPT a, LISPT b) { return user(lisp::current()).define(a, b); }
 inline LISPT de(lisp& l, LISPT a, LISPT b, LISPT c) { return user(l).de(a, b, c); }
+inline LISPT de(LISPT a, LISPT b, LISPT c) { return user(lisp::current()).de(a, b, c); }
 inline LISPT df(lisp& l, LISPT a, LISPT b, LISPT c) { return user(l).df(a, b, c); }
+inline LISPT df(LISPT a, LISPT b, LISPT c) { return user(lisp::current()).df(a, b, c); }
 
 } // namespace lisp

@@ -29,8 +29,11 @@ public:
 };
 
 inline LISPT p_and(lisp& l, LISPT x) { return logic(l).p_and(x); }
+inline LISPT p_and(LISPT x) { return logic(lisp::current()).p_and(x); }
 inline LISPT p_or(lisp& l, LISPT x) { return logic(l).p_or(x); }
+inline LISPT p_or(LISPT x) { return logic(lisp::current()).p_or(x); }
 inline LISPT p_not(lisp& l, LISPT x) { return logic(l).p_not(x); }
+inline LISPT p_not(LISPT x) { return logic(lisp::current()).p_not(x); }
 inline LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   return logic(l).xif(pred, true_expr, false_expr);

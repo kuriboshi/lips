@@ -38,12 +38,20 @@ public:
 };
 
 inline LISPT set(lisp& l, LISPT a, LISPT b) { return low(l).set(a, b); }
+inline LISPT set(LISPT a, LISPT b) { return low(lisp::current()).set(a, b); }
 inline LISPT setq(lisp& l, LISPT a, LISPT b) { return low(l).setq(a, b); }
+inline LISPT setq(LISPT a, LISPT b) { return low(lisp::current()).setq(a, b); }
 inline LISPT setqq(lisp& l, LISPT a, LISPT b) { return low(l).set(a, b); }
+inline LISPT setqq(LISPT a, LISPT b) { return low(lisp::current()).set(a, b); }
 inline LISPT cond(lisp& l, LISPT a) { return low(l).cond(a); }
+inline LISPT cond(LISPT a) { return low(lisp::current()).cond(a); }
 inline LISPT xwhile(lisp& l, LISPT a, LISPT b) { return low(l).xwhile(a, b); }
+inline LISPT xwhile(LISPT a, LISPT b) { return low(lisp::current()).xwhile(a, b); }
 inline LISPT progn(lisp& l, LISPT a) { return low(l).progn(a); }
+inline LISPT progn(LISPT a) { return low(lisp::current()).progn(a); }
 inline LISPT prog1(lisp& l, LISPT a, LISPT b) { return low(l).prog1(a, b); }
+inline LISPT prog1(LISPT a, LISPT b) { return low(lisp::current()).prog1(a, b); }
 inline LISPT prog2(lisp& l, LISPT a, LISPT b, LISPT c) { return low(l).prog2(a, b, c); }
+inline LISPT prog2(LISPT a, LISPT b, LISPT c) { return low(lisp::current()).prog2(a, b, c); }
 
 } // namespace lisp

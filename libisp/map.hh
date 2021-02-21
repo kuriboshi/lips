@@ -29,8 +29,12 @@ public:
 };
 
 inline LISPT xmap(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).xmap(a, b, c); }
+inline LISPT xmap(LISPT a, LISPT b, LISPT c) { return map(lisp::current()).xmap(a, b, c); }
 inline LISPT mapc(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).mapc(a, b, c); }
+inline LISPT mapc(LISPT a, LISPT b, LISPT c) { return map(lisp::current()).mapc(a, b, c); }
 inline LISPT maplist(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).maplist(a, b, c); }
+inline LISPT maplist(LISPT a, LISPT b, LISPT c) { return map(lisp::current()).maplist(a, b, c); }
 inline LISPT mapcar(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).mapcar(a, b, c); }
+inline LISPT mapcar(LISPT a, LISPT b, LISPT c) { return map(lisp::current()).mapcar(a, b, c); }
 
 } // namespace lisp

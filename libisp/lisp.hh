@@ -302,6 +302,7 @@ public:
   ~lisp();
   alloc& a() const { return _alloc; }
   evaluator& e() const { return _eval; };
+  static lisp& current() { return *_current; }
 
   file_t& primout() const { return *_primout; }
   file_t& primerr() const { return *_primerr; }
@@ -455,12 +456,17 @@ private:
   file_t* _stdout = nullptr;
   file_t* _stderr = nullptr;
   file_t* _stdin = nullptr;
+  static lisp* _current;
 };
 
 inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }
+inline LISPT perror(int i, LISPT a) { return perror(lisp::current(), i, a); }
 inline LISPT error(lisp& l, int i, LISPT a) { return l.error(i, a); }
+inline LISPT error(int i, LISPT a) { return error(lisp::current(), i, a); }
 inline LISPT syserr(lisp& l, LISPT a) { return l.syserr(a); }
+inline LISPT syserr(LISPT a) { return syserr(lisp::current(), a); }
 inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
+inline LISPT break0(LISPT a) { return break0(lisp::current(), a); }
 
 inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
 inline void check(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check(arg, type0, type1); }
