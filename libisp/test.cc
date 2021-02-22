@@ -110,7 +110,7 @@ TEST_CASE("Create lisp object")
     lisp::file_t out(std::move(sink));
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
-    std::cout << "lisp::xprint: ";
+    std::cout << "lisp::print: ";
     lisp::prin2(lisp, lisp::mkstring(lisp, s_nihongo.c_str()), lisp::C_NIL);
     std::cout << "From file: " << s_nihongo.c_str() << std::endl;
   }
@@ -118,8 +118,8 @@ TEST_CASE("Create lisp object")
   SUBCASE("Reise box")
   {
     auto s = lisp::mkstring(lisp, "ライゼボツクス");
-    std::cout << "lisp::xprint: ";
-    lisp::xprint(lisp, s, lisp::C_NIL);
+    std::cout << "lisp::print: ";
+    lisp::print(lisp, s, lisp::C_NIL);
     std::cout << "Reise box: " << '"' << s->stringval() << '"' << std::endl;
   }
 }

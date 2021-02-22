@@ -8,14 +8,14 @@
 
 namespace lisp
 {
-PRIMITIVE file::xratom(LISPT file)
+PRIMITIVE file::ratom(LISPT file)
 {
   if(is_NIL(file))
-    return ratom(l, l.primin());
+    return ::lisp::ratom(l, l.primin());
   if(is_T(file))
-    return ratom(l, l.stdin());
+    return ::lisp::ratom(l, l.stdin());
   l.check(file, FILET);
-  return ratom(l, file->fileval());
+  return ::lisp::ratom(l, file->fileval());
 }
 
 PRIMITIVE file::readc(LISPT file)
@@ -28,7 +28,7 @@ PRIMITIVE file::readc(LISPT file)
   return a.mknumber(file->fileval().getch());
 }
 
-PRIMITIVE file::xread(LISPT file)
+PRIMITIVE file::read(LISPT file)
 {
   if(is_NIL(file))
     return lispread(l, l.primin(), false);
@@ -38,14 +38,14 @@ PRIMITIVE file::xread(LISPT file)
   return lispread(l, file->fileval(), false);
 }
 
-PRIMITIVE file::xprint(LISPT x, LISPT file)
+PRIMITIVE file::print(LISPT x, LISPT file)
 {
   if(is_NIL(file))
-    return print(l, x, l.primout());
+    return ::lisp::print(l, x, l.primout());
   if(is_T(file))
-    return print(l, x, l.primerr());
+    return ::lisp::print(l, x, l.primerr());
   l.check(file, FILET);
-  return print(l, x, file->fileval());
+  return ::lisp::print(l, x, file->fileval());
 }
 
 bool file::loadfile(const char* lf)
@@ -71,14 +71,14 @@ PRIMITIVE file::load(LISPT f)
   return f;
 }
 
-PRIMITIVE file::xterpri(LISPT file)
+PRIMITIVE file::terpri(LISPT file)
 {
   if(is_NIL(file))
-    return terpri(l, l.primout());
+    return ::lisp::terpri(l, l.primout());
   if(is_T(file))
-    return terpri(l, l.primerr());
+    return ::lisp::terpri(l, l.primerr());
   l.check(file, FILET);
-  return terpri(l, file->fileval());
+  return ::lisp::terpri(l, file->fileval());
 }
 
 PRIMITIVE file::prin1(LISPT x, LISPT file)
@@ -133,14 +133,14 @@ PRIMITIVE file::spaces(LISPT n, LISPT file)
   return C_NIL;
 }
 
-PRIMITIVE file::xreadline(LISPT file)
+PRIMITIVE file::readline(LISPT file)
 {
   if(is_NIL(file))
-    return readline(l, l.primin());
+    return ::lisp::readline(l, l.primin());
   else if(is_T(file))
-    return readline(l, l.stdin());
+    return ::lisp::readline(l, l.stdin());
   l.check(file, FILET);
-  return readline(l, file->fileval());
+  return ::lisp::readline(l, file->fileval());
 }
 
 PRIMITIVE file::cpprint(LISPT oname, LISPT file)
@@ -240,14 +240,14 @@ void file::init()
   mkprim(PN_LOAD,     ::lisp::load,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_PRIN1,    ::lisp::prin1,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_PRIN2,    ::lisp::prin2,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PRINT,    ::lisp::xprint,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PRINT,    ::lisp::print,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_PLEVEL,   ::lisp::plevel,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_RATOM,    ::lisp::xratom,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_READ,     ::lisp::xread,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_RATOM,    ::lisp::ratom,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_READ,     ::lisp::read,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_READC,    ::lisp::readc,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_READLINE, ::lisp::xreadline, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_READLINE, ::lisp::readline,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_SPACES,   ::lisp::spaces,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_TERPRI,   ::lisp::xterpri,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_TERPRI,   ::lisp::terpri,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
   mkprim(PN_CPPRINT,  ::lisp::cpprint,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
   // clang-format on
 }

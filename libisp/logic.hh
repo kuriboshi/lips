@@ -38,5 +38,9 @@ inline LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   return logic(l).xif(pred, true_expr, false_expr);
 }
+inline LISPT xif(LISPT pred, LISPT true_expr, LISPT false_expr)
+{
+  return xif(lisp::current(), pred, true_expr, false_expr);
+}
 
 } // namespace lisp

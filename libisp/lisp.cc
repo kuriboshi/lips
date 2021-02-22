@@ -205,7 +205,7 @@ static int dobreak(lisp& l, LISPT* com)
   }
   else if(EQ((**com).car(), C_GO))
   {
-    l.pexp = xprint(l, eval(l, l.pexp), C_NIL);
+    l.pexp = print(l, eval(l, l.pexp), C_NIL);
     return 0;
   }
   else if(EQ((**com).car(), C_RESET))

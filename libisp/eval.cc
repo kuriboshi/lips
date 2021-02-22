@@ -108,7 +108,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     (*breakhook)();
   if(env == nullptr)
     throw lisp_error("break");
-  file(l).xprint(cons(l, fault, cons(l, C_BROKEN, C_NIL)), C_T);
+  file(l).print(cons(l, fault, cons(l, C_BROKEN, C_NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -273,7 +273,7 @@ bool evaluator::peval()
 {
 #ifdef TRACE
   if(_trace)
-    file(l).xprint(expression, C_T);
+    file(l).print(expression, C_T);
 #endif
   push_lisp(expression);
   push_func(&evaluator::ev0);
@@ -525,7 +525,7 @@ void evaluator::bt()
   for(int i = toctrl - 1; i; i--)
   {
     if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
-      file(l).xprint(control[i - 1].u.lisp, C_T);
+      file(l).print(control[i - 1].u.lisp, C_T);
   }
   l.printlevel = op;
 }
@@ -911,7 +911,7 @@ PRIMITIVE evaluator::baktrace()
     switch(control[i].type)
     {
       case CTRL_LISP:
-        file(l).xprint(control[i].u.lisp, C_T);
+        file(l).print(control[i].u.lisp, C_T);
         break;
       case CTRL_POINT:
         l.primerr().printf("destblock\n");

@@ -124,7 +124,7 @@ static void printjob(job_t* job)
   }
   strcat(buffer, "\t");
   L->primout().puts(buffer);
-  xprint(*L, job->exp, C_NIL);
+  print(*L, job->exp, C_NIL);
 }
 #endif
 

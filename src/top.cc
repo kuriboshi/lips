@@ -188,7 +188,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     {
       if(type_of(eval(*L, promptform)) == ERROR)
       {
-        xprint(*L, mkstring(*L, "Error in promptform, reset to nil"), C_T);
+        print(*L, mkstring(*L, "Error in promptform, reset to nil"), C_T);
         promptform = C_NIL;
       }
       promptprint(*tprompt);
@@ -226,7 +226,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     alias_expanded = C_NIL;
     topexp = eval(*L, topexp);
     if(printit)
-      xprint(*L, topexp, C_T);
+      print(*L, topexp, C_T);
     if(!options.interactive && options.command)
       return false;
     top::trimhist();
