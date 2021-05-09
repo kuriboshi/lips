@@ -169,7 +169,7 @@ public:
 
 private:
   std::string _string;
-  int _pos = 0;
+  std::size_t _pos = 0;
 };
 
 class io_sink

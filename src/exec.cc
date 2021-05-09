@@ -115,10 +115,10 @@ static void printjob(job_t* job)
   else if(WIFEXITED(job->status))
     strcat(buffer, "Done");
   else if(WIFSTOPPED(job->status))
-    strcat(buffer, sys_siglist[WSTOPSIG(job->status)]);
+    strcat(buffer, strsignal(WSTOPSIG(job->status)));
   else
   {
-    strcat(buffer, sys_siglist[WTERMSIG(job->status)]);
+    strcat(buffer, strsignal(WTERMSIG(job->status)));
     if(WCOREDUMP(job->status))
       strcat(buffer, " (core dumped)");
   }
