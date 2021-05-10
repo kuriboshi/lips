@@ -53,9 +53,11 @@ target_include_directories(lisp PUBLIC
   $<INSTALL_INTERFACE:include/libisp>
   )
 target_compile_options(lisp PRIVATE -Wall -Werror)
-target_link_libraries(lisp doctest)
-target_link_libraries(lisp fmt::fmt)
+target_link_libraries(lisp
+  fmt::fmt)
 add_executable(test test.cc)
-target_link_libraries(test lisp)
+target_link_libraries(test
+  lisp
+  doctest::doctest)
 add_executable(main main.cc)
 target_link_libraries(main lisp)
