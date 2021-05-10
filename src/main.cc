@@ -63,7 +63,7 @@ static int getuser(int def)
   switch(select(FD_SETSIZE, &readfs, nullptr, nullptr, &timeout))
   {
     case -1:
-      L->primerr().printf("(error in select %d) ", errno);
+      L->primerr().format("(error in select {}) ", errno);
       return 'n';
       break;
     case 0:
@@ -90,23 +90,23 @@ void core(int sig)
   // init_term();
   if(insidefork)
   {
-    L->primerr().printf(" -- (in fork) core dumped\n");
+    L->primerr().format(" -- (in fork) core dumped\n");
     killpg(getpgrp(), sig);
   }
-  L->primerr().printf(" -- Continue? ");
+  L->primerr().format(" -- Continue? ");
   L->primerr().flush();
   int c = getuser('y');
   while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
   if((islower(c) ? c : tolower(c)) == 'n')
   {
-    L->primerr().printf("No\n");
-    L->primerr().printf("Core dump? ");
+    L->primerr().format("No\n");
+    L->primerr().format("Core dump? ");
     L->primerr().flush();
     c = getuser('y');
     while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
     if((islower(c) ? c : tolower(c)) == 'n')
     {
-      L->primerr().printf("No\n");
+      L->primerr().format("No\n");
       throw lisp::lisp_finish("core", 0);
     }
     else
@@ -119,9 +119,9 @@ void core(int sig)
   }
   else
   {
-    L->primerr().printf("Yes\n");
-    L->primerr().printf("Warning: continued after signal %d.\n", sig);
-    L->primerr().printf("Save your work and exit.\n");
+    L->primerr().format("Yes\n");
+    L->primerr().format("Warning: continued after signal {}.\n", sig);
+    L->primerr().format("Save your work and exit.\n");
     term_source::end_term();
     throw lisp::lisp_error("continue after signal");
   }
@@ -135,19 +135,19 @@ void onquit(int sig)
 
 void onbus(int sig)
 {
-  L->primerr().printf("%s: Bus error!", progname);
+  L->primerr().format("{}: Bus error!", progname);
   std::longjmp(jumper, sig);
 }
 
 void onsegv(int sig)
 {
-  L->primerr().printf("%s: Segmentation violation!", progname);
+  L->primerr().format("{}: Segmentation violation!", progname);
   std::longjmp(jumper, sig);
 }
 
 void onill(int sig)
 {
-  L->primerr().printf("%s: Illegal instruction!", progname);
+  L->primerr().format("{}: Illegal instruction!", progname);
   std::longjmp(jumper, sig);
 }
 
@@ -496,7 +496,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_finish& fin)
     {
-      L->stderr().printf("finish: %s", fin.what());
+      L->stderr().format("finish: {}", fin.what());
       return fin.exit_code;
     }
   }

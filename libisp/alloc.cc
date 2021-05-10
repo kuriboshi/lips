@@ -171,7 +171,7 @@ void alloc::mark(LISPT x)
 LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
-    _lisp.primerr().printf("garbage collecting\n");
+    _lisp.primerr().format("garbage collecting\n");
 #ifdef FLOATING
   for(int i = 0; i < 4; i++) floats.marks[i] = 0;
   point = 31;
@@ -230,7 +230,7 @@ LISPT alloc::doreclaim(int incr)
     while(incr-- > 0); /* At least one page more */
   }
   if(is_NIL(gcgag))
-    _lisp.primerr().printf("%d cells freed\n", nrfreed);
+    _lisp.primerr().format("{} cells freed\n", nrfreed);
   return C_NIL;
 }
 
@@ -579,7 +579,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   conscells = newpage(); /* Allocate one page of storage */
   if(conscells == nullptr)
   {
-    _lisp.primerr().printf("Cons cells memory exhausted\n");
+    _lisp.primerr().format("Cons cells memory exhausted\n");
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
   sweep();

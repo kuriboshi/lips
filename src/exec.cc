@@ -562,7 +562,7 @@ PRIMITIVE exec::to(LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr().printf("%s\n", strerror(errno));
+      l.stderr().format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmd);
@@ -596,7 +596,7 @@ PRIMITIVE exec::toto(LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      L->stderr().printf("%s\n", strerror(errno));
+      L->stderr().format("{}\n", strerror(errno));
       exit(1);
     }
     eval(*L, cmd);
@@ -630,7 +630,7 @@ PRIMITIVE exec::from(LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr().printf("%s\n", strerror(errno));
+      l.stderr().format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmd);
@@ -661,7 +661,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
       close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        l.stderr().printf("%s\n", strerror(errno));
+        l.stderr().format("{}\n", strerror(errno));
         exit(1);
       }
       eval(l, cmds->car());
@@ -673,7 +673,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
     close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      l.stderr().printf("%s\n", strerror(errno));
+      l.stderr().format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmds->car());

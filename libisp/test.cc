@@ -155,7 +155,7 @@ TEST_CASE("Basic I/O")
 
   auto out0 = std::make_unique<lisp::string_sink>();
   lisp.primout(*new lisp::file_t(std::move(out0)));
-  lisp.primout().printf("hello world %d", 123);
+  lisp.primout().format("hello world {}", 123);
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
 

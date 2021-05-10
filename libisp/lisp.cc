@@ -170,9 +170,9 @@ void lisp::primin(file_t& f)
 LISPT lisp::perror(int messnr, LISPT arg)
 {
   if(NOT_A & messnr)
-    primerr().printf("%s ", errmess[error_code(messnr)]);
+    primerr().format("{} ", errmess[error_code(messnr)]);
   else
-    primerr().printf("%s ", messages[error_code(messnr)]);
+    primerr().format("{} ", messages[error_code(messnr)]);
   if(messnr & (PRINT_ARG | NOT_A))
     prin2(*this, arg, C_T);
   return C_ERROR;
@@ -189,9 +189,9 @@ LISPT lisp::syserr(LISPT fault)
   if(!is_NIL(fault))
   {
     prin2(*this, fault, C_T);
-    primerr().printf(": ");
+    primerr().format(": ");
   }
-  primerr().printf("%s", strerror(errno));
+  primerr().format("{}", strerror(errno));
   return C_ERROR;
 }
 

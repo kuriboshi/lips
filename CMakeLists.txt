@@ -20,6 +20,10 @@ set(LIPS_SOURCE_LOCATION "${CMAKE_INSTALL_PREFIX}/src/lips" CACHE
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(external)
 
+list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/install")
+add_subdirectory(external)
+find_package(fmt REQUIRED)
+
 add_subdirectory(libisp)
 add_subdirectory(src)
 

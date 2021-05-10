@@ -32,7 +32,7 @@ LISPT evaluator::printwhere()
           && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
         {
           foo = control[i - 1].u.lisp;
-          l.primerr().printf(" [in ");
+          l.primerr().format(" [in ");
           file(l).prin2(foo->car(), C_T);
           l.primerr().putch(']');
           goto out;
@@ -907,84 +907,84 @@ PRIMITIVE evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
-    l.primerr().printf("%d: ", i);
+    l.primerr().format("{}: ", i);
     switch(control[i].type)
     {
       case CTRL_LISP:
         file(l).print(control[i].u.lisp, C_T);
         break;
       case CTRL_POINT:
-        l.primerr().printf("destblock\n");
+        l.primerr().format("destblock\n");
         break;
       case CTRL_FUNC:
         if(control[i].u.f_point == &evaluator::ev0)
-          l.primerr().printf("ev0\n");
+          l.primerr().format("ev0\n");
         else if(control[i].u.f_point == &evaluator::peval)
-          l.primerr().printf("peval\n");
+          l.primerr().format("peval\n");
         else if(control[i].u.f_point == &evaluator::peval1)
-          l.primerr().printf("peval1\n");
+          l.primerr().format("peval1\n");
         else if(control[i].u.f_point == &evaluator::peval2)
-          l.primerr().printf("peval2\n");
+          l.primerr().format("peval2\n");
         else if(control[i].u.f_point == &evaluator::ev0)
-          l.primerr().printf("ev0\n");
+          l.primerr().format("ev0\n");
         else if(control[i].u.f_point == &evaluator::ev1)
-          l.primerr().printf("ev1\n");
+          l.primerr().format("ev1\n");
         else if(control[i].u.f_point == &evaluator::ev2)
-          l.primerr().printf("ev2\n");
+          l.primerr().format("ev2\n");
         else if(control[i].u.f_point == &evaluator::ev3)
-          l.primerr().printf("ev3\n");
+          l.primerr().format("ev3\n");
         else if(control[i].u.f_point == &evaluator::ev4)
-          l.primerr().printf("ev4\n");
+          l.primerr().format("ev4\n");
         else if(control[i].u.f_point == &evaluator::evlam0)
-          l.primerr().printf("evlam0\n");
+          l.primerr().format("evlam0\n");
         else if(control[i].u.f_point == &evaluator::evlam1)
-          l.primerr().printf("evlam1\n");
+          l.primerr().format("evlam1\n");
         else if(control[i].u.f_point == &evaluator::ev9)
-          l.primerr().printf("ev9\n");
+          l.primerr().format("ev9\n");
         else if(control[i].u.f_point == &evaluator::ev11)
-          l.primerr().printf("ev11\n");
+          l.primerr().format("ev11\n");
         else if(control[i].u.f_point == &evaluator::ev3p)
-          l.primerr().printf("ev3p\n");
+          l.primerr().format("ev3p\n");
         else if(control[i].u.f_point == &evaluator::evalargs)
-          l.primerr().printf("evalargs\n");
+          l.primerr().format("evalargs\n");
         else if(control[i].u.f_point == &evaluator::noevarg)
-          l.primerr().printf("noevarg\n");
+          l.primerr().format("noevarg\n");
         else if(control[i].u.f_point == &evaluator::evlam)
-          l.primerr().printf("evlam\n");
+          l.primerr().format("evlam\n");
         else if(control[i].u.f_point == &evaluator::spread)
-          l.primerr().printf("spread\n");
+          l.primerr().format("spread\n");
         else if(control[i].u.f_point == &evaluator::evlis)
-          l.primerr().printf("evlis\n");
+          l.primerr().format("evlis\n");
         else if(control[i].u.f_point == &evaluator::evlis1)
-          l.primerr().printf("evlis1\n");
+          l.primerr().format("evlis1\n");
         else if(control[i].u.f_point == &evaluator::evlis2)
-          l.primerr().printf("evlis2\n");
+          l.primerr().format("evlis2\n");
         else if(control[i].u.f_point == &evaluator::evlis3)
-          l.primerr().printf("evlis3\n");
+          l.primerr().format("evlis3\n");
         else if(control[i].u.f_point == &evaluator::evlis4)
-          l.primerr().printf("evlis4\n");
+          l.primerr().format("evlis4\n");
         else if(control[i].u.f_point == &evaluator::noev9)
-          l.primerr().printf("noev9\n");
+          l.primerr().format("noev9\n");
         else if(control[i].u.f_point == &evaluator::evsequence)
-          l.primerr().printf("evsequence\n");
+          l.primerr().format("evsequence\n");
         else if(control[i].u.f_point == &evaluator::evseq1)
-          l.primerr().printf("evseq1\n");
+          l.primerr().format("evseq1\n");
         else if(control[i].u.f_point == &evaluator::evseq3)
-          l.primerr().printf("evseq3\n");
+          l.primerr().format("evseq3\n");
         else if(control[i].u.f_point == &evaluator::evclosure)
-          l.primerr().printf("evclosure\n");
+          l.primerr().format("evclosure\n");
         else if(control[i].u.f_point == &evaluator::evclosure1)
-          l.primerr().printf("evclosure1\n");
+          l.primerr().format("evclosure1\n");
         else if(control[i].u.f_point == &evaluator::eval0)
-          l.primerr().printf("eval0\n");
+          l.primerr().format("eval0\n");
         else if(control[i].u.f_point == &evaluator::apply0)
-          l.primerr().printf("apply0\n");
+          l.primerr().format("apply0\n");
         else if(control[i].u.f_point == &evaluator::everr)
-          l.primerr().printf("everr\n");
+          l.primerr().format("everr\n");
         else if(control[i].u.f_point == &evaluator::lookup)
-          l.primerr().printf("lookup\n");
+          l.primerr().format("lookup\n");
         else
-          l.stderr().printf("Unknown control stack element\n");
+          l.stderr().format("Unknown control stack element\n");
         break;
     }
   }

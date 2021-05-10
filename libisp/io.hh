@@ -10,6 +10,7 @@
 #include <cstring>
 #include <optional>
 #include <string>
+#include <fmt/format.h>
 #include "lisp.hh"
 #include "base.hh"
 #include "except.hh"
@@ -269,14 +270,11 @@ public:
   void terpri() { ptrcheck(_sink); _sink->terpri(); }
   void flush() { ptrcheck(_sink); _sink->flush(); }
 
-  void printf(const char* format, ...)
+  template<typename... Ts>
+  void format(Ts&&... t)
   {
-    va_list ap;
-    va_start(ap, format);
-    char* ret;
-    vasprintf(&ret, format, ap);
-    va_end(ap);
-    _sink->puts(ret);
+    auto ret = fmt::format(t...);
+    _sink->puts(ret.c_str());
   }
 
   bool close()

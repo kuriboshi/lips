@@ -489,10 +489,8 @@ static void pi(long i, int base, file_t& file)
 
 static void pf(double d, file_t& file)
 {
-  char ss[30];
-
-  sprintf(ss, "%#g", d);
-  ps(ss, file, 0);
+  auto ss = fmt::format("{:#g}", d);
+  ps(ss.c_str(), file, 0);
 }
 
 // Print pointer type object

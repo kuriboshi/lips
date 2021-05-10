@@ -54,6 +54,7 @@ target_include_directories(lisp PUBLIC
   )
 target_compile_options(lisp PRIVATE -Wall -Werror)
 target_link_libraries(lisp doctest)
+target_link_libraries(lisp fmt::fmt)
 add_executable(test test.cc)
 target_link_libraries(test lisp)
 add_executable(main main.cc)
