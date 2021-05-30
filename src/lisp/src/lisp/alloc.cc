@@ -4,7 +4,6 @@
  *
  */
 
-#include <cstdio>
 #include "alloc.hh"
 #include "error.hh"
 #include "eval.hh"
@@ -339,14 +338,10 @@ void alloc::mkprim(const char* pname, func3_t fname, subr_t::subr_type subr, sub
  * mkstring - Strings are stored in a cons cell with car set to NIL and
  *            cdr is set to the string pointer.
  */
-LISPT alloc::mkstring(const char* str)
+LISPT alloc::mkstring(const std::string& str)
 {
-  auto* c = realmalloc((unsigned)strlen(str) + 1);
-  if(c == nullptr)
-    return C_ERROR;
-  strcpy(c, str);
   LISPT s = getobject();
-  s->stringval(c);
+  s->stringval(str);
   return s;
 }
 
@@ -440,11 +435,11 @@ LISPT alloc::buildatom(const char* s, bool copy, LISPT newatom)
   return l;
 }
 
-alloc::obarray_t* alloc::findatom(int hv, const char* str, obarray_t* obarray[])
+alloc::obarray_t* alloc::findatom(int hv, const std::string& str, obarray_t* obarray[])
 {
   for(auto* ob = *(obarray + hv); ob; ob = ob->onext)
   {
-    if(!strcmp(ob->sym->symval().pname, str))
+    if(ob->sym->symval().pname == str)
       return ob;
   }
   return nullptr;

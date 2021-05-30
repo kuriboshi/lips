@@ -48,7 +48,7 @@ PRIMITIVE file::print(LISPT x, LISPT file)
   return ::lisp::print(l, x, file->fileval());
 }
 
-bool file::loadfile(const char* lf)
+bool file::loadfile(const std::string& lf)
 {
   try
   {

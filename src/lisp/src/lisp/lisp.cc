@@ -3,8 +3,8 @@
 // Copyright 2020 Krister Joas
 //
 
-#include <cstdio>
-#include <cerrno>
+#include <cstring>              // For strerror
+#include <cerrno>               // For errno
 #include "libisp.hh"
 #include "except.hh"
 #include "error.hh"
@@ -149,7 +149,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     _current = this;
 }
 
-lisp::~lisp() {}
+lisp::~lisp() = default;
 
 void lisp::primout(file_t& f)
 {

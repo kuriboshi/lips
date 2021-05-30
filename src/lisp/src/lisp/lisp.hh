@@ -12,7 +12,7 @@
 
 #include <variant>
 #include <memory>
-#include <cstdio>
+#include <string>
 #include "error.hh"
 
 namespace lisp
@@ -108,7 +108,7 @@ struct cons_t
 
 struct symbol_t
 {
-  const char* pname = nullptr;  // The printname of the atom
+  std::string pname;  // The printname of the atom
   LISPT value = C_NIL;
   LISPT plist = C_NIL;          // The property list
   LISPT topval = C_NIL;         // Holds top value (not used yet)
@@ -194,7 +194,7 @@ struct lisp_t
     double,                     // FLOAT (3)
     indirect_t,                 // INDIRECT (4)
     cons_t,                     // CONS (5)
-    char*,                      // STRING (6)
+    std::string,                // STRING (6)
     subr_t*,                    // SUBR (7)
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
@@ -230,8 +230,8 @@ struct lisp_t
   LISPT cdr() { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
   void cdr(LISPT x) { std::get<cons_t>(u).cdr = x; }
-  const char* stringval() const { return std::get<char*>(u); }
-  void stringval(char* s)
+  const std::string& stringval() const { return std::get<std::string>(u); }
+  void stringval(const std::string& s)
   {
     type = STRING;
     u = s;
@@ -252,7 +252,7 @@ struct lisp_t
   void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
   void* cpointval() { return std::get<void*>(u); }
 
-  const char* getstr() const { return type == STRING ? stringval() : std::get<symbol_t>(u).pname; }
+  const std::string& getstr() const { return type == STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
   //
   // Some more or less helpfull functions

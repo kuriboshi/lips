@@ -73,7 +73,7 @@ public:
   static void mkprim(const char* pname, func3_t fname, subr_t::subr_type, subr_t::spread_type);
 
   LISPT mklambda(LISPT args, LISPT def, lisp_type type);
-  LISPT mkstring(const char*);
+  LISPT mkstring(const std::string&);
   LISPT mknumber(int);
   LISPT mkatom(const char*);
   LISPT mkfloat(double);
@@ -110,7 +110,7 @@ private:
   LISPT mkarglis(LISPT alist, int& count);
 
   static LISPT buildatom(const char* s, bool copy, LISPT newatom);
-  static obarray_t* findatom(int hv, const char* str, obarray_t* obarray[]);
+  static obarray_t* findatom(int hv, const std::string& str, obarray_t* obarray[]);
   static int hash(const char* str);
   static LISPT puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom);
   static LISPT mkprim(const char* pname, subr_t* subr);
@@ -134,8 +134,8 @@ inline LISPT intern(const char* s) { return alloc::intern(s); }
 
 inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
 inline LISPT mklambda(LISPT args, LISPT def, lisp_type type) { return mklambda(lisp::current(), args, def, type); }
-inline LISPT mkstring(lisp& l, const char* s) { return l.a().mkstring(s); }
-inline LISPT mkstring(const char* s) { return mkstring(lisp::current(), s); }
+inline LISPT mkstring(lisp& l, const std::string& s) { return l.a().mkstring(s); }
+inline LISPT mkstring(const std::string& s) { return mkstring(lisp::current(), s); }
 inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
 inline LISPT mknumber(int i) { return mknumber(lisp::current(), i); }
 inline LISPT mkatom(lisp& l, const char* s) { return l.a().mkatom(s); }

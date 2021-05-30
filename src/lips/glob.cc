@@ -153,7 +153,7 @@ const char* extilde(const char* w, int rep)
     return w;
   w++;
   if(*w == '/' || !*w)
-    strcpy(s, home->getstr());
+    strcpy(s, home->getstr().c_str());
   else
   {
     if(index(w, '/') == nullptr)
@@ -291,7 +291,7 @@ PRIMITIVE expand(::lisp::lisp& l, LISPT wild, LISPT rep, LISPT all)
   if(is_NIL(rep))
     r = 1;
   l.check(wild, STRING, SYMBOL);
-  wstr = extilde(wild->getstr(), r);
+  wstr = extilde(wild->getstr().c_str(), r);
   if(wstr == nullptr)
     return C_NIL;
   return expandfiles(wstr, is_NIL(all) ? 0 : 1, r, 0);

@@ -349,11 +349,11 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
   LISPT stripped;
   const char* s;
 
-  if(strncmp(files->car()->getstr(), prefix, strlen(prefix) - 1) != 0)
+  if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;
   for(stripped = cons(*L, lisp::C_NIL, lisp::C_NIL); !is_NIL(files); files = files->cdr())
   {
-    s = files->car()->getstr() + strlen(prefix) - strlen(suffix);
+    s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
     tconc(*L, stripped, mkstring(*L, s));
   }
@@ -591,7 +591,7 @@ std::optional<std::string> term_source::getline()
         if(type_of(ex) == lisp::CONS && strlen(s) > 1)
           ex = strip(ex, t, s);
         if(type_of(ex) == lisp::CONS && is_NIL(ex->cdr()))
-          fillrest(ex->car()->getstr());
+          fillrest(ex->car()->getstr().c_str());
         else
         {
           if(type_of(ex) == lisp::CONS)

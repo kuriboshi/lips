@@ -458,9 +458,10 @@ LISPT io::readline(file_t& file)
 }
 
 /* print the string s, on stream file */
-static void ps(const char* s, file_t& file, bool esc)
+static void ps(const std::string& s, file_t& file, bool esc)
 {
-  while(*s) file.putch(*s++, esc);
+  for(auto c: s)
+    file.putch(c, esc);
 }
 
 static void pi(long i, int base, file_t& file)

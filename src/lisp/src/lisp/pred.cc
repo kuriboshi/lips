@@ -4,8 +4,6 @@
  *
  */
 
-#include <cstring>
-
 #include "libisp.hh"
 
 namespace lisp
@@ -69,7 +67,7 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
       }
       return x;
     case STRING:
-      return (!strcmp(l1->stringval(), l2->stringval())) ? C_T : C_NIL;
+      return (l1->stringval() == l2->stringval()) ? C_T : C_NIL;
       break;
     case LAMBDA:
     case NLAMBDA:

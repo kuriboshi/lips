@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <iostream>
+#include <string>
 #include <doctest/doctest.h>
 
 #include "lisp.hh"
@@ -10,6 +11,8 @@
 #include "low.hh"
 #include "io.hh"
 #include "file.hh"
+
+using namespace std::literals;
 
 namespace
 {
@@ -161,7 +164,7 @@ TEST_CASE("Basic I/O")
 
 TEST_CASE("Check size of lisp_t object")
 {
-  CHECK(sizeof(lisp::lisp_t::u) == 40);
+  CHECK(sizeof(lisp::lisp_t::u) == 56);
   std::cout << "sizeof(std::monostate) = " << sizeof(std::monostate) << '\n';
   std::cout << "sizeof(lisp::symbol_t) = " << sizeof(lisp::symbol_t) << '\n';
   std::cout << "sizeof(int) = " << sizeof(int) << '\n';
@@ -386,7 +389,7 @@ TEST_CASE("Primary function tests")
       auto a = lisp::eval(l, "(setq f (lambda () \"hello\"))");
       auto b = lisp::eval(l, "(f)");
       CHECK(type_of(b) == lisp::STRING);
-      CHECK(strcmp(b->stringval(), "hello") == 0);
+      CHECK(b->stringval() == "hello"s);
     }
     SUBCASE("LAMBDA - one argument")
     {
@@ -418,7 +421,7 @@ TEST_CASE("Primary function tests")
       auto a = lisp::eval(l, "(setq f (nlambda (a) a))");
       auto b = lisp::eval(l, "(f x)");
       CHECK(type_of(b) == lisp::SYMBOL);
-      CHECK(strcmp(b->symval().pname, "x") == 0);
+      CHECK(strcmp(b->symval().pname.c_str(), "x") == 0);
     }
   }
 }

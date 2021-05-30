@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cstdio>
 #include "base.hh"
 
 namespace lisp
@@ -43,7 +42,7 @@ public:
   LISPT readline(LISPT);
   LISPT cpprint(LISPT, LISPT);
 
-  bool loadfile(const char*);
+  bool loadfile(const std::string&);
 };
 
 inline LISPT ratom(lisp& l, LISPT a) { return file(l).ratom(a); }

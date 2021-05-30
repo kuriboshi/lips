@@ -6,7 +6,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/errno.h>
+#include <cerrno>
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -21,7 +21,7 @@ PRIMITIVE posix::uxaccess(LISPT name, LISPT mode)
 {
   l.check(name, STRING);
   l.check(mode, INTEGER);
-  return mknumber(l, access(name->stringval(), mode->intval()));
+  return mknumber(l, access(name->stringval().c_str(), mode->intval()));
 }
 
 PRIMITIVE posix::uxalarm(LISPT seconds)
@@ -33,14 +33,14 @@ PRIMITIVE posix::uxalarm(LISPT seconds)
 PRIMITIVE posix::uxchdir(LISPT dirname)
 {
   l.check(dirname, STRING);
-  return mknumber(l, chdir(dirname->stringval()));
+  return mknumber(l, chdir(dirname->stringval().c_str()));
 }
 
 PRIMITIVE posix::uxchmod(LISPT name, LISPT mode)
 {
   l.check(name, STRING);
   l.check(mode, INTEGER);
-  return mknumber(l, chmod(name->stringval(), mode->intval()));
+  return mknumber(l, chmod(name->stringval().c_str(), mode->intval()));
 }
 
 PRIMITIVE posix::uxclose(LISPT fildes)
@@ -57,7 +57,7 @@ PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
 
   l.check(name, STRING);
   l.check(mode, INTEGER);
-  i = creat(name->stringval(), mode->intval());
+  i = creat(name->stringval().c_str(), mode->intval());
   if(i < 0)
     return C_NIL;
   else
@@ -91,7 +91,7 @@ PRIMITIVE posix::uxlink(LISPT name1, LISPT name2)
 {
   l.check(name1, STRING);
   l.check(name2, STRING);
-  return mknumber(l, link(name1->stringval(), name2->stringval()));
+  return mknumber(l, link(name1->stringval().c_str(), name2->stringval().c_str()));
 }
 
 PRIMITIVE posix::uxnice(LISPT incr)
@@ -122,7 +122,7 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
       return l.error(UNKNOWN_REQUEST, mode);
   }
   auto f = readmode ? std::make_unique<file_t>(std::make_unique<file_source>(name->stringval()))
-    : std::make_unique<file_t>(std::make_unique<file_sink>(name->stringval(), appendmode));
+    : std::make_unique<file_t>(std::make_unique<file_sink>(name->stringval().c_str(), appendmode));
   if(!f)
     return l.error(CANT_OPEN, name);
   LISPT newfile = nullptr;
@@ -175,7 +175,7 @@ PRIMITIVE posix::uxsignal(LISPT sig, LISPT fun)
 PRIMITIVE posix::uxunlink(LISPT name)
 {
   l.check(name, STRING);
-  return mknumber(l, unlink(name->stringval()));
+  return mknumber(l, unlink(name->stringval().c_str()));
 }
 
 posix::posix(lisp& lisp): base(lisp) {}

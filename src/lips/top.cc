@@ -154,7 +154,7 @@ void top::promptprint(LISPT prompt)
     return;
   else
   {
-    s = prompt->getstr();
+    s = prompt->getstr().c_str();
     for(i = 0; s[i]; i++)
     {
       if(s[i] == '!')
@@ -285,7 +285,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
           tmp = histget(0L, h);
           if(!is_NIL(tmp) && type_of(tmp->car()) == CONS && is_NIL(tmp->cdr()))
             tmp = tmp->car();
-          if(!strncmp(tmp->car()->getstr(), at->getstr(), std::strlen(at->getstr())))
+          if(!strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())))
             return histget(0L, h);
         }
         return C_NIL;
