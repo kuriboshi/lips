@@ -4,6 +4,9 @@
  *
  */
 
+#define DOCTEST_CONFIG_IMPLEMENT
+#include <doctest/doctest.h>
+
 #include <sys/types.h>
 #ifdef SELECT
 #include <sys/select.h>
@@ -183,7 +186,6 @@ void init_all_signals()
 
 using namespace lisp;
 
-options_t options; /* Structure for all options. */
 LISPT path;        /* Search path for executables. */
 LISPT home;        /* Home directory. */
 LISPT globsort;    /* To sort or not during globbing. */
@@ -419,14 +421,11 @@ LISPT greet(LISPT who)
 
 int main(int argc, char* const* argv)
 {
-  auto terminal = std::make_unique<file_t>(std::make_unique<term_source>());
-  options.debug = false;
-  options.version = false;
-  options.fast = false;
-  options.interactive = false;
-  options.command = false;
+  doctest::Context context;
+
   int option;
-  while((option = getopt(argc, argv, "c:fvid")) != EOF)
+  options_t options;
+  while((option = getopt(argc, argv, "c:fvidT")) != EOF)
   {
     switch(option)
     {
@@ -447,8 +446,11 @@ int main(int argc, char* const* argv)
       case 'd':
         options.debug = true;
         break;
+      case 'T':
+        options.test = true;
+        break;
       default:
-        L->primerr().puts("usage: -fvic [arguments]\n");
+        std::cout << "usage: -fvicT [arguments]\n";
         exit(1);
         break;
     }
@@ -463,6 +465,12 @@ int main(int argc, char* const* argv)
    * Init shell and lisp interpreter.
    */
   init();
+  if(options.test)
+  {
+    context.applyCommandLine(argc, argv);
+    auto result = context.run();
+    return result;
+  }
   if(!options.fast)
   {
     try
@@ -475,6 +483,8 @@ int main(int argc, char* const* argv)
     catch(const lisp_error& error)
     {}
   }
+  auto terminal = std::make_unique<file_t>(std::make_unique<term_source>(options));
+  auto toploop = std::make_unique<top>(top(*L, options));
   while(true)
   {
     try
@@ -482,7 +492,7 @@ int main(int argc, char* const* argv)
       if(!options.debug && options.interactive)
         init_all_signals();
       L->e().reset();
-      if(top::toploop(&L->topprompt, nullptr, *terminal.get()))
+      if(toploop->toploop(&L->topprompt, nullptr, *terminal.get()))
         break;
     }
     catch(const lisp_reset&)

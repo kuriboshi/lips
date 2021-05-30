@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 2020 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 2020 Krister Joas
+//
 
 #pragma once
 
@@ -10,11 +9,12 @@
 
 struct options_t
 {
-  bool debug;       /* Debugging */
-  bool interactive; /* Force interactive mode */
-  bool command;     /* Command string */
-  bool version;     /* Print version */
-  bool fast;        /* Fast start, don't read init file */
+  bool debug = false;       // Debugging
+  bool interactive = false; // Force interactive mode
+  bool command = false;     // Command string
+  bool version = false;     // Print version
+  bool fast = false;        // Fast start, don't read init file
+  bool test = false;        // Run unit tests
 };
 
 extern options_t options;

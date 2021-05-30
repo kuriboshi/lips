@@ -13,7 +13,7 @@
 class term_source: public lisp::io_source
 {
 public:
-  term_source();
+  term_source(const options_t& options) : options(options) {}
   virtual ~term_source();
 
   // io::source
@@ -105,6 +105,8 @@ private:
   int linepos = 0;                 /* End of line buffer.  */
   int position = 0;                /* Current position in line buffer.  */
   enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
+
+  const options_t& options;
 
 #ifdef TERMCAP
   char tcap[128]; /* Buffer for terminal capabilties.  */

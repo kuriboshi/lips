@@ -4,6 +4,11 @@
  *
  */
 
+#include <iostream>
+#include <filesystem>
+#include <string>
+#include <doctest/doctest.h>
+
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -19,6 +24,7 @@
 
 extern lisp::lisp* L;
 
+using namespace std::literals;
 using namespace lisp;
 
 inline constexpr int TICKS = 64;
@@ -29,10 +35,16 @@ static char** globarr;
 static char** globp;
 static char** globlimit;
 
-/*
- * If *wild is a slash then str must be a directory to match
- * wild completely. Used by match.
- */
+//
+// If *wild is a slash then str must be a directory to match wild completely.
+// Used by match.
+//
+// str is the rest of the file and has to be the empty string for the function
+// to return true.  wild should end with a slash or one or more stars, in which
+// case the original glob expression had at least two stars.  The final
+// parameter, ss, is the complete original path and is used to verify that the
+// path refers to a directory.
+//
 static bool dircheck(const char* str, const char* wild, const char* ss)
 {
   struct stat sbuf;
@@ -56,6 +68,11 @@ static bool dircheck(const char* str, const char* wild, const char* ss)
   if(*str || *wild)
     return false;
   return true;
+}
+
+TEST_CASE("glob.cc: dircheck")
+{
+  REQUIRE(dircheck("", "/", "/"));
 }
 
 /*
@@ -106,39 +123,90 @@ static bool match(const char* str, const char* wild)
   return dircheck(str, wild, ss);
 }
 
-#if 0
+TEST_CASE("glob.cc: match")
+{
+  SUBCASE("pattern a*")
+  {
+    REQUIRE(match("alpha", "a*"));
+    REQUIRE(!match("beta", "a*"));
+    REQUIRE(match("aaa", "a*"));
+  }
+  SUBCASE("pattern *a*")
+  {
+    REQUIRE(match("xxxaxxx", "*a*"));
+    REQUIRE(match("xxxa", "*a*"));
+    REQUIRE(match("axxx", "*a*"));
+  }
+  SUBCASE("pattern *.cc")
+  {
+    REQUIRE(match("glob.cc", "*.cc"));
+    REQUIRE(!match("glob.hh", "*.cc"));
+  }
+  SUBCASE("pattern *.??")
+  {
+    REQUIRE(match("foo.cc", "*.??"));
+    REQUIRE(!match("foo.cpp", "*.??"));
+  }
+  SUBCASE("pattern [abc].??")
+  {
+    REQUIRE(match("a.cc", "[abc].??"));
+    REQUIRE(match("b.cc", "[abc].??"));
+    REQUIRE(match("c.hh", "[abc].??"));
+    REQUIRE(!match("d.cc", "[abc].??"));
+    REQUIRE(!match("b.cpp", "[abc].??"));
+    REQUIRE(!match("b.c", "[abc].??"));
+    REQUIRE(match("b...", "[abc].??"));
+  }
+}
+
 /*
  * Inserts element what in list where keeping alphabetic order.
  */
 static LISPT orderinsert(LISPT what, LISPT where)
 {
-  LISPT p1, p2;
-
-  p1 = C_NIL;
-  p2 = where;
-  while (!is_NIL(p2))
+  LISPT p1 = C_NIL;
+  auto p2 = where;
+  while(!is_NIL(p2))
+  {
+    if(strcmp(p2->car()->getstr().c_str(), what->getstr().c_str()) > 0)
     {
-      if (strcmp(GETSTR(CAR(p2)), GETSTR(what)) > 0)
-        {
-          if (!is_NIL(p1))
-            {
-              rplacd(p1, cons(what, C_NIL));
-              rplacd(CDR(p1), p2);
-            }
-          else
-            where = cons(what, where);
-          break;
-        }
-      p1 = p2;
-      p2 = CDR(p2);
+      if(!is_NIL(p1))
+      {
+        rplacd(p1, cons(what, C_NIL));
+        rplacd(p1->cdr(), p2);
+      }
+      else
+        where = cons(what, where);
+      break;
     }
-  if (is_NIL(where))
+    p1 = p2;
+    p2 = p2->cdr();
+  }
+  if(is_NIL(where))
     where = cons(what, C_NIL);
-  else if (is_NIL(p2))
+  else if(is_NIL(p2))
     rplacd(p1, cons(what, C_NIL));
   return where;
 }
-#endif
+
+TEST_CASE("glob.cc: orderinsert")
+{
+  auto list = cons(mkstring("a"), cons(mkstring("c"), C_NIL));
+  SUBCASE("Insert in the middle")
+  {
+    auto b = mkstring("b");
+    auto result = orderinsert(b, list);
+    REQUIRE(type_of(result) == CONS);
+    REQUIRE(list->cdr()->car()->getstr() == b->getstr());
+  }
+  SUBCASE("Insert at the end")
+  {
+    auto d = mkstring("d");
+    auto result = orderinsert(d, list);
+    REQUIRE(type_of(result) == CONS);
+    REQUIRE(list->cdr()->cdr()->car()->getstr() == d->getstr());
+  }
+}
 
 /*
  * Expands tilde character in first position to home directory or
@@ -180,6 +248,28 @@ const char* extilde(const char* w, int rep)
   }
   strcat(s, w);
   return s;
+}
+
+TEST_CASE("glob.cc: extilde")
+{
+  std::string home = std::getenv("HOME");
+  SUBCASE("~ == HOME")
+  {
+    std::string dir = extilde("~", false);
+    REQUIRE(home == dir);
+  }
+  SUBCASE("~USER == HOME")
+  {
+    std::string user = std::getenv("USER");
+    auto tilde_user = "~" + user;
+    std::string dir = extilde(tilde_user.c_str(), false);
+    REQUIRE(home == dir);
+  }
+  SUBCASE("~UNKNOWN != ")
+  {
+    std::string unknown = "~foobar";
+    REQUIRE(extilde(unknown.c_str(), false) == nullptr);
+  }
 }
 
 /* 
@@ -242,11 +332,23 @@ static bool walkfiles(const char* wild, int all, int report)
   return result;
 }
 
+TEST_CASE("glob.cc: walkfiles")
+{
+  globarr = (char**)malloc(TICKS * sizeof(char*));
+  globp = globarr;
+  globlimit = globarr + TICKS;
+  auto result = walkfiles("*", false, false);
+  REQUIRE(result);
+#if 0
+  for(auto r = globarr; r < globp; r++)
+    std::cout << *r << std::endl;
+#endif
+}
+
 static LISPT buildlist()
 {
-  char** r;
   LISPT l = C_NIL;
-  for(r = globarr; r < globp; r++)
+  for(auto r = globarr; r < globp; r++)
   {
     l = cons(*L, mkstring(*L, *r), l);
     free(*r);
@@ -277,6 +379,59 @@ LISPT expandfiles(const char* wild, int all, int report, int sort)
   if(!is_NIL(globsort) || sort)
     qsort((char*)globarr, globp - globarr, sizeof(char*), comp);
   return buildlist();
+}
+
+TEST_CASE("glob.cc: expandfiles")
+{
+  std::error_code ec;
+  std::filesystem::create_directories("testdir/a", ec);
+  REQUIRE(!ec);
+  std::filesystem::create_directories("testdir/bb", ec);
+  REQUIRE(!ec);
+  std::filesystem::create_directories("testdir/ccc", ec);
+  REQUIRE(!ec);
+  
+  SUBCASE("Expand all files")
+  {
+    auto result = expandfiles("testdir/*", false, false, true);
+    REQUIRE(length(result)->intval() == 3);
+
+    int count = 3;
+    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    {
+      for(auto a = result; !is_NIL(a); a = a->cdr())
+      {
+        if(a->car()->getstr() == i)
+          --count;
+      }
+    }
+    REQUIRE(count == 0);
+  }
+  SUBCASE("Expand only one file")
+  {
+    auto result = expandfiles("testdir/??", false, false, true);
+    REQUIRE(length(result)->intval() == 1);
+
+    int count = 1;
+    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    {
+      for(auto a = result; !is_NIL(a); a = a->cdr())
+      {
+        if(a->car()->getstr() == i)
+          --count;
+      }
+    }
+    REQUIRE(count == 0);
+  }
+
+  std::filesystem::remove("testdir/a", ec);
+  REQUIRE(!ec);
+  std::filesystem::remove("testdir/bb", ec);
+  REQUIRE(!ec);
+  std::filesystem::remove("testdir/ccc", ec);
+  REQUIRE(!ec);
+  std::filesystem::remove("testdir", ec);
+  REQUIRE(!ec);
 }
 
 /*

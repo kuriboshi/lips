@@ -21,8 +21,8 @@
 #include <csetjmp>
 
 #include <lisp/libisp.hh>
-#include "top.hh"
 #include "main.hh"
+#include "top.hh"
 #include "glob.hh"
 #include "os.hh"
 #include "term.hh"
@@ -56,8 +56,6 @@ void term_source::init_keymap()
   key_tab[(int)'\\'] = term_fun::T_ESCAPE;
   key_tab[(int)'"'] = term_fun::T_STRING;
 }
-
-term_source::term_source() {}
 
 /* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
