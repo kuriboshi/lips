@@ -16,8 +16,8 @@
 #include <csignal>
 #include <cstring>
 
-#include <libisp/libisp.hh>
-#include <libisp/except.hh>
+#include <lisp/libisp.hh>
+#include <lisp/except.hh>
 #include "glob.hh"
 #include "main.hh"
 #include "top.hh"

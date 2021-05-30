@@ -8,7 +8,7 @@
 
 #include <termios.h>
 
-#include <libisp/io.hh>
+#include <lisp/io.hh>
 
 class term_source: public lisp::io_source
 {

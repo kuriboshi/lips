@@ -3,7 +3,7 @@
 #
 cmake_minimum_required(VERSION 3.18.0)
 
-project(lips VERSION 0.2.0)
+project(lips VERSION 0.3.0)
 set(CMAKE_CXX_STANDARD 17)
 
 option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
@@ -19,10 +19,10 @@ set(LIPS_SOURCE_LOCATION "${CMAKE_INSTALL_PREFIX}/src/lips" CACHE
 
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/install")
 add_subdirectory(external)
+
 find_package(fmt REQUIRED)
 find_package(doctest REQUIRED)
 
-add_subdirectory(libisp)
 add_subdirectory(src)
 
 if(ENABLE_TRACE)

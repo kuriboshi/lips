@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libisp/lisp.hh>
+#include <lisp/lisp.hh>
 
 struct options_t
 {

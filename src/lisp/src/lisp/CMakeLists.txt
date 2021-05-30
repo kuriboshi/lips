@@ -50,14 +50,13 @@ target_sources(lisp PRIVATE
 get_filename_component(_parent ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 target_include_directories(lisp PUBLIC
   $<BUILD_INTERFACE:${_parent}>
-  $<INSTALL_INTERFACE:include/libisp>
+  $<INSTALL_INTERFACE:include/lisp>
   )
 target_compile_options(lisp PRIVATE -Wall -Werror)
-target_link_libraries(lisp
-  fmt::fmt)
+target_link_libraries(lisp PUBLIC fmt::fmt)
+
 add_executable(test test.cc)
-target_link_libraries(test
-  lisp
-  doctest::doctest)
+target_link_libraries(test PUBLIC lisp doctest::doctest)
+
 add_executable(main main.cc)
-target_link_libraries(main lisp)
+target_link_libraries(main PUBLIC lisp)
