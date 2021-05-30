@@ -1,15 +1,14 @@
-/*
- * Lips, lisp shell.
- * Copyright 1989, 2020 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1989, 2020 Krister Joas
+//
 
 #pragma once
 
-/* 
- * This header file is private to the libisp libray.  Applications using
- * libisp should only include libisp.h.
- */
+//
+// This header file is private to the libisp libray.  Applications using
+// libisp should only include libisp.hh.
+//
 
 #include <variant>
 #include <memory>
@@ -26,9 +25,9 @@ class file_t;
 struct lisp_t;
 using LISPT = struct lisp_t*;
 
-/*
- * All lisp constants used internally.
- */
+//
+// All lisp constants used internally.
+//
 extern LISPT C_T;
 extern LISPT CE_NIL;
 extern LISPT CE_T;
@@ -65,42 +64,40 @@ extern LISPT C_SYMBOL;
 extern LISPT C_UNBOUND;
 extern LISPT C_WRITE;
 
-/* This is used to recognize c-functions for cpprint */
+// This is used to recognize c-functions for cpprint.
 using PRIMITIVE = LISPT;
 
 enum lisp_type
 {
-  NIL = 0,   /* so that nullptr also becomes NIL */
-  SYMBOL,    /* an atomic symbol */
-  INTEGER,   /* 24 bit integer in same word */
-  BIGNUM,    /* bigger than longs (NYI) */
-  FLOAT,     /* a double */
-  INDIRECT,  /* used when a value is stored in a closure */
-  CONS,      /* a pair */
-  STRING,    /* character strings */
-  SUBR,      /* eval type primitive function */
-  FSUBR,     /* noeval */
-  LAMBDA,    /* lambda function */
-  NLAMBDA,   /* noeval */
-  CLOSURE,   /* static binding object */
-  UNBOUND,   /* unbound indicator */
-  ENVIRON,   /* environment stack type for gc use */
-  FILET,     /* file pointer */
-  T,         /* the truth object */
-  FREE,      /* an object on the freelist, used for
-                consistency checks */
-  ENDOFFILE, /* returned from read at end of file */
-  ERROR,     /* returned from primitive when an error
-                occured */
-  HASHTAB,   /* contains hashed data table */
-  CVARIABLE, /* is a pointer to c-variable */
-  CPOINTER,  /* general c pointer */
-  USER,      /* user defined type */
+  NIL = 0,   // so that nullptr also becomes NIL
+  SYMBOL,    // an atomic symbol
+  INTEGER,   // 24 bit integer in same word
+  BIGNUM,    // bigger than longs (NYI)
+  FLOAT,     // a double
+  INDIRECT,  // used when a value is stored in a closure
+  CONS,      // a pair
+  STRING,    // character strings
+  SUBR,      // eval type primitive function
+  FSUBR,     // noeval
+  LAMBDA,    // lambda function
+  NLAMBDA,   // noeval
+  CLOSURE,   // static binding object
+  UNBOUND,   // unbound indicator
+  ENVIRON,   // environment stack type for gc use
+  FILET,     // file pointer
+  T,         // the truth object
+  FREE,      // an object on the freelist, used for
+             // consistency checks
+  ENDOFFILE, // returned from read at end of file
+  ERROR,     // returned from primitive when an error
+             // occured
+  HASHTAB,   // contains hashed data table
+  CVARIABLE, // is a pointer to c-variable
+  CPOINTER,  // general c pointer
+  USER,      // user defined type
 };
 
 inline constexpr auto C_NIL = nullptr;
-
-using BITS32 = int;
 
 // The cons cell
 struct cons_t
@@ -180,12 +177,14 @@ using cvariable_t = LISPT*;
 
 struct lisp_t
 {
-  lisp_t() {}
-  ~lisp_t() {}
+  lisp_t() = default;
+  ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
   bool gcmark = false;
   enum lisp_type type = NIL;
+  lisp* interpreter = nullptr;
+
   // One entry for each type.  Types that has no, or just one value are
   // indicated by a comment.
   std::variant<
@@ -255,9 +254,9 @@ struct lisp_t
 
   const char* getstr() const { return type == STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
-  /*
-   * Some more or less helpfull functions
-   */
+  //
+  // Some more or less helpfull functions
+  //
   void settype(lisp_type t) { type = t; }
   bool marked() { return gcmark; }
   void mark() { gcmark = true; }
@@ -352,7 +351,7 @@ public:
   LISPT verbose = nullptr;
   LISPT version = nullptr;
 
-  /* clang-format off */
+  // clang-format off
   rtinfo currentrt =
   {
     {
@@ -440,7 +439,7 @@ public:
       0, 0, 0, 0, 0, 0, 0, 0
     }
   };
-  /* clang-format on */
+  // clang-format on
   void set_read_table(unsigned char c, enum char_class chcls, rtinfo::rmacro_t macro)
   {
     currentrt.chclass[static_cast<int>(c)] = chcls;

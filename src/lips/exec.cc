@@ -39,8 +39,8 @@ using UNION_WAIT = int;
 bool insidefork = false; /* Is nonzero in the child after */
                          /* a fork */
 
-static BITS32 exechash[EXECHASH / 32]; /* One bit set for each program */
-static int pgrp;                       /* Process group of current job */
+static int exechash[EXECHASH / 32]; /* One bit set for each program */
+static int pgrp;                    /* Process group of current job */
 
 #ifdef JOB_CONTROL
 struct job_t
@@ -449,7 +449,7 @@ static bool ifexec(const char* dir, const char* name)
 }
 
 /* hashfun - Calculates the hash function used in hashtable. */
-static BITS32 hashfun(const char* str)
+static int hashfun(const char* str)
 {
   int i;
   int bc;
@@ -475,7 +475,7 @@ int execcommand(LISPT exp, LISPT* res)
   LISPT cdir;
   const char* command;
   char comdir[MAXPATHLEN];
-  BITS32 i, possible;
+  int i, possible;
 
   *res = C_T;
   command = extilde(exp->car()->getstr(), 1);
@@ -716,11 +716,11 @@ PRIMITIVE exec::rehash()
   DIR* odir;
   struct dirent* rdir;
   const char* sdir;
-  BITS32 i;
-  LISPT p;
 
-  for(i = 0; i < EXECHASH / 32; i++) exechash[i] = 0;
-  for(p = path; type_of(p) == CONS; p = p->cdr())
+  for(int i = 0; i < EXECHASH / 32; i++)
+    exechash[i] = 0;
+
+  for(auto p = path; type_of(p) == CONS; p = p->cdr())
   {
     if(is_NIL(p->car()))
       continue;
@@ -733,7 +733,7 @@ PRIMITIVE exec::rehash()
       continue;
     while((rdir = readdir(odir)) != nullptr)
     {
-      i = hashfun(rdir->d_name);
+      auto i = hashfun(rdir->d_name);
       exechash[i / 32] |= 1 << (i % 32);
     }
     closedir(odir);
