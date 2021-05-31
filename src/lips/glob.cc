@@ -251,7 +251,7 @@ const char* extilde(const char* w, int rep)
     if(pw == nullptr)
     {
       if(rep)
-        L->error(NO_USER, mkstring(*L, s));
+        L->error(NO_USER, mkstring(s));
       return nullptr;
     }
     strncpy(s, pw->pw_dir, MAXNAMLEN);
@@ -303,7 +303,7 @@ static bool walkfiles(const char* wild, int all, int report)
   if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
   {
     if(report)
-      L->error(NO_DIRECTORY, mkstring(*L, r));
+      L->error(NO_DIRECTORY, mkstring(r));
     return false;
   }
   while((rdir = readdir(odir)) != nullptr)
@@ -338,7 +338,7 @@ static bool walkfiles(const char* wild, int all, int report)
   }
   closedir(odir);
   if(!result && report)
-    L->error(NO_MATCH, mkstring(*L, wild));
+    L->error(NO_MATCH, mkstring(wild));
   return result;
 }
 
