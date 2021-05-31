@@ -197,14 +197,24 @@ TEST_CASE("glob.cc: orderinsert")
     auto b = mkstring("b");
     auto result = orderinsert(b, list);
     REQUIRE(type_of(result) == CONS);
-    REQUIRE(list->cdr()->car()->getstr() == b->getstr());
+    REQUIRE(result->cdr()->car()->getstr() == b->getstr());
+    REQUIRE(equal(list, result));
   }
   SUBCASE("Insert at the end")
   {
     auto d = mkstring("d");
     auto result = orderinsert(d, list);
     REQUIRE(type_of(result) == CONS);
-    REQUIRE(list->cdr()->cdr()->car()->getstr() == d->getstr());
+    REQUIRE(result->cdr()->cdr()->car()->getstr() == d->getstr());
+    REQUIRE(equal(list, result));
+  }
+  SUBCASE("Insert at the beginning")
+  {
+    auto A = mkstring("A");
+    auto result = orderinsert(A, list);
+    REQUIRE(type_of(result) == CONS);
+    REQUIRE(result->car()->getstr() == A->getstr());
+    REQUIRE(equal(result->cdr(), list));
   }
 }
 
