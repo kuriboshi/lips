@@ -26,7 +26,6 @@ target_sources(lisp PRIVATE
   src/lisp/alloc.hh
   src/lisp/arith.hh
   src/lisp/base.hh
-  src/lisp/defs.hh
   src/lisp/error.hh
   src/lisp/eval.hh
   src/lisp/except.hh

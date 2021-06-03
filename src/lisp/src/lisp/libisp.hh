@@ -10,7 +10,6 @@
 #include "alloc.hh"
 #include "arith.hh"
 #include "debug.hh"
-#include "defs.hh"
 #include "error.hh"
 #include "eval.hh"
 #include "file.hh"
