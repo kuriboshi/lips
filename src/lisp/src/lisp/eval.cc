@@ -335,7 +335,7 @@ bool evaluator::evalhook(LISPT exp)
         return false;
         break;
     }
-  return true;
+  return false;
 }
 
 void evaluator::do_unbound(continuation_t continuation)

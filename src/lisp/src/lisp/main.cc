@@ -4,6 +4,8 @@
 //
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include "libisp.hh"
 #include "except.hh"
 
@@ -13,11 +15,16 @@ static int macro(lisp::lisp& l, lisp::LISPT*)
   throw lisp::lisp_reset();
 }
 
-int main()
+int main(int argc, const char** argv)
 {
   lisp::lisp lisp;
-  auto prompt = mkstring(lisp, "> ");
-  lisp.a().add_mark_object(&prompt);
+  auto prompt = lisp::mkstring("> ");
+  lisp::gcprotect(prompt);
+  std::vector<std::string> args{argv + 1, argv + argc};
+  for(auto f: args)
+  {
+    lisp::load(lisp::mkstring(f));
+  }
   while(true)
   {
     try
