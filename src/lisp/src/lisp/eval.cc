@@ -327,6 +327,7 @@ bool evaluator::evalhook(LISPT exp)
       case 1:
         send(res);
         cont = pop_func();
+        return true;
         break;
       case -1:
         abort(NO_MESSAGE, C_NIL);
