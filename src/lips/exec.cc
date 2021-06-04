@@ -31,17 +31,14 @@ extern lisp::lisp* L;
 using namespace lisp;
 using namespace std::literals;
 
-inline constexpr int MAXARGS = 256;
 inline constexpr int EXECHASH = 1023; /* Hash table size for commands */
-inline constexpr auto DEFAULT_SHELL = "/bin/sh";
 
 extern char** environ;
 LISPT p_setenv(LISPT, LISPT);
 
 using UNION_WAIT = int;
 
-bool insidefork = false; /* Is nonzero in the child after */
-                         /* a fork */
+bool insidefork = false; // Is nonzero in the child after a fork
 
 static int exechash[EXECHASH / 32]; /* One bit set for each program */
 static int pgrp;                    /* Process group of current job */
@@ -78,22 +75,6 @@ static void preparefork()
   signal(SIGBUS, SIG_DFL);
   signal(SIGTTIN, SIG_DFL);
   signal(SIGTTOU, SIG_DFL);
-}
-
-/* 
- * strsave - saves string in argument STR in a safe place with malloc.  
- *           Returns nullptr if either STR is nullptr or malloc fail to allocate 
- *           more memory.
- */
-char* strsave(const char* str)
-{
-  if(str == nullptr)
-    return nullptr;
-  auto* newstr = L->a().realmalloc((unsigned)strlen(str) + 1);
-  if(newstr == nullptr)
-    return nullptr;
-  strcpy(newstr, str);
-  return newstr;
 }
 
 /* 
@@ -247,78 +228,12 @@ static int mfork()
   return pid;
 }
 
-/* ltoa - Converts a long to its ascii representation. */
-char* ltoa(int v)
-{
-  static char buf[20];
-
-  sprintf(buf, "%d", v);
-  return buf;
-}
-
 /*
- * checkmeta - checks the string S if it contains any non-quoted
- *             meta characters in which case it returns true.
- *             It also strips off all quote-characters (backslash).
+ * check_meta - checks the string S if it contains any non-quoted meta
+ *              characters in which case it returns true.  It also strips off
+ *              all quote-characters (backslash).
  */
-static bool checkmeta(char* s)
-{
-  bool meta = false;
-  for(int i = 0; s[i]; i++)
-    if(s[i] == '\\')
-    {
-      strcpy(s + i, s + i + 1);
-      continue;
-    }
-    else if(index("*?[]", s[i]))
-      meta = true;
-  return meta;
-}
-
-TEST_CASE("exec.cc: checkmeta")
-{
-  char s[1024];
-  SUBCASE("test 1")
-  {
-    strcpy(s, "hello");
-    auto b = checkmeta(s);
-    CHECK(!b);
-  }
-  SUBCASE("test 2")
-  {
-    strcpy(s, "hello*");
-    auto b = checkmeta(s);
-    CHECK(b);
-  }
-  SUBCASE("test 3")
-  {
-    strcpy(s, "hello\\*");
-    auto b = checkmeta(s);
-    CHECK(!b);
-    CHECK(std::string(s) == "hello*");
-  }
-  SUBCASE("test 4")
-  {
-    strcpy(s, "hello\\*\\[\\]");
-    auto b = checkmeta(s);
-    CHECK(!b);
-    CHECK(std::string(s) == "hello*[]");
-  }
-  SUBCASE("test 5")
-  {
-    strcpy(s, "hello\\*[a]\\*");
-    auto b = checkmeta(s);
-    CHECK(b);
-    CHECK(std::string(s) == "hello*[a]*");
-  }
-}
-
-/*
- * checkmeta - checks the string S if it contains any non-quoted
- *             meta characters in which case it returns true.
- *             It also strips off all quote-characters (backslash).
- */
-static std::pair<bool, std::string> checkmeta2(const std::string& s)
+static std::pair<bool, std::string> check_meta(const std::string& s)
 {
   std::string result;
   bool meta = false;
@@ -341,33 +256,33 @@ static std::pair<bool, std::string> checkmeta2(const std::string& s)
   return std::pair(meta, result);
 }
 
-TEST_CASE("exec.cc: checkmeta")
+TEST_CASE("exec.cc: check_meta")
 {
   SUBCASE("test 1")
   {
-    auto b = checkmeta2("hello");
+    auto b = check_meta("hello");
     CHECK(!b.first);
   }
   SUBCASE("test 2")
   {
-    auto b = checkmeta2("hello*");
+    auto b = check_meta("hello*");
     CHECK(b.first);
   }
   SUBCASE("test 3")
   {
-    auto b = checkmeta2("hello\\*");
+    auto b = check_meta("hello\\*");
     CHECK(!b.first);
     CHECK(b.second == "hello*"s);
   }
   SUBCASE("test 4")
   {
-    auto b = checkmeta2("hello\\*\\[\\]");
+    auto b = check_meta("hello\\*\\[\\]");
     CHECK(!b.first);
     CHECK(b.second == "hello*[]"s);
   }
   SUBCASE("test 5")
   {
-    auto b = checkmeta2("hello\\*[a]\\*");
+    auto b = check_meta("hello\\*[a]\\*");
     CHECK(b.first);
     CHECK(b.second == "hello*[a]*"s);
   }
@@ -381,7 +296,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
     auto c = extilde2(arg->getstr(), true);
     if(!c)
       return {};
-    auto [meta, str] = checkmeta2(*c);
+    auto [meta, str] = check_meta(*c);
     if(!meta)
       args.push_back(str);
     else
@@ -420,9 +335,9 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
 }
 
 /* 
- * makeexec - Parse command line and build argument vector suitable for
- *            execve. Returns nullptr if some error occured, like a no match
- *            for wild cards. Returns pointers to globbed arguments.
+ * make_exec - Parse command line and build argument vector suitable for
+ *             execve. Returns nullptr if some error occured, like a no match
+ *             for wild cards. Returns pointers to globbed arguments.
  */
 static std::optional<std::vector<std::string>> make_exec(LISPT command)
 {
@@ -438,9 +353,9 @@ static std::optional<std::vector<std::string>> make_exec(LISPT command)
   return args;
 }
 
-TEST_CASE("exec.cc: makeexec")
+TEST_CASE("exec.cc: make_exec")
 {
-  SUBCASE("(makeexec (a b c)) -> a b c")
+  SUBCASE("(make_exec (a b c)) -> a b c")
   {
     auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
     REQUIRE(result);
@@ -450,13 +365,13 @@ TEST_CASE("exec.cc: makeexec")
     CHECK(*i++ == "b");
     CHECK(*i++ == "c");
   }
-  SUBCASE("(makeexec (100)) -> 100")
+  SUBCASE("(make_exec (100)) -> 100")
   {
     auto result = make_exec(cons(mknumber(100), C_NIL));
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
-  SUBCASE("(makeexec (+ 1 2)) -> 3")
+  SUBCASE("(make_exec (+ 1 2)) -> 3")
   {
     // auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
     auto is = file_t("((+ 1 2))");
@@ -465,7 +380,7 @@ TEST_CASE("exec.cc: makeexec")
     REQUIRE(result);
     CHECK(result->at(0) == "3"s);
   }
-  SUBCASE("(makeexec (/b*)) -> /bin")
+  SUBCASE("(make_exec (/b*)) -> /bin")
   {
     file_t is("(/b*)");
     auto expr = lispread(is);
@@ -474,7 +389,7 @@ TEST_CASE("exec.cc: makeexec")
     REQUIRE(!result->empty());
     CHECK(result->at(0) == "/bin"s);
   }
-  SUBCASE("(makeexec (/a*)) -> <empty>")
+  SUBCASE("(make_exec (/a*)) -> <empty>")
   {
     file_t is("(/a*)");
     auto expr = lispread(is);
