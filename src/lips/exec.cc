@@ -11,6 +11,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <doctest/doctest.h>
+#include <string>
+#include <iostream>
 #include <cstdlib>
 #include <cerrno>
 #include <csignal>
@@ -26,6 +29,7 @@
 extern lisp::lisp* L;
 
 using namespace lisp;
+using namespace std::literals;
 
 inline constexpr int MAXARGS = 256;
 inline constexpr int EXECHASH = 1023; /* Hash table size for commands */
@@ -259,50 +263,145 @@ char* ltoa(int v)
  */
 static bool checkmeta(char* s)
 {
-  int i;
-
-  for(i = 0; s[i]; i++)
+  bool meta = false;
+  for(int i = 0; s[i]; i++)
     if(s[i] == '\\')
     {
       strcpy(s + i, s + i + 1);
       continue;
     }
     else if(index("*?[]", s[i]))
-      return true;
-  return false;
+      meta = true;
+  return meta;
+}
+
+TEST_CASE("exec.cc: checkmeta")
+{
+  char s[1024];
+  SUBCASE("test 1")
+  {
+    strcpy(s, "hello");
+    auto b = checkmeta(s);
+    CHECK(!b);
+  }
+  SUBCASE("test 2")
+  {
+    strcpy(s, "hello*");
+    auto b = checkmeta(s);
+    CHECK(b);
+  }
+  SUBCASE("test 3")
+  {
+    strcpy(s, "hello\\*");
+    auto b = checkmeta(s);
+    CHECK(!b);
+    CHECK(std::string(s) == "hello*");
+  }
+  SUBCASE("test 4")
+  {
+    strcpy(s, "hello\\*\\[\\]");
+    auto b = checkmeta(s);
+    CHECK(!b);
+    CHECK(std::string(s) == "hello*[]");
+  }
+  SUBCASE("test 5")
+  {
+    strcpy(s, "hello\\*[a]\\*");
+    auto b = checkmeta(s);
+    CHECK(b);
+    CHECK(std::string(s) == "hello*[a]*");
+  }
+}
+
+/*
+ * checkmeta - checks the string S if it contains any non-quoted
+ *             meta characters in which case it returns true.
+ *             It also strips off all quote-characters (backslash).
+ */
+static std::pair<bool, std::string> checkmeta2(const std::string& s)
+{
+  std::string result;
+  bool meta = false;
+  bool quote = false;
+  for(auto c: s)
+  {
+    if(c == '\\')
+    {
+      quote = true;
+      continue;
+    }
+    else if(quote)
+      quote = false;
+    else if("*?[]"s.find_first_of(c) != std::string::npos)
+    {
+      meta = true;
+    }
+    result.push_back(c);
+  }
+  return std::pair(meta, result);
+}
+
+TEST_CASE("exec.cc: checkmeta")
+{
+  SUBCASE("test 1")
+  {
+    auto b = checkmeta2("hello");
+    CHECK(!b.first);
+  }
+  SUBCASE("test 2")
+  {
+    auto b = checkmeta2("hello*");
+    CHECK(b.first);
+  }
+  SUBCASE("test 3")
+  {
+    auto b = checkmeta2("hello\\*");
+    CHECK(!b.first);
+    CHECK(b.second == "hello*"s);
+  }
+  SUBCASE("test 4")
+  {
+    auto b = checkmeta2("hello\\*\\[\\]");
+    CHECK(!b.first);
+    CHECK(b.second == "hello*[]"s);
+  }
+  SUBCASE("test 5")
+  {
+    auto b = checkmeta2("hello\\*[a]\\*");
+    CHECK(b.first);
+    CHECK(b.second == "hello*[a]*"s);
+  }
 }
 
 /* 
- * makeexec - Parse command lin and build argument vector suitable for 
- *            execve. Returns nullptr if some error occured, like a no match 
+ * makeexec - Parse command line and build argument vector suitable for
+ *            execve. Returns nullptr if some error occured, like a no match
  *            for wild cards. Returns pointers to globbed arguments.
  */
 static char** makeexec(LISPT command)
 {
-  LISPT files, com;
-  int i, ok;
+  static char* args[MAXARGS];
+
+  int ok = 0;
+  auto com = command;
   sigset_t new_mask;
   sigset_t old_mask;
-  static char* args[MAXARGS];
-  char** t;
-
-  ok = 0;
-  com = command;
   sigemptyset(&new_mask);
   sigaddset(&new_mask, SIGINT);
   sigprocmask(SIG_BLOCK, &new_mask, &old_mask); /* Dangerous to interrupt here */
-  for(t = args; *t != nullptr; t++)
+  for(auto t = args; *t != nullptr; t++)
   {
     free(*t);
     *t = nullptr;
   }
   sigprocmask(SIG_SETMASK, &old_mask, nullptr);
+  int i;
   for(i = 0; type_of(com) == CONS && i < (MAXARGS - 1); com = com->cdr())
   {
   again:
     if(type_of(com->car()) == SYMBOL)
     {
-      char* c = strsave(extilde(com->car()->getstr().c_str(), 1));
+      auto c = strsave(extilde(com->car()->getstr().c_str(), 1));
       if(c == nullptr)
         return nullptr;
       if(!checkmeta(c))
@@ -311,12 +410,7 @@ static char** makeexec(LISPT command)
       {
         if(ok == 0)
           ok = 1;
-        if(i == 0)
-        {
-          error(*L, AMBIGUOUS, com->car());
-          return nullptr;
-        }
-        files = expandfiles(c, 0, 0, 1);
+        auto files = expandfiles(c, 0, 0, 1);
         if(!is_NIL(files))
           ok = 2;
         while(type_of(files) == CONS)
@@ -340,17 +434,169 @@ static char** makeexec(LISPT command)
     }
     else
     {
-      error(*L, ILLEGAL_ARG, com->car());
+      error(ILLEGAL_ARG, com->car());
       return nullptr;
     }
   }
   args[i] = nullptr;
   if(ok == 1)
   {
-    error(*L, NO_MATCH, command->cdr());
+    error(NO_MATCH, command->cdr());
     return nullptr;
   }
   return args;
+}
+
+static std::optional<std::vector<std::string>> process_one(LISPT arg)
+{
+  std::vector<std::string> args;
+  if(type_of(arg) == SYMBOL)
+  {
+    auto c = extilde2(arg->getstr(), true);
+    if(!c)
+      return {};
+    auto [meta, str] = checkmeta2(*c);
+    if(!meta)
+      args.push_back(str);
+    else
+    {
+      auto files = expandfiles(c->c_str(), 0, 0, 1);
+      if(type_of(files) == CONS)
+      {
+        for(auto f: files)
+          args.push_back(f->getstr());
+      }
+      else if(is_NIL(files))
+      {
+        error(NO_MATCH, arg);
+        return {};
+      }
+    }
+  }
+  else if(type_of(arg) == INTEGER)
+    args.push_back(std::to_string(arg->intval()));
+  else if(type_of(arg) == STRING)
+    args.push_back(arg->getstr());
+  else if(type_of(arg) == CONS)
+  {
+    auto result = process_one(eval(arg));
+    if(!result)
+      return {};
+    for(auto s: *result)
+      args.push_back(s);
+  }
+  else
+  {
+    error(ILLEGAL_ARG, arg);
+    return {};
+  }
+  return args;
+}
+
+/* 
+ * makeexec - Parse command line and build argument vector suitable for
+ *            execve. Returns nullptr if some error occured, like a no match
+ *            for wild cards. Returns pointers to globbed arguments.
+ */
+static std::optional<std::vector<std::string>> makeexec2(LISPT command)
+{
+  std::vector<std::string> args;
+
+  for(auto i: command)
+  {
+    auto p = process_one(i);
+    if(p)
+      for(auto j: *p)
+        args.push_back(j);
+  }
+  return args;
+}
+
+TEST_CASE("exec.cc: makeexec")
+{
+  SUBCASE("(makeexec (a b c)) -> a b c")
+  {
+    auto result = makeexec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
+    int i = 0;
+    CHECK(result[i++] == "a"s);
+    CHECK(result[i++] == "b"s);
+    CHECK(result[i++] == "c"s);
+  }
+  SUBCASE("(makeexec (100)) -> 100")
+  {
+    auto result = makeexec(cons(mknumber(100), C_NIL));
+    CHECK(result[0] == "100"s);
+  }
+  SUBCASE("(makeexec (+ 1 2)) -> 3")
+  {
+    auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
+    // file_t is("((+ 1 2))");
+    // auto expr = lispread(is);
+    auto result = makeexec(expr);
+    CHECK(result[0] == "3"s);
+  }
+  SUBCASE("(makeexec (/b*)) -> /bin")
+  {
+    file_t is("(/b*)");
+    auto expr = lispread(is);
+    auto result = makeexec(expr);
+    REQUIRE(result != nullptr);
+    CHECK(result[0] == "/bin"s);
+  }
+  SUBCASE("(makeexec (/a*)) -> <empty>")
+  {
+    file_t is("(/a*)");
+    auto expr = lispread(is);
+    auto result = makeexec(expr);
+    REQUIRE(result != nullptr);
+    REQUIRE(result[0] == nullptr);
+  }
+}
+
+TEST_CASE("exec.cc: makeexec")
+{
+  SUBCASE("(makeexec (a b c)) -> a b c")
+  {
+    auto result = makeexec2(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
+    REQUIRE(result);
+    CHECK(result->size() == 3);
+    auto i = result->begin();
+    CHECK(*i++ == "a");
+    CHECK(*i++ == "b");
+    CHECK(*i++ == "c");
+  }
+  SUBCASE("(makeexec (100)) -> 100")
+  {
+    auto result = makeexec2(cons(mknumber(100), C_NIL));
+    REQUIRE(result);
+    CHECK(result->at(0) == "100"s);
+  }
+  SUBCASE("(makeexec (+ 1 2)) -> 3")
+  {
+    // auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
+    auto is = file_t("((+ 1 2))");
+    auto expr = lispread(is);
+    auto result = makeexec2(expr);
+    REQUIRE(result);
+    CHECK(result->at(0) == "3"s);
+  }
+  SUBCASE("(makeexec (/b*)) -> /bin")
+  {
+    file_t is("(/b*)");
+    auto expr = lispread(is);
+    auto result = makeexec2(expr);
+    REQUIRE(result);
+    REQUIRE(!result->empty());
+    CHECK(result->at(0) == "/bin"s);
+  }
+  SUBCASE("(makeexec (/a*)) -> <empty>")
+  {
+    file_t is("(/a*)");
+    auto expr = lispread(is);
+    auto result = makeexec2(expr);
+    REQUIRE(result);
+    REQUIRE(result->empty());
+  }
 }
 
 /* 
