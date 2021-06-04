@@ -373,80 +373,6 @@ TEST_CASE("exec.cc: checkmeta")
   }
 }
 
-/* 
- * makeexec - Parse command line and build argument vector suitable for
- *            execve. Returns nullptr if some error occured, like a no match
- *            for wild cards. Returns pointers to globbed arguments.
- */
-static char** makeexec(LISPT command)
-{
-  static char* args[MAXARGS];
-
-  int ok = 0;
-  auto com = command;
-  sigset_t new_mask;
-  sigset_t old_mask;
-  sigemptyset(&new_mask);
-  sigaddset(&new_mask, SIGINT);
-  sigprocmask(SIG_BLOCK, &new_mask, &old_mask); /* Dangerous to interrupt here */
-  for(auto t = args; *t != nullptr; t++)
-  {
-    free(*t);
-    *t = nullptr;
-  }
-  sigprocmask(SIG_SETMASK, &old_mask, nullptr);
-  int i;
-  for(i = 0; type_of(com) == CONS && i < (MAXARGS - 1); com = com->cdr())
-  {
-  again:
-    if(type_of(com->car()) == SYMBOL)
-    {
-      auto c = strsave(extilde(com->car()->getstr().c_str(), 1));
-      if(c == nullptr)
-        return nullptr;
-      if(!checkmeta(c))
-        args[i++] = c;
-      else
-      {
-        if(ok == 0)
-          ok = 1;
-        auto files = expandfiles(c, 0, 0, 1);
-        if(!is_NIL(files))
-          ok = 2;
-        while(type_of(files) == CONS)
-        {
-          args[i++] = strsave(files->car()->getstr().c_str());
-          files = files->cdr();
-        }
-      }
-    }
-    else if(type_of(com->car()) == INTEGER)
-      args[i++] = strsave(ltoa(com->car()->intval()));
-    else if(type_of(com->car()) == STRING)
-    {
-      if((args[i++] = strsave(com->car()->getstr().c_str())) == nullptr)
-        return nullptr;
-    }
-    else if(type_of(com->car()) == CONS)
-    {
-      rplaca(*L, com, eval(*L, com->car()));
-      goto again;
-    }
-    else
-    {
-      error(ILLEGAL_ARG, com->car());
-      return nullptr;
-    }
-  }
-  args[i] = nullptr;
-  if(ok == 1)
-  {
-    error(NO_MATCH, command->cdr());
-    return nullptr;
-  }
-  return args;
-}
-
 static std::optional<std::vector<std::string>> process_one(LISPT arg)
 {
   std::vector<std::string> args;
@@ -498,7 +424,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
  *            execve. Returns nullptr if some error occured, like a no match
  *            for wild cards. Returns pointers to globbed arguments.
  */
-static std::optional<std::vector<std::string>> makeexec2(LISPT command)
+static std::optional<std::vector<std::string>> make_exec(LISPT command)
 {
   std::vector<std::string> args;
 
@@ -516,48 +442,7 @@ TEST_CASE("exec.cc: makeexec")
 {
   SUBCASE("(makeexec (a b c)) -> a b c")
   {
-    auto result = makeexec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
-    int i = 0;
-    CHECK(result[i++] == "a"s);
-    CHECK(result[i++] == "b"s);
-    CHECK(result[i++] == "c"s);
-  }
-  SUBCASE("(makeexec (100)) -> 100")
-  {
-    auto result = makeexec(cons(mknumber(100), C_NIL));
-    CHECK(result[0] == "100"s);
-  }
-  SUBCASE("(makeexec (+ 1 2)) -> 3")
-  {
-    auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
-    // file_t is("((+ 1 2))");
-    // auto expr = lispread(is);
-    auto result = makeexec(expr);
-    CHECK(result[0] == "3"s);
-  }
-  SUBCASE("(makeexec (/b*)) -> /bin")
-  {
-    file_t is("(/b*)");
-    auto expr = lispread(is);
-    auto result = makeexec(expr);
-    REQUIRE(result != nullptr);
-    CHECK(result[0] == "/bin"s);
-  }
-  SUBCASE("(makeexec (/a*)) -> <empty>")
-  {
-    file_t is("(/a*)");
-    auto expr = lispread(is);
-    auto result = makeexec(expr);
-    REQUIRE(result != nullptr);
-    REQUIRE(result[0] == nullptr);
-  }
-}
-
-TEST_CASE("exec.cc: makeexec")
-{
-  SUBCASE("(makeexec (a b c)) -> a b c")
-  {
-    auto result = makeexec2(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
+    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
     REQUIRE(result);
     CHECK(result->size() == 3);
     auto i = result->begin();
@@ -567,7 +452,7 @@ TEST_CASE("exec.cc: makeexec")
   }
   SUBCASE("(makeexec (100)) -> 100")
   {
-    auto result = makeexec2(cons(mknumber(100), C_NIL));
+    auto result = make_exec(cons(mknumber(100), C_NIL));
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
@@ -576,7 +461,7 @@ TEST_CASE("exec.cc: makeexec")
     // auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
     auto is = file_t("((+ 1 2))");
     auto expr = lispread(is);
-    auto result = makeexec2(expr);
+    auto result = make_exec(expr);
     REQUIRE(result);
     CHECK(result->at(0) == "3"s);
   }
@@ -584,7 +469,7 @@ TEST_CASE("exec.cc: makeexec")
   {
     file_t is("(/b*)");
     auto expr = lispread(is);
-    auto result = makeexec2(expr);
+    auto result = make_exec(expr);
     REQUIRE(result);
     REQUIRE(!result->empty());
     CHECK(result->at(0) == "/bin"s);
@@ -593,7 +478,7 @@ TEST_CASE("exec.cc: makeexec")
   {
     file_t is("(/a*)");
     auto expr = lispread(is);
-    auto result = makeexec2(expr);
+    auto result = make_exec(expr);
     REQUIRE(result);
     REQUIRE(result->empty());
   }
@@ -646,34 +531,43 @@ void checkfork()
  *           waitfork). Exec either returns T or ERROR depending success or
  *           failure for some reason.
  */
-static LISPT execute(const char* name, LISPT command)
+static LISPT execute(const std::string& name, LISPT command)
 {
-  char** args;
-  int pid;
-  UNION_WAIT status;
-
-  if((args = makeexec(command)) == nullptr)
+  auto args = make_exec(command);
+  if(!args)
     return C_ERROR;
+  std::vector<char*> argv;
+  for(auto a: *args)
+    argv.push_back(a.data());
+  argv.push_back(nullptr);
   if(insidefork)
   {
-    execve(name, args, environ);
+    execve(name.c_str(), &argv[0], environ);
     if(errno == ENOEXEC)
-      execvp(name, args);
+      execvp(name.c_str(), &argv[0]);
     fprintf(stderr, "%s\n", strerror(errno));
-    exit(1); /* No return */
+    exit(1);
+    /* No return */
   }
-  else if((pid = mfork()) == 0)
+  auto pid = mfork();
+  if(pid == 0)
   {
-    execve(name, args, environ);
+    execve(name.c_str(), &argv[0], environ);
     if(errno == ENOEXEC)
-      execvp(name, args);
+      execvp(name.c_str(), &argv[0]);
     fprintf(stderr, "%s\n", strerror(errno));
     exit(1);
   }
   else if(pid < 0)
     return C_ERROR;
-  status = waitfork(pid);
+  auto status = waitfork(pid);
   return mknumber(*L, WEXITSTATUS(status));
+}
+
+TEST_CASE("execute")
+{
+  auto result = execute("/bin/ls", cons(mkstring("ls"), C_NIL));
+  CHECK(result->intval() == 0);
 }
 
 /* 
