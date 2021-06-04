@@ -375,6 +375,22 @@ TEST_CASE("glob.cc: extilde2")
 }
 
 /* 
+ * strsave - saves string in argument STR in a safe place with malloc.  Returns
+ *           nullptr if either STR is nullptr or malloc fail to allocate more
+ *           memory.
+ */
+static char* strsave(const char* str)
+{
+  if(str == nullptr)
+    return nullptr;
+  auto* newstr = L->a().realmalloc((unsigned)strlen(str) + 1);
+  if(newstr == nullptr)
+    return nullptr;
+  strcpy(newstr, str);
+  return newstr;
+}
+
+/* 
  * walkfiles - walks through files as specified by WILD and builds an 
  *             unsorted array of character strings. Returns true if
  *             any file matched the pattern, false otherwise.
