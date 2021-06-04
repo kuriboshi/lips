@@ -530,7 +530,7 @@ void term_source::clearscr() { tputs(clear, 1, outc); }
 std::optional<std::string> term_source::getline()
 {
   char c;
-  const char *s, *t;
+  const char *s;
   int origpar;
   int instring = 0;
   int escaped = 0;
@@ -578,16 +578,17 @@ std::optional<std::string> term_source::getline()
         retype(1);
         break;
       case term_fun::T_TAB:
+      {
         s = mkexstr();
-        t = extilde(s, 0);
-        if(t == nullptr)
+        auto t = extilde2(s, 0);
+        if(!t)
         {
           putc(BELL, stdout);
           break;
         }
-        ex = expandfiles(t, 0, 0, 1);
+        ex = expandfiles(t->c_str(), 0, 0, 1);
         if(type_of(ex) == lisp::CONS && strlen(s) > 1)
-          ex = strip(ex, t, s);
+          ex = strip(ex, t->c_str(), s);
         if(type_of(ex) == lisp::CONS && is_NIL(ex->cdr()))
           fillrest(ex->car()->getstr().c_str());
         else
@@ -597,6 +598,7 @@ std::optional<std::string> term_source::getline()
           putc(BELL, stdout);
         }
         break;
+      }
       case term_fun::T_ERASE:
         escaped = 0;
         if(linepos > 0 && linebuffer[linepos - 1] == '\n')

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <filesystem>
 #include <string>
+#include <optional>
 #include <doctest/doctest.h>
 
 #include <sys/param.h>
@@ -263,9 +264,25 @@ const char* extilde(const char* w, int rep)
 TEST_CASE("glob.cc: extilde")
 {
   std::string home = std::getenv("HOME");
+  SUBCASE("empty string")
+  {
+    REQUIRE(extilde("", false) == ""s);
+  }
   SUBCASE("~ == HOME")
   {
     std::string dir = extilde("~", false);
+    REQUIRE(home == dir);
+  }
+  SUBCASE("~/ == HOME/")
+  {
+    std::string dir = extilde("~/", false);
+    home.push_back('/');
+    REQUIRE(home == dir);
+  }
+  SUBCASE("~/hello/ == HOME/")
+  {
+    std::string dir = extilde("~/hello/", false);
+    home += "/hello/";
     REQUIRE(home == dir);
   }
   SUBCASE("~USER == HOME")
@@ -279,6 +296,81 @@ TEST_CASE("glob.cc: extilde")
   {
     std::string unknown = "~foobar";
     REQUIRE(extilde(unknown.c_str(), false) == nullptr);
+  }
+}
+
+/*
+ * Expands tilde character in first position to home directory or
+ * other users home directory.
+ */
+const std::optional<std::string> extilde2(const std::string& w, bool report)
+{
+  if(w.empty() || w[0] != '~')
+    return w;
+  auto p = w.begin();
+  ++p;
+  std::string s;
+  if(p == w.end() || *p == '/')
+  {
+    s = home->getstr();
+    std::copy(p, w.end(), std::back_inserter(s));
+  }
+  else
+  {
+    auto first = std::find(p, w.end(), '/');
+    if(first == w.end())
+      std::copy(p, w.end(), std::back_inserter(s));
+    else
+      std::copy(p, first - 1, std::back_inserter(s));
+    auto* pw = getpwnam(s.c_str());
+    if(pw == nullptr)
+    {
+      if(report)
+        L->error(NO_USER, mkstring(s));
+      return {};
+    }
+    s = pw->pw_dir;
+    std::copy(first, w.end(), std::back_inserter(s));
+  }
+  return s;
+}
+
+TEST_CASE("glob.cc: extilde2")
+{
+  std::string home = std::getenv("HOME");
+  SUBCASE("~ == HOME")
+  {
+    auto dir = extilde2("~", false);
+    REQUIRE(dir);
+    CHECK(home == *dir);
+  }
+  SUBCASE("~/ == HOME/")
+  {
+    auto dir = extilde2("~/", false);
+    REQUIRE(dir);
+    home.push_back('/');
+    CHECK(home == *dir);
+  }
+  SUBCASE("~/hello/ == HOME/")
+  {
+    auto dir = extilde2("~/hello/", false);
+    REQUIRE(dir);
+    home += "/hello/";
+    CHECK(home == *dir);
+  }
+  SUBCASE("~USER == HOME")
+  {
+    std::string user = std::getenv("USER");
+    auto tilde_user = "~" + user;
+    auto dir = extilde2(tilde_user, false);
+    REQUIRE(dir);
+    CHECK(home == *dir);
+  }
+  SUBCASE("~UNKNOWN != ")
+  {
+    std::string unknown = "~foobar";
+    auto dir = extilde2(unknown, false);
+    REQUIRE(!dir);
   }
 }
 
@@ -391,75 +483,93 @@ LISPT expandfiles(const char* wild, int all, int report, int sort)
   return buildlist();
 }
 
-TEST_CASE("glob.cc: expandfiles")
-{
-  std::error_code ec;
-  std::filesystem::create_directories("testdir/a", ec);
-  REQUIRE(!ec);
-  std::filesystem::create_directories("testdir/bb", ec);
-  REQUIRE(!ec);
-  std::filesystem::create_directories("testdir/ccc", ec);
-  REQUIRE(!ec);
-  
-  SUBCASE("Expand all files")
-  {
-    auto result = expandfiles("testdir/*", false, false, true);
-    REQUIRE(length(result)->intval() == 3);
-
-    int count = 3;
-    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
-    {
-      for(auto a = result; !is_NIL(a); a = a->cdr())
-      {
-        if(a->car()->getstr() == i)
-          --count;
-      }
-    }
-    REQUIRE(count == 0);
-  }
-  SUBCASE("Expand only one file")
-  {
-    auto result = expandfiles("testdir/??", false, false, true);
-    REQUIRE(length(result)->intval() == 1);
-
-    int count = 1;
-    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
-    {
-      for(auto a = result; !is_NIL(a); a = a->cdr())
-      {
-        if(a->car()->getstr() == i)
-          --count;
-      }
-    }
-    REQUIRE(count == 0);
-  }
-
-  std::filesystem::remove("testdir/a", ec);
-  REQUIRE(!ec);
-  std::filesystem::remove("testdir/bb", ec);
-  REQUIRE(!ec);
-  std::filesystem::remove("testdir/ccc", ec);
-  REQUIRE(!ec);
-  std::filesystem::remove("testdir", ec);
-  REQUIRE(!ec);
-}
-
 /*
  * Lisp function expand. Expand all files matching wild
  * in directory dir.
  */
 PRIMITIVE expand(::lisp::lisp& l, LISPT wild, LISPT rep, LISPT all)
 {
-  const char* wstr;
-  int r = 0;
-
-  if(is_NIL(rep))
-    r = 1;
+  bool r = is_NIL(rep) ? true : false;
   l.check(wild, STRING, SYMBOL);
-  wstr = extilde(wild->getstr().c_str(), r);
-  if(wstr == nullptr)
+  auto wstr = extilde2(wild->getstr(), r);
+  if(!wstr)
     return C_NIL;
-  return expandfiles(wstr, is_NIL(all) ? 0 : 1, r, 0);
+  return expandfiles(wstr->c_str(), is_NIL(all) ? 0 : 1, r, 0);
+}
+
+TEST_CASE("glob.cc: expandfiles")
+{
+  std::error_code ec;
+  std::filesystem::create_directories("testdir/a", ec);
+  CHECK(!ec);
+  std::filesystem::create_directories("testdir/bb", ec);
+  CHECK(!ec);
+  std::filesystem::create_directories("testdir/ccc", ec);
+  CHECK(!ec);
+  
+  SUBCASE("Expand all files")
+  {
+    auto result = expandfiles("testdir/*", false, false, true);
+    CHECK(length(result)->intval() == 3);
+
+    int count = 3;
+    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    {
+      for(auto a: result)
+      {
+        if(a->getstr() == i)
+        {
+          CHECK(a->getstr() == i);
+          --count;
+          break;
+        }
+      }
+    }
+    CHECK(count == 0);
+  }
+  SUBCASE("Expand only one file")
+  {
+    auto result = expandfiles("testdir/??", false, false, true);
+    CHECK(length(result)->intval() == 1);
+
+    int count = 1;
+    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    {
+      for(auto a: result)
+      {
+        if(a->getstr() == i)
+        {
+          CHECK(a->getstr() == i);
+          --count;
+          break;
+        }
+      }
+    }
+    CHECK(count == 0);
+  }
+
+  LISPT wild = mkstring("testdir/*");
+  auto e = expand(*L, wild, 0, 0);
+  CHECK(length(e)->intval() == 3);
+  std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
+  for(auto i: e)
+    for(auto j: x)
+    {
+      if(i->getstr() == j)
+      {
+        CHECK(i->getstr() == j);
+        break;
+      }
+    }
+
+  std::filesystem::remove("testdir/a", ec);
+  CHECK(!ec);
+  std::filesystem::remove("testdir/bb", ec);
+  CHECK(!ec);
+  std::filesystem::remove("testdir/ccc", ec);
+  CHECK(!ec);
+  std::filesystem::remove("testdir", ec);
+  CHECK(!ec);
 }
 
 LISPT glob(LISPT wild) { return expand(*L, wild, 0, 0); }
