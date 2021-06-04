@@ -70,6 +70,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   messages[error_code(UNDEF_FUNCTION)] = "Undefined function";
   messages[error_code(UNBOUND_VARIABLE)] = "Unbound variable";
   messages[error_code(KBD_BREAK)] = "Break";
+  messages[error_code(AMBIGUOUS)] = "Ambiguous";
   messages[error_code(USER_ERROR)] = "";
 
   auto intern = [this](const char* s) { return a().intern(s); };
