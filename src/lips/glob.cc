@@ -331,7 +331,7 @@ static bool walkfiles(const char* wild, bool all, bool report)
   if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
   {
     if(report)
-      L->error(NO_DIRECTORY, mkstring(r));
+      error(NO_DIRECTORY, mkstring(r));
     return false;
   }
   while((rdir = readdir(odir)) != nullptr)
@@ -370,17 +370,107 @@ static bool walkfiles(const char* wild, bool all, bool report)
   return result;
 }
 
+/* 
+ * walkfiles - walks through files as specified by WILD and builds an 
+ *             unsorted array of character strings. Returns true if
+ *             any file matched the pattern, false otherwise.
+ */
+static std::vector<std::string> walkfiles2(
+  const std::filesystem::path& root, const std::string& wild, bool all, bool report)
+{
+  std::vector<std::string> result;
+  auto last = wild.find('/');
+  auto w = [&]() {
+    if(last == std::string::npos)
+      return wild;
+    return wild.substr(0, last);
+  }();
+  auto rest = [&]() {
+    if(last == std::string::npos)
+      return ""s;
+    auto first = wild.find_first_not_of('/', last);
+    return wild.substr(first);
+  }();
+  if(last == 0)
+    return walkfiles2("/", rest, all, report);
+  for(auto& d: std::filesystem::directory_iterator(root))
+  {
+    if((all || d.path().filename().string()[0] != '.' || w[0] == '.')
+      && match(d.path().filename().string().c_str(), w.c_str()))
+    {
+      if(!rest.empty() && std::filesystem::is_directory(d.path()))
+      {
+        auto subdir = root;
+        if(subdir == "."s)
+          subdir = d.path().filename();
+        else
+          subdir /= d.path().filename();
+        for(auto& p: walkfiles2(subdir, rest, all, report))
+          result.push_back(p);
+      }
+      else
+      {
+        if(root == "."s)
+          result.push_back(d.path().filename());
+        else
+          result.push_back(root / d.path().filename());
+      }
+    }
+  }
+  return result;
+}
+
 TEST_CASE("glob.cc: walkfiles")
 {
-  globarr = (char**)malloc(TICKS * sizeof(char*));
-  globp = globarr;
-  globlimit = globarr + TICKS;
-  auto result = walkfiles("*", false, false);
-  REQUIRE(result);
-#if 0
-  for(auto r = globarr; r < globp; r++)
-    std::cout << *r << std::endl;
-#endif
+  std::error_code ec;
+  for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y"})
+  {
+    std::filesystem::create_directories(s, ec);
+    CHECK(!ec);
+  }
+
+  SUBCASE("test 1")
+  {
+    auto result = walkfiles2(".", "*", false, false);
+    REQUIRE(!result.empty());
+  }
+  SUBCASE("test 2")
+  {
+    auto result = walkfiles2(".", "testdi*", false, false);
+    REQUIRE(!result.empty());
+    CHECK(result.size() == 1);
+    CHECK(result[0] == "testdir"s);
+  }
+  SUBCASE("test 3")
+  {
+    auto result = walkfiles2(".", "testdir/*", false, false);
+    REQUIRE(!result.empty());
+    CHECK(result.size() == 4);
+    for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
+      CHECK(std::find(result.begin(), result.end(), r) != result.end());
+  }
+  SUBCASE("test 4")
+  {
+    auto result = walkfiles2(".", "testdir/*/*", false, false);
+    REQUIRE(!result.empty());
+    CHECK(result.size() == 1);
+    for(auto r: {"testdir/x/y"})
+      CHECK(std::find(result.begin(), result.end(), r) != result.end());
+  }
+  SUBCASE("test 5")
+  {
+    auto result = walkfiles2(".", "testdir/[b]*", false, false);
+    REQUIRE(!result.empty());
+    CHECK(result.size() == 1);
+    for(auto r: {"testdir/bb"})
+      CHECK(std::find(result.begin(), result.end(), r) != result.end());
+  }
+
+  for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y", "testdir/x", "testdir"})
+  {
+    std::filesystem::remove(s, ec);
+    CHECK(!ec);
+  }
 }
 
 static LISPT buildlist()
