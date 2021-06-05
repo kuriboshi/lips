@@ -561,6 +561,9 @@ void alloc::dzero() { destblockused = 0; }
 
 alloc::alloc(lisp& lisp): _lisp(lisp)
 {
+  for(int i = 0; i != MAXHASH; ++i)
+    obarray[i] = nullptr;
+
   add_mark_object(&_lisp.topprompt);
   add_mark_object(&_lisp.brkprompt);
   add_mark_object(&_lisp.currentbase);
