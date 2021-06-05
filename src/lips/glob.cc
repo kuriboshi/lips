@@ -38,107 +38,111 @@ using namespace lisp;
 // parameter, ss, is the complete original path and is used to verify that the
 // path refers to a directory.
 //
-static bool dircheck(const char* str, const char* wild, const std::string& ss)
+static bool dircheck(const std::string& str, const std::string& wild, const std::string& ss)
 {
-  if(*wild == '/')
+  auto sbegin = str.begin();
+  auto wbegin = wild.begin();
+  if(*wbegin == '/')
   {
-    if(*str)
+    if(sbegin != str.end())
       return false;
     return std::filesystem::is_directory(ss);
   }
-  while(*wild == '*') wild++;
-  if(*str || *wild)
+  while(*wbegin == '*')
+    ++wbegin;
+  if(sbegin != str.end() || wbegin != wild.end())
     return false;
   return true;
 }
 
 TEST_CASE("glob.cc: dircheck")
 {
-  REQUIRE(dircheck("", "/", "/"));
+  CHECK(dircheck("", "/", "/"));
 }
 
 /*
  * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
  * is a simple string with no slashes.
  */
-static bool match(const char* str, const char* wild)
+static bool match(const std::string& str, const std::string& wild)
 {
-  const char* ss = str;
-
-  while(*wild && *str)
+  auto sbegin = str.begin();
+  auto wbegin = wild.begin();
+  while(sbegin != str.end() && wbegin != wild.end())
   {
-    switch(*wild)
+    switch(*wbegin)
     {
       case '*':
-        wild++;
-        while(*str)
-          if(match(str, wild))
+        ++wbegin;
+        while(sbegin != str.end())
+        {
+          if(match(std::string(sbegin, str.end()), std::string(wbegin, wild.end())))
             return true;
-          else
-            str++;
-        return dircheck(str, wild, ss);
+          ++sbegin;
+        }
+        return dircheck(std::string(sbegin, str.end()), std::string(wbegin, wild.end()), str);
       case '?':
         break;
       case '[':
       {
         bool ok = false;
-        while(*wild && *wild != ']')
+        while(wbegin != wild.end() && *wbegin != ']')
         {
-          if(*wild == *str)
+          if(*wbegin == *sbegin)
             ok = true;
-          wild++;
+          ++wbegin;
         }
-        if(!ok && *wild)
+        if(!ok && wbegin != wild.end())
           return false;
         break;
       }
       case '\\':
-        wild++;
+        ++wbegin;
         /* fall through */
       default:
-        if(*str != *wild)
+        if(*sbegin != *wbegin)
           return false;
         break;
     }
-    str++;
-    wild++;
+    ++sbegin;
+    ++wbegin;
   }
-  return dircheck(str, wild, ss);
+  return dircheck(std::string(sbegin, str.end()), std::string(wbegin, wild.end()), str);
 }
 
 TEST_CASE("glob.cc: match")
 {
   SUBCASE("pattern a*")
   {
-    REQUIRE(match("alpha", "a*"));
-    REQUIRE(!match("beta", "a*"));
-    REQUIRE(match("aaa", "a*"));
+    CHECK(match("alpha", "a*"));
+    CHECK(!match("beta", "a*"));
+    CHECK(match("aaa", "a*"));
   }
   SUBCASE("pattern *a*")
   {
-    REQUIRE(match("xxxaxxx", "*a*"));
-    REQUIRE(match("xxxa", "*a*"));
-    REQUIRE(match("axxx", "*a*"));
+    CHECK(match("xxxaxxx", "*a*"));
+    CHECK(match("xxxa", "*a*"));
+    CHECK(match("axxx", "*a*"));
   }
   SUBCASE("pattern *.cc")
   {
-    REQUIRE(match("glob.cc", "*.cc"));
-    REQUIRE(!match("glob.hh", "*.cc"));
+    CHECK(match("glob.cc", "*.cc"));
+    CHECK(!match("glob.hh", "*.cc"));
   }
   SUBCASE("pattern *.??")
   {
-    REQUIRE(match("foo.cc", "*.??"));
-    REQUIRE(!match("foo.cpp", "*.??"));
+    CHECK(match("foo.cc", "*.??"));
+    CHECK(!match("foo.cpp", "*.??"));
   }
   SUBCASE("pattern [abc].??")
   {
-    REQUIRE(match("a.cc", "[abc].??"));
-    REQUIRE(match("b.cc", "[abc].??"));
-    REQUIRE(match("c.hh", "[abc].??"));
-    REQUIRE(!match("d.cc", "[abc].??"));
-    REQUIRE(!match("b.cpp", "[abc].??"));
-    REQUIRE(!match("b.c", "[abc].??"));
-    REQUIRE(match("b...", "[abc].??"));
+    CHECK(match("a.cc", "[abc].??"));
+    CHECK(match("b.cc", "[abc].??"));
+    CHECK(match("c.hh", "[abc].??"));
+    CHECK(!match("d.cc", "[abc].??"));
+    CHECK(!match("b.cpp", "[abc].??"));
+    CHECK(!match("b.c", "[abc].??"));
+    CHECK(match("b...", "[abc].??"));
   }
 }
 
@@ -151,7 +155,7 @@ static LISPT orderinsert(LISPT what, LISPT where)
   auto p2 = where;
   while(!is_NIL(p2))
   {
-    if(strcmp(p2->car()->getstr().c_str(), what->getstr().c_str()) > 0)
+    if(what->getstr() < p2->car()->getstr())
     {
       if(!is_NIL(p1))
       {
@@ -180,24 +184,24 @@ TEST_CASE("glob.cc: orderinsert")
     auto b = mkstring("b");
     auto result = orderinsert(b, list);
     REQUIRE(type_of(result) == CONS);
-    REQUIRE(result->cdr()->car()->getstr() == b->getstr());
-    REQUIRE(equal(list, result));
+    CHECK(result->cdr()->car()->getstr() == b->getstr());
+    CHECK(equal(list, result));
   }
   SUBCASE("Insert at the end")
   {
     auto d = mkstring("d");
     auto result = orderinsert(d, list);
     REQUIRE(type_of(result) == CONS);
-    REQUIRE(result->cdr()->cdr()->car()->getstr() == d->getstr());
-    REQUIRE(equal(list, result));
+    CHECK(result->cdr()->cdr()->car()->getstr() == d->getstr());
+    CHECK(equal(list, result));
   }
   SUBCASE("Insert at the beginning")
   {
     auto A = mkstring("A");
     auto result = orderinsert(A, list);
     REQUIRE(type_of(result) == CONS);
-    REQUIRE(result->car()->getstr() == A->getstr());
-    REQUIRE(equal(result->cdr(), list));
+    CHECK(result->car()->getstr() == A->getstr());
+    CHECK(equal(result->cdr(), list));
   }
 }
 
@@ -302,7 +306,7 @@ static std::vector<std::string> walkfiles(
   for(auto& d: std::filesystem::directory_iterator(root))
   {
     if((all || d.path().filename().string()[0] != '.' || w[0] == '.')
-      && match(d.path().filename().string().c_str(), w.c_str()))
+      && match(d.path().filename().string(), w))
     {
       if(!rest.empty() && std::filesystem::is_directory(d.path()))
       {
@@ -332,13 +336,13 @@ TEST_CASE("glob.cc: walkfiles")
   for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y"})
   {
     std::filesystem::create_directories(s, ec);
-    CHECK(!ec);
+    REQUIRE(!ec);
   }
 
   SUBCASE("test 1")
   {
     auto result = walkfiles(".", "*", false, false);
-    REQUIRE(!result.empty());
+    CHECK(!result.empty());
   }
   SUBCASE("test 2")
   {
@@ -375,7 +379,7 @@ TEST_CASE("glob.cc: walkfiles")
   for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y", "testdir/x", "testdir"})
   {
     std::filesystem::remove(s, ec);
-    CHECK(!ec);
+    REQUIRE(!ec);
   }
 }
 
