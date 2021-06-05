@@ -32,9 +32,6 @@ inline constexpr int TICKS = 64;
 inline constexpr int NAMELEN = 1024;
 
 static char r[MAXPATHLEN];
-static char** globarr;
-static char** globp;
-static char** globlimit;
 
 //
 // If *wild is a slash then str must be a directory to match wild completely.
@@ -295,87 +292,11 @@ TEST_CASE("glob.cc: extilde")
 }
 
 /* 
- * strsave - saves string in argument STR in a safe place with malloc.  Returns
- *           nullptr if either STR is nullptr or malloc fail to allocate more
- *           memory.
- */
-static char* strsave(const char* str)
-{
-  if(str == nullptr)
-    return nullptr;
-  auto* newstr = L->a().realmalloc((unsigned)strlen(str) + 1);
-  if(newstr == nullptr)
-    return nullptr;
-  strcpy(newstr, str);
-  return newstr;
-}
-
-/* 
  * walkfiles - walks through files as specified by WILD and builds an 
  *             unsorted array of character strings. Returns true if
  *             any file matched the pattern, false otherwise.
  */
-static bool walkfiles(const char* wild, bool all, bool report)
-{
-  bool result;
-  int pos;
-  struct dirent* rdir;
-  DIR* odir;
-  const char* sw;
-  const char* w;
-
-  if(*wild == '/')
-    w = wild + 1;
-  else
-    w = wild;
-  if((odir = opendir(*r == '\0' ? "." : r)) == nullptr)
-  {
-    if(report)
-      error(NO_DIRECTORY, mkstring(r));
-    return false;
-  }
-  while((rdir = readdir(odir)) != nullptr)
-  {
-    if((all || rdir->d_name[0] != '.' || *w == '.') && match(rdir->d_name, w))
-    {
-      result = true;
-      pos = strlen(r);
-      if(pos != 0 && r[pos - 1] != '/')
-        strcat(r, "/");
-      strcat(r, rdir->d_name);
-      for(sw = w; *sw && *sw != '/'; sw++)
-        ;
-      if(*sw && *(++sw))
-        result = walkfiles(sw, all, false);
-      else
-      {
-        *globp = strsave(r);
-        if(globp == globlimit)
-        {
-          int foo;
-
-          foo = globp - globarr;
-          globarr = (char**)realloc(globarr, (foo + TICKS) * sizeof(char*));
-          globlimit = globarr + foo + TICKS;
-          globp = globarr + foo;
-        }
-        globp++;
-      }
-      r[pos] = '\0';
-    }
-  }
-  closedir(odir);
-  if(!result && report)
-    L->error(NO_MATCH, mkstring(wild));
-  return result;
-}
-
-/* 
- * walkfiles - walks through files as specified by WILD and builds an 
- *             unsorted array of character strings. Returns true if
- *             any file matched the pattern, false otherwise.
- */
-static std::vector<std::string> walkfiles2(
+static std::vector<std::string> walkfiles(
   const std::filesystem::path& root, const std::string& wild, bool all, bool report)
 {
   std::vector<std::string> result;
@@ -392,7 +313,7 @@ static std::vector<std::string> walkfiles2(
     return wild.substr(first);
   }();
   if(last == 0)
-    return walkfiles2("/", rest, all, report);
+    return walkfiles("/", rest, all, report);
   for(auto& d: std::filesystem::directory_iterator(root))
   {
     if((all || d.path().filename().string()[0] != '.' || w[0] == '.')
@@ -405,7 +326,7 @@ static std::vector<std::string> walkfiles2(
           subdir = d.path().filename();
         else
           subdir /= d.path().filename();
-        for(auto& p: walkfiles2(subdir, rest, all, report))
+        for(auto& p: walkfiles(subdir, rest, all, report))
           result.push_back(p);
       }
       else
@@ -431,19 +352,19 @@ TEST_CASE("glob.cc: walkfiles")
 
   SUBCASE("test 1")
   {
-    auto result = walkfiles2(".", "*", false, false);
+    auto result = walkfiles(".", "*", false, false);
     REQUIRE(!result.empty());
   }
   SUBCASE("test 2")
   {
-    auto result = walkfiles2(".", "testdi*", false, false);
+    auto result = walkfiles(".", "testdi*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     CHECK(result[0] == "testdir"s);
   }
   SUBCASE("test 3")
   {
-    auto result = walkfiles2(".", "testdir/*", false, false);
+    auto result = walkfiles(".", "testdir/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 4);
     for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
@@ -451,7 +372,7 @@ TEST_CASE("glob.cc: walkfiles")
   }
   SUBCASE("test 4")
   {
-    auto result = walkfiles2(".", "testdir/*/*", false, false);
+    auto result = walkfiles(".", "testdir/*/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/x/y"})
@@ -459,7 +380,7 @@ TEST_CASE("glob.cc: walkfiles")
   }
   SUBCASE("test 5")
   {
-    auto result = walkfiles2(".", "testdir/[b]*", false, false);
+    auto result = walkfiles(".", "testdir/[b]*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/bb"})
@@ -473,40 +394,27 @@ TEST_CASE("glob.cc: walkfiles")
   }
 }
 
-static LISPT buildlist()
+static LISPT buildlist(const std::vector<std::string>& list)
 {
   LISPT l = C_NIL;
-  for(auto r = globarr; r < globp; r++)
-  {
-    l = cons(*L, mkstring(*L, *r), l);
-    free(*r);
-  }
-  free(globarr);
+  for(auto r: list)
+    l = cons(mkstring(r), l);
   return l;
-}
-
-static int comp(const void* a, const void* b)
-{
-  /* Reverse sort. */
-  return -strcmp(*(char**)a, *(char**)b);
 }
 
 LISPT expandfiles(const char* wild, bool all, bool report, bool sort)
 {
   if(*wild == '/' && *(wild + 1) == '\0')
     return cons(mkstring(*L, wild), C_NIL);
-  if(*wild == '/')
-    strcpy(r, "/");
-  else
-    strcpy(r, "");
-  globarr = (char**)malloc(TICKS * sizeof(char*));
-  globp = globarr;
-  globlimit = globarr + TICKS;
-  if(!walkfiles(wild, all, report))
+  auto files = walkfiles(".", wild, all, report);
+  if(files.empty())
     return C_ERROR;
+  struct {
+    bool operator()(const std::string& a, const std::string& b) { return b < a; }
+  } reverse;
   if(!is_NIL(globsort) || sort)
-    qsort((char*)globarr, globp - globarr, sizeof(char*), comp);
-  return buildlist();
+    std::sort(files.begin(), files.end(), reverse);
+  return buildlist(files);
 }
 
 /*
@@ -593,7 +501,7 @@ TEST_CASE("glob.cc: expandfiles")
 
   SUBCASE("test*/*")
   {
-    LISPT wild = mkstring("test*/*");
+    LISPT wild = mkstring("testd*/*");
     auto e = expand(*L, wild, 0, 0);
     CHECK(length(e)->intval() == 3);
     std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
