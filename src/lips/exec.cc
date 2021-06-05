@@ -453,7 +453,7 @@ static LISPT execute(const std::string& name, LISPT command)
   if(!args)
     return C_ERROR;
   std::vector<char*> argv;
-  for(auto a: *args)
+  for(auto& a: *args)
     argv.push_back(a.data());
   argv.push_back(nullptr);
   if(insidefork)
