@@ -28,11 +28,6 @@ extern lisp::lisp* L;
 using namespace std::literals;
 using namespace lisp;
 
-inline constexpr int TICKS = 64;
-inline constexpr int NAMELEN = 1024;
-
-static char r[MAXPATHLEN];
-
 //
 // If *wild is a slash then str must be a directory to match wild completely.
 // Used by match.
@@ -43,24 +38,13 @@ static char r[MAXPATHLEN];
 // parameter, ss, is the complete original path and is used to verify that the
 // path refers to a directory.
 //
-static bool dircheck(const char* str, const char* wild, const char* ss)
+static bool dircheck(const char* str, const char* wild, const std::string& ss)
 {
-  struct stat sbuf;
-  int pos;
-
   if(*wild == '/')
   {
     if(*str)
       return false;
-    pos = strlen(r);
-    if(pos != 0)
-      strcat(r, "/");
-    strcat(r, ss);
-    stat(r, &sbuf);
-    r[pos] = '\0';
-    if(sbuf.st_mode & S_IFDIR)
-      return true;
-    return false;
+    return std::filesystem::is_directory(ss);
   }
   while(*wild == '*') wild++;
   if(*str || *wild)
@@ -79,7 +63,6 @@ TEST_CASE("glob.cc: dircheck")
  */
 static bool match(const char* str, const char* wild)
 {
-  int ok;
   const char* ss = str;
 
   while(*wild && *str)
@@ -97,16 +80,18 @@ static bool match(const char* str, const char* wild)
       case '?':
         break;
       case '[':
-        ok = 0;
+      {
+        bool ok = false;
         while(*wild && *wild != ']')
         {
           if(*wild == *str)
-            ok = 1;
+            ok = true;
           wild++;
         }
         if(!ok && *wild)
           return false;
         break;
+      }
       case '\\':
         wild++;
         /* fall through */
