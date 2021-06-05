@@ -530,7 +530,7 @@ int execcommand(LISPT exp, LISPT* res)
   {
     if(is_NIL(cdir) || cdir->getstr() == ".")
       comdir = ".";
-    else if(*command == cmd->first)
+    else if(cmd != exechash.end() && *command == cmd->first)
       comdir = cdir->getstr();
     else
       continue;
