@@ -10,13 +10,7 @@
 #include <optional>
 #include <doctest/doctest.h>
 
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <dirent.h>
 #include <pwd.h>
-
-#include <cstring>
-#include <cstdlib>
 
 #include <lisp/libisp.hh>
 #include "main.hh"
@@ -391,10 +385,10 @@ static LISPT buildlist(const std::vector<std::string>& list)
   return l;
 }
 
-LISPT expandfiles(const char* wild, bool all, bool report, bool sort)
+LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort)
 {
-  if(*wild == '/' && *(wild + 1) == '\0')
-    return cons(mkstring(*L, wild), C_NIL);
+  if(wild == "/"s)
+    return cons(mkstring(wild), C_NIL);
   auto files = walkfiles(".", wild, all, report);
   if(files.empty())
     return C_ERROR;
@@ -412,12 +406,12 @@ LISPT expandfiles(const char* wild, bool all, bool report, bool sort)
  */
 PRIMITIVE expand(::lisp::lisp& l, LISPT wild, LISPT rep, LISPT all)
 {
-  bool r = is_NIL(rep);
+  auto r = is_NIL(rep);
   l.check(wild, STRING, SYMBOL);
   auto wstr = extilde(wild->getstr(), r);
   if(!wstr)
     return C_NIL;
-  return expandfiles(wstr->c_str(), !is_NIL(all), r, false);
+  return expandfiles(*wstr, !is_NIL(all), r, false);
 }
 
 TEST_CASE("glob.cc: expandfiles")
