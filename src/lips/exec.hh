@@ -70,6 +70,4 @@ inline LISPT doexec(lisp& l, LISPT cmd) { return exec(l).doexec(cmd); }
 extern bool insidefork;
 
 extern void printdone();
-extern char* ltoa(int);
 extern void checkfork();
-extern int execcommand(lisp::LISPT, lisp::LISPT*);

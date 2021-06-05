@@ -14,6 +14,7 @@
 #include <doctest/doctest.h>
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <iostream>
 #include <cstdlib>
 #include <cerrno>
@@ -32,8 +33,6 @@ extern lisp::lisp* L;
 using namespace lisp;
 using namespace std::literals;
 
-inline constexpr int EXECHASH = 1023; /* Hash table size for commands */
-
 extern char** environ;
 LISPT p_setenv(LISPT, LISPT);
 
@@ -41,7 +40,7 @@ using UNION_WAIT = int;
 
 bool insidefork = false; // Is nonzero in the child after a fork
 
-static int exechash[EXECHASH / 32]; /* One bit set for each program */
+static std::unordered_map<std::string, std::string> exechash;
 static int pgrp;                    /* Process group of current job */
 
 #ifdef JOB_CONTROL
@@ -302,7 +301,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
       args.push_back(str);
     else
     {
-      auto files = expandfiles(c->c_str(), false, false, true);
+      auto files = expandfiles(*c, false, false, true);
       if(type_of(files) == CONS)
       {
         for(auto f: files)
@@ -504,22 +503,6 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
   return false;
 }
 
-/* hashfun - Calculates the hash function used in hashtable. */
-static int hashfun(const char* str)
-{
-  int i;
-  int bc;
-
-  i = 0;
-  bc = 0;
-  while(*str)
-  {
-    i ^= (*str++) << bc;
-    bc = (bc + 7) % 10;
-  }
-  return i % (EXECHASH);
-}
-
 /* 
  * execcommand - Tries to execute the lisp expression exp as a command. 
  *               execcomand returns 0 if there is no executable file in 
@@ -528,9 +511,6 @@ static int hashfun(const char* str)
  */
 int execcommand(LISPT exp, LISPT* res)
 {
-  std::string comdir;
-  int i, possible;
-
   *res = C_T;
   auto command = extilde(exp->car()->getstr(), true);
   if(!command || command->empty())
@@ -543,20 +523,15 @@ int execcommand(LISPT exp, LISPT* res)
       return 1;
   }
 
-  i = hashfun(command->c_str());
-  possible = exechash[i / 32] & (1 << (i % 32));
+  auto cmd = exechash.find(*command);
 
+  std::string comdir;
   for(auto cdir: path)
   {
     if(is_NIL(cdir) || cdir->getstr() == ".")
       comdir = ".";
-    else if(possible)
-    {
-      /* This isn't really necessary, is it? */
-      if(type_of(cdir) != STRING && type_of(cdir) != SYMBOL)
-        return -1;
+    else if(*command == cmd->first)
       comdir = cdir->getstr();
-    }
     else
       continue;
     if(ifexec(comdir, *command))
@@ -767,30 +742,15 @@ PRIMITIVE exec::stop()
 
 PRIMITIVE exec::rehash()
 {
-  DIR* odir;
-  struct dirent* rdir;
-  const char* sdir;
+  exechash.clear();
 
-  for(int i = 0; i < EXECHASH / 32; i++)
-    exechash[i] = 0;
-
-  for(auto p = path; type_of(p) == CONS; p = p->cdr())
+  for(auto p: path)
   {
-    if(is_NIL(p->car()))
+    if(is_NIL(p))
       continue;
-    else
-    {
-      l.check(p->car(), STRING, SYMBOL);
-      sdir = p->car()->getstr().c_str();
-    }
-    if((odir = opendir(sdir)) == nullptr)
-      continue;
-    while((rdir = readdir(odir)) != nullptr)
-    {
-      auto i = hashfun(rdir->d_name);
-      exechash[i / 32] |= 1 << (i % 32);
-    }
-    closedir(odir);
+    l.check(p, STRING, SYMBOL);
+    for(auto& odir: std::filesystem::directory_iterator(p->getstr()))
+      exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }
   return C_NIL;
 }
