@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <doctest/doctest.h>
+#include <filesystem>
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -293,7 +294,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
   std::vector<std::string> args;
   if(type_of(arg) == SYMBOL)
   {
-    auto c = extilde2(arg->getstr(), true);
+    auto c = extilde(arg->getstr(), true);
     if(!c)
       return {};
     auto [meta, str] = check_meta(*c);
@@ -301,7 +302,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
       args.push_back(str);
     else
     {
-      auto files = expandfiles(c->c_str(), 0, 0, 1);
+      auto files = expandfiles(c->c_str(), false, false, true);
       if(type_of(files) == CONS)
       {
         for(auto f: files)
@@ -488,17 +489,17 @@ TEST_CASE("execute")
 /* 
  * ifexec - Returns true if directory DIR contains a NAME that is executable.
  */
-static bool ifexec(const char* dir, const char* name)
+static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 {
-  static char path[MAXNAMLEN];
-  struct stat buf;
-
-  strcpy(path, dir);
-  strcat(path, "/");
-  strcat(path, name);
-  if(stat(path, &buf) == -1)
+  auto path = dir / name;
+  std::error_code ec;
+  auto status = std::filesystem::status(path, ec);
+  if(!ec)
     return false;
-  if((buf.st_mode & (S_IEXEC | S_IFREG)) == (S_IEXEC | S_IFREG))
+  if(status.type() == std::filesystem::file_type::regular
+    && (status.permissions() == std::filesystem::perms::others_exec
+      || status.permissions() == std::filesystem::perms::group_exec
+      || status.permissions() == std::filesystem::perms::owner_exec))
     return true;
   return false;
 }
@@ -527,43 +528,41 @@ static int hashfun(const char* str)
  */
 int execcommand(LISPT exp, LISPT* res)
 {
-  LISPT cdir;
-  const char* command;
-  char comdir[MAXPATHLEN];
+  std::string comdir;
   int i, possible;
 
   *res = C_T;
-  command = extilde(exp->car()->getstr().c_str(), 1);
-  if(command == nullptr)
+  auto command = extilde(exp->car()->getstr(), true);
+  if(!command || command->empty())
     return -1;
-  if(*command == '/' || strpbrk(command, "/") != nullptr)
+  if(command->at(0) == '/' || strpbrk(command->c_str(), "/") != nullptr)
   {
-    if(EQ(execute(command, exp), C_ERROR))
+    if(EQ(execute(*command, exp), C_ERROR))
       return -1;
     else
       return 1;
   }
 
-  i = hashfun(command);
+  i = hashfun(command->c_str());
   possible = exechash[i / 32] & (1 << (i % 32));
 
-  for(cdir = path; type_of(cdir) == CONS; cdir = cdir->cdr())
+  for(auto cdir: path)
   {
-    if(is_NIL(cdir->car()) || strcmp(cdir->car()->getstr().c_str(), ".") == 0)
-      strcpy(comdir, ".");
+    if(is_NIL(cdir) || cdir->getstr() == ".")
+      comdir = ".";
     else if(possible)
     {
       /* This isn't really necessary, is it? */
-      if(type_of(cdir->car()) != STRING && type_of(cdir->car()) != SYMBOL)
+      if(type_of(cdir) != STRING && type_of(cdir) != SYMBOL)
         return -1;
-      strcpy(comdir, cdir->car()->getstr().c_str());
+      comdir = cdir->getstr();
     }
     else
       continue;
-    if(ifexec(comdir, command))
+    if(ifexec(comdir, *command))
     {
-      strcat(comdir, "/");
-      strcat(comdir, command);
+      comdir += "/";
+      comdir += *command;
       if(EQ(execute(comdir, exp), C_ERROR))
         return -1;
       else

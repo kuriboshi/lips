@@ -580,13 +580,13 @@ std::optional<std::string> term_source::getline()
       case term_fun::T_TAB:
       {
         s = mkexstr();
-        auto t = extilde2(s, 0);
+        auto t = extilde(s, 0);
         if(!t)
         {
           putc(BELL, stdout);
           break;
         }
-        ex = expandfiles(t->c_str(), 0, 0, 1);
+        ex = expandfiles(t->c_str(), false, false, true);
         if(type_of(ex) == lisp::CONS && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
         if(type_of(ex) == lisp::CONS && is_NIL(ex->cdr()))
