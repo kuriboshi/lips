@@ -30,7 +30,7 @@ using namespace lisp;
 // parameter, ss, is the complete original path and is used to verify that the
 // path refers to a directory.
 //
-static bool dircheck(const std::string& str, const std::string& wild, const std::string& ss)
+bool glob::dircheck(const std::string& str, const std::string& wild, const std::string& ss)
 {
   auto sbegin = str.begin();
   auto wbegin = wild.begin();
@@ -47,16 +47,16 @@ static bool dircheck(const std::string& str, const std::string& wild, const std:
   return true;
 }
 
-TEST_CASE("glob.cc: dircheck")
+void glob::_test_dircheck()
 {
-  CHECK(dircheck("", "/", "/"));
+  CHECK(glob::dircheck("", "/", "/"));
 }
 
-/*
- * Returns 1 if s matches wildcard pattern in w, 0 otherwise. Str
- * is a simple string with no slashes.
- */
-static bool match(const std::string& str, const std::string& wild)
+//
+// Returns true if s matches wildcard pattern in w, false otherwise. STR is a
+// simple string with no slashes.
+//
+bool glob::match(const std::string& str, const std::string& wild)
 {
   auto sbegin = str.begin();
   auto wbegin = wild.begin();
@@ -102,46 +102,46 @@ static bool match(const std::string& str, const std::string& wild)
   return dircheck(std::string(sbegin, str.end()), std::string(wbegin, wild.end()), str);
 }
 
-TEST_CASE("glob.cc: match")
+void glob::_test_match()
 {
   SUBCASE("pattern a*")
   {
-    CHECK(match("alpha", "a*"));
-    CHECK(!match("beta", "a*"));
-    CHECK(match("aaa", "a*"));
+    CHECK(glob::match("alpha", "a*"));
+    CHECK(!glob::match("beta", "a*"));
+    CHECK(glob::match("aaa", "a*"));
   }
   SUBCASE("pattern *a*")
   {
-    CHECK(match("xxxaxxx", "*a*"));
-    CHECK(match("xxxa", "*a*"));
-    CHECK(match("axxx", "*a*"));
+    CHECK(glob::match("xxxaxxx", "*a*"));
+    CHECK(glob::match("xxxa", "*a*"));
+    CHECK(glob::match("axxx", "*a*"));
   }
   SUBCASE("pattern *.cc")
   {
-    CHECK(match("glob.cc", "*.cc"));
-    CHECK(!match("glob.hh", "*.cc"));
+    CHECK(glob::match("glob.cc", "*.cc"));
+    CHECK(!glob::match("glob.hh", "*.cc"));
   }
   SUBCASE("pattern *.??")
   {
-    CHECK(match("foo.cc", "*.??"));
-    CHECK(!match("foo.cpp", "*.??"));
+    CHECK(glob::match("foo.cc", "*.??"));
+    CHECK(!glob::match("foo.cpp", "*.??"));
   }
   SUBCASE("pattern [abc].??")
   {
-    CHECK(match("a.cc", "[abc].??"));
-    CHECK(match("b.cc", "[abc].??"));
-    CHECK(match("c.hh", "[abc].??"));
-    CHECK(!match("d.cc", "[abc].??"));
-    CHECK(!match("b.cpp", "[abc].??"));
-    CHECK(!match("b.c", "[abc].??"));
-    CHECK(match("b...", "[abc].??"));
+    CHECK(glob::match("a.cc", "[abc].??"));
+    CHECK(glob::match("b.cc", "[abc].??"));
+    CHECK(glob::match("c.hh", "[abc].??"));
+    CHECK(!glob::match("d.cc", "[abc].??"));
+    CHECK(!glob::match("b.cpp", "[abc].??"));
+    CHECK(!glob::match("b.c", "[abc].??"));
+    CHECK(glob::match("b...", "[abc].??"));
   }
 }
 
-/*
- * Inserts element what in list where keeping alphabetic order.
- */
-static LISPT orderinsert(LISPT what, LISPT where)
+//
+// Inserts element WHAT in list WHERE keeping alphabetic order.
+//
+LISPT glob::orderinsert(LISPT what, LISPT where)
 {
   LISPT p1 = C_NIL;
   auto p2 = where;
@@ -168,7 +168,7 @@ static LISPT orderinsert(LISPT what, LISPT where)
   return where;
 }
 
-TEST_CASE("glob.cc: orderinsert")
+void glob::_test_orderinsert()
 {
   auto list = cons(mkstring("a"), cons(mkstring("c"), C_NIL));
   SUBCASE("Insert in the middle")
@@ -197,11 +197,11 @@ TEST_CASE("glob.cc: orderinsert")
   }
 }
 
-/*
- * Expands tilde character in first position to home directory or
- * other users home directory.
- */
-const std::optional<std::string> extilde(const std::string& w, bool report)
+//
+// Expands tilde character in first position to home directory or other users
+// home directory.
+//
+std::optional<std::string> glob::extilde(const std::string& w, bool report)
 {
   if(w.empty() || w[0] != '~')
     return w;
@@ -233,25 +233,25 @@ const std::optional<std::string> extilde(const std::string& w, bool report)
   return s;
 }
 
-TEST_CASE("glob.cc: extilde")
+void glob::_test_extilde()
 {
   std::string home = std::getenv("HOME");
   SUBCASE("~ == HOME")
   {
-    auto dir = extilde("~", false);
+    auto dir = glob::extilde("~", false);
     REQUIRE(dir);
     CHECK(home == *dir);
   }
   SUBCASE("~/ == HOME/")
   {
-    auto dir = extilde("~/", false);
+    auto dir = glob::extilde("~/", false);
     REQUIRE(dir);
     home.push_back('/');
     CHECK(home == *dir);
   }
   SUBCASE("~/hello/ == HOME/")
   {
-    auto dir = extilde("~/hello/", false);
+    auto dir = glob::extilde("~/hello/", false);
     REQUIRE(dir);
     home += "/hello/";
     CHECK(home == *dir);
@@ -260,24 +260,24 @@ TEST_CASE("glob.cc: extilde")
   {
     std::string user = std::getenv("USER");
     auto tilde_user = "~" + user;
-    auto dir = extilde(tilde_user, false);
+    auto dir = glob::extilde(tilde_user, false);
     REQUIRE(dir);
     CHECK(home == *dir);
   }
   SUBCASE("~UNKNOWN != ")
   {
     std::string unknown = "~foobar";
-    auto dir = extilde(unknown, false);
+    auto dir = glob::extilde(unknown, false);
     REQUIRE(!dir);
   }
 }
 
-/* 
- * walkfiles - walks through files as specified by WILD and builds an 
- *             unsorted array of character strings. Returns true if
- *             any file matched the pattern, false otherwise.
- */
-static std::vector<std::string> walkfiles(
+//
+// walkfiles - walks through files as specified by WILD and builds an unsorted
+//             array of character strings.  Returns true if any file matched
+//             the pattern, false otherwise.
+//
+std::vector<std::string> glob::walkfiles(
   const std::filesystem::path& root, const std::string& wild, bool all, bool report)
 {
   std::vector<std::string> result;
@@ -322,7 +322,7 @@ static std::vector<std::string> walkfiles(
   return result;
 }
 
-TEST_CASE("glob.cc: walkfiles")
+void glob::_test_walkfiles()
 {
   std::error_code ec;
   for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y"})
@@ -333,19 +333,19 @@ TEST_CASE("glob.cc: walkfiles")
 
   SUBCASE("test 1")
   {
-    auto result = walkfiles(".", "*", false, false);
+    auto result = glob::walkfiles(".", "*", false, false);
     CHECK(!result.empty());
   }
   SUBCASE("test 2")
   {
-    auto result = walkfiles(".", "testdi*", false, false);
+    auto result = glob::walkfiles(".", "testdi*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     CHECK(result[0] == "testdir"s);
   }
   SUBCASE("test 3")
   {
-    auto result = walkfiles(".", "testdir/*", false, false);
+    auto result = glob::walkfiles(".", "testdir/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 4);
     for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
@@ -353,7 +353,7 @@ TEST_CASE("glob.cc: walkfiles")
   }
   SUBCASE("test 4")
   {
-    auto result = walkfiles(".", "testdir/*/*", false, false);
+    auto result = glob::walkfiles(".", "testdir/*/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/x/y"})
@@ -361,7 +361,7 @@ TEST_CASE("glob.cc: walkfiles")
   }
   SUBCASE("test 5")
   {
-    auto result = walkfiles(".", "testdir/[b]*", false, false);
+    auto result = glob::walkfiles(".", "testdir/[b]*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/bb"})
@@ -375,7 +375,7 @@ TEST_CASE("glob.cc: walkfiles")
   }
 }
 
-static LISPT buildlist(const std::vector<std::string>& list)
+LISPT glob::buildlist(const std::vector<std::string>& list)
 {
   LISPT l = C_NIL;
   for(auto r: list)
@@ -383,11 +383,17 @@ static LISPT buildlist(const std::vector<std::string>& list)
   return l;
 }
 
-LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort)
+//
+// expandfiles - expand file in the current directory matching the glob pattern
+//               in 'wild'.  If ALL is true the list includes all files, even
+//               hidden files.  If REPORT is true errors will throw an
+//               exception.  If SORT is true the result list is sorted.
+//
+LISPT glob::expandfiles(const std::string& wild, bool all, bool report, bool sort)
 {
   if(wild == "/"s)
     return cons(mkstring(wild), C_NIL);
-  auto files = walkfiles(".", wild, all, report);
+  auto files = glob::walkfiles(".", wild, all, report);
   if(files.empty())
     return C_ERROR;
   struct {
@@ -395,46 +401,32 @@ LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort)
   } reverse;
   if(!is_NIL(globsort) || sort)
     std::sort(files.begin(), files.end(), reverse);
-  return buildlist(files);
+  return glob::buildlist(files);
 }
 
-/*
- * Lisp function expand. Expand all files matching wild
- * in directory dir.
- */
-LISPT expand(LISPT wild, LISPT rep, LISPT all)
-{
-  auto r = is_NIL(rep);
-  check(wild, STRING, SYMBOL);
-  auto wstr = extilde(wild->getstr(), r);
-  if(!wstr)
-    return C_NIL;
-  return expandfiles(*wstr, !is_NIL(all), r, false);
-}
-
-TEST_CASE("glob.cc: expandfiles")
+void glob::_test_expandfiles()
 {
   std::error_code ec;
-  std::filesystem::create_directories("testdir/a", ec);
-  CHECK(!ec);
-  std::filesystem::create_directories("testdir/bb", ec);
-  CHECK(!ec);
-  std::filesystem::create_directories("testdir/ccc", ec);
-  CHECK(!ec);
+  std::vector<std::string> dirs{"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
+  for(auto d: dirs)
+  {
+    std::filesystem::create_directories(d, ec);
+    CHECK(!ec);
+  }
   
   SUBCASE("Expand all files")
   {
-    auto result = expandfiles("testdir/*", false, false, true);
+    auto result = glob::expandfiles("testdir/*", false, false, true);
     CHECK(length(result)->intval() == 3);
 
     int count = 3;
-    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    for(auto d: dirs)
     {
       for(auto a: result)
       {
-        if(a->getstr() == i)
+        if(a->getstr() == d)
         {
-          CHECK(a->getstr() == i);
+          CHECK(a->getstr() == d);
           --count;
           break;
         }
@@ -444,17 +436,17 @@ TEST_CASE("glob.cc: expandfiles")
   }
   SUBCASE("Expand only one file")
   {
-    auto result = expandfiles("testdir/??", false, false, true);
+    auto result = glob::expandfiles("testdir/??", false, false, true);
     CHECK(length(result)->intval() == 1);
 
     int count = 1;
-    for(auto i: {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s})
+    for(auto d: dirs)
     {
       for(auto a: result)
       {
-        if(a->getstr() == i)
+        if(a->getstr() == d)
         {
-          CHECK(a->getstr() == i);
+          CHECK(a->getstr() == d);
           --count;
           break;
         }
@@ -466,15 +458,14 @@ TEST_CASE("glob.cc: expandfiles")
   SUBCASE("testdir/*")
   {
     LISPT wild = mkstring("testdir/*");
-    auto e = expand(wild, 0, 0);
+    auto e = ::expand(wild, 0, 0);
     CHECK(length(e)->intval() == 3);
-    std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
     for(auto i: e)
-      for(auto j: x)
+      for(auto d: dirs)
       {
-        if(i->getstr() == j)
+        if(i->getstr() == d)
         {
-          CHECK(i->getstr() == j);
+          CHECK(i->getstr() == d);
           break;
         }
       }
@@ -483,28 +474,39 @@ TEST_CASE("glob.cc: expandfiles")
   SUBCASE("test*/*")
   {
     LISPT wild = mkstring("testd*/*");
-    auto e = expand(wild, 0, 0);
+    auto e = ::expand(wild, 0, 0);
     CHECK(length(e)->intval() == 3);
-    std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
     for(auto i: e)
-      for(auto j: x)
+      for(auto d: dirs)
       {
-        if(i->getstr() == j)
+        if(i->getstr() == d)
         {
-          CHECK(i->getstr() == j);
+          CHECK(i->getstr() == d);
           break;
         }
       }
   }
 
-  std::filesystem::remove("testdir/a", ec);
-  CHECK(!ec);
-  std::filesystem::remove("testdir/bb", ec);
-  CHECK(!ec);
-  std::filesystem::remove("testdir/ccc", ec);
-  CHECK(!ec);
+  for(auto d: dirs)
+  {
+    std::filesystem::remove(d, ec);
+    CHECK(!ec);
+  }
   std::filesystem::remove("testdir", ec);
   CHECK(!ec);
 }
 
-LISPT glob(LISPT wild) { return expand(wild, 0, 0); }
+//
+// Lisp function expand.  Expand all files matching wild in directory dir.
+//
+LISPT glob::expand(LISPT wild, LISPT rep, LISPT all)
+{
+  auto r = is_NIL(rep);
+  check(wild, STRING, SYMBOL);
+  auto wstr = glob::extilde(wild->getstr(), r);
+  if(!wstr)
+    return C_NIL;
+  return glob::expandfiles(*wstr, !is_NIL(all), r, false);
+}
+
+LISPT glob::expand(LISPT wild) { return expand(wild, 0, 0); }
