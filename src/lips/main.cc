@@ -197,16 +197,16 @@ LISPT C_BACK;
 LISPT C_BAR;
 LISPT C_EXCL;
 LISPT C_EXEC;
-LISPT C_FROM;
 LISPT C_GGT;
 LISPT C_GT;
 LISPT C_LT;
 LISPT C_OLDVAL;
 LISPT C_PIPE;
 LISPT C_PROGN;
+LISPT C_REDIR_APPEND;
+LISPT C_REDIR_FROM;
+LISPT C_REDIR_TO;
 LISPT C_SEMI;
-LISPT C_TO;
-LISPT C_TOTO;
 
 /*
  * Processes the environment variable PATH and returns a list
@@ -301,27 +301,27 @@ static LISPT transform(LISPT list)
     else if(EQ(ll->car(), C_GT))
     {
       if(is_NIL(res))
-        res = cons(C_TO, cons(tl, C_NIL));
+        res = cons(C_REDIR_TO, cons(tl, C_NIL));
       else
-        res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_GGT))
     {
       if(is_NIL(res))
-        res = cons(C_TOTO, cons(tl, C_NIL));
+        res = cons(C_REDIR_APPEND, cons(tl, C_NIL));
       else
-        res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_LT))
     {
       if(is_NIL(res))
-        res = cons(C_FROM, cons(tl, C_NIL));
+        res = cons(C_REDIR_FROM, cons(tl, C_NIL));
       else
-        res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
+        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
@@ -359,16 +359,16 @@ static std::unique_ptr<::lisp::lisp> init()
   C_BAR = alloc::intern("|");
   C_EXCL = alloc::intern("!");
   C_EXEC = alloc::intern(PN_EXEC);
-  C_FROM = alloc::intern(PN_REDIR_FROM);
   C_GGT = alloc::intern(">>");
   C_GT = alloc::intern(">");
   C_LT = alloc::intern("<");
   C_OLDVAL = alloc::intern("oldval");
   C_PIPE = alloc::intern(PN_PIPECMD);
   C_PROGN = alloc::intern(PN_PROGN);
+  C_REDIR_APPEND = alloc::intern(PN_REDIR_APPEND);
+  C_REDIR_FROM = alloc::intern(PN_REDIR_FROM);
+  C_REDIR_TO = alloc::intern(PN_REDIR_TO);
   C_SEMI = alloc::intern(";");
-  C_TO = alloc::intern(PN_REDIR_TO);
-  C_TOTO = alloc::intern(PN_REDIR_APPEND);
 
   top::init();
 
