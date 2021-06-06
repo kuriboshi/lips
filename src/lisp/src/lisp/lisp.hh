@@ -54,7 +54,6 @@ extern LISPT C_LAMBDA;
 extern LISPT C_NLAMBDA;
 extern LISPT C_OLDDEF;
 extern LISPT C_QUOTE;
-extern LISPT C_READ;
 extern LISPT C_REDEFINED;
 extern LISPT C_RESET;
 extern LISPT C_RETURN;

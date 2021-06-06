@@ -10,15 +10,10 @@
 
 namespace lisp
 {
-inline constexpr auto PN_SETPLIST = "setplist"; // set property list
-inline constexpr auto PN_GETPLIST = "getplist"; // get property list
-inline constexpr auto PN_PUTPROP = "putprop";   // put property on atom
-inline constexpr auto PN_GETPROP = "getprop";   // get property value
-inline constexpr auto PN_REMPROP = "remprop";   // remove prop
-
 class prop: public base
 {
 public:
+  prop();
   prop(lisp&);
   ~prop() = default;
   static void init();
@@ -31,14 +26,14 @@ public:
 };
 
 inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return prop(l).setplist(a, b); }
-inline LISPT setplist(LISPT a, LISPT b) { return setplist(lisp::current(), a, b); }
+inline LISPT setplist(LISPT a, LISPT b) { return prop().setplist(a, b); }
 inline LISPT getplist(lisp& l, LISPT a) { return prop(l).getplist(a); }
-inline LISPT getplist(LISPT a) { return getplist(lisp::current(), a); }
+inline LISPT getplist(LISPT a) { return prop().getplist(a); }
 inline LISPT putprop(lisp& l, LISPT a, LISPT b, LISPT c) { return prop(l).putprop(a, b, c); }
-inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return putprop(lisp::current(), a, b, c); }
+inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return prop().putprop(a, b, c); }
 inline LISPT getprop(lisp& l, LISPT a, LISPT b) { return prop(l).getprop(a, b); }
-inline LISPT getprop(LISPT a, LISPT b) { return getprop(lisp::current(), a, b); }
+inline LISPT getprop(LISPT a, LISPT b) { return prop().getprop(a, b); }
 inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return prop(l).remprop(a, b); }
-inline LISPT remprop(LISPT a, LISPT b) { return remprop(lisp::current(), a, b); }
+inline LISPT remprop(LISPT a, LISPT b) { return prop().remprop(a, b); }
 
 } // namespace lisp

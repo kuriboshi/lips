@@ -129,7 +129,7 @@ void alloc::mark(LISPT x)
 LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
-    _lisp.primerr().format("garbage collecting\n");
+    l.primerr().format("garbage collecting\n");
   if(C_T != nullptr)
     C_T->mark();
   if(e().dest != nullptr)
@@ -183,7 +183,7 @@ LISPT alloc::doreclaim(int incr)
     while(incr-- > 0); /* At least one page more */
   }
   if(is_NIL(gcgag))
-    _lisp.primerr().format("{} cells freed\n", nrfreed);
+    l.primerr().format("{} cells freed\n", nrfreed);
   return C_NIL;
 }
 
@@ -199,7 +199,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     i = 0;
   else
   {
-    _lisp.check(incr, INTEGER);
+    l.check(incr, INTEGER);
     i = incr->intval();
   }
   doreclaim(i);
@@ -481,16 +481,16 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
  */
 void alloc::dzero() { destblockused = 0; }
 
-alloc::alloc(lisp& lisp): _lisp(lisp)
+alloc::alloc(lisp& lisp): base(lisp)
 {
   for(int i = 0; i != MAXHASH; ++i)
     obarray[i] = nullptr;
 
-  add_mark_object(&_lisp.topprompt);
-  add_mark_object(&_lisp.brkprompt);
-  add_mark_object(&_lisp.currentbase);
-  add_mark_object(&_lisp.version);
-  add_mark_object(&_lisp.verbose);
+  add_mark_object(&l.topprompt);
+  add_mark_object(&l.brkprompt);
+  add_mark_object(&l.currentbase);
+  add_mark_object(&l.version);
+  add_mark_object(&l.verbose);
   add_mark_object(&gcgag);
   add_mark_object(&C_EOF);
 
@@ -499,7 +499,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   conscells = newpage(); /* Allocate one page of storage */
   if(conscells == nullptr)
   {
-    _lisp.primerr().format("Cons cells memory exhausted\n");
+    l.primerr().format("Cons cells memory exhausted\n");
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
   sweep();
@@ -511,6 +511,8 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
   // clang-format on
 }
+
+alloc::alloc(): alloc(lisp::current()) {}
 
 alloc::~alloc()
 {

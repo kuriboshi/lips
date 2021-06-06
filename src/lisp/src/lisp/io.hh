@@ -20,6 +20,7 @@ class lisp;
 class io: public base
 {
 public:
+  io(): base() {}
   io(lisp& lisp): base(lisp) {}
   ~io() = default;
   static void init(lisp&);
@@ -298,55 +299,59 @@ private:
 };
 
 inline bool isascii(int c) { return c >= 0 && c <= 127; }
+inline bool is_charclass(lisp& l, int c, char_class cc)
+{
+  return isascii(c) && l.currentrt.chclass[c] == cc;
+}
 
-inline bool issepr(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SEPR; }
+inline bool issepr(lisp& l, int c) { return is_charclass(l, c, char_class::SEPR); }
 inline bool issepr(int c) { return issepr(lisp::current(), c); }
-inline bool isbrk(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::BRK; }
+inline bool isbrk(lisp& l, int c) { return is_charclass(l, c, char_class::BRK); }
 inline bool isbrk(int c) { return isbrk(lisp::current(), c); }
-inline bool isctrl(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::CTRL; }
+inline bool isctrl(lisp& l, int c) { return is_charclass(l, c, char_class::CTRL); }
 inline bool isctrl(int c) { return isctrl(lisp::current(), c); }
-inline bool isinsert(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INSERT; }
+inline bool isinsert(lisp& l, int c) { return is_charclass(l, c, char_class::INSERT); }
 inline bool isinsert(int c) { return isinsert(lisp::current(), c); }
-inline bool issplice(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SPLICE; }
+inline bool issplice(lisp& l, int c) { return is_charclass(l, c, char_class::SPLICE); }
 inline bool issplice(int c) { return issplice(lisp::current(), c); }
-inline bool isinfix(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INFIX; }
+inline bool isinfix(lisp& l, int c) { return is_charclass(l, c, char_class::INFIX); }
 inline bool isinfix(int c) { return isinfix(lisp::current(), c); }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
-inline LISPT ratom(file_t& f) { return io(lisp::current()).ratom(f); }
+inline LISPT ratom(file_t& f) { return io().ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io(l).lispread(f, esc); }
-inline LISPT lispread(file_t& f, bool esc = false) { return io(lisp::current()).lispread(f, esc); }
-inline LISPT lispread(std::string_view s, bool esc = false) { file_t f(s); return io(lisp::current()).lispread(f, esc); }
+inline LISPT lispread(file_t& f, bool esc = false) { return io().lispread(f, esc); }
+inline LISPT lispread(std::string_view s, bool esc = false) { file_t f(s); return io().lispread(f, esc); }
 inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
-inline LISPT readline(file_t& f) { return io(lisp::current()).readline(f); }
+inline LISPT readline(file_t& f) { return io().readline(f); }
 
 inline LISPT patom(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).patom(a, f, esc); }
-inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io(lisp::current()).patom(a, f, esc); }
+inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io().patom(a, f, esc); }
 inline LISPT patom(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
   return io(l).patom(a, out ? l.primerr() : l.primout(), esc);
 }
 inline LISPT patom(LISPT a, bool out = false, bool esc = false) { return patom(lisp::current(), a, out, esc); }
 inline LISPT terpri(lisp& l, file_t& f) { return io(l).terpri(f); }
-inline LISPT terpri(file_t& f) { return io(lisp::current()).terpri(f); }
+inline LISPT terpri(file_t& f) { return io().terpri(f); }
 inline LISPT terpri(lisp& l, bool out = false) { return io(l).terpri(out ? l.primerr() : l.primout()); }
 inline LISPT terpri(bool out = false) { return terpri(lisp::current(), out); }
 inline LISPT prinbody(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).prinbody(a, f, esc); }
-inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io(lisp::current()).prinbody(a, f, esc); }
+inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io().prinbody(a, f, esc); }
 inline LISPT prinbody(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
   return io(l).prinbody(a, out ? l.primerr() : l.primout(), esc);
 }
 inline LISPT prinbody(LISPT a, bool out = false, bool esc = false) { return prinbody(lisp::current(), a, out, esc); }
 inline LISPT prin0(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).prin0(a, f, esc); }
-inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io(lisp::current()).prin0(a, f, esc); }
+inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io().prin0(a, f, esc); }
 inline LISPT prin0(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
   return io(l).prin0(a, out ? l.primerr() : l.primout(), esc);
 }
 inline LISPT prin0(LISPT a, bool out = false, bool esc = false) { return prin0(lisp::current(), a, out, esc); }
 inline LISPT print(lisp& l, LISPT a, file_t& f) { return io(l).print(a, f); }
-inline LISPT print(LISPT a, file_t& f) { return io(lisp::current()).print(a, f); }
+inline LISPT print(LISPT a, file_t& f) { return io().print(a, f); }
 inline LISPT print(lisp& l, LISPT a, bool out = false) { return io(l).print(a, out ? l.primerr() : l.primout()); }
 inline LISPT print(LISPT a, bool out = false) { return print(lisp::current(), a, out); }
 inline file_t& primout() { return lisp::current().primout(); }

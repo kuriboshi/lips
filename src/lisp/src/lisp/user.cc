@@ -9,6 +9,9 @@
 
 namespace lisp
 {
+user::user(): base() {}
+user::user(lisp& lisp): base(lisp) {}
+
 LISPT user::getargs(LISPT al)
 {
   if(is_NIL(al->cdr()))
@@ -98,7 +101,10 @@ PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, 
 
 PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
 
-user::user(lisp& lisp): base(lisp) {}
+inline constexpr auto PN_DEFINE = "define"; // define function
+inline constexpr auto PN_GETREP = "getrep"; // get function representation
+inline constexpr auto PN_DE = "de";         // defile lambda function
+inline constexpr auto PN_DF = "df";         // define nlambda function
 
 void user::init()
 {

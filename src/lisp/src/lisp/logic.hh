@@ -10,14 +10,10 @@
 
 namespace lisp
 {
-inline constexpr auto PN_AND = "and"; // and
-inline constexpr auto PN_OR = "or";   // or
-inline constexpr auto PN_NOT = "not"; // not
-inline constexpr auto PN_IF = "if";   // if a then b else c
-
 class logic: public base
 {
 public:
+  logic();
   logic(lisp&);
   ~logic() = default;
   static void init();
@@ -29,18 +25,18 @@ public:
 };
 
 inline LISPT p_and(lisp& l, LISPT x) { return logic(l).p_and(x); }
-inline LISPT p_and(LISPT x) { return logic(lisp::current()).p_and(x); }
+inline LISPT p_and(LISPT x) { return logic().p_and(x); }
 inline LISPT p_or(lisp& l, LISPT x) { return logic(l).p_or(x); }
-inline LISPT p_or(LISPT x) { return logic(lisp::current()).p_or(x); }
+inline LISPT p_or(LISPT x) { return logic().p_or(x); }
 inline LISPT p_not(lisp& l, LISPT x) { return logic(l).p_not(x); }
-inline LISPT p_not(LISPT x) { return logic(lisp::current()).p_not(x); }
+inline LISPT p_not(LISPT x) { return logic().p_not(x); }
 inline LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   return logic(l).xif(pred, true_expr, false_expr);
 }
 inline LISPT xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  return xif(lisp::current(), pred, true_expr, false_expr);
+  return logic().xif(pred, true_expr, false_expr);
 }
 
 } // namespace lisp

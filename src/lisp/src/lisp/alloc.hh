@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "lisp.hh"
+#include "base.hh"
 
 namespace lisp
 {
@@ -17,9 +18,10 @@ inline constexpr auto PN_OBARRAY = "obarray";     // return list of all atoms
 
 class evaluator;
 
-class alloc
+class alloc: public base
 {
 public:
+  alloc();
   alloc(lisp&);
   ~alloc();
 
@@ -98,9 +100,7 @@ public:
   void add_mark_object(LISPT* o) { markobjs.push_back(o); }
 
 private:
-  lisp& _lisp; // Context
-
-  evaluator& e() { return _lisp.e(); }
+  evaluator& e() { return base::e; }
   conscells_t* newpage();
   int sweep();
   void mark(LISPT);

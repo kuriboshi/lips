@@ -364,7 +364,7 @@ static std::unique_ptr<::lisp::lisp> init()
   C_LT = alloc::intern("<");
   C_OLDVAL = alloc::intern("oldval");
   C_PIPE = alloc::intern(PN_PIPECMD);
-  C_PROGN = alloc::intern(PN_PROGN);
+  C_PROGN = alloc::intern("progn");
   C_REDIR_APPEND = alloc::intern(PN_REDIR_APPEND);
   C_REDIR_FROM = alloc::intern(PN_REDIR_FROM);
   C_REDIR_TO = alloc::intern(PN_REDIR_TO);

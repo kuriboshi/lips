@@ -1018,11 +1018,20 @@ PRIMITIVE evaluator::envget(LISPT e, LISPT n)
   return foo;
 }
 
+inline constexpr auto PN_E = "e";               // noeval version of eval
+inline constexpr auto PN_EVAL = "eval";         // evaluate exp
+inline constexpr auto PN_APPLY = "apply";       // apply function on args
+inline constexpr auto PN_APPLYSTAR = "apply*";  // apply nospread
+inline constexpr auto PN_BAKTRACE = "baktrace"; // control stack backtrace
+inline constexpr auto PN_TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr auto PN_ENVGET = "envget";         // examine environment
+
+evaluator::evaluator(): base() {}
 evaluator::evaluator(lisp& lisp): base(lisp)
 {
-  add_mark_object(&fun);
-  add_mark_object(&expression);
-  add_mark_object(&args);
+  gcprotect(lisp, fun);
+  gcprotect(lisp, expression);
+  gcprotect(lisp, args);
   // clang-format off
   mkprim(PN_E,          ::lisp::eval,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
   mkprim(PN_EVAL,       ::lisp::eval,       subr_t::S_EVAL,   subr_t::S_NOSPREAD);

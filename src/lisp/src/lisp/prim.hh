@@ -10,44 +10,11 @@
 
 namespace lisp
 {
-inline constexpr auto PN_ATOM = "atom";       // t if atom
-inline constexpr auto PN_CAR = "car";         // car
-inline constexpr auto PN_CDR = "cdr";         // cdr
-inline constexpr auto PN_CADR = "cadr";       // cadr
-inline constexpr auto PN_CDAR = "cdar";       // cdar
-inline constexpr auto PN_CAAR = "caar";       // caar
-inline constexpr auto PN_CDDR = "cddr";       // cddr
-inline constexpr auto PN_CDDDR = "cdddr";     // cdddr
-inline constexpr auto PN_CADDR = "caddr";     // caddr
-inline constexpr auto PN_CDADR = "cdadr";     // cdadr
-inline constexpr auto PN_CAADR = "caadr";     // caadr
-inline constexpr auto PN_CDDAR = "cddar";     // cddar
-inline constexpr auto PN_CADAR = "cadar";     // cadar
-inline constexpr auto PN_CDAAR = "cdaar";     // cdaar
-inline constexpr auto PN_CAAAR = "caaar";     // caaar
-inline constexpr auto PN_CLOSURE = "closure"; // create static environment
-inline constexpr auto PN_EQ = "eq";           // pointer equal
-inline constexpr auto PN_ERROR = "error";     // error
-inline constexpr auto PN_LAMBDA = "lambda";   // create lambda object
-inline constexpr auto PN_LENGTH = "length";   // length of list
-inline constexpr auto PN_LIST = "list";       // make list of args
-inline constexpr auto PN_NCONC = "nconc";     // destructive append
-inline constexpr auto PN_NLAMBDA = "nlambda"; // make nlambda object
-inline constexpr auto PN_NTH = "nth";         // nth car in list
-inline constexpr auto PN_NULL = "null";       // t if nil
-inline constexpr auto PN_QUOTE = "quote";     // don't eval arg
-inline constexpr auto PN_RPLACA = "rplaca";   // replace car
-inline constexpr auto PN_RPLACD = "rplacd";   // replace cdr
-inline constexpr auto PN_TCONC = "tconc";     // add to end of list
-inline constexpr auto PN_NTHD = "nthd";       // return nth cdr of list
-inline constexpr auto PN_ATTACH = "attach";   // attach object at front of list
-inline constexpr auto PN_APPEND = "append";   // append lists
-inline constexpr auto PN_EXIT = "exit";       // exit lips
-
 class prim: public base
 {
 public:
-  prim(lisp& lisp);
+  prim();
+  prim(lisp&);
   ~prim() = default;
   static void init();
 
@@ -89,72 +56,78 @@ private:
   LISPT closobj(LISPT);
 };
 
+extern LISPT C_APPEND;
+extern LISPT C_ERROR;
+extern LISPT C_LAMBDA;
+extern LISPT C_NLAMBDA;
+extern LISPT C_QUOTE;
+
 inline LISPT car(lisp& l, LISPT a) { return prim(l).car(a); }
-inline LISPT car(LISPT a) { return prim(lisp::current()).car(a); }
+inline LISPT car(LISPT a) { return prim().car(a); }
 inline LISPT cdr(lisp& l, LISPT a) { return prim(l).cdr(a); }
-inline LISPT cdr(LISPT a) { return prim(lisp::current()).cdr(a); }
+inline LISPT cdr(LISPT a) { return prim().cdr(a); }
 inline LISPT cadr(lisp& l, LISPT a) { return prim(l).cadr(a); }
-inline LISPT cadr(LISPT a) { return prim(lisp::current()).cadr(a); }
+inline LISPT cadr(LISPT a) { return prim().cadr(a); }
 inline LISPT cdar(lisp& l, LISPT a) { return prim(l).cdar(a); }
-inline LISPT cdar(LISPT a) { return prim(lisp::current()).cdar(a); }
+inline LISPT cdar(LISPT a) { return prim().cdar(a); }
 inline LISPT caar(lisp& l, LISPT a) { return prim(l).caar(a); }
-inline LISPT caar(LISPT a) { return prim(lisp::current()).caar(a); }
+inline LISPT caar(LISPT a) { return prim().caar(a); }
 inline LISPT cddr(lisp& l, LISPT a) { return prim(l).cddr(a); }
-inline LISPT cddr(LISPT a) { return prim(lisp::current()).cddr(a); }
+inline LISPT cddr(LISPT a) { return prim().cddr(a); }
 inline LISPT cdddr(lisp& l, LISPT a) { return prim(l).cdddr(a); }
-inline LISPT cdddr(LISPT a) { return prim(lisp::current()).cdddr(a); }
+inline LISPT cdddr(LISPT a) { return prim().cdddr(a); }
 inline LISPT caddr(lisp& l, LISPT a) { return prim(l).caddr(a); }
-inline LISPT caddr(LISPT a) { return prim(lisp::current()).caddr(a); }
+inline LISPT caddr(LISPT a) { return prim().caddr(a); }
 inline LISPT cdadr(lisp& l, LISPT a) { return prim(l).cdadr(a); }
-inline LISPT cdadr(LISPT a) { return prim(lisp::current()).cdadr(a); }
+inline LISPT cdadr(LISPT a) { return prim().cdadr(a); }
 inline LISPT caadr(lisp& l, LISPT a) { return prim(l).caadr(a); }
-inline LISPT caadr(LISPT a) { return prim(lisp::current()).caadr(a); }
+inline LISPT caadr(LISPT a) { return prim().caadr(a); }
 inline LISPT cddar(lisp& l, LISPT a) { return prim(l).cddar(a); }
-inline LISPT cddar(LISPT a) { return prim(lisp::current()).cddar(a); }
+inline LISPT cddar(LISPT a) { return prim().cddar(a); }
 inline LISPT cadar(lisp& l, LISPT a) { return prim(l).cadar(a); }
-inline LISPT cadar(LISPT a) { return prim(lisp::current()).cadar(a); }
+inline LISPT cadar(LISPT a) { return prim().cadar(a); }
 inline LISPT cdaar(lisp& l, LISPT a) { return prim(l).cdaar(a); }
-inline LISPT cdaar(LISPT a) { return prim(lisp::current()).cdaar(a); }
+inline LISPT cdaar(LISPT a) { return prim().cdaar(a); }
 inline LISPT caaar(lisp& l, LISPT a) { return prim(l).caaar(a); }
-inline LISPT caaar(LISPT a) { return prim(lisp::current()).caaar(a); }
+inline LISPT caaar(LISPT a) { return prim().caaar(a); }
 inline LISPT eq(lisp& l, LISPT a, LISPT b) { return prim(l).eq(a, b); }
-inline LISPT eq(LISPT a, LISPT b) { return prim(lisp::current()).eq(a, b); }
+inline LISPT eq(LISPT a, LISPT b) { return prim().eq(a, b); }
 inline LISPT atom(lisp& l, LISPT a) { return prim(l).atom(a); }
-inline LISPT atom(LISPT a) { return prim(lisp::current()).atom(a); }
+inline LISPT atom(LISPT a) { return prim().atom(a); }
 inline LISPT nconc(lisp& l, LISPT a) { return prim(l).nconc(a); }
-inline LISPT nconc(LISPT a) { return prim(lisp::current()).nconc(a); }
+inline LISPT nconc(LISPT a) { return prim().nconc(a); }
 inline LISPT attach(lisp& l, LISPT a, LISPT b) { return prim(l).attach(a, b); }
-inline LISPT attach(LISPT a, LISPT b) { return prim(lisp::current()).attach(a, b); }
+inline LISPT attach(LISPT a, LISPT b) { return prim().attach(a, b); }
 inline LISPT null(lisp& l, LISPT a) { return prim(l).null(a); }
-inline LISPT null(LISPT a) { return prim(lisp::current()).null(a); }
+inline LISPT null(LISPT a) { return prim().null(a); }
 inline LISPT quote(lisp& l, LISPT a) { return prim(l).quote(a); }
-inline LISPT quote(LISPT a) { return prim(lisp::current()).quote(a); }
+inline LISPT quote(LISPT a) { return prim().quote(a); }
 inline LISPT lambda(lisp& l, LISPT a, LISPT b) { return prim(l).lambda(a, b); }
-inline LISPT lambda(LISPT a, LISPT b) { return prim(lisp::current()).lambda(a, b); }
+inline LISPT lambda(LISPT a, LISPT b) { return prim().lambda(a, b); }
 inline LISPT nlambda(lisp& l, LISPT a, LISPT b) { return prim(l).nlambda(a, b); }
-inline LISPT nlambda(LISPT a, LISPT b) { return prim(lisp::current()).nlambda(a, b); }
+inline LISPT nlambda(LISPT a, LISPT b) { return prim().nlambda(a, b); }
 inline LISPT list(lisp& l, LISPT a) { return prim(l).list(a); }
-inline LISPT list(LISPT a) { return prim(lisp::current()).list(a); }
+inline LISPT list(LISPT a) { return prim().list(a); }
 inline LISPT length(lisp& l, LISPT a) { return prim(l).length(a); }
-inline LISPT length(LISPT a) { return prim(lisp::current()).length(a); }
+inline LISPT length(LISPT a) { return prim().length(a); }
 inline LISPT closure(lisp& l, LISPT a, LISPT b) { return prim(l).closure(a, b); }
-inline LISPT closure(LISPT a, LISPT b) { return prim(lisp::current()).closure(a, b); }
+inline LISPT closure(LISPT a, LISPT b) { return prim().closure(a, b); }
 inline LISPT xnth(lisp& l, LISPT a, LISPT b) { return prim(l).xnth(a, b); }
-inline LISPT xnth(LISPT a, LISPT b) { return prim(lisp::current()).xnth(a, b); }
+inline LISPT xnth(LISPT a, LISPT b) { return prim().xnth(a, b); }
 inline LISPT nthd(lisp& l, LISPT a, LISPT b) { return prim(l).nthd(a, b); }
-inline LISPT nthd(LISPT a, LISPT b) { return prim(lisp::current()).nthd(a, b); }
+inline LISPT nthd(LISPT a, LISPT b) { return prim().nthd(a, b); }
 inline LISPT xerror(lisp& l, LISPT a) { return prim(l).xerror(a); }
-inline LISPT xerror(LISPT a) { return prim(lisp::current()).xerror(a); }
+inline LISPT xerror(LISPT a) { return prim().xerror(a); }
 inline LISPT uxexit(lisp& l, LISPT a) { return prim(l).uxexit(a); }
-inline LISPT uxexit(LISPT a) { return prim(lisp::current()).uxexit(a); }
+inline LISPT uxexit(LISPT a) { return prim().uxexit(a); }
 
 inline LISPT rplaca(lisp& l, LISPT a, LISPT b) { return prim(l).rplaca(a, b); }
-inline LISPT rplaca(LISPT a, LISPT b) { return prim(lisp::current()).rplaca(a, b); }
+inline LISPT rplaca(LISPT a, LISPT b) { return prim().rplaca(a, b); }
 inline LISPT rplacd(lisp& l, LISPT a, LISPT b) { return prim(l).rplacd(a, b); }
-inline LISPT rplacd(LISPT a, LISPT b) { return prim(lisp::current()).rplacd(a, b); }
+inline LISPT rplacd(LISPT a, LISPT b) { return prim().rplacd(a, b); }
 inline LISPT append(lisp& l, LISPT a) { return prim(l).append(a); }
-inline LISPT append(LISPT a) { return prim(lisp::current()).append(a); }
+inline LISPT append(LISPT a) { return prim().append(a); }
 inline LISPT tconc(lisp& l, LISPT a, LISPT b) { return prim(l).tconc(a, b); }
-inline LISPT tconc(LISPT a, LISPT b) { return prim(lisp::current()).tconc(a, b); }
+inline LISPT tconc(LISPT a, LISPT b) { return prim().tconc(a, b); }
 
 } // namespace lisp

@@ -12,11 +12,11 @@ namespace lisp
 class base
 {
 public:
+  base(): l(lisp::current()), a(l.a()), e(l.e()) {}
   base(lisp& lisp): l(lisp), a(lisp.a()), e(lisp.e()) {}
   virtual ~base() = default;
 
 protected:
-  void add_mark_object(LISPT* o) { a.add_mark_object(o); }
   lisp& l;
   alloc& a;
   evaluator& e;

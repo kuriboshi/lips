@@ -6,10 +6,11 @@
 
 #include "libisp.hh"
 
-using namespace lisp;
-
 namespace lisp
 {
+debug::debug(): base() {}
+debug::debug(lisp& lisp): base(lisp) {}
+
 PRIMITIVE evaltrace(lisp& l, LISPT state)
 {
   auto i = l.e().trace();
@@ -22,7 +23,7 @@ PRIMITIVE evaltrace(lisp& l, LISPT state)
   return mknumber(l, i);
 }
 
-debug::debug(lisp& lisp): base(lisp) {}
+inline constexpr auto PN_EVALTRACE = "evaltrace"; // evaltrace
 
 void debug::init()
 {

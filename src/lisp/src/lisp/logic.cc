@@ -8,6 +8,9 @@
 
 namespace lisp
 {
+logic::logic(): base() {}
+logic::logic(lisp& lisp): base(lisp) {}
+
 PRIMITIVE logic::p_and(LISPT x)
 {
   LISPT foo = C_T;
@@ -49,7 +52,10 @@ PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
   return eval(l, true_expr);
 }
 
-logic::logic(lisp& lisp): base(lisp) {}
+inline constexpr auto PN_AND = "and"; // and
+inline constexpr auto PN_OR = "or";   // or
+inline constexpr auto PN_NOT = "not"; // not
+inline constexpr auto PN_IF = "if";   // if a then b else c
 
 void logic::init()
 {

@@ -8,6 +8,9 @@
 
 namespace lisp
 {
+string::string(): base() {}
+string::string(lisp& lisp): base(lisp) {}
+
 /* Return symbols print name as a string. */
 PRIMITIVE string::symstr(LISPT sym)
 {
@@ -79,7 +82,13 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   return mkstring(l, str->stringval().substr(s, e));
 }
 
-string::string(lisp& lisp): base(lisp) {}
+inline constexpr auto PN_STRINGP = "stringp"; // t if string
+inline constexpr auto PN_STREQ = "streq";     // string equal
+inline constexpr auto PN_CONCAT = "concat";   // concatenate strings
+inline constexpr auto PN_STRLEN = "strlen";   // length of string
+inline constexpr auto PN_SUBSTR = "substr";   // get sub string
+inline constexpr auto PN_SYMSTR = "symstr";   // make symbol a string
+inline constexpr auto PN_STRCMP = "strcmp";   // compare strings
 
 void string::init()
 {

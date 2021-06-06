@@ -8,6 +8,9 @@
 
 namespace lisp
 {
+map::map(): base() {}
+map::map(lisp& lisp): base(lisp) {}
+
 PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == CONS)
@@ -80,7 +83,10 @@ PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-map::map(lisp& lisp): base(lisp) {}
+inline constexpr auto PN_MAP = "map";         // map
+inline constexpr auto PN_MAPC = "mapc";       // map on car
+inline constexpr auto PN_MAPLIST = "maplist"; // map and build result
+inline constexpr auto PN_MAPCAR = "mapcar";   // mapc and build result
 
 void map::init()
 {
