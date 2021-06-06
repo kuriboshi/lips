@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 #include <fmt/format.h>
 #include "lisp.hh"
 #include "base.hh"
@@ -147,8 +148,7 @@ private:
 class string_source: public io_source
 {
 public:
-  string_source(const char* string): _string(string) {}
-  string_source(std::string string): _string(string) {}
+  string_source(std::string_view string): _string(string) {}
 
   virtual int getch(bool inside_string) override
   {
@@ -250,7 +250,7 @@ public:
   file_t(std::unique_ptr<io_source> source): _source(std::move(source)) {}
   file_t(std::unique_ptr<io_sink> sink): _sink(std::move(sink)) {}
   file_t(std::unique_ptr<io_source> source, std::unique_ptr<io_sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
-  file_t(std::string source): _source(std::make_unique<string_source>(source)) {}
+  file_t(std::string_view string): _source(std::make_unique<string_source>(string)) {}
   ~file_t() {}
 
   // io_source
@@ -316,6 +316,7 @@ inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
 inline LISPT ratom(file_t& f) { return io(lisp::current()).ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io(l).lispread(f, esc); }
 inline LISPT lispread(file_t& f, bool esc = false) { return io(lisp::current()).lispread(f, esc); }
+inline LISPT lispread(std::string_view s, bool esc = false) { file_t f(s); return io(lisp::current()).lispread(f, esc); }
 inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
 inline LISPT readline(file_t& f) { return io(lisp::current()).readline(f); }
 

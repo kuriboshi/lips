@@ -370,17 +370,14 @@ TEST_CASE("exec.cc: make_exec")
   }
   SUBCASE("(make_exec (+ 1 2)) -> 3")
   {
-    // auto expr = cons(cons(intern("+"), cons(mknumber(1), cons(mknumber(2), C_NIL))), C_NIL);
-    auto is = file_t("((+ 1 2))");
-    auto expr = lispread(is);
+    auto expr = lispread("((+ 1 2))");
     auto result = make_exec(expr);
     REQUIRE(result);
     CHECK(result->at(0) == "3"s);
   }
   SUBCASE("(make_exec (/b*)) -> /bin")
   {
-    file_t is("(/b*)");
-    auto expr = lispread(is);
+    auto expr = lispread("(/b*)");
     auto result = make_exec(expr);
     REQUIRE(result);
     REQUIRE(!result->empty());
@@ -388,8 +385,7 @@ TEST_CASE("exec.cc: make_exec")
   }
   SUBCASE("(make_exec (/a*)) -> <empty>")
   {
-    file_t is("(/a*)");
-    auto expr = lispread(is);
+    auto expr = lispread("(/a*)");
     auto result = make_exec(expr);
     REQUIRE(result);
     REQUIRE(result->empty());
