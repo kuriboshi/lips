@@ -7,7 +7,6 @@ project(lips VERSION 0.3.0)
 set(CMAKE_CXX_STANDARD 17)
 
 option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
-option(ENABLE_FLOATING "Enable reading floating point values" OFF)
 option(ENABLE_SELECT "Enable using select when asking about core dumps" ON)
 option(ENABLE_JOB_CONTROL "Enable job control in the shell" ON)
 option(ENABLE_FANCY_SIGNALS "Enable catching signals and offer to skip dumping core" ON)
@@ -28,10 +27,6 @@ add_subdirectory(src)
 if(ENABLE_TRACE)
   # Enable ability to trace calls to peval.
   target_compile_definitions(lisp PRIVATE TRACE)
-endif()
-
-if(ENABLE_FLOATING)
-  target_compile_definitions(lisp PRIVATE FLOATING)
 endif()
 
 if(ENABLE_SELECT)

@@ -12,14 +12,13 @@ namespace lisp
 /*
  * This state table parses a floating point number.
  */
-#if FLOATING
 static int nxtstate[4][10] = {
   { 1,-1,-1,-1,-1,-1,-1, 8,-1,-1}, 
   { 2, 2, 2, 4, 4, 6, 6, 9, 9, 9}, 
   {-1,-1, 7, 7, 7,-1, 7,-1,-1,-1}, 
   { 5, 5, 3,-1,-1,-1,-1,-1,-1,-1}
 };
-#endif
+
 static char digits[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
@@ -55,7 +54,6 @@ bool io::integerp(char* buf, int* res)
 /*
  * Returns nonzero if buffer BUF is a floating point constant.
  */
-#ifdef FLOATING
 bool io::floatp(char* buf)
 {
   int state = 0;
@@ -95,7 +93,6 @@ bool io::floatp(char* buf)
     return true;
   return false;
 }
-#endif
 
 /*
  * Find out if the buffer can be interpreted as numbers of
@@ -107,10 +104,8 @@ LISPT io::parsebuf(char* buf)
 
   if(integerp(buf, &longval))
     return mknumber(l, longval);
-#ifdef FLOATING
   else if(floatp(buf))
-    return mkfloat(l, atof(buf));
-#endif /* FLOATING */
+    return mkfloat(l, std::stod(buf));
   return mkatom(l, buf);
 }
 

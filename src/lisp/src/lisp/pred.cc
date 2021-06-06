@@ -15,10 +15,7 @@ PRIMITIVE pred::numberp(LISPT a)
     case INTEGER:
     case FLOAT:
     case BIGNUM:
-#ifdef FLOATING
-    case LONG:
       return a;
-#endif /* FLOATING */
     default:
       return C_NIL;
   }

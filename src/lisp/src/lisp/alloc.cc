@@ -12,25 +12,6 @@
 
 namespace lisp
 {
-#ifdef FLOATING
-static unsigned short point = 31;
-static int p0 = 0;
-
-/*
- * The structure floats contains the data for floating point values.
- * It contains 128 values together with four longs with a total of
- * 128 bits. When a float is allocated the corresponding mark bit is
- * set. Marks are also used during gc. Then next pointer is not used
- * currently so the number of floats is limited to 128.
- */
-static struct floats
-{
-  long marks[4];
-  double fdata[128];
-  struct floats* fnext;
-} floats;
-#endif /* FLOATING */
-
 /* 
  * newpage - Allocates a new block of cons cells and links it into the 
  *           current list of blocks.
@@ -111,14 +92,6 @@ void alloc::mark(LISPT x)
       mark(x->car());
       mark(x->cdr());
       break;
-#ifdef FLOATING
-    case FLOAT:
-    {
-      int y = &FLOATVAL(x) - &floats.fdata[0];
-      floats.marks[(y / 32)] |= 1 << (31 - y % 32);
-      break;
-    }
-#endif /* FLOATING */
     case SYMBOL:
       break;
     case LAMBDA:
@@ -157,11 +130,6 @@ LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
     _lisp.primerr().format("garbage collecting\n");
-#ifdef FLOATING
-  for(int i = 0; i < 4; i++) floats.marks[i] = 0;
-  point = 31;
-  p0 = 0;
-#endif /* FLOATING */
   if(C_T != nullptr)
     C_T->mark();
   if(e().dest != nullptr)
@@ -476,30 +444,6 @@ LISPT alloc::mkatom(const std::string& str)
  */
 LISPT alloc::mkfloat(double num)
 {
-#ifdef FLOATING
-  LISPT rval = nullptr;
-again:
-  while(p0 < 4)
-    if((floats.marks[p0] & (1 << point)) == 0)
-      break;
-    else
-    {
-      point--;
-      if(!point)
-      {
-        p0++;
-        point = 31;
-      }
-    }
-  if(p0 == 4)
-  {
-    doreclaim();
-    goto again;
-  }
-  SET(rval, FLOAT, &floats.fdata[p0 * 32 + (31 - point)]);
-  floats.marks[p0] |= 1 << point;
-  *((double*)POINTER(rval)) = num;
-#endif /* FLOATING */
   LISPT rval = getobject();
   rval->floatval(num);
   return rval;
