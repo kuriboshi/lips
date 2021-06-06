@@ -27,9 +27,7 @@
 #include "os.hh"
 #include "term.hh"
 
-using lisp::LISPT;
-using lisp::issepr;
-using lisp::cons;
+using namespace lisp;
 
 void term_source::clearlbuf()
 {
@@ -58,6 +56,8 @@ void term_source::init_keymap()
   key_tab[(int)'\\'] = term_fun::T_ESCAPE;
   key_tab[(int)'"'] = term_fun::T_STRING;
 }
+
+struct termios term_source::oldterm;
 
 /* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
@@ -349,11 +349,11 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
 
   if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(lisp::C_NIL, lisp::C_NIL); !is_NIL(files); files = files->cdr())
+  for(stripped = cons(C_NIL, C_NIL); !is_NIL(files); files = files->cdr())
   {
     s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
-    tconc(stripped, lisp::mkstring(s));
+    tconc(stripped, mkstring(s));
   }
   return stripped->car();
 }
@@ -550,7 +550,7 @@ std::optional<std::string> term_source::getline()
     if(escaped)
       escaped--;
     fflush(stdout);
-    if(lisp::readchar(stdin, &c) == 0)
+    if(readchar(stdin, &c) == 0)
       return {};
     switch(key_tab[static_cast<int>(c)])
     {
@@ -587,13 +587,13 @@ std::optional<std::string> term_source::getline()
           break;
         }
         ex = expandfiles(t->c_str(), false, false, true);
-        if(type_of(ex) == lisp::CONS && strlen(s) > 1)
+        if(type_of(ex) == CONS && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
-        if(type_of(ex) == lisp::CONS && is_NIL(ex->cdr()))
+        if(type_of(ex) == CONS && is_NIL(ex->cdr()))
           fillrest(ex->car()->getstr().c_str());
         else
         {
-          if(type_of(ex) == lisp::CONS)
+          if(type_of(ex) == CONS)
             complete(ex);
           putc(BELL, stdout);
         }
@@ -701,5 +701,3 @@ bool term_source::eoln()
   }
   return true;
 }
-
-struct termios term_source::oldterm;

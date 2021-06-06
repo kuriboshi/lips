@@ -359,7 +359,7 @@ static std::unique_ptr<::lisp::lisp> init()
   C_BAR = alloc::intern("|");
   C_EXCL = alloc::intern("!");
   C_EXEC = alloc::intern(PN_EXEC);
-  C_FROM = alloc::intern(PN_FROM);
+  C_FROM = alloc::intern(PN_REDIR_FROM);
   C_GGT = alloc::intern(">>");
   C_GT = alloc::intern(">");
   C_LT = alloc::intern("<");
@@ -367,8 +367,8 @@ static std::unique_ptr<::lisp::lisp> init()
   C_PIPE = alloc::intern(PN_PIPECMD);
   C_PROGN = alloc::intern(PN_PROGN);
   C_SEMI = alloc::intern(";");
-  C_TO = alloc::intern(PN_TO);
-  C_TOTO = alloc::intern(PN_TOTO);
+  C_TO = alloc::intern(PN_REDIR_TO);
+  C_TOTO = alloc::intern(PN_REDIR_APPEND);
 
   top::init();
 
@@ -378,8 +378,8 @@ static std::unique_ptr<::lisp::lisp> init()
   gcprotect(home);
 
   initcvar(&globsort, "globsort", C_T);
-  top::transformhook = transform;
-  top::beforeprompt = promptfun;
+  top::transform_hook = transform;
+  top::prompt_hook = promptfun;
   breakhook(onbreak);
 
   exec::init();

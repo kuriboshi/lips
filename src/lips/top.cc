@@ -104,8 +104,8 @@ PRIMITIVE top::printhist()
 
 LISPT top::transform(LISPT list)
 {
-  if(transformhook != nullptr)
-    return (*transformhook)(list);
+  if(transform_hook)
+    return transform_hook(list);
   return list;
 }
 
@@ -177,8 +177,8 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
   while(true)
   {
     lisp::current().echoline = false;
-    if(beforeprompt != nullptr)
-      (*beforeprompt)();
+    if(prompt_hook)
+      prompt_hook();
     //
     // Evaluate promptform and print prompt.
     //
@@ -315,7 +315,8 @@ void top::init()
 LISPT top::history = nullptr;
 LISPT top::histnum = nullptr;
 LISPT top::histmax = nullptr;
-LISPT (*top::transformhook)(LISPT) = nullptr;
-void (*top::beforeprompt)() = nullptr;
+
+std::function<LISPT(LISPT)> top::transform_hook;;
+std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded = nullptr;
 LISPT top::promptform = nullptr;
