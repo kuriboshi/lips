@@ -116,7 +116,7 @@ void core(int sig)
     else
     {
       signal(sig, SIG_DFL);
-      printf("Yes\n");
+      std::cout << "Yes\n";
       term_source::end_term();
       killpg(mypgrp, sig);
     }
@@ -394,7 +394,7 @@ static std::unique_ptr<::lisp::lisp> init()
 static void loadinit(const char* initfile)
 {
   if(!loadfile(*L, initfile))
-    printf("Can't open file %s\n", initfile); /* System init file. */
+    std::cout << "Can't open file " << initfile << '\n'; // System init file
 }
 #endif
 
@@ -460,7 +460,7 @@ int main(int argc, char* const* argv)
   if(!options.interactive && !options.command)
     options.interactive = isatty(0);
   if(options.version)
-    printf("%s\n", VERSION);
+    std::cout << VERSION << '\n';
   progname = argv[0];
 
   /*
@@ -499,12 +499,12 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_reset&)
     {
-      printf("^C\n");
+      std::cout << "^C\n";
     }
     catch(const lisp_error& error)
     {
       static_cast<term_source&>(terminal->source()).clearlbuf();
-      printf("error: %s\n", error.what());
+      std::cout << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)
     {

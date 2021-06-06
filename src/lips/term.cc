@@ -15,6 +15,7 @@
 #include <term.h>
 #endif
 
+#include <iostream>
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
@@ -249,7 +250,7 @@ void term_source::retype(int all)
     if(all)
       nl = 0;
     if(nl == 0)
-      fputs(current_prompt, stdout);
+      std::cout << current_prompt;
     if(all != 2)
     {
       for(int i = nl; i < linepos; i++)
@@ -272,21 +273,21 @@ void term_source::retype(int all)
       for(; i >= 0 && linebuffer[i] != '\n'; --i)
         ;
       if(i == 0)
-        fputs(current_prompt, stdout);
+        std::cout << current_prompt;
       for(++i; i < linepos; i++) pputc(linebuffer[i], stdout);
     }
     else if(all == 1)
     {
       pputc(CRPRNT, stdout);
       pputc('\n', stdout);
-      fputs(current_prompt, stdout);
+      std::cout << current_prompt;
       for(int i = 0; i < linepos; ++i) pputc(linebuffer[i], stdout);
     }
     else
     {
       pputc(CKILL, stdout);
       pputc('\n', stdout);
-      fputs(current_prompt, stdout);
+      std::cout << current_prompt;
     }
   }
 }
@@ -453,12 +454,12 @@ void term_source::scan(int begin)
   currentpos.line = line;
   if(line == 0)
   {
-    currentpos.cpos += strlen(current_prompt);
+    currentpos.cpos += current_prompt.length();
     currentpos.line_start = linebuffer;
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)
-    parpos.cpos = cpos - parpos.cpos + strlen(current_prompt);
+    parpos.cpos = cpos - parpos.cpos + current_prompt.length();
 }
 
 /*
@@ -512,7 +513,7 @@ void term_source::blink()
   else
   {
     if(currentpos.line == 0)
-      fputs(current_prompt, stdout);
+      std::cout << current_prompt;
     for(i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout);
   }
   fflush(stdout);
@@ -538,7 +539,7 @@ std::optional<std::string> term_source::getline()
 
   if(options.command)
   {
-    fprintf(stderr, "Unbalanced parenthesis\n");
+    std::cerr << "Unbalanced parenthesis\n";
     end_term();
     exit(1);
   }

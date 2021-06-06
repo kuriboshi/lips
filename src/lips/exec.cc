@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <fmt/format.h>
 #include <doctest/doctest.h>
 #include <filesystem>
 #include <string>
@@ -89,23 +90,21 @@ static void preparefork()
 #ifdef JOB_CONTROL
 static void printjob(job_t* job)
 {
-  char buffer[80];
-
-  sprintf(buffer, "[%d]  %d ", job->jobnum, job->procid);
+  std::string buffer = fmt::format("[{}]  {} ", job->jobnum, job->procid);
   if(job->running)
-    strcat(buffer, "Running");
+    buffer += "Running";
   else if(WIFEXITED(job->status))
-    strcat(buffer, "Done");
+    buffer += "Done";
   else if(WIFSTOPPED(job->status))
-    strcat(buffer, strsignal(WSTOPSIG(job->status)));
+    buffer += strsignal(WSTOPSIG(job->status));
   else
   {
-    strcat(buffer, strsignal(WTERMSIG(job->status)));
+    buffer += strsignal(WTERMSIG(job->status));
     if(WCOREDUMP(job->status))
-      strcat(buffer, " (core dumped)");
+      buffer += " (core dumped)";
   }
-  strcat(buffer, "\t");
-  primout().puts(buffer);
+  buffer += "\t";
+  primout().format(buffer);
   print(job->exp, C_NIL);
 }
 #endif
@@ -216,7 +215,7 @@ static int mfork()
   else if(pid < 0)
   {
     if(insidefork)
-      fprintf(stderr, "%s\n", strerror(errno));
+      std::cerr << fmt::format("{}\n", strerror(errno));
     else
       syserr(C_NIL);
     return pid;
@@ -453,7 +452,7 @@ static LISPT execute(const std::string& name, LISPT command)
     execve(name.c_str(), &argv[0], environ);
     if(errno == ENOEXEC)
       execvp(name.c_str(), &argv[0]);
-    fprintf(stderr, "%s\n", strerror(errno));
+    std::cerr << strerror(errno) << '\n';
     exit(1);
     /* No return */
   }
@@ -463,7 +462,7 @@ static LISPT execute(const std::string& name, LISPT command)
     execve(name.c_str(), &argv[0], environ);
     if(errno == ENOEXEC)
       execvp(name.c_str(), &argv[0]);
-    fprintf(stderr, "%s\n", strerror(errno));
+    std::cerr << strerror(errno) << '\n';
     exit(1);
   }
   else if(pid < 0)
@@ -704,7 +703,7 @@ PRIMITIVE exec::back(LISPT x)
   else if(pid < 0)
     return C_ERROR;
   recordjob(pid, 1);
-  printf("[%d] %d\n", joblist->jobnum, pid);
+  std::cout << fmt::format("[{}] {}\n", joblist->jobnum, pid);
   return mknumber(l, pid);
 }
 

@@ -54,5 +54,5 @@ private:
 
 } // namespace lisp
 
-extern char current_prompt[];
+extern std::string current_prompt;
 extern lisp::LISPT input_exp;

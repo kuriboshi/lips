@@ -6,6 +6,8 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
+#include <iostream>
 #include <lisp/libisp.hh>
 #include <lisp/except.hh>
 #include "main.hh"
@@ -13,9 +15,7 @@
 
 using namespace lisp;
 
-inline constexpr int PROMPTLENGTH = 80;
-
-char current_prompt[PROMPTLENGTH];
+std::string current_prompt;
 LISPT input_exp; /* The input expression. */
 
 /*
@@ -30,7 +30,7 @@ void top::phist()
 
   for(hl = history; !is_NIL(hl); hl = hl->cdr())
   {
-    printf("%d.\t", hl->car()->car()->intval());
+    std::cout << fmt::format("{}.\t", hl->car()->car()->intval());
     prinbody(hl->car()->cdr(), lisp::current().stdout(), true);
     primout().terpri();
   }
@@ -143,33 +143,26 @@ LISPT top::findalias(LISPT exp)
 
 void top::promptprint(LISPT prompt)
 {
-  int i;
-  const char* s;
-  char buf[80];
-
-  current_prompt[0] = '\0';
+  current_prompt.clear();
   if(type_of(prompt) != STRING)
     return;
   else
   {
-    s = prompt->getstr().c_str();
-    for(i = 0; s[i]; i++)
+    auto s = prompt->getstr();
+    for(auto c: s)
     {
-      if(s[i] == '!')
+      if(c == '!')
       {
-        sprintf(buf, "%d", top::histnum->intval());
-        strcat(current_prompt, buf);
+        current_prompt += std::to_string(top::histnum->intval());
         continue;
       }
-      else if(s[i] == '\\')
-        i++;
-      buf[0] = s[i];
-      buf[1] = '\0';
-      strcat(current_prompt, buf);
+      else if(c == '\\')
+        continue;
+      current_prompt.push_back(c);
     }
   }
-  printf("\r");
-  printf("%s", current_prompt);
+  std::cout << "\r";
+  std::cout << current_prompt;
 }
 
 bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
