@@ -211,29 +211,28 @@ LISPT C_TOTO;
  * Processes the environment variable PATH and returns a list
  * of all directories in PATH.
  */
-LISPT mungepath(char* pstr)
+LISPT mungepath(const std::string& pstr)
 {
-  char *ps, *s;
-  LISPT p;
-
-  ps = L->a().realmalloc((unsigned)(strlen(pstr) + 1));
-  if(ps == nullptr)
+  LISPT result = C_NIL;
+  auto pos = pstr.size();
+  for(;;)
   {
-    fprintf(stderr, "No more memory, can't munge path.\n");
-    throw lisp_finish("mungepath", 1);
+    auto next = pstr.rfind(':', pos);
+    if(next == std::string::npos)
+    {
+      result = cons(mkstring(pstr.substr(0, pos - next)), result);
+      break;
+    }
+    result = cons(mkstring(pstr.substr(next + 1, pos - next)), result);
+    pos = next;
+    if(pos == 0)
+    {
+      result = cons(mkstring(""), result);
+      break;
+    }
+    --pos;
   }
-  strcpy(ps, pstr);
-  p = C_NIL;
-  s = ps + strlen(ps);
-  while(s >= ps)
-  {
-    *s = '\0';
-    for(; s >= ps && *s != ':'; s--)
-      ;
-    p = cons(*L, mkstring(*L, s + 1), p);
-  }
-  free(ps);
-  return p;
+  return result;
 }
 
 void onbreak()
