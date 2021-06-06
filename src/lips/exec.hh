@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <lisp/lisp.hh>
 #include <lisp/base.hh>
 
@@ -40,7 +41,7 @@ public:
   LISPT pipecmd(LISPT cmds);
   LISPT back(LISPT x);
   LISPT stop();
-  LISPT rehash();
+  static LISPT rehash();
   LISPT jobs();
   LISPT fg(LISPT job);
   LISPT bg(LISPT job);
@@ -48,6 +49,10 @@ public:
   LISPT getenviron(LISPT var);
   LISPT cd(LISPT dir, LISPT emess);
   LISPT doexec(LISPT cmd);
+
+private:
+  static int execcommand(LISPT, LISPT*);
+  static std::unordered_map<std::string, std::string> exechash;
 };
 
 inline LISPT to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec(l).to(cmd, file, filed); }
@@ -57,6 +62,7 @@ inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec(l).pipecmd(cmds); }
 inline LISPT back(lisp& l, LISPT x) { return exec(l).back(x); }
 inline LISPT stop(lisp& l) { return exec(l).stop(); }
 inline LISPT rehash(lisp& l) { return exec(l).rehash(); }
+inline LISPT rehash() { return rehash(lisp::current()); }
 inline LISPT jobs(lisp& l) { return exec(l).jobs(); }
 inline LISPT fg(lisp& l, LISPT job) { return exec(l).fg(job); }
 inline LISPT bg(lisp& l, LISPT job) { return exec(l).bg(job); }

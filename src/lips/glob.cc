@@ -17,8 +17,6 @@
 #include "exec.hh"
 #include "glob.hh"
 
-extern lisp::lisp* L;
-
 using namespace std::literals;
 using namespace lisp;
 
@@ -226,7 +224,7 @@ const std::optional<std::string> extilde(const std::string& w, bool report)
     if(pw == nullptr)
     {
       if(report)
-        L->error(NO_USER, mkstring(s));
+        error(NO_USER, mkstring(s));
       return {};
     }
     s = pw->pw_dir;
@@ -404,10 +402,10 @@ LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort)
  * Lisp function expand. Expand all files matching wild
  * in directory dir.
  */
-PRIMITIVE expand(::lisp::lisp& l, LISPT wild, LISPT rep, LISPT all)
+LISPT expand(LISPT wild, LISPT rep, LISPT all)
 {
   auto r = is_NIL(rep);
-  l.check(wild, STRING, SYMBOL);
+  check(wild, STRING, SYMBOL);
   auto wstr = extilde(wild->getstr(), r);
   if(!wstr)
     return C_NIL;
@@ -468,7 +466,7 @@ TEST_CASE("glob.cc: expandfiles")
   SUBCASE("testdir/*")
   {
     LISPT wild = mkstring("testdir/*");
-    auto e = expand(*L, wild, 0, 0);
+    auto e = expand(wild, 0, 0);
     CHECK(length(e)->intval() == 3);
     std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
     for(auto i: e)
@@ -485,7 +483,7 @@ TEST_CASE("glob.cc: expandfiles")
   SUBCASE("test*/*")
   {
     LISPT wild = mkstring("testd*/*");
-    auto e = expand(*L, wild, 0, 0);
+    auto e = expand(wild, 0, 0);
     CHECK(length(e)->intval() == 3);
     std::vector<std::string> x = {"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
     for(auto i: e)
@@ -509,4 +507,4 @@ TEST_CASE("glob.cc: expandfiles")
   CHECK(!ec);
 }
 
-LISPT glob(LISPT wild) { return expand(*L, wild, 0, 0); }
+LISPT glob(LISPT wild) { return expand(wild, 0, 0); }

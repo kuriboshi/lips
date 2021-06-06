@@ -298,12 +298,19 @@ private:
 };
 
 inline bool isascii(int c) { return c >= 0 && c <= 127; }
+
 inline bool issepr(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SEPR; }
+inline bool issepr(int c) { return issepr(lisp::current(), c); }
 inline bool isbrk(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::BRK; }
+inline bool isbrk(int c) { return isbrk(lisp::current(), c); }
 inline bool isctrl(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::CTRL; }
+inline bool isctrl(int c) { return isctrl(lisp::current(), c); }
 inline bool isinsert(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INSERT; }
+inline bool isinsert(int c) { return isinsert(lisp::current(), c); }
 inline bool issplice(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::SPLICE; }
+inline bool issplice(int c) { return issplice(lisp::current(), c); }
 inline bool isinfix(lisp& l, int c) { return isascii(c) && l.currentrt.chclass[c] == char_class::INFIX; }
+inline bool isinfix(int c) { return isinfix(lisp::current(), c); }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
 inline LISPT ratom(file_t& f) { return io(lisp::current()).ratom(f); }
@@ -341,5 +348,8 @@ inline LISPT print(lisp& l, LISPT a, file_t& f) { return io(l).print(a, f); }
 inline LISPT print(LISPT a, file_t& f) { return io(lisp::current()).print(a, f); }
 inline LISPT print(lisp& l, LISPT a, bool out = false) { return io(l).print(a, out ? l.primerr() : l.primout()); }
 inline LISPT print(LISPT a, bool out = false) { return print(lisp::current(), a, out); }
+inline file_t& primout() { return lisp::current().primout(); }
+inline file_t& primin() { return lisp::current().primin(); }
+inline file_t& primerr() { return lisp::current().primerr(); }
 
 } // namespace lisp

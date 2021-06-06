@@ -468,6 +468,10 @@ inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
 inline LISPT break0(LISPT a) { return break0(lisp::current(), a); }
 
 inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
+inline void check(LISPT arg, lisp_type type) { check(lisp::current(), arg, type); }
 inline void check(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check(arg, type0, type1); }
+inline void check(LISPT arg, lisp_type type0, lisp_type type1) { check(lisp::current(), arg, type0, type1); }
+inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
+inline void break_flag(bool val) { lisp::current().brkflg = val; }
 
 } // namespace lisp

@@ -104,8 +104,8 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     l.perror(mess, fault);
     printwhere();
   }
-  if(breakhook != nullptr)
-    (*breakhook)();
+  if(_breakhook)
+    _breakhook();
   if(env == nullptr)
     throw lisp_error("break");
   file(l).print(cons(l, fault, cons(l, C_BROKEN, C_NIL)), C_T);
@@ -321,8 +321,8 @@ bool evaluator::evalhook(LISPT exp)
 {
   LISPT res;
 
-  if(undefhook != nullptr)
-    switch((*undefhook)(exp, &res))
+  if(_undefhook)
+    switch(_undefhook(exp, &res))
     {
       case 1:
         send(res);

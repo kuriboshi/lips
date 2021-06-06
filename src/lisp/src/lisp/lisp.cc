@@ -143,8 +143,8 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   user::init();
   io::init(*this);
 
-  e().undefhook = nullptr;
-  e().breakhook = nullptr;
+  e().undefhook(nullptr);
+  e().breakhook(nullptr);
 
   if(_current == nullptr)
     _current = this;

@@ -31,9 +31,14 @@ public:
 };
 
 inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return prop(l).setplist(a, b); }
+inline LISPT setplist(LISPT a, LISPT b) { return setplist(lisp::current(), a, b); }
 inline LISPT getplist(lisp& l, LISPT a) { return prop(l).getplist(a); }
+inline LISPT getplist(LISPT a) { return getplist(lisp::current(), a); }
 inline LISPT putprop(lisp& l, LISPT a, LISPT b, LISPT c) { return prop(l).putprop(a, b, c); }
+inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return putprop(lisp::current(), a, b, c); }
 inline LISPT getprop(lisp& l, LISPT a, LISPT b) { return prop(l).getprop(a, b); }
+inline LISPT getprop(LISPT a, LISPT b) { return getprop(lisp::current(), a, b); }
 inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return prop(l).remprop(a, b); }
+inline LISPT remprop(LISPT a, LISPT b) { return remprop(lisp::current(), a, b); }
 
 } // namespace lisp

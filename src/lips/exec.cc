@@ -14,7 +14,6 @@
 #include <doctest/doctest.h>
 #include <filesystem>
 #include <string>
-#include <unordered_map>
 #include <iostream>
 #include <cstdlib>
 #include <cerrno>
@@ -28,19 +27,17 @@
 #include "top.hh"
 #include "exec.hh"
 
-extern lisp::lisp* L;
-
 using namespace lisp;
 using namespace std::literals;
 
+std::unordered_map<std::string, std::string> exec::exechash;
 extern char** environ;
 LISPT p_setenv(LISPT, LISPT);
 
 using UNION_WAIT = int;
 
-bool insidefork = false; // Is nonzero in the child after a fork
+bool insidefork = false;        // Is nonzero in the child after a fork
 
-static std::unordered_map<std::string, std::string> exechash;
 static int pgrp;                    /* Process group of current job */
 
 #ifdef JOB_CONTROL
@@ -108,8 +105,8 @@ static void printjob(job_t* job)
       strcat(buffer, " (core dumped)");
   }
   strcat(buffer, "\t");
-  L->primout().puts(buffer);
-  print(*L, job->exp, C_NIL);
+  primout().puts(buffer);
+  print(job->exp, C_NIL);
 }
 #endif
 
@@ -221,7 +218,7 @@ static int mfork()
     if(insidefork)
       fprintf(stderr, "%s\n", strerror(errno));
     else
-      syserr(*L, C_NIL);
+      syserr(C_NIL);
     return pid;
   }
   recordjob(pid, 0);
@@ -420,7 +417,7 @@ static UNION_WAIT waitfork(int pid)
   } while(errno == EINTR || (pid != 0 && pid != wpid && wpid != -1));
   if(WIFSIGNALED(wstat))
   {
-    L->e().unwind();
+    unwind();
     throw lisp_error("waitfork");
   }
   return wstat;
@@ -476,7 +473,7 @@ static LISPT execute(const std::string& name, LISPT command)
   else if(pid < 0)
     return C_ERROR;
   auto status = waitfork(pid);
-  return mknumber(*L, WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 TEST_CASE("execute")
@@ -509,7 +506,7 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
  *               the path, 1 if the command was successively run and -1 if 
  *               there was some error.
  */
-int execcommand(LISPT exp, LISPT* res)
+int exec::execcommand(LISPT exp, LISPT* res)
 {
   *res = C_T;
   auto command = extilde(exp->car()->getstr(), true);
@@ -547,25 +544,6 @@ int execcommand(LISPT exp, LISPT* res)
       continue;
   }
   return 0;
-}
-
-/* 
- * setenviron - Set environmet variable VAR to VAL. No sorting of the 
- *              entries is done.
- */
-static void setenviron(const char* var, const char* val)
-{
-#ifdef PUTENV
-  auto* env = L->a().realmalloc((unsigned)strlen(var) + strlen(val) + 2);
-  strcpy(env, var);
-  strcat(env, "=");
-  strcat(env, val);
-  putenv(env);
-#else
-  auto* var_ = L->a().realmalloc((unsigned)strlen(var) + 1);
-  auto* val_ = L->a().realmalloc((unsigned)strlen(val) + 1);
-  setenv(strcpy(var_, var), strcpy(val_, val), 1);
-#endif
 }
 
 /* Primitives */
@@ -620,22 +598,22 @@ PRIMITIVE exec::toto(LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
-    return syserr(*L, file);
+    return syserr(file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      L->stderr().format("{}\n", strerror(errno));
+      l.stderr().format("{}\n", strerror(errno));
       exit(1);
     }
-    eval(*L, cmd);
+    eval(cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   close(fd);
-  return mknumber(*L, WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 PRIMITIVE exec::from(LISPT cmd, LISPT file, LISPT filed)
@@ -748,7 +726,7 @@ PRIMITIVE exec::rehash()
   {
     if(is_NIL(p))
       continue;
-    l.check(p, STRING, SYMBOL);
+    check(p, STRING, SYMBOL);
     for(auto& odir: std::filesystem::directory_iterator(p->getstr()))
       exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }
@@ -838,7 +816,7 @@ PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
 {
   l.check(var, STRING, SYMBOL);
   l.check(val, STRING, SYMBOL);
-  setenviron(var->getstr().c_str(), val->getstr().c_str());
+  setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
@@ -877,9 +855,8 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   }
   else
   {
-    char* wd = getcwd(nullptr, 0);
-    setenviron("PWD", wd);
-    free(wd);
+    auto wd = std::filesystem::current_path();
+    setenv("PWD", wd.c_str(), 1);
     return C_T;
   }
   return ndir; // TODO: Is this correct?
@@ -922,6 +899,6 @@ void exec::init()
   mkprim(PN_GETENV,  ::lisp::getenviron, subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
   mkprim(PN_EXEC,    ::lisp::doexec,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
   // clang-format on
-  ::lisp::rehash(*L);
-  L->e().undefhook = execcommand;
+  rehash();
+  undefhook(execcommand);
 }

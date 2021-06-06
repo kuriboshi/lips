@@ -27,7 +27,8 @@
 #include "top.hh"
 #include "term.hh"
 
-lisp::lisp* L;
+using lisp::primin;
+using lisp::primerr;
 
 std::jmp_buf jumper;
 int mypgrp;     /* lips process group. */
@@ -44,7 +45,7 @@ void onintr(int sig)
  * The stop key means to break inside a lisp expression. The
  * brkflg is checked on every entry to eval.
  */
-void onstop(int) { L->brkflg = true; }
+void onstop(int) { lisp::break_flag(true); }
 
 static void fixpgrp()
 {
@@ -66,19 +67,19 @@ static int getuser(int def)
   switch(select(FD_SETSIZE, &readfs, nullptr, nullptr, &timeout))
   {
     case -1:
-      L->primerr().format("(error in select {}) ", errno);
+      primerr().format("(error in select {}) ", errno);
       return 'n';
       break;
     case 0:
       return def;
       break;
     default:
-      return L->primin().getch();
+      return primin().getch();
       break;
   }
   return def;
 #else
-  return L->primin().getch();
+  return primin().getch();
 #endif
 }
 
@@ -93,23 +94,23 @@ void core(int sig)
   // init_term();
   if(insidefork)
   {
-    L->primerr().format(" -- (in fork) core dumped\n");
+    primerr().format(" -- (in fork) core dumped\n");
     killpg(getpgrp(), sig);
   }
-  L->primerr().format(" -- Continue? ");
-  L->primerr().flush();
+  primerr().format(" -- Continue? ");
+  primerr().flush();
   int c = getuser('y');
   while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
   if((islower(c) ? c : tolower(c)) == 'n')
   {
-    L->primerr().format("No\n");
-    L->primerr().format("Core dump? ");
-    L->primerr().flush();
+    primerr().format("No\n");
+    primerr().format("Core dump? ");
+    primerr().flush();
     c = getuser('y');
     while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
     if((islower(c) ? c : tolower(c)) == 'n')
     {
-      L->primerr().format("No\n");
+      primerr().format("No\n");
       throw lisp::lisp_finish("core", 0);
     }
     else
@@ -122,9 +123,9 @@ void core(int sig)
   }
   else
   {
-    L->primerr().format("Yes\n");
-    L->primerr().format("Warning: continued after signal {}.\n", sig);
-    L->primerr().format("Save your work and exit.\n");
+    primerr().format("Yes\n");
+    primerr().format("Warning: continued after signal {}.\n", sig);
+    primerr().format("Save your work and exit.\n");
     term_source::end_term();
     throw lisp::lisp_error("continue after signal");
   }
@@ -132,25 +133,25 @@ void core(int sig)
 
 void onquit(int sig)
 {
-  L->primerr().puts("Quit!");
+  primerr().puts("Quit!");
   std::longjmp(jumper, sig);
 }
 
 void onbus(int sig)
 {
-  L->primerr().format("{}: Bus error!", progname);
+  primerr().format("{}: Bus error!", progname);
   std::longjmp(jumper, sig);
 }
 
 void onsegv(int sig)
 {
-  L->primerr().format("{}: Segmentation violation!", progname);
+  primerr().format("{}: Segmentation violation!", progname);
   std::longjmp(jumper, sig);
 }
 
 void onill(int sig)
 {
-  L->primerr().format("{}: Illegal instruction!", progname);
+  primerr().format("{}: Illegal instruction!", progname);
   std::longjmp(jumper, sig);
 }
 
@@ -258,15 +259,15 @@ static LISPT put_end(LISPT list, LISPT obj, bool conc)
   {
     if(conc)
       return obj;
-    return cons(*L, obj, C_NIL);
+    return cons(obj, C_NIL);
   }
   LISPT t;
   for(t = list; type_of(t->cdr()) == CONS; t = t->cdr())
     ;
   if(conc)
-    rplacd(*L, t, obj);
+    rplacd(t, obj);
   else
-    rplacd(*L, t, cons(*L, obj, C_NIL));
+    rplacd(t, cons(obj, C_NIL));
   return list;
 }
 
@@ -282,54 +283,54 @@ static LISPT transform(LISPT list)
     else if(EQ(ll->car(), C_BAR))
     {
       if(is_NIL(res))
-        res = cons(*L, C_PIPE, cons(*L, tl, C_NIL));
+        res = cons(C_PIPE, cons(tl, C_NIL));
       else
-        res = cons(*L, C_PIPE, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = false;
     }
     else if(EQ(ll->car(), C_SEMI))
     {
       if(is_NIL(res))
-        res = cons(*L, C_PROGN, cons(*L, tl, C_NIL));
+        res = cons(C_PROGN, cons(tl, C_NIL));
       else
-        res = cons(*L, C_PROGN, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = false;
     }
     else if(EQ(ll->car(), C_GT))
     {
       if(is_NIL(res))
-        res = cons(*L, C_TO, cons(*L, tl, C_NIL));
+        res = cons(C_TO, cons(tl, C_NIL));
       else
-        res = cons(*L, C_TO, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_TO, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_GGT))
     {
       if(is_NIL(res))
-        res = cons(*L, C_TOTO, cons(*L, tl, C_NIL));
+        res = cons(C_TOTO, cons(tl, C_NIL));
       else
-        res = cons(*L, C_TOTO, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_TOTO, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_LT))
     {
       if(is_NIL(res))
-        res = cons(*L, C_FROM, cons(*L, tl, C_NIL));
+        res = cons(C_FROM, cons(tl, C_NIL));
       else
-        res = cons(*L, C_FROM, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_FROM, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_AMPER))
     {
       if(is_NIL(res))
-        res = cons(*L, C_BACK, cons(*L, tl, C_NIL));
+        res = cons(C_BACK, cons(tl, C_NIL));
       else
-        res = cons(*L, C_BACK, cons(*L, put_end(res, tl, conc), C_NIL));
+        res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
       tl = C_NIL;
       conc = true;
     }
@@ -343,14 +344,14 @@ static LISPT transform(LISPT list)
   return res;
 }
 
-static void init()
+static std::unique_ptr<::lisp::lisp> init()
 {
   signal(SIGTTIN, SIG_IGN);
   signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
 
   fixpgrp();
 
-  L = new ::lisp::lisp();
+  auto l = std::make_unique<::lisp::lisp>();
 
   C_ALIAS = alloc::intern("alias");
   C_AMPER = alloc::intern("&");
@@ -372,16 +373,18 @@ static void init()
   top::init();
 
   initcvar(&path, "path", mungepath(getenv("PATH")));
-  initcvar(&home, "home", mkstring(*L, getenv("HOME")));
-  L->a().add_mark_object(&path);
-  L->a().add_mark_object(&home);
+  initcvar(&home, "home", mkstring(getenv("HOME")));
+  gcprotect(path);
+  gcprotect(home);
 
   initcvar(&globsort, "globsort", C_T);
   top::transformhook = transform;
   top::beforeprompt = promptfun;
-  L->e().breakhook = onbreak;
+  breakhook(onbreak);
 
   exec::init();
+
+  return l;
 }
 
 #ifdef LIPSRC
@@ -414,7 +417,7 @@ LISPT greet(LISPT who)
   char loadf[256];
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
-  loadfile(*L, loadf);
+  loadfile(loadf);
   return C_T;
 }
 
@@ -463,7 +466,7 @@ int main(int argc, char* const* argv)
   /*
    * Init shell and lisp interpreter.
    */
-  init();
+  auto lisp = init();
   if(options.test)
   {
     context.applyCommandLine(argc, argv);
@@ -483,15 +486,15 @@ int main(int argc, char* const* argv)
     {}
   }
   auto terminal = std::make_unique<file_t>(std::make_unique<term_source>(options));
-  auto toploop = std::make_unique<top>(top(*L, options));
+  auto toploop = std::make_unique<top>(top(*lisp, options));
   while(true)
   {
     try
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      L->e().reset();
-      if(toploop->toploop(&L->topprompt, nullptr, *terminal.get()))
+      ::lisp::lisp::current().e().reset();
+      if(toploop->toploop(&::lisp::lisp::current().topprompt, nullptr, *terminal.get()))
         break;
     }
     catch(const lisp_reset&)
@@ -505,7 +508,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_finish& fin)
     {
-      L->stderr().format("finish: {}", fin.what());
+      lisp->primerr().format("finish: {}", fin.what());
       return fin.exit_code;
     }
   }

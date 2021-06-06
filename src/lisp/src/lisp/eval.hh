@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <functional>
 #include "lisp.hh"
 #include "base.hh"
 #include "io.hh"
@@ -66,11 +67,10 @@ public:
 
   destblock_t* dest = nullptr; // Current destination being built.
 
-  using undefhook_t = int (*)(LISPT, LISPT*);
-  undefhook_t undefhook = nullptr; // Called in case of undefined function.
-
-  using breakhook_t = void (*)();
-  breakhook_t breakhook = nullptr; // Called before going into break.
+  using undefhook_t = std::function<int(LISPT, LISPT*)>;
+  void undefhook(undefhook_t fun) { _undefhook = fun; }
+  using breakhook_t = std::function<void()>;
+  void breakhook(breakhook_t fun) { _breakhook = fun; }
 
   struct destblock_t* environment() const { return env; }
 
@@ -134,6 +134,8 @@ private:
   void abort(int m, LISPT v);
   void overflow();
 
+  undefhook_t _undefhook;        // Called in case of undefined function.
+  breakhook_t _breakhook;        // Called before going into break.
   LISPT fun = nullptr;           // Store current function being evaluated.
   LISPT expression = nullptr;    // Current expression.
   LISPT args = nullptr;          // Current arguments.
@@ -160,5 +162,11 @@ inline LISPT topofstack(lisp& l) { return l.e().topofstack(); }
 inline LISPT topofstack() { return topofstack(lisp::current()); }
 inline LISPT envget(lisp& l, LISPT a, LISPT b) { return l.e().envget(a, b); }
 inline LISPT envget(LISPT a, LISPT b) { return envget(lisp::current(), a, b); }
+inline void breakhook(lisp& l, evaluator::breakhook_t fun) { l.e().breakhook(fun); }
+inline void breakhook(evaluator::breakhook_t fun) { lisp::current().e().breakhook(fun); }
+inline void undefhook(lisp& l, evaluator::undefhook_t fun) { l.e().undefhook(fun); }
+inline void undefhook(evaluator::undefhook_t fun) { lisp::current().e().undefhook(fun); }
+inline void unwind(lisp& l) { l.e().unwind(); }
+inline void unwind() { lisp::current().e().unwind(); }
 
 } // namespace lisp
