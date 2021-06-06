@@ -61,8 +61,8 @@ inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return ex
 inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec(l).pipecmd(cmds); }
 inline LISPT back(lisp& l, LISPT x) { return exec(l).back(x); }
 inline LISPT stop(lisp& l) { return exec(l).stop(); }
-inline LISPT rehash(lisp& l) { return exec(l).rehash(); }
-inline LISPT rehash() { return rehash(lisp::current()); }
+inline LISPT rehash(lisp&) { return exec::rehash(); }
+inline LISPT rehash() { return exec::rehash(); }
 inline LISPT jobs(lisp& l) { return exec(l).jobs(); }
 inline LISPT fg(lisp& l, LISPT job) { return exec(l).fg(job); }
 inline LISPT bg(lisp& l, LISPT job) { return exec(l).bg(job); }
