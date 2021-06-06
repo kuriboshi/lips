@@ -31,20 +31,6 @@ static struct floats
 } floats;
 #endif /* FLOATING */
 
-/*
- * realmalloc - wrapper around malloc which returns a char*.
- */
-char* alloc::realmalloc(unsigned int size)
-{
-  char* cp = (char*)malloc(size);
-  if(cp == nullptr)
-  {
-    // error(OUT_OF_MEMORY, C_NIL);
-    return nullptr;
-  }
-  return cp;
-}
-
 /* 
  * newpage - Allocates a new block of cons cells and links it into the 
  *           current list of blocks.
@@ -305,7 +291,7 @@ PRIMITIVE alloc::freecount()
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-LISPT alloc::mkprim(const char* pname, subr_t* subr)
+LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
 {
   LISPT s = new lisp_t;
   s->subrval(subr);
@@ -314,22 +300,22 @@ LISPT alloc::mkprim(const char* pname, subr_t* subr)
   return s;
 }
 
-void alloc::mkprim(const char* pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
 
-void alloc::mkprim(const char* pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
 {
   mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
 }
@@ -399,11 +385,12 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
 /*
  * Calculates hash value of string.
  */
-int alloc::hash(const char* str)
+int alloc::hash(const std::string& str)
 {
   int sum = 0;
 
-  for(; *str; str++) sum += *str;
+  for(auto c: str)
+    sum += c;
   return sum % MAXHASH;
 }
 
@@ -411,23 +398,14 @@ int alloc::hash(const char* str)
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-LISPT alloc::buildatom(const char* s, bool copy, LISPT newatom)
+LISPT alloc::buildatom(const std::string& s, bool copy, LISPT newatom)
 {
   static LISPT unbound = nullptr;
   if(unbound == nullptr)
     set(unbound, UNBOUND, new lisp_t);
 
   newatom->symval(symbol_t());
-  if(copy)
-  {
-    auto* pname = realmalloc((unsigned)strlen(s) + 1);
-    if(pname == nullptr)
-      return C_ERROR;
-    strcpy(pname, s);
-    newatom->symval().pname = pname;
-  }
-  else
-    newatom->symval().pname = s;
+  newatom->symval().pname = s;
   newatom->symval().plist = C_NIL;
   newatom->symval().value = unbound;
   LISPT l = nullptr;
@@ -450,7 +428,7 @@ alloc::obarray_t* alloc::findatom(int hv, const std::string& str, obarray_t* oba
  *           If the atom is already in obarray, no new atom is created.
  *           Copy str if COPY is true. Returns the atom.
  */
-LISPT alloc::puthash(int hv, const char* str, obarray_t* obarray[], bool copy, LISPT newatom)
+LISPT alloc::puthash(int hv, const std::string& str, obarray_t* obarray[], bool copy, LISPT newatom)
 {
   auto* ob = new obarray_t;
   if(ob == nullptr)
@@ -470,7 +448,7 @@ LISPT alloc::puthash(int hv, const char* str, obarray_t* obarray[], bool copy, L
  * intern - Make interned symbol in hasharray obarray. Str is not copied so
  *          this is only used with global constant strings during init.
  */
-LISPT alloc::intern(const char* str)
+LISPT alloc::intern(const std::string& str)
 {
   auto hv = hash(str);
   if(auto* ob = findatom(hv, str, globals))
@@ -481,7 +459,7 @@ LISPT alloc::intern(const char* str)
 /*
  * mkatom - Generates interned symbol like intern but copy str.
  */
-LISPT alloc::mkatom(const char* str)
+LISPT alloc::mkatom(const std::string& str)
 {
   // First we search for global interned atoms
   auto hv = hash(str);
