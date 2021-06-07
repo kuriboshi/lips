@@ -6,6 +6,7 @@
 #pragma once
 
 #include <optional>
+#include <fstream>
 #include <string>
 #include <string_view>
 #include <fmt/format.h>
@@ -86,63 +87,88 @@ public:
 class file_source: public io_source
 {
 public:
-  enum class mode_t
-  {
-    READ,
-    WRITE,
-    APPEND
-  };
-
-  file_source(std::FILE* file): _file(file), _owner(false) {}
-  file_source(const std::string& filename, mode_t = mode_t::READ);
-  ~file_source()
-  {
-    if(_owner)
-      fclose(_file);
-  }
+  file_source(const std::string& filename);
+  ~file_source() = default;
 
   virtual int getch(bool inside_string) override
   {
-    _curc = getc(_file);
+    _curc = _file->get();
     if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
-      while((_curc = getc(_file)) != '\n')
+      while((_curc = _file->get()) != '\n')
         ;
     return _curc;
   }
-  virtual void ungetch(int c) override { ungetc(c, _file); }
+  virtual void ungetch(int c) override { _file->putback(c); }
   virtual bool eoln() override
   {
     while(true)
     {
-      if(feof(_file))
+      if(_file->eof())
         return true;
       if(_curc != ' ' && _curc != '\t' && _curc != '\n')
         return false;
       if(_curc == '\n')
         return true;
-      _curc = getc(_file);
+      _curc = _file->get();
     }
     return true;
   }
   virtual bool close() override
   {
-    if(std::fclose(_file) == -1)
-      return false;
-    return true;
+    _file->close();
+    return !_file->is_open();
   }
   virtual std::optional<std::string> getline() override
   {
-    char* buf = nullptr;
-    std::size_t size = 0;
-    auto rv = ::getline(&buf, &size, _file);
-    if(rv == -1)
-      return {};
-    return std::string(buf);
+    std::string buf;
+    std::getline(*_file, buf);
+    return buf;
   }
 
 private:
-  std::FILE* _file;
-  bool _owner = false;
+  std::unique_ptr<std::ifstream> _file;
+  int _curc = 0;
+};
+
+class stream_source: public io_source
+{
+public:
+  stream_source(std::istream& stream): _stream(stream) {}
+  ~stream_source() = default;
+
+  virtual int getch(bool inside_string) override
+  {
+    _curc = _stream.get();
+    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
+      while((_curc = _stream.get()) != '\n')
+        ;
+    return _curc;
+  }
+  virtual void ungetch(int c) override { _stream.putback(c); }
+  virtual bool eoln() override
+  {
+    while(true)
+    {
+      if(_stream.eof())
+        return true;
+      if(_curc != ' ' && _curc != '\t' && _curc != '\n')
+        return false;
+      if(_curc == '\n')
+        return true;
+      _curc = _stream.get();
+    }
+    return true;
+  }
+  virtual bool close() override { return true; }
+  virtual std::optional<std::string> getline() override
+  {
+    std::string buf;
+    std::getline(_stream, buf);
+    return buf;
+  }
+
+private:
+  std::istream& _stream;
   int _curc = 0;
 };
 
@@ -153,11 +179,11 @@ public:
 
   virtual int getch(bool inside_string) override
   {
-    if(_pos == _string.length())
+    if(_pos == _string.size())
       return -1;
     auto c = _string[_pos++];
     if(!inside_string && c == COMMENTCHAR) /* Skip comments.  */
-      while(_pos != _string.length() && (c = _string[_pos++]) != '\n')
+      while(_pos != _string.size() && (c = _string[_pos++]) != '\n')
         ;
     return c;
   }
@@ -178,7 +204,7 @@ public:
   virtual ~io_sink() = default;
 
   virtual void putch(int, bool esc = false) = 0;
-  virtual void puts(const char*) = 0;
+  virtual void puts(const std::string_view) = 0;
   virtual void terpri() = 0;
   virtual void flush() {}
   virtual bool close() = 0;
@@ -187,46 +213,87 @@ public:
 class file_sink: public io_sink
 {
 public:
-  file_sink(std::FILE* file): _file(file) {}
-  file_sink(const char* filename, bool append = false) { _file = fopen(filename, append ? "a" : "w"); }
+  file_sink(const std::string& filename, bool append = false)
+    : _file(std::make_unique<std::ofstream>(filename, append ? std::ios_base::ate : std::ios_base::out))
+  {}
+  ~file_sink() = default;
 
-  virtual void putch(int c, bool esc) override { putch(c, _file, esc); }
-  virtual void puts(const char* s) override { std::fputs(s, _file); }
-  virtual void terpri() override { putch('\n', _file, false); }
-  virtual void flush() override { fflush(_file); }
+  virtual void putch(int c, bool esc) override { putch(c, *_file, esc); }
+  virtual void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
+  virtual void terpri() override { _file->put('\n'); }
+  virtual void flush() override { _file->flush(); }
   virtual bool close() override
   {
-    if(std::fclose(_file) == -1)
-      return false;
-    return true;
+    _file->close();
+    return !_file->is_open();
   }
 
 private:
   // Put a character on stdout prefixing it with a ^ if it's a control
   // character.
-  void pputc(int c, std::FILE* file)
+  void pputc(int c, std::ofstream& file)
   {
     // Need to generalize this
     if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
     {
-      putc('^', file);
-      putc(c + 0x40, file);
+      file.put('^');
+      file.put(c + 0x40);
     }
     else
-      putc(c, file);
+      file.put(c);
   }
 
   /*
    * Put a character c, on stream file, escaping enabled if esc != 0.
    */
-  void putch(int c, std::FILE* file, bool esc)
+  void putch(int c, std::ofstream& file, bool esc)
   {
     if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
       pputc('\\', file);
     pputc(c, file);
   }
 
-  std::FILE* _file;
+  std::unique_ptr<std::ofstream> _file;
+};
+
+class stream_sink: public io_sink
+{
+public:
+  stream_sink(std::ostream& stream): _stream(stream) {}
+  ~stream_sink() = default;
+
+  virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
+  virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  virtual void terpri() override { _stream.put('\n'); }
+  virtual void flush() override { _stream.flush(); }
+  virtual bool close() override { return true; }
+
+private:
+  // Put a character on stdout prefixing it with a ^ if it's a control
+  // character.
+  void pputc(int c, std::ostream& file)
+  {
+    // Need to generalize this
+    if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
+    {
+      file.put('^');
+      file.put(c + 0x40);
+    }
+    else
+      file.put(c);
+  }
+
+  /*
+   * Put a character c, on stream file, escaping enabled if esc != 0.
+   */
+  void putch(int c, std::ostream& file, bool esc)
+  {
+    if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
+      pputc('\\', file);
+    pputc(c, file);
+  }
+
+  std::ostream& _stream;
 };
 
 class string_sink: public io_sink
@@ -237,7 +304,7 @@ public:
   std::string string() const { return _string; }
 
   virtual void putch(int c, bool) override { _string.push_back(static_cast<char>(c)); }
-  virtual void puts(const char* s) override { _string.append(s); }
+  virtual void puts(const std::string_view s) override { _string.append(s); }
   virtual void terpri() override { _string.push_back('\n'); }
   virtual bool close() override { return true; }
 
@@ -264,7 +331,7 @@ public:
   // io_sink
   io_sink& sink() { return *_sink.get(); }
   void putch(char c, bool esc = false) { ptrcheck(_sink); _sink->putch(c, esc); }
-  void puts(const char* s) { ptrcheck(_sink); _sink->puts(s); }
+  void puts(const std::string_view s) { ptrcheck(_sink); _sink->puts(s); }
   void terpri() { ptrcheck(_sink); _sink->terpri(); }
   void flush() { ptrcheck(_sink); _sink->flush(); }
 
@@ -272,7 +339,7 @@ public:
   void format(Ts&&... t)
   {
     auto ret = fmt::format(t...);
-    _sink->puts(ret.c_str());
+    _sink->puts(ret);
   }
 
   bool close()

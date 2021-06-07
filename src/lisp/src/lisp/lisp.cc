@@ -5,6 +5,7 @@
 
 #include <cstring>              // For strerror
 #include <cerrno>               // For errno
+#include <iostream>
 #include "libisp.hh"
 #include "except.hh"
 #include "error.hh"
@@ -112,12 +113,12 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&currentbase, "base", a().mknumber(10L));
   initcvar(&version, "version", a().mkstring(VERSION));
 
-  _primout = new file_t(std::make_unique<file_sink>(::stdout));
-  _primerr = new file_t(std::make_unique<file_sink>(::stderr));
-  _primin = new file_t(std::make_unique<file_source>(::stdin));
-  _stdout = new file_t(std::make_unique<file_sink>(::stdout));
-  _stderr = new file_t(std::make_unique<file_sink>(::stderr));
-  _stdin = new file_t(std::make_unique<file_source>(::stdin));
+  _primout = new file_t(std::make_unique<stream_sink>(std::cout));
+  _primerr = new file_t(std::make_unique<stream_sink>(std::cerr));
+  _primin = new file_t(std::make_unique<stream_source>(std::cin));
+  _stdout = new file_t(std::make_unique<stream_sink>(std::cout));
+  _stderr = new file_t(std::make_unique<stream_sink>(std::cerr));
+  _stdin = new file_t(std::make_unique<stream_source>(std::cin));
 
   a().add_mark_object(&top);
   a().add_mark_object(&rstack);

@@ -657,23 +657,17 @@ std::pair<bool, int> io::getchar(lisp& l, file_t& file, bool line)
   return std::make_pair(false, curc);
 }
 
-file_source::file_source(const std::string& name, mode_t mode) : _owner(true)
+file_source::file_source(const std::string& name)
 {
-  auto m = [](mode_t mode) {
-             if(mode == mode_t::WRITE)
-               return "w";
-             else if(mode == mode_t::APPEND)
-               return "a";
-             return "r";
-           }(mode);
-  _file = std::fopen(name.c_str(), m);
-  if(!_file)
-    _file = std::fopen((name + ".lisp").c_str(), m);
-  if(!_file)
-    _file = std::fopen((name + ".lsp").c_str(), m);
+  _file = std::make_unique<std::ifstream>();
+  _file->open(name, std::ios_base::in);
+  if(_file->fail())
+    _file->open((name + ".lisp"), std::ios_base::in);
+  if(_file->fail())
+    _file->open((name + ".lsp"), std::ios_base::in);
   // TODO: Throw different exception
-  if(!_file)
-    throw lisp_error("Can't open file");
+  if(_file->fail())
+    throw lisp_error("Can't open file " + name);
 }
 
 } // namespace lisp
