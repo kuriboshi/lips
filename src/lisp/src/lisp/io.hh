@@ -6,6 +6,7 @@
 #pragma once
 
 #include <optional>
+#include <sstream>
 #include <fstream>
 #include <string>
 #include <string_view>
@@ -82,6 +83,42 @@ public:
   virtual bool eoln() = 0;
   virtual bool close() = 0;
   virtual std::optional<std::string> getline() = 0;
+
+protected:
+  int getch(std::istream& stream, bool inside_string)
+  {
+    auto _curc = stream.get();
+    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
+      while((_curc = stream.get()) != '\n')
+        ;
+    return _curc;
+  }
+
+  bool eoln(std::istream& stream)
+  {
+    while(true)
+    {
+      if(stream.eof())
+        return true;
+      if(_curc != ' ' && _curc != '\t' && _curc != '\n')
+        return false;
+      if(_curc == '\n')
+        return true;
+      _curc = stream.get();
+    }
+    return true;
+  }
+
+  std::optional<std::string> getline(std::istream& stream)
+  {
+    std::string buf;
+    std::getline(stream, buf);
+    if(stream.fail())
+      return {};
+    return buf;
+  }
+
+  int _curc = 0;
 };
 
 class file_source: public io_source
@@ -90,28 +127,18 @@ public:
   file_source(const std::string& filename);
   ~file_source() = default;
 
+  using io_source::getch;
+  using io_source::eoln;
+  using io_source::getline;
+
   virtual int getch(bool inside_string) override
   {
-    _curc = _file->get();
-    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
-      while((_curc = _file->get()) != '\n')
-        ;
-    return _curc;
+    return getch(*_file, inside_string);
   }
   virtual void ungetch(int c) override { _file->putback(c); }
   virtual bool eoln() override
   {
-    while(true)
-    {
-      if(_file->eof())
-        return true;
-      if(_curc != ' ' && _curc != '\t' && _curc != '\n')
-        return false;
-      if(_curc == '\n')
-        return true;
-      _curc = _file->get();
-    }
-    return true;
+    return eoln(*_file);
   }
   virtual bool close() override
   {
@@ -120,14 +147,11 @@ public:
   }
   virtual std::optional<std::string> getline() override
   {
-    std::string buf;
-    std::getline(*_file, buf);
-    return buf;
+    return getline(*_file);
   }
 
 private:
   std::unique_ptr<std::ifstream> _file;
-  int _curc = 0;
 };
 
 class stream_source: public io_source
@@ -136,65 +160,49 @@ public:
   stream_source(std::istream& stream): _stream(stream) {}
   ~stream_source() = default;
 
+  using io_source::getch;
+  using io_source::eoln;
+  using io_source::getline;
+
   virtual int getch(bool inside_string) override
   {
-    _curc = _stream.get();
-    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
-      while((_curc = _stream.get()) != '\n')
-        ;
-    return _curc;
+    return getch(_stream, inside_string);
   }
   virtual void ungetch(int c) override { _stream.putback(c); }
   virtual bool eoln() override
   {
-    while(true)
-    {
-      if(_stream.eof())
-        return true;
-      if(_curc != ' ' && _curc != '\t' && _curc != '\n')
-        return false;
-      if(_curc == '\n')
-        return true;
-      _curc = _stream.get();
-    }
-    return true;
+    return eoln(_stream);
   }
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override
   {
-    std::string buf;
-    std::getline(_stream, buf);
-    return buf;
+    return getline(_stream);
   }
 
 private:
   std::istream& _stream;
-  int _curc = 0;
 };
 
 class string_source: public io_source
 {
 public:
-  string_source(std::string_view string): _string(string) {}
+  string_source(const std::string& string): _string(string) {}
+
+  using io_source::getch;
+  using io_source::eoln;
+  using io_source::getline;
 
   virtual int getch(bool inside_string) override
   {
-    if(_pos == _string.size())
-      return -1;
-    auto c = _string[_pos++];
-    if(!inside_string && c == COMMENTCHAR) /* Skip comments.  */
-      while(_pos != _string.size() && (c = _string[_pos++]) != '\n')
-        ;
-    return c;
+    return getch(_string, inside_string);
   }
-  virtual void ungetch(int c) override { --_pos; }
-  virtual bool eoln() override { return false; }
+  virtual void ungetch(int c) override { _string.putback(c); }
+  virtual bool eoln() override { return eoln(_string); }
   virtual bool close() override { return true; }
-  virtual std::optional<std::string> getline() override { return _string; }
+  virtual std::optional<std::string> getline() override { return getline(_string); }
 
 private:
-  std::string _string;
-  std::size_t _pos = 0;
+  std::istringstream _string;
 };
 
 class io_sink
@@ -318,7 +326,7 @@ public:
   file_t(std::unique_ptr<io_source> source): _source(std::move(source)) {}
   file_t(std::unique_ptr<io_sink> sink): _sink(std::move(sink)) {}
   file_t(std::unique_ptr<io_source> source, std::unique_ptr<io_sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
-  file_t(std::string_view string): _source(std::make_unique<string_source>(string)) {}
+  file_t(const std::string& string): _source(std::make_unique<string_source>(string)) {}
   ~file_t() {}
 
   // io_source
@@ -388,7 +396,7 @@ inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
 inline LISPT ratom(file_t& f) { return io().ratom(f); }
 inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io(l).lispread(f, esc); }
 inline LISPT lispread(file_t& f, bool esc = false) { return io().lispread(f, esc); }
-inline LISPT lispread(std::string_view s, bool esc = false) { file_t f(s); return io().lispread(f, esc); }
+inline LISPT lispread(const std::string& s, bool esc = false) { file_t f(s); return io().lispread(f, esc); }
 inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
 inline LISPT readline(file_t& f) { return io().readline(f); }
 
