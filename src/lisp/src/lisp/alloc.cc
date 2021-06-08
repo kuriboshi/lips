@@ -4,11 +4,13 @@
  *
  */
 
+#include <doctest/doctest.h>
 #include "alloc.hh"
 #include "error.hh"
 #include "eval.hh"
 #include "io.hh"
 #include "except.hh"
+#include "low.hh"
 
 namespace lisp
 {
@@ -520,5 +522,61 @@ alloc::~alloc()
 }
 
 alloc::obarray_t* alloc::globals[];
+
+TEST_CASE("Create lisp objects")
+{
+  lisp lisp;
+
+  SUBCASE("Multiple calls to intern should return the same object for the same string")
+  {
+    auto hello0 = intern("hello");
+    auto hello1 = intern("hello");
+    CHECK(hello0 == hello1);
+  }
+
+  SUBCASE("Check constants are the same as interned strings")
+  {
+    auto lambda = intern("lambda");
+    CHECK(lambda == C_LAMBDA);
+  }
+
+  SUBCASE("Check constants are the same as a local atom")
+  {
+    auto lambda = mkatom(lisp, "lambda");
+    CHECK(lambda == C_LAMBDA);
+  }
+
+  SUBCASE("Set variable")
+  {
+    auto i = mkatom(lisp, "i");
+    auto j = mkatom(lisp, "j");
+    auto a = mkstring(lisp, "a");
+    auto b = mkstring(lisp, "b");
+
+    set(lisp, i, a);
+    set(lisp, j, b);
+    CHECK(i != j);
+    set(lisp, j, a);
+    CHECK(i != j);
+
+    auto sink0 = std::make_unique<string_sink>();
+    file_t out0(std::move(sink0));
+    prin0(lisp, i, out0);
+    CHECK(to_string(out0.sink()) == std::string(i->getstr()));
+
+    auto sink1 = std::make_unique<string_sink>();
+    file_t out1(std::move(sink1));
+    prin0(lisp, j, out1);
+    CHECK(to_string(out1.sink()) == std::string(j->getstr()));
+
+    std::string s_hello{"(hello)"};
+    file_t in(s_hello);
+    auto hello = lispread(lisp, in, false);
+    auto sink2 = std::make_unique<string_sink>();
+    file_t out2(std::move(sink2));
+    prin0(lisp, hello, out2);
+    CHECK(to_string(out2.sink()) == s_hello);
+  }
+}
 
 } // namespace lisp

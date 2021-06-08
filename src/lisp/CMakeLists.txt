@@ -52,8 +52,5 @@ target_include_directories(lisp PUBLIC
   )
 target_link_libraries(lisp PUBLIC fmt::fmt)
 
-add_executable(test src/lisp/test.cc)
-target_link_libraries(test PUBLIC lisp doctest::doctest)
-
 add_executable(main src/lisp/main.cc)
-target_link_libraries(main PUBLIC lisp)
+target_link_libraries(main PUBLIC lisp doctest::doctest)

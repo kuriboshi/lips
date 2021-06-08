@@ -4,6 +4,7 @@
  *
  */
 
+#include <doctest/doctest.h>
 #include "libisp.hh"
 
 namespace lisp
@@ -658,6 +659,63 @@ file_source::file_source(const std::string& name)
   // TODO: Throw different exception
   if(_file->fail())
     throw lisp_error("Can't open file " + name);
+}
+
+TEST_CASE("Basic I/O")
+{
+  lisp lisp;
+
+  auto out0 = std::make_unique<string_sink>();
+  lisp.primout(*new file_t(std::move(out0)));
+  lisp.primout().format("hello world {}", 123);
+  CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
+}
+
+TEST_CASE("Read lisp objects")
+{
+  lisp lisp;
+
+  SUBCASE("Read from utf-8")
+  {
+    std::string s_nihongo{"\"日本語\"\n"};
+    file_t in{s_nihongo};
+    auto nihongo = lispread(lisp, in, false);
+    auto sink = std::make_unique<string_sink>();
+    file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+  }
+
+  SUBCASE("Read from utf-8 2")
+  {
+    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    file_t in{s_nihongo};
+    auto nihongo = lispread(lisp, in, false);
+    auto sink = std::make_unique<string_sink>();
+    file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+  }
+
+  SUBCASE("Read utf-8 from file")
+  {
+    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    {
+      std::ofstream o{"test.lisp"};
+      o << s_nihongo;
+    }
+    auto f = file_t(std::make_unique<file_source>("test.lisp"));
+    auto nihongo = lispread(lisp, f, false);
+    auto sink = std::make_unique<string_sink>();
+    file_t out(std::move(sink));
+    print(lisp, nihongo, out);
+    CHECK(to_string(out.sink()) == s_nihongo);
+  }
+
+  SUBCASE("Reise box")
+  {
+    auto s = mkstring(lisp, "ライゼボツクス");
+  }
 }
 
 } // namespace lisp

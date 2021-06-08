@@ -430,4 +430,10 @@ inline file_t& primout() { return lisp::current().primout(); }
 inline file_t& primin() { return lisp::current().primin(); }
 inline file_t& primerr() { return lisp::current().primerr(); }
 
+template<typename T>
+std::string to_string(T& sink)
+{
+  return static_cast<string_sink&>(sink).string();
+}
+
 } // namespace lisp
