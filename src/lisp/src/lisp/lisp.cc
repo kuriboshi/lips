@@ -43,7 +43,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   messages[error_code(AMBIGUOUS)] = "Ambiguous";
   messages[error_code(USER_ERROR)] = "";
 
-  auto intern = [this](const char* s) { return a().intern(s); };
+  auto intern = [this](const auto s) { return a().intern(s); };
 
   set(C_T, lisp_type::T, a().getobject());
   CE_NIL = intern("nil");
