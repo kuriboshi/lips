@@ -12,37 +12,6 @@
 
 namespace lisp
 {
-const char* messages[MAXMESSAGE];
-// Some standard messages, all of them not necessarily used
-// clang-format off
-const char* errmess[] = {
-  "Not NIL",
-  "Not a symbol",
-  "Not an integer",
-  "Not a bignum",
-  "Not a float",
-  "Not indirect",
-  "Not a cons cell",
-  "Not a string",
-  "Not SUBR",
-  "Not FSUBR",
-  "Not LAMBDA",
-  "Not NLAMBDA",
-  "Not a closure",
-  "Not unbound",
-  "Not an environment",
-  "Not a file pointer",
-  "Not T",
-  "Not free",
-  "Not EOF",
-  "Not an ERROR",
-  "Not a hash table"
-};
-// clang-format on
-} // namespace lisp
-
-namespace lisp
-{
 lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 {
   messages[error_code(NO_MESSAGE)] = "";
@@ -76,7 +45,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
   auto intern = [this](const char* s) { return a().intern(s); };
 
-  set(C_T, T, a().getobject());
+  set(C_T, lisp_type::T, a().getobject());
   CE_NIL = intern("nil");
   CE_NIL->setq(C_NIL);
   CE_T = intern("t");
@@ -90,7 +59,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   C_DOT = intern(".");
   C_ENDOFFILE = intern("endoffile");
   C_ENVIRON = intern("environ");
-  set(C_EOF, ENDOFFILE, a().getobject());
+  set(C_EOF, lisp_type::ENDOFFILE, a().getobject());
   C_FILE = intern("file");
   C_FLOAT = intern("float");
   C_FREE = intern("free");
@@ -193,7 +162,7 @@ LISPT lisp::syserr(LISPT fault)
 static int dobreak(lisp& l, LISPT* com)
 {
   /* OK, EVAL, ^, ... */
-  if(type_of(*com) != CONS)
+  if(type_of(*com) != lisp_type::CONS)
   {
     l.e().unwind();
     throw lisp_error("bad command");

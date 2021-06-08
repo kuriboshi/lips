@@ -60,7 +60,7 @@ inline LISPT readline(LISPT a) { return file().readline(a); }
 inline LISPT cpprint(lisp& l, LISPT a, LISPT b) { return file(l).cpprint(a, b); }
 inline LISPT cpprint(LISPT a, LISPT b) { return file().cpprint(a, b); }
 
-inline bool loadfile(lisp& l, const char* filename) { return file(l).loadfile(filename); }
-inline bool loadfile(const char* filename) { return file().loadfile(filename); }
+inline bool loadfile(lisp& l, const std::string& filename) { return file(l).loadfile(filename); }
+inline bool loadfile(const std::string& filename) { return file().loadfile(filename); }
 
 } // namespace lisp

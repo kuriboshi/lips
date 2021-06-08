@@ -14,14 +14,14 @@ string::string(lisp& lisp): base(lisp) {}
 /* Return symbols print name as a string. */
 PRIMITIVE string::symstr(LISPT sym)
 {
-  l.check(sym, SYMBOL);
+  l.check(sym, lisp_type::SYMBOL);
   return mkstring(l, sym->symval().pname);
 }
 
 /* T if s is a string, NIL otherwise. */
 PRIMITIVE string::stringp(LISPT s)
 {
-  if(type_of(s) == STRING)
+  if(type_of(s) == lisp_type::STRING)
     return C_T;
   return C_NIL;
 }
@@ -29,8 +29,8 @@ PRIMITIVE string::stringp(LISPT s)
 /* T if both strings are equal */
 PRIMITIVE string::streq(LISPT s1, LISPT s2)
 {
-  l.check(s1, STRING);
-  l.check(s2, STRING);
+  l.check(s1, lisp_type::STRING);
+  l.check(s2, lisp_type::STRING);
   if(s1->stringval() == s2->stringval())
     return C_T;
   return C_NIL;
@@ -38,8 +38,8 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
 
 PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
 {
-  l.check(s1, STRING);
-  l.check(s2, STRING);
+  l.check(s1, lisp_type::STRING);
+  l.check(s2, lisp_type::STRING);
   return mknumber(l, s1->stringval().compare(s2->stringval()));
 }
 
@@ -50,7 +50,7 @@ PRIMITIVE string::concat(LISPT strlist)
   std::string result;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
-    l.check(sl->car(), STRING);
+    l.check(sl->car(), lisp_type::STRING);
     result += sl->car()->stringval();
   }
   return mkstring(l, result);
@@ -59,7 +59,7 @@ PRIMITIVE string::concat(LISPT strlist)
 /* Return string length of s */
 PRIMITIVE string::strlen(LISPT s)
 {
-  l.check(s, STRING);
+  l.check(s, lisp_type::STRING);
   return mknumber(l, s->stringval().length());
 }
 
@@ -70,9 +70,9 @@ PRIMITIVE string::strlen(LISPT s)
    to zero if start is equal to one is accepted. */
 PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
 {
-  l.check(str, STRING);
-  l.check(start, INTEGER);
-  l.check(end, INTEGER);
+  l.check(str, lisp_type::STRING);
+  l.check(start, lisp_type::INTEGER);
+  l.check(end, lisp_type::INTEGER);
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;

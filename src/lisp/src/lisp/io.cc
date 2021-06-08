@@ -162,7 +162,7 @@ LISPT io::ratom(file_t& file)
 LISPT io::splice(LISPT x, LISPT y, bool tailp)
 {
   LISPT t = x->cdr();
-  if(type_of(x) != CONS)
+  if(type_of(x) != lisp_type::CONS)
   {
     if(tailp)
       rplacd(l, x, cons(l, y, t));
@@ -179,7 +179,7 @@ LISPT io::splice(LISPT x, LISPT y, bool tailp)
     return x;
   rplacd(l, x, y);
   LISPT t2 = C_NIL;
-  for(; type_of(y) == CONS; y = y->cdr()) t2 = y;
+  for(; type_of(y) == lisp_type::CONS; y = y->cdr()) t2 = y;
   return rplacd(l, t2, t);
 }
 
@@ -449,7 +449,7 @@ static void ps(const std::string& s, file_t& file, bool esc)
     file.putch(c, esc);
 }
 
-static void pi(long i, int base, file_t& file)
+static void pi(int i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -509,7 +509,7 @@ nxtelt:
   prin0(xx->car(), file, esc);
   if(EQ(xx->cdr(), C_NIL))
     ;
-  else if(type_of(xx->cdr()) == CONS)
+  else if(type_of(xx->cdr()) == lisp_type::CONS)
   {
     file.putch(' ');
     xx = xx->cdr();
@@ -529,7 +529,7 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
-    case CONS:
+    case lisp_type::CONS:
       l.thisplevel++;
       if(l.thisplevel <= l.printlevel || l.printlevel <= 0)
       {
@@ -541,26 +541,26 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
         file.putch('&');
       l.thisplevel--;
       break;
-    case SYMBOL:
+    case lisp_type::SYMBOL:
       return patom(x, file, esc);
       break;
-    case CPOINTER:
+    case lisp_type::CPOINTER:
       if(x->cpointval() != nullptr)
         pp("#<pointer", file, x);
       break;
-    case NIL:
+    case lisp_type::NIL:
       ps("nil", file, false);
       break;
-    case T:
+    case lisp_type::T:
       file.putch('t');
       break;
-    case INTEGER:
+    case lisp_type::INTEGER:
       pi(x->intval(), l.currentbase->intval(), file);
       break;
-    case FLOAT:
+    case lisp_type::FLOAT:
       pf(x->floatval(), file);
       break;
-    case STRING:
+    case lisp_type::STRING:
       if(esc)
       {
         file.putch('"');
@@ -570,42 +570,42 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       else
         ps(x->stringval(), file, false);
       break;
-    case CLOSURE:
+    case lisp_type::CLOSURE:
       pp("#<closure", file, x);
       break;
-    case LAMBDA:
+    case lisp_type::LAMBDA:
       pp("#<lambda", file, x);
       break;
-    case NLAMBDA:
+    case lisp_type::NLAMBDA:
       pp("#<nlambda", file, x);
       break;
-    case INDIRECT:
+    case lisp_type::INDIRECT:
       pp("#<indirect", file, x);
       break;
-    case SUBR:
+    case lisp_type::SUBR:
       pp("#<subr", file, x);
       break;
-    case UNBOUND:
+    case lisp_type::UNBOUND:
       ps("#<unbound>", file, false);
       break;
-    case ENVIRON:
+    case lisp_type::ENVIRON:
       pp("#<environ", file, x);
       break;
-    case FREE:
+    case lisp_type::FREE:
       pp("#<free", file, x);
       break;
-    case ENDOFFILE:
+    case lisp_type::ENDOFFILE:
       pp("#<endoffile", file, x);
       break;
-    case FILET:
+    case lisp_type::FILET:
       pp("#<file", file, x);
       break;
-    case ERROR:
+    case lisp_type::ERROR:
       pp("#<error", file, x);
       break;
     default:
       ps("#<illegal ", file, false);
-      pi(type_of(x), l.currentbase->intval(), file);
+      pi(to_underlying(type_of(x)), l.currentbase->intval(), file);
       pp("", file, x);
   }
   return x;

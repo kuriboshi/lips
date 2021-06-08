@@ -29,7 +29,7 @@ LISPT evaluator::printwhere()
       for(; i; i--)
       {
         if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0 && control[i - 1].type == CTRL_LISP
-          && (type_of(control[i - 1].u.lisp) == CONS && type_of(control[i - 1].u.lisp->car()) != CONS))
+          && (type_of(control[i - 1].u.lisp) == lisp_type::CONS && type_of(control[i - 1].u.lisp->car()) != lisp_type::CONS))
         {
           foo = control[i - 1].u.lisp;
           l.primerr().format(" [in ");
@@ -279,7 +279,7 @@ bool evaluator::peval()
   push_func(&evaluator::ev0);
   switch(type_of(expression))
   {
-    case CONS:
+    case lisp_type::CONS:
       push_lisp(fun);
       fun = expression->car();
       push_lisp(args);
@@ -287,18 +287,18 @@ bool evaluator::peval()
       push_func(&evaluator::ev1);
       cont = &evaluator::peval1;
       break;
-    case SYMBOL:
+    case lisp_type::SYMBOL:
       cont = &evaluator::lookup;
       break;
-    case INDIRECT:
+    case lisp_type::INDIRECT:
       send(expression->indirectval());
       cont = pop_func();
       break;
-    case CVARIABLE:
+    case lisp_type::CVARIABLE:
       send(*expression->cvarval());
       cont = pop_func();
       break;
-    case FREE:
+    case lisp_type::FREE:
       abort(CORRUPT_DATA, expression);
       break;
     default:
@@ -355,7 +355,7 @@ void evaluator::do_unbound(continuation_t continuation)
     dest = pop_point();
     expression = pop_lisp();
     fun = expression->car()->symvalue();
-    if(type_of(fun) == UNBOUND)
+    if(type_of(fun) == lisp_type::UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -369,8 +369,8 @@ void evaluator::do_unbound(continuation_t continuation)
     // TODO:
     expression = findalias(expression);
 #endif
-    if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
-      && type_of(expression->car()->symvalue()) == UNBOUND)
+    if(type_of(expression) == lisp_type::CONS && type_of(expression->car()) == lisp_type::SYMBOL
+      && type_of(expression->car()->symvalue()) == lisp_type::UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -390,8 +390,8 @@ bool evaluator::do_default(continuation_t continuation)
   // TODO:
   expression = findalias(expression);
 #endif
-  if(type_of(expression) == CONS && type_of(expression->car()) == SYMBOL
-    && type_of(expression->car()->symvalue()) == UNBOUND)
+  if(type_of(expression) == lisp_type::CONS && type_of(expression->car()) == lisp_type::SYMBOL
+    && type_of(expression->car()->symvalue()) == lisp_type::UNBOUND)
   {
     if(!evalhook(expression))
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -409,11 +409,11 @@ bool evaluator::peval1()
   else
     switch(type_of(fun))
     {
-      case CLOSURE:
+      case lisp_type::CLOSURE:
         push_func(&evaluator::peval1);
         cont = &evaluator::evclosure;
         break;
-      case SUBR:
+      case lisp_type::SUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
         dest = mkdestblock(fun->subrval().argcount());
@@ -431,28 +431,28 @@ bool evaluator::peval1()
         else
           cont = &evaluator::evalargs;
         break;
-      case LAMBDA:
+      case lisp_type::LAMBDA:
         noeval = false;
         cont = &evaluator::evlam;
         break;
-      case NLAMBDA:
+      case lisp_type::NLAMBDA:
         noeval = true;
         cont = &evaluator::evlam;
         break;
-      case CONS:
-      case INDIRECT:
+      case lisp_type::CONS:
+      case lisp_type::INDIRECT:
         expression = fun;
         push_func(&evaluator::ev3);
         cont = &evaluator::peval;
         break;
-      case SYMBOL:
+      case lisp_type::SYMBOL:
         fun = fun->symvalue();
         cont = &evaluator::peval1;
         break;
-      case UNBOUND:
+      case lisp_type::UNBOUND:
         do_unbound(&evaluator::peval1);
         break;
-      case STRING:
+      case lisp_type::STRING:
         if(!evalhook(expression))
           xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval1);
         break;
@@ -471,11 +471,11 @@ bool evaluator::peval2()
   else
     switch(type_of(fun))
     {
-      case CLOSURE:
+      case lisp_type::CLOSURE:
         push_func(&evaluator::peval2);
         cont = &evaluator::evclosure;
         break;
-      case SUBR:
+      case lisp_type::SUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
         noeval = fun->subrval().subr == subr_t::S_NOEVAL;
@@ -485,25 +485,25 @@ bool evaluator::peval2()
         else
           cont = &evaluator::evalargs;
         break;
-      case LAMBDA:
-      case NLAMBDA:
+      case lisp_type::LAMBDA:
+      case lisp_type::NLAMBDA:
         noeval = true;
         cont = &evaluator::evlam;
         break;
-      case CONS:
-      case INDIRECT:
+      case lisp_type::CONS:
+      case lisp_type::INDIRECT:
         expression = fun;
         push_func(&evaluator::ev3p);
         cont = &evaluator::peval;
         break;
-      case SYMBOL:
+      case lisp_type::SYMBOL:
         fun = fun->symvalue();
         cont = &evaluator::peval2;
         break;
-      case UNBOUND:
+      case lisp_type::UNBOUND:
         do_unbound(&evaluator::peval2);
         break;
-      case STRING:
+      case lisp_type::STRING:
         if(!evalhook(expression))
           xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval2);
         break;
@@ -818,14 +818,14 @@ bool evaluator::lookup()
   LISPT t = expression->symvalue();
   switch(type_of(t))
   {
-    case UNBOUND:
+    case lisp_type::UNBOUND:
       xbreak(UNBOUND_VARIABLE, expression, &evaluator::lookup);
       return false;
       break;
-    case INDIRECT:
+    case lisp_type::INDIRECT:
       send(t->indirectval());
       break;
-    case CVARIABLE:
+    case lisp_type::CVARIABLE:
       send(*t->cvarval());
       break;
     default:
@@ -995,7 +995,7 @@ PRIMITIVE evaluator::baktrace()
 PRIMITIVE evaluator::topofstack()
 {
   auto x = a.getobject();
-  x->type = ENVIRON;
+  x->type = lisp_type::ENVIRON;
   x->envval(l.e().environment());
   return x;
 }

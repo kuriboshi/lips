@@ -175,7 +175,7 @@ void glob::_test_orderinsert()
   {
     auto b = mkstring("b");
     auto result = orderinsert(b, list);
-    REQUIRE(type_of(result) == CONS);
+    REQUIRE(type_of(result) == lisp_type::CONS);
     CHECK(result->cdr()->car()->getstr() == b->getstr());
     CHECK(equal(list, result));
   }
@@ -183,7 +183,7 @@ void glob::_test_orderinsert()
   {
     auto d = mkstring("d");
     auto result = orderinsert(d, list);
-    REQUIRE(type_of(result) == CONS);
+    REQUIRE(type_of(result) == lisp_type::CONS);
     CHECK(result->cdr()->cdr()->car()->getstr() == d->getstr());
     CHECK(equal(list, result));
   }
@@ -191,7 +191,7 @@ void glob::_test_orderinsert()
   {
     auto A = mkstring("A");
     auto result = orderinsert(A, list);
-    REQUIRE(type_of(result) == CONS);
+    REQUIRE(type_of(result) == lisp_type::CONS);
     CHECK(result->car()->getstr() == A->getstr());
     CHECK(equal(result->cdr(), list));
   }
@@ -502,7 +502,7 @@ void glob::_test_expandfiles()
 LISPT glob::expand(LISPT wild, LISPT rep, LISPT all)
 {
   auto r = is_NIL(rep);
-  check(wild, STRING, SYMBOL);
+  check(wild, lisp_type::STRING, lisp_type::SYMBOL);
   auto wstr = glob::extilde(wild->getstr(), r);
   if(!wstr)
     return C_NIL;

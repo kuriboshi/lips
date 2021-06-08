@@ -588,13 +588,13 @@ std::optional<std::string> term_source::getline()
           break;
         }
         ex = glob::expandfiles(t->c_str(), false, false, true);
-        if(type_of(ex) == CONS && strlen(s) > 1)
+        if(type_of(ex) == lisp_type::CONS && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
-        if(type_of(ex) == CONS && is_NIL(ex->cdr()))
+        if(type_of(ex) == lisp_type::CONS && is_NIL(ex->cdr()))
           fillrest(ex->car()->getstr().c_str());
         else
         {
-          if(type_of(ex) == CONS)
+          if(type_of(ex) == lisp_type::CONS)
             complete(ex);
           putc(BELL, stdout);
         }

@@ -23,14 +23,14 @@ static LISPT mkindirect(lisp& l, LISPT obj)
   /* If already an indirect type object, return it. */
   /* We want all symbols that we include in closures */
   /* on the same level to refer to the same value. */
-  if(type_of(obj) == INDIRECT)
+  if(type_of(obj) == lisp_type::INDIRECT)
     return obj;
   else
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
   {
     iobj = cons(l, C_NIL, obj);
-    iobj->settype(INDIRECT);
+    iobj->settype(lisp_type::INDIRECT);
   }
   return iobj;
 }
@@ -43,119 +43,119 @@ LISPT prim::closobj(LISPT vars)
 {
   if(is_NIL(vars))
     return C_NIL;
-  l.check(vars, CONS);
-  l.check(vars->car(), SYMBOL);
+  l.check(vars, lisp_type::CONS);
+  l.check(vars->car(), lisp_type::SYMBOL);
   return cons(l, mkindirect(l, vars->car()->symval().value), closobj(vars->cdr()));
 }
 
 PRIMITIVE prim::car(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return a->car();
   return C_NIL;
 }
 
 PRIMITIVE prim::cdr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return a->cdr();
   return C_NIL;
 }
 
 PRIMITIVE prim::cadr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(a->cdr());
   return C_NIL;
 }
 
 PRIMITIVE prim::cdar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(a->car());
   return C_NIL;
 }
 
 PRIMITIVE prim::caar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(a->car());
   return C_NIL;
 }
 
 PRIMITIVE prim::cddr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(a->cdr());
   return C_NIL;
 }
 
 PRIMITIVE prim::cdddr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(cdr(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE prim::caddr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(cdr(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE prim::cdadr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(car(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE prim::caadr(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(car(a->cdr()));
   return C_NIL;
 }
 
 PRIMITIVE prim::cddar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(cdr(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE prim::cadar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(cdr(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE prim::cdaar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return cdr(car(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE prim::caaar(LISPT a)
 {
-  if(type_of(a) == CONS)
+  if(type_of(a) == lisp_type::CONS)
     return car(car(a->car()));
   return C_NIL;
 }
 
 PRIMITIVE prim::rplaca(LISPT x, LISPT y)
 {
-  l.check(x, CONS);
+  l.check(x, lisp_type::CONS);
   x->car(y);
   return x;
 }
 
 PRIMITIVE prim::rplacd(LISPT x, LISPT y)
 {
-  l.check(x, CONS);
+  l.check(x, lisp_type::CONS);
   x->cdr(y);
   return x;
 }
@@ -169,7 +169,7 @@ PRIMITIVE prim::eq(LISPT a, LISPT b)
 
 PRIMITIVE prim::atom(LISPT a)
 {
-  if(is_NIL(a) || is_T(a) || type_of(a) == SYMBOL || type_of(a) == INTEGER || type_of(a) == FLOAT)
+  if(is_NIL(a) || is_T(a) || type_of(a) == lisp_type::SYMBOL || type_of(a) == lisp_type::INTEGER || type_of(a) == lisp_type::FLOAT)
     return C_T;
   return C_NIL;
 }
@@ -184,7 +184,7 @@ PRIMITIVE prim::nconc(LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      l.check(x->car(), CONS);
+      l.check(x->car(), lisp_type::CONS);
       if(is_NIL(curp))
       {
         curp = x->car();
@@ -207,8 +207,8 @@ PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
     cell = cons(l, cons(l, obj, C_NIL), C_NIL);
     return rplacd(cell, cell->car());
   }
-  l.check(cell, CONS);
-  if(type_of(cell->car()) != CONS)
+  l.check(cell, lisp_type::CONS);
+  if(type_of(cell->car()) != lisp_type::CONS)
   {
     rplacd(cell, cons(l, obj, C_NIL));
     return rplaca(cell, cell->cdr());
@@ -221,7 +221,7 @@ PRIMITIVE prim::attach(LISPT obj, LISPT list)
 {
   if(is_NIL(list))
     return cons(l, obj, C_NIL);
-  l.check(list, CONS);
+  l.check(list, lisp_type::CONS);
   rplacd(list, cons(l, list->car(), list->cdr()));
   return rplaca(list, obj);
 }
@@ -237,7 +237,7 @@ PRIMITIVE prim::append(LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      l.check(x->car(), CONS);
+      l.check(x->car(), lisp_type::CONS);
       for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
       {
         rplacd(curp, cons(l, cl->car(), C_NIL));
@@ -258,16 +258,16 @@ PRIMITIVE prim::null(LISPT a)
 
 PRIMITIVE prim::quote(LISPT x) { return x; }
 
-PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, LAMBDA); }
+PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, lisp_type::LAMBDA); }
 
-PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, NLAMBDA); }
+PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, lisp_type::NLAMBDA); }
 
 PRIMITIVE prim::list(LISPT x) { return x; }
 
 PRIMITIVE prim::length(LISPT x)
 {
   int i = 0;
-  while(!is_NIL(x) && type_of(x) == CONS)
+  while(!is_NIL(x) && type_of(x) == lisp_type::CONS)
   {
     x = x->cdr();
     i++;
@@ -285,11 +285,11 @@ PRIMITIVE prim::closure(LISPT fun, LISPT vars)
   LISPT f = length(vars);
   c->closval().count = f->intval();
   f = closobj(vars);
-  if(type_of(f) == ERROR)
+  if(type_of(f) == lisp_type::ERROR)
     return f;
   c->closval().cvalues = f;
   LISPT clos = nullptr;
-  set(clos, CLOSURE, c);
+  set(clos, lisp_type::CLOSURE, c);
   return clos;
 }
 
@@ -311,28 +311,28 @@ static LISPT nth(LISPT list, int n)
 
 PRIMITIVE prim::xnth(LISPT x, LISPT p)
 {
-  l.check(p, INTEGER);
+  l.check(p, lisp_type::INTEGER);
   if(is_NIL(x))
     return C_NIL;
-  l.check(x, CONS);
+  l.check(x, lisp_type::CONS);
   return nth(x, p->intval());
 }
 
 PRIMITIVE prim::nthd(LISPT list, LISPT pos)
 {
-  l.check(pos, INTEGER);
+  l.check(pos, lisp_type::INTEGER);
   int p = pos->intval();
   if(is_NIL(list))
     return C_NIL;
-  l.check(list, CONS);
+  l.check(list, lisp_type::CONS);
   LISPT l;
-  for(l = list; type_of(l) == CONS && p > 1; l = l->cdr()) p--;
+  for(l = list; type_of(l) == lisp_type::CONS && p > 1; l = l->cdr()) p--;
   return l;
 }
 
 PRIMITIVE prim::xerror(LISPT mess)
 {
-  l.check(mess, STRING);
+  l.check(mess, lisp_type::STRING);
   return l.error(USER_ERROR, mess);
 }
 
@@ -340,7 +340,7 @@ PRIMITIVE prim::uxexit(LISPT status)
 {
   if(is_NIL(status))
     throw lisp_finish("prim::uxexit called", 0);
-  l.check(status, INTEGER);
+  l.check(status, lisp_type::INTEGER);
   throw lisp_finish("prim::uxexit called", status->intval());
   return C_NIL;
 }
@@ -389,7 +389,7 @@ void prim::init()
 {
   C_APPEND = intern(PN_APPEND);
   C_ERROR = intern(PN_ERROR);
-  C_ERROR->type = ERROR;
+  C_ERROR->type = lisp_type::ERROR;
   C_LAMBDA = intern(PN_LAMBDA);
   C_NLAMBDA = intern(PN_NLAMBDA);
   C_QUOTE = intern(PN_QUOTE);

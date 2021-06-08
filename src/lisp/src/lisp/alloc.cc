@@ -45,10 +45,10 @@ int alloc::sweep()
     if(i < CONSCELLS)
       break;
   }
-  set(freelist, FREE, &cc->cells[i]);
+  set(freelist, lisp_type::FREE, &cc->cells[i]);
   nrfreed++;
   LISPT f = freelist;
-  if(type_of(f) == CPOINTER)
+  if(type_of(f) == lisp_type::CPOINTER)
     free(f->cpointval());
   i++; /* Check *next* cell */
   for(; cc; cc = cc->next, i = 0)
@@ -61,7 +61,7 @@ int alloc::sweep()
         /*
 	   * C pointers must be freed.
 	   */
-        if(type_of(f) == CPOINTER)
+        if(type_of(f) == lisp_type::CPOINTER)
           free(f->cpointval());
         f->freeval(&cc->cells[i]);
         f->unmark();
@@ -85,35 +85,35 @@ void alloc::mark(LISPT x)
 {
   switch(type_of(x))
   {
-    case CONS:
+    case lisp_type::CONS:
       if(x->marked())
         break;
       x->mark();
       mark(x->car());
       mark(x->cdr());
       break;
-    case SYMBOL:
+    case lisp_type::SYMBOL:
       break;
-    case LAMBDA:
-    case NLAMBDA:
+    case lisp_type::LAMBDA:
+    case lisp_type::NLAMBDA:
       x->mark();
       mark(x->lamval().lambdarep);
       mark(x->lamval().arglist);
       break;
-    case CLOSURE:
+    case lisp_type::CLOSURE:
       x->mark();
       mark(x->closval().cfunction);
       mark(x->closval().closed);
       mark(x->closval().cvalues);
       break;
-    case STRING:
+    case lisp_type::STRING:
       x->mark();
       break;
-    case INDIRECT:
+    case lisp_type::INDIRECT:
       x->mark();
       mark(x->indirectval());
       break;
-    case NIL:
+    case lisp_type::NIL:
       break;
     default:
       x->mark();
@@ -146,7 +146,7 @@ LISPT alloc::doreclaim(int incr)
 #endif
   for(int i = 0; i < e().toctrl; i++)
     if(e().control[i].type == e().CTRL_LISP && e().control[i].u.lisp != nullptr
-      && type_of(e().control[i].u.lisp) != ENVIRON)
+      && type_of(e().control[i].u.lisp) != lisp_type::ENVIRON)
       mark(e().control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext)
@@ -199,7 +199,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     i = 0;
   else
   {
-    l.check(incr, INTEGER);
+    l.check(incr, lisp_type::INTEGER);
     i = incr->intval();
   }
   doreclaim(i);
@@ -212,7 +212,7 @@ LISPT alloc::getobject()
     doreclaim();
 
   LISPT f = nullptr;
-  set(f, CONS, freelist);
+  set(f, lisp_type::CONS, freelist);
   freelist = freelist->freeval();
   return f;
 }
@@ -264,7 +264,7 @@ LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
   LISPT s = new lisp_t;
   s->subrval(subr);
   LISPT f = intern(pname);
-  set(f->symval().value, SUBR, s);
+  set(f->symval().value, lisp_type::SUBR, s);
   return s;
 }
 
@@ -315,7 +315,7 @@ LISPT alloc::mknumber(int i)
  */
 LISPT alloc::mkarglis(LISPT alist, int& count)
 {
-  if(type_of(alist) == CONS)
+  if(type_of(alist) == lisp_type::CONS)
   {
     count++;
     return cons(alist->car(), mkarglis(alist->cdr(), count));
@@ -370,14 +370,14 @@ LISPT alloc::buildatom(const std::string& s, bool copy, LISPT newatom)
 {
   static LISPT unbound = nullptr;
   if(unbound == nullptr)
-    set(unbound, UNBOUND, new lisp_t);
+    set(unbound, lisp_type::UNBOUND, new lisp_t);
 
   newatom->symval(symbol_t());
   newatom->symval().pname = s;
   newatom->symval().plist = C_NIL;
   newatom->symval().value = unbound;
   LISPT l = nullptr;
-  set(l, SYMBOL, newatom);
+  set(l, lisp_type::SYMBOL, newatom);
   return l;
 }
 

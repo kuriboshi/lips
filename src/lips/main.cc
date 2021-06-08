@@ -262,7 +262,7 @@ static LISPT put_end(LISPT list, LISPT obj, bool conc)
     return cons(obj, C_NIL);
   }
   LISPT t;
-  for(t = list; type_of(t->cdr()) == CONS; t = t->cdr())
+  for(t = list; type_of(t->cdr()) == lisp_type::CONS; t = t->cdr())
     ;
   if(conc)
     rplacd(t, obj);
@@ -276,9 +276,9 @@ static LISPT transform(LISPT list)
   LISPT tl = C_NIL;
   LISPT res = C_NIL;
   bool conc = false;
-  for(LISPT ll = list; type_of(ll) == CONS; ll = ll->cdr())
+  for(LISPT ll = list; type_of(ll) == lisp_type::CONS; ll = ll->cdr())
   {
-    if(type_of(ll->car()) == CONS)
+    if(type_of(ll->car()) == lisp_type::CONS)
       tl = put_end(tl, transform(ll->car()), conc);
     else if(EQ(ll->car(), C_BAR))
     {

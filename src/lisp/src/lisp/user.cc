@@ -24,7 +24,7 @@ PRIMITIVE user::getrep(LISPT fun)
 {
   LISPT args;
 
-  if(type_of(fun) != LAMBDA && type_of(fun) != NLAMBDA)
+  if(type_of(fun) != lisp_type::LAMBDA && type_of(fun) != lisp_type::NLAMBDA)
     return C_NIL;
   auto& x = fun->lamval();
   if(x.argcnt == -1)
@@ -33,7 +33,7 @@ PRIMITIVE user::getrep(LISPT fun)
     args = getargs(x.arglist);
   else
     args = x.arglist;
-  if(type_of(fun) == LAMBDA)
+  if(type_of(fun) == lisp_type::LAMBDA)
     return cons(l, C_LAMBDA, cons(l, args, x.lambdarep));
   return cons(l, C_NLAMBDA, cons(l, args, x.lambdarep));
 }
@@ -61,8 +61,8 @@ LISPT user::funeq(LISPT f1, LISPT f2)
 
 LISPT user::checkfn(LISPT name, LISPT lam)
 {
-  if(type_of(name->getopval()) != UNBOUND)
-    if(type_of(name->getopval()) == LAMBDA || type_of(name->getopval()) == NLAMBDA)
+  if(type_of(name->getopval()) != lisp_type::UNBOUND)
+    if(type_of(name->getopval()) == lisp_type::LAMBDA || type_of(name->getopval()) == lisp_type::NLAMBDA)
     {
       LISPT t = funeq(name->getopval(), lam);
       if(is_NIL(t))
@@ -77,8 +77,8 @@ LISPT user::checkfn(LISPT name, LISPT lam)
 
 PRIMITIVE user::define(LISPT name, LISPT lam)
 {
-  l.check(name, SYMBOL);
-  l.check(lam, LAMBDA, NLAMBDA);
+  l.check(name, lisp_type::SYMBOL);
+  l.check(lam, lisp_type::LAMBDA, lisp_type::NLAMBDA);
   checkfn(name, lam);
   name->setopval(lam);
   return name;
@@ -86,20 +86,20 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
 
 LISPT user::def(LISPT name, LISPT pars, LISPT body, lisp_type type)
 {
-  l.check(name, SYMBOL);
-  if(!is_NIL(pars) && type_of(pars) != SYMBOL)
-    l.check(pars, CONS);
+  l.check(name, lisp_type::SYMBOL);
+  if(!is_NIL(pars) && type_of(pars) != lisp_type::SYMBOL)
+    l.check(pars, lisp_type::CONS);
   LISPT foo = mklambda(l, pars, body, type);
-  if(type_of(foo) == ERROR)
+  if(type_of(foo) == lisp_type::ERROR)
     return C_NIL;
   checkfn(name, foo);
   name->setopval(foo);
   return cons(l, name, C_NIL);
 }
 
-PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, LAMBDA); }
+PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, lisp_type::LAMBDA); }
 
-PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, NLAMBDA); }
+PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, lisp_type::NLAMBDA); }
 
 inline constexpr auto PN_DEFINE = "define"; // define function
 inline constexpr auto PN_GETREP = "getrep"; // get function representation

@@ -13,21 +13,21 @@ prop::prop(lisp& lisp): base(lisp) {}
 
 PRIMITIVE prop::setplist(LISPT x, LISPT pl)
 {
-  l.check(x, SYMBOL);
+  l.check(x, lisp_type::SYMBOL);
   x->symval().plist = pl;
   return pl;
 }
 
 PRIMITIVE prop::getplist(LISPT x)
 {
-  l.check(x, SYMBOL);
+  l.check(x, lisp_type::SYMBOL);
   return x->symval().plist;
 }
 
 PRIMITIVE prop::putprop(LISPT x, LISPT p, LISPT v)
 {
-  l.check(x, SYMBOL);
-  l.check(p, SYMBOL);
+  l.check(x, lisp_type::SYMBOL);
+  l.check(p, lisp_type::SYMBOL);
   for(auto pl = x->symval().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
     if(EQ(pl->car(), p))
     {
@@ -40,8 +40,8 @@ PRIMITIVE prop::putprop(LISPT x, LISPT p, LISPT v)
 
 PRIMITIVE prop::getprop(LISPT x, LISPT p)
 {
-  l.check(x, SYMBOL);
-  l.check(p, SYMBOL);
+  l.check(x, lisp_type::SYMBOL);
+  l.check(p, lisp_type::SYMBOL);
   for(auto pl = x->symval().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
@@ -54,8 +54,8 @@ PRIMITIVE prop::remprop(LISPT x, LISPT p)
 {
   LISPT pl, pl2;
 
-  l.check(x, SYMBOL);
-  l.check(p, SYMBOL);
+  l.check(x, lisp_type::SYMBOL);
+  l.check(p, lisp_type::SYMBOL);
   LISPT r = C_NIL;
   for(pl = x->symval().plist, pl2 = C_NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
   {

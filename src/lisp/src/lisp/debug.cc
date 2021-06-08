@@ -17,7 +17,7 @@ PRIMITIVE evaltrace(lisp& l, LISPT state)
 
   if(!is_NIL(state))
   {
-    l.check(state, INTEGER);
+    l.check(state, lisp_type::INTEGER);
     l.e().trace(state->intval());
   }
   return mknumber(l, i);

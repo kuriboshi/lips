@@ -10,9 +10,11 @@
 // libisp should only include libisp.hh.
 //
 
-#include <variant>
+#include <map>
 #include <memory>
 #include <string>
+#include <variant>
+#include <vector>
 #include "error.hh"
 
 namespace lisp
@@ -66,7 +68,13 @@ extern LISPT C_WRITE;
 // This is used to recognize c-functions for cpprint.
 using PRIMITIVE = LISPT;
 
-enum lisp_type
+template<typename Enum>
+constexpr auto to_underlying(Enum e) noexcept
+{
+  return static_cast<std::underlying_type_t<Enum>>(e);
+}
+
+enum class lisp_type
 {
   NIL = 0,   // so that nullptr also becomes NIL
   SYMBOL,    // an atomic symbol
@@ -181,7 +189,7 @@ struct lisp_t
   lisp_t(const lisp_t&) = delete;
 
   bool gcmark = false;
-  enum lisp_type type = NIL;
+  enum lisp_type type = lisp_type::NIL;
   lisp* interpreter = nullptr;
 
   // One entry for each type.  Types that has no, or just one value are
@@ -204,7 +212,7 @@ struct lisp_t
     void*                       // CPOINTER (14)
     > u;
   symbol_t& symval() { return std::get<symbol_t>(u); }
-  void symval(symbol_t x) { type = SYMBOL; u = x; }
+  void symval(symbol_t x) { type = lisp_type::SYMBOL; u = x; }
   LISPT symvalue() { return std::get<symbol_t>(u).value; }
   void symvalue(LISPT x) { std::get<symbol_t>(u).value = x; }
   void setq(LISPT y) { std::get<symbol_t>(u).value = y; }
@@ -213,18 +221,18 @@ struct lisp_t
   int intval() { return std::get<int>(u); }
   void intval(int x)
   {
-    type = INTEGER;
+    type = lisp_type::INTEGER;
     u = x;
   }
   double floatval() { return std::get<double>(u); }
   void floatval(double f)
   {
-    type = FLOAT;
+    type = lisp_type::FLOAT;
     u = f;
   }
   indirect_t& indirectval() { return std::get<4>(u); }
   cons_t& consval() { return std::get<cons_t>(u); }
-  void consval(cons_t x) { type = CONS; u = x; }
+  void consval(cons_t x) { type = lisp_type::CONS; u = x; }
   LISPT car() { return std::get<cons_t>(u).car; }
   LISPT cdr() { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
@@ -232,26 +240,26 @@ struct lisp_t
   const std::string& stringval() const { return std::get<std::string>(u); }
   void stringval(const std::string& s)
   {
-    type = STRING;
+    type = lisp_type::STRING;
     u = s;
   }
   subr_t& subrval() { return *std::get<subr_t*>(u); }
-  void subrval(subr_t* x) { type = SUBR; u = x; }
+  void subrval(subr_t* x) { type = lisp_type::SUBR; u = x; }
   lambda_t& lamval() { return std::get<lambda_t>(u); }
-  void lamval(lambda_t x) { type = LAMBDA; u = x; }
-  void nlamval(lambda_t x) { type = NLAMBDA; u = x; }
+  void lamval(lambda_t x) { type = lisp_type::LAMBDA; u = x; }
+  void nlamval(lambda_t x) { type = lisp_type::NLAMBDA; u = x; }
   closure_t& closval() { return std::get<closure_t>(u); }
   destblock_t* envval() { return std::get<destblock_t*>(u); }
-  void envval(destblock_t* env) { type = ENVIRON; u = env; }
+  void envval(destblock_t* env) { type = lisp_type::ENVIRON; u = env; }
   file_t& fileval() { return *std::get<std::unique_ptr<file_t>>(u).get(); }
-  void fileval(std::unique_ptr<file_t> f) { type = FILET; u = std::move(f); }
+  void fileval(std::unique_ptr<file_t> f) { type = lisp_type::FILET; u = std::move(f); }
   free_t& freeval() { return std::get<12>(u); }
-  void freeval(LISPT x) { type = FREE; u.emplace<12>(x); }
+  void freeval(LISPT x) { type = lisp_type::FREE; u.emplace<12>(x); }
   cvariable_t cvarval() const { return std::get<cvariable_t>(u); }
   void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
   void* cpointval() { return std::get<void*>(u); }
 
-  const std::string& getstr() const { return type == STRING ? stringval() : std::get<symbol_t>(u).pname; }
+  const std::string& getstr() const { return type == lisp_type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
   //
   // Some more or less helpfull functions
@@ -281,7 +289,7 @@ struct rtinfo
 };
 
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
-inline lisp_type type_of(LISPT a) { return a == nullptr ? NIL : a->type; }
+inline lisp_type type_of(LISPT a) { return a == nullptr ? lisp_type::NIL : a->type; }
 
 inline void set(LISPT& a, lisp_type t, LISPT p)
 {
@@ -290,8 +298,8 @@ inline void set(LISPT& a, lisp_type t, LISPT p)
   a->unmark();
 }
 
-inline bool is_T(LISPT x) { return type_of(x) == T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == NIL; }
+inline bool is_T(LISPT x) { return type_of(x) == lisp_type::T; }
+inline bool is_NIL(LISPT x) { return type_of(x) == lisp_type::NIL; }
 
 class lisp
 {
@@ -320,7 +328,7 @@ public:
   void check(LISPT arg, lisp_type type)
   {
     if(type_of(arg) != type)
-      error(NOT_A | type, arg);
+      error(NOT_A | to_underlying(type), arg);
   }
 
   void check(LISPT arg, lisp_type type0, lisp_type type1)
@@ -455,6 +463,34 @@ private:
   file_t* _stderr = nullptr;
   file_t* _stdin = nullptr;
   static lisp* _current;
+
+  std::map<int, std::string> messages;
+  // Some standard messages, all of them not necessarily used
+  // clang-format off
+  const std::vector<std::string> errmess = {
+    "Not NIL",
+    "Not a symbol",
+    "Not an integer",
+    "Not a bignum",
+    "Not a float",
+    "Not indirect",
+    "Not a cons cell",
+    "Not a string",
+    "Not SUBR",
+    "Not FSUBR",
+    "Not LAMBDA",
+    "Not NLAMBDA",
+    "Not a closure",
+    "Not unbound",
+    "Not an environment",
+    "Not a file pointer",
+    "Not T",
+    "Not free",
+    "Not EOF",
+    "Not an ERROR",
+    "Not a hash table"
+  };
+  // clang-format on
 };
 
 inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }

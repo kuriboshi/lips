@@ -266,31 +266,31 @@ TEST_CASE("Arithmetic functions")
   SUBCASE("f+")
   {
     auto r = eval(l, "(f+ (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp::FLOAT);
+    CHECK(type_of(r) == lisp::lisp_type::FLOAT);
     CHECK(r->floatval() == 7.0);
   }
   SUBCASE("f-")
   {
     auto r = eval(l, "(f- (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp::FLOAT);
+    CHECK(type_of(r) == lisp::lisp_type::FLOAT);
     CHECK(r->floatval() == 3.0);
   }
   SUBCASE("f*")
   {
     auto r = eval(l, "(f* (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp::FLOAT);
+    CHECK(type_of(r) == lisp::lisp_type::FLOAT);
     CHECK(r->floatval() == 10.0);
   }
   SUBCASE("f/")
   {
     auto r = eval(l, "(f/ (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp::FLOAT);
+    CHECK(type_of(r) == lisp::lisp_type::FLOAT);
     CHECK(r->floatval() == 2.5);
   }
   SUBCASE("itof")
   {
     auto r = eval(l, "(itof 8)");
-    CHECK(type_of(r) == lisp::FLOAT);
+    CHECK(type_of(r) == lisp::lisp_type::FLOAT);
     CHECK(r->floatval() == 8.0);
   }
 
@@ -388,39 +388,39 @@ TEST_CASE("Primary function tests")
     {
       auto a = lisp::eval(l, "(setq f (lambda () \"hello\"))");
       auto b = lisp::eval(l, "(f)");
-      CHECK(type_of(b) == lisp::STRING);
+      CHECK(type_of(b) == lisp::lisp_type::STRING);
       CHECK(b->stringval() == "hello"s);
     }
     SUBCASE("LAMBDA - one argument")
     {
       auto a = lisp::eval(l, "(setq f (lambda (x) (cons x nil)))");
       auto b = lisp::eval(l, "(f 10)");
-      CHECK(type_of(b) == lisp::CONS);
-      CHECK(type_of(b->car()) == lisp::INTEGER);
+      CHECK(type_of(b) == lisp::lisp_type::CONS);
+      CHECK(type_of(b->car()) == lisp::lisp_type::INTEGER);
       CHECK(b->car()->intval() == 10);
     }
     SUBCASE("LAMBDA - spread case")
     {
       auto a = lisp::eval(l, "(setq f (lambda x (cadr x)))");
       auto b = lisp::eval(l, "(f 1 2)");
-      CHECK(type_of(b) == lisp::INTEGER);
+      CHECK(type_of(b) == lisp::lisp_type::INTEGER);
       CHECK(b->intval() == 2);
     }
     SUBCASE("LAMBDA - half spread")
     {
       auto a = lisp::eval(l, "(setq f (lambda (a . x) (list a (cadr x))))");
       auto b = lisp::eval(l, "(f 0 1 2)");
-      CHECK(type_of(b) == lisp::CONS);
-      CHECK(type_of(b->car()) == lisp::INTEGER);
+      CHECK(type_of(b) == lisp::lisp_type::CONS);
+      CHECK(type_of(b->car()) == lisp::lisp_type::INTEGER);
       CHECK(b->car()->intval() == 0);
-      CHECK(type_of(b->cdr()->car()) == lisp::INTEGER);
+      CHECK(type_of(b->cdr()->car()) == lisp::lisp_type::INTEGER);
       CHECK(b->cdr()->car()->intval() == 2);
     }
     SUBCASE("NLAMBDA - basic case")
     {
       auto a = lisp::eval(l, "(setq f (nlambda (a) a))");
       auto b = lisp::eval(l, "(f x)");
-      CHECK(type_of(b) == lisp::SYMBOL);
+      CHECK(type_of(b) == lisp::lisp_type::SYMBOL);
       CHECK(strcmp(b->symval().pname.c_str(), "x") == 0);
     }
   }
