@@ -31,8 +31,6 @@ using LISPT = struct lisp_t*;
 // All lisp constants used internally.
 //
 extern LISPT C_T;
-extern LISPT CE_NIL;
-extern LISPT CE_T;
 extern LISPT C_APPEND;
 extern LISPT C_AUTOLOAD;
 extern LISPT C_BIGNUM;
@@ -115,10 +113,11 @@ struct cons_t
 
 struct symbol_t
 {
-  std::string pname;  // The printname of the atom
-  LISPT value = C_NIL;
-  LISPT plist = C_NIL;          // The property list
-  LISPT topval = C_NIL;         // Holds top value (not used yet)
+  std::string pname;           // The printname of the atom
+  bool constant = false;       // If true this is a constant which can't be set
+  LISPT value = C_NIL;         // Value
+  LISPT plist = C_NIL;         // The property list
+  LISPT topval = C_NIL;        // Holds top value (not used yet)
 };
 
 using func0_t = LISPT (*)(lisp&);

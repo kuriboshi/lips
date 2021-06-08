@@ -18,8 +18,8 @@ PRIMITIVE low::set(var, val)
 PRIMITIVE low::set(LISPT var, LISPT val)
 {
   l.check(var, lisp_type::SYMBOL);
-  if(EQ(var, CE_NIL) || EQ(var, CE_T))
-    return l.error(ATTEMPT_TO_RESET, var);
+  if(var->symval().constant)
+    return l.error(ATTEMPT_TO_CLOBBER, var);
   if(type_of(var->symval().value) == lisp_type::INDIRECT)
     var->symval().value->indirectval() = val;
   else if(type_of(var->symval().value) == lisp_type::CVARIABLE)

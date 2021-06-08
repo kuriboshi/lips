@@ -26,7 +26,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   messages[error_code(NOT_PRINTABLE)] = "Not printable";
   messages[error_code(NO_DIRECTORY)] = "No directory";
   messages[error_code(NO_USER)] = "No such user";
-  messages[error_code(ATTEMPT_TO_RESET)] = "Attempt to clobber";
+  messages[error_code(ATTEMPT_TO_CLOBBER)] = "Attempt to clobber constant";
   messages[error_code(OUT_OF_MEMORY)] = "Out of memory";
   messages[error_code(UNEXPECTED_EOF)] = "Unexpected end of file";
   messages[error_code(EVENT_NOT_FOUND)] = "Event not found";
@@ -46,10 +46,15 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   auto intern = [this](const auto s) { return a().intern(s); };
 
   set(C_T, lisp_type::T, a().getobject());
-  CE_NIL = intern("nil");
-  CE_NIL->setq(C_NIL);
-  CE_T = intern("t");
-  CE_T->setq(C_T);
+
+  auto nil = intern("nil");
+  nil->setq(C_NIL);
+  nil->symval().constant = true;
+  
+  auto t = intern("t");
+  t->setq(C_T);
+  t->symval().constant = true;
+
   C_AUTOLOAD = intern("autoload");
   C_BIGNUM = intern("bignum");
   C_BROKEN = intern("broken");
@@ -216,8 +221,6 @@ lisp* lisp::_current = nullptr;
 // All lisp constants needed internally.
 //
 LISPT C_T;
-LISPT CE_NIL;
-LISPT CE_T;
 LISPT C_AUTOLOAD;
 LISPT C_BIGNUM;
 LISPT C_BROKEN;
