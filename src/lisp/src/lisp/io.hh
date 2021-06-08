@@ -34,14 +34,11 @@ public:
     l.rstack = l.rstack->cdr();
   }
 
-  static inline constexpr int NUL = '\0';
-  static inline constexpr int MAXATOMSIZE = 128; // Max length of atom read can handle
-
-  bool integerp(char*, int* res);
-  bool floatp(char*);
+  bool integerp(const std::string&, int& res);
+  bool floatp(const std::string&);
 
   LISPT splice(LISPT, LISPT, bool);
-  LISPT parsebuf(char*);
+  LISPT parsebuf(const std::string&);
 
   LISPT ratom(file_t&);
   LISPT lispread(file_t&, bool line = false);

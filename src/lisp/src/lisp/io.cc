@@ -26,40 +26,47 @@ static char digits[] = {
   'u', 'v', 'w', 'x', 'y', 'z'};
 /* clang-format on */
 
-/*
- * INTEGERP returns nonzero if the characters in buffer BUF
- * represents an integer, and the result as a long in res.
- */
-bool io::integerp(char* buf, int* res)
+//
+// INTEGERP returns nonzero if the characters in buffer BUF represents an
+// integer, and the result as a long in res.
+//
+bool io::integerp(const std::string& buf, int& res)
 {
-  int d = 0;
-  int sign = 1;
+  res = 0;
+  if(buf.empty())
+    return false;
 
-  *res = 0;
-  if(*buf == '-')
-    sign = *buf++ == '-' ? -1 : 1;
-  if(!*buf)
-    d = 1;
-  for(; *buf; buf++)
+  auto i = buf.begin();
+  int sign = 1;
+  if(*i == '-')
   {
-    if(!isdigit(*buf))
-      d++;
-    else
-      *res = *res * 10 + *buf - '0';
+    sign = -1;
+    ++i;
   }
-  *res *= sign;
-  return !d;
+  else if(*i == '+')
+    ++i;
+  if(i == buf.end())
+    return false;
+  for(; i != buf.end(); ++i)
+  {
+    if(!isdigit(*i))
+      return false;
+    res = res * 10 + *i - '0';
+  }
+  res *= sign;
+  return i == buf.end();
 }
 
-/*
- * Returns nonzero if buffer BUF is a floating point constant.
- */
-bool io::floatp(char* buf)
+//
+// Returns nonzero if buffer BUF is a floating point constant.
+//
+bool io::floatp(const std::string& buf)
 {
   int state = 0;
-  while(state >= 0 && *buf)
+  auto i = buf.begin();
+  while(state >= 0 && i != buf.end())
   {
-    switch(*buf)
+    switch(*i)
     {
       case '+':
       case '-':
@@ -87,74 +94,63 @@ bool io::floatp(char* buf)
       default:
         state = -1;
     }
-    buf++;
+    ++i;
   }
   if(state == 3 || state == 4 || state == 6 || state == 9)
     return true;
   return false;
 }
 
-/*
- * Find out if the buffer can be interpreted as numbers of
- * any kind.
- */
-LISPT io::parsebuf(char* buf)
+//
+// Find out if the buffer can be interpreted as numbers of any kind.
+//
+LISPT io::parsebuf(const std::string& buf)
 {
   int longval;
-
-  if(integerp(buf, &longval))
+  if(integerp(buf, longval))
     return mknumber(l, longval);
   else if(floatp(buf))
     return mkfloat(l, std::stod(buf));
   return mkatom(l, buf);
 }
 
-/*
- * Read an atom from FILE.
- */
+//
+// Read an atom from FILE.
+//
 LISPT io::ratom(file_t& file)
 {
-  char buffer[MAXATOMSIZE];
-  int pos = 0;
-
-  int c = file.getch();
-  while(1)
+  std::string buffer;
+  while(true)
   {
+    int c = file.getch();
     if(c == EOF)
       return C_EOF;
     else if(issepr(l, c))
       ;
     else if(isbrk(l, c))
     {
-      buffer[pos++] = c;
-      buffer[pos] = NUL;
+      buffer.push_back(c);
       return mkatom(l, buffer);
     }
     else
     {
-      while(1)
+      while(true)
       {
         if(c == EOF)
           return parsebuf(buffer);
         if(c == '\\')
           c = file.getch();
-        if(pos < MAXATOMSIZE)
-          buffer[pos++] = c;
+        buffer.push_back(c);
         c = file.getch();
         if(isbrk(l, c))
         {
           file.ungetch(c);
-          buffer[pos] = NUL;
           return parsebuf(buffer);
         }
         else if(issepr(l, c))
-        {
-          buffer[pos] = NUL;
           return parsebuf(buffer);
-        }
       }
     }
-    c = file.getch();
   }
 }
 
@@ -362,32 +358,26 @@ tail:
   }
 }
 
-/*
- * Read macros.
- */
+//
+// Read macros.
+//
 LISPT io::rmdquote(lisp& l, file_t& file, LISPT, char)
 {
-  // FIXME: Need to be dynamic to handle arbitrary long strings.
-  char buffer[10240];
-  char c;
-  int pos = 0;
-
-  c = file.getch(true);
-  while(c != '"' && pos < 10240)
+  std::string buffer;
+  auto c = file.getch(true);
+  while(c != '"')
   {
     if(c == '\\')
       c = file.getch(true);
-    buffer[pos++] = c;
+    buffer.push_back(c);
     c = file.getch(true);
   }
-  buffer[pos] = NUL;
   return mkstring(l, buffer);
 }
 
 LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
 {
   int c;
-
   if((c = file.getch()) == ')' || issepr(l, c))
   {
     file.ungetch(c);
