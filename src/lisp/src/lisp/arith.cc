@@ -171,11 +171,25 @@ PRIMITIVE arith::divide(LISPT x, LISPT y)
   l.check(y, lisp_type::INTEGER, lisp_type::FLOAT);
   if(type_of(x) == lisp_type::INTEGER)
     if(type_of(y) == lisp_type::INTEGER)
+    {
+      if(y->intval() == 0)
+        return l.error(DIVIDE_ZERO, C_NIL);
       return mknumber(l, x->intval() / y->intval());
+    }
     else
+    {
+      if(y->floatval() == 0.0)
+        return l.error(DIVIDE_ZERO, C_NIL);
       return mkfloat(l, (double)x->intval() / y->floatval());
+    }
   else if(type_of(y) == lisp_type::INTEGER)
-    return mkfloat(l, x->floatval() / (double)y->intval());
+  {
+    if(y->intval() == 0)
+      return l.error(DIVIDE_ZERO, C_NIL);
+    return mkfloat(l, x->floatval() / static_cast<double>(y->intval()));
+  }
+  if(y->floatval() == 0.0)
+    return l.error(DIVIDE_ZERO, C_NIL);
   return mkfloat(l, x->floatval() / y->floatval());
 }
 
