@@ -1122,8 +1122,7 @@ TEST_CASE("Evaluator")
   SUBCASE("Evaluate simple expression: (+ 123 1)")
   {
     auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
-    auto sink0 = std::make_unique<string_sink>();
-    auto out0 = std::make_unique<file_t>(std::move(sink0));
+    auto out0 = std::make_unique<file_t>(std::make_unique<string_sink>());
     prin0(lisp, e1, *out0.get());
     CHECK(to_string(out0->sink()) == std::string("(+ 123 1)"));
     auto r1 = eval(lisp, e1);

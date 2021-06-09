@@ -87,15 +87,15 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&currentbase, "base", a().mknumber(10L));
   initcvar(&version, "version", a().mkstring(VERSION));
 
-  _primout = new file_t(std::make_unique<stream_sink>(std::cout));
-  _primerr = new file_t(std::make_unique<stream_sink>(std::cerr));
-  _primin = new file_t(std::make_unique<stream_source>(std::cin));
-  _stdout = new file_t(std::make_unique<stream_sink>(std::cout));
-  _stderr = new file_t(std::make_unique<stream_sink>(std::cerr));
-  _stdin = new file_t(std::make_unique<stream_source>(std::cin));
+  _primout = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cout));
+  _primerr = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cerr));
+  _primin = std::make_unique<file_t>(std::make_unique<stream_source>(std::cin));
+  _stdout = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cout));
+  _stderr = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cerr));
+  _stdin = std::make_unique<file_t>(std::make_unique<stream_source>(std::cin));
 
-  a().add_mark_object(&top);
-  a().add_mark_object(&rstack);
+  a().gcprotect(top);
+  a().gcprotect(rstack);
 
   arith::init();
   debug::init();
@@ -120,20 +120,17 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
 lisp::~lisp() = default;
 
-void lisp::primout(file_t& f)
+void lisp::primout(std::unique_ptr<file_t> f)
 {
-  delete _primout;
-  _primout = &f;
+  _primout = std::move(f);
 }
-void lisp::primerr(file_t& f)
+void lisp::primerr(std::unique_ptr<file_t> f)
 {
-  delete _primerr;
-  _primerr = &f;
+  _primerr = std::move(f);
 }
-void lisp::primin(file_t& f)
+void lisp::primin(std::unique_ptr<file_t> f)
 {
-  delete _primin;
-  _primin = &f;
+  _primin = std::move(f);
 }
 
 LISPT lisp::perror(int messnr, LISPT arg)

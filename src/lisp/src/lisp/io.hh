@@ -433,7 +433,7 @@ inline file_t& primerr() { return lisp::current().primerr(); }
 template<typename T>
 std::string to_string(T& sink)
 {
-  return static_cast<string_sink&>(sink).string();
+  return dynamic_cast<string_sink&>(sink).string();
 }
 
 } // namespace lisp

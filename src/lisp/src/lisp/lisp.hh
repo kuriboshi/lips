@@ -312,9 +312,9 @@ public:
   file_t& primout() const { return *_primout; }
   file_t& primerr() const { return *_primerr; }
   file_t& primin() const { return *_primin; }
-  void primout(file_t&);
-  void primerr(file_t&);
-  void primin(file_t&);
+  void primout(std::unique_ptr<file_t>);
+  void primerr(std::unique_ptr<file_t>);
+  void primin(std::unique_ptr<file_t>);
   file_t& stdout() const { return *_stdout; }
   file_t& stderr() const { return *_stderr; }
   file_t& stdin() const { return *_stdin; }
@@ -455,12 +455,12 @@ public:
 private:
   alloc& _alloc;
   evaluator& _eval;
-  file_t* _primout = nullptr;
-  file_t* _primerr = nullptr;
-  file_t* _primin = nullptr;
-  file_t* _stdout = nullptr;
-  file_t* _stderr = nullptr;
-  file_t* _stdin = nullptr;
+  std::unique_ptr<file_t> _primout;
+  std::unique_ptr<file_t> _primerr;
+  std::unique_ptr<file_t> _primin;
+  std::unique_ptr<file_t> _stdout;
+  std::unique_ptr<file_t> _stderr;
+  std::unique_ptr<file_t> _stdin;
   static lisp* _current;
 
   std::map<int, std::string> messages;

@@ -665,8 +665,7 @@ TEST_CASE("Basic I/O")
 {
   lisp lisp;
 
-  auto out0 = std::make_unique<string_sink>();
-  lisp.primout(*new file_t(std::move(out0)));
+  lisp.primout(std::make_unique<file_t>(std::make_unique<string_sink>()));
   lisp.primout().format("hello world {}", 123);
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
@@ -680,8 +679,7 @@ TEST_CASE("Read lisp objects")
     std::string s_nihongo{"\"日本語\"\n"};
     file_t in{s_nihongo};
     auto nihongo = lispread(lisp, in, false);
-    auto sink = std::make_unique<string_sink>();
-    file_t out(std::move(sink));
+    file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
@@ -691,8 +689,7 @@ TEST_CASE("Read lisp objects")
     std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
     file_t in{s_nihongo};
     auto nihongo = lispread(lisp, in, false);
-    auto sink = std::make_unique<string_sink>();
-    file_t out(std::move(sink));
+    file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
@@ -706,8 +703,7 @@ TEST_CASE("Read lisp objects")
     }
     auto f = file_t(std::make_unique<file_source>("test.lisp"));
     auto nihongo = lispread(lisp, f, false);
-    auto sink = std::make_unique<string_sink>();
-    file_t out(std::move(sink));
+    file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }

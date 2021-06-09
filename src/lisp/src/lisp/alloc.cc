@@ -488,13 +488,13 @@ alloc::alloc(lisp& lisp): base(lisp)
   for(int i = 0; i != MAXHASH; ++i)
     obarray[i] = nullptr;
 
-  add_mark_object(&l.topprompt);
-  add_mark_object(&l.brkprompt);
-  add_mark_object(&l.currentbase);
-  add_mark_object(&l.version);
-  add_mark_object(&l.verbose);
-  add_mark_object(&gcgag);
-  add_mark_object(&C_EOF);
+  gcprotect(l.topprompt);
+  gcprotect(l.brkprompt);
+  gcprotect(l.currentbase);
+  gcprotect(l.version);
+  gcprotect(l.verbose);
+  gcprotect(gcgag);
+  gcprotect(C_EOF);
 
   destblockused = 0;
   conscells = nullptr;
@@ -559,21 +559,18 @@ TEST_CASE("Create lisp objects")
     set(lisp, j, a);
     CHECK(i != j);
 
-    auto sink0 = std::make_unique<string_sink>();
-    file_t out0(std::move(sink0));
+    file_t out0(std::make_unique<string_sink>());
     prin0(lisp, i, out0);
     CHECK(to_string(out0.sink()) == std::string(i->getstr()));
 
-    auto sink1 = std::make_unique<string_sink>();
-    file_t out1(std::move(sink1));
+    file_t out1(std::make_unique<string_sink>());
     prin0(lisp, j, out1);
     CHECK(to_string(out1.sink()) == std::string(j->getstr()));
 
     std::string s_hello{"(hello)"};
     file_t in(s_hello);
     auto hello = lispread(lisp, in, false);
-    auto sink2 = std::make_unique<string_sink>();
-    file_t out2(std::move(sink2));
+    file_t out2(std::make_unique<string_sink>());
     prin0(lisp, hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);
   }
