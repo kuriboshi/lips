@@ -87,12 +87,12 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   initcvar(&currentbase, "base", a().mknumber(10L));
   initcvar(&version, "version", a().mkstring(VERSION));
 
-  _primout = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cout));
-  _primerr = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cerr));
-  _primin = std::make_unique<file_t>(std::make_unique<stream_source>(std::cin));
-  _stdout = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cout));
-  _stderr = std::make_unique<file_t>(std::make_unique<stream_sink>(std::cerr));
-  _stdin = std::make_unique<file_t>(std::make_unique<stream_source>(std::cin));
+  _primout = std::make_unique<file_t>(std::cout);
+  _primerr = std::make_unique<file_t>(std::cerr);
+  _primin = std::make_unique<file_t>(std::cin);
+  _stdout = std::make_unique<file_t>(std::cout);
+  _stderr = std::make_unique<file_t>(std::cerr);
+  _stdin = std::make_unique<file_t>(std::cin);
 
   a().gcprotect(top);
   a().gcprotect(rstack);

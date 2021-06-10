@@ -185,11 +185,10 @@ LISPT io::splice(LISPT x, LISPT y, bool tailp)
 }
 
 /*
- * LISPREAD reads a lisp expression from file FILE. If LINE
- * is true then it is assumed that it was called from READLINE.
- * READLINE initializes by itself TOP so that an extra level of
- * parentheses is in effect. An explicit stack is used to store
- * TOP when LISPREAD recurses.
+ * LISPREAD reads a lisp expression from file FILE.  If LINE is true then it is
+ * assumed that it was called from READLINE.  READLINE initializes by itself
+ * TOP so that an extra level of parentheses is in effect.  An explicit stack
+ * is used to store TOP when LISPREAD recurses.
  */
 /*
  * If you don't like goto's, keep your eyes shut.
@@ -197,22 +196,18 @@ LISPT io::splice(LISPT x, LISPT y, bool tailp)
 LISPT io::lispread(file_t& file, bool line)
 {
   LISPT curr, temp, curatom;
-  int curc;
-
   if(!line)
   {
-    l.top = cons(l, C_NIL, C_NIL);
+    l.top = cons(C_NIL, C_NIL);
     curr = l.top;
   }
   else
     curr = l.top->car();
-  {
-  head:
-    auto [eof, c] = getchar(l, file, line);
-    if(eof)
-      return C_EOF;
-    curc = c;
-  }
+head:
+  auto [eof, c] = getchar(l, file, line);
+  if(eof)
+    return C_EOF;
+  auto curc = c;
   if(isinsert(l, curc))
   {
     pushr(l.top);
@@ -503,9 +498,7 @@ LISPT io::terpri(file_t& file)
 
 LISPT io::prinbody(LISPT x, file_t& file, bool esc)
 {
-  LISPT xx;
-
-  xx = x;
+  LISPT xx = x;
 nxtelt:
   prin0(xx->car(), file, esc);
   if(EQ(xx->cdr(), C_NIL))
@@ -686,7 +679,8 @@ TEST_CASE("Read lisp objects")
 
   SUBCASE("Read from utf-8 2")
   {
-    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
+)"};
     file_t in{s_nihongo};
     auto nihongo = lispread(lisp, in, false);
     file_t out(std::make_unique<string_sink>());
@@ -696,7 +690,8 @@ TEST_CASE("Read lisp objects")
 
   SUBCASE("Read utf-8 from file")
   {
-    std::string s_nihongo{"(((field \"payee\") (re \"ライゼボツクス\") (category \"Housing/Storage\")) ((field \"payee\") (re \"ビューカード\") (category \"Transfer/viewcard\")) ((field \"payee\") (re \"楽天コミュニケー\") (category \"Utilities/Phone\")))\n"};
+    std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
+)"};
     {
       std::ofstream o{"test.lisp"};
       o << s_nihongo;
@@ -708,9 +703,15 @@ TEST_CASE("Read lisp objects")
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
-  SUBCASE("Reise box")
+  SUBCASE("lispread vs. readline")
   {
-    auto s = mkstring(lisp, "ライゼボツクス");
+    std::string s0{R"((hello world))"};
+    auto f0 = file_t(s0);
+    auto result0 = lispread(lisp, f0, false);
+    std::string s1{R"(hello world)"};
+    auto f1 = file_t(s1);
+    auto result1 = readline(lisp, f1);
+    CHECK(equal(lisp, result0, result1) != C_NIL);
   }
 }
 

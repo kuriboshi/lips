@@ -34,12 +34,6 @@ public:
     l.rstack = l.rstack->cdr();
   }
 
-  bool integerp(const std::string&, int& res);
-  bool floatp(const std::string&);
-
-  LISPT splice(LISPT, LISPT, bool);
-  LISPT parsebuf(const std::string&);
-
   LISPT ratom(file_t&);
   LISPT lispread(file_t&, bool line = false);
   LISPT readline(file_t&);
@@ -63,6 +57,10 @@ public:
 #endif
 
 private:
+  LISPT splice(LISPT, LISPT, bool);
+  LISPT parsebuf(const std::string&);
+  bool integerp(const std::string&, int& res);
+  bool floatp(const std::string&);
   bool checkeof(lisp& l, int c, bool line);
   std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
@@ -213,6 +211,30 @@ public:
   virtual void terpri() = 0;
   virtual void flush() {}
   virtual bool close() = 0;
+
+protected:
+  //
+  // Put a character c, on stream file, escaping enabled if esc is true.
+  //
+  void putch(int c, std::ostream& file, bool esc)
+  {
+    if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
+      pputc('\\', file);
+    pputc(c, file);
+  }
+
+  // Put a character on stdout prefixing it with a ^ if it's a control
+  // character.
+  void pputc(int c, std::ostream& file)
+  {
+    if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
+    {
+      file.put('^');
+      file.put(c + 0x40);
+    }
+    else
+      file.put(c);
+  }
 };
 
 class file_sink: public io_sink
@@ -222,6 +244,8 @@ public:
     : _file(std::make_unique<std::ofstream>(filename, append ? std::ios_base::ate : std::ios_base::out))
   {}
   ~file_sink() = default;
+
+  using io_sink::putch;
 
   virtual void putch(int c, bool esc) override { putch(c, *_file, esc); }
   virtual void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
@@ -234,30 +258,6 @@ public:
   }
 
 private:
-  // Put a character on stdout prefixing it with a ^ if it's a control
-  // character.
-  void pputc(int c, std::ofstream& file)
-  {
-    // Need to generalize this
-    if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
-    {
-      file.put('^');
-      file.put(c + 0x40);
-    }
-    else
-      file.put(c);
-  }
-
-  /*
-   * Put a character c, on stream file, escaping enabled if esc != 0.
-   */
-  void putch(int c, std::ofstream& file, bool esc)
-  {
-    if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
-      pputc('\\', file);
-    pputc(c, file);
-  }
-
   std::unique_ptr<std::ofstream> _file;
 };
 
@@ -267,6 +267,8 @@ public:
   stream_sink(std::ostream& stream): _stream(stream) {}
   ~stream_sink() = default;
 
+  using io_sink::putch;
+
   virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
   virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
   virtual void terpri() override { _stream.put('\n'); }
@@ -274,30 +276,6 @@ public:
   virtual bool close() override { return true; }
 
 private:
-  // Put a character on stdout prefixing it with a ^ if it's a control
-  // character.
-  void pputc(int c, std::ostream& file)
-  {
-    // Need to generalize this
-    if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
-    {
-      file.put('^');
-      file.put(c + 0x40);
-    }
-    else
-      file.put(c);
-  }
-
-  /*
-   * Put a character c, on stream file, escaping enabled if esc != 0.
-   */
-  void putch(int c, std::ostream& file, bool esc)
-  {
-    if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
-      pputc('\\', file);
-    pputc(c, file);
-  }
-
   std::ostream& _stream;
 };
 
@@ -323,6 +301,8 @@ public:
   file_t(std::unique_ptr<io_source> source): _source(std::move(source)) {}
   file_t(std::unique_ptr<io_sink> sink): _sink(std::move(sink)) {}
   file_t(std::unique_ptr<io_source> source, std::unique_ptr<io_sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
+  file_t(std::istream& stream): _source(std::make_unique<stream_source>(stream)) {}
+  file_t(std::ostream& stream): _sink(std::make_unique<stream_sink>(stream)) {}
   file_t(const std::string& string): _source(std::make_unique<string_source>(string)) {}
   ~file_t() {}
 
@@ -363,6 +343,7 @@ private:
     if(!_source)
       throw lisp_error("file_t: No source");
   }
+
   void ptrcheck(const std::unique_ptr<io_sink>&) const
   {
     if(!_sink)

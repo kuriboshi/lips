@@ -12,8 +12,48 @@
 #include "except.hh"
 #include "low.hh"
 
+#include <iostream>
+
 namespace lisp
 {
+alloc::alloc(): alloc(lisp::current()) {}
+
+alloc::alloc(lisp& lisp): base(lisp)
+{
+  for(int i = 0; i != MAXHASH; ++i)
+    obarray[i] = nullptr;
+
+  gcprotect(l.topprompt);
+  gcprotect(l.brkprompt);
+  gcprotect(l.currentbase);
+  gcprotect(l.version);
+  gcprotect(l.verbose);
+  gcprotect(gcgag);
+  gcprotect(C_EOF);
+
+  destblockused = 0;
+  conscells = nullptr;
+  conscells = newpage(); /* Allocate one page of storage */
+  if(conscells == nullptr)
+  {
+    l.primerr().format("Cons cells memory exhausted\n");
+    throw lisp_finish("Cons cells memory exhausted", 1);
+  }
+  sweep();
+  initcvar(&gcgag, "gcgag", C_NIL);
+  // clang-format off
+  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_CONS,      ::lisp::cons,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  // clang-format on
+}
+
+alloc::~alloc()
+{
+  // TODO: Free all memory
+}
+
 /* 
  * newpage - Allocates a new block of cons cells and links it into the 
  *           current list of blocks.
@@ -368,7 +408,7 @@ int alloc::hash(const std::string& str)
  * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
  *             if the printname should be saved.
  */
-LISPT alloc::buildatom(const std::string& s, bool copy, LISPT newatom)
+LISPT alloc::buildatom(const std::string& s, LISPT newatom)
 {
   static LISPT unbound = nullptr;
   if(unbound == nullptr)
@@ -383,9 +423,9 @@ LISPT alloc::buildatom(const std::string& s, bool copy, LISPT newatom)
   return l;
 }
 
-alloc::obarray_t* alloc::findatom(int hv, const std::string& str, obarray_t* obarray[])
+alloc::bucket_t* alloc::findatom(int hv, const std::string& str, const obarray_t& obarray)
 {
-  for(auto* ob = *(obarray + hv); ob; ob = ob->onext)
+  for(auto* ob = obarray[hv]; ob; ob = ob->onext)
   {
     if(ob->sym->symval().pname == str)
       return ob;
@@ -394,17 +434,17 @@ alloc::obarray_t* alloc::findatom(int hv, const std::string& str, obarray_t* oba
 }
 
 /*
- * puthash - Puts an atom with printname STR in the hash array OBARRAY.
- *           If the atom is already in obarray, no new atom is created.
- *           Copy str if COPY is true. Returns the atom.
+ * puthash - Puts an atom with printname STR in the hash array OBARRAY.  If the
+ *           atom is already in obarray, no new atom is created.  Returns the
+ *           atom.
  */
-LISPT alloc::puthash(int hv, const std::string& str, obarray_t* obarray[], bool copy, LISPT newatom)
+LISPT alloc::puthash(int hv, const std::string& str, obarray_t& obarray, LISPT newatom)
 {
-  auto* ob = new obarray_t;
+  auto* ob = new bucket_t;
   if(ob == nullptr)
     return C_ERROR;
   ob->onext = obarray[hv];
-  ob->sym = buildatom(str, copy, newatom);
+  ob->sym = buildatom(str, newatom);
   if(EQ(ob->sym, C_ERROR))
   {
     delete ob;
@@ -423,11 +463,13 @@ LISPT alloc::intern(const std::string& str)
   auto hv = hash(str);
   if(auto* ob = findatom(hv, str, globals))
     return ob->sym;
-  return puthash(hv, str, globals, 0, new lisp_t);
+  // Use new lisp_t here because we're never going to free interned symbols.
+  return puthash(hv, str, globals, new lisp_t);
 }
 
 /*
- * mkatom - Generates interned symbol like intern but copy str.
+ * mkatom - Generates interned symbol like intern but create it in the local
+ *          obarray if not found in the global.
  */
 LISPT alloc::mkatom(const std::string& str)
 {
@@ -437,7 +479,7 @@ LISPT alloc::mkatom(const std::string& str)
     return ob->sym;
   if(auto* ob = findatom(hv, str, obarray))
     return ob->sym;
-  return puthash(hv, str, obarray, 1, getobject());
+  return puthash(hv, str, obarray, getobject());
 }
 
 /* This isn't converted yet */
@@ -478,50 +520,12 @@ destblock_t* alloc::dalloc(int size)
  */
 void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
 
+alloc::obarray_t alloc::globals;
+
 /*
  * dzero - Frees all destination blocks.
  */
 void alloc::dzero() { destblockused = 0; }
-
-alloc::alloc(lisp& lisp): base(lisp)
-{
-  for(int i = 0; i != MAXHASH; ++i)
-    obarray[i] = nullptr;
-
-  gcprotect(l.topprompt);
-  gcprotect(l.brkprompt);
-  gcprotect(l.currentbase);
-  gcprotect(l.version);
-  gcprotect(l.verbose);
-  gcprotect(gcgag);
-  gcprotect(C_EOF);
-
-  destblockused = 0;
-  conscells = nullptr;
-  conscells = newpage(); /* Allocate one page of storage */
-  if(conscells == nullptr)
-  {
-    l.primerr().format("Cons cells memory exhausted\n");
-    throw lisp_finish("Cons cells memory exhausted", 1);
-  }
-  sweep();
-  initcvar(&gcgag, "gcgag", C_NIL);
-  // clang-format off
-  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_CONS,      ::lisp::cons,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  // clang-format on
-}
-
-alloc::alloc(): alloc(lisp::current()) {}
-
-alloc::~alloc()
-{
-  // TODO: Free all memory
-}
-
-alloc::obarray_t* alloc::globals[];
 
 TEST_CASE("Create lisp objects")
 {

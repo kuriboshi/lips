@@ -5,16 +5,17 @@
 
 #pragma once
 
+#include <array>
 #include <vector>
 #include "lisp.hh"
 #include "base.hh"
 
 namespace lisp
 {
-inline constexpr auto PN_RECLAIM = "reclaim";     // initiate garbage collection
-inline constexpr auto PN_CONS = "cons";           // make a new cons cell
-inline constexpr auto PN_FREECOUNT = "freecount"; // number of free cells
-inline constexpr auto PN_OBARRAY = "obarray";     // return list of all atoms
+inline constexpr auto PN_RECLAIM = "reclaim";     // Initiate garbage collection
+inline constexpr auto PN_CONS = "cons";           // Make a new cons cell
+inline constexpr auto PN_FREECOUNT = "freecount"; // Number of free cells
+inline constexpr auto PN_OBARRAY = "obarray";     // Return list of all atoms
 
 class evaluator;
 
@@ -28,7 +29,7 @@ public:
   static constexpr int CONSCELLS = 1000;     // Number of cells in each block
   static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
   static constexpr int MINCONSES = 2000;     // Minimum number of cells after gc
-  static constexpr int MAXHASH = 255;        // Max number of hash buckets
+  static constexpr int MAXHASH = 256;        // Max number of hash buckets
 
   struct conscells_t
   {
@@ -36,21 +37,22 @@ public:
     conscells_t* next;
   };
 
-  /*
-   * Each hashbucket contains a symbol and a pointer to the next
-   * symbol in that bucket.
-   */
-  struct obarray_t
+  //
+  // Each hashbucket contains a symbol and a pointer to the next symbol in that
+  // bucket.
+  //
+  struct bucket_t
   {
     LISPT sym;
-    obarray_t* onext;
+    bucket_t* onext;
   };
 
-  static obarray_t* globals[MAXHASH]; // Atoms created by 'intern' which are the same across all instances
-  std::vector<LISPT> savearray;       // Stack of objects which needs to be protected from gc
-  obarray_t* obarray[MAXHASH];        // Atoms local to each interpreter instance
-  LISPT freelist = nullptr;           // List of free objects
-  LISPT gcgag = nullptr;              // Nonnil means print gc message
+  using obarray_t = std::array<bucket_t*, MAXHASH>;
+  static obarray_t globals;     // Atoms created by 'intern' which are the same across all instances
+  obarray_t obarray;            // Atoms local to each interpreter instance
+  std::vector<LISPT> savearray; // Stack of objects which needs to be protected from gc
+  LISPT freelist = nullptr;     // List of free objects
+  LISPT gcgag = nullptr;        // Nonnil means print gc message
 
   LISPT getobject();
 
@@ -74,11 +76,11 @@ public:
   static void mkprim(const std::string& pname, func2_t fname, subr_t::subr_type, subr_t::spread_type);
   static void mkprim(const std::string& pname, func3_t fname, subr_t::subr_type, subr_t::spread_type);
 
-  LISPT mklambda(LISPT args, LISPT def, lisp_type type);
+  LISPT mkatom(const std::string&);
   LISPT mkstring(const std::string&);
   LISPT mknumber(int);
-  LISPT mkatom(const std::string&);
   LISPT mkfloat(double);
+  LISPT mklambda(LISPT args, LISPT def, lisp_type type);
 
   destblock_t* dalloc(int);
   void dfree(destblock_t*);
@@ -96,7 +98,7 @@ public:
   PRIMITIVE cons(LISPT, LISPT);
   PRIMITIVE xobarray();
   PRIMITIVE freecount();
-
+  
   void gcprotect(LISPT& o) { markobjs.push_back(&o); }
 
 private:
@@ -107,10 +109,10 @@ private:
   LISPT doreclaim(int incr = 0);
   LISPT mkarglis(LISPT alist, int& count);
 
-  static LISPT buildatom(const std::string& s, bool copy, LISPT newatom);
-  static obarray_t* findatom(int hv, const std::string& str, obarray_t* obarray[]);
+  static LISPT buildatom(const std::string& s, LISPT newatom);
+  static bucket_t* findatom(int hv, const std::string&, const obarray_t&);
   static int hash(const std::string& str);
-  static LISPT puthash(int hv, const std::string& str, obarray_t* obarray[], bool copy, LISPT newatom);
+  static LISPT puthash(int hv, const std::string&, obarray_t&, LISPT newatom);
   static LISPT mkprim(const std::string& pname, subr_t* subr);
 
   conscells_t* conscells = nullptr;     // Cons cell storage.
