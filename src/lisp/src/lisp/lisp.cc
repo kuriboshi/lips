@@ -48,12 +48,12 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   set(C_T, lisp_type::T, a().getobject());
 
   auto nil = intern("nil");
-  nil->setq(C_NIL);
-  nil->symval().constant = true;
+  nil->symvalue(C_NIL);
+  nil->symbol().constant = true;
   
   auto t = intern("t");
-  t->setq(C_T);
-  t->symval().constant = true;
+  t->symvalue(C_T);
+  t->symbol().constant = true;
 
   C_AUTOLOAD = intern("autoload");
   C_BIGNUM = intern("bignum");

@@ -61,13 +61,13 @@ LISPT user::funeq(LISPT f1, LISPT f2)
 
 LISPT user::checkfn(LISPT name, LISPT lam)
 {
-  if(type_of(name->getopval()) != lisp_type::UNBOUND)
-    if(type_of(name->getopval()) == lisp_type::LAMBDA || type_of(name->getopval()) == lisp_type::NLAMBDA)
+  if(type_of(name->symvalue()) != lisp_type::UNBOUND)
+    if(type_of(name->symvalue()) == lisp_type::LAMBDA || type_of(name->symvalue()) == lisp_type::NLAMBDA)
     {
-      LISPT t = funeq(name->getopval(), lam);
+      LISPT t = funeq(name->symvalue(), lam);
       if(is_NIL(t))
       {
-        putprop(l, name, C_OLDDEF, name->getopval());
+        putprop(l, name, C_OLDDEF, name->symvalue());
         if(!is_NIL(l.verbose))
           print(l, cons(l, name, cons(l, C_REDEFINED, C_NIL)), C_NIL);
       }
@@ -80,7 +80,7 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
   l.check(name, lisp_type::SYMBOL);
   l.check(lam, lisp_type::LAMBDA, lisp_type::NLAMBDA);
   checkfn(name, lam);
-  name->setopval(lam);
+  name->symvalue(lam);
   return name;
 }
 
@@ -93,7 +93,7 @@ LISPT user::def(LISPT name, LISPT pars, LISPT body, lisp_type type)
   if(type_of(foo) == lisp_type::ERROR)
     return C_NIL;
   checkfn(name, foo);
-  name->setopval(foo);
+  name->symvalue(foo);
   return cons(l, name, C_NIL);
 }
 

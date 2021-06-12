@@ -63,8 +63,8 @@ public:
   static void initcvar(LISPT* cvar, const std::string& name, LISPT val)
   {
     LISPT t = intern(name);
-    set(t->symval().value, lisp_type::CVARIABLE, new lisp_t);
-    t->symval().value->cvarval(cvar);
+    set(t->symbol().value, lisp_type::CVARIABLE, new lisp_t);
+    t->symvalue()->cvarval(cvar);
     *cvar = val;
   }
 

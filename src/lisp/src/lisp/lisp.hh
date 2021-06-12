@@ -187,37 +187,11 @@ struct lisp_t
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  bool gcmark = false;
-  enum lisp_type type = lisp_type::NIL;
-  lisp* interpreter = nullptr;
-
-  // One entry for each type.  Types that has no, or just one value are
-  // indicated by a comment.
-  std::variant<
-    std::monostate,             // NIL (0)
-    symbol_t,                   // SYMBOL (1)
-    int,                        // INTEGER (2)
-    double,                     // FLOAT (3)
-    indirect_t,                 // INDIRECT (4)
-    cons_t,                     // CONS (5)
-    std::string,                // STRING (6)
-    subr_t*,                    // SUBR (7)
-    lambda_t,                   // LAMBDA (8)
-    closure_t,                  // CLOSURE (9)
-    destblock_t*,               // ENVIRON (10)
-    std::unique_ptr<file_t>,    // FILE (11)
-    free_t,                     // FREE (12)
-    cvariable_t,                // CVARIABLE (13)
-    void*                       // CPOINTER (14)
-    > u;
-  symbol_t& symval() { return std::get<symbol_t>(u); }
-  void symval(symbol_t x) { type = lisp_type::SYMBOL; u = x; }
-  LISPT symvalue() { return std::get<symbol_t>(u).value; }
+  symbol_t& symbol() { return std::get<symbol_t>(u); }
+  void symbol(symbol_t x) { type = lisp_type::SYMBOL; u = x; }
+  LISPT symvalue() const { return std::get<symbol_t>(u).value; }
   void symvalue(LISPT x) { std::get<symbol_t>(u).value = x; }
-  void setq(LISPT y) { std::get<symbol_t>(u).value = y; }
-  void setopval(LISPT y) { setq(y); }
-  LISPT getopval() { return symvalue(); }
-  int intval() { return std::get<int>(u); }
+  int intval() const { return std::get<int>(u); }
   void intval(int x)
   {
     type = lisp_type::INTEGER;
@@ -263,10 +237,36 @@ struct lisp_t
   //
   // Some more or less helpfull functions
   //
+  lisp_type gettype() const { return type; }
   void settype(lisp_type t) { type = t; }
-  bool marked() { return gcmark; }
+  bool marked() const { return gcmark; }
   void mark() { gcmark = true; }
   void unmark() { gcmark = false; }
+
+private:
+  bool gcmark = false;
+  lisp_type type = lisp_type::NIL;
+  // lisp* interpreter = nullptr;
+
+  // One entry for each type.  Types that has no, or just one value are
+  // indicated by a comment.
+  std::variant<
+    std::monostate,             // NIL (0)
+    symbol_t,                   // SYMBOL (1)
+    int,                        // INTEGER (2)
+    double,                     // FLOAT (3)
+    indirect_t,                 // INDIRECT (4)
+    cons_t,                     // CONS (5)
+    std::string,                // STRING (6)
+    subr_t*,                    // SUBR (7)
+    lambda_t,                   // LAMBDA (8)
+    closure_t,                  // CLOSURE (9)
+    destblock_t*,               // ENVIRON (10)
+    std::unique_ptr<file_t>,    // FILE (11)
+    free_t,                     // FREE (12)
+    cvariable_t,                // CVARIABLE (13)
+    void*                       // CPOINTER (14)
+    > u;
 };
 
 enum class char_class
@@ -288,13 +288,13 @@ struct rtinfo
 };
 
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
-inline lisp_type type_of(LISPT a) { return a == nullptr ? lisp_type::NIL : a->type; }
-inline lisp_type type_of(lisp_t& a) { return a.type; }
+inline lisp_type type_of(LISPT a) { return a == nullptr ? lisp_type::NIL : a->gettype(); }
+inline lisp_type type_of(lisp_t& a) { return a.gettype(); }
 
 inline void set(LISPT& a, lisp_type t, LISPT p)
 {
   a = p;
-  a->type = t;
+  a->settype(t);
   a->unmark();
 }
 

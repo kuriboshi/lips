@@ -14,27 +14,27 @@ prop::prop(lisp& lisp): base(lisp) {}
 PRIMITIVE prop::setplist(LISPT x, LISPT pl)
 {
   l.check(x, lisp_type::SYMBOL);
-  x->symval().plist = pl;
+  x->symbol().plist = pl;
   return pl;
 }
 
 PRIMITIVE prop::getplist(LISPT x)
 {
   l.check(x, lisp_type::SYMBOL);
-  return x->symval().plist;
+  return x->symbol().plist;
 }
 
 PRIMITIVE prop::putprop(LISPT x, LISPT p, LISPT v)
 {
   l.check(x, lisp_type::SYMBOL);
   l.check(p, lisp_type::SYMBOL);
-  for(auto pl = x->symval().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
     if(EQ(pl->car(), p))
     {
       rplaca(l, pl->cdr(), v);
       return v;
     }
-  x->symval().plist = cons(l, p, cons(l, v, x->symval().plist));
+  x->symbol().plist = cons(l, p, cons(l, v, x->symbol().plist));
   return v;
 }
 
@@ -42,7 +42,7 @@ PRIMITIVE prop::getprop(LISPT x, LISPT p)
 {
   l.check(x, lisp_type::SYMBOL);
   l.check(p, lisp_type::SYMBOL);
-  for(auto pl = x->symval().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
       return pl->cdr()->car();
@@ -57,13 +57,13 @@ PRIMITIVE prop::remprop(LISPT x, LISPT p)
   l.check(x, lisp_type::SYMBOL);
   l.check(p, lisp_type::SYMBOL);
   LISPT r = C_NIL;
-  for(pl = x->symval().plist, pl2 = C_NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
+  for(pl = x->symbol().plist, pl2 = C_NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
     {
       r = pl->cdr()->car();
       if(is_NIL(pl2))
-        x->symval().plist = pl->cdr()->cdr();
+        x->symbol().plist = pl->cdr()->cdr();
       else
         rplacd(l, pl2, pl->cdr()->cdr());
     }

@@ -45,7 +45,7 @@ LISPT prim::closobj(LISPT vars)
     return C_NIL;
   l.check(vars, lisp_type::CONS);
   l.check(vars->car(), lisp_type::SYMBOL);
-  return cons(l, mkindirect(l, vars->car()->symval().value), closobj(vars->cdr()));
+  return cons(l, mkindirect(l, vars->car()->symvalue()), closobj(vars->cdr()));
 }
 
 PRIMITIVE prim::car(LISPT a)
@@ -389,7 +389,7 @@ void prim::init()
 {
   C_APPEND = intern(PN_APPEND);
   C_ERROR = intern(PN_ERROR);
-  C_ERROR->type = lisp_type::ERROR;
+  C_ERROR->settype(lisp_type::ERROR);
   C_LAMBDA = intern(PN_LAMBDA);
   C_NLAMBDA = intern(PN_NLAMBDA);
   C_QUOTE = intern(PN_QUOTE);

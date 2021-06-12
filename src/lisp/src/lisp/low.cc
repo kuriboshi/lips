@@ -18,12 +18,12 @@ PRIMITIVE low::set(var, val)
 PRIMITIVE low::set(LISPT var, LISPT val)
 {
   l.check(var, lisp_type::SYMBOL);
-  if(var->symval().constant)
+  if(var->symbol().constant)
     return l.error(ATTEMPT_TO_CLOBBER, var);
-  if(type_of(var->symval().value) == lisp_type::INDIRECT)
-    var->symval().value->indirectval() = val;
-  else if(type_of(var->symval().value) == lisp_type::CVARIABLE)
-    *var->symval().value->cvarval() = val;
+  if(type_of(var->symvalue()) == lisp_type::INDIRECT)
+    var->symvalue()->indirectval() = val;
+  else if(type_of(var->symvalue()) == lisp_type::CVARIABLE)
+    *var->symvalue()->cvarval() = val;
   else
     var->symvalue(val);
   return val;

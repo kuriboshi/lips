@@ -102,7 +102,7 @@ PRIMITIVE pred::boundp(LISPT a)
 {
   if(type_of(a) != lisp_type::SYMBOL)
     return C_NIL;
-  else if(type_of(a->symval().value) != lisp_type::UNBOUND)
+  else if(type_of(a->symvalue()) != lisp_type::UNBOUND)
     return C_T;
   else
     return C_NIL;

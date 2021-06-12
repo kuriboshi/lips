@@ -1003,7 +1003,7 @@ PRIMITIVE evaluator::baktrace()
 PRIMITIVE evaluator::topofstack()
 {
   auto x = a.getobject();
-  x->type = lisp_type::ENVIRON;
+  x->settype(lisp_type::ENVIRON);
   x->envval(l.e().environment());
   return x;
 }
@@ -1105,7 +1105,7 @@ TEST_CASE("Primary function tests")
       auto a = eval(l, "(setq f (nlambda (a) a))");
       auto b = eval(l, "(f x)");
       CHECK(type_of(b) == lisp_type::SYMBOL);
-      CHECK(strcmp(b->symval().pname.c_str(), "x") == 0);
+      CHECK(strcmp(b->symbol().pname.c_str(), "x") == 0);
     }
   }
 }

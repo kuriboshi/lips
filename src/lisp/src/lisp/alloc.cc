@@ -165,8 +165,8 @@ LISPT alloc::doreclaim(int incr)
     for(auto* l = obarray[i]; l; l = l->onext)
     {
       l->sym->mark();
-      mark((l->sym->symval().value));
-      mark((l->sym->symval().plist));
+      mark((l->sym->symvalue()));
+      mark((l->sym->symbol().plist));
     }
   for(int i = destblockused - 1; i >= 0; i--)
   {
@@ -277,7 +277,7 @@ LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
   LISPT s = new lisp_t;
   s->subrval(subr);
   LISPT f = intern(pname);
-  set(f->symval().value, lisp_type::SUBR, s);
+  set(f->symbol().value, lisp_type::SUBR, s);
   return s;
 }
 
@@ -357,7 +357,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, lisp_type type)
   s->lamval().arglist = mkarglis(args, count);
   s->lamval().argcnt = count;
   LISPT t = s;
-  t->type = type;
+  t->settype(type);
   def = unsave();
   args = unsave();
   return t;
@@ -385,10 +385,10 @@ LISPT alloc::buildatom(const std::string& s, LISPT newatom)
   if(unbound == nullptr)
     set(unbound, lisp_type::UNBOUND, new lisp_t);
 
-  newatom->symval(symbol_t());
-  newatom->symval().pname = s;
-  newatom->symval().plist = C_NIL;
-  newatom->symval().value = unbound;
+  newatom->symbol(symbol_t());
+  newatom->symbol().pname = s;
+  newatom->symbol().plist = C_NIL;
+  newatom->symvalue(unbound);
   LISPT l = nullptr;
   set(l, lisp_type::SYMBOL, newatom);
   return l;
@@ -398,7 +398,7 @@ alloc::bucket_t* alloc::findatom(int hv, const std::string& str, const obarray_t
 {
   for(auto* ob = obarray[hv]; ob; ob = ob->onext)
   {
-    if(ob->sym->symval().pname == str)
+    if(ob->sym->symbol().pname == str)
       return ob;
   }
   return nullptr;
