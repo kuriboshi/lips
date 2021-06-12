@@ -281,24 +281,24 @@ LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
   return s;
 }
 
-void alloc::mkprim(const std::string& pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func0_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func1_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func2_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func3_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
 {
-  mkprim(pname, new subr_t(subr, spread))->subrval().f = fname;
+  mkprim(pname, new subr_t(subr, spread, fun));
 }
 
 /*

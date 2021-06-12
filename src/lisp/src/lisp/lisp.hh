@@ -136,12 +136,15 @@ struct subr_t
     S_NOSPREAD
   };
 
-  subr_t(subr_type subr, spread_type spread) : subr(subr), spread(spread) {}
+  subr_t(subr_type subr, spread_type spread, func0_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(subr_type subr, spread_type spread, func1_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(subr_type subr, spread_type spread, func2_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(subr_type subr, spread_type spread, func3_t fun) : subr(subr), spread(spread), f(fun) {}
   constexpr std::size_t argcount() const noexcept { return f.index() - 1; }
 
-  std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
   subr_type subr;
   spread_type spread;
+  std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
 };
 
 struct lambda_t
@@ -197,17 +200,17 @@ struct lisp_t
     type = lisp_type::INTEGER;
     u = x;
   }
-  double floatval() { return std::get<double>(u); }
+  double floatval() const { return std::get<double>(u); }
   void floatval(double f)
   {
     type = lisp_type::FLOAT;
     u = f;
   }
   indirect_t& indirectval() { return std::get<4>(u); }
-  cons_t& consval() { return std::get<cons_t>(u); }
+  const cons_t& consval() const { return std::get<cons_t>(u); }
   void consval(cons_t x) { type = lisp_type::CONS; u = x; }
-  LISPT car() { return std::get<cons_t>(u).car; }
-  LISPT cdr() { return std::get<cons_t>(u).cdr; }
+  LISPT car() const { return std::get<cons_t>(u).car; }
+  LISPT cdr() const { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
   void cdr(LISPT x) { std::get<cons_t>(u).cdr = x; }
   const std::string& stringval() const { return std::get<std::string>(u); }
@@ -216,7 +219,7 @@ struct lisp_t
     type = lisp_type::STRING;
     u = s;
   }
-  subr_t& subrval() { return *std::get<subr_t*>(u); }
+  const subr_t& subrval() const { return *std::get<subr_t*>(u); }
   void subrval(subr_t* x) { type = lisp_type::SUBR; u = x; }
   lambda_t& lamval() { return std::get<lambda_t>(u); }
   void lamval(lambda_t x) { type = lisp_type::LAMBDA; u = x; }
@@ -235,7 +238,7 @@ struct lisp_t
   const std::string& getstr() const { return type == lisp_type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
   //
-  // Some more or less helpfull functions
+  // Some more or less helpful functions
   //
   lisp_type gettype() const { return type; }
   void settype(lisp_type t) { type = t; }
@@ -246,7 +249,6 @@ struct lisp_t
 private:
   bool gcmark = false;
   lisp_type type = lisp_type::NIL;
-  // lisp* interpreter = nullptr;
 
   // One entry for each type.  Types that has no, or just one value are
   // indicated by a comment.
