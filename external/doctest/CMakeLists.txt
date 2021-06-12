@@ -1,5 +1,5 @@
-file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt"
-  CONTENT [[
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
+  [[
 cmake_minimum_required(VERSION 3.18.0)
 
 project(doctest.download NONE)
@@ -24,6 +24,8 @@ ExternalProject_Add(doctest.external
   USES_TERMINAL_BUILD TRUE
   )
 ]])
+configure_file("${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt")
 
 execute_process(
   COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .

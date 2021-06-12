@@ -20,6 +20,9 @@ target_sources(lips PRIVATE
 )
 target_link_libraries(lips PRIVATE lisp)
 target_link_libraries(lips PRIVATE doctest::doctest)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  target_link_libraries(lips PRIVATE stdc++fs)
+endif()
 target_compile_options(lips PRIVATE -Wall -Werror)
 
 find_package(Curses)
