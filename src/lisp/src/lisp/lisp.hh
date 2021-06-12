@@ -252,7 +252,7 @@ struct lisp_t
   void envval(destblock_t* env) { type = lisp_type::ENVIRON; u = env; }
   file_t& fileval() { return *std::get<std::unique_ptr<file_t>>(u).get(); }
   void fileval(std::unique_ptr<file_t> f) { type = lisp_type::FILET; u = std::move(f); }
-  free_t& freeval() { return std::get<12>(u); }
+  LISPT freeval() { return std::get<12>(u); }
   void freeval(LISPT x) { type = lisp_type::FREE; u.emplace<12>(x); }
   cvariable_t cvarval() const { return std::get<cvariable_t>(u); }
   void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
@@ -289,6 +289,7 @@ struct rtinfo
 
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
 inline lisp_type type_of(LISPT a) { return a == nullptr ? lisp_type::NIL : a->type; }
+inline lisp_type type_of(lisp_t& a) { return a.type; }
 
 inline void set(LISPT& a, lisp_type t, LISPT p)
 {

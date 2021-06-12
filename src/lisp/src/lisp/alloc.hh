@@ -7,6 +7,7 @@
 
 #include <array>
 #include <vector>
+#include <list>
 #include "lisp.hh"
 #include "base.hh"
 
@@ -19,10 +20,9 @@ inline constexpr auto PN_OBARRAY = "obarray";     // Return list of all atoms
 
 class evaluator;
 
-class alloc: public base
+class alloc
 {
 public:
-  alloc();
   alloc(lisp&);
   ~alloc();
 
@@ -33,8 +33,7 @@ public:
 
   struct conscells_t
   {
-    lisp_t cells[CONSCELLS];
-    conscells_t* next;
+    std::array<lisp_t, CONSCELLS> cells;
   };
 
   //
@@ -102,7 +101,8 @@ public:
   void gcprotect(LISPT& o) { markobjs.push_back(&o); }
 
 private:
-  evaluator& e() { return base::e; }
+  lisp& _lisp;
+  evaluator& e() { return _lisp.e(); }
   conscells_t* newpage();
   int sweep();
   void mark(LISPT);
@@ -115,7 +115,7 @@ private:
   static LISPT puthash(int hv, const std::string&, obarray_t&, LISPT newatom);
   static LISPT mkprim(const std::string& pname, subr_t* subr);
 
-  conscells_t* conscells = nullptr;     // Cons cell storage.
+  std::list<conscells_t*> conscells;     // Cons cell storage.
   destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
   int destblockused = 0;                // Index to last slot in destblock.
   std::vector<LISPT*> markobjs;

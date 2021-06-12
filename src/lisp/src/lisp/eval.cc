@@ -14,6 +14,11 @@ using namespace std::literals;
 
 namespace lisp
 {
+evaluator::evaluator(lisp& lisp): l(lisp), a(lisp.a())
+{
+  init();
+}
+
 void evaluator::reset()
 {
   a.dzero();
@@ -1029,12 +1034,11 @@ inline constexpr auto PN_BAKTRACE = "baktrace"; // control stack backtrace
 inline constexpr auto PN_TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto PN_ENVGET = "envget";         // examine environment
 
-evaluator::evaluator(): base() {}
-evaluator::evaluator(lisp& lisp): base(lisp)
+void evaluator::init()
 {
-  gcprotect(lisp, fun);
-  gcprotect(lisp, expression);
-  gcprotect(lisp, args);
+  gcprotect(l, fun);
+  gcprotect(l, expression);
+  gcprotect(l, args);
   // clang-format off
   mkprim(PN_E,          ::lisp::eval,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
   mkprim(PN_EVAL,       ::lisp::eval,       subr_t::S_EVAL,   subr_t::S_NOSPREAD);

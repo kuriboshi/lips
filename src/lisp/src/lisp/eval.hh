@@ -12,10 +12,9 @@
 
 namespace lisp
 {
-class evaluator: public base
+class evaluator
 {
 public:
-  evaluator();
   evaluator(lisp&);
   ~evaluator() = default;
 
@@ -129,6 +128,8 @@ private:
   void abort(int m, LISPT v);
   void overflow();
 
+  lisp& l;
+  alloc& a;
   undefhook_t _undefhook;        // Called in case of undefined function.
   breakhook_t _breakhook;        // Called before going into break.
   LISPT fun = nullptr;           // Store current function being evaluated.

@@ -16,27 +16,24 @@
 
 namespace lisp
 {
-alloc::alloc(): alloc(lisp::current()) {}
-
-alloc::alloc(lisp& lisp): base(lisp)
+alloc::alloc(lisp& lisp): _lisp(lisp)
 {
   for(int i = 0; i != MAXHASH; ++i)
     obarray[i] = nullptr;
 
-  gcprotect(l.topprompt);
-  gcprotect(l.brkprompt);
-  gcprotect(l.currentbase);
-  gcprotect(l.version);
-  gcprotect(l.verbose);
+  gcprotect(lisp.topprompt);
+  gcprotect(lisp.brkprompt);
+  gcprotect(lisp.currentbase);
+  gcprotect(lisp.version);
+  gcprotect(lisp.verbose);
   gcprotect(gcgag);
   gcprotect(C_EOF);
 
   destblockused = 0;
-  conscells = nullptr;
-  conscells = newpage(); /* Allocate one page of storage */
-  if(conscells == nullptr)
+  newpage(); // Allocate one page of storage
+  if(conscells.empty())
   {
-    l.primerr().format("Cons cells memory exhausted\n");
+    lisp.primerr().format("Cons cells memory exhausted\n");
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
   sweep();
@@ -62,8 +59,8 @@ alloc::conscells_t* alloc::newpage()
 {
   auto* newp = new conscells_t;
   if(newp == nullptr)
-    return conscells;
-  newp->next = conscells;
+    return conscells.front();
+  conscells.push_front(newp);
   return newp;
 }
 
@@ -74,48 +71,22 @@ alloc::conscells_t* alloc::newpage()
  */
 int alloc::sweep()
 {
-  conscells_t* cc;
-
   int nrfreed = 0;
-  int i = 0;
-  for(cc = conscells; cc && cc->cells[i].gcmark; cc = cc->next, i = 0)
+  for(auto cc: conscells)
   {
-    for(; i < CONSCELLS && cc->cells[i].gcmark; i++)
+    for(auto& i: cc->cells)
     {
-      cc->cells[i].gcmark = 0;
-    }
-    if(i < CONSCELLS)
-      break;
-  }
-  set(freelist, lisp_type::FREE, &cc->cells[i]);
-  nrfreed++;
-  LISPT f = freelist;
-  if(type_of(f) == lisp_type::CPOINTER)
-    free(f->cpointval());
-  i++; /* Check *next* cell */
-  for(; cc; cc = cc->next, i = 0)
-  {
-    for(; i < CONSCELLS; i++)
-    {
-      if(!cc->cells[i].gcmark)
+      if(!i.marked())
       {
-        nrfreed++;
-        /*
-	   * C pointers must be freed.
-	   */
-        if(type_of(f) == lisp_type::CPOINTER)
-          free(f->cpointval());
-        f->freeval(&cc->cells[i]);
-        f->unmark();
-        f = f->freeval();
-      }
-      else
-      {
-        cc->cells[i].gcmark = 0;
+        ++nrfreed;
+        if(type_of(i) == lisp_type::CPOINTER)
+          free(i.cpointval());
+        i.unmark();
+        i.freeval(freelist);
+        freelist = &i;
       }
     }
   }
-  f->freeval(C_NIL);
   return nrfreed;
 }
 
@@ -171,7 +142,7 @@ void alloc::mark(LISPT x)
 LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
-    l.primerr().format("garbage collecting\n");
+    _lisp.primerr().format("garbage collecting\n");
   if(C_T != nullptr)
     C_T->mark();
   if(e().dest != nullptr)
@@ -221,11 +192,11 @@ LISPT alloc::doreclaim(int incr)
   if(nrfreed < MINCONSES || incr > 0)
   {
     do
-      conscells = newpage();
+      newpage();
     while(incr-- > 0); /* At least one page more */
   }
   if(is_NIL(gcgag))
-    l.primerr().format("{} cells freed\n", nrfreed);
+    _lisp.primerr().format("{} cells freed\n", nrfreed);
   return C_NIL;
 }
 
@@ -241,7 +212,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     i = 0;
   else
   {
-    l.check(incr, lisp_type::INTEGER);
+    _lisp.check(incr, lisp_type::INTEGER);
     i = incr->intval();
   }
   doreclaim(i);
