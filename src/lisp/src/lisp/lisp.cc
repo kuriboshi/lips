@@ -3,6 +3,7 @@
 // Copyright 2020 Krister Joas
 //
 
+#include <doctest/doctest.h>
 #include <cstring>              // For strerror
 #include <cerrno>               // For errno
 #include <iostream>
@@ -246,3 +247,53 @@ LISPT C_UNBOUND;
 LISPT C_WRITE;
 
 } // namespace lisp
+
+TEST_CASE("lisp.cc: current")
+{
+  lisp::lisp lisp0;
+  lisp::lisp lisp1;
+
+  SUBCASE("test 1")
+  {
+    auto v0 = lisp::mkatom(lisp0, "v0");
+    lisp::setqq(lisp0, v0, lisp::mkatom(lisp0, "world"));
+    // Same atom in the same interpreter should be TRUE.
+    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::C_NIL);
+    // Same printname atom from different interpreters should be FALSE.
+    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::C_NIL);
+  }
+
+  SUBCASE("test 2")
+  {
+    auto v1 = lisp::mkatom(lisp1, "v1");
+    lisp::setqq(lisp1, v1, lisp::mkatom(lisp1, "world"));
+    // Same atom in the same interpreter should be TRUE.
+    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::C_NIL);
+    // Same printname atom from different interpreters should be FALSE.
+    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::C_NIL);
+  }
+
+  SUBCASE("current 1")
+  {
+    // Set default lisp interpreter to lisp0
+    lisp::current c(lisp0);
+    auto v2 = lisp::mkatom("v2");
+    lisp::setqq(v2, lisp::mkatom("world"));
+    // Same atom in the same interpreter should be TRUE.
+    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::C_NIL);
+    // Same printname atom from different interpreters should be FALSE.
+    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::C_NIL);
+  }
+
+  SUBCASE("current 2")
+  {
+    // Set default lisp interpreter to lisp1
+    lisp::current c(lisp1);
+    auto v3 = lisp::mkatom("v3");
+    lisp::setqq(v3, lisp::mkatom("world"));
+    // Same atom in the same interpreter should be TRUE.
+    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::C_NIL);
+    // Same printname atom from different interpreters should be FALSE.
+    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::C_NIL);
+  }
+}

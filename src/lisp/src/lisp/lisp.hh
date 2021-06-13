@@ -311,6 +311,7 @@ public:
   alloc& a() const { return _alloc; }
   evaluator& e() const { return _eval; };
   static lisp& current() { return *_current; }
+  static void current(lisp& lisp) { _current = &lisp; }
 
   file_t& primout() const { return *_primout; }
   file_t& primerr() const { return *_primerr; }
@@ -493,6 +494,23 @@ private:
     "Not a hash table"
   };
   // clang-format on
+};
+
+class current
+{
+public:
+  current(lisp& c)
+  {
+    previous = &lisp::current();
+    lisp::current(c);
+  }
+  ~current()
+  {
+    lisp::current(*previous);
+  }
+  current(const current&) = delete;
+private:
+  lisp* previous = nullptr;
 };
 
 inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }
