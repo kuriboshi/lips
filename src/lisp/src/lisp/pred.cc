@@ -45,7 +45,7 @@ PRIMITIVE pred::memb(LISPT x, LISPT l)
 
 PRIMITIVE pred::equal(LISPT l1, LISPT l2)
 {
-  LISPT x;
+  LISPT x = C_NIL;
 
   if(type_of(l1) != type_of(l2))
     return C_NIL;
