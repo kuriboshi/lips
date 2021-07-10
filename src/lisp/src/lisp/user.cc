@@ -41,7 +41,7 @@ PRIMITIVE user::getrep(LISPT fun)
 LISPT user::funeq(LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
-    return C_T;
+    return T;
   if(f1->lamval().argcnt == f2->lamval().argcnt)
   {
     LISPT t1 = f1->lamval().arglist;
@@ -53,7 +53,7 @@ LISPT user::funeq(LISPT f1, LISPT f2)
       t2 = f2->lamval().lambdarep;
       tmp = equal(l, t1, t2);
       if(!is_NIL(tmp))
-        return C_T;
+        return T;
     }
   }
   return NIL;

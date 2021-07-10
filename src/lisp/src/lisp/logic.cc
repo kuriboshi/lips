@@ -13,7 +13,7 @@ logic::logic(lisp& lisp): base(lisp) {}
 
 PRIMITIVE logic::p_and(LISPT x)
 {
-  LISPT foo = C_T;
+  LISPT foo = T;
   while(!is_NIL(x))
   {
     foo = eval(l, x->car());
@@ -40,7 +40,7 @@ PRIMITIVE logic::p_or(LISPT x)
 PRIMITIVE logic::p_not(LISPT x)
 {
   if(is_NIL(x))
-    return C_T;
+    return T;
   return NIL;
 }
 

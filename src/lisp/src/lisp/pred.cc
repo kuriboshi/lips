@@ -50,14 +50,14 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
   if(type_of(l1) != type_of(l2))
     return NIL;
   if(EQ(l1, l2))
-    return C_T;
+    return T;
   switch(type_of(l1))
   {
     case type::CONS:
       while(!EQ(l1, NIL) && !EQ(l2, NIL))
       {
         x = equal(l1->car(), l2->car());
-        if(EQ(x, C_T))
+        if(EQ(x, T))
         {
           l1 = l1->cdr();
           l2 = l2->cdr();
@@ -67,14 +67,14 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
       }
       return x;
     case type::STRING:
-      return (l1->stringval() == l2->stringval()) ? C_T : NIL;
+      return (l1->stringval() == l2->stringval()) ? T : NIL;
       break;
     case type::LAMBDA:
     case type::NLAMBDA:
       return funeq(l, l1, l2);
       break;
     case type::INTEGER:
-      return (l1->intval() == l2->intval() ? C_T : NIL);
+      return (l1->intval() == l2->intval() ? T : NIL);
       break;
     default:
       break;
@@ -93,7 +93,7 @@ PRIMITIVE pred::nlistp(LISPT a)
 PRIMITIVE pred::neq(LISPT a, LISPT b)
 {
   if(!EQ(a, b))
-    return C_T;
+    return T;
   else
     return NIL;
 }
@@ -103,7 +103,7 @@ PRIMITIVE pred::boundp(LISPT a)
   if(type_of(a) != type::SYMBOL)
     return NIL;
   else if(type_of(a->symvalue()) != type::UNBOUND)
-    return C_T;
+    return T;
   else
     return NIL;
 }
@@ -111,7 +111,7 @@ PRIMITIVE pred::boundp(LISPT a)
 PRIMITIVE pred::litatom(LISPT a)
 {
   if(type_of(a) == type::SYMBOL)
-    return C_T;
+    return T;
   else
     return NIL;
 }
@@ -151,7 +151,7 @@ PRIMITIVE pred::xtypeof(LISPT a)
     case type::ENVIRON:
       return C_ENVIRON;
     case type::T:
-      return C_T;
+      return T;
     case type::FREE:
       return C_FREE;
     case type::ENDOFFILE:

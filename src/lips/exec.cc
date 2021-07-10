@@ -503,7 +503,7 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
  */
 int exec::execcommand(LISPT exp, LISPT* res)
 {
-  *res = C_T;
+  *res = T;
   auto command = glob::extilde(exp->car()->getstr(), true);
   if(!command || command->empty())
     return -1;
@@ -710,7 +710,7 @@ PRIMITIVE exec::back(LISPT x)
 PRIMITIVE exec::stop()
 {
   kill(0, SIGSTOP);
-  return C_T;
+  return T;
 }
 
 PRIMITIVE exec::rehash()
@@ -801,7 +801,7 @@ PRIMITIVE exec::bg(LISPT job)
       if(killpg(pgrp, SIGCONT) < 0)
         return syserr(l, mknumber(l, pgrp));
     j->background = 1;
-    return C_T;
+    return T;
   }
   return l.error(NO_SUCH_JOB, job);
 #endif
@@ -852,7 +852,7 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   {
     auto wd = std::filesystem::current_path();
     setenv("PWD", wd.c_str(), 1);
-    return C_T;
+    return T;
   }
   return ndir; // TODO: Is this correct?
 }

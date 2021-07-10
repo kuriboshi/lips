@@ -144,8 +144,8 @@ LISPT alloc::doreclaim(int incr)
 {
   if(is_NIL(gcgag))
     _lisp.primerr().format("garbage collecting\n");
-  if(C_T != nullptr)
-    C_T->mark();
+  if(T != nullptr)
+    T->mark();
   if(e().dest != nullptr)
     for(int i = e().dest[0].val.d_integer; i > 0; i--)
     {

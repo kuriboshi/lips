@@ -377,7 +377,7 @@ static std::unique_ptr<::lisp::lisp> init()
   gcprotect(path);
   gcprotect(home);
 
-  initcvar(&globsort, "globsort", C_T);
+  initcvar(&globsort, "globsort", T);
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
   breakhook(onbreak);
@@ -418,7 +418,7 @@ LISPT greet(LISPT who)
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
   loadfile(loadf);
-  return C_T;
+  return T;
 }
 
 int main(int argc, char* const* argv)

@@ -50,7 +50,7 @@ PRIMITIVE posix::uxclose(LISPT fildes)
 {
   l.check(fildes, type::FILET);
   if(fildes->fileval().close())
-    return C_T;
+    return T;
   return NIL;
 }
 
@@ -171,7 +171,7 @@ PRIMITIVE posix::uxsignal(LISPT sig, LISPT fun)
     sighandler[sig->intval()] = fun;
     signal(sig->intval(), sighandle);
   }
-  return C_T;
+  return T;
 }
 #endif
 

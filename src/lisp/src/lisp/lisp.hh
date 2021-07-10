@@ -30,7 +30,7 @@ using LISPT = struct lisp_t*;
 //
 // All lisp constants used internally.
 //
-extern LISPT C_T;
+extern LISPT T;
 extern LISPT C_APPEND;
 extern LISPT C_AUTOLOAD;
 extern LISPT C_BIGNUM;

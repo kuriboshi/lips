@@ -22,7 +22,7 @@ PRIMITIVE string::symstr(LISPT sym)
 PRIMITIVE string::stringp(LISPT s)
 {
   if(type_of(s) == type::STRING)
-    return C_T;
+    return T;
   return NIL;
 }
 
@@ -32,7 +32,7 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
   l.check(s1, type::STRING);
   l.check(s2, type::STRING);
   if(s1->stringval() == s2->stringval())
-    return C_T;
+    return T;
   return NIL;
 }
 

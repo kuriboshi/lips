@@ -296,11 +296,11 @@ inline num_type numtype(LISPT x, LISPT y)
   return num_type::ILLEGAL1;
 }
 
-template<typename T, typename C>
-inline LISPT docheck(T x, T y, C cmp)
+template<typename Type, typename Comparor>
+inline LISPT docheck(Type x, Type y, Comparor cmp)
 {
   if(cmp(x, y))
-    return C_T;
+    return T;
   return NIL;
 }
 
@@ -346,7 +346,7 @@ PRIMITIVE arith::neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, 
 PRIMITIVE arith::zerop(LISPT x)
 {
   if(type_of(x) == type::INTEGER && x->intval() == 0)
-    return C_T;
+    return T;
   return NIL;
 }
 
@@ -355,14 +355,14 @@ PRIMITIVE arith::minusp(LISPT x)
   if(type_of(x) == type::FLOAT)
   {
     if(x->floatval() < 0.0)
-      return C_T;
+      return T;
     else
       return NIL;
   }
   else if(type_of(x) == type::INTEGER)
   {
     if(x->intval() < 0)
-      return C_T;
+      return T;
     else
       return NIL;
   }

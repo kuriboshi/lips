@@ -163,17 +163,17 @@ PRIMITIVE prim::rplacd(LISPT x, LISPT y)
 PRIMITIVE prim::eq(LISPT a, LISPT b)
 {
   if(EQ(a, b))
-    return C_T;
+    return T;
   if(type_of(a) == type::INTEGER && type_of(b) == type::INTEGER
     && a->intval() == b->intval())
-    return C_T;
+    return T;
   return NIL;
 }
 
 PRIMITIVE prim::atom(LISPT a)
 {
   if(is_NIL(a) || is_T(a) || type_of(a) == type::SYMBOL || type_of(a) == type::INTEGER || type_of(a) == type::FLOAT)
-    return C_T;
+    return T;
   return NIL;
 }
 
@@ -255,7 +255,7 @@ PRIMITIVE prim::append(LISPT x)
 PRIMITIVE prim::null(LISPT a)
 {
   if(EQ(a, NIL))
-    return C_T;
+    return T;
   return NIL;
 }
 

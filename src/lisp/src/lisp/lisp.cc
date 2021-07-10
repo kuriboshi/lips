@@ -46,14 +46,14 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
   auto intern = [this](const auto s) { return a().intern(s); };
 
-  set(C_T, type::T, a().getobject());
+  set(T, type::T, a().getobject());
 
   auto nil = intern("nil");
   nil->symvalue(NIL);
   nil->symbol().constant = true;
   
   auto t = intern("t");
-  t->symvalue(C_T);
+  t->symvalue(T);
   t->symbol().constant = true;
 
   C_AUTOLOAD = intern("autoload");
@@ -141,7 +141,7 @@ LISPT lisp::perror(int messnr, LISPT arg)
   else
     primerr().format("{} ", messages[error_code(messnr)]);
   if(messnr & (PRINT_ARG | NOT_A))
-    prin2(*this, arg, C_T);
+    prin2(*this, arg, T);
   return C_ERROR;
 }
 
@@ -155,7 +155,7 @@ LISPT lisp::syserr(LISPT fault)
 {
   if(!is_NIL(fault))
   {
-    prin2(*this, fault, C_T);
+    prin2(*this, fault, T);
     primerr().format(": ");
   }
   primerr().format("{}", strerror(errno));
@@ -218,7 +218,7 @@ lisp* lisp::_current = nullptr;
 //
 // All lisp constants needed internally.
 //
-LISPT C_T;
+LISPT T;
 LISPT C_AUTOLOAD;
 LISPT C_BIGNUM;
 LISPT C_BROKEN;
