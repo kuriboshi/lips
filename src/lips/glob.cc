@@ -281,44 +281,53 @@ std::vector<std::string> glob::walkfiles(
   const std::filesystem::path& root, const std::string& wild, bool all, bool report)
 {
   std::vector<std::string> result;
+
   auto last = wild.find('/');
   auto w = [&]() {
     if(last == std::string::npos)
       return wild;
     return wild.substr(0, last);
   }();
+
   auto rest = [&]() {
     if(last == std::string::npos)
       return ""s;
     auto first = wild.find_first_not_of('/', last);
     return wild.substr(first);
   }();
+
   if(last == 0)
     return walkfiles("/", rest, all, report);
-  for(auto& d: std::filesystem::directory_iterator(root))
-  {
-    if((all || d.path().filename().string()[0] != '.' || w[0] == '.')
-      && match(d.path().filename().string(), w))
+
+  auto walkentry = [&](const std::filesystem::path& path) -> void {
+    if((all || path.filename().string()[0] != '.' || w[0] == '.')
+      && match(path.filename().string(), w))
     {
-      if(!rest.empty() && std::filesystem::is_directory(d.path()))
+      if(!rest.empty() && std::filesystem::is_directory(path))
       {
         auto subdir = root;
         if(subdir == "."s)
-          subdir = d.path().filename();
+          subdir = path.filename();
         else
-          subdir /= d.path().filename();
+          subdir /= path.filename();
         for(auto& p: walkfiles(subdir, rest, all, report))
           result.push_back(p);
       }
       else
       {
         if(root == "."s)
-          result.push_back(d.path().filename());
+          result.push_back(path.filename());
         else
-          result.push_back(root / d.path().filename());
+          result.push_back(root / path.filename());
       }
     }
-  }
+  };
+
+  // Work around the fact that directory_iterator skips "." and "..".
+  walkentry(".");
+  walkentry("..");
+  for(auto& d: std::filesystem::directory_iterator(root))
+    walkentry(d.path());
   return result;
 }
 
