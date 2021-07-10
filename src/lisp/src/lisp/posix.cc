@@ -181,54 +181,57 @@ PRIMITIVE posix::uxunlink(LISPT name)
   return mknumber(l, unlink(name->stringval().c_str()));
 }
 
-inline constexpr auto PN_UXACCESS = "access";   // check file access
-inline constexpr auto PN_UXALARM = "alarm";     // set alarm clock
-inline constexpr auto PN_UXCHDIR = "chdir";     // change directory
-inline constexpr auto PN_UXCHMOD = "chmode";    // change mode of file
-inline constexpr auto PN_UXCLOSE = "close";     // close file
-inline constexpr auto PN_UXCREAT = "creat";     // create file
-inline constexpr auto PN_UXDUP = "dup";         // duplicate fileno
-inline constexpr auto PN_UXERRNO = "errno";     // return latest error
-inline constexpr auto PN_UXGETUID = "getuid";   // get user id
-inline constexpr auto PN_UXGETEUID = "geteuid"; // get effective user id
-inline constexpr auto PN_UXGETGID = "getgid";   // set group id
-inline constexpr auto PN_UXGETEGID = "getegid"; // get effective group id
-inline constexpr auto PN_UXGETPID = "getpid";   // get process id
-inline constexpr auto PN_UXKILL = "killproc";   // kill process
-inline constexpr auto PN_UXLINK = "link";       // link file
-inline constexpr auto PN_UXNICE = "setnice";    // set nice
-inline constexpr auto PN_UXOPEN = "open";       // open file
-inline constexpr auto PN_UXSETUID = "setuid";   // set user id
-inline constexpr auto PN_UXSETGID = "setgid";   // set group id
-inline constexpr auto PN_SIGNAL = "signal";     // install signal handler
-inline constexpr auto PN_UXUNLINK = "unlink";   // unlink file
+namespace pn
+{
+inline constexpr auto UXACCESS = "access";   // check file access
+inline constexpr auto UXALARM = "alarm";     // set alarm clock
+inline constexpr auto UXCHDIR = "chdir";     // change directory
+inline constexpr auto UXCHMOD = "chmode";    // change mode of file
+inline constexpr auto UXCLOSE = "close";     // close file
+inline constexpr auto UXCREAT = "creat";     // create file
+inline constexpr auto UXDUP = "dup";         // duplicate fileno
+inline constexpr auto UXERRNO = "errno";     // return latest error
+inline constexpr auto UXGETUID = "getuid";   // get user id
+inline constexpr auto UXGETEUID = "geteuid"; // get effective user id
+inline constexpr auto UXGETGID = "getgid";   // set group id
+inline constexpr auto UXGETEGID = "getegid"; // get effective group id
+inline constexpr auto UXGETPID = "getpid";   // get process id
+inline constexpr auto UXKILL = "killproc";   // kill process
+inline constexpr auto UXLINK = "link";       // link file
+inline constexpr auto UXNICE = "setnice";    // set nice
+inline constexpr auto UXOPEN = "open";       // open file
+inline constexpr auto UXSETUID = "setuid";   // set user id
+inline constexpr auto UXSETGID = "setgid";   // set group id
+inline constexpr auto SIGNAL = "signal";     // install signal handler
+inline constexpr auto UXUNLINK = "unlink";   // unlink file
+} // namespace pn
 
 void posix::init()
 {
   // clang-format off
-  mkprim(PN_UXACCESS,  ::lisp::uxaccess,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXALARM,   ::lisp::uxalarm,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXCHDIR,   ::lisp::uxchdir,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXCHMOD,   ::lisp::uxchmod,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXCLOSE,   ::lisp::uxclose,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXCREAT,   ::lisp::uxcreat,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXDUP,     ::lisp::uxdup,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXERRNO,   ::lisp::uxerrno,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXGETUID,  ::lisp::uxgetuid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXGETEUID, ::lisp::uxgeteuid, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXGETGID,  ::lisp::uxgetgid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXGETEGID, ::lisp::uxgetegid, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXGETPID,  ::lisp::uxgetpid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXKILL,    ::lisp::uxkill,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXLINK,    ::lisp::uxlink,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXNICE,    ::lisp::uxnice,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXOPEN,    ::lisp::uxopen,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXSETUID,  ::lisp::uxsetuid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_UXSETGID,  ::lisp::uxsetgid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXACCESS,  ::lisp::uxaccess,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXALARM,   ::lisp::uxalarm,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXCHDIR,   ::lisp::uxchdir,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXCHMOD,   ::lisp::uxchmod,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXCLOSE,   ::lisp::uxclose,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXCREAT,   ::lisp::uxcreat,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXDUP,     ::lisp::uxdup,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXERRNO,   ::lisp::uxerrno,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXGETUID,  ::lisp::uxgetuid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXGETEUID, ::lisp::uxgeteuid, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXGETGID,  ::lisp::uxgetgid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXGETEGID, ::lisp::uxgetegid, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXGETPID,  ::lisp::uxgetpid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXKILL,    ::lisp::uxkill,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXLINK,    ::lisp::uxlink,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXNICE,    ::lisp::uxnice,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXOPEN,    ::lisp::uxopen,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXSETUID,  ::lisp::uxsetuid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXSETGID,  ::lisp::uxsetgid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
 #if 0
-  mkprim(PN_SIGNAL,    ::lisp::uxsignal,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SIGNAL,    ::lisp::uxsignal,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
 #endif
-  mkprim(PN_UXUNLINK,  ::lisp::uxunlink,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::UXUNLINK,  ::lisp::uxunlink,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

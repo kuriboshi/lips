@@ -13,10 +13,13 @@
 
 namespace lisp
 {
-inline constexpr auto PN_RECLAIM = "reclaim";     // Initiate garbage collection
-inline constexpr auto PN_CONS = "cons";           // Make a new cons cell
-inline constexpr auto PN_FREECOUNT = "freecount"; // Number of free cells
-inline constexpr auto PN_OBARRAY = "obarray";     // Return list of all atoms
+namespace pn
+{
+inline constexpr auto RECLAIM = "reclaim";     // Initiate garbage collection
+inline constexpr auto CONS = "cons";           // Make a new cons cell
+inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
+inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
+} // namespace pn
 
 class evaluator;
 

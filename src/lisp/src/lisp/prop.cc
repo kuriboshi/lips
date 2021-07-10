@@ -72,20 +72,23 @@ PRIMITIVE prop::remprop(LISPT x, LISPT p)
   return r;
 }
 
-inline constexpr auto PN_SETPLIST = "setplist"; // set property list
-inline constexpr auto PN_GETPLIST = "getplist"; // get property list
-inline constexpr auto PN_PUTPROP = "putprop";   // put property on atom
-inline constexpr auto PN_GETPROP = "getprop";   // get property value
-inline constexpr auto PN_REMPROP = "remprop";   // remove prop
+namespace pn
+{
+inline constexpr auto SETPLIST = "setplist"; // set property list
+inline constexpr auto GETPLIST = "getplist"; // get property list
+inline constexpr auto PUTPROP = "putprop";   // put property on atom
+inline constexpr auto GETPROP = "getprop";   // get property value
+inline constexpr auto REMPROP = "remprop";   // remove prop
+} // namespace pn
 
 void prop::init()
 {
   // clang-format off
-  mkprim(PN_SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

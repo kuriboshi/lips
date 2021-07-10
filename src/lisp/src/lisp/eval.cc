@@ -1026,13 +1026,16 @@ PRIMITIVE evaluator::envget(LISPT e, LISPT n)
   return foo;
 }
 
-inline constexpr auto PN_E = "e";               // noeval version of eval
-inline constexpr auto PN_EVAL = "eval";         // evaluate exp
-inline constexpr auto PN_APPLY = "apply";       // apply function on args
-inline constexpr auto PN_APPLYSTAR = "apply*";  // apply nospread
-inline constexpr auto PN_BAKTRACE = "baktrace"; // control stack backtrace
-inline constexpr auto PN_TOPOFSTACK = "topofstack"; // return top of value stack
-inline constexpr auto PN_ENVGET = "envget";         // examine environment
+namespace pn
+{
+inline constexpr auto E = "e";                   // noeval version of eval
+inline constexpr auto EVAL = "eval";             // evaluate exp
+inline constexpr auto APPLY = "apply";           // apply function on args
+inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
+inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
+inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr auto ENVGET = "envget";         // examine environment
+} // namespace pn
 
 void evaluator::init()
 {
@@ -1040,13 +1043,13 @@ void evaluator::init()
   gcprotect(l, expression);
   gcprotect(l, args);
   // clang-format off
-  mkprim(PN_E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_APPLY,      ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_APPLYSTAR,  ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(PN_BAKTRACE,   ::lisp::baktrace,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::APPLY,      ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::APPLYSTAR,  ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::BAKTRACE,   ::lisp::baktrace,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

@@ -101,18 +101,21 @@ PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, 
 
 PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, lisp_type::NLAMBDA); }
 
-inline constexpr auto PN_DEFINE = "define"; // define function
-inline constexpr auto PN_GETREP = "getrep"; // get function representation
-inline constexpr auto PN_DE = "de";         // defile lambda function
-inline constexpr auto PN_DF = "df";         // define nlambda function
+namespace pn
+{
+inline constexpr auto DEFINE = "define"; // define function
+inline constexpr auto GETREP = "getrep"; // get function representation
+inline constexpr auto DE = "de";         // defile lambda function
+inline constexpr auto DF = "df";         // define nlambda function
+} // namespace pn
 
 void user::init()
 {
   // clang-format off
-  mkprim(PN_DEFINE, ::lisp::define, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_GETREP, ::lisp::getrep, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_DE,     ::lisp::de,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(PN_DF,     ::lisp::df,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::DEFINE, ::lisp::define, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::GETREP, ::lisp::getrep, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::DE,     ::lisp::de,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::DF,     ::lisp::df,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

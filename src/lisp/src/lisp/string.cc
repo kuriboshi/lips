@@ -82,24 +82,27 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   return mkstring(l, str->stringval().substr(s, e));
 }
 
-inline constexpr auto PN_STRINGP = "stringp"; // t if string
-inline constexpr auto PN_STREQ = "streq";     // string equal
-inline constexpr auto PN_CONCAT = "concat";   // concatenate strings
-inline constexpr auto PN_STRLEN = "strlen";   // length of string
-inline constexpr auto PN_SUBSTR = "substr";   // get sub string
-inline constexpr auto PN_SYMSTR = "symstr";   // make symbol a string
-inline constexpr auto PN_STRCMP = "strcmp";   // compare strings
+namespace pn
+{
+inline constexpr auto STRINGP = "stringp"; // t if string
+inline constexpr auto STREQ = "streq";     // string equal
+inline constexpr auto CONCAT = "concat";   // concatenate strings
+inline constexpr auto STRLEN = "strlen";   // length of string
+inline constexpr auto SUBSTR = "substr";   // get sub string
+inline constexpr auto SYMSTR = "symstr";   // make symbol a string
+inline constexpr auto STRCMP = "strcmp";   // compare strings
+} // namespace pn
 
 void string::init()
 {
   // clang-format off
-  mkprim(PN_STRINGP, ::lisp::stringp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_STREQ,   ::lisp::streq,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_CONCAT,  ::lisp::concat,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(PN_STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_STRCMP,  ::lisp::strcomp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRINGP, ::lisp::stringp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STREQ,   ::lisp::streq,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CONCAT,  ::lisp::concat,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRCMP,  ::lisp::strcomp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

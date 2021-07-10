@@ -348,39 +348,42 @@ PRIMITIVE prim::uxexit(LISPT status)
   return C_NIL;
 }
 
-inline constexpr auto PN_ATOM = "atom";       // t if atom
-inline constexpr auto PN_CAR = "car";         // car
-inline constexpr auto PN_CDR = "cdr";         // cdr
-inline constexpr auto PN_CADR = "cadr";       // cadr
-inline constexpr auto PN_CDAR = "cdar";       // cdar
-inline constexpr auto PN_CAAR = "caar";       // caar
-inline constexpr auto PN_CDDR = "cddr";       // cddr
-inline constexpr auto PN_CDDDR = "cdddr";     // cdddr
-inline constexpr auto PN_CADDR = "caddr";     // caddr
-inline constexpr auto PN_CDADR = "cdadr";     // cdadr
-inline constexpr auto PN_CAADR = "caadr";     // caadr
-inline constexpr auto PN_CDDAR = "cddar";     // cddar
-inline constexpr auto PN_CADAR = "cadar";     // cadar
-inline constexpr auto PN_CDAAR = "cdaar";     // cdaar
-inline constexpr auto PN_CAAAR = "caaar";     // caaar
-inline constexpr auto PN_CLOSURE = "closure"; // create static environment
-inline constexpr auto PN_EQ = "eq";           // pointer equal
-inline constexpr auto PN_ERROR = "error";     // error
-inline constexpr auto PN_LAMBDA = "lambda";   // create lambda object
-inline constexpr auto PN_LENGTH = "length";   // length of list
-inline constexpr auto PN_LIST = "list";       // make list of args
-inline constexpr auto PN_NCONC = "nconc";     // destructive append
-inline constexpr auto PN_NLAMBDA = "nlambda"; // make nlambda object
-inline constexpr auto PN_NTH = "nth";         // nth car in list
-inline constexpr auto PN_NULL = "null";       // t if nil
-inline constexpr auto PN_QUOTE = "quote";     // don't eval arg
-inline constexpr auto PN_RPLACA = "rplaca";   // replace car
-inline constexpr auto PN_RPLACD = "rplacd";   // replace cdr
-inline constexpr auto PN_TCONC = "tconc";     // add to end of list
-inline constexpr auto PN_NTHD = "nthd";       // return nth cdr of list
-inline constexpr auto PN_ATTACH = "attach";   // attach object at front of list
-inline constexpr auto PN_APPEND = "append";   // append lists
-inline constexpr auto PN_EXIT = "exit";       // exit lips
+namespace pn
+{
+inline constexpr auto ATOM = "atom";       // t if atom
+inline constexpr auto CAR = "car";         // car
+inline constexpr auto CDR = "cdr";         // cdr
+inline constexpr auto CADR = "cadr";       // cadr
+inline constexpr auto CDAR = "cdar";       // cdar
+inline constexpr auto CAAR = "caar";       // caar
+inline constexpr auto CDDR = "cddr";       // cddr
+inline constexpr auto CDDDR = "cdddr";     // cdddr
+inline constexpr auto CADDR = "caddr";     // caddr
+inline constexpr auto CDADR = "cdadr";     // cdadr
+inline constexpr auto CAADR = "caadr";     // caadr
+inline constexpr auto CDDAR = "cddar";     // cddar
+inline constexpr auto CADAR = "cadar";     // cadar
+inline constexpr auto CDAAR = "cdaar";     // cdaar
+inline constexpr auto CAAAR = "caaar";     // caaar
+inline constexpr auto CLOSURE = "closure"; // create static environment
+inline constexpr auto EQ = "eq";           // pointer equal
+inline constexpr auto ERROR = "error";     // error
+inline constexpr auto LAMBDA = "lambda";   // create lambda object
+inline constexpr auto LENGTH = "length";   // length of list
+inline constexpr auto LIST = "list";       // make list of args
+inline constexpr auto NCONC = "nconc";     // destructive append
+inline constexpr auto NLAMBDA = "nlambda"; // make nlambda object
+inline constexpr auto NTH = "nth";         // nth car in list
+inline constexpr auto NULL_ = "null";      // t if nil
+inline constexpr auto QUOTE = "quote";     // don't eval arg
+inline constexpr auto RPLACA = "rplaca";   // replace car
+inline constexpr auto RPLACD = "rplacd";   // replace cdr
+inline constexpr auto TCONC = "tconc";     // add to end of list
+inline constexpr auto NTHD = "nthd";       // return nth cdr of list
+inline constexpr auto ATTACH = "attach";   // attach object at front of list
+inline constexpr auto APPEND = "append";   // append lists
+inline constexpr auto EXIT = "exit";       // exit lips
+} // namespace pn
 
 LISPT C_APPEND;
 LISPT C_ERROR;
@@ -390,47 +393,47 @@ LISPT C_QUOTE;
 
 void prim::init()
 {
-  C_APPEND = intern(PN_APPEND);
-  C_ERROR = intern(PN_ERROR);
+  C_APPEND = intern(pn::APPEND);
+  C_ERROR = intern(pn::ERROR);
   C_ERROR->settype(lisp_type::ERROR);
-  C_LAMBDA = intern(PN_LAMBDA);
-  C_NLAMBDA = intern(PN_NLAMBDA);
-  C_QUOTE = intern(PN_QUOTE);
+  C_LAMBDA = intern(pn::LAMBDA);
+  C_NLAMBDA = intern(pn::NLAMBDA);
+  C_QUOTE = intern(pn::QUOTE);
 
   // clang-format off
-  mkprim(PN_ATOM,    ::lisp::atom,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_ATTACH,  ::lisp::attach,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_APPEND,  ::lisp::append,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(PN_CAR,     ::lisp::car,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDR,     ::lisp::cdr,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CADR,    ::lisp::cadr,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDAR,    ::lisp::cdar,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CAAR,    ::lisp::caar,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDDR,    ::lisp::cddr,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDDDR,   ::lisp::cdddr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CADDR,   ::lisp::caddr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDADR,   ::lisp::cdadr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CAADR,   ::lisp::caadr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDDAR,   ::lisp::cddar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CADAR,   ::lisp::cadar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CDAAR,   ::lisp::cdaar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CAAAR,   ::lisp::caaar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_CLOSURE, ::lisp::closure, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_EQ,      ::lisp::eq,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_ERROR,   ::lisp::xerror,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(PN_EXIT,    ::lisp::uxexit,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_LAMBDA,  ::lisp::lambda,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(PN_LENGTH,  ::lisp::length,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_LIST,    ::lisp::list,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(PN_NCONC,   ::lisp::nconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(PN_NLAMBDA, ::lisp::nlambda, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(PN_NTH,     ::lisp::xnth,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_NULL,    ::lisp::null,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_QUOTE,   ::lisp::quote,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_RPLACA,  ::lisp::rplaca,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_RPLACD,  ::lisp::rplacd,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_TCONC,   ::lisp::tconc,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(PN_NTHD,    ::lisp::nthd,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::ATOM,    ::lisp::atom,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::ATTACH,  ::lisp::attach,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::APPEND,  ::lisp::append,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CAR,     ::lisp::car,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDR,     ::lisp::cdr,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CADR,    ::lisp::cadr,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDAR,    ::lisp::cdar,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CAAR,    ::lisp::caar,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDDR,    ::lisp::cddr,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDDDR,   ::lisp::cdddr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CADDR,   ::lisp::caddr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDADR,   ::lisp::cdadr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CAADR,   ::lisp::caadr,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDDAR,   ::lisp::cddar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CADAR,   ::lisp::cadar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CDAAR,   ::lisp::cdaar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CAAAR,   ::lisp::caaar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CLOSURE, ::lisp::closure, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::EQ,      ::lisp::eq,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::ERROR,   ::lisp::xerror,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::EXIT,    ::lisp::uxexit,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::LAMBDA,  ::lisp::lambda,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LENGTH,  ::lisp::length,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::LIST,    ::lisp::list,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::NCONC,   ::lisp::nconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::NLAMBDA, ::lisp::nlambda, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NTH,     ::lisp::xnth,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::NULL_,   ::lisp::null,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::QUOTE,   ::lisp::quote,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::RPLACA,  ::lisp::rplaca,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::RPLACD,  ::lisp::rplacd,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::TCONC,   ::lisp::tconc,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::NTHD,    ::lisp::nthd,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

@@ -61,7 +61,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   C_BROKEN = intern("broken");
   C_BT = intern("bt");
   C_CLOSURE = intern("closure");
-  C_CONS = intern(PN_CONS);
+  C_CONS = intern(pn::CONS);
   C_DOT = intern(".");
   C_ENDOFFILE = intern("endoffile");
   C_ENVIRON = intern("environ");

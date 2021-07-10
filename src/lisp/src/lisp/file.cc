@@ -235,38 +235,41 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 #endif
 }
 
-inline constexpr auto PN_LOAD = "load";         // load file
-inline constexpr auto PN_PRIN1 = "prin1";       // print without escapes
-inline constexpr auto PN_PRIN2 = "prin2";       // print without new-line
-inline constexpr auto PN_PRINT = "print";       // print
-inline constexpr auto PN_PLEVEL = "printlevel"; // how deep to print
-inline constexpr auto PN_RATOM = "ratom";       // read atom
-inline constexpr auto PN_READ = "read";         // read expression
-inline constexpr auto PN_READC = "readc";       // read characte
-inline constexpr auto PN_READLINE = "readline"; // read a line
-inline constexpr auto PN_SPACES = "spaces";     // print some spaces
-inline constexpr auto PN_TERPRI = "terpri";     // print new-line
-inline constexpr auto PN_CPPRINT = "cpprint";   // find and prettyprint c function
+namespace pn
+{
+inline constexpr auto LOAD = "load";         // load file
+inline constexpr auto PRIN1 = "prin1";       // print without escapes
+inline constexpr auto PRIN2 = "prin2";       // print without new-line
+inline constexpr auto PRINT = "print";       // print
+inline constexpr auto PLEVEL = "printlevel"; // how deep to print
+inline constexpr auto RATOM = "ratom";       // read atom
+inline constexpr auto READ = "read";         // read expression
+inline constexpr auto READC = "readc";       // read characte
+inline constexpr auto READLINE = "readline"; // read a line
+inline constexpr auto SPACES = "spaces";     // print some spaces
+inline constexpr auto TERPRI = "terpri";     // print new-line
+inline constexpr auto CPPRINT = "cpprint";   // find and prettyprint c function
+} // namespace pn
 
 LISPT C_READ;
 
 void file::init()
 {
-  C_READ = intern(PN_READ);
+  C_READ = intern(pn::READ);
 
   // clang-format off
-  mkprim(PN_LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_CPPRINT,  ::lisp::cpprint,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CPPRINT,  ::lisp::cpprint,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

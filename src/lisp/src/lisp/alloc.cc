@@ -38,11 +38,12 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   }
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
+
   // clang-format off
-  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::OBARRAY,   ::lisp::xobarray,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
