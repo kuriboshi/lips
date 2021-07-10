@@ -276,7 +276,7 @@ enum class char_class
   NONE = 0,
   SEPR,                         // seperator
   BRK,                          // break character
-  CTRL,                         // controll character - escaped when printed
+  CTRL,                         // control character - escaped when printed
   INSERT,                       // insert read macro
   SPLICE,                       // splice read macro
   INFIX                         // infix read macro
