@@ -66,7 +66,7 @@ public:
   static void initcvar(LISPT* cvar, const std::string& name, LISPT val)
   {
     LISPT t = intern(name);
-    set(t->symbol().value, lisp_type::CVARIABLE, new lisp_t);
+    set(t->symbol().value, type::CVARIABLE, new lisp_t);
     t->symvalue()->cvarval(cvar);
     *cvar = val;
   }
@@ -82,7 +82,7 @@ public:
   LISPT mkstring(const std::string&);
   LISPT mknumber(int);
   LISPT mkfloat(double);
-  LISPT mklambda(LISPT args, LISPT def, lisp_type type);
+  LISPT mklambda(LISPT args, LISPT def, type type);
 
   destblock_t* dalloc(int);
   void dfree(destblock_t*);
@@ -137,8 +137,8 @@ inline LISPT gcprotect(LISPT& a) { return gcprotect(lisp::current(), a); }
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 
-inline LISPT mklambda(lisp& l, LISPT args, LISPT def, lisp_type type) { return l.a().mklambda(args, def, type); }
-inline LISPT mklambda(LISPT args, LISPT def, lisp_type type) { return mklambda(lisp::current(), args, def, type); }
+inline LISPT mklambda(lisp& l, LISPT args, LISPT def, type type) { return l.a().mklambda(args, def, type); }
+inline LISPT mklambda(LISPT args, LISPT def, type type) { return mklambda(lisp::current(), args, def, type); }
 inline LISPT mkstring(lisp& l, const std::string& s) { return l.a().mkstring(s); }
 inline LISPT mkstring(const std::string& s) { return mkstring(lisp::current(), s); }
 inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }

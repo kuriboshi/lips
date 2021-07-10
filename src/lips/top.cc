@@ -74,7 +74,7 @@ LISPT top::histget(int num, LISPT hlist)
 {
   if(num < 0)
   {
-    for(; type_of(hlist) == lisp_type::CONS && num < 0; hlist = hlist->cdr(), num++)
+    for(; type_of(hlist) == type::CONS && num < 0; hlist = hlist->cdr(), num++)
       ;
     if(is_NIL(hlist))
       return C_NIL;
@@ -83,7 +83,7 @@ LISPT top::histget(int num, LISPT hlist)
   }
   else if(num > 0)
   {
-    for(; type_of(hlist) == lisp_type::CONS && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
+    for(; type_of(hlist) == type::CONS && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
       ;
     if(is_NIL(hlist))
       return C_NIL;
@@ -122,7 +122,7 @@ LISPT top::findalias(LISPT exp)
   auto rval = exp;
   while(true)
   {
-    if(type_of(rval) == lisp_type::CONS && type_of(rval->car()) == lisp_type::SYMBOL)
+    if(type_of(rval) == type::CONS && type_of(rval->car()) == type::SYMBOL)
     {
       auto alias = getprop(rval->car(), C_ALIAS);
       if(!is_NIL(alias) && (is_NIL(alias_expanded) || !EQ(rval->car(), alias_expanded->car())))
@@ -144,7 +144,7 @@ LISPT top::findalias(LISPT exp)
 void top::promptprint(LISPT prompt)
 {
   current_prompt.clear();
-  if(type_of(prompt) != lisp_type::STRING)
+  if(type_of(prompt) != type::STRING)
     return;
   else
   {
@@ -177,7 +177,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     //
     if(options.interactive)
     {
-      if(type_of(eval(promptform)) == lisp_type::ERROR)
+      if(type_of(eval(promptform)) == type::ERROR)
       {
         print(mkstring("Error in promptform, reset to nil"), C_T);
         promptform = C_NIL;
@@ -197,7 +197,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
         case 2:
           continue;
       }
-    if(type_of(input_exp) == lisp_type::ENDOFFILE)
+    if(type_of(input_exp) == type::ENDOFFILE)
       return true;
     if(EQ(input_exp->car(), C_NIL))
       continue;
@@ -209,7 +209,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     }
     bool printit = false; // If the result will be printed.
     LISPT topexp = transform(input_exp);
-    if(type_of(topexp->car()) == lisp_type::CONS)
+    if(type_of(topexp->car()) == type::CONS)
     {
       topexp = topexp->car();
       printit = true;
@@ -243,7 +243,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
     return C_EXCL;
   l.echoline = true;
   LISPT tmp = histget(0L, history);
-  if(type_of(tmp->car()) == lisp_type::CONS && is_NIL(tmp->cdr()))
+  if(type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
     tmp = tmp->car();
   switch(c)
   {
@@ -251,7 +251,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
       return histget(0L, history);
       break;
     case '$':
-      while(type_of(tmp->cdr()) == lisp_type::CONS) tmp = tmp->cdr();
+      while(type_of(tmp->cdr()) == type::CONS) tmp = tmp->cdr();
       return tmp;
       break;
     case '*':
@@ -264,17 +264,17 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
     default:
       file.ungetch(c);
       at = io(l).ratom(file);
-      if(type_of(at) == lisp_type::INTEGER)
+      if(type_of(at) == type::INTEGER)
       {
         tmp = histget(at->intval(), history);
         return tmp;
       }
-      if(type_of(at) == lisp_type::SYMBOL)
+      if(type_of(at) == type::SYMBOL)
       {
         for(auto h = history; !is_NIL(h); h = h->cdr())
         {
           tmp = histget(0L, h);
-          if(!is_NIL(tmp) && type_of(tmp->car()) == lisp_type::CONS && is_NIL(tmp->cdr()))
+          if(!is_NIL(tmp) && type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
             tmp = tmp->car();
           if(!strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())))
             return histget(0L, h);

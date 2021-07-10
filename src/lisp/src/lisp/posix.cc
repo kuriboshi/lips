@@ -22,33 +22,33 @@ PRIMITIVE posix::uxerrno() { return mknumber(l, errno); }
 
 PRIMITIVE posix::uxaccess(LISPT name, LISPT mode)
 {
-  l.check(name, lisp_type::STRING);
-  l.check(mode, lisp_type::INTEGER);
+  l.check(name, type::STRING);
+  l.check(mode, type::INTEGER);
   return mknumber(l, access(name->stringval().c_str(), mode->intval()));
 }
 
 PRIMITIVE posix::uxalarm(LISPT seconds)
 {
-  l.check(seconds, lisp_type::INTEGER);
+  l.check(seconds, type::INTEGER);
   return mknumber(l, alarm(seconds->intval()));
 }
 
 PRIMITIVE posix::uxchdir(LISPT dirname)
 {
-  l.check(dirname, lisp_type::STRING);
+  l.check(dirname, type::STRING);
   return mknumber(l, chdir(dirname->stringval().c_str()));
 }
 
 PRIMITIVE posix::uxchmod(LISPT name, LISPT mode)
 {
-  l.check(name, lisp_type::STRING);
-  l.check(mode, lisp_type::INTEGER);
+  l.check(name, type::STRING);
+  l.check(mode, type::INTEGER);
   return mknumber(l, chmod(name->stringval().c_str(), mode->intval()));
 }
 
 PRIMITIVE posix::uxclose(LISPT fildes)
 {
-  l.check(fildes, lisp_type::FILET);
+  l.check(fildes, type::FILET);
   if(fildes->fileval().close())
     return C_T;
   return C_NIL;
@@ -58,8 +58,8 @@ PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
 {
   int i;
 
-  l.check(name, lisp_type::STRING);
-  l.check(mode, lisp_type::INTEGER);
+  l.check(name, type::STRING);
+  l.check(mode, type::INTEGER);
   i = creat(name->stringval().c_str(), mode->intval());
   if(i < 0)
     return C_NIL;
@@ -69,7 +69,7 @@ PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
 
 PRIMITIVE posix::uxdup(LISPT fildes)
 {
-  l.check(fildes, lisp_type::INTEGER);
+  l.check(fildes, type::INTEGER);
   return mknumber(l, dup(fildes->intval()));
 }
 
@@ -85,21 +85,21 @@ PRIMITIVE posix::uxgetpid() { return mknumber(l, getpid()); }
 
 PRIMITIVE posix::uxkill(LISPT pid, LISPT sig)
 {
-  l.check(pid, lisp_type::INTEGER);
-  l.check(sig, lisp_type::INTEGER);
+  l.check(pid, type::INTEGER);
+  l.check(sig, type::INTEGER);
   return mknumber(l, kill(pid->intval(), sig->intval()));
 }
 
 PRIMITIVE posix::uxlink(LISPT name1, LISPT name2)
 {
-  l.check(name1, lisp_type::STRING);
-  l.check(name2, lisp_type::STRING);
+  l.check(name1, type::STRING);
+  l.check(name2, type::STRING);
   return mknumber(l, link(name1->stringval().c_str(), name2->stringval().c_str()));
 }
 
 PRIMITIVE posix::uxnice(LISPT incr)
 {
-  l.check(incr, lisp_type::INTEGER);
+  l.check(incr, type::INTEGER);
   return mknumber(l, nice(incr->intval()));
 }
 
@@ -108,10 +108,10 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
   bool readmode = true;
   bool appendmode = false;
 
-  l.check(name, lisp_type::STRING);
+  l.check(name, type::STRING);
   if(!is_NIL(mode))
   {
-    l.check(mode, lisp_type::SYMBOL);
+    l.check(mode, type::SYMBOL);
     if(EQ(mode, C_READ))
       readmode = true;
     else if(EQ(mode, C_WRITE))
@@ -129,20 +129,20 @@ PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
   if(!f)
     return l.error(CANT_OPEN, name);
   LISPT newfile = nullptr;
-  set(newfile, lisp_type::FILET, getobject(l));
+  set(newfile, type::FILET, getobject(l));
   newfile->fileval(std::move(f));
   return newfile;
 }
 
 PRIMITIVE posix::uxsetuid(LISPT uid)
 {
-  l.check(uid, lisp_type::INTEGER);
+  l.check(uid, type::INTEGER);
   return mknumber(l, setuid(uid->intval()));
 }
 
 PRIMITIVE posix::uxsetgid(LISPT gid)
 {
-  l.check(gid, lisp_type::INTEGER);
+  l.check(gid, type::INTEGER);
   return mknumber(l, setgid(gid->intval()));
 }
 
@@ -177,7 +177,7 @@ PRIMITIVE posix::uxsignal(LISPT sig, LISPT fun)
 
 PRIMITIVE posix::uxunlink(LISPT name)
 {
-  l.check(name, lisp_type::STRING);
+  l.check(name, type::STRING);
   return mknumber(l, unlink(name->stringval().c_str()));
 }
 

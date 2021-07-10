@@ -287,7 +287,7 @@ TEST_CASE("exec.cc: check_meta")
 static std::optional<std::vector<std::string>> process_one(LISPT arg)
 {
   std::vector<std::string> args;
-  if(type_of(arg) == lisp_type::SYMBOL)
+  if(type_of(arg) == type::SYMBOL)
   {
     auto c = glob::extilde(arg->getstr(), true);
     if(!c)
@@ -298,7 +298,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
     else
     {
       auto files = glob::expandfiles(*c, false, false, true);
-      if(type_of(files) == lisp_type::CONS)
+      if(type_of(files) == type::CONS)
       {
         for(auto f: files)
           args.push_back(f->getstr());
@@ -310,11 +310,11 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
       }
     }
   }
-  else if(type_of(arg) == lisp_type::INTEGER)
+  else if(type_of(arg) == type::INTEGER)
     args.push_back(std::to_string(arg->intval()));
-  else if(type_of(arg) == lisp_type::STRING)
+  else if(type_of(arg) == type::STRING)
     args.push_back(arg->getstr());
-  else if(type_of(arg) == lisp_type::CONS)
+  else if(type_of(arg) == type::CONS)
   {
     auto result = process_one(eval(arg));
     if(!result)
@@ -550,12 +550,12 @@ PRIMITIVE exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  l.check(file, lisp_type::STRING, lisp_type::SYMBOL);
+  l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    l.check(filed, lisp_type::INTEGER);
+    l.check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
@@ -584,12 +584,12 @@ PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  l.check(file, lisp_type::STRING, lisp_type::SYMBOL);
+  l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    l.check(filed, lisp_type::INTEGER);
+    l.check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
@@ -618,12 +618,12 @@ PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return C_NIL;
-  l.check(file, lisp_type::STRING, lisp_type::SYMBOL);
+  l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 0;
   else
   {
-    l.check(filed, lisp_type::INTEGER);
+    l.check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = open(file->getstr().c_str(), O_RDONLY)) == -1)
@@ -721,7 +721,7 @@ PRIMITIVE exec::rehash()
   {
     if(is_NIL(p))
       continue;
-    check(p, lisp_type::STRING, lisp_type::SYMBOL);
+    check(p, type::STRING, type::SYMBOL);
     for(auto& odir: std::filesystem::directory_iterator(p->getstr()))
       exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }
@@ -749,7 +749,7 @@ PRIMITIVE exec::fg(LISPT job)
   }
   else
   {
-    l.check(job, lisp_type::INTEGER);
+    l.check(job, type::INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -785,7 +785,7 @@ PRIMITIVE exec::bg(LISPT job)
   }
   else
   {
-    l.check(job, lisp_type::INTEGER);
+    l.check(job, type::INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -809,15 +809,15 @@ PRIMITIVE exec::bg(LISPT job)
 
 PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
 {
-  l.check(var, lisp_type::STRING, lisp_type::SYMBOL);
-  l.check(val, lisp_type::STRING, lisp_type::SYMBOL);
+  l.check(var, type::STRING, type::SYMBOL);
+  l.check(val, type::STRING, type::SYMBOL);
   setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
 PRIMITIVE exec::getenviron(LISPT var)
 {
-  l.check(var, lisp_type::STRING, lisp_type::SYMBOL);
+  l.check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
     return C_NIL;
@@ -833,7 +833,7 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   else
   {
     ndir = expand(dir);
-    if(type_of(ndir) == lisp_type::CONS)
+    if(type_of(ndir) == type::CONS)
       ndir = ndir->car();
   }
   if(is_NIL(ndir))

@@ -72,7 +72,7 @@ constexpr auto to_underlying(Enum e) noexcept
   return static_cast<std::underlying_type_t<Enum>>(e);
 }
 
-enum class lisp_type
+enum class type
 {
   NIL = 0,   // so that nullptr also becomes NIL
   SYMBOL,    // an atomic symbol
@@ -189,24 +189,24 @@ struct lisp_t
   lisp_t(const lisp_t&) = delete;
 
   auto symbol() -> symbol_t& { return std::get<symbol_t>(u); }
-  auto symbol(symbol_t x) -> void { type = lisp_type::SYMBOL; u = x; }
+  auto symbol(symbol_t x) -> void { type = type::SYMBOL; u = x; }
   auto symvalue() const -> LISPT { return std::get<symbol_t>(u).value; }
   auto symvalue(LISPT x) -> void { std::get<symbol_t>(u).value = x; }
   auto intval() const -> int { return std::get<int>(u); }
   auto intval(int x) -> void
   {
-    type = lisp_type::INTEGER;
+    type = type::INTEGER;
     u = x;
   }
   auto floatval() const -> double { return std::get<double>(u); }
   auto floatval(double f) -> void
   {
-    type = lisp_type::FLOAT;
+    type = type::FLOAT;
     u = f;
   }
   auto indirectval() -> indirect_t& { return std::get<4>(u); }
   auto consval() const -> const cons_t& { return std::get<cons_t>(u); }
-  void consval(cons_t x) { type = lisp_type::CONS; u = x; }
+  void consval(cons_t x) { type = type::CONS; u = x; }
   auto car() const -> LISPT { return std::get<cons_t>(u).car; }
   auto cdr() const -> LISPT { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
@@ -214,39 +214,39 @@ struct lisp_t
   auto stringval() const -> const std::string& { return std::get<std::string>(u); }
   void stringval(const std::string& s)
   {
-    type = lisp_type::STRING;
+    type = type::STRING;
     u = s;
   }
   auto subrval() const -> const subr_t& { return *std::get<subr_t*>(u); }
-  void subrval(subr_t* x) { type = lisp_type::SUBR; u = x; }
+  void subrval(subr_t* x) { type = type::SUBR; u = x; }
   auto lamval() -> lambda_t& { return std::get<lambda_t>(u); }
-  void lamval(lambda_t x) { type = lisp_type::LAMBDA; u = x; }
-  void nlamval(lambda_t x) { type = lisp_type::NLAMBDA; u = x; }
+  void lamval(lambda_t x) { type = type::LAMBDA; u = x; }
+  void nlamval(lambda_t x) { type = type::NLAMBDA; u = x; }
   auto closval() -> closure_t& { return std::get<closure_t>(u); }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(u); }
-  void envval(destblock_t* env) { type = lisp_type::ENVIRON; u = env; }
+  void envval(destblock_t* env) { type = type::ENVIRON; u = env; }
   auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(u).get(); }
-  void fileval(std::unique_ptr<file_t> f) { type = lisp_type::FILET; u = std::move(f); }
+  void fileval(std::unique_ptr<file_t> f) { type = type::FILET; u = std::move(f); }
   auto freeval() -> LISPT { return std::get<12>(u); }
-  void freeval(LISPT x) { type = lisp_type::FREE; u.emplace<12>(x); }
+  void freeval(LISPT x) { type = type::FREE; u.emplace<12>(x); }
   auto cvarval() const -> cvariable_t{ return std::get<cvariable_t>(u); }
   void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
   auto cpointval() -> void* { return std::get<void*>(u); }
 
-  const std::string& getstr() const { return type == lisp_type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
+  const std::string& getstr() const { return type == type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
   //
   // Some more or less helpful functions
   //
-  lisp_type gettype() const { return type; }
-  void settype(lisp_type t) { type = t; }
+  type gettype() const { return type; }
+  void settype(type t) { type = t; }
   bool marked() const { return gcmark; }
   void mark() { gcmark = true; }
   void unmark() { gcmark = false; }
 
 private:
   bool gcmark = false;
-  lisp_type type = lisp_type::NIL;
+  type type = type::NIL;
 
   // One entry for each type.  Types that has no, or just one value are
   // indicated by a comment.
@@ -288,18 +288,18 @@ struct rtinfo
 };
 
 inline bool EQ(LISPT x, LISPT y) { return x == y; }
-inline lisp_type type_of(LISPT a) { return a == nullptr ? lisp_type::NIL : a->gettype(); }
-inline lisp_type type_of(lisp_t& a) { return a.gettype(); }
+inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
+inline type type_of(lisp_t& a) { return a.gettype(); }
 
-inline void set(LISPT& a, lisp_type t, LISPT p)
+inline void set(LISPT& a, type t, LISPT p)
 {
   a = p;
   a->settype(t);
   a->unmark();
 }
 
-inline bool is_T(LISPT x) { return type_of(x) == lisp_type::T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == lisp_type::NIL; }
+inline bool is_T(LISPT x) { return type_of(x) == type::T; }
+inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
 class lisp
 {
@@ -326,13 +326,13 @@ public:
   LISPT syserr(LISPT);
   LISPT break0(LISPT);
 
-  void check(LISPT arg, lisp_type type)
+  void check(LISPT arg, type type)
   {
     if(type_of(arg) != type)
       error(NOT_A | to_underlying(type), arg);
   }
 
-  void check(LISPT arg, lisp_type type0, lisp_type type1)
+  void check(LISPT arg, type type0, type type1)
   {
     if(type_of(arg) != type0 && type_of(arg) != type1)
       error(ILLEGAL_ARG, arg);
@@ -520,10 +520,10 @@ inline LISPT syserr(LISPT a) { return syserr(lisp::current(), a); }
 inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
 inline LISPT break0(LISPT a) { return break0(lisp::current(), a); }
 
-inline void check(lisp& l, LISPT arg, lisp_type type) { l.check(arg, type); }
-inline void check(LISPT arg, lisp_type type) { check(lisp::current(), arg, type); }
-inline void check(lisp& l, LISPT arg, lisp_type type0, lisp_type type1) { l.check(arg, type0, type1); }
-inline void check(LISPT arg, lisp_type type0, lisp_type type1) { check(lisp::current(), arg, type0, type1); }
+inline void check(lisp& l, LISPT arg, type type) { l.check(arg, type); }
+inline void check(LISPT arg, type type) { check(lisp::current(), arg, type); }
+inline void check(lisp& l, LISPT arg, type type0, type type1) { l.check(arg, type0, type1); }
+inline void check(LISPT arg, type type0, type type1) { check(lisp::current(), arg, type0, type1); }
 inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
 inline void break_flag(bool val) { lisp::current().brkflg = val; }
 

@@ -13,7 +13,7 @@ map::map(lisp& lisp): base(lisp) {}
 
 PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(type_of(obj) == lisp_type::CONS)
+  while(type_of(obj) == type::CONS)
   {
     apply(l, fn1, cons(l, obj, C_NIL));
     if(is_NIL(fn2))
@@ -26,7 +26,7 @@ PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
 
 PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(type_of(obj) == lisp_type::CONS)
+  while(type_of(obj) == type::CONS)
   {
     apply(l, fn1, cons(l, obj->car(), C_NIL));
     if(is_NIL(fn2))
@@ -40,14 +40,14 @@ PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
-  if(type_of(obj) == lisp_type::CONS)
+  if(type_of(obj) == type::CONS)
   {
     tmp = cons(l, apply(l, fn1, cons(l, obj, C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   a.save(rval);
-  while(type_of(obj) == lisp_type::CONS)
+  while(type_of(obj) == type::CONS)
   {
     rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj, C_NIL)), C_NIL));
     tmp = tmp->cdr();
@@ -63,14 +63,14 @@ PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
 PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = C_NIL;
-  if(type_of(obj) == lisp_type::CONS)
+  if(type_of(obj) == type::CONS)
   {
     tmp = cons(l, apply(l, fn1, cons(l, obj->car(), C_NIL)), C_NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   a.save(rval);
-  while(type_of(obj) == lisp_type::CONS)
+  while(type_of(obj) == type::CONS)
   {
     rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj->car(), C_NIL)), C_NIL));
     tmp = tmp->cdr();

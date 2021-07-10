@@ -25,20 +25,20 @@ PRIMITIVE arith::plus(LISPT x)
   int sum = 0;
   int f = 0;
 
-  while(type_of(x) == lisp_type::CONS)
+  while(type_of(x) == type::CONS)
   {
     if(f)
     {
-      if(type_of(x->car()) == lisp_type::INTEGER)
+      if(type_of(x->car()) == type::INTEGER)
         fsum += (double)x->car()->intval();
-      else if(type_of(x->car()) == lisp_type::FLOAT)
+      else if(type_of(x->car()) == type::FLOAT)
         fsum += x->car()->floatval();
       else
         return l.error(ILLEGAL_ARG, x->car());
     }
-    else if(type_of(x->car()) == lisp_type::INTEGER)
+    else if(type_of(x->car()) == type::INTEGER)
       sum += x->car()->intval();
-    else if(type_of(x->car()) == lisp_type::FLOAT)
+    else if(type_of(x->car()) == type::FLOAT)
     {
       f = 1;
       fsum = x->car()->floatval() + (double)sum;
@@ -57,7 +57,7 @@ PRIMITIVE arith::iplus(LISPT x)
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
   {
-    l.check(*i, lisp_type::INTEGER);
+    l.check(*i, type::INTEGER);
     sum += (**i).intval();
   }
   return mknumber(l, sum);
@@ -65,12 +65,12 @@ PRIMITIVE arith::iplus(LISPT x)
 
 PRIMITIVE arith::fplus(LISPT x)
 {
-  l.check(x->car(), lisp_type::FLOAT);
+  l.check(x->car(), type::FLOAT);
   auto sum = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == lisp_type::CONS)
+  while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), lisp_type::FLOAT);
+    l.check(x->car(), type::FLOAT);
     sum = sum + x->car()->floatval();
     x = x->cdr();
   }
@@ -79,29 +79,29 @@ PRIMITIVE arith::fplus(LISPT x)
 
 PRIMITIVE arith::difference(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::INTEGER, lisp_type::FLOAT);
-  l.check(y, lisp_type::INTEGER, lisp_type::FLOAT);
-  if(type_of(x) == lisp_type::INTEGER)
-    if(type_of(y) == lisp_type::INTEGER)
+  l.check(x, type::INTEGER, type::FLOAT);
+  l.check(y, type::INTEGER, type::FLOAT);
+  if(type_of(x) == type::INTEGER)
+    if(type_of(y) == type::INTEGER)
       return mknumber(l, x->intval() - y->intval());
     else
       return mkfloat(l, (double)x->intval() - y->floatval());
-  else if(type_of(y) == lisp_type::INTEGER)
+  else if(type_of(y) == type::INTEGER)
     return mkfloat(l, x->floatval() - (double)y->intval());
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
 PRIMITIVE arith::idifference(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::INTEGER);
-  l.check(y, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
+  l.check(y, type::INTEGER);
   return mknumber(l, x->intval() - y->intval());
 }
 
 PRIMITIVE arith::fdifference(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::FLOAT);
-  l.check(y, lisp_type::FLOAT);
+  l.check(x, type::FLOAT);
+  l.check(y, type::FLOAT);
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
@@ -111,20 +111,20 @@ PRIMITIVE arith::ltimes(LISPT x)
   int prod = 1;
   int f = 0;
 
-  while(type_of(x) == lisp_type::CONS)
+  while(type_of(x) == type::CONS)
   {
     if(f)
     {
-      if(type_of(x->car()) == lisp_type::INTEGER)
+      if(type_of(x->car()) == type::INTEGER)
         fprod *= (double)x->car()->intval();
-      else if(type_of(x->car()) == lisp_type::FLOAT)
+      else if(type_of(x->car()) == type::FLOAT)
         fprod *= x->car()->floatval();
       else
         return l.error(ILLEGAL_ARG, x->car());
     }
-    else if(type_of(x->car()) == lisp_type::INTEGER)
+    else if(type_of(x->car()) == type::INTEGER)
       prod *= x->car()->intval();
-    else if(type_of(x->car()) == lisp_type::FLOAT)
+    else if(type_of(x->car()) == type::FLOAT)
     {
       f = 1;
       fprod = x->car()->floatval() * (double)prod;
@@ -140,12 +140,12 @@ PRIMITIVE arith::ltimes(LISPT x)
 
 PRIMITIVE arith::itimes(LISPT x)
 {
-  l.check(x->car(), lisp_type::INTEGER);
+  l.check(x->car(), type::INTEGER);
   auto prod = x->car()->intval();
   x = x->cdr();
-  while(type_of(x) == lisp_type::CONS)
+  while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), lisp_type::INTEGER);
+    l.check(x->car(), type::INTEGER);
     prod = prod * x->car()->intval();
     x = x->cdr();
   }
@@ -154,12 +154,12 @@ PRIMITIVE arith::itimes(LISPT x)
 
 PRIMITIVE arith::ftimes(LISPT x)
 {
-  l.check(x->car(), lisp_type::FLOAT);
+  l.check(x->car(), type::FLOAT);
   auto prod = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == lisp_type::CONS)
+  while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), lisp_type::FLOAT);
+    l.check(x->car(), type::FLOAT);
     prod = prod * x->car()->floatval();
     x = x->cdr();
   }
@@ -168,10 +168,10 @@ PRIMITIVE arith::ftimes(LISPT x)
 
 PRIMITIVE arith::divide(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::INTEGER, lisp_type::FLOAT);
-  l.check(y, lisp_type::INTEGER, lisp_type::FLOAT);
-  if(type_of(x) == lisp_type::INTEGER)
-    if(type_of(y) == lisp_type::INTEGER)
+  l.check(x, type::INTEGER, type::FLOAT);
+  l.check(y, type::INTEGER, type::FLOAT);
+  if(type_of(x) == type::INTEGER)
+    if(type_of(y) == type::INTEGER)
     {
       if(y->intval() == 0)
         return l.error(DIVIDE_ZERO, C_NIL);
@@ -183,7 +183,7 @@ PRIMITIVE arith::divide(LISPT x, LISPT y)
         return l.error(DIVIDE_ZERO, C_NIL);
       return mkfloat(l, (double)x->intval() / y->floatval());
     }
-  else if(type_of(y) == lisp_type::INTEGER)
+  else if(type_of(y) == type::INTEGER)
   {
     if(y->intval() == 0)
       return l.error(DIVIDE_ZERO, C_NIL);
@@ -196,8 +196,8 @@ PRIMITIVE arith::divide(LISPT x, LISPT y)
 
 PRIMITIVE arith::iquotient(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::INTEGER);
-  l.check(y, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
+  l.check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, C_NIL);
   return mknumber(l, x->intval() / y->intval());
@@ -205,8 +205,8 @@ PRIMITIVE arith::iquotient(LISPT x, LISPT y)
 
 PRIMITIVE arith::iremainder(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::INTEGER);
-  l.check(y, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
+  l.check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, C_NIL);
   return mknumber(l, x->intval() % y->intval());
@@ -214,8 +214,8 @@ PRIMITIVE arith::iremainder(LISPT x, LISPT y)
 
 PRIMITIVE arith::fdivide(LISPT x, LISPT y)
 {
-  l.check(x, lisp_type::FLOAT);
-  l.check(y, lisp_type::FLOAT);
+  l.check(x, type::FLOAT);
+  l.check(y, type::FLOAT);
   if(y->floatval() == 0.0)
     return l.error(DIVIDE_ZERO, C_NIL);
   return mkfloat(l, x->floatval() / y->floatval());
@@ -223,15 +223,15 @@ PRIMITIVE arith::fdivide(LISPT x, LISPT y)
 
 PRIMITIVE arith::minus(LISPT x)
 {
-  l.check(x, lisp_type::FLOAT, lisp_type::INTEGER);
-  if(type_of(x) == lisp_type::INTEGER)
+  l.check(x, type::FLOAT, type::INTEGER);
+  if(type_of(x) == type::INTEGER)
     return mknumber(l, -x->intval());
   return mkfloat(l, -x->floatval());
 }
 
 PRIMITIVE arith::iminus(LISPT x)
 {
-  l.check(x, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
   return mknumber(l, -x->intval());
 }
 
@@ -239,7 +239,7 @@ PRIMITIVE arith::absval(LISPT x)
 {
   int sign;
 
-  l.check(x, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
   if(x->intval() < 0)
     sign = -1;
   else
@@ -249,19 +249,19 @@ PRIMITIVE arith::absval(LISPT x)
 
 PRIMITIVE arith::itof(LISPT x)
 {
-  l.check(x, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
   return mkfloat(l, (double)x->intval());
 }
 
 PRIMITIVE arith::add1(LISPT x)
 {
-  l.check(x, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
   return mknumber(l, x->intval() + 1);
 }
 
 PRIMITIVE arith::sub1(LISPT x)
 {
-  l.check(x, lisp_type::INTEGER);
+  l.check(x, type::INTEGER);
   return mknumber(l, x->intval() - 1);
 }
 
@@ -277,19 +277,19 @@ enum class num_type
 
 inline num_type numtype(LISPT x, LISPT y)
 {
-  if(type_of(x) == lisp_type::FLOAT)
+  if(type_of(x) == type::FLOAT)
   {
-    if(type_of(y) == lisp_type::FLOAT)
+    if(type_of(y) == type::FLOAT)
       return num_type::FLOATFLOAT;
-    else if(type_of(y) == lisp_type::INTEGER)
+    else if(type_of(y) == type::INTEGER)
       return num_type::FLOATINT;
     return num_type::ILLEGAL2;
   }
-  else if(type_of(x) == lisp_type::INTEGER)
+  else if(type_of(x) == type::INTEGER)
   {
-    if(type_of(y) == lisp_type::FLOAT)
+    if(type_of(y) == type::FLOAT)
       return num_type::INTFLOAT;
-    else if(type_of(y) == lisp_type::INTEGER)
+    else if(type_of(y) == type::INTEGER)
       return num_type::INTINT;
     return num_type::ILLEGAL2;
   }
@@ -345,21 +345,21 @@ PRIMITIVE arith::neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, 
 
 PRIMITIVE arith::zerop(LISPT x)
 {
-  if(type_of(x) == lisp_type::INTEGER && x->intval() == 0)
+  if(type_of(x) == type::INTEGER && x->intval() == 0)
     return C_T;
   return C_NIL;
 }
 
 PRIMITIVE arith::minusp(LISPT x)
 {
-  if(type_of(x) == lisp_type::FLOAT)
+  if(type_of(x) == type::FLOAT)
   {
     if(x->floatval() < 0.0)
       return C_T;
     else
       return C_NIL;
   }
-  else if(type_of(x) == lisp_type::INTEGER)
+  else if(type_of(x) == type::INTEGER)
   {
     if(x->intval() < 0)
       return C_T;
@@ -515,31 +515,31 @@ TEST_CASE("Arithmetic functions")
   SUBCASE("f+")
   {
     auto r = eval(l, "(f+ (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp_type::FLOAT);
+    CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 7.0);
   }
   SUBCASE("f-")
   {
     auto r = eval(l, "(f- (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp_type::FLOAT);
+    CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 3.0);
   }
   SUBCASE("f*")
   {
     auto r = eval(l, "(f* (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp_type::FLOAT);
+    CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 10.0);
   }
   SUBCASE("f/")
   {
     auto r = eval(l, "(f/ (itof 5) (itof 2))");
-    CHECK(type_of(r) == lisp_type::FLOAT);
+    CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 2.5);
   }
   SUBCASE("itof")
   {
     auto r = eval(l, "(itof 8)");
-    CHECK(type_of(r) == lisp_type::FLOAT);
+    CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 8.0);
   }
 

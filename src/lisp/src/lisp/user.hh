@@ -26,7 +26,7 @@ public:
 
 private:
   LISPT getargs(LISPT);
-  LISPT def(LISPT, LISPT, LISPT, lisp_type);
+  LISPT def(LISPT, LISPT, LISPT, type);
   LISPT checkfn(LISPT, LISPT);
 };
 

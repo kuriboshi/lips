@@ -46,7 +46,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
   auto intern = [this](const auto s) { return a().intern(s); };
 
-  set(C_T, lisp_type::T, a().getobject());
+  set(C_T, type::T, a().getobject());
 
   auto nil = intern("nil");
   nil->symvalue(C_NIL);
@@ -65,7 +65,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   C_DOT = intern(".");
   C_ENDOFFILE = intern("endoffile");
   C_ENVIRON = intern("environ");
-  set(C_EOF, lisp_type::ENDOFFILE, a().getobject());
+  set(C_EOF, type::ENDOFFILE, a().getobject());
   C_FILE = intern("file");
   C_FLOAT = intern("float");
   C_FREE = intern("free");
@@ -165,7 +165,7 @@ LISPT lisp::syserr(LISPT fault)
 static int dobreak(lisp& l, LISPT* com)
 {
   /* OK, EVAL, ^, ... */
-  if(type_of(*com) != lisp_type::CONS)
+  if(type_of(*com) != type::CONS)
   {
     l.e().unwind();
     throw lisp_error("bad command");

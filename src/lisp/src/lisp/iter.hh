@@ -19,7 +19,7 @@ public:
   bool operator!=(const iterator& x) const { return _car != x._car; }
   iterator& operator++()
   {
-    if(type_of(_car) == lisp_type::CONS)
+    if(type_of(_car) == type::CONS)
       _car = _car->cdr();
     else
       _car = nullptr;

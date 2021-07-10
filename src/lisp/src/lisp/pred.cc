@@ -15,9 +15,9 @@ PRIMITIVE pred::numberp(LISPT a)
 {
   switch(type_of(a))
   {
-    case lisp_type::INTEGER:
-    case lisp_type::FLOAT:
-    case lisp_type::BIGNUM:
+    case type::INTEGER:
+    case type::FLOAT:
+    case type::BIGNUM:
       return a;
     default:
       return C_NIL;
@@ -26,7 +26,7 @@ PRIMITIVE pred::numberp(LISPT a)
 
 PRIMITIVE pred::listp(LISPT a)
 {
-  if(type_of(a) == lisp_type::CONS)
+  if(type_of(a) == type::CONS)
     return a;
   else
     return C_NIL;
@@ -53,7 +53,7 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
     return C_T;
   switch(type_of(l1))
   {
-    case lisp_type::CONS:
+    case type::CONS:
       while(!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
       {
         x = equal(l1->car(), l2->car());
@@ -66,14 +66,14 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
           return C_NIL;
       }
       return x;
-    case lisp_type::STRING:
+    case type::STRING:
       return (l1->stringval() == l2->stringval()) ? C_T : C_NIL;
       break;
-    case lisp_type::LAMBDA:
-    case lisp_type::NLAMBDA:
+    case type::LAMBDA:
+    case type::NLAMBDA:
       return funeq(l, l1, l2);
       break;
-    case lisp_type::INTEGER:
+    case type::INTEGER:
       return (l1->intval() == l2->intval() ? C_T : C_NIL);
       break;
     default:
@@ -84,7 +84,7 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
 
 PRIMITIVE pred::nlistp(LISPT a)
 {
-  if(type_of(a) != lisp_type::CONS)
+  if(type_of(a) != type::CONS)
     return a;
   else
     return C_NIL;
@@ -100,9 +100,9 @@ PRIMITIVE pred::neq(LISPT a, LISPT b)
 
 PRIMITIVE pred::boundp(LISPT a)
 {
-  if(type_of(a) != lisp_type::SYMBOL)
+  if(type_of(a) != type::SYMBOL)
     return C_NIL;
-  else if(type_of(a->symvalue()) != lisp_type::UNBOUND)
+  else if(type_of(a->symvalue()) != type::UNBOUND)
     return C_T;
   else
     return C_NIL;
@@ -110,7 +110,7 @@ PRIMITIVE pred::boundp(LISPT a)
 
 PRIMITIVE pred::litatom(LISPT a)
 {
-  if(type_of(a) == lisp_type::SYMBOL)
+  if(type_of(a) == type::SYMBOL)
     return C_T;
   else
     return C_NIL;
@@ -120,45 +120,45 @@ PRIMITIVE pred::xtypeof(LISPT a)
 {
   switch(type_of(a))
   {
-    case lisp_type::NIL:
+    case type::NIL:
       return C_NIL;
-    case lisp_type::SYMBOL:
+    case type::SYMBOL:
       return C_SYMBOL;
-    case lisp_type::INTEGER:
+    case type::INTEGER:
       return C_INTEGER;
-    case lisp_type::BIGNUM:
+    case type::BIGNUM:
       return C_BIGNUM;
-    case lisp_type::FLOAT:
+    case type::FLOAT:
       return C_FLOAT;
-    case lisp_type::INDIRECT:
+    case type::INDIRECT:
       return C_INDIRECT;
-    case lisp_type::CONS:
+    case type::CONS:
       return C_CONS;
-    case lisp_type::STRING:
+    case type::STRING:
       return C_STRING;
-    case lisp_type::SUBR:
+    case type::SUBR:
       return C_SUBR;
-    case lisp_type::FSUBR:
+    case type::FSUBR:
       return C_FSUBR;
-    case lisp_type::LAMBDA:
+    case type::LAMBDA:
       return C_LAMBDA;
-    case lisp_type::NLAMBDA:
+    case type::NLAMBDA:
       return C_NLAMBDA;
-    case lisp_type::CLOSURE:
+    case type::CLOSURE:
       return C_CLOSURE;
-    case lisp_type::UNBOUND:
+    case type::UNBOUND:
       return C_UNBOUND;
-    case lisp_type::ENVIRON:
+    case type::ENVIRON:
       return C_ENVIRON;
-    case lisp_type::T:
+    case type::T:
       return C_T;
-    case lisp_type::FREE:
+    case type::FREE:
       return C_FREE;
-    case lisp_type::ENDOFFILE:
+    case type::ENDOFFILE:
       return C_ENDOFFILE;
-    case lisp_type::ERROR:
+    case type::ERROR:
       return C_ERROR;
-    case lisp_type::FILET:
+    case type::FILET:
       return C_FILE;
     default:
       return C_NIL;
