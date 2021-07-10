@@ -190,50 +190,50 @@ struct lisp_t
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  symbol_t& symbol() { return std::get<symbol_t>(u); }
-  void symbol(symbol_t x) { type = lisp_type::SYMBOL; u = x; }
-  LISPT symvalue() const { return std::get<symbol_t>(u).value; }
-  void symvalue(LISPT x) { std::get<symbol_t>(u).value = x; }
-  int intval() const { return std::get<int>(u); }
-  void intval(int x)
+  auto symbol() -> symbol_t& { return std::get<symbol_t>(u); }
+  auto symbol(symbol_t x) -> void { type = lisp_type::SYMBOL; u = x; }
+  auto symvalue() const -> LISPT { return std::get<symbol_t>(u).value; }
+  auto symvalue(LISPT x) -> void { std::get<symbol_t>(u).value = x; }
+  auto intval() const -> int { return std::get<int>(u); }
+  auto intval(int x) -> void
   {
     type = lisp_type::INTEGER;
     u = x;
   }
-  double floatval() const { return std::get<double>(u); }
-  void floatval(double f)
+  auto floatval() const -> double { return std::get<double>(u); }
+  auto floatval(double f) -> void
   {
     type = lisp_type::FLOAT;
     u = f;
   }
-  indirect_t& indirectval() { return std::get<4>(u); }
-  const cons_t& consval() const { return std::get<cons_t>(u); }
+  auto indirectval() -> indirect_t& { return std::get<4>(u); }
+  auto consval() const -> const cons_t& { return std::get<cons_t>(u); }
   void consval(cons_t x) { type = lisp_type::CONS; u = x; }
-  LISPT car() const { return std::get<cons_t>(u).car; }
-  LISPT cdr() const { return std::get<cons_t>(u).cdr; }
+  auto car() const -> LISPT { return std::get<cons_t>(u).car; }
+  auto cdr() const -> LISPT { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
   void cdr(LISPT x) { std::get<cons_t>(u).cdr = x; }
-  const std::string& stringval() const { return std::get<std::string>(u); }
+  auto stringval() const -> const std::string& { return std::get<std::string>(u); }
   void stringval(const std::string& s)
   {
     type = lisp_type::STRING;
     u = s;
   }
-  const subr_t& subrval() const { return *std::get<subr_t*>(u); }
+  auto subrval() const -> const subr_t& { return *std::get<subr_t*>(u); }
   void subrval(subr_t* x) { type = lisp_type::SUBR; u = x; }
-  lambda_t& lamval() { return std::get<lambda_t>(u); }
+  auto lamval() -> lambda_t& { return std::get<lambda_t>(u); }
   void lamval(lambda_t x) { type = lisp_type::LAMBDA; u = x; }
   void nlamval(lambda_t x) { type = lisp_type::NLAMBDA; u = x; }
-  closure_t& closval() { return std::get<closure_t>(u); }
-  destblock_t* envval() { return std::get<destblock_t*>(u); }
+  auto closval() -> closure_t& { return std::get<closure_t>(u); }
+  auto envval() -> destblock_t* { return std::get<destblock_t*>(u); }
   void envval(destblock_t* env) { type = lisp_type::ENVIRON; u = env; }
-  file_t& fileval() { return *std::get<std::unique_ptr<file_t>>(u).get(); }
+  auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(u).get(); }
   void fileval(std::unique_ptr<file_t> f) { type = lisp_type::FILET; u = std::move(f); }
-  LISPT freeval() { return std::get<12>(u); }
+  auto freeval() -> LISPT { return std::get<12>(u); }
   void freeval(LISPT x) { type = lisp_type::FREE; u.emplace<12>(x); }
-  cvariable_t cvarval() const { return std::get<cvariable_t>(u); }
+  auto cvarval() const -> cvariable_t{ return std::get<cvariable_t>(u); }
   void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
-  void* cpointval() { return std::get<void*>(u); }
+  auto cpointval() -> void* { return std::get<void*>(u); }
 
   const std::string& getstr() const { return type == lisp_type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
