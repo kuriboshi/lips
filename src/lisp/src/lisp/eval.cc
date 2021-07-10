@@ -33,10 +33,10 @@ LISPT evaluator::printwhere()
   LISPT foo = C_NIL;
   for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
-    if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::evlam0)
+    if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::evlam0)
       for(; i; i--)
       {
-        if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0 && control[i - 1].type == CTRL_LISP
+        if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::ev0 && control[i - 1].type == control::LISP
           && (type_of(control[i - 1].u.lisp) == lisp_type::CONS && type_of(control[i - 1].u.lisp->car()) != lisp_type::CONS))
         {
           foo = control[i - 1].u.lisp;
@@ -73,7 +73,7 @@ void evaluator::overflow() { abort(STACK_OVERFLOW, C_NIL); }
  */
 void evaluator::push_lisp(LISPT a)
 {
-  control[toctrl].type = CTRL_LISP;
+  control[toctrl].type = control::LISP;
   control[toctrl++].u.lisp = a;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
@@ -81,7 +81,7 @@ void evaluator::push_lisp(LISPT a)
 
 void evaluator::push_point(destblock_t* d)
 {
-  control[toctrl].type = CTRL_POINT;
+  control[toctrl].type = control::POINT;
   control[toctrl++].u.point = d;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
@@ -89,7 +89,7 @@ void evaluator::push_point(destblock_t* d)
 
 void evaluator::push_func(continuation_t f)
 {
-  control[toctrl].type = CTRL_FUNC;
+  control[toctrl].type = control::FUNC;
   control[toctrl++].u.f_point = f;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
@@ -425,8 +425,8 @@ bool evaluator::peval1()
         push_point(dest);
         push_func(&evaluator::ev2);
         dest = mkdestblock(fun->subrval().argcount());
-        noeval = fun->subrval().subr == subr_t::S_NOEVAL;
-        if(fun->subrval().spread == subr_t::S_SPREAD)
+        noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
+        if(fun->subrval().spread == subr_t::spread::SPREAD)
         {
           if(!noeval)
           {
@@ -486,9 +486,9 @@ bool evaluator::peval2()
       case lisp_type::SUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
-        noeval = fun->subrval().subr == subr_t::S_NOEVAL;
+        noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
         dest = mkdestblock(fun->subrval().argcount());
-        if(fun->subrval().spread == subr_t::S_SPREAD)
+        if(fun->subrval().spread == subr_t::spread::SPREAD)
           cont = &evaluator::spread;
         else
           cont = &evaluator::evalargs;
@@ -533,7 +533,7 @@ void evaluator::bt()
   l.printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
-    if(control[i].type == CTRL_FUNC && control[i].u.f_point == &evaluator::ev0)
+    if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::ev0)
       file(l).print(control[i - 1].u.lisp, C_T);
   }
   l.printlevel = op;
@@ -919,13 +919,13 @@ PRIMITIVE evaluator::baktrace()
     l.primerr().format("{}: ", i);
     switch(control[i].type)
     {
-      case CTRL_LISP:
+      case control::LISP:
         file(l).print(control[i].u.lisp, C_T);
         break;
-      case CTRL_POINT:
+      case control::POINT:
         l.primerr().format("destblock\n");
         break;
-      case CTRL_FUNC:
+      case control::FUNC:
         if(control[i].u.f_point == &evaluator::ev0)
           l.primerr().format("ev0\n");
         else if(control[i].u.f_point == &evaluator::peval)
@@ -1040,13 +1040,13 @@ void evaluator::init()
   gcprotect(l, expression);
   gcprotect(l, args);
   // clang-format off
-  mkprim(PN_E,          ::lisp::eval,       subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_EVAL,       ::lisp::eval,       subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_APPLY,      ::lisp::apply,      subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_APPLYSTAR,  ::lisp::apply,      subr_t::S_EVAL,   subr_t::S_SPREAD);
-  mkprim(PN_BAKTRACE,   ::lisp::baktrace,   subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_ENVGET,     ::lisp::envget,     subr_t::S_EVAL,   subr_t::S_NOSPREAD);
+  mkprim(PN_E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_APPLY,      ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_APPLYSTAR,  ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(PN_BAKTRACE,   ::lisp::baktrace,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

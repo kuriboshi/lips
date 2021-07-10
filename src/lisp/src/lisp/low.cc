@@ -94,14 +94,14 @@ inline constexpr auto PN_PROG2 = "prog2";           // return second expression
 void low::init()
 {
   // clang-format off
-  mkprim(PN_SET,   ::lisp::set,    subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_SETQ,  ::lisp::setq,   subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_SETQQ, ::lisp::set,    subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_COND,  ::lisp::cond,   subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_WHILE, ::lisp::xwhile, subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_PROGN, ::lisp::progn,  subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_PROG1, ::lisp::prog1,  subr_t::S_EVAL,   subr_t::S_SPREAD);
-  mkprim(PN_PROG2, ::lisp::prog2,  subr_t::S_EVAL,   subr_t::S_SPREAD);
+  mkprim(PN_SET,   ::lisp::set,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_SETQ,  ::lisp::setq,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_SETQQ, ::lisp::set,    subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_COND,  ::lisp::cond,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_WHILE, ::lisp::xwhile, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_PROGN, ::lisp::progn,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_PROG1, ::lisp::prog1,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(PN_PROG2, ::lisp::prog2,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
 }
 

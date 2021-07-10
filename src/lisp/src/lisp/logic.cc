@@ -60,10 +60,10 @@ inline constexpr auto PN_IF = "if";   // if a then b else c
 void logic::init()
 {
   // clang-format off
-  mkprim(PN_AND, ::lisp::p_and, subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_OR,  ::lisp::p_or,  subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_NOT, ::lisp::p_not, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_IF,  ::lisp::xif,   subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_AND, ::lisp::p_and, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_OR,  ::lisp::p_or,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_NOT, ::lisp::p_not, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_IF,  ::lisp::xif,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

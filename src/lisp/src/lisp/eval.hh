@@ -23,16 +23,16 @@ public:
   /*
    * The control stack.
    */
-  enum control_type
+  enum class control
   {
-    CTRL_LISP,
-    CTRL_FUNC,
-    CTRL_POINT,
+    LISP,
+    FUNC,
+    POINT,
   };
 
   struct control_t
   {
-    enum control_type type;
+    enum control type;
     union
     {
       continuation_t f_point;

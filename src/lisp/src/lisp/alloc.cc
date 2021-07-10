@@ -39,10 +39,10 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   sweep();
   initcvar(&gcgag, "gcgag", C_NIL);
   // clang-format off
-  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_CONS,      ::lisp::cons,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_OBARRAY,   ::lisp::xobarray,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
@@ -158,7 +158,7 @@ LISPT alloc::doreclaim(int incr)
     mark((LISPT *) &ENVVAL(env));
 #endif
   for(int i = 0; i < e().toctrl; i++)
-    if(e().control[i].type == e().CTRL_LISP && e().control[i].u.lisp != nullptr
+    if(e().control[i].type == evaluator::control::LISP && e().control[i].u.lisp != nullptr
       && type_of(e().control[i].u.lisp) != lisp_type::ENVIRON)
       mark(e().control[i].u.lisp);
   for(int i = 0; i < MAXHASH; i++)
@@ -281,22 +281,22 @@ LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
   return s;
 }
 
-void alloc::mkprim(const std::string& pname, func0_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func1_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func2_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   mkprim(pname, new subr_t(subr, spread, fun));
 }
 
-void alloc::mkprim(const std::string& pname, func3_t fun, subr_t::subr_type subr, subr_t::spread_type spread)
+void alloc::mkprim(const std::string& pname, func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   mkprim(pname, new subr_t(subr, spread, fun));
 }

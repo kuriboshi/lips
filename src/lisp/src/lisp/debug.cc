@@ -28,7 +28,7 @@ inline constexpr auto PN_EVALTRACE = "evaltrace"; // evaltrace
 void debug::init()
 {
   // clang-format off
-  mkprim(PN_EVALTRACE, evaltrace, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_EVALTRACE, evaltrace, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format in
 }
 

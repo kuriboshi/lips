@@ -179,15 +179,15 @@ inline constexpr auto PN_TYPEOF = "typeof";   // return type as an atom
 void pred::init()
 {
   // clang-format off
-  mkprim(PN_LISTP,   ::lisp::listp,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_NLISTP,  ::lisp::nlistp,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_NEQ,     ::lisp::neq,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_NUMBERP, ::lisp::numberp, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_MEMB,    ::lisp::memb,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_EQUAL,   ::lisp::equal,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_BOUNDP,  ::lisp::boundp,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_LITATOM, ::lisp::litatom, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_TYPEOF,  ::lisp::xtypeof, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_LISTP,   ::lisp::listp,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_NLISTP,  ::lisp::nlistp,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_NEQ,     ::lisp::neq,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_NUMBERP, ::lisp::numberp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_MEMB,    ::lisp::memb,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_EQUAL,   ::lisp::equal,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_BOUNDP,  ::lisp::boundp,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_LITATOM, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_TYPEOF,  ::lisp::xtypeof, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

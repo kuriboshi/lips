@@ -70,10 +70,10 @@ public:
 
   static LISPT intern(const std::string&);
 
-  static void mkprim(const std::string& pname, func0_t fname, subr_t::subr_type, subr_t::spread_type);
-  static void mkprim(const std::string& pname, func1_t fname, subr_t::subr_type, subr_t::spread_type);
-  static void mkprim(const std::string& pname, func2_t fname, subr_t::subr_type, subr_t::spread_type);
-  static void mkprim(const std::string& pname, func3_t fname, subr_t::subr_type, subr_t::spread_type);
+  static void mkprim(const std::string& pname, func0_t fname, enum subr_t::subr, enum subr_t::spread);
+  static void mkprim(const std::string& pname, func1_t fname, enum subr_t::subr, enum subr_t::spread);
+  static void mkprim(const std::string& pname, func2_t fname, enum subr_t::subr, enum subr_t::spread);
+  static void mkprim(const std::string& pname, func3_t fname, enum subr_t::subr, enum subr_t::spread);
 
   LISPT mkatom(const std::string&);
   LISPT mkstring(const std::string&);
@@ -150,19 +150,19 @@ inline LISPT getobject() { return getobject(lisp::current()); }
 
 inline void initcvar(LISPT* cvar, const std::string& name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
-inline void mkprim(const std::string& pname, func0_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+inline void mkprim(const std::string& pname, func0_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   alloc::mkprim(pname, fname, subr, spread);
 }
-inline void mkprim(const std::string& pname, func1_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+inline void mkprim(const std::string& pname, func1_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   alloc::mkprim(pname, fname, subr, spread);
 }
-inline void mkprim(const std::string& pname, func2_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+inline void mkprim(const std::string& pname, func2_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   alloc::mkprim(pname, fname, subr, spread);
 }
-inline void mkprim(const std::string& pname, func3_t fname, subr_t::subr_type subr, subr_t::spread_type spread)
+inline void mkprim(const std::string& pname, func3_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   alloc::mkprim(pname, fname, subr, spread);
 }

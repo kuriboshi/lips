@@ -127,23 +127,21 @@ using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
 
 struct subr_t
 {
-  enum subr_type {
-    S_EVAL,
-    S_NOEVAL
-  };
-  enum spread_type {
-    S_SPREAD,
-    S_NOSPREAD
-  };
+  enum class subr {
+    EVAL,
+    NOEVAL
+  } subr = subr::EVAL;
+  enum class spread {
+    SPREAD,
+    NOSPREAD
+  } spread = spread::SPREAD;
 
-  subr_t(subr_type subr, spread_type spread, func0_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(subr_type subr, spread_type spread, func1_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(subr_type subr, spread_type spread, func2_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(subr_type subr, spread_type spread, func3_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(enum subr subr, enum spread spread, func0_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(enum subr subr, enum spread spread, func1_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(enum subr subr, enum spread spread, func2_t fun) : subr(subr), spread(spread), f(fun) {}
+  subr_t(enum subr subr, enum spread spread, func3_t fun) : subr(subr), spread(spread), f(fun) {}
   constexpr std::size_t argcount() const noexcept { return f.index() - 1; }
 
-  subr_type subr;
-  spread_type spread;
   std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
 };
 

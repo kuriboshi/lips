@@ -255,18 +255,18 @@ void file::init()
   C_READ = intern(PN_READ);
 
   // clang-format off
-  mkprim(PN_LOAD,     ::lisp::load,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PRIN1,    ::lisp::prin1,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PRIN2,    ::lisp::prin2,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PRINT,    ::lisp::print,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PLEVEL,   ::lisp::plevel,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_RATOM,    ::lisp::ratom,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_READ,     ::lisp::read,      subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_READC,    ::lisp::readc,     subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_READLINE, ::lisp::readline,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_SPACES,   ::lisp::spaces,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_TERPRI,   ::lisp::terpri,    subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_CPPRINT,  ::lisp::cpprint,   subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_CPPRINT,  ::lisp::cpprint,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

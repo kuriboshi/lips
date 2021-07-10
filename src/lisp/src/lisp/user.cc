@@ -109,10 +109,10 @@ inline constexpr auto PN_DF = "df";         // define nlambda function
 void user::init()
 {
   // clang-format off
-  mkprim(PN_DEFINE, ::lisp::define, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_GETREP, ::lisp::getrep, subr_t::S_EVAL,   subr_t::S_NOSPREAD);
-  mkprim(PN_DE,     ::lisp::de,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
-  mkprim(PN_DF,     ::lisp::df,     subr_t::S_NOEVAL, subr_t::S_SPREAD);
+  mkprim(PN_DEFINE, ::lisp::define, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_GETREP, ::lisp::getrep, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(PN_DE,     ::lisp::de,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(PN_DF,     ::lisp::df,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

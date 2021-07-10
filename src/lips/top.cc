@@ -301,7 +301,7 @@ void top::init()
   initcvar(&top::histnum, "histnum", mknumber(1L));
   initcvar(&top::histmax, "histmax", mknumber(100L));
   initcvar(&promptform, "promptform", C_NIL);
-  mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::S_NOEVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }
 

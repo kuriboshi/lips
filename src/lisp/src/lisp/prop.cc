@@ -81,11 +81,11 @@ inline constexpr auto PN_REMPROP = "remprop";   // remove prop
 void prop::init()
 {
   // clang-format off
-  mkprim(PN_SETPLIST, ::lisp::setplist, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_GETPLIST, ::lisp::getplist, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_PUTPROP,  ::lisp::putprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_GETPROP,  ::lisp::getprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_REMPROP,  ::lisp::remprop,  subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(PN_SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(PN_REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
