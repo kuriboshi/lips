@@ -169,16 +169,16 @@ LISPT evaluator::call(LISPT fun)
   switch(fun->subrval().argcount())
   {
     case 0:
-      return std::get<func0_t>(fun->subrval().f)(l);
+      return fun->subrval()(l);
       break;
     case 1:
-      return std::get<func1_t>(fun->subrval().f)(l, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[1].val.d_lisp);
       break;
     case 2:
-      return std::get<func2_t>(fun->subrval().f)(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     case 3:
-      return std::get<func3_t>(fun->subrval().f)(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
       break;
     default:
       break;

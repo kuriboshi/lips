@@ -120,11 +120,6 @@ struct symbol_t
   LISPT topval = NIL;        // Holds top value (not used yet)
 };
 
-using func0_t = LISPT (*)(lisp&);
-using func1_t = LISPT (*)(lisp&, LISPT);
-using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
-using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
-
 struct subr_t
 {
   enum class subr {
@@ -136,11 +131,21 @@ struct subr_t
     NOSPREAD
   } spread = spread::SPREAD;
 
+  using func0_t = LISPT (*)(lisp&);
+  using func1_t = LISPT (*)(lisp&, LISPT);
+  using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
+  using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
+
   subr_t(enum subr subr, enum spread spread, func0_t fun) : subr(subr), spread(spread), f(fun) {}
   subr_t(enum subr subr, enum spread spread, func1_t fun) : subr(subr), spread(spread), f(fun) {}
   subr_t(enum subr subr, enum spread spread, func2_t fun) : subr(subr), spread(spread), f(fun) {}
   subr_t(enum subr subr, enum spread spread, func3_t fun) : subr(subr), spread(spread), f(fun) {}
   constexpr std::size_t argcount() const noexcept { return f.index() - 1; }
+
+  LISPT operator()(lisp& l) const { return std::get<func0_t>(f)(l); }
+  LISPT operator()(lisp& l, LISPT a) const { return std::get<func1_t>(f)(l, a); }
+  LISPT operator()(lisp& l, LISPT a, LISPT b) const { return std::get<func2_t>(f)(l, a, b); }
+  LISPT operator()(lisp& l, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(l, a, b, c); }
 
   std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
 };
