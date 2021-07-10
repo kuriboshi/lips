@@ -198,7 +198,7 @@ LISPT io::lispread(file_t& file, bool line)
   LISPT curr, temp, curatom;
   if(!line)
   {
-    l.top = cons(C_NIL, C_NIL);
+    l.top = cons(l, C_NIL, C_NIL);
     curr = l.top;
   }
   else
