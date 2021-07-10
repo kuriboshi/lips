@@ -164,6 +164,9 @@ PRIMITIVE prim::eq(LISPT a, LISPT b)
 {
   if(EQ(a, b))
     return C_T;
+  if(type_of(a) == lisp_type::INTEGER && type_of(b) == lisp_type::INTEGER
+    && a->intval() == b->intval())
+    return C_T;
   return C_NIL;
 }
 
