@@ -47,7 +47,7 @@ PRIMITIVE prop::getprop(LISPT x, LISPT p)
     if(EQ(pl->car(), p))
       return pl->cdr()->car();
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE prop::remprop(LISPT x, LISPT p)
@@ -56,8 +56,8 @@ PRIMITIVE prop::remprop(LISPT x, LISPT p)
 
   l.check(x, type::SYMBOL);
   l.check(p, type::SYMBOL);
-  LISPT r = C_NIL;
-  for(pl = x->symbol().plist, pl2 = C_NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
+  LISPT r = NIL;
+  for(pl = x->symbol().plist, pl2 = NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
     {

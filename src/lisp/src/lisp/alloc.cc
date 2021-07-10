@@ -37,7 +37,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
   sweep();
-  initcvar(&gcgag, "gcgag", C_NIL);
+  initcvar(&gcgag, "gcgag", NIL);
 
   // clang-format off
   mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
@@ -198,7 +198,7 @@ LISPT alloc::doreclaim(int incr)
   }
   if(is_NIL(gcgag))
     _lisp.primerr().format("{} cells freed\n", nrfreed);
-  return C_NIL;
+  return NIL;
 }
 
 /*
@@ -217,7 +217,7 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     i = incr->intval();
   }
   doreclaim(i);
-  return C_NIL;
+  return NIL;
 }
 
 LISPT alloc::getobject()
@@ -254,7 +254,7 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
 
 PRIMITIVE alloc::xobarray()
 {
-  LISPT o = C_NIL;
+  LISPT o = NIL;
   for(int i = 0; i < MAXHASH; i++)
     for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
   return o;
@@ -334,12 +334,12 @@ LISPT alloc::mkarglis(LISPT alist, int& count)
     count++;
     return cons(alist->car(), mkarglis(alist->cdr(), count));
   }
-  else if(EQ(alist, C_NIL))
-    return C_NIL;
+  else if(EQ(alist, NIL))
+    return NIL;
   else
   {
     count = -(count + 1);
-    return cons(alist, C_NIL);
+    return cons(alist, NIL);
   }
 }
 
@@ -388,7 +388,7 @@ LISPT alloc::buildatom(const std::string& s, LISPT newatom)
 
   newatom->symbol(symbol_t());
   newatom->symbol().pname = s;
-  newatom->symbol().plist = C_NIL;
+  newatom->symbol().plist = NIL;
   newatom->symvalue(unbound);
   LISPT l = nullptr;
   set(l, type::SYMBOL, newatom);
@@ -476,8 +476,8 @@ destblock_t* alloc::dalloc(int size)
     destblockused += size;
     for(int i = 0; i < size; i++)
     {
-      destblock[destblockused - 1 - i].var.d_lisp = C_NIL;
-      destblock[destblockused - 1 - i].val.d_lisp = C_NIL;
+      destblock[destblockused - 1 - i].var.d_lisp = NIL;
+      destblock[destblockused - 1 - i].val.d_lisp = NIL;
     }
   }
   else

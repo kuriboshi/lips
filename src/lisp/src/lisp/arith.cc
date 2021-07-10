@@ -174,23 +174,23 @@ PRIMITIVE arith::divide(LISPT x, LISPT y)
     if(type_of(y) == type::INTEGER)
     {
       if(y->intval() == 0)
-        return l.error(DIVIDE_ZERO, C_NIL);
+        return l.error(DIVIDE_ZERO, NIL);
       return mknumber(l, x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        return l.error(DIVIDE_ZERO, C_NIL);
+        return l.error(DIVIDE_ZERO, NIL);
       return mkfloat(l, (double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::INTEGER)
   {
     if(y->intval() == 0)
-      return l.error(DIVIDE_ZERO, C_NIL);
+      return l.error(DIVIDE_ZERO, NIL);
     return mkfloat(l, x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    return l.error(DIVIDE_ZERO, C_NIL);
+    return l.error(DIVIDE_ZERO, NIL);
   return mkfloat(l, x->floatval() / y->floatval());
 }
 
@@ -199,7 +199,7 @@ PRIMITIVE arith::iquotient(LISPT x, LISPT y)
   l.check(x, type::INTEGER);
   l.check(y, type::INTEGER);
   if(y->intval() == 0)
-    return l.error(DIVIDE_ZERO, C_NIL);
+    return l.error(DIVIDE_ZERO, NIL);
   return mknumber(l, x->intval() / y->intval());
 }
 
@@ -208,7 +208,7 @@ PRIMITIVE arith::iremainder(LISPT x, LISPT y)
   l.check(x, type::INTEGER);
   l.check(y, type::INTEGER);
   if(y->intval() == 0)
-    return l.error(DIVIDE_ZERO, C_NIL);
+    return l.error(DIVIDE_ZERO, NIL);
   return mknumber(l, x->intval() % y->intval());
 }
 
@@ -217,7 +217,7 @@ PRIMITIVE arith::fdivide(LISPT x, LISPT y)
   l.check(x, type::FLOAT);
   l.check(y, type::FLOAT);
   if(y->floatval() == 0.0)
-    return l.error(DIVIDE_ZERO, C_NIL);
+    return l.error(DIVIDE_ZERO, NIL);
   return mkfloat(l, x->floatval() / y->floatval());
 }
 
@@ -301,7 +301,7 @@ inline LISPT docheck(T x, T y, C cmp)
 {
   if(cmp(x, y))
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 inline void illegalreturn(lisp& l, LISPT x) { l.error(ILLEGAL_ARG, x); }
@@ -328,7 +328,7 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
     default:
       break;
   }
-  return l.error(BUG, C_NIL);
+  return l.error(BUG, NIL);
 }
 
 PRIMITIVE arith::greaterp(LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
@@ -347,7 +347,7 @@ PRIMITIVE arith::zerop(LISPT x)
 {
   if(type_of(x) == type::INTEGER && x->intval() == 0)
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE arith::minusp(LISPT x)
@@ -357,14 +357,14 @@ PRIMITIVE arith::minusp(LISPT x)
     if(x->floatval() < 0.0)
       return C_T;
     else
-      return C_NIL;
+      return NIL;
   }
   else if(type_of(x) == type::INTEGER)
   {
     if(x->intval() < 0)
       return C_T;
     else
-      return C_NIL;
+      return NIL;
   }
   return l.error(ILLEGAL_ARG, x);
 }

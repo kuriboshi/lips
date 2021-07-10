@@ -350,7 +350,7 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
 
   if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(C_NIL, C_NIL); !is_NIL(files); files = files->cdr())
+  for(stripped = cons(NIL, NIL); !is_NIL(files); files = files->cdr())
   {
     s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';

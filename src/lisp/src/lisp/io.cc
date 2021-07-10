@@ -179,7 +179,7 @@ LISPT io::splice(LISPT x, LISPT y, bool tailp)
   if(is_NIL(y))
     return x;
   rplacd(l, x, y);
-  LISPT t2 = C_NIL;
+  LISPT t2 = NIL;
   for(; type_of(y) == type::CONS; y = y->cdr()) t2 = y;
   return rplacd(l, t2, t);
 }
@@ -198,7 +198,7 @@ LISPT io::lispread(file_t& file, bool line)
   LISPT curr, temp, curatom;
   if(!line)
   {
-    l.top = cons(l, C_NIL, C_NIL);
+    l.top = cons(l, NIL, NIL);
     curr = l.top;
   }
   else
@@ -226,7 +226,7 @@ head:
   else if(curc == '(')
   {
   head2:
-    rplaca(l, curr, cons(l, C_NIL, C_NIL));
+    rplaca(l, curr, cons(l, NIL, NIL));
     rplacd(l, curr->car(), curr);
     curr = curr->car();
     goto head;
@@ -234,7 +234,7 @@ head:
   else if(curc == ')')
   {
     curr = curr->cdr();
-    rplaca(l, curr, C_NIL);
+    rplaca(l, curr, NIL);
     goto check;
   }
   else
@@ -246,7 +246,7 @@ head:
     if(is_NIL(curr->cdr()))
     {
       temp = l.top->car();
-      l.top = C_NIL;
+      l.top = NIL;
       return temp;
     }
     else if(line && file.eoln() && EQ(curr->cdr(), l.top))
@@ -265,7 +265,7 @@ tail:
   if(isinsert(l, curc))
   {
     temp = curr->cdr();
-    rplacd(l, curr, cons(l, C_NIL, temp));
+    rplacd(l, curr, cons(l, NIL, temp));
     curr = curr->cdr();
     pushr(l.top);
     rplaca(l, curr, (*l.currentrt.rmacros[curc])(l, file, curr, curc));
@@ -289,14 +289,14 @@ tail:
   {
   addparen:
     temp = curr->cdr();
-    rplacd(l, curr, C_NIL);
+    rplacd(l, curr, NIL);
     curr = temp;
     goto check;
   }
   else if(curc == '(')
   {
     temp = curr->cdr();
-    rplacd(l, curr, cons(l, C_NIL, C_NIL));
+    rplacd(l, curr, cons(l, NIL, NIL));
     curr = curr->cdr();
     rplacd(l, curr, temp);
     goto head2;
@@ -330,7 +330,7 @@ tail:
     }
     if(curc != ')')
     {
-      rplacd(l, curr, cons(l, C_DOT, cons(l, C_NIL, temp)));
+      rplacd(l, curr, cons(l, C_DOT, cons(l, NIL, temp)));
       curr = curr->cdr()->cdr();
       rplaca(l, curr, curatom);
       goto another;
@@ -347,7 +347,7 @@ tail:
     curatom = ratom(file);
   insert:
     temp = curr->cdr();
-    rplacd(l, curr, cons(l, C_NIL, temp));
+    rplacd(l, curr, cons(l, NIL, temp));
     curr = curr->cdr();
     rplaca(l, curr, curatom);
     goto tail;
@@ -380,7 +380,7 @@ LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
     return C_QUOTE;
   }
   file.ungetch(c);
-  return cons(l, C_QUOTE, cons(l, io(l).lispread(file, false), C_NIL));
+  return cons(l, C_QUOTE, cons(l, io(l).lispread(file, false), NIL));
 }
 
 #if 0
@@ -390,8 +390,8 @@ LISPT io::rmpipe(lisp& l, file_t&, LISPT curr, char)
 
   t1 = curr->cdr();
   rplaca(
-    t1, cons(l, C_PIPE, cons(l, curr->cdr()->car(), cons(l, t2 = cons(l, C_NIL, t1), C_NIL))));
-  rplacd(l, curr, C_NIL);
+    t1, cons(l, C_PIPE, cons(l, curr->cdr()->car(), cons(l, t2 = cons(l, NIL, t1), NIL))));
+  rplacd(l, curr, NIL);
   return t2;
 }
 
@@ -404,17 +404,17 @@ LISPT io::rmredir(lisp& l, file_t& file, LISPT curr, char curc)
   c = file.getch();
   rplaca(l, t1,
     cons(l, (curc == '<') ? C_FROM : ((c == '>') ? C_TOTO : C_TO),
-      cons(l, curr->cdr()->car(), t2 = cons(l, C_NIL, t1))));
+      cons(l, curr->cdr()->car(), t2 = cons(l, NIL, t1))));
   if (!(c == '>' || curc == '>'))
     file.ungetch(c);
-  rplacd(l, curr, C_NIL);
+  rplacd(l, curr, NIL);
   return t2;
 }
 
 LISPT io::rmbg(lisp& l, file_t*, LISPT curr, char)
 {
   rplaca(l, curr->cd(), cons(l, C_BACK, curr->cdr()->car()));
-  rplacd(l, curr, cons(l, C_NIL, curr->cdr()));
+  rplacd(l, curr, cons(l, NIL, curr->cdr()));
   return curr->cdr();
 }
 
@@ -432,8 +432,8 @@ LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
 
 LISPT io::readline(file_t& file)
 {
-  l.top = cons(l, C_NIL, C_NIL); /* Init first paren level */
-  rplaca(l, l.top, cons(l, C_NIL, l.top));
+  l.top = cons(l, NIL, NIL); /* Init first paren level */
+  rplaca(l, l.top, cons(l, NIL, l.top));
   LISPT rd = lispread(file, true);
   return rd;
 }
@@ -493,7 +493,7 @@ LISPT io::patom(LISPT x, file_t& file, bool esc)
 LISPT io::terpri(file_t& file)
 {
   file.putch('\n');
-  return C_NIL;
+  return NIL;
 }
 
 LISPT io::prinbody(LISPT x, file_t& file, bool esc)
@@ -501,7 +501,7 @@ LISPT io::prinbody(LISPT x, file_t& file, bool esc)
   LISPT xx = x;
 nxtelt:
   prin0(xx->car(), file, esc);
-  if(EQ(xx->cdr(), C_NIL))
+  if(EQ(xx->cdr(), NIL))
     ;
   else if(type_of(xx->cdr()) == type::CONS)
   {
@@ -625,7 +625,7 @@ bool io::checkeof(lisp& l, int c, bool line)
   {
     if(line || is_NIL(l.top->car()))
       return true;
-    l.error(UNEXPECTED_EOF, C_NIL);
+    l.error(UNEXPECTED_EOF, NIL);
   }
   return false;
 }
@@ -711,7 +711,7 @@ TEST_CASE("Read lisp objects")
     std::string s1{R"(hello world)"};
     auto f1 = file_t(s1);
     auto result1 = readline(lisp, f1);
-    CHECK(equal(lisp, result0, result1) != C_NIL);
+    CHECK(equal(lisp, result0, result1) != NIL);
   }
 }
 

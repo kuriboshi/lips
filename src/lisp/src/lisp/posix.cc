@@ -51,7 +51,7 @@ PRIMITIVE posix::uxclose(LISPT fildes)
   l.check(fildes, type::FILET);
   if(fildes->fileval().close())
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
@@ -62,7 +62,7 @@ PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
   l.check(mode, type::INTEGER);
   i = creat(name->stringval().c_str(), mode->intval());
   if(i < 0)
-    return C_NIL;
+    return NIL;
   else
     return mknumber(l, i);
 }
@@ -159,12 +159,12 @@ PRIMITIVE posix::uxsignal(LISPT sig, LISPT fun)
   if(is_NIL(fun))
   {
     signal(sig->intval(), SIG_IGN);
-    sighandler[sig->intval()] = C_NIL;
+    sighandler[sig->intval()] = NIL;
   }
   else if(is_T(fun))
   {
     signal(sig->intval(), SIG_DFL);
-    sighandler[sig->intval()] = C_NIL;
+    sighandler[sig->intval()] = NIL;
   }
   else
   {

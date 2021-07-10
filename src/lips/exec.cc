@@ -105,7 +105,7 @@ static void printjob(job_t* job)
   }
   buffer += "\t";
   primout().format(buffer);
-  print(job->exp, C_NIL);
+  print(job->exp, NIL);
 }
 #endif
 
@@ -217,7 +217,7 @@ static int mfork()
     if(insidefork)
       std::cerr << fmt::format("{}\n", strerror(errno));
     else
-      syserr(C_NIL);
+      syserr(NIL);
     return pid;
   }
   recordjob(pid, 0);
@@ -353,7 +353,7 @@ TEST_CASE("exec.cc: make_exec")
 {
   SUBCASE("(make_exec (a b c)) -> a b c")
   {
-    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), C_NIL))));
+    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), NIL))));
     REQUIRE(result);
     CHECK(result->size() == 3);
     auto i = result->begin();
@@ -363,7 +363,7 @@ TEST_CASE("exec.cc: make_exec")
   }
   SUBCASE("(make_exec (100)) -> 100")
   {
-    auto result = make_exec(cons(mknumber(100), C_NIL));
+    auto result = make_exec(cons(mknumber(100), NIL));
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
@@ -473,7 +473,7 @@ static LISPT execute(const std::string& name, LISPT command)
 
 TEST_CASE("execute")
 {
-  auto result = execute("/bin/ls", cons(mkstring("ls"), C_NIL));
+  auto result = execute("/bin/ls", cons(mkstring("ls"), NIL));
   CHECK(result->intval() == 0);
 }
 
@@ -549,7 +549,7 @@ PRIMITIVE exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
   UNION_WAIT status;
 
   if(is_NIL(cmd))
-    return C_NIL;
+    return NIL;
   l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
@@ -583,7 +583,7 @@ PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
   UNION_WAIT status;
 
   if(is_NIL(cmd))
-    return C_NIL;
+    return NIL;
   l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
@@ -617,7 +617,7 @@ PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
   UNION_WAIT status;
 
   if(is_NIL(cmd))
-    return C_NIL;
+    return NIL;
   l.check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 0;
@@ -652,7 +652,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
   UNION_WAIT status;
 
   if(is_NIL(cmds))
-    return C_NIL;
+    return NIL;
   if(is_NIL(cmds->cdr()))
     return eval(l, cmds->car());
   if((pid = mfork()) == 0)
@@ -725,7 +725,7 @@ PRIMITIVE exec::rehash()
     for(auto& odir: std::filesystem::directory_iterator(p->getstr()))
       exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE exec::jobs()
@@ -733,7 +733,7 @@ PRIMITIVE exec::jobs()
 #ifdef JOB_CONTROL
   for(auto* j = joblist; j; j = j->next) printjob(j);
 #endif
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE exec::fg(LISPT job)
@@ -820,7 +820,7 @@ PRIMITIVE exec::getenviron(LISPT var)
   l.check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
-    return C_NIL;
+    return NIL;
   return mkstring(l, s);
 }
 
@@ -840,13 +840,13 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   {
     if(is_NIL(emess))
       return l.error(NO_MATCH, dir);
-    return C_NIL;
+    return NIL;
   }
   if(chdir(ndir->getstr().c_str()) == -1)
   {
     if(is_NIL(emess))
       return syserr(l, dir);
-    return C_NIL;
+    return NIL;
   }
   else
   {
@@ -870,7 +870,7 @@ PRIMITIVE exec::doexec(LISPT cmd)
     default:
       break; /* Never reached */
   }
-  return C_NIL;
+  return NIL;
 }
 
 exec::exec(lisp& lisp): base(lisp) {}

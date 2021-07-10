@@ -34,7 +34,7 @@ PRIMITIVE low::setq(LISPT var, LISPT val) { return set(var, eval(l, val)); }
 PRIMITIVE low::progn(LISPT lexp)
 {
   if(is_NIL(lexp))
-    return C_NIL;
+    return NIL;
   while(!is_NIL(lexp->cdr()))
   {
     eval(l, lexp->car());
@@ -45,9 +45,9 @@ PRIMITIVE low::progn(LISPT lexp)
 
 PRIMITIVE low::cond(LISPT args)
 {
-  LISPT res = C_NIL;
+  LISPT res = NIL;
   if(is_NIL(args))
-    return C_NIL;
+    return NIL;
   while(is_NIL(res))
   {
     LISPT alt = args->car();
@@ -64,7 +64,7 @@ PRIMITIVE low::cond(LISPT args)
     if(is_NIL(args))
       break;
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE low::xwhile(LISPT pred, LISPT exp)
@@ -75,7 +75,7 @@ PRIMITIVE low::xwhile(LISPT pred, LISPT exp)
     progn(exp);
     res = eval(l, pred);
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE low::prog1(LISPT a1, LISPT) { return a1; }

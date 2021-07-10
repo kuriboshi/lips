@@ -133,7 +133,7 @@ PRIMITIVE file::spaces(LISPT n, LISPT file)
     f = &file->fileval();
   }
   for(i = n->intval(); i > 0; i--) f->putch(' ');
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE file::readline(LISPT file)
@@ -231,7 +231,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
   fclose(tagsfile);
   return error(NOT_PRINTABLE, oname);
 #else
-  return C_NIL;
+  return NIL;
 #endif
 }
 

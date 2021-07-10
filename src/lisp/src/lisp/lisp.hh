@@ -102,22 +102,22 @@ enum class type
   USER,      // user defined type
 };
 
-inline constexpr auto C_NIL = nullptr;
+inline constexpr auto NIL = nullptr;
 
 // The cons cell
 struct cons_t
 {
-  LISPT car = C_NIL;
-  LISPT cdr = C_NIL;
+  LISPT car = NIL;
+  LISPT cdr = NIL;
 };
 
 struct symbol_t
 {
   std::string pname;           // The printname of the atom
   bool constant = false;       // If true this is a constant which can't be set
-  LISPT value = C_NIL;         // Value
-  LISPT plist = C_NIL;         // The property list
-  LISPT topval = C_NIL;        // Holds top value (not used yet)
+  LISPT value = NIL;         // Value
+  LISPT plist = NIL;         // The property list
+  LISPT topval = NIL;        // Holds top value (not used yet)
 };
 
 using func0_t = LISPT (*)(lisp&);
@@ -147,16 +147,16 @@ struct subr_t
 
 struct lambda_t
 {
-  LISPT lambdarep = C_NIL;
-  LISPT arglist = C_NIL;
+  LISPT lambdarep = NIL;
+  LISPT arglist = NIL;
   short argcnt = 0;
 };
 
 struct closure_t
 {
-  LISPT cfunction = C_NIL;
-  LISPT closed = C_NIL;
-  LISPT cvalues = C_NIL;
+  LISPT cfunction = NIL;
+  LISPT closed = NIL;
+  LISPT cvalues = NIL;
   short count = 0;
 };
 

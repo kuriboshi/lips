@@ -23,7 +23,7 @@ PRIMITIVE string::stringp(LISPT s)
 {
   if(type_of(s) == type::STRING)
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 /* T if both strings are equal */
@@ -33,7 +33,7 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
   l.check(s2, type::STRING);
   if(s1->stringval() == s2->stringval())
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
@@ -78,7 +78,7 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   auto size = e - s + 1;
   if(size < 0 || s > str->stringval().length()
     || e > str->stringval().length() || s <= 0 || e < 0)
-    return C_NIL;
+    return NIL;
   return mkstring(l, str->stringval().substr(s, e));
 }
 

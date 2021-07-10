@@ -143,7 +143,7 @@ void glob::_test_match()
 //
 LISPT glob::orderinsert(LISPT what, LISPT where)
 {
-  LISPT p1 = C_NIL;
+  LISPT p1 = NIL;
   auto p2 = where;
   while(!is_NIL(p2))
   {
@@ -151,7 +151,7 @@ LISPT glob::orderinsert(LISPT what, LISPT where)
     {
       if(!is_NIL(p1))
       {
-        rplacd(p1, cons(what, C_NIL));
+        rplacd(p1, cons(what, NIL));
         rplacd(p1->cdr(), p2);
       }
       else
@@ -162,15 +162,15 @@ LISPT glob::orderinsert(LISPT what, LISPT where)
     p2 = p2->cdr();
   }
   if(is_NIL(where))
-    where = cons(what, C_NIL);
+    where = cons(what, NIL);
   else if(is_NIL(p2))
-    rplacd(p1, cons(what, C_NIL));
+    rplacd(p1, cons(what, NIL));
   return where;
 }
 
 void glob::_test_orderinsert()
 {
-  auto list = cons(mkstring("a"), cons(mkstring("c"), C_NIL));
+  auto list = cons(mkstring("a"), cons(mkstring("c"), NIL));
   SUBCASE("Insert in the middle")
   {
     auto b = mkstring("b");
@@ -377,7 +377,7 @@ void glob::_test_walkfiles()
 
 LISPT glob::buildlist(const std::vector<std::string>& list)
 {
-  LISPT l = C_NIL;
+  LISPT l = NIL;
   for(auto r: list)
     l = cons(mkstring(r), l);
   return l;
@@ -392,7 +392,7 @@ LISPT glob::buildlist(const std::vector<std::string>& list)
 LISPT glob::expandfiles(const std::string& wild, bool all, bool report, bool sort)
 {
   if(wild == "/"s)
-    return cons(mkstring(wild), C_NIL);
+    return cons(mkstring(wild), NIL);
   auto files = glob::walkfiles(".", wild, all, report);
   if(files.empty())
     return C_ERROR;
@@ -505,7 +505,7 @@ LISPT glob::expand(LISPT wild, LISPT rep, LISPT all)
   check(wild, type::STRING, type::SYMBOL);
   auto wstr = glob::extilde(wild->getstr(), r);
   if(!wstr)
-    return C_NIL;
+    return NIL;
   return glob::expandfiles(*wstr, !is_NIL(all), r, false);
 }
 

@@ -23,14 +23,14 @@ void evaluator::reset()
 {
   a.dzero();
   toctrl = 0;
-  fun = C_NIL;
-  args = C_NIL;
+  fun = NIL;
+  args = NIL;
   env = nullptr;
 }
 
 LISPT evaluator::printwhere()
 {
-  LISPT foo = C_NIL;
+  LISPT foo = NIL;
   for(int i = toctrl - 1; i; i--) /* Find latest completed call */
   {
     if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::evlam0)
@@ -64,7 +64,7 @@ void evaluator::abort(int m, LISPT v)
   throw lisp_error("abort");
 }
 
-void evaluator::overflow() { abort(STACK_OVERFLOW, C_NIL); }
+void evaluator::overflow() { abort(STACK_OVERFLOW, NIL); }
 
 /* 
  * These macros handles the control stack.  The control stack stores
@@ -116,7 +116,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     _breakhook();
   if(env == nullptr)
     throw lisp_error("break");
-  file(l).print(cons(l, fault, cons(l, C_BROKEN, C_NIL)), C_T);
+  file(l).print(cons(l, fault, cons(l, C_BROKEN, NIL)), C_T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -183,7 +183,7 @@ LISPT evaluator::call(LISPT fun)
     default:
       break;
   }
-  return C_NIL;
+  return NIL;
 }
 
 /*
@@ -338,7 +338,7 @@ bool evaluator::evalhook(LISPT exp)
         return true;
         break;
       case -1:
-        abort(NO_MESSAGE, C_NIL);
+        abort(NO_MESSAGE, NIL);
         break;
       default:
         return false;
@@ -413,7 +413,7 @@ bool evaluator::peval1()
   if(l.brkflg)
     xbreak(KBD_BREAK, fun, &evaluator::peval1);
   else if(l.interrupt)
-    abort(NO_MESSAGE, C_NIL);
+    abort(NO_MESSAGE, NIL);
   else
     switch(type_of(fun))
     {
@@ -644,7 +644,7 @@ bool evaluator::evlis1()
 
 bool evaluator::evlis2()
 {
-  LISPT x = cons(l, receive(), C_NIL);
+  LISPT x = cons(l, receive(), NIL);
   send(x);
   cont = pop_func();
   return false;
@@ -708,7 +708,7 @@ bool evaluator::evlam()
 bool evaluator::spread()
 {
 respread:
-  if(EQ(args, C_NIL))
+  if(EQ(args, NIL))
   {
     cont = pop_func();
   }
@@ -744,7 +744,7 @@ bool evaluator::ev2()
     // fprintf(primerr, "%s ", ex.what());
     auto foo = printwhere();
     if(is_NIL(foo))
-      xbreak(0, C_NIL, &evaluator::peval1);
+      xbreak(0, NIL, &evaluator::peval1);
     else
       xbreak(0, foo->car(), &evaluator::peval1); /* CAR(_) broken */
   }
@@ -878,7 +878,7 @@ bool evaluator::evclosure1()
 
 bool evaluator::evsequence()
 {
-  if(EQ(args, C_NIL))
+  if(EQ(args, NIL))
   {
     cont = pop_func();
   }
@@ -892,7 +892,7 @@ bool evaluator::evsequence()
 
 bool evaluator::evseq1()
 {
-  if(EQ(args->cdr(), C_NIL))
+  if(EQ(args->cdr(), NIL))
   {
     cont = &evaluator::peval;
   }
@@ -997,7 +997,7 @@ PRIMITIVE evaluator::baktrace()
         break;
     }
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE evaluator::topofstack()
@@ -1021,7 +1021,7 @@ PRIMITIVE evaluator::envget(LISPT e, LISPT n)
       foo = cons(l, e->envval()->car() + n->intval(),
         e->envval()->cdr() + n->intval());
     else
-      foo = C_NIL;
+      foo = NIL;
 #endif
   return foo;
 }

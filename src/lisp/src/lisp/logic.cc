@@ -26,7 +26,7 @@ PRIMITIVE logic::p_and(LISPT x)
 
 PRIMITIVE logic::p_or(LISPT x)
 {
-  LISPT foo = C_NIL;
+  LISPT foo = NIL;
   while(!is_NIL(x))
   {
     foo = eval(l, x->car());
@@ -41,7 +41,7 @@ PRIMITIVE logic::p_not(LISPT x)
 {
   if(is_NIL(x))
     return C_T;
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)

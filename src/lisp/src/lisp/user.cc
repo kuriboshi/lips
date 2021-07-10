@@ -25,7 +25,7 @@ PRIMITIVE user::getrep(LISPT fun)
   LISPT args;
 
   if(type_of(fun) != type::LAMBDA && type_of(fun) != type::NLAMBDA)
-    return C_NIL;
+    return NIL;
   auto& x = fun->lamval();
   if(x.argcnt == -1)
     args = x.arglist->car();
@@ -56,7 +56,7 @@ LISPT user::funeq(LISPT f1, LISPT f2)
         return C_T;
     }
   }
-  return C_NIL;
+  return NIL;
 }
 
 LISPT user::checkfn(LISPT name, LISPT lam)
@@ -69,10 +69,10 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       {
         putprop(l, name, C_OLDDEF, name->symvalue());
         if(!is_NIL(l.verbose))
-          print(l, cons(l, name, cons(l, C_REDEFINED, C_NIL)), C_NIL);
+          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)), NIL);
       }
     }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE user::define(LISPT name, LISPT lam)
@@ -91,10 +91,10 @@ LISPT user::def(LISPT name, LISPT pars, LISPT body, type type)
     l.check(pars, type::CONS);
   LISPT foo = mklambda(l, pars, body, type);
   if(type_of(foo) == type::ERROR)
-    return C_NIL;
+    return NIL;
   checkfn(name, foo);
   name->symvalue(foo);
-  return cons(l, name, C_NIL);
+  return cons(l, name, NIL);
 }
 
 PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::LAMBDA); }

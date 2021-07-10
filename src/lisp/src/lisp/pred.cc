@@ -20,7 +20,7 @@ PRIMITIVE pred::numberp(LISPT a)
     case type::BIGNUM:
       return a;
     default:
-      return C_NIL;
+      return NIL;
   }
 }
 
@@ -29,32 +29,32 @@ PRIMITIVE pred::listp(LISPT a)
   if(type_of(a) == type::CONS)
     return a;
   else
-    return C_NIL;
+    return NIL;
 }
 
 PRIMITIVE pred::memb(LISPT x, LISPT l)
 {
-  while(!EQ(l, C_NIL))
+  while(!EQ(l, NIL))
   {
     if(EQ(x, l->car()))
       return l;
     l = l->cdr();
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE pred::equal(LISPT l1, LISPT l2)
 {
-  LISPT x = C_NIL;
+  LISPT x = NIL;
 
   if(type_of(l1) != type_of(l2))
-    return C_NIL;
+    return NIL;
   if(EQ(l1, l2))
     return C_T;
   switch(type_of(l1))
   {
     case type::CONS:
-      while(!EQ(l1, C_NIL) && !EQ(l2, C_NIL))
+      while(!EQ(l1, NIL) && !EQ(l2, NIL))
       {
         x = equal(l1->car(), l2->car());
         if(EQ(x, C_T))
@@ -63,23 +63,23 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
           l2 = l2->cdr();
         }
         else
-          return C_NIL;
+          return NIL;
       }
       return x;
     case type::STRING:
-      return (l1->stringval() == l2->stringval()) ? C_T : C_NIL;
+      return (l1->stringval() == l2->stringval()) ? C_T : NIL;
       break;
     case type::LAMBDA:
     case type::NLAMBDA:
       return funeq(l, l1, l2);
       break;
     case type::INTEGER:
-      return (l1->intval() == l2->intval() ? C_T : C_NIL);
+      return (l1->intval() == l2->intval() ? C_T : NIL);
       break;
     default:
       break;
   }
-  return C_NIL;
+  return NIL;
 }
 
 PRIMITIVE pred::nlistp(LISPT a)
@@ -87,7 +87,7 @@ PRIMITIVE pred::nlistp(LISPT a)
   if(type_of(a) != type::CONS)
     return a;
   else
-    return C_NIL;
+    return NIL;
 }
 
 PRIMITIVE pred::neq(LISPT a, LISPT b)
@@ -95,17 +95,17 @@ PRIMITIVE pred::neq(LISPT a, LISPT b)
   if(!EQ(a, b))
     return C_T;
   else
-    return C_NIL;
+    return NIL;
 }
 
 PRIMITIVE pred::boundp(LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
-    return C_NIL;
+    return NIL;
   else if(type_of(a->symvalue()) != type::UNBOUND)
     return C_T;
   else
-    return C_NIL;
+    return NIL;
 }
 
 PRIMITIVE pred::litatom(LISPT a)
@@ -113,7 +113,7 @@ PRIMITIVE pred::litatom(LISPT a)
   if(type_of(a) == type::SYMBOL)
     return C_T;
   else
-    return C_NIL;
+    return NIL;
 }
 
 PRIMITIVE pred::xtypeof(LISPT a)
@@ -121,7 +121,7 @@ PRIMITIVE pred::xtypeof(LISPT a)
   switch(type_of(a))
   {
     case type::NIL:
-      return C_NIL;
+      return NIL;
     case type::SYMBOL:
       return C_SYMBOL;
     case type::INTEGER:
@@ -161,9 +161,9 @@ PRIMITIVE pred::xtypeof(LISPT a)
     case type::FILET:
       return C_FILE;
     default:
-      return C_NIL;
+      return NIL;
   }
-  return C_NIL;
+  return NIL;
 }
 
 namespace pn

@@ -214,7 +214,7 @@ LISPT C_SEMI;
  */
 LISPT mungepath(const std::string& pstr)
 {
-  LISPT result = C_NIL;
+  LISPT result = NIL;
   auto pos = pstr.size();
   for(;;)
   {
@@ -259,7 +259,7 @@ static LISPT put_end(LISPT list, LISPT obj, bool conc)
   {
     if(conc)
       return obj;
-    return cons(obj, C_NIL);
+    return cons(obj, NIL);
   }
   LISPT t;
   for(t = list; type_of(t->cdr()) == type::CONS; t = t->cdr())
@@ -267,14 +267,14 @@ static LISPT put_end(LISPT list, LISPT obj, bool conc)
   if(conc)
     rplacd(t, obj);
   else
-    rplacd(t, cons(obj, C_NIL));
+    rplacd(t, cons(obj, NIL));
   return list;
 }
 
 static LISPT transform(LISPT list)
 {
-  LISPT tl = C_NIL;
-  LISPT res = C_NIL;
+  LISPT tl = NIL;
+  LISPT res = NIL;
   bool conc = false;
   for(LISPT ll = list; type_of(ll) == type::CONS; ll = ll->cdr())
   {
@@ -283,55 +283,55 @@ static LISPT transform(LISPT list)
     else if(EQ(ll->car(), C_BAR))
     {
       if(is_NIL(res))
-        res = cons(C_PIPE, cons(tl, C_NIL));
+        res = cons(C_PIPE, cons(tl, NIL));
       else
-        res = cons(C_PIPE, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_PIPE, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = false;
     }
     else if(EQ(ll->car(), C_SEMI))
     {
       if(is_NIL(res))
-        res = cons(C_PROGN, cons(tl, C_NIL));
+        res = cons(C_PROGN, cons(tl, NIL));
       else
-        res = cons(C_PROGN, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_PROGN, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = false;
     }
     else if(EQ(ll->car(), C_GT))
     {
       if(is_NIL(res))
-        res = cons(C_REDIR_TO, cons(tl, C_NIL));
+        res = cons(C_REDIR_TO, cons(tl, NIL));
       else
-        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_GGT))
     {
       if(is_NIL(res))
-        res = cons(C_REDIR_APPEND, cons(tl, C_NIL));
+        res = cons(C_REDIR_APPEND, cons(tl, NIL));
       else
-        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_LT))
     {
       if(is_NIL(res))
-        res = cons(C_REDIR_FROM, cons(tl, C_NIL));
+        res = cons(C_REDIR_FROM, cons(tl, NIL));
       else
-        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = true;
     }
     else if(EQ(ll->car(), C_AMPER))
     {
       if(is_NIL(res))
-        res = cons(C_BACK, cons(tl, C_NIL));
+        res = cons(C_BACK, cons(tl, NIL));
       else
-        res = cons(C_BACK, cons(put_end(res, tl, conc), C_NIL));
-      tl = C_NIL;
+        res = cons(C_BACK, cons(put_end(res, tl, conc), NIL));
+      tl = NIL;
       conc = true;
     }
     else
@@ -410,10 +410,10 @@ LISPT greet(LISPT who)
   else
     s = who->stringval().c_str();
   if(s == nullptr)
-    return C_NIL;
+    return NIL;
   struct passwd* pws = getpwnam(s);
   if(pws == nullptr)
-    return C_NIL;
+    return NIL;
   char loadf[256];
   strcpy(loadf, pws->pw_dir);
   strcat(loadf, "/.lipsrc");
@@ -480,7 +480,7 @@ int main(int argc, char* const* argv)
 #ifdef LIPSRC
       loadinit(LIPSRC);
 #endif
-      greet(C_NIL);
+      greet(NIL);
     }
     catch(const lisp_error& error)
     {}

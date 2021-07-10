@@ -132,7 +132,7 @@ inline LISPT xobarray(lisp& l) { return l.a().xobarray(); }
 inline LISPT xobarray() { return xobarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(); }
 inline LISPT freecount() { return freecount(lisp::current()); }
-inline LISPT gcprotect(lisp& l, LISPT& a) { l.a().gcprotect(a); return C_NIL; }
+inline LISPT gcprotect(lisp& l, LISPT& a) { l.a().gcprotect(a); return NIL; }
 inline LISPT gcprotect(LISPT& a) { return gcprotect(lisp::current(), a); }
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }

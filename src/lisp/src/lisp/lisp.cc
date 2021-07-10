@@ -49,7 +49,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   set(C_T, type::T, a().getobject());
 
   auto nil = intern("nil");
-  nil->symvalue(C_NIL);
+  nil->symvalue(NIL);
   nil->symbol().constant = true;
   
   auto t = intern("t");
@@ -172,7 +172,7 @@ static int dobreak(lisp& l, LISPT* com)
   }
   else if(EQ((**com).car(), C_GO))
   {
-    l.pexp = print(l, eval(l, l.pexp), C_NIL);
+    l.pexp = print(l, eval(l, l.pexp), NIL);
     return 0;
   }
   else if(EQ((**com).car(), C_RESET))
@@ -187,7 +187,7 @@ static int dobreak(lisp& l, LISPT* com)
   }
   else if(EQ((**com).car(), C_RETURN))
   {
-    l.pexp = is_NIL((**com).cdr()) ? C_NIL : (**com).cdr()->car();
+    l.pexp = is_NIL((**com).cdr()) ? NIL : (**com).cdr()->car();
     return 0;
   }
   return 1;
@@ -258,9 +258,9 @@ TEST_CASE("lisp.cc: current")
     auto v0 = lisp::mkatom(lisp0, "v0");
     lisp::setqq(lisp0, v0, lisp::mkatom(lisp0, "world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::C_NIL);
+    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::C_NIL);
+    CHECK(eq(lisp0, v0->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::NIL);
   }
 
   SUBCASE("test 2")
@@ -268,9 +268,9 @@ TEST_CASE("lisp.cc: current")
     auto v1 = lisp::mkatom(lisp1, "v1");
     lisp::setqq(lisp1, v1, lisp::mkatom(lisp1, "world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::C_NIL);
+    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::C_NIL);
+    CHECK(eq(lisp1, v1->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::NIL);
   }
 
   SUBCASE("current 1")
@@ -280,9 +280,9 @@ TEST_CASE("lisp.cc: current")
     auto v2 = lisp::mkatom("v2");
     lisp::setqq(v2, lisp::mkatom("world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::C_NIL);
+    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp0, "world")) != lisp::NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::C_NIL);
+    CHECK(eq(lisp1, v2->symvalue(), lisp::mkatom(lisp1, "world")) == lisp::NIL);
   }
 
   SUBCASE("current 2")
@@ -292,8 +292,8 @@ TEST_CASE("lisp.cc: current")
     auto v3 = lisp::mkatom("v3");
     lisp::setqq(v3, lisp::mkatom("world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::C_NIL);
+    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp1, "world")) != lisp::NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::C_NIL);
+    CHECK(eq(lisp1, v3->symvalue(), lisp::mkatom(lisp0, "world")) == lisp::NIL);
   }
 }
