@@ -147,11 +147,13 @@ LISPT alloc::doreclaim(int incr)
   if(T != nullptr)
     T->mark();
   if(e().dest != nullptr)
+  {
     for(int i = e().dest[0].val.d_integer; i > 0; i--)
     {
       mark(e().dest[i].var.d_lisp);
       mark(e().dest[i].val.d_lisp);
     }
+  }
   for(auto i: markobjs) mark(*i);
 #if 0
   // TODO:
@@ -159,16 +161,19 @@ LISPT alloc::doreclaim(int incr)
     mark((LISPT *) &ENVVAL(env));
 #endif
   for(int i = 0; i < e().toctrl; i++)
-    if(e().control[i].type == evaluator::control::LISP && e().control[i].u.lisp != nullptr
-      && type_of(e().control[i].u.lisp) != type::ENVIRON)
-      mark(e().control[i].u.lisp);
+  {
+    if(auto* env = std::get_if<LISPT>(&e().control[i]); env && *env && type_of(**env) != type::ENVIRON)
+      mark(*env);
+  }
   for(int i = 0; i < MAXHASH; i++)
+  {
     for(auto* l = obarray[i]; l; l = l->onext)
     {
       l->sym->mark();
       mark((l->sym->symvalue()));
       mark((l->sym->symbol().plist));
     }
+  }
   for(int i = destblockused - 1; i >= 0; i--)
   {
     switch(destblock[i].type)

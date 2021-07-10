@@ -6,6 +6,8 @@
 #pragma once
 
 #include <functional>
+#include <variant>
+
 #include "lisp.hh"
 #include "base.hh"
 #include "io.hh"
@@ -23,24 +25,7 @@ public:
   /*
    * The control stack.
    */
-  enum class control
-  {
-    LISP,
-    FUNC,
-    POINT,
-  };
-
-  struct control_t
-  {
-    enum control type;
-    union
-    {
-      continuation_t f_point;
-      destblock_t* point;
-      LISPT lisp;
-    } u;
-  };
-
+  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
   static constexpr int CTRLBLKSIZE = 4000;
   control_t control[CTRLBLKSIZE]; // Control-stack
   int toctrl = 0;                 // Control-stack stack pointer

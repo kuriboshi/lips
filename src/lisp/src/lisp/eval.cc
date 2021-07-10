@@ -31,21 +31,26 @@ void evaluator::reset()
 LISPT evaluator::printwhere()
 {
   LISPT foo = NIL;
-  for(int i = toctrl - 1; i; i--) /* Find latest completed call */
+  for(int i = toctrl - 1; i; --i) // Find latest completed call
   {
-    if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::evlam0)
-      for(; i; i--)
+    if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::evlam0)
+    {
+      for(; i; --i)
       {
-        if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::ev0 && control[i - 1].type == control::LISP
-          && (type_of(control[i - 1].u.lisp) == type::CONS && type_of(control[i - 1].u.lisp->car()) != type::CONS))
+        if(auto* func = std::get_if<continuation_t>(&control[i]); func && *func == &evaluator::ev0)
         {
-          foo = control[i - 1].u.lisp;
-          l.primerr().format(" [in ");
-          file(l).prin2(foo->car(), T);
-          l.primerr().putch(']');
-          goto out;
+          if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
+             lsp && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
+          {
+            foo = *lsp;
+            l.primerr().format(" [in ");
+            file(l).prin2(foo->car(), T);
+            l.primerr().putch(']');
+            goto out;
+          }
         }
       }
+    }
   }
 out:
   l.primerr().putch('\n');
@@ -73,33 +78,30 @@ void evaluator::overflow() { abort(STACK_OVERFLOW, NIL); }
  */
 void evaluator::push_lisp(LISPT a)
 {
-  control[toctrl].type = control::LISP;
-  control[toctrl++].u.lisp = a;
+  control[toctrl++] = a;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
 }
 
 void evaluator::push_point(destblock_t* d)
 {
-  control[toctrl].type = control::POINT;
-  control[toctrl++].u.point = d;
+  control[toctrl++] = d;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
 }
 
 void evaluator::push_func(continuation_t f)
 {
-  control[toctrl].type = control::FUNC;
-  control[toctrl++].u.f_point = f;
+  control[toctrl++] = f;
   if(toctrl >= CTRLBLKSIZE)
     overflow();
 }
 
-LISPT evaluator::pop_lisp() { return control[--toctrl].u.lisp; }
+LISPT evaluator::pop_lisp() { return std::get<LISPT>(control[--toctrl]); }
 
-destblock_t* evaluator::pop_point() { return control[--toctrl].u.point; }
+destblock_t* evaluator::pop_point() { return std::get<destblock_t*>(control[--toctrl]); }
 
-evaluator::continuation_t evaluator::pop_func() { return control[--toctrl].u.f_point; }
+evaluator::continuation_t evaluator::pop_func() { return std::get<evaluator::continuation_t>(control[--toctrl]); }
 
 /*
  * This function prints an error message, and sets up a call
@@ -533,8 +535,8 @@ void evaluator::bt()
   l.printlevel = 2;
   for(int i = toctrl - 1; i; i--)
   {
-    if(control[i].type == control::FUNC && control[i].u.f_point == &evaluator::ev0)
-      file(l).print(control[i - 1].u.lisp, T);
+    if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::ev0)
+      file(l).print(std::get<LISPT>(control[i - 1]), T);
   }
   l.printlevel = op;
 }
@@ -917,85 +919,92 @@ PRIMITIVE evaluator::baktrace()
   for(int i = toctrl; i >= 0; i--)
   {
     l.primerr().format("{}: ", i);
-    switch(control[i].type)
-    {
-      case control::LISP:
-        file(l).print(control[i].u.lisp, T);
-        break;
-      case control::POINT:
-        l.primerr().format("destblock\n");
-        break;
-      case control::FUNC:
-        if(control[i].u.f_point == &evaluator::ev0)
-          l.primerr().format("ev0\n");
-        else if(control[i].u.f_point == &evaluator::peval)
-          l.primerr().format("peval\n");
-        else if(control[i].u.f_point == &evaluator::peval1)
-          l.primerr().format("peval1\n");
-        else if(control[i].u.f_point == &evaluator::peval2)
-          l.primerr().format("peval2\n");
-        else if(control[i].u.f_point == &evaluator::ev0)
-          l.primerr().format("ev0\n");
-        else if(control[i].u.f_point == &evaluator::ev1)
-          l.primerr().format("ev1\n");
-        else if(control[i].u.f_point == &evaluator::ev2)
-          l.primerr().format("ev2\n");
-        else if(control[i].u.f_point == &evaluator::ev3)
-          l.primerr().format("ev3\n");
-        else if(control[i].u.f_point == &evaluator::ev4)
-          l.primerr().format("ev4\n");
-        else if(control[i].u.f_point == &evaluator::evlam0)
-          l.primerr().format("evlam0\n");
-        else if(control[i].u.f_point == &evaluator::evlam1)
-          l.primerr().format("evlam1\n");
-        else if(control[i].u.f_point == &evaluator::ev9)
-          l.primerr().format("ev9\n");
-        else if(control[i].u.f_point == &evaluator::ev11)
-          l.primerr().format("ev11\n");
-        else if(control[i].u.f_point == &evaluator::ev3p)
-          l.primerr().format("ev3p\n");
-        else if(control[i].u.f_point == &evaluator::evalargs)
-          l.primerr().format("evalargs\n");
-        else if(control[i].u.f_point == &evaluator::noevarg)
-          l.primerr().format("noevarg\n");
-        else if(control[i].u.f_point == &evaluator::evlam)
-          l.primerr().format("evlam\n");
-        else if(control[i].u.f_point == &evaluator::spread)
-          l.primerr().format("spread\n");
-        else if(control[i].u.f_point == &evaluator::evlis)
-          l.primerr().format("evlis\n");
-        else if(control[i].u.f_point == &evaluator::evlis1)
-          l.primerr().format("evlis1\n");
-        else if(control[i].u.f_point == &evaluator::evlis2)
-          l.primerr().format("evlis2\n");
-        else if(control[i].u.f_point == &evaluator::evlis3)
-          l.primerr().format("evlis3\n");
-        else if(control[i].u.f_point == &evaluator::evlis4)
-          l.primerr().format("evlis4\n");
-        else if(control[i].u.f_point == &evaluator::noev9)
-          l.primerr().format("noev9\n");
-        else if(control[i].u.f_point == &evaluator::evsequence)
-          l.primerr().format("evsequence\n");
-        else if(control[i].u.f_point == &evaluator::evseq1)
-          l.primerr().format("evseq1\n");
-        else if(control[i].u.f_point == &evaluator::evseq3)
-          l.primerr().format("evseq3\n");
-        else if(control[i].u.f_point == &evaluator::evclosure)
-          l.primerr().format("evclosure\n");
-        else if(control[i].u.f_point == &evaluator::evclosure1)
-          l.primerr().format("evclosure1\n");
-        else if(control[i].u.f_point == &evaluator::eval0)
-          l.primerr().format("eval0\n");
-        else if(control[i].u.f_point == &evaluator::apply0)
-          l.primerr().format("apply0\n");
-        else if(control[i].u.f_point == &evaluator::everr)
-          l.primerr().format("everr\n");
-        else if(control[i].u.f_point == &evaluator::lookup)
-          l.primerr().format("lookup\n");
+    std::visit(
+      [this](auto&& arg) {
+        using ArgType = std::decay_t<decltype(arg)>;
+        if constexpr(std::is_same_v<ArgType, LISPT>)
+        {
+          file(l).print(arg, T);
+        }
+        else if constexpr(std::is_same_v<ArgType, destblock_t*>)
+        {
+          l.primerr().format("destblock\n");
+        }
+        else if constexpr(std::is_same_v<ArgType, continuation_t>)
+        {
+          if(arg == &evaluator::ev0)
+            l.primerr().format("ev0\n");
+          else if(arg == &evaluator::peval)
+            l.primerr().format("peval\n");
+          else if(arg == &evaluator::peval1)
+            l.primerr().format("peval1\n");
+          else if(arg == &evaluator::peval2)
+            l.primerr().format("peval2\n");
+          else if(arg == &evaluator::ev0)
+            l.primerr().format("ev0\n");
+          else if(arg == &evaluator::ev1)
+            l.primerr().format("ev1\n");
+          else if(arg == &evaluator::ev2)
+            l.primerr().format("ev2\n");
+          else if(arg == &evaluator::ev3)
+            l.primerr().format("ev3\n");
+          else if(arg == &evaluator::ev4)
+            l.primerr().format("ev4\n");
+          else if(arg == &evaluator::evlam0)
+            l.primerr().format("evlam0\n");
+          else if(arg == &evaluator::evlam1)
+            l.primerr().format("evlam1\n");
+          else if(arg == &evaluator::ev9)
+            l.primerr().format("ev9\n");
+          else if(arg == &evaluator::ev11)
+            l.primerr().format("ev11\n");
+          else if(arg == &evaluator::ev3p)
+            l.primerr().format("ev3p\n");
+          else if(arg == &evaluator::evalargs)
+            l.primerr().format("evalargs\n");
+          else if(arg == &evaluator::noevarg)
+            l.primerr().format("noevarg\n");
+          else if(arg == &evaluator::evlam)
+            l.primerr().format("evlam\n");
+          else if(arg == &evaluator::spread)
+            l.primerr().format("spread\n");
+          else if(arg == &evaluator::evlis)
+            l.primerr().format("evlis\n");
+          else if(arg == &evaluator::evlis1)
+            l.primerr().format("evlis1\n");
+          else if(arg == &evaluator::evlis2)
+            l.primerr().format("evlis2\n");
+          else if(arg == &evaluator::evlis3)
+            l.primerr().format("evlis3\n");
+          else if(arg == &evaluator::evlis4)
+            l.primerr().format("evlis4\n");
+          else if(arg == &evaluator::noev9)
+            l.primerr().format("noev9\n");
+          else if(arg == &evaluator::evsequence)
+            l.primerr().format("evsequence\n");
+          else if(arg == &evaluator::evseq1)
+            l.primerr().format("evseq1\n");
+          else if(arg == &evaluator::evseq3)
+            l.primerr().format("evseq3\n");
+          else if(arg == &evaluator::evclosure)
+            l.primerr().format("evclosure\n");
+          else if(arg == &evaluator::evclosure1)
+            l.primerr().format("evclosure1\n");
+          else if(arg == &evaluator::eval0)
+            l.primerr().format("eval0\n");
+          else if(arg == &evaluator::apply0)
+            l.primerr().format("apply0\n");
+          else if(arg == &evaluator::everr)
+            l.primerr().format("everr\n");
+          else if(arg == &evaluator::lookup)
+            l.primerr().format("lookup\n");
+          else
+            l.stderr().format("Unknown control stack element\n");
+        }
         else
-          l.stderr().format("Unknown control stack element\n");
-        break;
-    }
+          ; // Do nothing for monostate
+      },
+      control[i]);
   }
   return NIL;
 }
