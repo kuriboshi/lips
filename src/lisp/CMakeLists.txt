@@ -54,3 +54,5 @@ target_link_libraries(lisp PUBLIC fmt::fmt)
 
 add_executable(main src/lisp/main.cc)
 target_link_libraries(main PUBLIC lisp doctest::doctest)
+add_test(NAME lisp_test
+  COMMAND main --test)

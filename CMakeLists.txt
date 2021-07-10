@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 
 project(lips VERSION 0.3.0)
 set(CMAKE_CXX_STANDARD 17)
+enable_testing()
 
 option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
 option(ENABLE_SELECT "Enable using select when asking about core dumps" ON)
