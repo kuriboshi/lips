@@ -16,7 +16,6 @@
 using namespace lisp;
 
 std::string current_prompt;
-LISPT input_exp; /* The input expression. */
 
 /*
  * History functions.
@@ -26,12 +25,10 @@ LISPT input_exp; /* The input expression. */
  */
 void top::phist()
 {
-  LISPT hl;
-
-  for(hl = history; !is_NIL(hl); hl = hl->cdr())
+  for(auto hl: history)
   {
-    std::cout << fmt::format("{}.\t", hl->car()->car()->intval());
-    prinbody(hl->car()->cdr(), lisp::current().stdout(), true);
+    std::cout << fmt::format("{}.\t", hl->car()->intval());
+    prinbody(hl->cdr(), lisp::current().stdout(), true);
     primout().terpri();
   }
 }
@@ -78,8 +75,7 @@ LISPT top::histget(int num, LISPT hlist)
       ;
     if(is_NIL(hlist))
       return NIL;
-    else
-      return hlist->car()->cdr();
+    return hlist->car()->cdr();
   }
   else if(num > 0)
   {
@@ -87,8 +83,7 @@ LISPT top::histget(int num, LISPT hlist)
       ;
     if(is_NIL(hlist))
       return NIL;
-    else
-      return hlist->car()->cdr();
+    return hlist->car()->cdr();
   }
   else if(!is_NIL(hlist))
     return hlist->car()->cdr();
@@ -321,3 +316,4 @@ std::function<LISPT(LISPT)> top::transform_hook;;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded = nullptr;
 LISPT top::promptform = nullptr;
+LISPT top::input_exp = nullptr; // The input expression.

@@ -42,6 +42,7 @@ public:
   // Read table functions
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
 
+  static LISPT input_exp;
   static std::function<LISPT(LISPT)> transform_hook; // Applied on input if non-nullptr.
   static std::function<void()> prompt_hook;          // Called before the prompt is printed.
 
@@ -57,4 +58,3 @@ private:
 } // namespace lisp
 
 extern std::string current_prompt;
-extern lisp::LISPT input_exp;

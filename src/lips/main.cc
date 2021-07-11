@@ -344,7 +344,7 @@ static LISPT transform(LISPT list)
   return res;
 }
 
-static std::unique_ptr<::lisp::lisp> init()
+inline std::unique_ptr<::lisp::lisp> init()
 {
   signal(SIGTTIN, SIG_IGN);
   signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */

@@ -130,7 +130,7 @@ static bool recordjob(int pid, int bg)
   job->status = 0;
   job->wdir = getcwd(nullptr, 0); /* Not a fatal error if nullptr */
   job->next = joblist;
-  job->exp = input_exp;
+  job->exp = top::input_exp;
   job->background = bg;
   job->running = 1;
   joblist = job;
