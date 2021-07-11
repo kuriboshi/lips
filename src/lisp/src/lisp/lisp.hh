@@ -349,9 +349,7 @@ public:
     PROCEED,                    // Proceed with repl
     SKIP,                       // Skip eval
   };
-  // using break_fun_t = std::function<enum break_return(lisp&, LISPT&)>;
   using repl_fun_t = std::function<void()>;
-  //break_fun_t break_fun;
   repl_fun_t repl;
 
   LISPT pexp = NIL;
