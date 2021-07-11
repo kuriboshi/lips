@@ -165,11 +165,12 @@ void top::promptprint(LISPT prompt)
   std::cout << current_prompt;
 }
 
-bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
+void top::operator()(::lisp::lisp& lisp)
 {
+  ++_level;
   while(true)
   {
-    lisp::current().echoline = false;
+    lisp.echoline = false;
     if(prompt_hook)
       prompt_hook();
     //
@@ -177,30 +178,37 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     //
     if(options.interactive)
     {
-      if(type_of(eval(promptform)) == type::ERROR)
+      if(type_of(eval(lisp, promptform)) == type::ERROR)
       {
-        print(mkstring("Error in promptform, reset to nil"), T);
+        print(mkstring(lisp, "Error in promptform, reset to nil"), T);
         promptform = NIL;
       }
-      promptprint(*tprompt);
+      if(_level > 1)
+        promptprint(lisp.brkprompt);
+      else
+        promptprint(lisp.topprompt);
     }
     input_exp = readline(file);
+    if(type_of(input_exp) == type::ENDOFFILE)
+      return;
     if(is_NIL(input_exp))
       continue;
-    if(macrofun)
-      switch((*macrofun)(&input_exp))
-      {
-        case 0:
-          return true;
-        case 1:
-          break;
-        case 2:
-          continue;
-      }
-    if(type_of(input_exp) == type::ENDOFFILE)
-      return true;
     if(EQ(input_exp->car(), NIL))
       continue;
+#if 0
+    if(transform_hook)
+    {
+      switch(transform_hook(lisp, &input_exp))
+      {
+        case break_return::RETURN:
+          return;
+        case break_return::PROCEED:
+          break;
+        case break_return::SKIP:
+          continue;
+      }
+    }
+#endif
     top::addhist(input_exp);
     if(lisp::current().echoline)
     {
@@ -219,7 +227,7 @@ bool top::toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t& file)
     if(printit)
       print(topexp, T);
     if(!options.interactive && options.command)
-      return false;
+      return;
     top::trimhist();
   }
 }

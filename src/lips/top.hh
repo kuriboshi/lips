@@ -17,12 +17,12 @@ inline constexpr auto PN_PRINTHIST = "??"; // print history
 class top: public base
 {
 public:
-  top(lisp& lisp, const options_t& options) : base(lisp), options(options) {}
+  top(lisp& lisp, const options_t& options, file_t& file) : base(lisp), options(options), file(file) {}
   ~top() = default;
 
   static void init();
 
-  bool toploop(LISPT* tprompt, int (*macrofun)(LISPT*), file_t&);
+  void operator()(lisp&);
 
   static LISPT transform(LISPT list);
   static LISPT findalias(LISPT exp);
@@ -50,6 +50,8 @@ private:
   static LISPT promptform;     // Evaluated before printing the prompt.
 
   const options_t& options;
+  file_t& file;
+  int _level = 0;
 };
 
 } // namespace lisp

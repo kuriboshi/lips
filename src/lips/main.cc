@@ -485,17 +485,18 @@ int main(int argc, char* const* argv)
     catch(const lisp_error& error)
     {}
   }
-  auto terminal = std::make_unique<file_t>(std::make_unique<term_source>(options));
-  auto toploop = std::make_unique<top>(top(*lisp, options));
+  file_t terminal(std::make_unique<term_source>(options));
+  top toploop(*lisp, options, terminal);
   while(true)
   {
     try
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      ::lisp::lisp::current().e().reset();
-      if(toploop->toploop(&::lisp::lisp::current().topprompt, nullptr, *terminal.get()))
-        break;
+      lisp->e().reset();
+      lisp->repl = [&lisp, &toploop]() { toploop(*lisp); };
+      lisp->repl();
+      return 0;
     }
     catch(const lisp_reset&)
     {
@@ -503,7 +504,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_error& error)
     {
-      static_cast<term_source&>(terminal->source()).clearlbuf();
+      static_cast<term_source&>(terminal.source()).clearlbuf();
       std::cout << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)

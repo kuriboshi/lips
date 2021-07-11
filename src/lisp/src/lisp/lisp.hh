@@ -343,13 +343,22 @@ public:
       error(ILLEGAL_ARG, arg);
   }
 
-  using breakfun_t = int (*)(lisp&, LISPT);
-  void repl(LISPT prompt, breakfun_t f);
-  LISPT pexp = nullptr;
+  enum class break_return
+  {
+    RETURN,                     // Return from recursive repl
+    PROCEED,                    // Proceed with repl
+    SKIP,                       // Skip eval
+  };
+  // using break_fun_t = std::function<enum break_return(lisp&, LISPT&)>;
+  using repl_fun_t = std::function<void()>;
+  //break_fun_t break_fun;
+  repl_fun_t repl;
+
+  LISPT pexp = NIL;
 
   // Used by lisp::io
-  LISPT top = nullptr;
-  LISPT rstack = nullptr;
+  LISPT top = NIL;
+  LISPT rstack = NIL;
   int printlevel = 0;
   int thisplevel = 0;
   bool echoline = false;
@@ -358,11 +367,11 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  LISPT currentbase = nullptr;
-  LISPT topprompt = nullptr;
-  LISPT brkprompt = nullptr;
-  LISPT verbose = nullptr;
-  LISPT version = nullptr;
+  LISPT currentbase = NIL;
+  LISPT topprompt = NIL;
+  LISPT brkprompt = NIL;
+  LISPT verbose = NIL;
+  LISPT version = NIL;
 
   // clang-format off
   rtinfo currentrt =

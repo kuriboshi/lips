@@ -18,11 +18,45 @@ static int macro(lisp::lisp& l, lisp::LISPT*)
   throw lisp::lisp_reset();
 }
 
+class repl
+{
+public:
+  repl()
+  {
+    _prompt = lisp::mkstring("> ");
+    lisp::gcprotect(_prompt);
+    _break_prompt = lisp::mkstring(": ");
+    lisp::gcprotect(_break_prompt);
+  }
+  ~repl() = default;
+
+  void operator()(lisp::lisp& lisp)
+  {
+    ++_level;
+    while(true)
+    {
+      if(_level > 1)
+        lisp::prin0(lisp, _break_prompt, lisp.primout());
+      else
+        lisp::prin0(lisp, _prompt, lisp.primout());
+      auto expr = lisp::lispread(lisp, lisp.primin(), false);
+      if(expr == lisp::C_EOF)
+        break;
+      lisp::print(lisp, eval(lisp, expr), lisp.primout());
+    }
+  }
+
+private:
+  int _level = 0;
+  lisp::LISPT _prompt;
+  lisp::LISPT _break_prompt;
+};
+
 int main(int argc, const char** argv)
 {
   lisp::lisp lisp;
-  auto prompt = lisp::mkstring("> ");
-  lisp::gcprotect(prompt);
+  repl repl;
+  lisp.repl = [&lisp, &repl]() -> void { repl(lisp); };
   bool test = false;
   std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
@@ -45,8 +79,7 @@ int main(int argc, const char** argv)
   {
     try
     {
-      // lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
-      lisp.repl(prompt, nullptr);
+      lisp.repl();
       // If we return normally from repl we exit the program
       return 0;
     }

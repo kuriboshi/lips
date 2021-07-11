@@ -199,32 +199,6 @@ LISPT lisp::break0(LISPT exp)
   return pexp;
 }
 
-void lisp::repl(LISPT prompt, breakfun_t f)
-{
-  while(true)
-  {
-    prin0(*this, prompt, primout());
-    auto buf = primin().getline();
-    if(!buf)
-      break;
-    auto in = std::make_unique<file_t>(*buf);
-    auto expr = lispread(*this, *in.get(), false);
-    if(f)
-    {
-      switch(f(*this, expr))
-      {
-        case 0:
-          return;
-        case 1:
-          break;
-        case 2:
-          continue;
-      }
-    }
-    print(*this, eval(*this, expr), primout());
-  }
-}
-
 lisp* lisp::_current = nullptr;
 
 //
