@@ -31,28 +31,27 @@ void evaluator::reset()
 LISPT evaluator::printwhere()
 {
   LISPT foo = NIL;
-  for(int i = toctrl - 1; i; --i) // Find latest completed call
+  int i = toctrl - 1;
+  for(; i != 0; --i) // Find latest completed call
   {
     if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::evlam0)
+      break;
+  }
+  for(; i != 0; --i)
+  {
+    if(auto* func = std::get_if<continuation_t>(&control[i]); func && *func == &evaluator::ev0)
     {
-      for(; i; --i)
+      if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
+        lsp && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
       {
-        if(auto* func = std::get_if<continuation_t>(&control[i]); func && *func == &evaluator::ev0)
-        {
-          if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
-             lsp && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
-          {
-            foo = *lsp;
-            l.primerr().format(" [in ");
-            file(l).prin2(foo->car(), T);
-            l.primerr().putch(']');
-            goto out;
-          }
-        }
+        foo = *lsp;
+        l.primerr().format(" [in ");
+        file(l).prin2(foo->car(), T);
+        l.primerr().putch(']');
+        break;
       }
     }
   }
-out:
   l.primerr().putch('\n');
   return foo;
 }
