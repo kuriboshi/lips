@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
 #include <variant>
 
@@ -22,13 +23,13 @@ public:
 
   using continuation_t = bool (evaluator::*)();
 
-  /*
-   * The control stack.
-   */
+  //
+  // The control stack.
+  //
   using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
   static constexpr int CTRLBLKSIZE = 4000;
-  control_t control[CTRLBLKSIZE]; // Control-stack
-  int toctrl = 0;                 // Control-stack stack pointer
+  std::array<control_t, CTRLBLKSIZE> control; // Control-stack
+  int toctrl = 0;                             // Control-stack stack pointer
 
   void reset();
 
