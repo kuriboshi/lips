@@ -45,7 +45,8 @@ int main(int argc, const char** argv)
   {
     try
     {
-      lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
+      // lisp.repl(prompt, [](lisp::lisp& lisp, lisp::LISPT*) -> int { return macro(lisp, nullptr); });
+      lisp.repl(prompt, nullptr);
       // If we return normally from repl we exit the program
       return 0;
     }

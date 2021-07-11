@@ -343,7 +343,7 @@ public:
       error(ILLEGAL_ARG, arg);
   }
 
-  using breakfun_t = int (*)(lisp&, LISPT*);
+  using breakfun_t = int (*)(lisp&, LISPT);
   void repl(LISPT prompt, breakfun_t f);
   LISPT pexp = nullptr;
 

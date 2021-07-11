@@ -543,8 +543,8 @@ void evaluator::bt()
 
 bool evaluator::everr()
 {
-  // expression = break0(expression);
-  cont = pop_func(); /* Discard one continuation. */
+  expression = break0(expression);
+  cont = pop_func(); // Discard one continuation.
   cont = pop_func();
   return false;
 }

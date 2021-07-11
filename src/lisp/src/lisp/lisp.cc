@@ -162,32 +162,32 @@ LISPT lisp::syserr(LISPT fault)
   return C_ERROR;
 }
 
-static int dobreak(lisp& l, LISPT* com)
+inline int dobreak(lisp& l, LISPT com)
 {
   /* OK, EVAL, ^, ... */
-  if(type_of(*com) != type::CONS)
+  if(type_of(com) != type::CONS)
   {
     l.e().unwind();
     throw lisp_error("bad command");
   }
-  else if(EQ((**com).car(), C_GO))
+  else if(EQ(com->car(), C_GO))
   {
     l.pexp = print(l, eval(l, l.pexp), NIL);
     return 0;
   }
-  else if(EQ((**com).car(), C_RESET))
+  else if(EQ(com->car(), C_RESET))
   {
     l.e().unwind();
     throw lisp_reset();
   }
-  else if(EQ((**com).car(), C_BT))
+  else if(EQ(com->car(), C_BT))
   {
     l.e().bt();
     return 2;
   }
-  else if(EQ((**com).car(), C_RETURN))
+  else if(EQ(com->car(), C_RETURN))
   {
-    l.pexp = is_NIL((**com).cdr()) ? NIL : (**com).cdr()->car();
+    l.pexp = is_NIL(com->cdr()) ? NIL : com->cdr()->car();
     return 0;
   }
   return 1;
@@ -195,7 +195,7 @@ static int dobreak(lisp& l, LISPT* com)
 
 LISPT lisp::break0(LISPT exp)
 {
-  repl(brkprompt, [](lisp& lisp, LISPT* com) -> int { return dobreak(lisp, com); });
+  repl();
   return pexp;
 }
 
@@ -209,6 +209,18 @@ void lisp::repl(LISPT prompt, breakfun_t f)
       break;
     auto in = std::make_unique<file_t>(*buf);
     auto expr = lispread(*this, *in.get(), false);
+    if(f)
+    {
+      switch(f(*this, expr))
+      {
+        case 0:
+          return;
+        case 1:
+          break;
+        case 2:
+          continue;
+      }
+    }
     print(*this, eval(*this, expr), primout());
   }
 }
