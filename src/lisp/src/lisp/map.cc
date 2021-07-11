@@ -8,10 +8,10 @@
 
 namespace lisp
 {
-map::map(): base() {}
-map::map(lisp& lisp): base(lisp) {}
+Map::Map(): base() {}
+Map::Map(lisp& lisp): base(lisp) {}
 
-PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE Map::map(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -24,7 +24,7 @@ PRIMITIVE map::xmap(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -37,7 +37,7 @@ PRIMITIVE map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
@@ -60,7 +60,7 @@ PRIMITIVE map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-PRIMITIVE map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
+PRIMITIVE Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
@@ -91,10 +91,10 @@ inline constexpr auto MAPLIST = "maplist"; // map and build result
 inline constexpr auto MAPCAR = "mapcar";   // mapc and build result
 } // namespace pn
 
-void map::init()
+void Map::init()
 {
   // clang-format off
-  mkprim(pn::MAP,     ::lisp::xmap,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::MAP,     ::lisp::map,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::MAPC,    ::lisp::mapc,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::MAPLIST, ::lisp::maplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::MAPCAR,  ::lisp::mapcar,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);

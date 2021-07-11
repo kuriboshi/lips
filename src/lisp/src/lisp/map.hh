@@ -10,27 +10,27 @@
 
 namespace lisp
 {
-class map: public base
+class Map: public base
 {
 public:
-  map();
-  map(lisp&);
-  ~map() = default;
+  Map();
+  Map(lisp&);
+  ~Map() = default;
   static void init();
 
-  LISPT xmap(LISPT, LISPT, LISPT);
+  LISPT map(LISPT, LISPT, LISPT);
   LISPT mapc(LISPT, LISPT, LISPT);
   LISPT maplist(LISPT, LISPT, LISPT);
   LISPT mapcar(LISPT, LISPT, LISPT);
 };
 
-inline LISPT xmap(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).xmap(a, b, c); }
-inline LISPT xmap(LISPT a, LISPT b, LISPT c) { return map().xmap(a, b, c); }
-inline LISPT mapc(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).mapc(a, b, c); }
-inline LISPT mapc(LISPT a, LISPT b, LISPT c) { return map().mapc(a, b, c); }
-inline LISPT maplist(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).maplist(a, b, c); }
-inline LISPT maplist(LISPT a, LISPT b, LISPT c) { return map().maplist(a, b, c); }
-inline LISPT mapcar(lisp& l, LISPT a, LISPT b, LISPT c) { return map(l).mapcar(a, b, c); }
-inline LISPT mapcar(LISPT a, LISPT b, LISPT c) { return map().mapcar(a, b, c); }
+inline LISPT map(lisp& l, LISPT a, LISPT b, LISPT c) { return Map(l).map(a, b, c); }
+inline LISPT map(LISPT a, LISPT b, LISPT c) { return Map().map(a, b, c); }
+inline LISPT mapc(lisp& l, LISPT a, LISPT b, LISPT c) { return Map(l).mapc(a, b, c); }
+inline LISPT mapc(LISPT a, LISPT b, LISPT c) { return Map().mapc(a, b, c); }
+inline LISPT maplist(lisp& l, LISPT a, LISPT b, LISPT c) { return Map(l).maplist(a, b, c); }
+inline LISPT maplist(LISPT a, LISPT b, LISPT c) { return Map().maplist(a, b, c); }
+inline LISPT mapcar(lisp& l, LISPT a, LISPT b, LISPT c) { return Map(l).mapcar(a, b, c); }
+inline LISPT mapcar(LISPT a, LISPT b, LISPT c) { return Map().mapcar(a, b, c); }
 
 } // namespace lisp
