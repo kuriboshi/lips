@@ -22,7 +22,7 @@ public:
 
   static void init();
 
-  void operator()(lisp&);
+  LISPT operator()(LISPT);
 
   static LISPT transform(LISPT list);
   static LISPT findalias(LISPT exp);

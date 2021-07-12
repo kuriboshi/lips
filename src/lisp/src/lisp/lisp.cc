@@ -162,41 +162,9 @@ LISPT lisp::syserr(LISPT fault)
   return C_ERROR;
 }
 
-inline lisp::break_return dobreak(lisp& l, LISPT com)
-{
-  /* OK, EVAL, ^, ... */
-  if(type_of(com) != type::CONS)
-  {
-    l.e().unwind();
-    throw lisp_error("bad command");
-  }
-  else if(EQ(com->car(), C_GO))
-  {
-    l.pexp = print(l, eval(l, l.pexp), NIL);
-    return lisp::break_return::RETURN;
-  }
-  else if(EQ(com->car(), C_RESET))
-  {
-    l.e().unwind();
-    throw lisp_reset();
-  }
-  else if(EQ(com->car(), C_BT))
-  {
-    l.e().bt();
-    return lisp::break_return::SKIP;
-  }
-  else if(EQ(com->car(), C_RETURN))
-  {
-    l.pexp = is_NIL(com->cdr()) ? NIL : com->cdr()->car();
-    return lisp::break_return::RETURN;
-  }
-  return lisp::break_return::PROCEED;
-}
-
 LISPT lisp::break0(LISPT exp)
 {
-  repl();
-  return pexp;
+  return repl(exp);
 }
 
 lisp* lisp::_current = nullptr;

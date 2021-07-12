@@ -349,10 +349,8 @@ public:
     PROCEED,                    // Proceed with repl
     SKIP,                       // Skip eval
   };
-  using repl_fun_t = std::function<void()>;
+  using repl_fun_t = std::function<LISPT(LISPT)>;
   repl_fun_t repl;
-
-  LISPT pexp = NIL;
 
   // Used by lisp::io
   LISPT top = NIL;

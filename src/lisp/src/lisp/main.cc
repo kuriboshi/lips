@@ -21,7 +21,7 @@ static int macro(lisp::lisp& l, lisp::LISPT*)
 class repl
 {
 public:
-  repl()
+  repl(lisp::lisp& lisp) : l(lisp)
   {
     _prompt = lisp::mkstring("> ");
     lisp::gcprotect(_prompt);
@@ -30,23 +30,63 @@ public:
   }
   ~repl() = default;
 
-  void operator()(lisp::lisp& lisp)
+  class level
   {
-    ++_level;
+  public:
+    level(repl& repl) : _repl(repl) { ++_repl._level; }
+    ~level() { --_repl._level; }
+  private:
+    repl& _repl;
+  };
+
+  void operator()()
+  {
     while(true)
     {
-      if(_level > 1)
-        lisp::prin0(lisp, _break_prompt, lisp.primout());
-      else
-        lisp::prin0(lisp, _prompt, lisp.primout());
-      auto expr = lisp::lispread(lisp, lisp.primin(), false);
+      lisp::prin0(l, _prompt, l.primout());
+      auto expr = lisp::lispread(l, l.primin(), false);
       if(expr == lisp::C_EOF)
         break;
-      lisp::print(lisp, eval(lisp, expr), lisp.primout());
+      lisp::print(l, eval(l, expr), l.primout());
+    }
+  }
+
+  lisp::LISPT operator()(lisp::LISPT exp)
+  {
+    level begin(*this);
+    if(_level == 1)
+    {
+      operator()();
+      return lisp::NIL;
+    }
+    while(true)
+    {
+      lisp::prin0(l, _break_prompt, l.primout());
+      auto com = lisp::lispread(l, l.primin(), false);
+      if(com == lisp::C_EOF)
+        return com;
+      /* OK, EVAL, ^, ... */
+      if(type_of(com) != lisp::type::CONS)
+        continue;
+      else if(EQ(com->car(), lisp::C_GO))
+        return print(l, eval(l, exp), lisp::NIL);
+      else if(EQ(com->car(), lisp::C_RESET))
+      {
+        l.e().unwind();
+        throw lisp::lisp_reset();
+      }
+      else if(EQ(com->car(), lisp::C_BT))
+      {
+        l.e().bt();
+        continue;
+      }
+      else if(EQ(com->car(), lisp::C_RETURN))
+        return is_NIL(com->cdr()) ? lisp::NIL : com->cdr()->car();
     }
   }
 
 private:
+  lisp::lisp& l;
   int _level = 0;
   lisp::LISPT _prompt;
   lisp::LISPT _break_prompt;
@@ -55,8 +95,8 @@ private:
 int main(int argc, const char** argv)
 {
   lisp::lisp lisp;
-  repl repl;
-  lisp.repl = [&lisp, &repl]() -> void { repl(lisp); };
+  repl repl(lisp);
+  lisp.repl = [&repl](lisp::LISPT) -> lisp::LISPT { return repl(lisp::NIL); };
   bool test = false;
   std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
@@ -79,9 +119,13 @@ int main(int argc, const char** argv)
   {
     try
     {
-      lisp.repl();
+      lisp.repl(lisp::NIL);
       // If we return normally from repl we exit the program
       return 0;
+    }
+    catch(const lisp::lisp_reset& ex)
+    {
+      lisp.e().reset();
     }
     catch(const lisp::lisp_error& ex)
     {

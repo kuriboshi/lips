@@ -494,8 +494,8 @@ int main(int argc, char* const* argv)
       if(!options.debug && options.interactive)
         init_all_signals();
       lisp->e().reset();
-      lisp->repl = [&lisp, &toploop]() { toploop(*lisp); };
-      lisp->repl();
+      lisp->repl = [&toploop](LISPT exp) -> LISPT { return toploop(exp); };
+      lisp->repl(NIL);
       return 0;
     }
     catch(const lisp_reset&)

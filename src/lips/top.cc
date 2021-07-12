@@ -160,12 +160,12 @@ void top::promptprint(LISPT prompt)
   std::cout << current_prompt;
 }
 
-void top::operator()(::lisp::lisp& lisp)
+LISPT top::operator()(LISPT exp)
 {
   ++_level;
   while(true)
   {
-    lisp.echoline = false;
+    l.echoline = false;
     if(prompt_hook)
       prompt_hook();
     //
@@ -173,19 +173,19 @@ void top::operator()(::lisp::lisp& lisp)
     //
     if(options.interactive)
     {
-      if(type_of(eval(lisp, promptform)) == type::ERROR)
+      if(type_of(eval(l, promptform)) == type::ERROR)
       {
-        print(mkstring(lisp, "Error in promptform, reset to nil"), T);
+        print(mkstring(l, "Error in promptform, reset to nil"), T);
         promptform = NIL;
       }
       if(_level > 1)
-        promptprint(lisp.brkprompt);
+        promptprint(l.brkprompt);
       else
-        promptprint(lisp.topprompt);
+        promptprint(l.topprompt);
     }
     input_exp = readline(file);
     if(type_of(input_exp) == type::ENDOFFILE)
-      return;
+      return NIL;
     if(is_NIL(input_exp))
       continue;
     if(EQ(input_exp->car(), NIL))
@@ -222,9 +222,10 @@ void top::operator()(::lisp::lisp& lisp)
     if(printit)
       print(topexp, T);
     if(!options.interactive && options.command)
-      return;
+      return NIL;
     top::trimhist();
   }
+  return NIL;
 }
 
 /*

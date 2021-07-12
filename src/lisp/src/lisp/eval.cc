@@ -116,7 +116,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
   if(_breakhook)
     _breakhook();
   if(env == nullptr)
-    throw lisp_error("break");
+    throw lisp_reset();
   file(l).print(cons(l, fault, cons(l, C_BROKEN, NIL)), T);
   push_func(next);
   cont = &evaluator::everr;
