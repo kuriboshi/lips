@@ -18,6 +18,7 @@ public:
   static void init();
 
   LISPT open(LISPT, LISPT);
+  LISPT close(LISPT);
   LISPT ratom(LISPT);
   LISPT readc(LISPT);
   LISPT read(LISPT);
@@ -38,6 +39,8 @@ extern LISPT C_READ;
 
 inline LISPT open(lisp& l, LISPT a, LISPT b) { return file(l).open(a, b); }
 inline LISPT open(LISPT a, LISPT b) { return file().open(a, b); }
+inline LISPT close(lisp& l, LISPT a) { return file(l).close(a); }
+inline LISPT close(LISPT a) { return file().close(a); }
 inline LISPT ratom(lisp& l, LISPT a) { return file(l).ratom(a); }
 inline LISPT ratom(LISPT a) { return file().ratom(a); }
 inline LISPT readc(lisp& l, LISPT a) { return file(l).readc(a); }

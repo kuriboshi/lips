@@ -37,27 +37,49 @@ TEST_CASE("File functions")
 
   SUBCASE("print")
   {
-    auto f0 = open(mkstring("test.lisp"), intern("write"));
+    auto f0 = open(mkstring("test_print.lisp"), intern("write"));
     print(mkstring("hello"), f0);
+    close(f0);
+    auto f1 = open(mkstring("test_print.lisp"), intern("read"));
+    auto r1 = getline(f1);
+    REQUIRE(r1 != NIL);
+    CHECK(r1->getstr() == "\"hello\"");
   }
 
   SUBCASE("terpri")
   {
-    auto f0 = open(mkstring("test.lisp"), intern("write"));
+    auto f0 = open(mkstring("test_terpri.lisp"), intern("write"));
     print(mkstring("hello"), f0);
     terpri(f0);
+    close(f0);
+    auto f1 = open(mkstring("test_terpri.lisp"), intern("read"));
+    auto r1 = getline(f1);
+    REQUIRE(r1 != NIL);
+    CHECK(r1->getstr() == "\"hello\"");
   }
 
   SUBCASE("prin1")
   {
-    auto f0 = open(mkstring("test.lisp"), intern("write"));
-    prin1(mkstring("hello"), f0);
+    auto f0 = open(mkstring("test_prin1.lisp"), intern("write"));
+    prin1(mkstring("hello \"world\""), f0);
+    close(f0);
+    auto f1 = open(mkstring("test_prin1.lisp"), intern("read"));
+    auto r1 = getline(f1);
+    REQUIRE(r1 != NIL);
+    CHECK(r1->getstr() == "hello \"world\"");
   }
 
   SUBCASE("prin2")
   {
-    auto f0 = open(mkstring("test.lisp"), intern("write"));
-    prin2(mkstring("hello"), f0);
+    auto f0 = open(mkstring("test_prin2.lisp"), intern("write"));
+    prin2(mkstring("hello \"world\""), f0);
+    close(f0);
+    auto f1 = open(mkstring("test_prin2.lisp"), intern("read"));
+    auto r1 = getline(f1);
+    REQUIRE(r1 != NIL);
+    // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
+    // versions print/prin1/princ.
+    CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
   }
 }
 

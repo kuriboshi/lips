@@ -573,7 +573,7 @@ PRIMITIVE exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  close(fd);
+  ::close(fd);
   return mknumber(l, WEXITSTATUS(status));
 }
 
@@ -607,7 +607,7 @@ PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  close(fd);
+  ::close(fd);
   return mknumber(WEXITSTATUS(status));
 }
 
@@ -641,7 +641,7 @@ PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
-  close(fd);
+  ::close(fd);
   return mknumber(l, WEXITSTATUS(status));
 }
 
@@ -660,7 +660,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
     pipe(pd);
     if((pid = mfork()) == 0)
     {
-      close(pd[0]);
+      ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
         l.stderr().format("{}\n", strerror(errno));
@@ -672,7 +672,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
     else if(pid < 0)
       exit(1);
     cmds = cmds->cdr();
-    close(pd[1]);
+    ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
       l.stderr().format("{}\n", strerror(errno));

@@ -46,14 +46,6 @@ PRIMITIVE posix::uxchmod(LISPT name, LISPT mode)
   return mknumber(l, chmod(name->stringval().c_str(), mode->intval()));
 }
 
-PRIMITIVE posix::uxclose(LISPT fildes)
-{
-  l.check(fildes, type::FILET);
-  if(fildes->fileval().close())
-    return T;
-  return NIL;
-}
-
 PRIMITIVE posix::uxcreat(LISPT name, LISPT mode)
 {
   int i;
@@ -156,7 +148,6 @@ inline constexpr auto UXACCESS = "access";   // check file access
 inline constexpr auto UXALARM = "alarm";     // set alarm clock
 inline constexpr auto UXCHDIR = "chdir";     // change directory
 inline constexpr auto UXCHMOD = "chmode";    // change mode of file
-inline constexpr auto UXCLOSE = "close";     // close file
 inline constexpr auto UXCREAT = "creat";     // create file
 inline constexpr auto UXDUP = "dup";         // duplicate fileno
 inline constexpr auto UXERRNO = "errno";     // return latest error
@@ -181,7 +172,6 @@ void posix::init()
   mkprim(pn::UXALARM,   ::lisp::uxalarm,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXCHDIR,   ::lisp::uxchdir,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXCHMOD,   ::lisp::uxchmod,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::UXCLOSE,   ::lisp::uxclose,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXCREAT,   ::lisp::uxcreat,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXDUP,     ::lisp::uxdup,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXERRNO,   ::lisp::uxerrno,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);

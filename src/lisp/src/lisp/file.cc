@@ -31,14 +31,26 @@ PRIMITIVE file::open(LISPT filename, LISPT mode)
     else
       return l.error(UNKNOWN_REQUEST, mode);
   }
-  auto f = readmode ? std::make_unique<file_t>(std::make_unique<file_source>(filename->getstr()))
-    : std::make_unique<file_t>(std::make_unique<file_sink>(filename->getstr(), appendmode));
+  auto f = [&]() {
+    if(readmode)
+      return std::make_unique<file_t>(std::make_unique<file_source>(filename->getstr()));
+    return std::make_unique<file_t>(std::make_unique<file_sink>(filename->getstr(), appendmode));
+  }();
   if(!f)
     return l.error(CANT_OPEN, filename);
   LISPT newfile = nullptr;
   set(newfile, type::FILET, getobject(l));
   newfile->fileval(std::move(f));
   return newfile;
+}
+
+PRIMITIVE file::close(LISPT fildes)
+{
+  l.check(fildes, type::FILET);
+  fildes->fileval().flush();
+  if(fildes->fileval().close())
+    return T;
+  return NIL;
 }
 
 PRIMITIVE file::ratom(LISPT file)
@@ -133,7 +145,7 @@ PRIMITIVE file::prin2(LISPT x, LISPT file)
   if(is_T(file))
     return prin0(l, x, l.primerr(), true);
   l.check(file, type::FILET);
-  return prin0(l, x, file->fileval(), false);
+  return prin0(l, x, file->fileval(), true);
 }
 
 PRIMITIVE file::plevel(LISPT newl)
@@ -268,6 +280,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 namespace pn
 {
 inline constexpr auto OPEN = "open";         // open file
+inline constexpr auto CLOSE = "close";       // close file
 inline constexpr auto LOAD = "load";         // load file
 inline constexpr auto PRIN1 = "prin1";       // print without escapes
 inline constexpr auto PRIN2 = "prin2";       // print without new-line
@@ -289,6 +302,7 @@ void file::init()
   C_READ = intern(pn::READ);
 
   // clang-format off
+  mkprim(pn::CLOSE,    ::lisp::close,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::OPEN,     ::lisp::open,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);

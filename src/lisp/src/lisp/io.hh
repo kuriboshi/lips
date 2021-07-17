@@ -43,6 +43,7 @@ public:
   LISPT prin0(LISPT, file_t&, bool esc = false);
   LISPT print(LISPT, file_t&);
   LISPT terpri(file_t&);
+  LISPT getline(LISPT);
 
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
   static LISPT rmdquote(lisp&, file_t&, LISPT, char);
@@ -237,13 +238,10 @@ protected:
   }
 };
 
-class file_sink: public io_sink
+class file_sink final: public io_sink
 {
 public:
-  file_sink(const std::string& filename, bool append = false)
-    : _file(std::make_unique<std::ofstream>(filename, append ? std::ios_base::ate : std::ios_base::out))
-  {}
-  ~file_sink() = default;
+  file_sink(const std::string& filename, bool append = false);
 
   using io_sink::putch;
 
@@ -261,7 +259,7 @@ private:
   std::unique_ptr<std::ofstream> _file;
 };
 
-class stream_sink: public io_sink
+class stream_sink final: public io_sink
 {
 public:
   stream_sink(std::ostream& stream): _stream(stream) {}
@@ -279,7 +277,7 @@ private:
   std::ostream& _stream;
 };
 
-class string_sink: public io_sink
+class string_sink final: public io_sink
 {
 public:
   string_sink() {}
@@ -377,6 +375,8 @@ inline LISPT lispread(file_t& f, bool esc = false) { return io().lispread(f, esc
 inline LISPT lispread(const std::string& s, bool esc = false) { file_t f(s); return io().lispread(f, esc); }
 inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
 inline LISPT readline(file_t& f) { return io().readline(f); }
+inline LISPT getline(lisp& l, LISPT f) { return io(l).getline(f); }
+inline LISPT getline(LISPT f) { return io().getline(f); }
 
 inline LISPT patom(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).patom(a, f, esc); }
 inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io().patom(a, f, esc); }
@@ -410,6 +410,7 @@ inline LISPT print(LISPT a, bool out = false) { return print(lisp::current(), a,
 inline file_t& primout() { return lisp::current().primout(); }
 inline file_t& primin() { return lisp::current().primin(); }
 inline file_t& primerr() { return lisp::current().primerr(); }
+
 
 template<typename T>
 std::string to_string(T& sink)

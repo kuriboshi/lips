@@ -23,7 +23,6 @@ public:
   LISPT uxalarm(LISPT seconds);
   LISPT uxchdir(LISPT dirname);
   LISPT uxchmod(LISPT name, LISPT mode);
-  LISPT uxclose(LISPT fildes);
   LISPT uxcreat(LISPT name, LISPT mode);
   LISPT uxdup(LISPT fildes);
   LISPT uxgetuid();
@@ -58,8 +57,6 @@ inline LISPT uxchdir(lisp& l, LISPT dirname) { return posix(l).uxchdir(dirname);
 inline LISPT uxchdir(LISPT dirname) { return posix().uxchdir(dirname); }
 inline LISPT uxchmod(lisp& l, LISPT name, LISPT mode) { return posix(l).uxchmod(name, mode); }
 inline LISPT uxchmod(LISPT name, LISPT mode) { return posix().uxchmod(name, mode); }
-inline LISPT uxclose(lisp& l, LISPT fildes) { return posix(l).uxclose(fildes); }
-inline LISPT uxclose(LISPT fildes) { return posix().uxclose(fildes); }
 inline LISPT uxcreat(lisp& l, LISPT name, LISPT mode) { return posix(l).uxcreat(name, mode); }
 inline LISPT uxcreat(LISPT name, LISPT mode) { return posix().uxcreat(name, mode); }
 inline LISPT uxdup(lisp& l, LISPT fildes) { return posix(l).uxdup(fildes); }

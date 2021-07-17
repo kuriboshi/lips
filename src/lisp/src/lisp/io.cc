@@ -1,9 +1,7 @@
 /*
  * Lips, lisp shell.
  * Copyright 1988, 2020 Krister Joas
- *
  */
-
 #include <doctest/doctest.h>
 #include "libisp.hh"
 
@@ -438,6 +436,15 @@ LISPT io::readline(file_t& file)
   return rd;
 }
 
+LISPT io::getline(LISPT file)
+{
+  l.check(file, type::FILET);
+  auto line = file->fileval().getline();
+  if(line)
+    return mkstring(*line);
+  return NIL;
+}
+
 /* print the string s, on stream file */
 static void ps(const std::string& s, file_t& file, bool esc)
 {
@@ -455,7 +462,7 @@ static void pi(int i, int base, file_t& file)
   sign = (i < 0) ? -1 : 1;
   i = sign * i;
   if(!i)
-    ps("0", file, 0);
+    ps("0", file, false);
   else
   {
     while(i)
@@ -466,22 +473,22 @@ static void pi(int i, int base, file_t& file)
   }
   if(sign == -1)
     ss[j--] = '-';
-  ps(ss + j + 1, file, 0);
+  ps(ss + j + 1, file, false);
 }
 
 static void pf(double d, file_t& file)
 {
   auto ss = fmt::format("{:#g}", d);
-  ps(ss.c_str(), file, 0);
+  ps(ss.c_str(), file, false);
 }
 
 // Print pointer type object
 static void pp(const char* s, file_t& file, LISPT x)
 {
-  ps(s, file, 0);
-  ps(" ", file, 0);
+  ps(s, file, false);
+  ps(" ", file, false);
   pi((long)&x, 16L, file);
-  ps(">", file, 0);
+  ps(">", file, false);
 }
 
 LISPT io::patom(LISPT x, file_t& file, bool esc)
@@ -493,6 +500,7 @@ LISPT io::patom(LISPT x, file_t& file, bool esc)
 LISPT io::terpri(file_t& file)
 {
   file.putch('\n');
+  file.flush();
   return NIL;
 }
 
@@ -650,6 +658,13 @@ file_source::file_source(const std::string& name)
   if(_file->fail())
     _file->open((name + ".lsp"), std::ios_base::in);
   // TODO: Throw different exception
+  if(_file->fail())
+    throw lisp_error("Can't open file " + name);
+}
+
+file_sink::file_sink(const std::string& name, bool append)
+{
+  _file = std::make_unique<std::ofstream>(name, append ? std::ios_base::ate : std::ios_base::out);
   if(_file->fail())
     throw lisp_error("Can't open file " + name);
 }
