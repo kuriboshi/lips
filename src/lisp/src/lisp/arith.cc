@@ -436,6 +436,8 @@ void arith::init()
 TEST_CASE("Arithmetic functions")
 {
   lisp l;
+  current c(l);
+
   SUBCASE("+")
   {
     auto r = eval(l, "(+ 1 2 3 4 5)");

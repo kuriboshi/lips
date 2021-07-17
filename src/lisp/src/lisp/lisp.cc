@@ -119,7 +119,11 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     _current = this;
 }
 
-lisp::~lisp() = default;
+lisp::~lisp()
+{
+  if(_current == this)
+    _current = nullptr;
+}
 
 void lisp::primout(std::unique_ptr<file_t> f)
 {

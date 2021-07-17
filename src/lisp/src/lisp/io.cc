@@ -657,6 +657,7 @@ file_source::file_source(const std::string& name)
 TEST_CASE("Basic I/O")
 {
   lisp lisp;
+  current c(lisp);
 
   lisp.primout(std::make_unique<file_t>(std::make_unique<string_sink>()));
   lisp.primout().format("hello world {}", 123);
@@ -666,6 +667,7 @@ TEST_CASE("Basic I/O")
 TEST_CASE("Read lisp objects")
 {
   lisp lisp;
+  current c(lisp);
 
   SUBCASE("Read from utf-8")
   {

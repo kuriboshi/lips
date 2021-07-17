@@ -502,6 +502,7 @@ void alloc::dzero() { destblockused = 0; }
 TEST_CASE("Create lisp objects")
 {
   lisp lisp;
+  current c(lisp);
 
   SUBCASE("Multiple calls to intern should return the same object for the same string")
   {

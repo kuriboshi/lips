@@ -1065,6 +1065,8 @@ void evaluator::init()
 TEST_CASE("Primary function tests")
 {
   lisp l;
+  current c(l);
+
   SUBCASE("CAR and CDR")
   {
     SUBCASE("CAR")
@@ -1125,6 +1127,7 @@ TEST_CASE("Primary function tests")
 TEST_CASE("Evaluator")
 {
   lisp lisp;
+  current c(lisp);
 
   SUBCASE("Evaluate variable")
   {
