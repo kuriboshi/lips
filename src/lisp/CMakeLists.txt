@@ -54,8 +54,15 @@ target_link_libraries(lisp PUBLIC fmt::fmt)
 
 add_executable(main src/lisp/main.cc)
 target_sources(main PRIVATE
+  src/lisp/alloc.test.cc
+  src/lisp/arith.test.cc
   src/lisp/debug.test.cc
+  src/lisp/eval.test.cc
+  src/lisp/file.test.cc
+  src/lisp/io.test.cc
+  src/lisp/lisp.test.cc
   src/lisp/logic.test.cc
+  src/lisp/prim.test.cc
   src/lisp/string.test.cc
 )
 target_link_libraries(main PUBLIC lisp doctest::doctest)

@@ -4,7 +4,6 @@
  *
  */
 
-#include <doctest/doctest.h>
 #include "libisp.hh"
 #include "except.hh"
 
@@ -168,18 +167,12 @@ LISPT evaluator::call(LISPT fun)
   {
     case 0:
       return fun->subrval()(l);
-      break;
     case 1:
       return fun->subrval()(l, dest[1].val());
-      break;
     case 2:
       return fun->subrval()(l, dest[2].val(), dest[1].val());
-      break;
     case 3:
       return fun->subrval()(l, dest[3].val(), dest[2].val(), dest[1].val());
-      break;
-    default:
-      break;
   }
   return NIL;
 }
@@ -1060,93 +1053,6 @@ void evaluator::init()
   mkprim(pn::TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
-}
-
-TEST_CASE("Primary function tests")
-{
-  lisp l;
-  current c(l);
-
-  SUBCASE("CAR and CDR")
-  {
-    SUBCASE("CAR")
-    {
-      auto a = eval(l, "(car (cons 1 2))");
-      CHECK(a->intval() == 1);
-    }
-    SUBCASE("CDR")
-    {
-      auto b = eval(l, "(cdr (cons 1 2))");
-      CHECK(b->intval() == 2);
-    }
-  }
-  SUBCASE("LAMBDA and NLAMBDA")
-  {
-    SUBCASE("LAMBDA - basic case")
-    {
-      auto a = eval(l, "(setq f (lambda () \"hello\"))");
-      auto b = eval(l, "(f)");
-      CHECK(type_of(b) == type::STRING);
-      CHECK(b->stringval() == "hello"s);
-    }
-    SUBCASE("LAMBDA - one argument")
-    {
-      auto a = eval(l, "(setq f (lambda (x) (cons x nil)))");
-      auto b = eval(l, "(f 10)");
-      CHECK(type_of(b) == type::CONS);
-      CHECK(type_of(b->car()) == type::INTEGER);
-      CHECK(b->car()->intval() == 10);
-    }
-    SUBCASE("LAMBDA - spread case")
-    {
-      auto a = eval(l, "(setq f (lambda x (cadr x)))");
-      auto b = eval(l, "(f 1 2)");
-      CHECK(type_of(b) == type::INTEGER);
-      CHECK(b->intval() == 2);
-    }
-    SUBCASE("LAMBDA - half spread")
-    {
-      auto a = eval(l, "(setq f (lambda (a . x) (list a (cadr x))))");
-      auto b = eval(l, "(f 0 1 2)");
-      CHECK(type_of(b) == type::CONS);
-      CHECK(type_of(b->car()) == type::INTEGER);
-      CHECK(b->car()->intval() == 0);
-      CHECK(type_of(b->cdr()->car()) == type::INTEGER);
-      CHECK(b->cdr()->car()->intval() == 2);
-    }
-    SUBCASE("NLAMBDA - basic case")
-    {
-      auto a = eval(l, "(setq f (nlambda (a) a))");
-      auto b = eval(l, "(f x)");
-      CHECK(type_of(b) == type::SYMBOL);
-      CHECK(std::strcmp(b->symbol().pname.c_str(), "x") == 0);
-    }
-  }
-}
-
-TEST_CASE("Evaluator")
-{
-  lisp lisp;
-  current c(lisp);
-
-  SUBCASE("Evaluate variable")
-  {
-    auto var = mkatom(lisp, "i");
-    auto val = mknumber(lisp, 123);
-    set(lisp, var, val);
-    auto r0 = eval(lisp, var);
-    CHECK(r0->intval() == 123);
-  }
-
-  SUBCASE("Evaluate simple expression: (+ 123 1)")
-  {
-    auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
-    auto out0 = std::make_unique<file_t>(std::make_unique<string_sink>());
-    prin0(lisp, e1, *out0.get());
-    CHECK(to_string(out0->sink()) == std::string("(+ 123 1)"));
-    auto r1 = eval(lisp, e1);
-    CHECK(r1->intval() == 124);
-  }
 }
 
 } // namespace lisp

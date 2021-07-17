@@ -103,37 +103,6 @@ PRIMITIVE posix::uxnice(LISPT incr)
   return mknumber(l, nice(incr->intval()));
 }
 
-PRIMITIVE posix::uxopen(LISPT name, LISPT mode)
-{
-  bool readmode = true;
-  bool appendmode = false;
-
-  l.check(name, type::STRING);
-  if(!is_NIL(mode))
-  {
-    l.check(mode, type::SYMBOL);
-    if(EQ(mode, C_READ))
-      readmode = true;
-    else if(EQ(mode, C_WRITE))
-      readmode = false;
-    else if(EQ(mode, C_APPEND))
-    {
-      readmode = false;
-      appendmode = true;
-    }
-    else
-      return l.error(UNKNOWN_REQUEST, mode);
-  }
-  auto f = readmode ? std::make_unique<file_t>(std::make_unique<file_source>(name->stringval()))
-    : std::make_unique<file_t>(std::make_unique<file_sink>(name->stringval().c_str(), appendmode));
-  if(!f)
-    return l.error(CANT_OPEN, name);
-  LISPT newfile = nullptr;
-  set(newfile, type::FILET, getobject(l));
-  newfile->fileval(std::move(f));
-  return newfile;
-}
-
 PRIMITIVE posix::uxsetuid(LISPT uid)
 {
   l.check(uid, type::INTEGER);
@@ -199,7 +168,6 @@ inline constexpr auto UXGETPID = "getpid";   // get process id
 inline constexpr auto UXKILL = "killproc";   // kill process
 inline constexpr auto UXLINK = "link";       // link file
 inline constexpr auto UXNICE = "setnice";    // set nice
-inline constexpr auto UXOPEN = "open";       // open file
 inline constexpr auto UXSETUID = "setuid";   // set user id
 inline constexpr auto UXSETGID = "setgid";   // set group id
 inline constexpr auto SIGNAL = "signal";     // install signal handler
@@ -225,7 +193,6 @@ void posix::init()
   mkprim(pn::UXKILL,    ::lisp::uxkill,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXLINK,    ::lisp::uxlink,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXNICE,    ::lisp::uxnice,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::UXOPEN,    ::lisp::uxopen,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXSETUID,  ::lisp::uxsetuid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::UXSETGID,  ::lisp::uxsetgid,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
 #if 0

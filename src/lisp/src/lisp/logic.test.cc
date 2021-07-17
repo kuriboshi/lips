@@ -58,7 +58,6 @@ TEST_CASE("Logic functions")
     auto s0 = mkstring("true");
     auto s1 = mkstring("false");
     auto r0 = xif(T, s0, s1);
-    std::cout << as_integer(type_of(r0)) << std::endl;
     REQUIRE(type_of(r0) == type::STRING);
     CHECK(r0->stringval() == "true");
 

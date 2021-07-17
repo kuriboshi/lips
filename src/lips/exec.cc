@@ -592,7 +592,7 @@ PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
     l.check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
-  if((fd = open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+  if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
     return syserr(file);
   if((pid = mfork()) == 0)
   {
@@ -626,7 +626,7 @@ PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
     l.check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
-  if((fd = open(file->getstr().c_str(), O_RDONLY)) == -1)
+  if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1)
     return syserr(l, file);
   if((pid = mfork()) == 0)
   {

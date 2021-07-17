@@ -34,7 +34,6 @@ public:
   LISPT uxkill(LISPT pid, LISPT sig);
   LISPT uxlink(LISPT name1, LISPT name2);
   LISPT uxnice(LISPT incr);
-  LISPT uxopen(LISPT name, LISPT mode);
   LISPT uxsetuid(LISPT uid);
   LISPT uxsetgid(LISPT gid);
 #if 0
@@ -81,8 +80,6 @@ inline LISPT uxlink(lisp& l, LISPT name1, LISPT name2) { return posix(l).uxlink(
 inline LISPT uxlink(LISPT name1, LISPT name2) { return posix().uxlink(name1, name2); }
 inline LISPT uxnice(lisp& l, LISPT incr) { return posix(l).uxnice(incr); }
 inline LISPT uxnice(LISPT incr) { return posix().uxnice(incr); }
-inline LISPT uxopen(lisp& l, LISPT name, LISPT mode) { return posix(l).uxopen(name, mode); }
-inline LISPT uxopen(LISPT name, LISPT mode) { return posix().uxopen(name, mode); }
 inline LISPT uxsetuid(lisp& l, LISPT uid) { return posix(l).uxsetuid(uid); }
 inline LISPT uxsetuid(LISPT uid) { return posix().uxsetuid(uid); }
 inline LISPT uxsetgid(lisp& l, LISPT gid) { return posix(l).uxsetgid(gid); }

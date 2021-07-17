@@ -11,6 +11,36 @@ namespace lisp
 file::file(): base() {}
 file::file(lisp& lisp): base(lisp) {}
 
+PRIMITIVE file::open(LISPT filename, LISPT mode)
+{
+  l.check(filename, type::STRING, type::SYMBOL);
+  bool readmode = true;
+  bool appendmode = false;
+  if(!is_NIL(mode))
+  {
+    l.check(mode, type::SYMBOL);
+    if(EQ(mode, C_READ))
+      readmode = true;
+    else if(EQ(mode, C_WRITE))
+      readmode = false;
+    else if(EQ(mode, C_APPEND))
+    {
+      readmode = false;
+      appendmode = true;
+    }
+    else
+      return l.error(UNKNOWN_REQUEST, mode);
+  }
+  auto f = readmode ? std::make_unique<file_t>(std::make_unique<file_source>(filename->getstr()))
+    : std::make_unique<file_t>(std::make_unique<file_sink>(filename->getstr(), appendmode));
+  if(!f)
+    return l.error(CANT_OPEN, filename);
+  LISPT newfile = nullptr;
+  set(newfile, type::FILET, getobject(l));
+  newfile->fileval(std::move(f));
+  return newfile;
+}
+
 PRIMITIVE file::ratom(LISPT file)
 {
   if(is_NIL(file))
@@ -237,6 +267,7 @@ PRIMITIVE file::cpprint(LISPT oname, LISPT file)
 
 namespace pn
 {
+inline constexpr auto OPEN = "open";         // open file
 inline constexpr auto LOAD = "load";         // load file
 inline constexpr auto PRIN1 = "prin1";       // print without escapes
 inline constexpr auto PRIN2 = "prin2";       // print without new-line
@@ -258,6 +289,7 @@ void file::init()
   C_READ = intern(pn::READ);
 
   // clang-format off
+  mkprim(pn::OPEN,     ::lisp::open,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
