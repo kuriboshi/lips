@@ -148,11 +148,8 @@ LISPT alloc::doreclaim(int incr)
     T->mark();
   if(e().dest != nullptr)
   {
-    for(int i = e().dest[0].val.d_integer; i > 0; i--)
-    {
-      mark(e().dest[i].var.d_lisp);
-      mark(e().dest[i].val.d_lisp);
-    }
+    for(int i = e().dest[0].size(); i > 0; i--)
+      mark(e().dest[i].lispt());
   }
   for(auto i: markobjs) mark(*i);
 #if 0
@@ -176,17 +173,17 @@ LISPT alloc::doreclaim(int incr)
   }
   for(int i = destblockused - 1; i >= 0; i--)
   {
-    switch(destblock[i].type)
-    {
-      case block_type::EMPTY:
-        break;
-      case block_type::LISPT:
-        mark(destblock[i].var.d_lisp);
-        mark(destblock[i].val.d_lisp);
-        break;
-      case block_type::ENVIRON:
-        break;
-    }
+    std::visit(
+      [this](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr(std::is_same_v<T, LISPT>)
+          mark(arg);
+        else if constexpr(std::is_same_v<T, int>)
+          ;
+        else if constexpr(std::is_same_v<T, destblock_t*>)
+          ;
+      },
+      destblock[i].u);
   }
   for(auto i: savearray) mark(i);
   int nrfreed = sweep();
@@ -476,18 +473,16 @@ LISPT alloc::mkfloat(double num)
  */
 destblock_t* alloc::dalloc(int size)
 {
-  if(size <= DESTBLOCKSIZE - destblockused)
+  if(size <= DESTBLOCKSIZE - destblockused - 1)
   {
-    destblockused += size;
-    for(int i = 0; i < size; i++)
-    {
-      destblock[destblockused - 1 - i].var.d_lisp = NIL;
-      destblock[destblockused - 1 - i].val.d_lisp = NIL;
-    }
+    auto* dest = &destblock[destblockused];
+    destblockused += size + 1;
+    dest->num(size);
+    for(int i = 1; i <= size; ++i)
+      destblock[destblockused - i].u = cons(NIL, NIL);
+    return dest;
   }
-  else
-    return nullptr;
-  return &destblock[destblockused - size];
+  return nullptr;
 }
 
 /*
@@ -495,7 +490,7 @@ destblock_t* alloc::dalloc(int size)
  *         stored in the cdr of the first element. If it isn't, look
  *         elsewhere.
  */
-void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->val.d_integer + 1; }
+void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
 
 alloc::obarray_t alloc::globals;
 

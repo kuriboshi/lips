@@ -23,6 +23,39 @@ inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
 
 class evaluator;
 
+//
+// The destblock_t is used to store variables and their values.  Each block of
+// variable/value pairs is proceeded by a control block which contains the
+// pieces of information.  The size of the block, the index of the
+// variable/value pair currently being set, and a link to another destblock_t
+// in a chain of blocks.
+//
+struct destblock_t
+{
+  using control_block = struct
+  {
+    std::int8_t size;
+    std::int8_t index;
+    destblock_t* link;
+  };
+  std::variant<control_block, LISPT> u;
+  void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
+  int size() const { return std::get<control_block>(u).size; }
+  int index() const { return std::get<control_block>(u).index; }
+  destblock_t* link() const { return std::get<control_block>(u).link; }
+  void link(destblock_t* dest) { std::get<control_block>(u).link = dest; }
+  void decr()
+  {
+    if(std::get<control_block>(u).index > 0)
+      --std::get<control_block>(u).index;
+  }
+  void var(LISPT x) { std::get<LISPT>(u)->car(x); }
+  LISPT var() { return std::get<LISPT>(u)->car(); }
+  void val(LISPT x) { std::get<LISPT>(u)->cdr(x); }
+  LISPT val() { return std::get<LISPT>(u)->cdr(); }
+  LISPT lispt() const { return std::get<LISPT>(u); }
+};
+
 class alloc
 {
 public:

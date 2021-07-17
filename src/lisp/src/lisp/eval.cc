@@ -128,17 +128,12 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
  */
 destblock_t* evaluator::mkdestblock(int s)
 {
-  auto dest = a.dalloc(s + 1);
-  dest[0].var.d_integer = s;
-  dest[0].val.d_integer = s;
-  dest[0].type = block_type::EMPTY;
-  return dest;
+  return a.dalloc(s);
 }
 
 void evaluator::storevar(LISPT v, int i)
 {
-  dest[i].var.d_lisp = v;
-  dest[i].type = block_type::LISPT;
+  dest[i].var(v);
 }
 
 destblock_t* evaluator::pop_env()
@@ -149,16 +144,18 @@ destblock_t* evaluator::pop_env()
 
 void evaluator::send(LISPT a)
 {
-  if(dest[0].var.d_integer > 0)
-    dest[dest[0].var.d_integer].val.d_lisp = a;
+  if(dest[0].index() > 0)
+    dest[dest[0].index()].val(a);
 }
 
-LISPT evaluator::receive() { return dest[dest[0].var.d_integer].val.d_lisp; }
+LISPT evaluator::receive()
+{
+  return dest[dest[0].index()].val();
+}
 
 void evaluator::next()
 {
-  if(dest[0].var.d_integer > 0)
-    --dest[0].var.d_integer;
+  dest[0].decr();
 }
 
 /* 
@@ -173,13 +170,13 @@ LISPT evaluator::call(LISPT fun)
       return fun->subrval()(l);
       break;
     case 1:
-      return fun->subrval()(l, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[1].val());
       break;
     case 2:
-      return fun->subrval()(l, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[2].val(), dest[1].val());
       break;
     case 3:
-      return fun->subrval()(l, dest[3].val.d_lisp, dest[2].val.d_lisp, dest[1].val.d_lisp);
+      return fun->subrval()(l, dest[3].val(), dest[2].val(), dest[1].val());
       break;
     default:
       break;
@@ -708,22 +705,25 @@ bool evaluator::evlam()
 
 bool evaluator::spread()
 {
-respread:
-  if(EQ(args, NIL))
+  while(true)
   {
-    cont = pop_func();
-  }
-  else if((dest[0].var.d_integer) == 1)
-  {
-    send(args);
-    cont = pop_func();
-  }
-  else
-  {
-    send(args->car());
-    next();
-    args = args->cdr();
-    goto respread;
+    if(EQ(args, NIL))
+    {
+      cont = pop_func();
+      break;
+    }
+    else if(dest[0].index() == 1)
+    {
+      send(args);
+      cont = pop_func();
+      break;
+    }
+    else
+    {
+      send(args->car());
+      next();
+      args = args->cdr();
+    }
   }
   return false;
 }
@@ -776,15 +776,13 @@ bool evaluator::ev4()
 
 void evaluator::link()
 {
-  dest[0].var.d_environ = env;
-  // dest[0].val.d_integer contains the number of var/val pairs
-  dest[0].type = block_type::ENVIRON;
+  dest[0].link(env);
   env = dest;
-  for(auto i = dest[0].val.d_integer; i > 0; i--)
+  for(auto i = dest[0].size(); i > 0; i--)
   {
-    LISPT t = dest[i].var.d_lisp->symvalue();
-    dest[i].var.d_lisp->symvalue(dest[i].val.d_lisp);
-    dest[i].val.d_lisp = t;
+    LISPT t = dest[i].var()->symvalue();
+    dest[i].var()->symvalue(dest[i].val());
+    dest[i].val(t);
   }
 }
 
@@ -801,7 +799,8 @@ bool evaluator::evlam1()
 void evaluator::restore_env()
 {
   auto* c = env;
-  for(auto i = c[0].val.d_integer; i > 0; i--) c[i].var.d_lisp->symvalue(c[i].val.d_lisp);
+  for(auto i = c[0].size(); i > 0; i--)
+    c[i].var()->symvalue(c[i].val());
 }
 
 bool evaluator::evlam0()
@@ -818,7 +817,7 @@ void evaluator::unwind()
   while(env != nullptr)
   {
     restore_env();
-    env = env->var.d_environ;
+    env = env->link();
   }
 }
 
@@ -1020,8 +1019,8 @@ PRIMITIVE evaluator::envget(LISPT e, LISPT n)
 {
   LISPT foo = nullptr;
 #if 0
-  l.check(e, ENVIRON);
-  l.check(n, INTEGER);
+  l.check(e, type::ENVIRON);
+  l.check(n, type::INTEGER);
   if(n->intval() <= 0)
     foo = cons(l, e->envval()->car(), mknumber(l, e->envval()->cdr()));
   else

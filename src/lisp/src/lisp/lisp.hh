@@ -10,6 +10,7 @@
 // libisp should only include libisp.hh.
 //
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -165,27 +166,10 @@ struct closure_t
   short count = 0;
 };
 
-enum class block_type
-{
-  EMPTY = 0,
-  LISPT,
-  ENVIRON
-};
-
-struct destblock_t
-{
-  block_type type = block_type::EMPTY;
-  union
-  {
-    LISPT d_lisp;
-    int d_integer;
-    destblock_t* d_environ;
-  } var, val;
-};
-
 using indirect_t = LISPT;
 using free_t = LISPT;
 using cvariable_t = LISPT*;
+struct destblock_t;
 
 struct lisp_t
 {
