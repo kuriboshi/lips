@@ -22,7 +22,7 @@ PRIMITIVE string::symstr(LISPT sym)
 PRIMITIVE string::stringp(LISPT s)
 {
   if(type_of(s) == type::STRING)
-    return T;
+    return s;
   return NIL;
 }
 
@@ -77,7 +77,7 @@ PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
   auto e = end->intval();
   auto size = e - s + 1;
   if(size < 0 || s > str->stringval().length()
-    || e > str->stringval().length() || s <= 0 || e < 0)
+    || e > str->stringval().length() || s < 0 || e < 0)
     return NIL;
   return mkstring(l, str->stringval().substr(s, e));
 }
