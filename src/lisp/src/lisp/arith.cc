@@ -23,28 +23,31 @@ PRIMITIVE arith::plus(LISPT x)
 {
   double fsum = 0.0;
   int sum = 0;
-  int f = 0;
+  bool f = false;
 
   while(type_of(x) == type::CONS)
   {
     if(f)
     {
       if(type_of(x->car()) == type::INTEGER)
-        fsum += (double)x->car()->intval();
+        fsum += static_cast<double>(x->car()->intval());
       else if(type_of(x->car()) == type::FLOAT)
         fsum += x->car()->floatval();
       else
         return l.error(ILLEGAL_ARG, x->car());
     }
-    else if(type_of(x->car()) == type::INTEGER)
-      sum += x->car()->intval();
-    else if(type_of(x->car()) == type::FLOAT)
-    {
-      f = 1;
-      fsum = x->car()->floatval() + (double)sum;
-    }
     else
-      return l.error(ILLEGAL_ARG, x->car());
+    {
+      if(type_of(x->car()) == type::INTEGER)
+        sum += x->car()->intval();
+      else if(type_of(x->car()) == type::FLOAT)
+      {
+        f = true;
+        fsum = x->car()->floatval() + static_cast<double>(sum);
+      }
+      else
+        return l.error(ILLEGAL_ARG, x->car());
+    }
     x = x->cdr();
   }
   if(f)
@@ -85,9 +88,9 @@ PRIMITIVE arith::difference(LISPT x, LISPT y)
     if(type_of(y) == type::INTEGER)
       return mknumber(l, x->intval() - y->intval());
     else
-      return mkfloat(l, (double)x->intval() - y->floatval());
+      return mkfloat(l, static_cast<double>(x->intval()) - y->floatval());
   else if(type_of(y) == type::INTEGER)
-    return mkfloat(l, x->floatval() - (double)y->intval());
+    return mkfloat(l, x->floatval() - static_cast<double>(y->intval()));
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
@@ -440,8 +443,21 @@ TEST_CASE("Arithmetic functions")
 
   SUBCASE("+")
   {
-    auto r = eval(l, "(+ 1 2 3 4 5)");
-    CHECK(r->intval() == 15);
+    auto r0 = eval(l, "(+ 1 2 3 4 5)");
+    REQUIRE(type_of(r0) == type::INTEGER);
+    CHECK(r0->intval() == 15);
+    auto r1 = eval(l, "(+ 1 1.0 2.0)");
+    REQUIRE(type_of(r1) == type::FLOAT);
+    CHECK(r1->floatval() == 4.0);
+    auto i2 = mknumber(1);
+    auto r2 = plus(cons(i2, cons(i2, NIL)));
+    REQUIRE(type_of(r2) == type::INTEGER);
+    CHECK(r2->intval() == 2);
+    auto i3 = mknumber(1);
+    auto f3 = mkfloat(1.0);
+    auto r3 = plus(cons(f3, cons(i3, NIL)));
+    REQUIRE(type_of(r3) == type::FLOAT);
+    CHECK(r3->floatval() == 2);
   }
   SUBCASE("-")
   {
@@ -517,7 +533,7 @@ TEST_CASE("Arithmetic functions")
   SUBCASE("f+")
   {
     auto r = eval(l, "(f+ (itof 5) (itof 2))");
-    CHECK(type_of(r) == type::FLOAT);
+    REQUIRE(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 7.0);
   }
   SUBCASE("f-")

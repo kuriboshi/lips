@@ -53,6 +53,10 @@ target_include_directories(lisp PUBLIC
 target_link_libraries(lisp PUBLIC fmt::fmt)
 
 add_executable(main src/lisp/main.cc)
+target_sources(main PRIVATE
+  src/lisp/debug.test.cc
+  src/lisp/string.test.cc
+)
 target_link_libraries(main PUBLIC lisp doctest::doctest)
 add_test(NAME lisp_test
   COMMAND main --test)

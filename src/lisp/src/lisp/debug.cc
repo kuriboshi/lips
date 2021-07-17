@@ -11,7 +11,7 @@ namespace lisp
 debug::debug(): base() {}
 debug::debug(lisp& lisp): base(lisp) {}
 
-PRIMITIVE evaltrace(lisp& l, LISPT state)
+PRIMITIVE debug::evaltrace(LISPT state)
 {
   auto i = l.e().trace();
 
@@ -31,7 +31,7 @@ inline constexpr auto EVALTRACE = "evaltrace"; // evaltrace
 void debug::init()
 {
   // clang-format off
-  mkprim(pn::EVALTRACE, evaltrace, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::EVALTRACE, ::lisp::evaltrace, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format in
 }
 

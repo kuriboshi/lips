@@ -36,7 +36,7 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
   return NIL;
 }
 
-PRIMITIVE string::strcomp(LISPT s1, LISPT s2)
+PRIMITIVE string::strcmp(LISPT s1, LISPT s2)
 {
   l.check(s1, type::STRING);
   l.check(s2, type::STRING);
@@ -102,7 +102,7 @@ void string::init()
   mkprim(pn::STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::STRCMP,  ::lisp::strcomp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRCMP,  ::lisp::strcmp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

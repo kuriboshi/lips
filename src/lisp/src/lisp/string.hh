@@ -21,7 +21,7 @@ public:
   LISPT symstr(LISPT);
   LISPT stringp(LISPT);
   LISPT streq(LISPT, LISPT);
-  LISPT strcomp(LISPT, LISPT);
+  LISPT strcmp(LISPT, LISPT);
   LISPT concat(LISPT);
   LISPT strlen(LISPT);
   LISPT substr(LISPT, LISPT, LISPT);
@@ -33,8 +33,8 @@ inline LISPT stringp(lisp& l, LISPT x) { return string(l).stringp(x); }
 inline LISPT stringp(LISPT x) { return string().stringp(x); }
 inline LISPT streq(lisp& l, LISPT x, LISPT y) { return string(l).streq(x, y); }
 inline LISPT streq(LISPT x, LISPT y) { return string().streq(x, y); }
-inline LISPT strcomp(lisp& l, LISPT x, LISPT y) { return string(l).strcomp(x, y); }
-inline LISPT strcomp(LISPT x, LISPT y) { return string().strcomp(x, y); }
+inline LISPT strcmp(lisp& l, LISPT x, LISPT y) { return string(l).strcmp(x, y); }
+inline LISPT strcmp(LISPT x, LISPT y) { return string().strcmp(x, y); }
 inline LISPT concat(lisp& l, LISPT x) { return string(l).concat(x); }
 inline LISPT concat(LISPT x) { return string().concat(x); }
 inline LISPT strlen(lisp& l, LISPT x) { return string(l).strlen(x); }

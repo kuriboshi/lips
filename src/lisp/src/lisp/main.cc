@@ -104,7 +104,7 @@ int main(int argc, const char** argv)
     if(f == "--test")
     {
       test = true;
-      continue;
+      break;
     }
     lisp::load(lisp::mkstring(f));
   }
