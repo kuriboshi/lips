@@ -594,19 +594,21 @@ bool evaluator::ev11()
 
 bool evaluator::noev9()
 {
-nextarg:
-  if(is_NIL(args->cdr()))
+  while(true)
   {
-    send(expression);
-    cont = pop_func();
-  }
-  else
-  {
-    send(expression);
-    next();
-    args = args->cdr();
-    expression = args->car();
-    goto nextarg;
+    if(is_NIL(args->cdr()))
+    {
+      send(expression);
+      cont = pop_func();
+      break;
+    }
+    else
+    {
+      send(expression);
+      next();
+      args = args->cdr();
+      expression = args->car();
+    }
   }
   return false;
 }
