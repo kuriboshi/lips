@@ -24,9 +24,7 @@ public:
   repl(lisp::lisp& lisp) : l(lisp)
   {
     _prompt = lisp::mkstring("> ");
-    lisp::gcprotect(_prompt);
     _break_prompt = lisp::mkstring(": ");
-    lisp::gcprotect(_break_prompt);
   }
   ~repl() = default;
 
@@ -69,7 +67,7 @@ public:
       if(type_of(com) != lisp::type::CONS)
         continue;
       else if(EQ(com->car(), lisp::C_GO))
-        return print(l, eval(l, exp), lisp::NIL);
+        return print(l, eval(l, exp), false);
       else if(EQ(com->car(), lisp::C_RESET))
       {
         l.e().unwind();

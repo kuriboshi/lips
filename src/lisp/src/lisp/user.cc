@@ -69,7 +69,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       {
         putprop(l, name, C_OLDDEF, name->symvalue());
         if(!is_NIL(l.verbose))
-          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)), NIL);
+          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)), false);
       }
     }
   return NIL;

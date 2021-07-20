@@ -296,15 +296,10 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
 
 void top::init()
 {
-  gcprotect(top::history);
-  gcprotect(top::histnum);
-  gcprotect(top::histmax);
-  gcprotect(alias_expanded);
-  gcprotect(promptform);
-  initcvar(&top::history, "history", NIL);
-  initcvar(&top::histnum, "histnum", mknumber(1L));
-  initcvar(&top::histmax, "histmax", mknumber(100L));
-  initcvar(&promptform, "promptform", NIL);
+  initcvar(top::history, "history", NIL);
+  initcvar(top::histnum, "histnum", mknumber(1L));
+  initcvar(top::histmax, "histmax", mknumber(100L));
+  initcvar(promptform, "promptform", NIL);
   mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }

@@ -372,12 +372,10 @@ inline std::unique_ptr<::lisp::lisp> init()
 
   top::init();
 
-  initcvar(&path, "path", mungepath(getenv("PATH")));
-  initcvar(&home, "home", mkstring(getenv("HOME")));
-  gcprotect(path);
-  gcprotect(home);
+  initcvar(path, "path", mungepath(getenv("PATH")));
+  initcvar(home, "home", mkstring(getenv("HOME")));
 
-  initcvar(&globsort, "globsort", T);
+  initcvar(globsort, "globsort", T);
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
   breakhook(onbreak);

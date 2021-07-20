@@ -20,14 +20,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
   for(int i = 0; i != MAXHASH; ++i)
     obarray[i] = nullptr;
 
-  gcprotect(lisp.topprompt);
-  gcprotect(lisp.brkprompt);
-  gcprotect(lisp.currentbase);
-  gcprotect(lisp.version);
-  gcprotect(lisp.verbose);
-  gcprotect(gcgag);
-  gcprotect(C_EOF);
-
   destblockused = 0;
   newpage(); // Allocate one page of storage
   if(conscells.empty())
@@ -35,8 +27,7 @@ alloc::alloc(lisp& lisp): _lisp(lisp)
     lisp.primerr().format("Cons cells memory exhausted\n");
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
-  sweep();
-  initcvar(&gcgag, "gcgag", NIL);
+  initcvar(gcgag, "gcgag", NIL);
 
   // clang-format off
   mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
@@ -60,146 +51,14 @@ alloc::conscells_t* alloc::newpage()
   auto* newp = new conscells_t;
   if(newp == nullptr)
     return conscells.front();
+  for(auto& i: newp->cells)
+  {
+    i.settype(type::FREE);
+    i.setnil();
+    freelist.push_back(&i);;
+  }
   conscells.push_front(newp);
   return newp;
-}
-
-/* 
- * sweep - Sweep up unused cons cells. Free objects that are pointers to 
- *         space allocated by malloc. These objects has the type field set 
- *         to NIL, and the rest of the field is the pointer.
- */
-int alloc::sweep()
-{
-  int nrfreed = 0;
-  for(auto cc: conscells)
-  {
-    for(auto& i: cc->cells)
-    {
-      if(!i.marked())
-      {
-        ++nrfreed;
-        if(type_of(i) == type::CPOINTER)
-          free(i.cpointval());
-        i.unmark();
-        i.freeval(freelist);
-        freelist = &i;
-      }
-    }
-  }
-  return nrfreed;
-}
-
-/*
- * mark - Mark a cell and traverse car and cdr of cons cells and all other
- *        fields of type LISPT.
- */
-void alloc::mark(LISPT x)
-{
-  switch(type_of(x))
-  {
-    case type::CONS:
-      if(x->marked())
-        break;
-      x->mark();
-      mark(x->car());
-      mark(x->cdr());
-      break;
-    case type::SYMBOL:
-      break;
-    case type::LAMBDA:
-    case type::NLAMBDA:
-      x->mark();
-      mark(x->lamval().lambdarep);
-      mark(x->lamval().arglist);
-      break;
-    case type::CLOSURE:
-      x->mark();
-      mark(x->closval().cfunction);
-      mark(x->closval().closed);
-      mark(x->closval().cvalues);
-      break;
-    case type::STRING:
-      x->mark();
-      break;
-    case type::INDIRECT:
-      x->mark();
-      mark(x->indirectval());
-      break;
-    case type::NIL:
-      break;
-    default:
-      x->mark();
-      break;
-  }
-}
-
-/*
- * doreclaim - Garbage collector, mark all used cells then
- *	       sweep up garbage.  Argument doconsargs is nonzero
- *	       
- */
-LISPT alloc::doreclaim(int incr)
-{
-  if(is_NIL(gcgag))
-    _lisp.primerr().format("garbage collecting\n");
-  if(T != nullptr)
-    T->mark();
-  if(e().dest != nullptr)
-  {
-    for(int i = e().dest[0].size(); i > 0; i--)
-      mark(e().dest[i].lispt());
-  }
-  for(auto i: markobjs) mark(*i);
-#if 0
-  // TODO:
-  if (env != nullptr && ENVVAL(env) != nullptr)
-    mark((LISPT *) &ENVVAL(env));
-#endif
-  for(int i = 0; i < e().toctrl; i++)
-  {
-    if(auto* env = std::get_if<LISPT>(&e().control[i]); env && *env && type_of(**env) != type::ENVIRON)
-      mark(*env);
-  }
-  for(int i = 0; i < MAXHASH; i++)
-  {
-    for(auto* l = obarray[i]; l; l = l->onext)
-    {
-      l->sym->mark();
-      mark((l->sym->symvalue()));
-      mark((l->sym->symbol().plist));
-    }
-  }
-  for(int i = destblockused - 1; i >= 0; i--)
-  {
-    std::visit(
-      [this](auto&& arg) {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr(std::is_same_v<T, LISPT>)
-          mark(arg);
-        else if constexpr(std::is_same_v<T, int>)
-          ;
-        else if constexpr(std::is_same_v<T, destblock_t*>)
-          ;
-      },
-      destblock[i].u);
-  }
-  for(auto i: savearray) mark(i);
-  int nrfreed = sweep();
-  /*
-   * A new page is allocated if the number of conses is lower
-   * than MINCONSES or if requested by calling doreclaim with
-   * incr greater than 0.
-   */
-  if(nrfreed < MINCONSES || incr > 0)
-  {
-    do
-      newpage();
-    while(incr-- > 0); /* At least one page more */
-  }
-  if(is_NIL(gcgag))
-    _lisp.primerr().format("{} cells freed\n", nrfreed);
-  return NIL;
 }
 
 /*
@@ -209,7 +68,6 @@ LISPT alloc::doreclaim(int incr)
 PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
 {
   int i;
-
   if(is_NIL(incr))
     i = 0;
   else
@@ -217,19 +75,23 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
     _lisp.check(incr, type::INTEGER);
     i = incr->intval();
   }
-  doreclaim(i);
+  for(; i > 0; --i)
+    newpage();
   return NIL;
 }
 
 LISPT alloc::getobject()
 {
-  if(is_NIL(freelist))
-    doreclaim();
+  if(freelist.empty())
+    newpage();
 
-  LISPT f = nullptr;
-  set(f, type::CONS, freelist);
-  freelist = freelist->freeval();
-  return f;
+  auto f = freelist.front();
+  freelist.pop_front();
+  auto r = LISPT(f, [this](lisp_t* obj) {
+    obj->setnil();
+    freelist.push_back(obj);
+  });
+  return r;
 }
 
 /*
@@ -238,15 +100,7 @@ LISPT alloc::getobject()
  */
 PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
-  if(is_NIL(freelist))
-  {
-    mark(a);
-    mark(b);
-    doreclaim();
-  }
-
-  LISPT f = freelist;
-  freelist = freelist->freeval();
+  LISPT f = getobject();
   f->consval(cons_t());
   f->car(a);
   f->cdr(b);
@@ -263,9 +117,7 @@ PRIMITIVE alloc::xobarray()
 
 PRIMITIVE alloc::freecount()
 {
-  int i = 0;
-  for(auto l = freelist; l->intval(); l = l->cdr()) i++;
-  return mknumber(i);
+  return mknumber(freelist.size());
 }
 
 /*
@@ -274,9 +126,9 @@ PRIMITIVE alloc::freecount()
  *          is the type of function: SUBR or FSUBR. If npar is negative
  *          it means the function is halfspread.
  */
-LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
+LISPT alloc::mkprim(const std::string& pname, subr_t subr)
 {
-  LISPT s = new lisp_t;
+  auto s = LISPT(new lisp_t);
   s->subrval(subr);
   LISPT f = intern(pname);
   set(f->symbol().value, type::SUBR, s);
@@ -285,22 +137,22 @@ LISPT alloc::mkprim(const std::string& pname, subr_t* subr)
 
 void alloc::mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, new subr_t(subr, spread, fun));
+  mkprim(pname, subr_t(subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, new subr_t(subr, spread, fun));
+  mkprim(pname, subr_t(subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, new subr_t(subr, spread, fun));
+  mkprim(pname, subr_t(subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, new subr_t(subr, spread, fun));
+  mkprim(pname, subr_t(subr, spread, fun));
 }
 
 /*
@@ -350,8 +202,6 @@ LISPT alloc::mkarglis(LISPT alist, int& count)
  */
 LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 {
-  save(args);
-  save(def);
   LISPT s = getobject();
   s->lamval(lambda_t());
   s->lamval().lambdarep = def;
@@ -360,8 +210,6 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
   s->lamval().argcnt = count;
   LISPT t = s;
   t->settype(type);
-  def = unsave();
-  args = unsave();
   return t;
 }
 
@@ -384,16 +232,17 @@ int alloc::hash(const std::string& str)
 LISPT alloc::buildatom(const std::string& s, LISPT newatom)
 {
   static LISPT unbound = nullptr;
-  if(unbound == nullptr)
-    set(unbound, type::UNBOUND, new lisp_t);
+  if(!unbound)
+  {
+    unbound.reset(new lisp_t);
+    unbound->settype(type::UNBOUND);
+  }
 
   newatom->symbol(symbol_t());
   newatom->symbol().pname = s;
   newatom->symbol().plist = NIL;
   newatom->symvalue(unbound);
-  LISPT l = nullptr;
-  set(l, type::SYMBOL, newatom);
-  return l;
+  return newatom;
 }
 
 alloc::bucket_t* alloc::findatom(int hv, const std::string& str, const obarray_t& obarray)
@@ -437,7 +286,7 @@ LISPT alloc::intern(const std::string& str)
   if(auto* ob = findatom(hv, str, globals))
     return ob->sym;
   // Use new lisp_t here because we're never going to free interned symbols.
-  return puthash(hv, str, globals, new lisp_t);
+  return puthash(hv, str, globals, LISPT(new lisp_t));
 }
 
 /*

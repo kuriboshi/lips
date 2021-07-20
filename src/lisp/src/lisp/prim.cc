@@ -234,7 +234,6 @@ PRIMITIVE prim::append(LISPT x)
   LISPT cl;
 
   LISPT newl = cons(l, NIL, NIL);
-  a.save(newl);
   LISPT curp = newl;
   for(; !is_NIL(x); x = x->cdr())
   {
@@ -248,7 +247,6 @@ PRIMITIVE prim::append(LISPT x)
       }
     }
   }
-  newl = a.unsave();
   return newl->cdr();
 }
 
@@ -280,8 +278,6 @@ PRIMITIVE prim::length(LISPT x)
 
 PRIMITIVE prim::closure(LISPT fun, LISPT vars)
 {
-  a.save(fun);
-  a.save(vars);
   LISPT c = a.getobject();
   c->closval().cfunction = fun;
   c->closval().closed = vars;

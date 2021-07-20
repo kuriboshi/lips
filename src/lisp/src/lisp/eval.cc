@@ -294,7 +294,7 @@ bool evaluator::peval()
       cont = pop_func();
       break;
     case type::CVARIABLE:
-      send(*expression->cvarval());
+      send(expression->cvarval());
       cont = pop_func();
       break;
     case type::FREE:
@@ -829,7 +829,7 @@ bool evaluator::lookup()
       send(t->indirectval());
       break;
     case type::CVARIABLE:
-      send(*t->cvarval());
+      send(t->cvarval());
       break;
     default:
       send(t);
@@ -1041,9 +1041,6 @@ inline constexpr auto ENVGET = "envget";         // examine environment
 
 void evaluator::init()
 {
-  gcprotect(l, fun);
-  gcprotect(l, expression);
-  gcprotect(l, args);
   // clang-format off
   mkprim(pn::E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);

@@ -452,7 +452,7 @@ static void ps(const std::string& s, file_t& file, bool esc)
     file.putch(c, esc);
 }
 
-static void pi(int i, int base, file_t& file)
+static void pi(std::int64_t i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -487,7 +487,7 @@ static void pp(const char* s, file_t& file, LISPT x)
 {
   ps(s, file, false);
   ps(" ", file, false);
-  pi((long)&x, 16L, file);
+  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file);
   ps(">", file, false);
 }
 
@@ -545,10 +545,6 @@ LISPT io::prin0(LISPT x, file_t& file, bool esc)
       break;
     case type::SYMBOL:
       return patom(x, file, esc);
-      break;
-    case type::CPOINTER:
-      if(x->cpointval() != nullptr)
-        pp("#<pointer", file, x);
       break;
     case type::NIL:
       ps("nil", file, false);

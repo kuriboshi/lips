@@ -15,78 +15,8 @@ namespace lisp
 {
 lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 {
-  messages[error_code(NO_MESSAGE)] = "";
-  messages[error_code(ILLEGAL_ARG)] = "Illegal argument";
-  messages[error_code(DIVIDE_ZERO)] = "Divide by zero";
-  messages[error_code(BUG)] = "Internal bug";
-  messages[error_code(NO_MATCH)] = "No match for";
-  messages[error_code(CANT_CREATE)] = "Can't create file";
-  messages[error_code(CANT_CREATE_OPEN)] = "Can't create or open file";
-  messages[error_code(CANT_OPEN)] = "Can't open file";
-  messages[error_code(NO_SUCH_JOB)] = "No such job";
-  messages[error_code(NOT_PRINTABLE)] = "Not printable";
-  messages[error_code(NO_DIRECTORY)] = "No directory";
-  messages[error_code(NO_USER)] = "No such user";
-  messages[error_code(ATTEMPT_TO_CLOBBER)] = "Attempt to clobber constant";
-  messages[error_code(OUT_OF_MEMORY)] = "Out of memory";
-  messages[error_code(UNEXPECTED_EOF)] = "Unexpected end of file";
-  messages[error_code(EVENT_NOT_FOUND)] = "Event not found";
-  messages[error_code(UNKNOWN_REQUEST)] = "Unknown request";
-  messages[error_code(ILLEGAL_SIGNAL)] = "Illegal signal";
-  messages[error_code(STACK_OVERFLOW)] = "Stack overflow";
-  messages[error_code(CORRUPT_DATA)] = "Bug: corrupt data";
-  messages[error_code(COMMAND_ABORTED)] = "Command aborted";
-  messages[error_code(ALIAS_LOOP)] = "Alias loop";
-  messages[error_code(ILLEGAL_FUNCTION)] = "Illegal function";
-  messages[error_code(UNDEF_FUNCTION)] = "Undefined function";
-  messages[error_code(UNBOUND_VARIABLE)] = "Unbound variable";
-  messages[error_code(KBD_BREAK)] = "Break";
-  messages[error_code(AMBIGUOUS)] = "Ambiguous";
-  messages[error_code(USER_ERROR)] = "";
-
-  auto intern = [this](const auto s) { return a().intern(s); };
-
-  set(T, type::T, a().getobject());
-
-  auto nil = intern("nil");
-  nil->symvalue(NIL);
-  nil->symbol().constant = true;
-  
-  auto t = intern("t");
-  t->symvalue(T);
-  t->symbol().constant = true;
-
-  C_AUTOLOAD = intern("autoload");
-  C_BIGNUM = intern("bignum");
-  C_BROKEN = intern("broken");
-  C_BT = intern("bt");
-  C_CLOSURE = intern("closure");
-  C_CONS = intern(pn::CONS);
-  C_DOT = intern(".");
-  C_ENDOFFILE = intern("endoffile");
-  C_ENVIRON = intern("environ");
-  set(C_EOF, type::ENDOFFILE, a().getobject());
-  C_FILE = intern("file");
-  C_FLOAT = intern("float");
-  C_FREE = intern("free");
-  C_FSUBR = intern("fsubr");
-  C_GO = intern("go");
-  C_INDIRECT = intern("indirect");
-  C_INTEGER = intern("integer");
-  C_OLDDEF = intern("olddef");
-  C_REDEFINED = intern("redefined");
-  C_RESET = intern("reset");
-  C_RETURN = intern("return");
-  C_STRING = intern("string");
-  C_SUBR = intern("subr");
-  C_SYMBOL = intern("symbol");
-  C_UNBOUND = intern("unbound");
-  C_WRITE = intern("write");
-
-  initcvar(&topprompt, "prompt", a().mkstring("!_"));
-  initcvar(&brkprompt, "brkprompt", a().mkstring("!:"));
-  initcvar(&currentbase, "base", a().mknumber(10L));
-  initcvar(&version, "version", a().mkstring(VERSION));
+  if(_current == nullptr)
+    _current = this;
 
   _primout = std::make_unique<file_t>(std::cout);
   _primerr = std::make_unique<file_t>(std::cerr);
@@ -95,28 +25,102 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   _stderr = std::make_unique<file_t>(std::cerr);
   _stdin = std::make_unique<file_t>(std::cin);
 
-  a().gcprotect(top);
-  a().gcprotect(rstack);
+  static auto global_set = false;
+  if(!global_set)
+  {
+    global_set = true;
 
+    messages[error_code(NO_MESSAGE)] = "";
+    messages[error_code(ILLEGAL_ARG)] = "Illegal argument";
+    messages[error_code(DIVIDE_ZERO)] = "Divide by zero";
+    messages[error_code(BUG)] = "Internal bug";
+    messages[error_code(NO_MATCH)] = "No match for";
+    messages[error_code(CANT_CREATE)] = "Can't create file";
+    messages[error_code(CANT_CREATE_OPEN)] = "Can't create or open file";
+    messages[error_code(CANT_OPEN)] = "Can't open file";
+    messages[error_code(NO_SUCH_JOB)] = "No such job";
+    messages[error_code(NOT_PRINTABLE)] = "Not printable";
+    messages[error_code(NO_DIRECTORY)] = "No directory";
+    messages[error_code(NO_USER)] = "No such user";
+    messages[error_code(ATTEMPT_TO_CLOBBER)] = "Attempt to clobber constant";
+    messages[error_code(OUT_OF_MEMORY)] = "Out of memory";
+    messages[error_code(UNEXPECTED_EOF)] = "Unexpected end of file";
+    messages[error_code(EVENT_NOT_FOUND)] = "Event not found";
+    messages[error_code(UNKNOWN_REQUEST)] = "Unknown request";
+    messages[error_code(ILLEGAL_SIGNAL)] = "Illegal signal";
+    messages[error_code(STACK_OVERFLOW)] = "Stack overflow";
+    messages[error_code(CORRUPT_DATA)] = "Bug: corrupt data";
+    messages[error_code(COMMAND_ABORTED)] = "Command aborted";
+    messages[error_code(ALIAS_LOOP)] = "Alias loop";
+    messages[error_code(ILLEGAL_FUNCTION)] = "Illegal function";
+    messages[error_code(UNDEF_FUNCTION)] = "Undefined function";
+    messages[error_code(UNBOUND_VARIABLE)] = "Unbound variable";
+    messages[error_code(KBD_BREAK)] = "Break";
+    messages[error_code(AMBIGUOUS)] = "Ambiguous";
+    messages[error_code(USER_ERROR)] = "";
+
+    auto intern = [this](const auto s) { return a().intern(s); };
+
+    auto nil = intern("nil");
+    nil->symvalue(NIL);
+    nil->symbol().constant = true;
+
+    auto t = intern("t");
+    T = t;
+    t->symvalue(T);
+    t->settype(type::T);
+    t->symbol().constant = true;
+
+    C_AUTOLOAD = intern("autoload");
+    C_BIGNUM = intern("bignum");
+    C_BROKEN = intern("broken");
+    C_BT = intern("bt");
+    C_CLOSURE = intern("closure");
+    C_CONS = intern(pn::CONS);
+    C_DOT = intern(".");
+    C_ENDOFFILE = intern("endoffile");
+    C_ENVIRON = intern("environ");
+    C_EOF = intern("eof");
+    C_EOF->settype(type::ENDOFFILE);
+    C_FILE = intern("file");
+    C_FLOAT = intern("float");
+    C_FREE = intern("free");
+    C_FSUBR = intern("fsubr");
+    C_GO = intern("go");
+    C_INDIRECT = intern("indirect");
+    C_INTEGER = intern("integer");
+    C_OLDDEF = intern("olddef");
+    C_REDEFINED = intern("redefined");
+    C_RESET = intern("reset");
+    C_RETURN = intern("return");
+    C_STRING = intern("string");
+    C_SUBR = intern("subr");
+    C_SYMBOL = intern("symbol");
+    C_UNBOUND = intern("unbound");
+    C_WRITE = intern("write");
+
+    e().undefhook(nullptr);
+    e().breakhook(nullptr);
+  }
+
+  initcvar(topprompt, "prompt", a().mkstring("!_"));
+  initcvar(brkprompt, "brkprompt", a().mkstring("!:"));
+  initcvar(currentbase, "base", a().mknumber(10L));
+  initcvar(version, "version", a().mkstring(VERSION));
+
+  Map::init();
   arith::init();
   debug::init();
   file::init();
+  io::init(*this);
   logic::init();
   low::init();
-  Map::init();
+  posix::init();
   pred::init();
   prim::init();
   prop::init();
   string::init();
-  posix::init();
   user::init();
-  io::init(*this);
-
-  e().undefhook(nullptr);
-  e().breakhook(nullptr);
-
-  if(_current == nullptr)
-    _current = this;
 }
 
 lisp::~lisp()

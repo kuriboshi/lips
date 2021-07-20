@@ -11,6 +11,7 @@
 //
 
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -25,8 +26,8 @@ class evaluator;
 class alloc;
 class file_t;
 
-struct lisp_t;
-using LISPT = struct lisp_t*;
+class lisp_t;
+using LISPT = std::shared_ptr<lisp_t>;
 
 //
 // All lisp constants used internally.
@@ -99,7 +100,6 @@ enum class type
              // occured
   HASHTAB,   // contains hashed data table
   CVARIABLE, // is a pointer to c-variable
-  CPOINTER,  // general c pointer
   USER,      // user defined type
 };
 
@@ -114,11 +114,11 @@ struct cons_t
 
 struct symbol_t
 {
-  std::string pname;           // The printname of the atom
-  bool constant = false;       // If true this is a constant which can't be set
-  LISPT value = NIL;         // Value
-  LISPT plist = NIL;         // The property list
-  LISPT topval = NIL;        // Holds top value (not used yet)
+  std::string pname;     // The printname of the atom
+  bool constant = false; // If true this is a constant which can't be set
+  LISPT value = NIL;     // Value
+  LISPT plist = NIL;     // The property list
+  LISPT topval = NIL;    // Holds top value (not used yet)
 };
 
 struct subr_t
@@ -166,36 +166,45 @@ struct closure_t
   short count = 0;
 };
 
-using indirect_t = LISPT;
-using free_t = LISPT;
-using cvariable_t = LISPT*;
+struct cvariable_t
+{
+  LISPT value;
+};
+
+struct indirect_t
+{
+  LISPT value;
+};
+
 struct destblock_t;
 
-struct lisp_t
+class lisp_t
 {
+public:
   lisp_t() = default;
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
+  void setnil() { u = {}; }
   auto symbol() -> symbol_t& { return std::get<symbol_t>(u); }
-  auto symbol(symbol_t x) -> void { type = type::SYMBOL; u = x; }
+  auto symbol(symbol_t x) -> void { _type = type::SYMBOL; u = x; }
   auto symvalue() const -> LISPT { return std::get<symbol_t>(u).value; }
   auto symvalue(LISPT x) -> void { std::get<symbol_t>(u).value = x; }
   auto intval() const -> int { return std::get<int>(u); }
   auto intval(int x) -> void
   {
-    type = type::INTEGER;
+    _type = type::INTEGER;
     u = x;
   }
   auto floatval() const -> double { return std::get<double>(u); }
   auto floatval(double f) -> void
   {
-    type = type::FLOAT;
+    _type = type::FLOAT;
     u = f;
   }
-  auto indirectval() -> indirect_t& { return std::get<4>(u); }
+  auto indirectval() -> LISPT { return std::get<4>(u).value; }
   auto consval() const -> const cons_t& { return std::get<cons_t>(u); }
-  void consval(cons_t x) { type = type::CONS; u = x; }
+  void consval(cons_t x) { _type = type::CONS; u = x; }
   auto car() const -> LISPT { return std::get<cons_t>(u).car; }
   auto cdr() const -> LISPT { return std::get<cons_t>(u).cdr; }
   void car(LISPT x) { std::get<cons_t>(u).car = x; }
@@ -203,40 +212,32 @@ struct lisp_t
   auto stringval() const -> const std::string& { return std::get<std::string>(u); }
   void stringval(const std::string& s)
   {
-    type = type::STRING;
+    _type = type::STRING;
     u = s;
   }
-  auto subrval() const -> const subr_t& { return *std::get<subr_t*>(u); }
-  void subrval(subr_t* x) { type = type::SUBR; u = x; }
+  auto subrval() const -> const subr_t& { return std::get<subr_t>(u); }
+  void subrval(subr_t x) { _type = type::SUBR; u = x; }
   auto lamval() -> lambda_t& { return std::get<lambda_t>(u); }
-  void lamval(lambda_t x) { type = type::LAMBDA; u = x; }
-  void nlamval(lambda_t x) { type = type::NLAMBDA; u = x; }
+  void lamval(lambda_t x) { _type = type::LAMBDA; u = x; }
+  void nlamval(lambda_t x) { _type = type::NLAMBDA; u = x; }
   auto closval() -> closure_t& { return std::get<closure_t>(u); }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(u); }
-  void envval(destblock_t* env) { type = type::ENVIRON; u = env; }
+  void envval(destblock_t* env) { _type = type::ENVIRON; u = env; }
   auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(u).get(); }
-  void fileval(std::unique_ptr<file_t> f) { type = type::FILET; u = std::move(f); }
-  auto freeval() -> LISPT { return std::get<12>(u); }
-  void freeval(LISPT x) { type = type::FREE; u.emplace<12>(x); }
-  auto cvarval() const -> cvariable_t{ return std::get<cvariable_t>(u); }
-  void cvarval(cvariable_t x) { u.emplace<cvariable_t>(x); }
-  auto cpointval() -> void* { return std::get<void*>(u); }
+  void fileval(std::unique_ptr<file_t> f) { _type = type::FILET; u = std::move(f); }
+  auto cvarval() -> LISPT { return std::get<cvariable_t>(u).value; }
+  void cvarval(LISPT x) { _type = type::CVARIABLE; u.emplace<cvariable_t>(cvariable_t{x}); }
 
-  const std::string& getstr() const { return type == type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
+  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
 
   //
   // Some more or less helpful functions
   //
-  type gettype() const { return type; }
-  void settype(type t) { type = t; }
-  bool marked() const { return gcmark; }
-  void mark() { gcmark = true; }
-  void unmark() { gcmark = false; }
+  type gettype() const { return _type; }
+  void settype(type t) { _type = t; }
 
 private:
-  bool gcmark = false;
-  type type = type::NIL;
-
+  type _type = type::NIL;
   // One entry for each type.  Types that has no, or just one value are
   // indicated by a comment.
   std::variant<
@@ -247,14 +248,12 @@ private:
     indirect_t,                 // INDIRECT (4)
     cons_t,                     // CONS (5)
     std::string,                // STRING (6)
-    subr_t*,                    // SUBR (7)
+    subr_t,                     // SUBR (7)
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
     std::unique_ptr<file_t>,    // FILE (11)
-    free_t,                     // FREE (12)
-    cvariable_t,                // CVARIABLE (13)
-    void*                       // CPOINTER (14)
+    cvariable_t                 // CVARIABLE (12)
     > u;
 };
 
@@ -284,7 +283,6 @@ inline void set(LISPT& a, type t, LISPT p)
 {
   a = p;
   a->settype(t);
-  a->unmark();
 }
 
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }

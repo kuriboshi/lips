@@ -105,7 +105,7 @@ static void printjob(job_t* job)
   }
   buffer += "\t";
   primout().format(buffer);
-  print(job->exp, NIL);
+  print(job->exp, false);
 }
 #endif
 

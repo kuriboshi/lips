@@ -8,6 +8,7 @@
 #include <array>
 #include <vector>
 #include <list>
+#include <deque>
 #include "lisp.hh"
 #include "base.hh"
 
@@ -62,13 +63,9 @@ public:
   alloc(lisp&);
   ~alloc();
 
-  static constexpr int CONSCELLS = 1000;     // Number of cells in each block
-  static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
-  static constexpr int MINCONSES = 2000;     // Minimum number of cells after gc
-  static constexpr int MAXHASH = 256;        // Max number of hash buckets
-
   struct conscells_t
   {
+    static constexpr int CONSCELLS = 1024; // Number of cells in each block
     std::array<lisp_t, CONSCELLS> cells;
   };
 
@@ -82,11 +79,11 @@ public:
     bucket_t* onext;
   };
 
+  static constexpr int MAXHASH = 256;        // Max number of hash buckets
   using obarray_t = std::array<bucket_t*, MAXHASH>;
   static obarray_t globals;     // Atoms created by 'intern' which are the same across all instances
   obarray_t obarray;            // Atoms local to each interpreter instance
-  std::vector<LISPT> savearray; // Stack of objects which needs to be protected from gc
-  LISPT freelist = nullptr;     // List of free objects
+  std::deque<lisp_t*> freelist; // List of free objects
   LISPT gcgag = nullptr;        // Nonnil means print gc message
 
   LISPT getobject();
@@ -96,12 +93,12 @@ public:
   // the C variable that CVAR points to. CVAR is set to VAL.  Whenever CVAR is
   // changed the corresponding lisp variable changes and vice versa.
   //
-  static void initcvar(LISPT* cvar, const std::string& name, LISPT val)
+  static void initcvar(LISPT& cvar, const std::string& name, LISPT val)
   {
-    LISPT t = intern(name);
-    set(t->symbol().value, type::CVARIABLE, new lisp_t);
+    auto t = intern(name);
+    t->symbol().value = LISPT(new lisp_t);
     t->symvalue()->cvarval(cvar);
-    *cvar = val;
+    cvar = val;
   }
 
   static LISPT intern(const std::string&);
@@ -121,40 +118,27 @@ public:
   void dfree(destblock_t*);
   void dzero();
 
-  void save(LISPT v) { savearray.push_back(v); }
-  LISPT unsave()
-  {
-    auto val = savearray.back();
-    savearray.pop_back();
-    return val;
-  }
-
-  PRIMITIVE reclaim(LISPT incr); /* Number of blocks to increase with */
+  PRIMITIVE reclaim(LISPT incr); // Number of blocks to increase with
   PRIMITIVE cons(LISPT, LISPT);
   PRIMITIVE xobarray();
   PRIMITIVE freecount();
   
-  void gcprotect(LISPT& o) { markobjs.push_back(&o); }
-
 private:
   lisp& _lisp;
   evaluator& e() { return _lisp.e(); }
   conscells_t* newpage();
-  int sweep();
-  void mark(LISPT);
-  LISPT doreclaim(int incr = 0);
   LISPT mkarglis(LISPT alist, int& count);
 
-  static LISPT buildatom(const std::string& s, LISPT newatom);
+  static LISPT buildatom(const std::string& s, LISPT);
   static bucket_t* findatom(int hv, const std::string&, const obarray_t&);
   static int hash(const std::string& str);
-  static LISPT puthash(int hv, const std::string&, obarray_t&, LISPT newatom);
-  static LISPT mkprim(const std::string& pname, subr_t* subr);
+  static LISPT puthash(int hv, const std::string&, obarray_t&, LISPT);
+  static LISPT mkprim(const std::string& pname, subr_t subr);
 
-  std::list<conscells_t*> conscells;     // Cons cell storage.
-  destblock_t destblock[DESTBLOCKSIZE]; // Destblock area.
-  int destblockused = 0;                // Index to last slot in destblock.
-  std::vector<LISPT*> markobjs;
+  std::list<conscells_t*> conscells;         // Cons cell storage.
+  static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
+  destblock_t destblock[DESTBLOCKSIZE];      // Destblock area.
+  int destblockused = 0;                     // Index to last slot in destblock.
 };
 
 inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
@@ -165,8 +149,6 @@ inline LISPT xobarray(lisp& l) { return l.a().xobarray(); }
 inline LISPT xobarray() { return xobarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(); }
 inline LISPT freecount() { return freecount(lisp::current()); }
-inline LISPT gcprotect(lisp& l, LISPT& a) { l.a().gcprotect(a); return NIL; }
-inline LISPT gcprotect(LISPT& a) { return gcprotect(lisp::current(), a); }
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 
@@ -184,7 +166,7 @@ inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 inline LISPT getobject() { return getobject(lisp::current()); }
 
-inline void initcvar(LISPT* cvar, const std::string& name, LISPT var) { return alloc::initcvar(cvar, name, var); }
+inline void initcvar(LISPT& cvar, const std::string& name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
 {

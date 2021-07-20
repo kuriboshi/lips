@@ -46,7 +46,6 @@ PRIMITIVE Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  a.save(rval);
   while(type_of(obj) == type::CONS)
   {
     rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj, NIL)), NIL));
@@ -56,7 +55,6 @@ PRIMITIVE Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
     else
       obj = apply(l, fn2, cons(l, obj, NIL));
   }
-  rval = a.unsave();
   return rval;
 }
 
@@ -69,7 +67,6 @@ PRIMITIVE Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  a.save(rval);
   while(type_of(obj) == type::CONS)
   {
     rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj->car(), NIL)), NIL));
@@ -79,7 +76,6 @@ PRIMITIVE Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
     else
       apply(l, fn2, cons(l, obj, NIL));
   }
-  rval = a.unsave();
   return rval;
 }
 
