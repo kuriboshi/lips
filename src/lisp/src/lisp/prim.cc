@@ -18,20 +18,15 @@ prim::prim(lisp& lisp): base(lisp) {}
  */
 static LISPT mkindirect(lisp& l, LISPT obj)
 {
-  LISPT iobj;
-
   /* If already an indirect type object, return it. */
   /* We want all symbols that we include in closures */
   /* on the same level to refer to the same value. */
   if(type_of(obj) == type::INDIRECT)
     return obj;
-  else
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
-  {
-    iobj = cons(l, NIL, obj);
-    iobj->settype(type::INDIRECT);
-  }
+  auto iobj = l.a().getobject();
+  iobj->indirectval(obj);
   return iobj;
 }
 
@@ -278,17 +273,17 @@ PRIMITIVE prim::length(LISPT x)
 
 PRIMITIVE prim::closure(LISPT fun, LISPT vars)
 {
-  LISPT c = a.getobject();
-  c->closval().cfunction = fun;
-  c->closval().closed = vars;
-  LISPT f = length(vars);
-  c->closval().count = f->intval();
+  closure_t c;
+  c.cfunction = fun;
+  c.closed = vars;
+  auto f = length(vars);
+  c.count = f->intval();
   f = closobj(vars);
   if(type_of(f) == type::ERROR)
     return f;
-  c->closval().cvalues = f;
-  LISPT clos = nullptr;
-  set(clos, type::CLOSURE, c);
+  c.cvalues = f;
+  auto clos = a.getobject();
+  clos->closval(c);
   return clos;
 }
 

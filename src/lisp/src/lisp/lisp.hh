@@ -202,7 +202,8 @@ public:
     _type = type::FLOAT;
     u = f;
   }
-  auto indirectval() -> LISPT { return std::get<4>(u).value; }
+  auto indirectval() const -> LISPT { return std::get<indirect_t>(u).value; }
+  void indirectval(LISPT x) { _type = type::INDIRECT; u = indirect_t{x}; }
   auto consval() const -> const cons_t& { return std::get<cons_t>(u); }
   void consval(cons_t x) { _type = type::CONS; u = x; }
   auto car() const -> LISPT { return std::get<cons_t>(u).car; }
@@ -221,6 +222,7 @@ public:
   void lamval(lambda_t x) { _type = type::LAMBDA; u = x; }
   void nlamval(lambda_t x) { _type = type::NLAMBDA; u = x; }
   auto closval() -> closure_t& { return std::get<closure_t>(u); }
+  void closval(closure_t x) { _type = type::CLOSURE; u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(u); }
   void envval(destblock_t* env) { _type = type::ENVIRON; u = env; }
   auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(u).get(); }
