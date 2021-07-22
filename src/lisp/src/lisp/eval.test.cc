@@ -5,8 +5,6 @@
 #include <doctest/doctest.h>
 #include "libisp.hh"
 
-using namespace std::literals;
-
 namespace lisp
 {
 
@@ -20,7 +18,7 @@ TEST_CASE("LAMBDA and NLAMBDA")
     auto a = eval(l, "(setq f (lambda () \"hello\"))");
     auto b = eval(l, "(f)");
     CHECK(type_of(b) == type::STRING);
-    CHECK(b->stringval() == "hello"s);
+    CHECK(b->stringval() == "hello");
   }
   SUBCASE("LAMBDA - one argument")
   {
@@ -79,6 +77,19 @@ TEST_CASE("Eval functions")
     auto r1 = eval(lisp, e1);
     CHECK(r1->intval() == 124);
   }
+}
+
+TEST_CASE("Closure")
+{
+  lisp l;
+  current c(l);
+
+  auto a = setq(mkatom("a"), mknumber(1));
+  auto clos = closure(lambda(NIL, cons(mkatom("a"), NIL)), cons(mkatom("a"), NIL));
+  auto r0 = eval(cons(clos, NIL));
+  a = setq(mkatom("a"), mknumber(2));
+  auto r1 = eval(apply(l, clos, NIL));
+  CHECK(equal(r0, r1) != NIL);
 }
 
 }
