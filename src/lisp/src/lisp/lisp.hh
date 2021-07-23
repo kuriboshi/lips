@@ -18,14 +18,6 @@
 #include <variant>
 #include <vector>
 
-namespace lisp
-{
-class lisp_t;
-using LISPT = std::shared_ptr<lisp_t>;
-inline constexpr auto NIL = nullptr;
-extern LISPT C_UNBOUND;
-}
-
 #include "error.hh"
 #include "symbol.hh"
 
@@ -42,7 +34,6 @@ class file_t;
 extern LISPT T;
 extern LISPT C_APPEND;
 extern LISPT C_AUTOLOAD;
-extern LISPT C_BIGNUM;
 extern LISPT C_BROKEN;
 extern LISPT C_BT;
 extern LISPT C_CLOSURE;
@@ -83,9 +74,9 @@ constexpr auto to_underlying(Enum e) noexcept
 enum class type
 {
   NIL = 0,   // so that nullptr also becomes NIL
+  T,         // the truth object
   SYMBOL,    // an atomic symbol
   INTEGER,   // 24 bit integer in same word
-  BIGNUM,    // bigger than longs (NYI)
   FLOAT,     // a double
   INDIRECT,  // used when a value is stored in a closure
   CONS,      // a pair
@@ -98,18 +89,13 @@ enum class type
   UNBOUND,   // unbound indicator
   ENVIRON,   // environment stack type for gc use
   FILET,     // file pointer
-  T,         // the truth object
-  FREE,      // an object on the freelist, used for
-             // consistency checks
+  FREE,      // an object on the freelist, used for consistency checks
   ENDOFFILE, // returned from read at end of file
-  ERROR,     // returned from primitive when an error
-             // occured
-  HASHTAB,   // contains hashed data table
-  CVARIABLE, // is a pointer to c-variable
-  USER       // user defined type
+  ERROR,     // returned from primitive when an error occured
+  CVARIABLE // is a pointer to c-variable
 };
 
-//inline constexpr auto NIL = nullptr;
+inline constexpr auto NIL = nullptr;
 
 // The cons cell
 struct cons_t
@@ -182,58 +168,56 @@ public:
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  void setnil() { u = {}; }
-  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(u)); }
-  void symbol(const symbol::symbol_t& sym) { _type = type::SYMBOL; u = sym.pname; }
-  auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(u)).value; }
-  void symvalue(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(u)).value = x; }
-  auto intval() const -> int { return std::get<int>(u); }
+  void setnil() { _u = {}; }
+  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(_u)); }
+  void symbol(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
+  auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
+  void symvalue(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(_u)).value = x; }
+  auto intval() const -> int { return std::get<int>(_u); }
   void intval(int x)
   {
     _type = type::INTEGER;
-    u = x;
+    _u = x;
   }
-  auto floatval() const -> double { return std::get<double>(u); }
+  auto floatval() const -> double { return std::get<double>(_u); }
   void floatval(double f)
   {
     _type = type::FLOAT;
-    u = f;
+    _u = f;
   }
-  auto indirectval() const -> LISPT { return std::get<indirect_t>(u).value; }
-  void indirectval(LISPT x) { _type = type::INDIRECT; u = indirect_t{x}; }
-  auto consval() const -> const cons_t& { return std::get<cons_t>(u); }
-  void consval(cons_t x) { _type = type::CONS; u = x; }
-  auto car() const -> LISPT { return std::get<cons_t>(u).car; }
-  auto cdr() const -> LISPT { return std::get<cons_t>(u).cdr; }
-  void car(LISPT x) { std::get<cons_t>(u).car = x; }
-  void cdr(LISPT x) { std::get<cons_t>(u).cdr = x; }
-  auto stringval() const -> const std::string& { return std::get<std::string>(u); }
+  auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
+  void indirectval(LISPT x) { _type = type::INDIRECT; _u = indirect_t{x}; }
+  auto consval() const -> const cons_t& { return std::get<cons_t>(_u); }
+  void consval(cons_t x) { _type = type::CONS; _u = x; }
+  auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
+  auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
+  void car(LISPT x) { std::get<cons_t>(_u).car = x; }
+  void cdr(LISPT x) { std::get<cons_t>(_u).cdr = x; }
+  auto stringval() const -> const std::string& { return std::get<std::string>(_u); }
   void stringval(const std::string& s)
   {
     _type = type::STRING;
-    u = s;
+    _u = s;
   }
-  auto subrval() const -> const subr_t& { return std::get<subr_t>(u); }
-  void subrval(subr_t x) { _type = type::SUBR; u = x; }
-  auto lamval() -> lambda_t& { return std::get<lambda_t>(u); }
-  void lamval(lambda_t x) { _type = type::LAMBDA; u = x; }
-  void nlamval(lambda_t x) { _type = type::NLAMBDA; u = x; }
-  auto closval() -> closure_t& { return std::get<closure_t>(u); }
-  void closval(closure_t x) { _type = type::CLOSURE; u = x; }
-  auto envval() -> destblock_t* { return std::get<destblock_t*>(u); }
-  void envval(destblock_t* env) { _type = type::ENVIRON; u = env; }
-  auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(u).get(); }
-  void fileval(std::unique_ptr<file_t> f) { _type = type::FILET; u = std::move(f); }
-  auto cvarval() -> LISPT { return std::get<cvariable_t>(u).value; }
-  void cvarval(LISPT x) { _type = type::CVARIABLE; u.emplace<cvariable_t>(cvariable_t{x}); }
+  auto subrval() const -> const subr_t& { return std::get<subr_t>(_u); }
+  void subrval(subr_t x) { _type = type::SUBR; _u = x; }
+  auto lamval() -> lambda_t& { return std::get<lambda_t>(_u); }
+  void lamval(lambda_t x) { _type = type::LAMBDA; _u = x; }
+  void nlamval(lambda_t x) { _type = type::NLAMBDA; _u = x; }
+  auto closval() -> closure_t& { return std::get<closure_t>(_u); }
+  void closval(closure_t x) { _type = type::CLOSURE; _u = x; }
+  auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
+  void envval(destblock_t* env) { _type = type::ENVIRON; _u = env; }
+  auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(_u).get(); }
+  void fileval(std::unique_ptr<file_t> f) { _type = type::FILET; _u = std::move(f); }
+  auto cvarval() -> LISPT { return std::get<cvariable_t>(_u).value; }
+  void cvarval(LISPT x) { _type = type::CVARIABLE; _u.emplace<cvariable_t>(cvariable_t{x}); }
 
-  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(u).name; }
+  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(_u).name; }
 
-  //
-  // Some more or less helpful functions
-  //
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
+
   static symbol::symbol_collection& symbol_collection()
   {
     static symbol::symbol_collection& all_symbols = *new symbol::symbol_collection;
@@ -242,7 +226,8 @@ public:
 
 private:
   type _type = type::NIL;
-  // One entry for each type.  Types that has no, or just one value are
+
+  // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<
     std::monostate,             // NIL (0)
@@ -258,8 +243,14 @@ private:
     destblock_t*,               // ENVIRON (10)
     std::unique_ptr<file_t>,    // FILE (11)
     cvariable_t                 // CVARIABLE (12)
-    > u;
+    > _u;
 };
+
+inline bool EQ(LISPT x, LISPT y) { return x == y; }
+inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
+inline type type_of(lisp_t& a) { return a.gettype(); }
+inline bool is_T(LISPT x) { return type_of(x) == type::T; }
+inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
 enum class char_class
 {
@@ -278,19 +269,6 @@ struct rtinfo
   using rmacro_t = LISPT (*)(lisp&, file_t&, LISPT, char);
   rmacro_t rmacros[128];
 };
-
-inline bool EQ(LISPT x, LISPT y) { return x == y; }
-inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
-inline type type_of(lisp_t& a) { return a.gettype(); }
-
-inline void set(LISPT& a, type t, LISPT p)
-{
-  a = p;
-  a->settype(t);
-}
-
-inline bool is_T(LISPT x) { return type_of(x) == type::T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
 class lisp
 {
@@ -350,8 +328,8 @@ public:
   bool interrupt = false;
 
   LISPT currentbase = NIL;
-  LISPT topprompt = NIL;
-  LISPT brkprompt = NIL;
+  //LISPT topprompt = NIL;
+  //LISPT brkprompt = NIL;
   LISPT verbose = NIL;
   LISPT version = NIL;
 
@@ -466,9 +444,9 @@ private:
   // clang-format off
   const std::vector<std::string> errmess = {
     "Not NIL",
+    "Not T",
     "Not a symbol",
     "Not an integer",
-    "Not a bignum",
     "Not a float",
     "Not indirect",
     "Not a cons cell",
@@ -481,11 +459,10 @@ private:
     "Not unbound",
     "Not an environment",
     "Not a file pointer",
-    "Not T",
     "Not free",
     "Not EOF",
     "Not an ERROR",
-    "Not a hash table"
+    "Not a c-variable"
   };
   // clang-format on
 };

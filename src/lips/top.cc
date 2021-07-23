@@ -179,9 +179,9 @@ LISPT top::operator()(LISPT exp)
         promptform = NIL;
       }
       if(_level > 1)
-        promptprint(l.brkprompt);
+        promptprint(brkprompt);
       else
-        promptprint(l.topprompt);
+        promptprint(topprompt);
     }
     input_exp = readline(file);
     if(type_of(input_exp) == type::ENDOFFILE)
@@ -296,20 +296,23 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
 
 void top::init()
 {
-  initcvar(top::history, "history", NIL);
-  initcvar(top::histnum, "histnum", mknumber(1L));
-  initcvar(top::histmax, "histmax", mknumber(100L));
+  initcvar(history, "history", NIL);
+  initcvar(histnum, "histnum", mknumber(1L));
+  initcvar(histmax, "histmax", mknumber(100L));
+  initcvar(topprompt, "prompt", mkstring("!_"));
+  initcvar(brkprompt, "brkprompt", mkstring("!:"));
   initcvar(promptform, "promptform", NIL);
   mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }
 
-LISPT top::history = nullptr;
-LISPT top::histnum = nullptr;
-LISPT top::histmax = nullptr;
-
+LISPT top::history;
+LISPT top::histnum;
+LISPT top::histmax;
+LISPT top::input_exp;           // The input expression.
 std::function<LISPT(LISPT)> top::transform_hook;;
 std::function<void()> top::prompt_hook;
-LISPT top::alias_expanded = nullptr;
-LISPT top::promptform = nullptr;
-LISPT top::input_exp = nullptr; // The input expression.
+LISPT top::alias_expanded;
+LISPT top::topprompt;
+LISPT top::brkprompt;
+LISPT top::promptform;

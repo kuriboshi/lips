@@ -72,7 +72,6 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     t->symbol().constant = true;
 
     C_AUTOLOAD = intern("autoload");
-    C_BIGNUM = intern("bignum");
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
     C_CLOSURE = intern("closure");
@@ -103,8 +102,8 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     e().breakhook(nullptr);
   }
 
-  initcvar(topprompt, "prompt", a().mkstring("!_"));
-  initcvar(brkprompt, "brkprompt", a().mkstring("!:"));
+  //initcvar(topprompt, "prompt", a().mkstring("!_"));
+  //initcvar(brkprompt, "brkprompt", a().mkstring("!:"));
   initcvar(currentbase, "base", a().mknumber(10L));
   initcvar(version, "version", a().mkstring(VERSION));
 
@@ -182,7 +181,6 @@ lisp* lisp::_current = nullptr;
 //
 LISPT T;
 LISPT C_AUTOLOAD;
-LISPT C_BIGNUM;
 LISPT C_BROKEN;
 LISPT C_BT;
 LISPT C_CLOSURE;

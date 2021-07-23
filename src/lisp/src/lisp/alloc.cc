@@ -12,7 +12,7 @@
 
 namespace lisp
 {
-alloc::alloc(lisp& lisp): _lisp(lisp), symbols(lisp_t::symbol_collection().create())
+alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection().create())
 {
   destblockused = 0;
   newpage(); // Allocate one page of storage
@@ -54,16 +54,15 @@ alloc::conscells_t* alloc::newpage()
   return newp;
 }
 
-/*
- * reclaim - Lips function reclaim interface. incr is the number of pages
- *           to inrease storage with.
- */
-PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
+/// @brief Allocate a number of blocks of cons cells.
+///
+/// @detail The name is historical from when there was garbage collection.
+///
+/// @param incr [in] Number of blocks of cons cells to allocate.
+PRIMITIVE alloc::reclaim(LISPT incr)
 {
-  int i;
-  if(is_NIL(incr))
-    i = 0;
-  else
+  int i = 0;
+  if(!is_NIL(incr))
   {
     _lisp.check(incr, type::INTEGER);
     i = incr->intval();
@@ -73,6 +72,14 @@ PRIMITIVE alloc::reclaim(LISPT incr) /* Number of blocks to increase with */
   return NIL;
 }
 
+/// @brief Return a cons cell from storage.
+///
+/// @detail If the free cell list is empty a new block of cons cells is
+/// allocated.  The LISPT shared_ptr created by this function will have its
+/// delete function overridden with a function which puts the cell back on the
+/// free cell list.
+///
+/// @return A new empty cons cell.
 LISPT alloc::getobject()
 {
   if(freelist.empty())
@@ -87,45 +94,54 @@ LISPT alloc::getobject()
   return r;
 }
 
-/*
- * cons - Builds a cons cell out of arguments A and B. Reclaims space
- *        and allocates new blocks if necessary.
- */
+/// @brief Builds a cons cell out of the arguments.
+///
+/// @detail The most basic of lisp functions.  Allocate a cons cell and fill in
+/// the cell's car and cdr parts.
+///
+/// @param a [in] The value to put in the head (car) of the cons cell.
+/// @param b [in] The value to put in the tail (cdr) of the cons cell.
+///
+/// @return The cons cell.
 PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
-  LISPT f = getobject();
-  f->consval(cons_t());
-  f->car(a);
-  f->cdr(b);
+  auto f = getobject();
+  f->consval(cons_t{a, b});
   return f;
 }
 
+/// @brief Build a list of symbols in the local symbol table.
+///
+/// @return Returns a list of local symbols in no particular order.
 PRIMITIVE alloc::obarray()
 {
   LISPT o = NIL;
-  for(auto i: symbols)
+  for(auto i: local_symbols)
     o = cons(i.self, o);
   return o;
 }
 
+/// @brief Number of free cell in the free cell list.
+///
+/// @return The number of free cells.
 PRIMITIVE alloc::freecount()
 {
   return mknumber(freelist.size());
 }
 
-/*
- * mkprim - Define the primitive with print name PNAME, to be the
- *          C function FNAME with NRPAR number of parameters. TYPE
- *          is the type of function: SUBR or FSUBR. If npar is negative
- *          it means the function is halfspread.
- */
-LISPT alloc::mkprim(const std::string& pname, subr_t subr)
+/// @brief Register a primitive function.
+///
+/// @param pname [in] The print name of the internal function.  This is put in
+/// the global symbol table using intern.
+/// @param subr [in] The calling details of the function.  This in includes
+/// number of parameters, whether the function is spread, nospread, or
+/// halfspread, whether the function should evaluate it's arguments or not.
+void alloc::mkprim(const std::string& pname, subr_t subr)
 {
   auto s = LISPT(new lisp_t);
   s->subrval(subr);
   LISPT f = intern(pname);
-  set(f->symbol().value, type::SUBR, s);
-  return s;
+  f->symvalue(s);
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
@@ -228,10 +244,9 @@ LISPT alloc::intern(const std::string& str)
  */
 LISPT alloc::mkatom(const std::string& str)
 {
-  auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
-  if(glob.exists(str))
-    return glob.get(str).self;
-  auto& sym = symbols.get(str);
+  if(global_symbols().exists(str))
+    return global_symbols().get(str).self;
+  auto& sym = local_symbols.get(str);
   if(sym.self == NIL)
   {
     sym.self = getobject();
@@ -263,16 +278,14 @@ destblock_t* alloc::dalloc(int size)
     destblockused += size + 1;
     dest->num(size);
     for(int i = 1; i <= size; ++i)
-      destblock[destblockused - i].u = cons(NIL, NIL);
+      destblock[destblockused - i].reset();
     return dest;
   }
   return nullptr;
 }
 
 /*
- * dfree - Free a destination block. The size of a block i (hopefully)
- *         stored in the cdr of the first element. If it isn't, look
- *         elsewhere.
+ * dfree - Free a destination block.
  */
 void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
 

@@ -13,9 +13,14 @@
 
 #include "lisp.hh"
 
-namespace lisp::symbol
+namespace lisp
 {
+class lisp_t;
+using LISPT = std::shared_ptr<lisp_t>;
+extern LISPT C_UNBOUND;
 
+namespace symbol
+{
 struct symbol_t;
 using store_t = std::vector<symbol_t>;
 using symbol_index_t = store_t::size_type;
@@ -38,10 +43,10 @@ struct print_name
 struct symbol_t
 {
   print_name pname;      // The printname of the atom
-  LISPT self = NIL;      // The LISPT object for this symbol
-  LISPT value = NIL;     // Value
-  LISPT plist = NIL;     // The property list
-  LISPT topval = NIL;    // Holds top value (not used yet)
+  LISPT self;            // The LISPT object for this symbol
+  LISPT value;           // Value
+  LISPT plist;           // The property list
+  LISPT topval;          // Holds top value (not used yet)
   bool constant = false; // If true this is a constant which can't be set
 };
 
@@ -151,6 +156,7 @@ private:
   symbol_collection_id _free = 0;
 };
 
-}
+} // namespace symbol
+} // namespace lisp
 
 #endif

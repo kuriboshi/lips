@@ -28,19 +28,26 @@ class evaluator;
 //
 // The destblock_t is used to store variables and their values.  Each block of
 // variable/value pairs is proceeded by a control block which contains the
-// pieces of information.  The size of the block, the index of the
+// following pieces of information: The size of the block, the index of the
 // variable/value pair currently being set, and a link to another destblock_t
 // in a chain of blocks.
 //
 struct destblock_t
 {
-  using control_block = struct
+  struct control_block
   {
     std::int8_t size;
     std::int8_t index;
     destblock_t* link;
   };
-  std::variant<control_block, LISPT> u;
+  struct var_val_pair
+  {
+    LISPT var;
+    LISPT val;
+  };
+  std::variant<control_block, var_val_pair> u;
+  void reset() { u = var_val_pair{NIL, NIL}; }
+
   void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
   int size() const { return std::get<control_block>(u).size; }
   int index() const { return std::get<control_block>(u).index; }
@@ -51,11 +58,11 @@ struct destblock_t
     if(std::get<control_block>(u).index > 0)
       --std::get<control_block>(u).index;
   }
-  void var(LISPT x) { std::get<LISPT>(u)->car(x); }
-  LISPT var() { return std::get<LISPT>(u)->car(); }
-  void val(LISPT x) { std::get<LISPT>(u)->cdr(x); }
-  LISPT val() { return std::get<LISPT>(u)->cdr(); }
-  LISPT lispt() const { return std::get<LISPT>(u); }
+
+  void var(LISPT x) { std::get<var_val_pair>(u).var = x; }
+  LISPT var() { return std::get<var_val_pair>(u).var; }
+  void val(LISPT x) { std::get<var_val_pair>(u).val = x; }
+  LISPT val() { return std::get<var_val_pair>(u).val; }
 };
 
 class alloc
@@ -66,25 +73,15 @@ public:
 
   struct conscells_t
   {
-    static constexpr int CONSCELLS = 1024; // Number of cells in each block
+    static constexpr int CONSCELLS = 10240; // Number of cells in each block
     std::array<lisp_t, CONSCELLS> cells;
-  };
-
-  //
-  // Each hashbucket contains a symbol and a pointer to the next symbol in that
-  // bucket.
-  //
-  struct bucket_t
-  {
-    LISPT sym;
-    bucket_t* onext;
   };
 
   static symbol::symbol_store_t& global_symbols()
   {
     return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
   }
-  symbol::symbol_store_t& symbols;
+  symbol::symbol_store_t& local_symbols;
 
   std::deque<lisp_t*> freelist; // List of free objects
 
@@ -105,6 +102,7 @@ public:
 
   static LISPT intern(const std::string&);
 
+  static void mkprim(const std::string& pname, subr_t subr);
   static void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr, enum subr_t::spread);
   static void mkprim(const std::string& pname, subr_t::func1_t fname, enum subr_t::subr, enum subr_t::spread);
   static void mkprim(const std::string& pname, subr_t::func2_t fname, enum subr_t::subr, enum subr_t::spread);
@@ -130,8 +128,6 @@ private:
   evaluator& e() { return _lisp.e(); }
   conscells_t* newpage();
   LISPT mkarglis(LISPT alist, int& count);
-
-  static LISPT mkprim(const std::string& pname, subr_t subr);
 
   std::list<conscells_t*> conscells;         // Cons cell storage.
   static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
@@ -166,21 +162,24 @@ inline LISPT getobject() { return getobject(lisp::current()); }
 
 inline void initcvar(LISPT& cvar, const std::string& name, LISPT var) { return alloc::initcvar(cvar, name, var); }
 
-inline void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
+inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, fname, subr, spread);
+  alloc::mkprim(pname, subr_t(subr, spread, fun));
 }
-inline void mkprim(const std::string& pname, subr_t::func1_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
+
+inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, fname, subr, spread);
+  alloc::mkprim(pname, subr_t(subr, spread, fun));
 }
-inline void mkprim(const std::string& pname, subr_t::func2_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
+
+inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, fname, subr, spread);
+  alloc::mkprim(pname, subr_t(subr, spread, fun));
 }
-inline void mkprim(const std::string& pname, subr_t::func3_t fname, enum subr_t::subr subr, enum subr_t::spread spread)
+
+inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, fname, subr, spread);
+  alloc::mkprim(pname, subr_t(subr, spread, fun));
 }
 
 } // namespace lisp

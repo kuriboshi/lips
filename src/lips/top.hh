@@ -35,6 +35,7 @@ public:
   static void addhist(LISPT);
   static void remhist();
   static void trimhist();
+
   static LISPT history; // Holds the history list.
   static LISPT histnum; // Current event number.
   static LISPT histmax; // Maximum number of events to save.
@@ -48,6 +49,8 @@ public:
 
 private:
   static LISPT alias_expanded; //For checking alias loops.
+  static LISPT topprompt;
+  static LISPT brkprompt;
   static LISPT promptform;     // Evaluated before printing the prompt.
 
   const options_t& options;

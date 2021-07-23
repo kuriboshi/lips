@@ -20,7 +20,6 @@ PRIMITIVE pred::numberp(LISPT a)
   {
     case type::INTEGER:
     case type::FLOAT:
-    case type::BIGNUM:
       return a;
     default:
       return NIL;
@@ -129,8 +128,6 @@ PRIMITIVE pred::xtypeof(LISPT a)
       return C_SYMBOL;
     case type::INTEGER:
       return C_INTEGER;
-    case type::BIGNUM:
-      return C_BIGNUM;
     case type::FLOAT:
       return C_FLOAT;
     case type::INDIRECT:
