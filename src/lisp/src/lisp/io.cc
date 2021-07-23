@@ -3,7 +3,9 @@
  * Copyright 1988, 2020 Krister Joas
  */
 #include <doctest/doctest.h>
-#include "libisp.hh"
+#include "io.hh"
+#include "alloc.hh"
+#include "prim.hh"
 
 namespace lisp
 {
@@ -24,6 +26,14 @@ static char digits[] = {
   'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
   'u', 'v', 'w', 'x', 'y', 'z'};
 /* clang-format on */
+
+void io::pushr(LISPT w) { l.rstack = cons(l, w, l.rstack); }
+
+void io::popr(LISPT& w)
+{
+  w = l.rstack->car();
+  l.rstack = l.rstack->cdr();
+}
 
 //
 // INTEGERP returns nonzero if the characters in buffer BUF represents an

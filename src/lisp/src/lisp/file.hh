@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "lisp.hh"
 #include "base.hh"
 
 namespace lisp

@@ -5,7 +5,10 @@
  */
 
 #include <doctest/doctest.h>
-#include "libisp.hh"
+#include "arith.hh"
+#include "alloc.hh"
+#include "iter.hh"
+#include "io.hh"
 
 namespace lisp
 {

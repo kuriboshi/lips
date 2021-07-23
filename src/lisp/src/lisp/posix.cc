@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "libisp.hh"
+#include "posix.hh"
+#include "alloc.hh"
+#include "io.hh"
 
 namespace lisp
 {

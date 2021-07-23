@@ -6,9 +6,10 @@
 #pragma once
 
 #include <array>
-#include <vector>
-#include <list>
 #include <deque>
+#include <list>
+#include <vector>
+
 #include "lisp.hh"
 #include "base.hh"
 

@@ -4,8 +4,12 @@
  *
  */
 
-#include "libisp.hh"
+#include "user.hh"
 #include "alloc.hh"
+#include "file.hh"
+#include "io.hh"
+#include "pred.hh"
+#include "prop.hh"
 
 namespace lisp
 {
@@ -69,7 +73,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
       {
         putprop(l, name, C_OLDDEF, name->symvalue());
         if(!is_NIL(l.verbose))
-          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)), false);
+          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)));
       }
     }
   return NIL;

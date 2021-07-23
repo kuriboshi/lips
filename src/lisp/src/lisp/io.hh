@@ -27,12 +27,8 @@ public:
   ~io() = default;
   static void init(lisp&);
 
-  void pushr(LISPT w) { l.rstack = cons(l, w, l.rstack); }
-  void popr(LISPT& w)
-  {
-    w = l.rstack->car();
-    l.rstack = l.rstack->cdr();
-  }
+  void pushr(LISPT w);
+  void popr(LISPT& w);
 
   LISPT ratom(file_t&);
   LISPT lispread(file_t&, bool line = false);

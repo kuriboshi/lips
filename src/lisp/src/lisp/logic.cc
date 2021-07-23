@@ -4,7 +4,10 @@
  *
  */
 
-#include "libisp.hh"
+#include "logic.hh"
+#include "alloc.hh"
+#include "eval.hh"
+#include "low.hh"
 
 namespace lisp
 {

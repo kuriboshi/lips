@@ -4,8 +4,11 @@
  *
  */
 
-#include "libisp.hh"
+#include "eval.hh"
+#include "alloc.hh"
 #include "except.hh"
+#include "file.hh"
+#include "prop.hh"
 
 // extern lisp::LISPT findalias(lisp::LISPT);
 

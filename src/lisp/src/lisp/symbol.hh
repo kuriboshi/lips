@@ -7,9 +7,10 @@
 #define LISP_SYMBOL_HH
 
 #include <cstdint>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
 #include "lisp.hh"
 
 namespace lisp::symbol
