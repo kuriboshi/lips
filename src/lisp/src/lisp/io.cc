@@ -503,7 +503,7 @@ static void pp(const char* s, file_t& file, LISPT x)
 
 LISPT io::patom(LISPT x, file_t& file, bool esc)
 {
-  ps(x->symbol().pname, file, esc);
+  ps(x->symbol().pname.name, file, esc);
   return x;
 }
 

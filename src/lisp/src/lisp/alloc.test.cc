@@ -72,7 +72,7 @@ TEST_CASE("Object sizes")
   std::cout << "sizeof lisp_t*: " << sizeof(lisp_t*) << std::endl;
 
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
-  std::cout << "symbol_t: " << sizeof(symbol_t) << std::endl;
+  std::cout << "symbol_t: " << sizeof(symbol::symbol_t) << std::endl;
   std::cout << "int: " << sizeof(int) << std::endl;
   std::cout << "double: " << sizeof(double) << std::endl;
   std::cout << "indirect_t: " << sizeof(indirect_t) << std::endl;

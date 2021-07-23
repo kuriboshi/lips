@@ -40,10 +40,11 @@ struct print_name
 struct symbol_t
 {
   print_name pname;      // The printname of the atom
-  bool constant = false; // If true this is a constant which can't be set
+  LISPT self = NIL;      // The LISPT object for this symbol
   LISPT value = NIL;     // Value
   LISPT plist = NIL;     // The property list
   LISPT topval = NIL;    // Holds top value (not used yet)
+  bool constant = false; // If true this is a constant which can't be set
 };
 
 class symbol_store_t
@@ -71,7 +72,6 @@ public:
       return _store[p->second];
     symbol_t symbol;
     symbol.pname = {_id, _store.size(), name};
-    symbol.plist = NIL;
     symbol.value = C_UNBOUND;
     _store.push_back(symbol);
     _map.emplace(name, symbol.pname.index);
@@ -79,7 +79,7 @@ public:
   }
   symbol_t& get(symbol_index_t index) { return _store.at(index); }
 
-  //private:
+private:
   symbol_collection_id _id;
   std::unordered_map<std::string, symbol_index_t> _map;
   store_t _store;

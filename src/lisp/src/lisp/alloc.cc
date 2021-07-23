@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell
- * Copyright 1988, 2020 Krister Joas
- *
- */
+//
+// Lips, lisp shell
+// Copyright 1988, 2020 Krister Joas
+//
 
 #include "alloc.hh"
 #include "error.hh"
@@ -212,69 +211,6 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 }
 
 /*
- * Calculates hash value of string.
- */
-int alloc::hash(const std::string& str)
-{
-  int sum = 0;
-
-  for(auto c: str)
-    sum += c;
-  return sum % MAXHASH;
-}
-
-/*
- * buildatom - Builds an atom with printname in S. Parameter CPY is non-zero
- *             if the printname should be saved.
- */
-LISPT alloc::buildatom(const std::string& s, LISPT newatom)
-{
-  static LISPT unbound = nullptr;
-  if(!unbound)
-  {
-    unbound.reset(new lisp_t);
-    unbound->settype(type::UNBOUND);
-  }
-
-  newatom->symbol(symbol_t());
-  newatom->symbol().pname = s;
-  newatom->symbol().plist = NIL;
-  newatom->symvalue(unbound);
-  return newatom;
-}
-
-alloc::bucket_t* alloc::findatom(int hv, const std::string& str, const obarray_t& obarray)
-{
-  for(auto* ob = obarray[hv]; ob; ob = ob->onext)
-  {
-    if(ob->sym->symbol().pname == str)
-      return ob;
-  }
-  return nullptr;
-}
-
-/*
- * puthash - Puts an atom with printname STR in the hash array OBARRAY.  If the
- *           atom is already in obarray, no new atom is created.  Returns the
- *           atom.
- */
-LISPT alloc::puthash(int hv, const std::string& str, obarray_t& obarray, LISPT newatom)
-{
-  auto* ob = new bucket_t;
-  if(ob == nullptr)
-    return C_ERROR;
-  ob->onext = obarray[hv];
-  ob->sym = buildatom(str, newatom);
-  if(EQ(ob->sym, C_ERROR))
-  {
-    delete ob;
-    return C_ERROR;
-  }
-  obarray[hv] = ob;
-  return ob->sym;
-}
-
-/*
  * intern - Make interned symbol in hasharray obarray. Str is not copied so
  *          this is only used with global constant strings during init.
  */
@@ -282,12 +218,12 @@ LISPT alloc::intern(const std::string& str)
 {
   auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
   auto& sym = glob.get(str);
-
-  auto hv = hash(str);
-  if(auto* ob = findatom(hv, str, globals))
-    return ob->sym;
-  // Use new lisp_t here because we're never going to free interned symbols.
-  return puthash(hv, str, globals, LISPT(new lisp_t));
+  if(sym.self == NIL)
+  {
+    sym.self = LISPT(new lisp_t);
+    sym.self->symbol(sym);
+  }
+  return sym.self;
 }
 
 /*
@@ -298,17 +234,14 @@ LISPT alloc::mkatom(const std::string& str)
 {
   auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
   if(glob.exists(str))
-    auto& sym = glob.get(str);
-  else
-    auto& sym = symbols.get(str);
-
-  // First we search for global interned atoms
-  auto hv = hash(str);
-  if(auto* ob = findatom(hv, str, globals))
-    return ob->sym;
-  if(auto* ob = findatom(hv, str, obarray))
-    return ob->sym;
-  return puthash(hv, str, obarray, getobject());
+    return glob.get(str).self;
+  auto& sym = symbols.get(str);
+  if(sym.self == NIL)
+  {
+    sym.self = getobject();
+    sym.self->symbol(sym);
+  }
+  return sym.self;
 }
 
 /* This isn't converted yet */

@@ -36,9 +36,6 @@ class evaluator;
 class alloc;
 class file_t;
 
-//class lisp_t;
-//using LISPT = std::shared_ptr<lisp_t>;
-
 //
 // All lisp constants used internally.
 //
@@ -109,8 +106,7 @@ enum class type
              // occured
   HASHTAB,   // contains hashed data table
   CVARIABLE, // is a pointer to c-variable
-  USER,      // user defined type
-  SYMBOL2
+  USER       // user defined type
 };
 
 //inline constexpr auto NIL = nullptr;
@@ -120,15 +116,6 @@ struct cons_t
 {
   LISPT car = NIL;
   LISPT cdr = NIL;
-};
-
-struct symbol_t
-{
-  std::string pname;     // The printname of the atom
-  bool constant = false; // If true this is a constant which can't be set
-  LISPT value = NIL;     // Value
-  LISPT plist = NIL;     // The property list
-  LISPT topval = NIL;    // Holds top value (not used yet)
 };
 
 struct subr_t
@@ -173,7 +160,7 @@ struct closure_t
   LISPT cfunction = NIL;
   LISPT closed = NIL;
   LISPT cvalues = NIL;
-  short count = 0;
+  std::uint8_t count = 0;
 };
 
 struct cvariable_t
@@ -196,25 +183,18 @@ public:
   lisp_t(const lisp_t&) = delete;
 
   void setnil() { u = {}; }
-  auto symbol() -> symbol_t& { return std::get<symbol_t>(u); }
-  auto symbol(symbol_t x) -> void { _type = type::SYMBOL; u = x; }
-  auto symvalue() const -> LISPT { return std::get<symbol_t>(u).value; }
-  auto symvalue(LISPT x) -> void { std::get<symbol_t>(u).value = x; }
-
-  // Symbol 2
-  auto symbol2() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(u)); }
-  // auto symbol2(symbol::symbol_t x) -> void { _type = type::SYMBOL2; u = symbol_collection().get(); }
-  auto symvalue2() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(u)).value; }
-  auto symvalue2(LISPT x) -> void { symbol_collection().get(std::get<symbol::print_name>(u)).value = x; }
-
+  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(u)); }
+  void symbol(const symbol::symbol_t& sym) { _type = type::SYMBOL; u = sym.pname; }
+  auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(u)).value; }
+  void symvalue(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(u)).value = x; }
   auto intval() const -> int { return std::get<int>(u); }
-  auto intval(int x) -> void
+  void intval(int x)
   {
     _type = type::INTEGER;
     u = x;
   }
   auto floatval() const -> double { return std::get<double>(u); }
-  auto floatval(double f) -> void
+  void floatval(double f)
   {
     _type = type::FLOAT;
     u = f;
@@ -247,7 +227,7 @@ public:
   auto cvarval() -> LISPT { return std::get<cvariable_t>(u).value; }
   void cvarval(LISPT x) { _type = type::CVARIABLE; u.emplace<cvariable_t>(cvariable_t{x}); }
 
-  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol_t>(u).pname; }
+  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(u).name; }
 
   //
   // Some more or less helpful functions
@@ -266,7 +246,7 @@ private:
   // indicated by a comment.
   std::variant<
     std::monostate,             // NIL (0)
-    symbol_t,                   // SYMBOL (1)
+    symbol::print_name,         // SYMBOL (1)
     int,                        // INTEGER (2)
     double,                     // FLOAT (3)
     indirect_t,                 // INDIRECT (4)
@@ -277,8 +257,7 @@ private:
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
     std::unique_ptr<file_t>,    // FILE (11)
-    cvariable_t,                // CVARIABLE (12)
-    symbol::print_name
+    cvariable_t                 // CVARIABLE (12)
     > u;
 };
 
