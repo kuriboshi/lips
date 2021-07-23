@@ -80,17 +80,13 @@ public:
     bucket_t* onext;
   };
 
-  static constexpr int MAXHASH = 256;        // Max number of hash buckets
-  using obarray_t = std::array<bucket_t*, MAXHASH>;
-  static obarray_t globals;     // Atoms created by 'intern' which are the same across all instances
-  obarray_t obarray;            // Atoms local to each interpreter instance
   static symbol::symbol_store_t& global_symbols()
   {
     return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
   }
   symbol::symbol_store_t& symbols;
+
   std::deque<lisp_t*> freelist; // List of free objects
-  LISPT gcgag = nullptr;        // Nonnil means print gc message
 
   LISPT getobject();
 
@@ -126,7 +122,7 @@ public:
 
   PRIMITIVE reclaim(LISPT incr); // Number of blocks to increase with
   PRIMITIVE cons(LISPT, LISPT);
-  PRIMITIVE xobarray();
+  PRIMITIVE obarray();
   PRIMITIVE freecount();
   
 private:
@@ -135,10 +131,6 @@ private:
   conscells_t* newpage();
   LISPT mkarglis(LISPT alist, int& count);
 
-  static LISPT buildatom(const std::string& s, LISPT);
-  static bucket_t* findatom(int hv, const std::string&, const obarray_t&);
-  static int hash(const std::string& str);
-  static LISPT puthash(int hv, const std::string&, obarray_t&, LISPT);
   static LISPT mkprim(const std::string& pname, subr_t subr);
 
   std::list<conscells_t*> conscells;         // Cons cell storage.
@@ -151,8 +143,8 @@ inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
 inline LISPT cons(LISPT a, LISPT b) { return cons(lisp::current(), a, b); }
 inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(a); }
 inline LISPT reclaim(LISPT a) { return reclaim(lisp::current(), a); }
-inline LISPT xobarray(lisp& l) { return l.a().xobarray(); }
-inline LISPT xobarray() { return xobarray(lisp::current()); }
+inline LISPT obarray(lisp& l) { return l.a().obarray(); }
+inline LISPT obarray() { return obarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return l.a().freecount(); }
 inline LISPT freecount() { return freecount(lisp::current()); }
 

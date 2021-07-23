@@ -14,9 +14,6 @@ namespace lisp
 {
 alloc::alloc(lisp& lisp): _lisp(lisp), symbols(lisp_t::symbol_collection().create())
 {
-  for(int i = 0; i != MAXHASH; ++i)
-    obarray[i] = nullptr;
-
   destblockused = 0;
   newpage(); // Allocate one page of storage
   if(conscells.empty())
@@ -24,13 +21,12 @@ alloc::alloc(lisp& lisp): _lisp(lisp), symbols(lisp_t::symbol_collection().creat
     lisp.primerr().format("Cons cells memory exhausted\n");
     throw lisp_finish("Cons cells memory exhausted", 1);
   }
-  initcvar(gcgag, "gcgag", NIL);
 
   // clang-format off
   mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::OBARRAY,   ::lisp::xobarray,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
@@ -104,11 +100,11 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
   return f;
 }
 
-PRIMITIVE alloc::xobarray()
+PRIMITIVE alloc::obarray()
 {
   LISPT o = NIL;
-  for(int i = 0; i < MAXHASH; i++)
-    for(auto* l = obarray[i]; l; l = l->onext) o = cons(l->sym, o);
+  for(auto i: symbols)
+    o = cons(i.self, o);
   return o;
 }
 
@@ -279,8 +275,6 @@ destblock_t* alloc::dalloc(int size)
  *         elsewhere.
  */
 void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
-
-alloc::obarray_t alloc::globals;
 
 /*
  * dzero - Frees all destination blocks.

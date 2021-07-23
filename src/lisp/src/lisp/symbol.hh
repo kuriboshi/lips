@@ -6,8 +6,6 @@
 #ifndef LISP_SYMBOL_HH
 #define LISP_SYMBOL_HH
 
-#include <iostream>
-
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -78,10 +76,13 @@ public:
     return _store[symbol.pname.index];
   }
   symbol_t& get(symbol_index_t index) { return _store.at(index); }
+  store_t::iterator begin() { return _store.begin(); }
+  store_t::iterator end() { return _store.end(); }
 
 private:
   symbol_collection_id _id;
-  std::unordered_map<std::string, symbol_index_t> _map;
+  using map_type = std::unordered_map<std::string, symbol_index_t>;
+  map_type _map;
   store_t _store;
 };
 
