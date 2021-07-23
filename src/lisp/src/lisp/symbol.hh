@@ -73,12 +73,28 @@ private:
 class symbol_collection
 {
 public:
+  static const constexpr symbol_collection_id global_id = 0;
+
+  symbol_collection()
+  {
+    // Create the global symbol store
+    create();
+  }
+
   std::unordered_map<symbol_collection_id, symbol_store_t> collection;
 
-  symbol_collection_id create()
+  symbol_store_t& create()
   {
-    collection.emplace(_free, symbol_store_t(_free));
-    return _free++;
+    auto [p, inserted] = collection.emplace(_free, symbol_store_t(_free));
+    return p->second;
+  }
+
+  symbol_store_t& symbol_store(symbol_collection_id id)
+  {
+    auto p = collection.find(id);
+    if(p == collection.end())
+      throw std::runtime_error("no such symbol store");
+    return p->second;
   }
 
   bool exists(symbol_collection_id id, const std::string& name)

@@ -15,7 +15,7 @@
 
 namespace lisp
 {
-alloc::alloc(lisp& lisp): _lisp(lisp)
+alloc::alloc(lisp& lisp): _lisp(lisp), symbols(lisp_t::symbol_collection().create())
 {
   for(int i = 0; i != MAXHASH; ++i)
     obarray[i] = nullptr;
@@ -282,6 +282,9 @@ LISPT alloc::puthash(int hv, const std::string& str, obarray_t& obarray, LISPT n
  */
 LISPT alloc::intern(const std::string& str)
 {
+  auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  auto& sym = glob.get(str);
+
   auto hv = hash(str);
   if(auto* ob = findatom(hv, str, globals))
     return ob->sym;

@@ -18,7 +18,16 @@
 #include <variant>
 #include <vector>
 
+namespace lisp
+{
+class lisp_t;
+using LISPT = std::shared_ptr<lisp_t>;
+inline constexpr auto NIL = nullptr;
+extern LISPT C_UNBOUND;
+}
+
 #include "error.hh"
+#include "symbol.hh"
 
 namespace lisp
 {
@@ -27,8 +36,8 @@ class evaluator;
 class alloc;
 class file_t;
 
-class lisp_t;
-using LISPT = std::shared_ptr<lisp_t>;
+//class lisp_t;
+//using LISPT = std::shared_ptr<lisp_t>;
 
 //
 // All lisp constants used internally.
@@ -63,7 +72,6 @@ extern LISPT C_RETURN;
 extern LISPT C_STRING;
 extern LISPT C_SUBR;
 extern LISPT C_SYMBOL;
-extern LISPT C_UNBOUND;
 extern LISPT C_WRITE;
 
 // This is used to recognize c-functions for cpprint.
@@ -102,9 +110,10 @@ enum class type
   HASHTAB,   // contains hashed data table
   CVARIABLE, // is a pointer to c-variable
   USER,      // user defined type
+  SYMBOL2
 };
 
-inline constexpr auto NIL = nullptr;
+//inline constexpr auto NIL = nullptr;
 
 // The cons cell
 struct cons_t
@@ -191,6 +200,13 @@ public:
   auto symbol(symbol_t x) -> void { _type = type::SYMBOL; u = x; }
   auto symvalue() const -> LISPT { return std::get<symbol_t>(u).value; }
   auto symvalue(LISPT x) -> void { std::get<symbol_t>(u).value = x; }
+
+  // Symbol 2
+  auto symbol2() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(u)); }
+  // auto symbol2(symbol::symbol_t x) -> void { _type = type::SYMBOL2; u = symbol_collection().get(); }
+  auto symvalue2() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(u)).value; }
+  auto symvalue2(LISPT x) -> void { symbol_collection().get(std::get<symbol::print_name>(u)).value = x; }
+
   auto intval() const -> int { return std::get<int>(u); }
   auto intval(int x) -> void
   {
@@ -238,6 +254,11 @@ public:
   //
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
+  static symbol::symbol_collection symbol_collection()
+  {
+    static symbol::symbol_collection all_symbols;
+    return all_symbols;
+  }
 
 private:
   type _type = type::NIL;
@@ -256,7 +277,8 @@ private:
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
     std::unique_ptr<file_t>,    // FILE (11)
-    cvariable_t                 // CVARIABLE (12)
+    cvariable_t,                // CVARIABLE (12)
+    symbol::print_name
     > u;
 };
 

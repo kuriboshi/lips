@@ -84,6 +84,11 @@ public:
   using obarray_t = std::array<bucket_t*, MAXHASH>;
   static obarray_t globals;     // Atoms created by 'intern' which are the same across all instances
   obarray_t obarray;            // Atoms local to each interpreter instance
+  static symbol::symbol_store_t& global_symbols()
+  {
+    return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  }
+  symbol::symbol_store_t& symbols;
   std::deque<lisp_t*> freelist; // List of free objects
   LISPT gcgag = nullptr;        // Nonnil means print gc message
 
