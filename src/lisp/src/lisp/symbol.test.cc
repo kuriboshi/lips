@@ -13,12 +13,15 @@ TEST_CASE("New symbol store")
 {
   symbol_collection& all_symbols = lisp_t::symbol_collection();
   auto& syms = all_symbols.create();
+
+#ifdef ENABLE_OBJECT_SIZES
   std::cout << "==========\n";
   std::cout << "sizeof print_name: " << sizeof(print_name) << std::endl;
   std::cout << "sizeof store_t: " << sizeof(store_t) << std::endl;
   std::cout << "sizeof symbol_store_t: " << sizeof(symbol_store_t) << std::endl;
   std::cout << "sizeof symbol_index: " << sizeof(symbol_index) << std::endl;
   std::cout << "sizeof symbol_t: " << sizeof(symbol_t) << std::endl;
+#endif
 
   auto& sym0 = syms.get("hello");
   CHECK(sym0.pname.name == "hello");

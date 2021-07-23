@@ -63,6 +63,7 @@ TEST_CASE("Create lisp objects")
   }
 }
 
+#ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {
   std::cout << "sizeof conscells_t: " << sizeof(alloc::conscells_t) << std::endl;
@@ -85,5 +86,6 @@ TEST_CASE("Object sizes")
   std::cout << "std::unique_ptr<file_t>: " << sizeof(std::unique_ptr<file_t>) << std::endl;
   std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
 }
+#endif
 
 }

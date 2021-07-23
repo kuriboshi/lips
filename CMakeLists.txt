@@ -17,6 +17,7 @@ option(ENABLE_FANCY_SIGNALS "Enable catching signals and offer to skip dumping c
 option(ENABLE_CPPRINT "Enable ability to print source code of primitives" OFF)
 option(ENABLE_LIPSRC "Enable loading a global lipsrc file" OFF)
 option(ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
+option(ENABLE_OBJECT_SIZES "Enable printing object sizes with --test" OFF)
 
 if(ENABLE_CODE_COVERAGE AND NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
   if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
@@ -65,6 +66,10 @@ add_subdirectory(src)
 if(ENABLE_TRACE)
   # Enable ability to trace calls to peval.
   target_compile_definitions(lisp PRIVATE TRACE)
+endif()
+
+if(ENABLE_OBJECT_SIZES)
+  target_compile_definitions(lisp PRIVATE ENABLE_OBJECT_SIZES)
 endif()
 
 if(ENABLE_SELECT)
