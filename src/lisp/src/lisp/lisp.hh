@@ -254,9 +254,9 @@ public:
   //
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
-  static symbol::symbol_collection symbol_collection()
+  static symbol::symbol_collection& symbol_collection()
   {
-    static symbol::symbol_collection all_symbols;
+    static symbol::symbol_collection& all_symbols = *new symbol::symbol_collection;
     return all_symbols;
   }
 

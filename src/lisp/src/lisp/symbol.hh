@@ -6,6 +6,8 @@
 #ifndef LISP_SYMBOL_HH
 #define LISP_SYMBOL_HH
 
+#include <iostream>
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -48,6 +50,19 @@ class symbol_store_t
 {
 public:
   symbol_store_t(symbol_collection_id id): _id(id) {}
+  symbol_store_t(symbol_store_t&& other) noexcept
+    : _id(other._id), _map(std::move(other._map)), _store(std::move(other._store))
+  {}
+  ~symbol_store_t() {}
+
+  symbol_store_t& operator=(const symbol_store_t&) = delete;
+  symbol_store_t& operator=(symbol_store_t&& other) noexcept
+  {
+    std::swap(other._map, _map);
+    std::swap(other._store, _store);
+    _id = other._id;
+    return *this;
+  }
   bool exists(const std::string& name) { return _map.find(name) != _map.end(); }
   symbol_t& get(const std::string& name)
   {
@@ -64,7 +79,7 @@ public:
   }
   symbol_t& get(symbol_index_t index) { return _store.at(index); }
 
-private:
+  //private:
   symbol_collection_id _id;
   std::unordered_map<std::string, symbol_index_t> _map;
   store_t _store;
@@ -80,12 +95,14 @@ public:
     // Create the global symbol store
     create();
   }
+  ~symbol_collection() {}
 
   std::unordered_map<symbol_collection_id, symbol_store_t> collection;
 
   symbol_store_t& create()
   {
-    auto [p, inserted] = collection.emplace(_free, symbol_store_t(_free));
+    auto [p, inserted] = collection.try_emplace(_free, _free);
+    ++_free;
     return p->second;
   }
 

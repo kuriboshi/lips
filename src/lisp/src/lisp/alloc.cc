@@ -11,8 +11,6 @@
 #include "except.hh"
 #include "low.hh"
 
-#include <iostream>
-
 namespace lisp
 {
 alloc::alloc(lisp& lisp): _lisp(lisp), symbols(lisp_t::symbol_collection().create())
@@ -298,6 +296,12 @@ LISPT alloc::intern(const std::string& str)
  */
 LISPT alloc::mkatom(const std::string& str)
 {
+  auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  if(glob.exists(str))
+    auto& sym = glob.get(str);
+  else
+    auto& sym = symbols.get(str);
+
   // First we search for global interned atoms
   auto hv = hash(str);
   if(auto* ob = findatom(hv, str, globals))
