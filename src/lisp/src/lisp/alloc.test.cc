@@ -2,6 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
+#include <iostream>
 #include <doctest/doctest.h>
 #include "libisp.hh"
 
@@ -60,6 +61,29 @@ TEST_CASE("Create lisp objects")
     prin0(lisp, hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);
   }
+}
+
+TEST_CASE("Object sizes")
+{
+  std::cout << "sizeof conscells_t: " << sizeof(alloc::conscells_t) << std::endl;
+  std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;
+  std::cout << "sizeof freelist: " << sizeof(lisp::current().a().freelist) << std::endl;
+  std::cout << "freelist.size(): " << lisp::current().a().freelist.size() << std::endl;
+  std::cout << "sizeof lisp_t*: " << sizeof(lisp_t*) << std::endl;
+
+  std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
+  std::cout << "symbol_t: " << sizeof(symbol_t) << std::endl;
+  std::cout << "int: " << sizeof(int) << std::endl;
+  std::cout << "double: " << sizeof(double) << std::endl;
+  std::cout << "indirect_t: " << sizeof(indirect_t) << std::endl;
+  std::cout << "cons_t: " << sizeof(cons_t) << std::endl;
+  std::cout << "std::string: " << sizeof(std::string) << std::endl;
+  std::cout << "subr_t: " << sizeof(subr_t) << std::endl;
+  std::cout << "lambda_t: " << sizeof(lambda_t) << std::endl;
+  std::cout << "closure_t: " << sizeof(closure_t) << std::endl;
+  std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
+  std::cout << "std::unique_ptr<file_t>: " << sizeof(std::unique_ptr<file_t>) << std::endl;
+  std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
 }
 
 }

@@ -64,6 +64,7 @@ target_sources(main PRIVATE
   src/lisp/logic.test.cc
   src/lisp/prim.test.cc
   src/lisp/string.test.cc
+  src/lisp/symbol.test.cc
 )
 target_link_libraries(main PUBLIC lisp doctest::doctest)
 add_test(NAME lisp_test
