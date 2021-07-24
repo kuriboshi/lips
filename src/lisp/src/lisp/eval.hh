@@ -52,7 +52,7 @@ public:
   using breakhook_t = std::function<void()>;
   void breakhook(breakhook_t fun) { _breakhook = fun; }
 
-  struct destblock_t* environment() const { return env; }
+  destblock_t* environment() const { return env; }
 
 private:
   void push_lisp(LISPT);

@@ -3,7 +3,8 @@
 // Copyright 1989, 2020 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_LISP_HH
+#define LISP_LISP_HH
 
 //
 // This header file is private to the libisp libray.  Applications using
@@ -97,13 +98,24 @@ enum class type
 
 inline constexpr auto NIL = nullptr;
 
-// The cons cell
+/// @brief The cons cell.
+///
+/// @details A cons cell contains two pieces of data: The head (traditionall
+/// called car) and the tail (traditionally called cdr).
+///
 struct cons_t
 {
   LISPT car = NIL;
   LISPT cdr = NIL;
 };
 
+/// @brief Structure describing a built-in function.
+///
+/// @details Built-in function can have zero, one, two, or three parameters.
+/// They can either evaluate their parameters or not (special forms).  Function
+/// can be either spread (fixed number of arguments) or nospread (variable
+/// number of arguments).
+///
 struct subr_t
 {
   enum class subr {
@@ -134,13 +146,20 @@ struct subr_t
   std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
 };
 
+/// @brief Lambda representation.
+///
 struct lambda_t
 {
+  /// @brief The S-expression representation of the lambda function.
   LISPT lambdarep = NIL;
+  /// @brief The list of arguments.
   LISPT arglist = NIL;
-  short argcnt = 0;
+  /// @brief The number of arguments.
+  std::int8_t argcnt = 0;
 };
 
+/// @brief A closure (static binding).
+///
 struct closure_t
 {
   LISPT cfunction = NIL;
@@ -149,6 +168,12 @@ struct closure_t
   std::uint8_t count = 0;
 };
 
+/// @brief A representation of a C++ variable linked to a lisp variable.
+///
+/// @details Wrapps a LISPT value in such a way that the value can be changed
+/// from either the C++ context of the lisp context and have the value be
+/// reflected to both.
+///
 class cvariable
 {
 public:
@@ -171,10 +196,13 @@ public:
   }
   cvariable& operator=(LISPT value) { _value = value; return *this; }
 
+  /// @brief Automatically convert to the LISPT value in a LISPT context.
   operator LISPT () const noexcept { return _value; }
+  /// @brief Dereference the wrapped LISPT value.
   LISPT operator->() const noexcept { return _value; }
 
 private:
+  /// @brief The wrapped LISPT value.
   LISPT _value;
 };
 
@@ -183,7 +211,7 @@ struct indirect_t
   LISPT value;
 };
 
-struct destblock_t;
+class destblock_t;
 
 class lisp_t
 {
@@ -298,6 +326,8 @@ struct rtinfo
   rmacro_t rmacros[128];
 };
 
+/// @brief The lisp interpreter.
+///
 class lisp
 {
 public:
@@ -527,3 +557,5 @@ inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
 inline void break_flag(bool val) { lisp::current().brkflg = val; }
 
 } // namespace lisp
+
+#endif

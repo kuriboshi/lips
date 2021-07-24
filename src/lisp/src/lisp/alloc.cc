@@ -28,10 +28,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection()
 // TODO: Free all memory
 alloc::~alloc() = default;
 
-/* 
- * newpage - Allocates a new block of cons cells and links it into the 
- *           current list of blocks.
- */
 alloc::conscells_t* alloc::newpage()
 {
   auto* newp = new conscells_t;
@@ -45,11 +41,6 @@ alloc::conscells_t* alloc::newpage()
   return newp;
 }
 
-/// @brief Allocate a number of blocks of cons cells.
-///
-/// @details The name is historical from when there was garbage collection.
-///
-/// @param incr [in] Number of blocks of cons cells to allocate.
 PRIMITIVE alloc::reclaim(LISPT incr)
 {
   int i = 0;
@@ -63,14 +54,6 @@ PRIMITIVE alloc::reclaim(LISPT incr)
   return NIL;
 }
 
-/// @brief Return a cons cell from storage.
-///
-/// @details If the free cell list is empty a new block of cons cells is
-/// allocated.  The LISPT shared_ptr created by this function will have its
-/// delete function overridden with a function which puts the cell back on the
-/// free cell list.
-///
-/// @return A new empty cons cell.
 LISPT alloc::getobject()
 {
   if(freelist.empty())
@@ -85,15 +68,6 @@ LISPT alloc::getobject()
   return r;
 }
 
-/// @brief Builds a cons cell out of the arguments.
-///
-/// @details The most basic of lisp functions.  Allocate a cons cell and fill in
-/// the cell's car and cdr parts.
-///
-/// @param a [in] The value to put in the head (car) of the cons cell.
-/// @param b [in] The value to put in the tail (cdr) of the cons cell.
-///
-/// @return The cons cell.
 PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   auto f = getobject();
@@ -101,9 +75,6 @@ PRIMITIVE alloc::cons(LISPT a, LISPT b)
   return f;
 }
 
-/// @brief Build a list of symbols in the local symbol table.
-///
-/// @return Returns a list of local symbols in no particular order.
 PRIMITIVE alloc::obarray()
 {
   LISPT o = NIL;
@@ -112,21 +83,11 @@ PRIMITIVE alloc::obarray()
   return o;
 }
 
-/// @brief Number of free cell in the free cell list.
-///
-/// @return The number of free cells.
 PRIMITIVE alloc::freecount()
 {
   return mknumber(freelist.size());
 }
 
-/// @brief Register a primitive function.
-///
-/// @param pname [in] The print name of the internal function.  This is put in
-/// the global symbol table using intern.
-/// @param subr [in] The calling details of the function.  This in includes
-/// number of parameters, whether the function is spread, nospread, or
-/// halfspread, whether the function should evaluate it's arguments or not.
 void alloc::mkprim(const std::string& pname, subr_t subr)
 {
   auto s = LISPT(new lisp_t);
@@ -155,10 +116,6 @@ void alloc::mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::s
   mkprim(pname, subr_t(subr, spread, fun));
 }
 
-/*
- * mkstring - Strings are stored in a cons cell with car set to NIL and
- *            cdr is set to the string pointer.
- */
 LISPT alloc::mkstring(const std::string& str)
 {
   LISPT s = getobject();
@@ -173,19 +130,12 @@ LISPT alloc::mknumber(int i)
   return c;
 }
 
-/*
- * mkarglis - builds a list out of the argument list ALIST given in a lambda
- *            definition. This list may end in an atom if the function is
- *            halfspread, or it could be an atom for a nospread function. COUNT
- *            is set to the number of arguments and is negative if halfspread
- *            or nospread.
- */
-LISPT alloc::mkarglis(LISPT alist, int& count)
+LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 {
   if(type_of(alist) == type::CONS)
   {
-    count++;
-    return cons(alist->car(), mkarglis(alist->cdr(), count));
+    ++count;
+    return cons(alist->car(), mkarglist(alist->cdr(), count));
   }
   else if(EQ(alist, NIL))
     return NIL;
@@ -196,17 +146,13 @@ LISPT alloc::mkarglis(LISPT alist, int& count)
   }
 }
 
-/*
- * mklambda - Make a lambda object with the argument ARGS and definition DEF
- *            and the type TYPE, wich is LAMBDA or NLAMBDA.
- */
 LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 {
   LISPT s = getobject();
   s->lamval(lambda_t());
   s->lamval().lambdarep = def;
-  int count = 0;
-  s->lamval().arglist = mkarglis(args, count);
+  std::int8_t count = 0;
+  s->lamval().arglist = mkarglist(args, count);
   s->lamval().argcnt = count;
   LISPT t = s;
   t->settype(type);

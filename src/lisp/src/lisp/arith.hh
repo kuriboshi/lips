@@ -17,8 +17,11 @@ public:
   arith(lisp&);
   static void init();
 
+  /// @brief Calculate sum of all parameters.
   LISPT plus(LISPT);
+  /// @brief Calculate integer sum of all paramerers.
   LISPT iplus(LISPT);
+  /// @brief Calculate floating point sum of all paramerers.
   LISPT fplus(LISPT);
   LISPT difference(LISPT, LISPT);
   LISPT idifference(LISPT, LISPT);

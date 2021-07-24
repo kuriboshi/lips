@@ -3,7 +3,8 @@
 // Copyright 2020 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_ALLOC_HH
+#define LISP_ALLOC_HH
 
 #include <array>
 #include <deque>
@@ -25,15 +26,17 @@ inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
 
 class evaluator;
 
-//
-// The destblock_t is used to store variables and their values.  Each block of
-// variable/value pairs is proceeded by a control block which contains the
-// following pieces of information: The size of the block, the index of the
-// variable/value pair currently being set, and a link to another destblock_t
-// in a chain of blocks.
-//
-struct destblock_t
+/// @brief Destination block is used to collect the parameters to a function.
+///
+/// @details The destblock_t is used to store variables and their values.  Each
+/// block of variable/value pairs is proceeded by a control block which
+/// contains the following pieces of information: The size of the block, the
+/// index of the variable/value pair currently being set, and a link to another
+/// destblock_t in a chain of blocks.
+///
+class destblock_t
 {
+private:
   struct control_block
   {
     std::int8_t size;
@@ -46,8 +49,10 @@ struct destblock_t
     LISPT val;
   };
   std::variant<control_block, var_val_pair> u;
-  void reset() { u = var_val_pair{NIL, NIL}; }
 
+public:
+  void reset() { u = var_val_pair{NIL, NIL}; }
+  
   void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
   int size() const { return std::get<control_block>(u).size; }
   int index() const { return std::get<control_block>(u).index; }
@@ -71,27 +76,31 @@ public:
   alloc(lisp&);
   ~alloc();
 
-  struct conscells_t
-  {
-    static constexpr int CONSCELLS = 10240; // Number of cells in each block
-    std::array<lisp_t, CONSCELLS> cells;
-  };
-
-  static symbol::symbol_store_t& global_symbols()
-  {
-    return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
-  }
-  symbol::symbol_store_t& local_symbols;
-
-  std::deque<lisp_t*> freelist; // List of free objects
-
+  /// @brief Return a cons cell from storage.
+  ///
+  /// @details If the free cell list is empty a new block of cons cells is
+  /// allocated.  The LISPT shared_ptr created by this function will have its
+  /// delete function overridden with a function which puts the cell back on the
+  /// free cell list.
+  ///
+  /// @return A new empty cons cell.
+  ///
   LISPT getobject();
 
-  //
-  // Initializes a lisp symbol with the pname NAME to contain the same value as
-  // the C variable that CVAR points to. CVAR is set to VAL.  Whenever CVAR is
-  // changed the corresponding lisp variable changes and vice versa.
-  //
+  /// @brief Initializes a lisp symbol for use in the C++ program.
+  ///
+  /// @details This function links a variable in lisp with a variable in C++ so
+  /// that changing the value in one domain will be reflected in the other.
+  /// The lisp variable will have the print name NAME.  In C++ the type
+  /// cvariable will work in many contexts which expects a value of type LISPT.
+  /// If assigned to the lisp value changes if the value is set with setq in
+  /// lisp the C++ value will change.
+  ///
+  /// @param name The lisp print name.
+  /// @param val The initial value.
+  ///
+  /// @return A reference of type cvariable which wraps the LISPT value.
+  ///
   static cvariable& initcvar(const std::string& name, LISPT val)
   {
     auto t = intern(name);
@@ -100,8 +109,23 @@ public:
     return t->symvalue()->cvarval();
   }
 
-  static LISPT intern(const std::string&);
+  /// @brief Create a symbol in the global symbol table, accessable from all
+  /// lisp instances.
+  ///
+  /// @param pname The print name.
+  ///
+  /// @return The interned symbol.
+  ///
+  static LISPT intern(const std::string& pname);
 
+  /// @brief Register a primitive function.
+  ///
+  /// @param pname [in] The print name of the internal function.  This is put in
+  /// the global symbol table using intern.
+  /// @param subr [in] The calling details of the function.  This in includes
+  /// number of parameters, whether the function is spread, nospread, or
+  /// halfspread, whether the function should evaluate it's arguments or not.
+  ///
   static void mkprim(const std::string& pname, subr_t subr);
   static void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr, enum subr_t::spread);
   static void mkprim(const std::string& pname, subr_t::func1_t fname, enum subr_t::subr, enum subr_t::spread);
@@ -109,30 +133,129 @@ public:
   static void mkprim(const std::string& pname, subr_t::func3_t fname, enum subr_t::subr, enum subr_t::spread);
 
   LISPT mkatom(const std::string&);
+
+  /// @brief Create a string.
+  ///
   LISPT mkstring(const std::string&);
+
+  /// @brief Create an integer number.
+  ///
   LISPT mknumber(int);
+
+  /// @brief Create a double.
+  ///
   LISPT mkfloat(double);
+
+  /// @brief  Make a lambda object.
+  ///
+  /// @details with the argument ARGS and definition DEF and the type TYPE, wich
+  /// is LAMBDA or NLAMBDA.
+  ///
+  /// @return The lambda object.
+  ///
   LISPT mklambda(LISPT args, LISPT def, type type);
 
-  destblock_t* dalloc(int);
-  void dfree(destblock_t*);
+  /// @brief Allocate a destination block.
+  ///
+  /// @param size The size of the destination block.
+  ///
+  destblock_t* dalloc(int size);
+
+  /// @brief Free a destination block.
+  ///
+  /// @details The destination blocks are freed in the reverse order of their
+  /// allocation.
+  ///
+  /// @param The block to free.
+  ///
+  void dfree(destblock_t* block);
+
+  /// @brief Release all destination blocks.
+  ///
   void dzero();
 
+  /// @brief Allocate a number of blocks of cons cells.
+  ///
+  /// @details The name is historical from when there was garbage collection.
+  ///
+  /// @param incr [in] Number of blocks of cons cells to allocate.
+  ///
   PRIMITIVE reclaim(LISPT incr); // Number of blocks to increase with
+
+  /// @brief Builds a cons cell out of the arguments.
+  ///
+  /// @details The most basic of lisp functions.  Allocate a cons cell and fill in
+  /// the cell's car and cdr parts.
+  ///
+  /// @param a [in] The value to put in the head (car) of the cons cell.
+  /// @param b [in] The value to put in the tail (cdr) of the cons cell.
+  ///
+  /// @return The cons cell.
+  ///
   PRIMITIVE cons(LISPT, LISPT);
+
+  /// @brief Build a list of symbols in the local symbol table.
+  ///
+  /// @return Returns a list of local symbols in no particular order.
+  ///
   PRIMITIVE obarray();
+
+  /// @brief Number of free cell in the free cell list.
+  ///
+  /// @return The number of free cells.
+  ///
   PRIMITIVE freecount();
   
 private:
+  /// @brief The lisp interpreter.
   lisp& _lisp;
+  /// @brief Returns the evaluator.
   evaluator& e() { return _lisp.e(); }
-  conscells_t* newpage();
-  LISPT mkarglis(LISPT alist, int& count);
 
-  std::list<conscells_t*> conscells;         // Cons cell storage.
-  static constexpr int DESTBLOCKSIZE = 3000; // Size of destination block area
-  destblock_t destblock[DESTBLOCKSIZE];      // Destblock area.
-  int destblockused = 0;                     // Index to last slot in destblock.
+  struct conscells_t
+  {
+    static constexpr int CONSCELLS = 10240; // Number of cells in each block
+    std::array<lisp_t, CONSCELLS> cells;
+  };
+
+  /// @brief Allocates a new block of cons cells.
+  ///
+  /// @details The new block is linked into the current list of blocks.
+  ///
+  conscells_t* newpage();
+
+  /// @brief Returns the global symbol table.
+  static symbol::symbol_store_t& global_symbols()
+  {
+    return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  }
+  /// @brief The local symbol table, local for each lisp instance.
+  symbol::symbol_store_t& local_symbols;
+  /// @brief List of free objects.
+  std::deque<lisp_t*> freelist;
+
+  /// @brief Builds an argument list.
+  ///
+  /// @details The list is constructed from the ALIST given in a lambda
+  /// definition.  This list may end in an atom if the function is halfspread,
+  /// or it could be an atom for a nospread function.  COUNT is set to the
+  /// number of arguments and is negative if halfspread or nospread.
+  ///
+  /// @param alist [in] The argument list in a lambda definitions.
+  /// @param count [in, out] The number of arguments in the argument list.
+  /// Negative for nospread and halfspread.
+  ///
+  /// @return A straight list of arguments.
+  LISPT mkarglist(LISPT alist, std::int8_t& count);
+
+  /// @brief Cons cell storage.
+  std::list<conscells_t*> conscells;
+  /// @brief Size of destination block area
+  static constexpr int DESTBLOCKSIZE = 3000;
+  /// @brief Destination block area.
+  std::array<destblock_t, DESTBLOCKSIZE> destblock;
+  /// @brief Index to last slot in destblock.
+  int destblockused = 0;
 };
 
 inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
@@ -205,3 +328,5 @@ inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::s
 }
 
 } // namespace lisp
+
+#endif
