@@ -36,9 +36,9 @@ public:
   static void remhist();
   static void trimhist();
 
-  static LISPT history; // Holds the history list.
-  static LISPT histnum; // Current event number.
-  static LISPT histmax; // Maximum number of events to save.
+  static cvariable history; // Holds the history list.
+  static cvariable histnum; // Current event number.
+  static cvariable histmax; // Maximum number of events to save.
 
   // Read table functions
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
@@ -49,9 +49,9 @@ public:
 
 private:
   static LISPT alias_expanded; //For checking alias loops.
-  static LISPT topprompt;
-  static LISPT brkprompt;
-  static LISPT promptform;     // Evaluated before printing the prompt.
+  static cvariable topprompt;
+  static cvariable brkprompt;
+  static cvariable promptform;     // Evaluated before printing the prompt.
 
   const options_t& options;
   file_t& file;

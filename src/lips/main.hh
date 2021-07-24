@@ -18,9 +18,9 @@ struct options_t
 };
 
 extern options_t options;
-extern lisp::LISPT path;
-extern lisp::LISPT home;
-extern lisp::LISPT globsort;
+extern lisp::cvariable path;
+extern lisp::cvariable home;
+extern lisp::cvariable globsort;
 
 extern lisp::LISPT C_ALIAS;
 extern lisp::LISPT C_AMPER;

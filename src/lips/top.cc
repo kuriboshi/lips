@@ -275,7 +275,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
       }
       if(type_of(at) == type::SYMBOL)
       {
-        for(auto h = history; !is_NIL(h); h = h->cdr())
+        for(auto h: history)
         {
           tmp = histget(0L, h);
           if(!is_NIL(tmp) && type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
@@ -296,23 +296,23 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
 
 void top::init()
 {
-  initcvar(history, "history", NIL);
-  initcvar(histnum, "histnum", mknumber(1L));
-  initcvar(histmax, "histmax", mknumber(100L));
-  initcvar(topprompt, "prompt", mkstring("!_"));
-  initcvar(brkprompt, "brkprompt", mkstring("!:"));
-  initcvar(promptform, "promptform", NIL);
+  history = initcvar("history", NIL);
+  histnum = initcvar("histnum", mknumber(1L));
+  histmax = initcvar("histmax", mknumber(100L));
+  topprompt = initcvar("prompt", mkstring("!_"));
+  brkprompt = initcvar("brkprompt", mkstring("!:"));
+  promptform = initcvar("promptform", NIL);
   mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }
 
-LISPT top::history;
-LISPT top::histnum;
-LISPT top::histmax;
+cvariable top::history;
+cvariable top::histnum;
+cvariable top::histmax;
 LISPT top::input_exp;           // The input expression.
 std::function<LISPT(LISPT)> top::transform_hook;;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded;
-LISPT top::topprompt;
-LISPT top::brkprompt;
-LISPT top::promptform;
+cvariable top::topprompt;
+cvariable top::brkprompt;
+cvariable top::promptform;

@@ -63,6 +63,31 @@ TEST_CASE("Create lisp objects")
   }
 }
 
+TEST_CASE("C Variables")
+{
+  lisp l;
+  current c(l);
+
+  auto& cvar = initcvar("cvar", mknumber(123));
+  auto a = eval(cvar);
+  CHECK(eq(cvar, mknumber(123)));
+  cvar = mknumber(321);
+  CHECK(eq(cvar, mknumber(321)));
+
+  auto r0 = eval(cvar);
+  CHECK(r0->intval() == 321);
+
+  auto r1 = eval("(setq cvar 444)");
+  CHECK(r1->intval() == 444);
+  CHECK(cvar->intval() == 444);
+
+  auto r2 = eval("cvar");
+  CHECK(r2->intval() == 444);
+
+  cvar = mkstring("hello");
+  CHECK(cvar->getstr() == "hello");
+}
+
 #ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {

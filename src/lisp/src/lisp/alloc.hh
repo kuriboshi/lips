@@ -92,12 +92,12 @@ public:
   // the C variable that CVAR points to. CVAR is set to VAL.  Whenever CVAR is
   // changed the corresponding lisp variable changes and vice versa.
   //
-  static void initcvar(LISPT& cvar, const std::string& name, LISPT val)
+  static cvariable& initcvar(const std::string& name, LISPT val)
   {
     auto t = intern(name);
     t->symbol().value = LISPT(new lisp_t);
-    t->symvalue()->cvarval(cvar);
-    cvar = val;
+    t->symvalue()->cvarval(cvariable(val));
+    return t->symvalue()->cvarval();
   }
 
   static LISPT intern(const std::string&);
@@ -160,7 +160,7 @@ inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 inline LISPT getobject() { return getobject(lisp::current()); }
 
-inline void initcvar(LISPT& cvar, const std::string& name, LISPT var) { return alloc::initcvar(cvar, name, var); }
+inline cvariable& initcvar(const std::string& name, LISPT val) { return alloc::initcvar(name, val); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {

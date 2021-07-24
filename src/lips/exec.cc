@@ -23,6 +23,7 @@
 
 #include <lisp/libisp.hh>
 #include <lisp/except.hh>
+#include <lisp/iter.hh>
 #include "glob.hh"
 #include "main.hh"
 #include "top.hh"

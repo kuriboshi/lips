@@ -25,7 +25,7 @@ PRIMITIVE low::set(LISPT var, LISPT val)
   if(type_of(var->symvalue()) == type::INDIRECT)
     var->symvalue()->indirectval(val);
   else if(type_of(var->symvalue()) == type::CVARIABLE)
-    var->symvalue()->cvarval(val);
+    var->symvalue()->cvarval() = val;
   else
     var->symvalue(val);
   return val;

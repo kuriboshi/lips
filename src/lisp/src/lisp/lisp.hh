@@ -149,9 +149,33 @@ struct closure_t
   std::uint8_t count = 0;
 };
 
-struct cvariable_t
+class cvariable
 {
-  LISPT value;
+public:
+  explicit cvariable(LISPT value): _value(value) {}
+  cvariable(): _value(NIL) {}
+  ~cvariable() = default;
+  cvariable(const cvariable& other): _value(other._value) {}
+  cvariable(cvariable&& other) noexcept
+  {
+    _value = std::move(other._value);
+  }
+  cvariable& operator=(cvariable&& other) noexcept
+  {
+    std::swap(_value, other._value);
+    return *this;
+  }
+  cvariable& operator=(const cvariable& other)
+  {
+    return *this = cvariable(other);
+  }
+  cvariable& operator=(LISPT value) { _value = value; return *this; }
+
+  operator LISPT () const noexcept { return _value; }
+  LISPT operator->() const noexcept { return _value; }
+
+private:
+  LISPT _value;
 };
 
 struct indirect_t
@@ -210,8 +234,8 @@ public:
   void envval(destblock_t* env) { _type = type::ENVIRON; _u = env; }
   auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(_u).get(); }
   void fileval(std::unique_ptr<file_t> f) { _type = type::FILET; _u = std::move(f); }
-  auto cvarval() -> LISPT { return std::get<cvariable_t>(_u).value; }
-  void cvarval(LISPT x) { _type = type::CVARIABLE; _u.emplace<cvariable_t>(cvariable_t{x}); }
+  auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
+  void cvarval(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
   const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(_u).name; }
 
@@ -242,7 +266,7 @@ private:
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
     std::unique_ptr<file_t>,    // FILE (11)
-    cvariable_t                 // CVARIABLE (12)
+    cvariable                   // CVARIABLE (12)
     > _u;
 };
 
@@ -327,11 +351,9 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  LISPT currentbase = NIL;
-  //LISPT topprompt = NIL;
-  //LISPT brkprompt = NIL;
-  LISPT verbose = NIL;
-  LISPT version = NIL;
+  cvariable currentbase;
+  cvariable verbose;
+  cvariable version;
 
   // clang-format off
   rtinfo currentrt =

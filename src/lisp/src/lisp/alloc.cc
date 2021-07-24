@@ -56,7 +56,7 @@ alloc::conscells_t* alloc::newpage()
 
 /// @brief Allocate a number of blocks of cons cells.
 ///
-/// @detail The name is historical from when there was garbage collection.
+/// @details The name is historical from when there was garbage collection.
 ///
 /// @param incr [in] Number of blocks of cons cells to allocate.
 PRIMITIVE alloc::reclaim(LISPT incr)
@@ -74,7 +74,7 @@ PRIMITIVE alloc::reclaim(LISPT incr)
 
 /// @brief Return a cons cell from storage.
 ///
-/// @detail If the free cell list is empty a new block of cons cells is
+/// @details If the free cell list is empty a new block of cons cells is
 /// allocated.  The LISPT shared_ptr created by this function will have its
 /// delete function overridden with a function which puts the cell back on the
 /// free cell list.
@@ -96,7 +96,7 @@ LISPT alloc::getobject()
 
 /// @brief Builds a cons cell out of the arguments.
 ///
-/// @detail The most basic of lisp functions.  Allocate a cons cell and fill in
+/// @details The most basic of lisp functions.  Allocate a cons cell and fill in
 /// the cell's car and cdr parts.
 ///
 /// @param a [in] The value to put in the head (car) of the cons cell.

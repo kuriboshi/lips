@@ -187,9 +187,9 @@ void init_all_signals()
 
 using namespace lisp;
 
-LISPT path;        /* Search path for executables. */
-LISPT home;        /* Home directory. */
-LISPT globsort;    /* To sort or not during globbing. */
+cvariable path;        /* Search path for executables. */
+cvariable home;        /* Home directory. */
+cvariable globsort;    /* To sort or not during globbing. */
 
 LISPT C_ALIAS;
 LISPT C_AMPER;
@@ -372,10 +372,10 @@ inline std::unique_ptr<::lisp::lisp> init()
 
   top::init();
 
-  initcvar(path, "path", mungepath(getenv("PATH")));
-  initcvar(home, "home", mkstring(getenv("HOME")));
+  path = initcvar("path", mungepath(getenv("PATH")));
+  home = initcvar("home", mkstring(getenv("HOME")));
 
-  initcvar(globsort, "globsort", T);
+  globsort = initcvar("globsort", T);
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
   breakhook(onbreak);

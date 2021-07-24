@@ -102,10 +102,8 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     e().breakhook(nullptr);
   }
 
-  //initcvar(topprompt, "prompt", a().mkstring("!_"));
-  //initcvar(brkprompt, "brkprompt", a().mkstring("!:"));
-  initcvar(currentbase, "base", a().mknumber(10L));
-  initcvar(version, "version", a().mkstring(VERSION));
+  currentbase = initcvar("base", a().mknumber(10L));
+  version = initcvar("version", a().mkstring(VERSION));
 
   Map::init();
   arith::init();
