@@ -461,7 +461,7 @@ private:
   std::unique_ptr<file_t> _stdin;
   static lisp* _current;
 
-  std::map<int, std::string> messages;
+  static std::map<int, std::string> messages;
   // Some standard messages, all of them not necessarily used
   // clang-format off
   const std::vector<std::string> errmess = {

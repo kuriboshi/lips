@@ -173,6 +173,7 @@ LISPT lisp::break0(LISPT exp)
 }
 
 lisp* lisp::_current = nullptr;
+std::map<int, std::string> lisp::messages;
 
 //
 // All lisp constants needed internally.
