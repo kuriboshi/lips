@@ -88,6 +88,27 @@ TEST_CASE("C Variables")
   CHECK(cvar->getstr() == "hello");
 }
 
+TEST_CASE("obarray")
+{
+  lisp l;
+  current c(l);
+
+  auto a0 = mkatom("foo");
+  auto obs = obarray();
+  CHECK(length(obs)->intval() == 1);
+  auto a1 = mkatom("bar");
+  obs = obarray();
+  CHECK(length(obs)->intval() == 2);
+}
+
+TEST_CASE("reclaim + freecount")
+{
+  auto f0 = freecount();
+  CHECK(is_NIL(reclaim(mknumber(1))));
+  auto f1 = freecount();
+  CHECK(f1->intval() > f0->intval());
+}
+
 #ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {

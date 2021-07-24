@@ -16,11 +16,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection()
 {
   destblockused = 0;
   newpage(); // Allocate one page of storage
-  if(conscells.empty())
-  {
-    lisp.primerr().format("Cons cells memory exhausted\n");
-    throw lisp_finish("Cons cells memory exhausted", 1);
-  }
 
   // clang-format off
   mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
@@ -30,10 +25,8 @@ alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection()
   // clang-format on
 }
 
-alloc::~alloc()
-{
-  // TODO: Free all memory
-}
+// TODO: Free all memory
+alloc::~alloc() = default;
 
 /* 
  * newpage - Allocates a new block of cons cells and links it into the 
@@ -42,8 +35,6 @@ alloc::~alloc()
 alloc::conscells_t* alloc::newpage()
 {
   auto* newp = new conscells_t;
-  if(newp == nullptr)
-    return conscells.front();
   for(auto& i: newp->cells)
   {
     i.settype(type::FREE);
