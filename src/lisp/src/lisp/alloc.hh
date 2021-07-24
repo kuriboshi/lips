@@ -157,16 +157,26 @@ inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
-template<typename T>
-LISPT mklist(lisp& l, T t)
+inline LISPT mklist(lisp& l, LISPT t)
 {
   return cons(l, t, NIL);
 }
 
-template<typename T, typename... Ts>
-LISPT mklist(lisp& l, T t, Ts ...ts)
+template<typename... Ts>
+LISPT mklist(lisp& l, LISPT t, Ts ...ts)
 {
   return cons(l, t, mklist(l, ts...));
+}
+
+inline LISPT mklist(LISPT t)
+{
+  return cons(t, NIL);
+}
+
+template<typename... Ts>
+LISPT mklist(LISPT t, Ts ...ts)
+{
+  return cons(t, mklist(ts...));
 }
 
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
