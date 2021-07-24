@@ -416,6 +416,7 @@ bool evaluator::peval1()
         cont = &evaluator::evclosure;
         break;
       case type::SUBR:
+      case type::FSUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
         dest = mkdestblock(fun->subrval().argcount());
@@ -478,6 +479,7 @@ bool evaluator::peval2()
         cont = &evaluator::evclosure;
         break;
       case type::SUBR:
+      case type::FSUBR:
         push_point(dest);
         push_func(&evaluator::ev2);
         noeval = fun->subrval().subr == subr_t::subr::NOEVAL;

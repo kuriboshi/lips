@@ -224,7 +224,11 @@ public:
     _u = s;
   }
   auto subrval() const -> const subr_t& { return std::get<subr_t>(_u); }
-  void subrval(subr_t x) { _type = type::SUBR; _u = x; }
+  void subrval(subr_t x)
+  {
+    _type = x.subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
+    _u = x;
+  }
   auto lamval() -> lambda_t& { return std::get<lambda_t>(_u); }
   void lamval(lambda_t x) { _type = type::LAMBDA; _u = x; }
   void nlamval(lambda_t x) { _type = type::NLAMBDA; _u = x; }
