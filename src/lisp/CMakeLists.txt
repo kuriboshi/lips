@@ -40,6 +40,7 @@ target_sources(lisp PRIVATE
   src/lisp/pred.hh
   src/lisp/prim.hh
   src/lisp/prop.hh
+  src/lisp/repl.hh
   src/lisp/string.hh
   src/lisp/user.hh
   src/lisp/version.hh
@@ -65,6 +66,7 @@ target_sources(main PRIVATE
   src/lisp/pred.test.cc
   src/lisp/prim.test.cc
   src/lisp/prop.test.cc
+  src/lisp/repl.test.cc
   src/lisp/string.test.cc
   src/lisp/symbol.test.cc
   src/lisp/user.test.cc
