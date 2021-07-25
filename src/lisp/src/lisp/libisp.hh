@@ -18,7 +18,6 @@
 #include "logic.hh"
 #include "low.hh"
 #include "map.hh"
-#include "posix.hh"
 #include "pred.hh"
 #include "prim.hh"
 #include "prop.hh"

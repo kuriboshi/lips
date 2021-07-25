@@ -14,7 +14,6 @@ target_sources(lisp PRIVATE
   src/lisp/low.cc
   src/lisp/map.cc
   src/lisp/debug.cc
-  src/lisp/posix.cc
   src/lisp/pred.cc
   src/lisp/prim.cc
   src/lisp/prop.cc
@@ -38,7 +37,6 @@ target_sources(lisp PRIVATE
   src/lisp/low.hh
   src/lisp/map.hh
   src/lisp/debug.hh
-  src/lisp/posix.hh
   src/lisp/pred.hh
   src/lisp/prim.hh
   src/lisp/prop.hh

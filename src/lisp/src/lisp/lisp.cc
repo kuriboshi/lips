@@ -112,7 +112,6 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
   io::init(*this);
   logic::init();
   low::init();
-  posix::init();
   pred::init();
   prim::init();
   prop::init();
