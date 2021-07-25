@@ -1011,7 +1011,7 @@ PRIMITIVE evaluator::topofstack()
 {
   auto x = a.getobject();
   x->settype(type::ENVIRON);
-  x->envval(l.e().environment());
+  x->set(l.e().environment());
   return x;
 }
 

@@ -34,7 +34,7 @@ alloc::conscells_t* alloc::newpage()
   for(auto& i: newp->cells)
   {
     i.settype(type::FREE);
-    i.setnil();
+    i.set();
     freelist.push_back(&i);;
   }
   conscells.push_front(newp);
@@ -62,7 +62,8 @@ LISPT alloc::getobject()
   auto f = freelist.front();
   freelist.pop_front();
   auto r = LISPT(f, [this](lisp_t* obj) {
-    obj->setnil();
+    obj->settype(type::FREE);
+    obj->set();
     freelist.push_back(obj);
   });
   return r;
@@ -71,7 +72,7 @@ LISPT alloc::getobject()
 PRIMITIVE alloc::cons(LISPT a, LISPT b)
 {
   auto f = getobject();
-  f->consval(cons_t{a, b});
+  f->set(cons_t{a, b});
   return f;
 }
 
@@ -91,7 +92,7 @@ PRIMITIVE alloc::freecount()
 void alloc::mkprim(const std::string& pname, subr_t subr)
 {
   auto s = LISPT(new lisp_t);
-  s->subrval(subr);
+  s->set(subr);
   LISPT f = intern(pname);
   f->symvalue(s);
 }
@@ -119,14 +120,14 @@ void alloc::mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::s
 LISPT alloc::mkstring(const std::string& str)
 {
   LISPT s = getobject();
-  s->stringval(str);
+  s->set(str);
   return s;
 }
 
 LISPT alloc::mknumber(int i)
 {
   LISPT c = getobject();
-  c->intval(i);
+  c->set(i);
   return c;
 }
 
@@ -148,15 +149,14 @@ LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 
 LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 {
-  LISPT s = getobject();
-  s->lamval(lambda_t());
-  s->lamval().lambdarep = def;
+  lambda_t lambda;
+  lambda.lambdarep = def;
   std::int8_t count = 0;
-  s->lamval().arglist = mkarglist(args, count);
-  s->lamval().argcnt = count;
-  LISPT t = s;
-  t->settype(type);
-  return t;
+  lambda.arglist = mkarglist(args, count);
+  lambda.argcnt = count;
+  LISPT s = getobject();
+  s->set(lambda, type == type::LAMBDA);
+  return s;
 }
 
 /*
@@ -170,7 +170,7 @@ LISPT alloc::intern(const std::string& str)
   if(sym.self == NIL)
   {
     sym.self = LISPT(new lisp_t);
-    sym.self->symbol(sym);
+    sym.self->set(sym);
   }
   return sym.self;
 }
@@ -187,19 +187,18 @@ LISPT alloc::mkatom(const std::string& str)
   if(sym.self == NIL)
   {
     sym.self = getobject();
-    sym.self->symbol(sym);
+    sym.self->set(sym);
   }
   return sym.self;
 }
 
-/* This isn't converted yet */
 /*
  * mkfloat - Make a floating point number.
  */
 LISPT alloc::mkfloat(double num)
 {
   LISPT rval = getobject();
-  rval->floatval(num);
+  rval->set(num);
   return rval;
 }
 

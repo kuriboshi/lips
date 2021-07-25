@@ -105,7 +105,7 @@ public:
   {
     auto t = intern(name);
     t->symbol().value = LISPT(new lisp_t);
-    t->symvalue()->cvarval(cvariable(val));
+    t->symvalue()->set(cvariable(val));
     return t->symvalue()->cvarval();
   }
 

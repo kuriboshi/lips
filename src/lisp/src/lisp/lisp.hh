@@ -220,54 +220,53 @@ public:
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  void setnil() { _u = {}; }
+  void set() { _u = {}; }
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(_u)); }
-  void symbol(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
+  void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
   auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
   void symvalue(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(_u)).value = x; }
   auto intval() const -> int { return std::get<int>(_u); }
-  void intval(int x)
+  void set(int x)
   {
     _type = type::INTEGER;
     _u = x;
   }
   auto floatval() const -> double { return std::get<double>(_u); }
-  void floatval(double f)
+  void set(double f)
   {
     _type = type::FLOAT;
     _u = f;
   }
   auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
-  void indirectval(LISPT x) { _type = type::INDIRECT; _u = indirect_t{x}; }
+  void set(indirect_t x) { _type = type::INDIRECT; _u = x; }
   auto consval() const -> const cons_t& { return std::get<cons_t>(_u); }
-  void consval(cons_t x) { _type = type::CONS; _u = x; }
+  void set(cons_t x) { _type = type::CONS; _u = x; }
   auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
   auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
   void car(LISPT x) { std::get<cons_t>(_u).car = x; }
   void cdr(LISPT x) { std::get<cons_t>(_u).cdr = x; }
   auto stringval() const -> const std::string& { return std::get<std::string>(_u); }
-  void stringval(const std::string& s)
+  void set(const std::string& s)
   {
     _type = type::STRING;
     _u = s;
   }
   auto subrval() const -> const subr_t& { return std::get<subr_t>(_u); }
-  void subrval(subr_t x)
+  void set(subr_t x)
   {
     _type = x.subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
     _u = x;
   }
   auto lamval() -> lambda_t& { return std::get<lambda_t>(_u); }
-  void lamval(lambda_t x) { _type = type::LAMBDA; _u = x; }
-  void nlamval(lambda_t x) { _type = type::NLAMBDA; _u = x; }
+  void set(lambda_t x, bool lambda) { _type = lambda ? type::LAMBDA : type::NLAMBDA; _u = x; }
   auto closval() -> closure_t& { return std::get<closure_t>(_u); }
-  void closval(closure_t x) { _type = type::CLOSURE; _u = x; }
+  void set(closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
-  void envval(destblock_t* env) { _type = type::ENVIRON; _u = env; }
+  void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
   auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(_u).get(); }
-  void fileval(std::unique_ptr<file_t> f) { _type = type::FILET; _u = std::move(f); }
+  void set(std::unique_ptr<file_t> f) { _type = type::FILET; _u = std::move(f); }
   auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
-  void cvarval(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
+  void set(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
   const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(_u).name; }
 

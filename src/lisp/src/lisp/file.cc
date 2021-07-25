@@ -41,7 +41,7 @@ PRIMITIVE file::open(LISPT filename, LISPT mode)
   if(!f)
     return l.error(CANT_OPEN, filename);
   LISPT newfile = getobject(l);
-  newfile->fileval(std::move(f));
+  newfile->set(std::move(f));
   return newfile;
 }
 

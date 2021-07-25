@@ -28,7 +28,7 @@ static LISPT mkindirect(lisp& l, LISPT obj)
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
   auto iobj = l.a().getobject();
-  iobj->indirectval(obj);
+  iobj->set(indirect_t{obj});
   return iobj;
 }
 
@@ -285,7 +285,7 @@ PRIMITIVE prim::closure(LISPT fun, LISPT vars)
     return f;
   c.cvalues = f;
   auto clos = a.getobject();
-  clos->closval(c);
+  clos->set(c);
   return clos;
 }
 

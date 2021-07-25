@@ -23,7 +23,7 @@ PRIMITIVE low::set(LISPT var, LISPT val)
   if(var->symbol().constant)
     return l.error(ATTEMPT_TO_CLOBBER, var);
   if(type_of(var->symvalue()) == type::INDIRECT)
-    var->symvalue()->indirectval(val);
+    var->symvalue()->set(indirect_t{val});
   else if(type_of(var->symvalue()) == type::CVARIABLE)
     var->symvalue()->cvarval() = val;
   else
