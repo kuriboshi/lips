@@ -280,6 +280,21 @@ inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
+inline LISPT operator"" _l(const char* s)
+{
+  return mkstring(s);
+}
+
+inline LISPT operator"" _l(unsigned long long i)
+{
+  return mknumber(i);
+}
+
+inline LISPT operator"" _l(long double d)
+{
+  return mkfloat(d);
+}
+
 inline LISPT mklist(lisp& l, LISPT t)
 {
   return cons(l, t, NIL);
