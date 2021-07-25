@@ -96,6 +96,9 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     C_SUBR = intern("subr");
     C_SYMBOL = intern("symbol");
     C_UNBOUND = intern("unbound");
+    C_UNBOUND->symbol().constant = true;
+    C_UNBOUND->set();
+    C_UNBOUND->settype(type::UNBOUND);
     C_WRITE = intern("write");
 
     e().undefhook(nullptr);
