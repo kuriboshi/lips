@@ -16,7 +16,9 @@ string::string(lisp& lisp): base(lisp) {}
 /* Return symbols print name as a string. */
 PRIMITIVE string::symstr(LISPT sym)
 {
-  l.check(sym, type::SYMBOL);
+  l.check(sym, type::SYMBOL, type::T, type::NIL);
+  if(type_of(sym) == type::NIL)
+    return mkstring("nil");
   return mkstring(l, sym->symbol().pname.name);
 }
 

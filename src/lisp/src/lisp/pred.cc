@@ -110,7 +110,7 @@ PRIMITIVE pred::boundp(LISPT a)
 
 PRIMITIVE pred::litatom(LISPT a)
 {
-  if(type_of(a) == type::SYMBOL)
+  if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
     return T;
   else
     return NIL;
@@ -173,7 +173,8 @@ inline constexpr auto NUMBERP = "numberp"; // integer of float
 inline constexpr auto MEMB = "memb";       // t if a in l
 inline constexpr auto EQUAL = "equal";     // equal
 inline constexpr auto BOUNDP = "boundp";   // t if var bound
-inline constexpr auto LITATOM = "litatom"; // t if literal atom
+inline constexpr auto LITATOM = "litatom"; // t if is a literal atom (Interlisp)
+inline constexpr auto SYMBOLP = "symbolp"; // t if is a symbol (CL)
 inline constexpr auto TYPEOF = "typeof";   // return type as an atom
 } // namespace pn
 
@@ -188,6 +189,7 @@ void pred::init()
   mkprim(pn::EQUAL,   ::lisp::equal,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::BOUNDP,  ::lisp::boundp,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::LITATOM, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SYMBOLP, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::TYPEOF,  ::lisp::xtypeof, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }

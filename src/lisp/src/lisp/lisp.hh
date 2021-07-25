@@ -364,6 +364,12 @@ public:
       error(ILLEGAL_ARG, arg);
   }
 
+  void check(LISPT arg, type type0, type type1, type type2)
+  {
+    if(type_of(arg) != type0 && type_of(arg) != type1 && type_of(arg) != type2)
+      error(ILLEGAL_ARG, arg);
+  }
+
   enum class break_return
   {
     RETURN,                     // Return from recursive repl

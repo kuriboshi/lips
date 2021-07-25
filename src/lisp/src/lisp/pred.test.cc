@@ -51,6 +51,8 @@ TEST_CASE("Predicate functions")
   {
     CHECK(litatom(l, mkatom("a")) != NIL);
     CHECK(litatom(mkatom("a")) != NIL);
+    CHECK(litatom(l, mkatom("t")) != NIL);
+    CHECK(litatom(mkatom("t")) != NIL);
     CHECK(litatom(l, mkstring("a")) == NIL);
     CHECK(litatom(mkstring("a")) == NIL);
   }
