@@ -22,7 +22,6 @@ TEST_CASE("User defined functions")
   (setq a 'b)
   (cons (l a) (n a)))
 )");
-  print(r0);
   CHECK(car(r0) == b);
   CHECK(cdr(r0) == a);
 }

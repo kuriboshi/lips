@@ -10,6 +10,77 @@ namespace lisp
 
 TEST_CASE("Predicate functions")
 {
+  lisp l;
+  current c(l);
+
+  SUBCASE("numberp")
+  {
+    CHECK(numberp(l, mknumber(1)) != NIL);
+    CHECK(numberp(mknumber(1)) != NIL);
+    CHECK(numberp(l, mkfloat(1.0)) != NIL);
+    CHECK(numberp(mkfloat(1.0)) != NIL);
+    CHECK(numberp(l, mkstring("hello")) == NIL);
+    CHECK(numberp(mkstring("hello")) == NIL);
+  }
+
+  SUBCASE("listp")
+  {
+    CHECK(listp(l, cons(l, mknumber(1), NIL)) != NIL);
+    CHECK(listp(cons(l, mknumber(1), NIL)) != NIL);
+    CHECK(listp(l, mkstring("hello")) == NIL);
+    CHECK(listp(mkstring("hello")) == NIL);
+  }
+
+  SUBCASE("nlistp")
+  {
+    CHECK(nlistp(l, cons(l, mknumber(1), NIL)) == NIL);
+    CHECK(nlistp(cons(l, mknumber(1), NIL)) == NIL);
+    CHECK(nlistp(l, mkstring("hello")) != NIL);
+    CHECK(nlistp(mkstring("hello")) != NIL);
+  }
+
+  SUBCASE("memb")
+  {
+    CHECK(memb(l, mknumber(2), mklist(mknumber(1), mknumber(2), mknumber(3))) != NIL);
+    CHECK(memb(mknumber(2), mklist(mknumber(1), mknumber(2), mknumber(3))) != NIL);
+    CHECK(memb(l, mknumber(4), mklist(mknumber(1), mknumber(2), mknumber(3))) == NIL);
+    CHECK(memb(mknumber(4), mklist(mknumber(1), mknumber(2), mknumber(3))) == NIL);
+  }
+
+  SUBCASE("litatom")
+  {
+    CHECK(litatom(l, mkatom("a")) != NIL);
+    CHECK(litatom(mkatom("a")) != NIL);
+    CHECK(litatom(l, mkstring("a")) == NIL);
+    CHECK(litatom(mkstring("a")) == NIL);
+  }
+
+  SUBCASE("equal")
+  {
+    auto num0 = mknumber(0);
+    auto num1 = mknumber(1);
+    auto str0 = mkstring("0");
+    auto str1 = mkstring("1");
+    auto lam0 = lambda(NIL, str0);
+    auto lam1 = lambda(NIL, str1);
+    CHECK(equal(l, num0, mknumber(0)) != NIL);
+    CHECK(equal(num0, mknumber(0)) != NIL);
+    CHECK(equal(l, num0, num1) == NIL);
+    CHECK(equal(num0, num1) == NIL);
+    CHECK(equal(l, str0, mkstring("0")) != NIL);
+    CHECK(equal(str0, mkstring("0")) != NIL);
+    CHECK(equal(l, str0, str1) == NIL);
+    CHECK(equal(str0, str1) == NIL);
+    CHECK(equal(l, lam0, lam1) == NIL);
+    CHECK(equal(lam0, lam1) == NIL);
+    CHECK(equal(l, lam0, lambda(NIL, mkstring("0"))) != NIL);
+    CHECK(equal(lam0, lambda(NIL, mkstring("0"))) != NIL);
+    CHECK(equal(l, num0, str0) == NIL);
+    CHECK(equal(num0, str0) == NIL);
+    CHECK(equal(l, mklist(num0, num1, num0), mklist(num1, num0, num1)) == NIL);
+    CHECK(equal(mklist(num0, num1, num0), mklist(num1, num0, num1)) == NIL);
+  }
+
   SUBCASE("typeof")
   {
     CHECK(xtypeof(NIL) == NIL);

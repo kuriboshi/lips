@@ -8,6 +8,7 @@
 #include "alloc.hh"
 #include "user.hh"
 #include "io.hh"
+#include "prim.hh"
 
 namespace lisp
 {
@@ -36,9 +37,9 @@ PRIMITIVE pred::listp(LISPT a)
 
 PRIMITIVE pred::memb(LISPT x, LISPT l)
 {
-  while(!EQ(l, NIL))
+  while(!eq(l, NIL))
   {
-    if(EQ(x, l->car()))
+    if(eq(x, l->car()))
       return l;
     l = l->cdr();
   }
@@ -70,14 +71,11 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
       return x;
     case type::STRING:
       return (l1->stringval() == l2->stringval()) ? T : NIL;
-      break;
     case type::LAMBDA:
     case type::NLAMBDA:
       return funeq(l, l1, l2);
-      break;
     case type::INTEGER:
       return (l1->intval() == l2->intval() ? T : NIL);
-      break;
     default:
       break;
   }
