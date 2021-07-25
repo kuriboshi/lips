@@ -280,7 +280,7 @@ inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
-inline LISPT operator"" _l(const char* s)
+inline LISPT operator"" _l(const char* s, std::size_t)
 {
   return mkstring(s);
 }
