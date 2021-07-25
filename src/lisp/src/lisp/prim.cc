@@ -289,11 +289,7 @@ PRIMITIVE prim::closure(LISPT fun, LISPT vars)
   return clos;
 }
 
-/*
- * nth - Return the N'th element in the list LIST. If N is greater than the
- *       length of LIST, return NIL.
- */
-static LISPT nth(LISPT list, int n)
+inline LISPT _nth(LISPT list, int n)
 {
   LISPT l;
 
@@ -305,13 +301,13 @@ static LISPT nth(LISPT list, int n)
     return NIL;
 }
 
-PRIMITIVE prim::xnth(LISPT x, LISPT p)
+PRIMITIVE prim::nth(LISPT x, LISPT p)
 {
   l.check(p, type::INTEGER);
   if(is_NIL(x))
     return NIL;
   l.check(x, type::CONS);
-  return nth(x, p->intval());
+  return _nth(x, p->intval());
 }
 
 PRIMITIVE prim::nthd(LISPT list, LISPT pos)
@@ -326,7 +322,7 @@ PRIMITIVE prim::nthd(LISPT list, LISPT pos)
   return l;
 }
 
-PRIMITIVE prim::xerror(LISPT mess)
+PRIMITIVE prim::error(LISPT mess)
 {
   l.check(mess, type::STRING);
   return l.error(USER_ERROR, mess);
@@ -413,14 +409,14 @@ void prim::init()
   mkprim(pn::CAAAR,   ::lisp::caaar,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::CLOSURE, ::lisp::closure, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::EQ,      ::lisp::eq,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::ERROR,   ::lisp::xerror,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ERROR,   ::lisp::error,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::EXIT,    ::lisp::uxexit,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::LAMBDA,  ::lisp::lambda,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::LENGTH,  ::lisp::length,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::LIST,    ::lisp::list,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::NCONC,   ::lisp::nconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::NLAMBDA, ::lisp::nlambda, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NTH,     ::lisp::xnth,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::NTH,     ::lisp::nth,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::NULL_,   ::lisp::null,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::QUOTE,   ::lisp::quote,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RPLACA,  ::lisp::rplaca,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);

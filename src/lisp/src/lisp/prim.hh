@@ -47,9 +47,13 @@ public:
   LISPT list(LISPT);
   LISPT length(LISPT);
   LISPT closure(LISPT, LISPT);
-  LISPT xnth(LISPT, LISPT);
+
+  /// @brief Return the N'th element in the list LIST.  If N is greater than
+  /// the length of LIST, return NIL.
+  ///
+  LISPT nth(LISPT, LISPT);
   LISPT nthd(LISPT, LISPT);
-  LISPT xerror(LISPT);
+  LISPT error(LISPT);
   LISPT uxexit(LISPT);
 
 private:
@@ -112,12 +116,12 @@ inline LISPT length(lisp& l, LISPT a) { return prim(l).length(a); }
 inline LISPT length(LISPT a) { return prim().length(a); }
 inline LISPT closure(lisp& l, LISPT a, LISPT b) { return prim(l).closure(a, b); }
 inline LISPT closure(LISPT a, LISPT b) { return prim().closure(a, b); }
-inline LISPT xnth(lisp& l, LISPT a, LISPT b) { return prim(l).xnth(a, b); }
-inline LISPT xnth(LISPT a, LISPT b) { return prim().xnth(a, b); }
+inline LISPT nth(lisp& l, LISPT a, LISPT b) { return prim(l).nth(a, b); }
+inline LISPT nth(LISPT a, LISPT b) { return prim().nth(a, b); }
 inline LISPT nthd(lisp& l, LISPT a, LISPT b) { return prim(l).nthd(a, b); }
 inline LISPT nthd(LISPT a, LISPT b) { return prim().nthd(a, b); }
-inline LISPT xerror(lisp& l, LISPT a) { return prim(l).xerror(a); }
-inline LISPT xerror(LISPT a) { return prim().xerror(a); }
+inline LISPT error(lisp& l, LISPT a) { return prim(l).error(a); }
+inline LISPT error(LISPT a) { return prim().error(a); }
 inline LISPT uxexit(lisp& l, LISPT a) { return prim(l).uxexit(a); }
 inline LISPT uxexit(LISPT a) { return prim().uxexit(a); }
 
