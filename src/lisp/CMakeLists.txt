@@ -60,6 +60,7 @@ target_sources(main PRIVATE
   src/lisp/io.test.cc
   src/lisp/lisp.test.cc
   src/lisp/logic.test.cc
+  src/lisp/low.test.cc
   src/lisp/map.test.cc
   src/lisp/pred.test.cc
   src/lisp/prim.test.cc

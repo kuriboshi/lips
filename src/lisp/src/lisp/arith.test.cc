@@ -18,105 +18,193 @@ TEST_CASE("Arithmetic functions")
 
   SUBCASE("+")
   {
-    auto r0 = eval(l, "(+ 1 2 3 4 5)");
-    REQUIRE(type_of(r0) == type::INTEGER);
-    CHECK(r0->intval() == 15);
-    auto r1 = eval(l, "(+ 1 1.0 2.0)");
-    REQUIRE(type_of(r1) == type::FLOAT);
-    CHECK(r1->floatval() == 4.0);
-    auto i2 = mknumber(1);
-    auto r2 = plus(cons(i2, cons(i2, NIL)));
-    REQUIRE(type_of(r2) == type::INTEGER);
-    CHECK(r2->intval() == 2);
-    auto i3 = mknumber(1);
-    auto f3 = mkfloat(1.0);
-    auto r3 = plus(cons(f3, cons(i3, NIL)));
-    REQUIRE(type_of(r3) == type::FLOAT);
-    CHECK(r3->floatval() == 2);
+    {
+      auto r0 = plus(l, mklist(1_l, 2_l, 3_l, 4_l, 5_l));
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == 15);
+    }
+    {
+      auto r0 = plus(l, mklist(1_l, 1.0_l, 2.0_l));
+      REQUIRE(type_of(r0) == type::FLOAT);
+      CHECK(r0->floatval() == 4.0);
+    }
+    {
+      auto r0 = plus(mklist(1_l, 1_l));
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == 2);
+    }
+    {
+      auto r0 = plus(mklist(1.0_l, 1_l));
+      REQUIRE(type_of(r0) == type::FLOAT);
+      CHECK(r0->floatval() == 2);
+    }
+    {
+      auto r0 = plus(mklist(1.0_l, 1_l));
+      REQUIRE(type_of(r0) == type::FLOAT);
+      CHECK(r0->floatval() == 2);
+    }
   }
 
   SUBCASE("-")
   {
-    auto r = eval(l, "(- 1 2)");
-    CHECK(r->intval() == -1);
+    {
+      auto r0 = difference(l, 1_l, 2_l);
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == -1);
+    }
+    {
+      auto r0 = difference(1_l, 2_l);
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == -1);
+    }
   }
 
   SUBCASE("*")
   {
-    auto r = eval(l, "(* 5 7)");
-    CHECK(r->intval() == 35);
+    auto r0 = ltimes(l, mklist(5_l, 7_l));
+    CHECK(r0->intval() == 35);
   }
 
-  SUBCASE("/ 1")
+  SUBCASE("/")
   {
-    auto r = eval(l, "(/ 4 2)");
-    CHECK(r->intval() == 2);
-  }
-
-  SUBCASE("/ 2")
-  {
-    auto r = eval(l, "(/ 4 (itof 2))");
-    CHECK(r->floatval() == 2.0);
+    {
+      auto r0 = divide(l, 4_l, 2_l);
+      CHECK(r0->intval() == 2);
+    }
+    {
+      auto r0 = divide(4_l, 2_l);
+      CHECK(r0->intval() == 2);
+    }
+    {
+      auto r0 = divide(l, 4_l, 2.0_l);
+      CHECK(r0->floatval() == 2.0);
+    }
+    {
+      auto r0 = divide(4_l, 2.0_l);
+      CHECK(r0->floatval() == 2.0);
+    }
   }
 
   SUBCASE("i+")
   {
-    auto r = eval(l, "(i+ 1 2 7)");
-    CHECK(r->intval() == 10);
+    {
+      auto r0 = iplus(l, mklist(1_l, 2_l, 7_l));
+      CHECK(r0->intval() == 10);
+    }
+    {
+      auto r0 = iplus(mklist(1_l, 2_l, 7_l));
+      CHECK(r0->intval() == 10);
+    }
   }
 
   SUBCASE("i-")
   {
-    auto r = eval(l, "(i- 13 2)");
-    CHECK(r->intval() == 11);
+    {
+      auto r0 = idifference(l, 1_l, 2_l);
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == -1);
+    }
+    {
+      auto r0 = idifference(1_l, 2_l);
+      REQUIRE(type_of(r0) == type::INTEGER);
+      CHECK(r0->intval() == -1);
+    }
   }
 
   SUBCASE("i*")
   {
-    auto r = eval(l, "(i* 6 8)");
-    CHECK(r->intval() == 48);
+    {
+      auto r0 = itimes(l, mklist(6_l, 8_l));
+      CHECK(r0->intval() == 48);
+    }
+    {
+      auto r0 = itimes(mklist(6_l, 8_l));
+      CHECK(r0->intval() == 48);
+    }
   }
 
   SUBCASE("i/")
   {
-    auto r = eval(l, "(i/ 5 2)");
-    CHECK(r->intval() == 2);
+    {
+      auto r0 = iquotient(l, 5_l, 2_l);
+      CHECK(r0->intval() == 2);
+    }
+    {
+      auto r0 = iquotient(5_l, 2_l);
+      CHECK(r0->intval() == 2);
+    }
   }
 
   SUBCASE("i%")
   {
-    auto r = eval(l, "(i% 5 2)");
-    CHECK(r->intval() == 1);
-  }
-
-  SUBCASE("iminus")
-  {
-    auto r = eval(l, "(iminus 1)");
-    CHECK(r->intval() == -1);
+    {
+      auto r0 = iremainder(l, 5_l, 2_l);
+      CHECK(r0->intval() == 1);
+    }
+    {
+      auto r0 = iremainder(5_l, 2_l);
+      CHECK(r0->intval() == 1);
+    }
   }
 
   SUBCASE("minus")
   {
-    auto r = eval(l, "(minus (itof 1))");
-    CHECK(r->floatval() == -1.0);
+    {
+      auto r0 = minus(l, 1.0_l);
+      CHECK(r0->floatval() == -1.0);
+    }
+    {
+      auto r0 = minus(1.0_l);
+      CHECK(r0->floatval() == -1.0);
+    }
+  }
+
+  SUBCASE("iminus")
+  {
+    {
+      auto r0 = iminus(l, 1_l);
+      CHECK(r0->intval() == -1);
+    }
+    {
+      auto r0 = eval(l, "(iminus 1)");
+      CHECK(r0->intval() == -1);
+    }
   }
 
   SUBCASE("add1")
   {
-    auto r = eval(l, "(add1 2)");
-    CHECK(r->intval() == 3);
+    {
+      auto r = add1(l, 2_l);
+      CHECK(r->intval() == 3);
+    }
+    {
+      auto r = add1(2_l);
+      CHECK(r->intval() == 3);
+    }
   }
 
   SUBCASE("sub1")
   {
-    auto r = eval(l, "(sub1 3)");
-    CHECK(r->intval() == 2);
+    {
+      auto r = sub1(l, 3_l);
+      CHECK(r->intval() == 2);
+    }
+    {
+      auto r = sub1(3_l);
+      CHECK(r->intval() == 2);
+    }
   }
 
   SUBCASE("abs")
   {
-    auto r = eval(l, "(abs -1)");
-    CHECK(r->intval() == 1);
+    {
+      auto r = absval(l, mknumber(-1));
+      CHECK(r->intval() == 1);
+    }
+    {
+      auto r = absval(mknumber(-1));
+      CHECK(r->intval() == 1);
+    }
   }
 
   SUBCASE("f+")
@@ -128,9 +216,16 @@ TEST_CASE("Arithmetic functions")
 
   SUBCASE("f-")
   {
-    auto r = eval(l, "(f- (itof 5) (itof 2))");
-    CHECK(type_of(r) == type::FLOAT);
-    CHECK(r->floatval() == 3.0);
+    {
+      auto r0 = fdifference(l, 1.0_l, 2.0_l);
+      REQUIRE(type_of(r0) == type::FLOAT);
+      CHECK(r0->floatval() == -1);
+    }
+    {
+      auto r0 = fdifference(1.0_l, 2.0_l);
+      REQUIRE(type_of(r0) == type::FLOAT);
+      CHECK(r0->floatval() == -1);
+    }
   }
 
   SUBCASE("f*")
@@ -238,24 +333,42 @@ TEST_CASE("Arithmetic functions")
 
   SUBCASE("zerop")
   {
-  }
-
-  SUBCASE("zerop 1")
-  {
-    auto r = eval(l, "(zerop 0)");
-    CHECK(is_T(r));
-  }
-
-  SUBCASE("zerop 2")
-  {
-    auto r = eval(l, "(zerop 1)");
-    CHECK(is_NIL(r));
+    {
+      auto r = zerop(l, 0_l);
+      CHECK(is_T(r));
+    }
+    {
+      auto r = zerop(0_l);
+      CHECK(is_T(r));
+    }
+    {
+      auto r = zerop(l, 1_l);
+      CHECK(is_NIL(r));
+    }
+    {
+      auto r = zerop(1_l);
+      CHECK(is_NIL(r));
+    }
   }
 
   SUBCASE("minusp")
   {
-    auto r = eval(l, "(minusp -5)");
-    CHECK(is_T(r));
+    {
+      auto r = minusp(l, mknumber(-5));
+      CHECK(is_T(r));
+    }
+    {
+      auto r = minusp(mknumber(-5));
+      CHECK(is_T(r));
+    }
+    {
+      auto r = minusp(l, 5_l);
+      CHECK(is_NIL(r));
+    }
+    {
+      auto r = minusp(5_l);
+      CHECK(is_NIL(r));
+    }
   }
 
 }
