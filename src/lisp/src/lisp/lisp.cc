@@ -61,6 +61,13 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
     auto intern = [this](const auto s) { return a().intern(s); };
 
+    // Must be early since it's used by symbol_store_t to initialize new
+    // symbols.
+    C_UNBOUND = intern("unbound");
+    C_UNBOUND->symbol().constant = true;
+    C_UNBOUND->set();
+    C_UNBOUND->settype(type::UNBOUND);
+
     auto nil = intern("nil");
     nil->symvalue(NIL);
     nil->symbol().constant = true;
@@ -95,10 +102,6 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     C_STRING = intern("string");
     C_SUBR = intern("subr");
     C_SYMBOL = intern("symbol");
-    C_UNBOUND = intern("unbound");
-    C_UNBOUND->symbol().constant = true;
-    C_UNBOUND->set();
-    C_UNBOUND->settype(type::UNBOUND);
     C_WRITE = intern("write");
 
     e().undefhook(nullptr);
