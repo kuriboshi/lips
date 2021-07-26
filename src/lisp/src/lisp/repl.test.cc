@@ -62,12 +62,32 @@ TEST_CASE("Interactive tests")
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
+    // Backtrace sets the print level to 2 which is why the '&' is printed
+    // representing a deeper level.
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 (xyzzy)
 ((lambda nil &))
 )";
     std::string expected_out = R"(> : : )";
+    CHECK(cout.str() == expected_out);
+    CHECK(cerr.str() == expected_err);
+  }
+
+  SUBCASE("Break repl (return)")
+  {
+    std::string is = R"(((lambda () (xyzzy)))
+(return "hello")
+)";
+    l.primin(std::move(std::make_unique<file_t>(is)));
+    repl repl(l);
+    l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+    repl(NIL);
+    std::string expected_err = R"(Undefined function xyzzy
+(xyzzy broken)
+)";
+    std::string expected_out = R"(> : "hello"
+> )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
   }
