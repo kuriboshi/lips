@@ -15,15 +15,13 @@ TEST_CASE("User defined functions")
 
   auto a = mkatom("a");
   auto b = mkatom("b");
-  auto r0 = eval(R"(
-(progn
-  (de l (a) a)
-  (df n (a) a)
-  (setq a 'b)
-  (cons (l a) (n a)))
-)");
-  CHECK(car(r0) == b);
-  CHECK(cdr(r0) == a);
+  auto lam = lambda(l, mklist(mkatom("a")), mklist(mkatom("a")));
+  auto nlam = nlambda(l, mklist(mkatom("a")), mklist(mkatom("a")));
+  set(l, mkatom("a"), mkatom("b"));
+  apply(l, lam, cons(a, NIL));
+  auto r0 = cons(l, eval(l, mklist(nlam, a)), eval(l, mklist(lam, a)));
+  CHECK(car(r0) == a);
+  CHECK(cdr(r0) == b);
 }
 
 }

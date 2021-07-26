@@ -672,21 +672,19 @@ bool evaluator::evlis4()
 
 bool evaluator::evlam()
 {
-  int i;
-  int ac;
-  LISPT foo;
-
   push_lisp(expression);
   push_point(env);
   push_point(dest);
-  int spr = 0;
+  int ac = 0;
+  auto spr = false;
   if((ac = fun->lamval().argcnt) < 0)
   {
     ac = -ac;
-    spr++;
+    spr = true;
   }
   dest = mkdestblock(ac);
-  for(foo = fun->lamval().arglist, i = ac; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  auto i = ac;
+  for(auto foo = fun->lamval().arglist; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
   push_func(&evaluator::evlam1);
   if(spr)
   {
