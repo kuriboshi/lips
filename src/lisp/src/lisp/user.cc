@@ -6,10 +6,13 @@
 
 #include "user.hh"
 #include "alloc.hh"
+#include "eval.hh"
 #include "file.hh"
 #include "io.hh"
+#include "iter.hh"
 #include "pred.hh"
 #include "prop.hh"
+#include "prim.hh"
 
 namespace lisp
 {
@@ -88,6 +91,23 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
   return name;
 }
 
+PRIMITIVE user::defineq(LISPT defs)
+{
+  if(is_NIL(defs))
+    return NIL;
+  auto result = cons(l, NIL, NIL);
+  auto r = result;
+  for(auto d: defs)
+  {
+    auto name = car(l, d);
+    auto lam = eval(l, cadr(l, d));
+    auto def = cons(define(name, lam), NIL);
+    rplacd(r, def);
+    r = def;
+  }
+  return result->cdr();
+}
+
 LISPT user::def(LISPT name, LISPT pars, LISPT body, type type)
 {
   l.check(name, type::SYMBOL);
@@ -107,19 +127,21 @@ PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, 
 
 namespace pn
 {
-inline constexpr auto DEFINE = "define"; // define function
-inline constexpr auto GETREP = "getrep"; // get function representation
-inline constexpr auto DE = "de";         // defile lambda function
-inline constexpr auto DF = "df";         // define nlambda function
+inline constexpr auto DEFINE = "define";   // define function
+inline constexpr auto DEFINEQ = "defineq"; // defineq function
+inline constexpr auto GETREP = "getrep";   // get function representation
+inline constexpr auto DE = "de";           // defile lambda function
+inline constexpr auto DF = "df";           // define nlambda function
 } // namespace pn
 
 void user::init()
 {
   // clang-format off
-  mkprim(pn::DEFINE, ::lisp::define, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::GETREP, ::lisp::getrep, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::DE,     ::lisp::de,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::DF,     ::lisp::df,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::DEFINE,  ::lisp::define,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::DEFINEQ, ::lisp::defineq, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETREP,  ::lisp::getrep,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::DE,      ::lisp::de,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::DF,      ::lisp::df,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 
