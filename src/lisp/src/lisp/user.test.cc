@@ -31,7 +31,29 @@ TEST_CASE("User defined functions")
       mklist(mkatom("f1"), lambda(mklist(mkatom("b")), mklist(mkatom("b")))));
     auto r0 = defineq(f0);
     REQUIRE(type_of(r0) == type::CONS);
-    CHECK(eq(r0->car(), mkatom("f0")));
+    CHECK(equal(r0, mklist(mkatom("f0"), mkatom("f1"))));
+  }
+
+  SUBCASE("Verbose flag")
+  {
+    CHECK(is_NIL(l.verbose()));
+    eval(l, "(setq verbose t)");
+    CHECK(is_T(l.verbose()));
+  }
+
+  SUBCASE("Redefine function")
+  {
+    auto f0 = define(l, mkatom("f"), lambda(mklist(mkatom("a")), mklist(mkatom("a"))));
+    auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
+    CHECK(is_NIL(redef0));
+    std::ostringstream cout;
+    auto out = std::make_unique<file_t>(cout);
+    l.primout(std::move(out));
+    eval(l, "(setq verbose t)");
+    auto f1 = define(l, mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
+    auto redef1 = getprop(mkatom("f"), mkatom("olddef"));
+    CHECK(!is_NIL(redef1));
+    CHECK(cout.str() == "(f redefined)\n");
   }
 }
 

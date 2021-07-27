@@ -20,7 +20,7 @@ public:
   top(lisp& lisp, const options_t& options, file_t& file) : base(lisp), options(options), file(file) {}
   ~top() = default;
 
-  static void init();
+  static void init(alloc&);
 
   LISPT operator()(LISPT);
 
@@ -36,10 +36,6 @@ public:
   static void remhist();
   static void trimhist();
 
-  static cvariable history; // Holds the history list.
-  static cvariable histnum; // Current event number.
-  static cvariable histmax; // Maximum number of events to save.
-
   // Read table functions
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
 
@@ -49,9 +45,27 @@ public:
 
 private:
   static LISPT alias_expanded; //For checking alias loops.
-  static cvariable topprompt;
-  static cvariable brkprompt;
-  static cvariable promptform;     // Evaluated before printing the prompt.
+
+  class cvariables
+  {
+  public:
+    cvariables(alloc& a)
+      : history(initcvar("history", NIL)),
+        histnum(initcvar("histnum", a.mknumber(1L))),
+        histmax(initcvar("histmax", a.mknumber(100L))),
+        topprompt(initcvar("prompt", a.mkstring("!_"))),
+        brkprompt(initcvar("brkprompt", a.mkstring("!:"))),
+        promptform(initcvar("promptform", NIL))
+    {}
+
+    cvariable& history; // Holds the history list.
+    cvariable& histnum; // Current event number.
+    cvariable& histmax; // Maximum number of events to save.
+    cvariable& topprompt;
+    cvariable& brkprompt;
+    cvariable& promptform;     // Evaluated before printing the prompt.
+  };
+  static std::unique_ptr<cvariables> variables;
 
   const options_t& options;
   file_t& file;

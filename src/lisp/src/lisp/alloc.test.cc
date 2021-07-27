@@ -68,11 +68,11 @@ TEST_CASE("C Variables")
   lisp l;
   current c(l);
 
-  auto& cvar = initcvar("cvar", mknumber(123));
+  auto& cvar = initcvar("cvar", 123_l);
   auto a = eval(cvar);
-  CHECK(eq(cvar, mknumber(123)));
-  cvar = mknumber(321);
-  CHECK(eq(cvar, mknumber(321)));
+  CHECK(eq(cvar, 123_l));
+  cvar = 321_l;
+  CHECK(eq(cvar, 321_l));
 
   auto r0 = eval(cvar);
   CHECK(r0->intval() == 321);
@@ -86,6 +86,14 @@ TEST_CASE("C Variables")
 
   cvar = mkstring("hello");
   CHECK(cvar->getstr() == "hello");
+
+  auto& xvar = initcvar("xvar", "hello"_l);
+  eval(l, "(setq xvar \"world\")");
+  CHECK(xvar->getstr() == "world");
+
+  auto& yvar = initcvar("yvar", 0_l);
+  eval(l, "(setq yvar \"string\")");
+  CHECK(yvar->getstr() == "string");
 }
 
 TEST_CASE("obarray")

@@ -180,7 +180,7 @@ public:
   explicit cvariable(LISPT value): _value(value) {}
   cvariable(): _value(NIL) {}
   ~cvariable() = default;
-  cvariable(const cvariable& other): _value(other._value) {}
+  cvariable(const cvariable& other) = delete;
   cvariable(cvariable&& other) noexcept
   {
     _value = std::move(other._value);
@@ -190,11 +190,12 @@ public:
     std::swap(_value, other._value);
     return *this;
   }
-  cvariable& operator=(const cvariable& other)
+  cvariable& operator=(const cvariable& other) = delete;
+  cvariable& operator=(LISPT value)
   {
-    return *this = cvariable(other);
+    _value = value;
+    return *this;
   }
-  cvariable& operator=(LISPT value) { _value = value; return *this; }
 
   /// @brief Automatically convert to the LISPT value in a LISPT context.
   operator LISPT () const noexcept { return _value; }
@@ -263,8 +264,8 @@ public:
   void set(closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
-  auto fileval() -> file_t& { return *std::get<std::unique_ptr<file_t>>(_u).get(); }
-  void set(std::unique_ptr<file_t> f) { _type = type::FILET; _u = std::move(f); }
+  auto fileval() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u).get(); }
+  void set(std::shared_ptr<file_t> f) { _type = type::FILET; _u = f; }
   auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
   void set(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
@@ -296,7 +297,7 @@ private:
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)
-    std::unique_ptr<file_t>,    // FILE (11)
+    std::shared_ptr<file_t>,    // FILE (11)
     cvariable                   // CVARIABLE (12)
     > _u;
 };
@@ -390,9 +391,9 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  cvariable currentbase;
-  cvariable verbose;
-  cvariable version;
+  cvariable& currentbase() const { return _variables->_currentbase; }
+  cvariable& verbose() const { return _variables->_verbose; }
+  cvariable& version() const { return _variables->_version; }
 
   // clang-format off
   rtinfo currentrt =
@@ -499,6 +500,16 @@ private:
   std::unique_ptr<file_t> _stderr;
   std::unique_ptr<file_t> _stdin;
   static lisp* _current;
+
+  class cvariables
+  {
+  public:
+    cvariables(alloc&);
+    cvariable& _currentbase;
+    cvariable& _verbose;
+    cvariable& _version;
+  };
+  std::unique_ptr<cvariables> _variables;
 
   static std::map<int, std::string> messages;
   // Some standard messages, all of them not necessarily used

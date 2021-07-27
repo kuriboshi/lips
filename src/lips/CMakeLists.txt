@@ -3,6 +3,7 @@
 #
 add_executable(lips)
 target_sources(lips PRIVATE
+  env.cc
   exec.cc
   glob.cc
   main.cc
@@ -11,6 +12,7 @@ target_sources(lips PRIVATE
   top.cc
 )
 target_sources(lips PRIVATE
+  env.hh
   exec.hh
   glob.hh
   main.hh

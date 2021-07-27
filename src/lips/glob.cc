@@ -210,7 +210,7 @@ std::optional<std::string> glob::extilde(const std::string& w, bool report)
   std::string s;
   if(p == w.end() || *p == '/')
   {
-    s = home->getstr();
+    s = env->home->getstr();
     std::copy(p, w.end(), std::back_inserter(s));
   }
   else
@@ -408,7 +408,7 @@ LISPT glob::expandfiles(const std::string& wild, bool all, bool report, bool sor
   struct {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }
   } reverse;
-  if(!is_NIL(globsort) || sort)
+  if(!is_NIL(env->globsort) || sort)
     std::sort(files.begin(), files.end(), reverse);
   return glob::buildlist(files);
 }

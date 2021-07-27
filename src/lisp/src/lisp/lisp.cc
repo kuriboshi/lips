@@ -108,8 +108,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     e().breakhook(nullptr);
   }
 
-  currentbase = initcvar("base", a().mknumber(10L));
-  version = initcvar("version", a().mkstring(VERSION));
+  _variables = std::make_unique<cvariables>(_alloc);
 
   Map::init();
   arith::init();
@@ -176,6 +175,11 @@ LISPT lisp::break0(LISPT exp)
 {
   return repl(exp);
 }
+
+lisp::cvariables::cvariables(alloc& a)
+  : _currentbase(initcvar("base", a.mknumber(10L))), _verbose(initcvar("verbose", NIL)),
+    _version(initcvar("version", a.mkstring(VERSION)))
+{}
 
 lisp* lisp::_current = nullptr;
 std::map<int, std::string> lisp::messages;

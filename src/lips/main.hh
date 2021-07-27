@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <memory>
 #include <lisp/lisp.hh>
+#include "env.hh"
 
 struct options_t
 {
@@ -18,9 +20,7 @@ struct options_t
 };
 
 extern options_t options;
-extern lisp::cvariable path;
-extern lisp::cvariable home;
-extern lisp::cvariable globsort;
+extern std::unique_ptr<lisp::environment> env;
 
 extern lisp::LISPT C_ALIAS;
 extern lisp::LISPT C_AMPER;

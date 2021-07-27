@@ -28,6 +28,7 @@
 #include "main.hh"
 #include "top.hh"
 #include "exec.hh"
+#include "env.hh"
 
 using namespace lisp;
 using namespace std::literals;
@@ -519,7 +520,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
   auto cmd = exechash.find(*command);
 
   std::string comdir;
-  for(auto cdir: path)
+  for(auto cdir: env->path)
   {
     if(is_NIL(cdir) || cdir->getstr() == ".")
       comdir = ".";
@@ -718,7 +719,7 @@ PRIMITIVE exec::rehash()
 {
   exechash.clear();
 
-  for(auto p: path)
+  for(auto p: env->path)
   {
     if(is_NIL(p))
       continue;
@@ -830,7 +831,7 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   LISPT ndir;
 
   if(is_NIL(dir))
-    ndir = home;
+    ndir = env->home;
   else
   {
     ndir = expand(dir);

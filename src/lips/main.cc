@@ -23,6 +23,7 @@
 #include <lisp/libisp.hh>
 #include <lisp/except.hh>
 #include "main.hh"
+#include "env.hh"
 #include "exec.hh"
 #include "top.hh"
 #include "term.hh"
@@ -187,10 +188,6 @@ void init_all_signals()
 
 using namespace lisp;
 
-cvariable path;        /* Search path for executables. */
-cvariable home;        /* Home directory. */
-cvariable globsort;    /* To sort or not during globbing. */
-
 LISPT C_ALIAS;
 LISPT C_AMPER;
 LISPT C_BACK;
@@ -208,33 +205,7 @@ LISPT C_REDIR_FROM;
 LISPT C_REDIR_TO;
 LISPT C_SEMI;
 
-/*
- * Processes the environment variable PATH and returns a list
- * of all directories in PATH.
- */
-LISPT mungepath(const std::string& pstr)
-{
-  LISPT result = NIL;
-  auto pos = pstr.size();
-  for(;;)
-  {
-    auto next = pstr.rfind(':', pos);
-    if(next == std::string::npos)
-    {
-      result = cons(mkstring(pstr.substr(0, pos - next)), result);
-      break;
-    }
-    result = cons(mkstring(pstr.substr(next + 1, pos - next)), result);
-    pos = next;
-    if(pos == 0)
-    {
-      result = cons(mkstring(""), result);
-      break;
-    }
-    --pos;
-  }
-  return result;
-}
+std::unique_ptr<environment> env;
 
 void onbreak()
 {
@@ -370,12 +341,10 @@ inline std::unique_ptr<::lisp::lisp> init()
   C_REDIR_TO = alloc::intern(PN_REDIR_TO);
   C_SEMI = alloc::intern(";");
 
-  top::init();
+  top::init(l->a());
 
-  path = initcvar("path", mungepath(getenv("PATH")));
-  home = initcvar("home", mkstring(getenv("HOME")));
+  env = std::make_unique<environment>();
 
-  globsort = initcvar("globsort", T);
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
   breakhook(onbreak);

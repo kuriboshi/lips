@@ -25,7 +25,7 @@ std::string current_prompt;
  */
 void top::phist()
 {
-  for(auto hl: history)
+  for(auto hl: variables->history)
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
     prinbody(hl->cdr(), lisp::current().stdout(), true);
@@ -38,8 +38,8 @@ void top::phist()
  */
 void top::addhist(LISPT what)
 {
-  history = cons(cons(histnum, what), history);
-  histnum = add1(histnum);
+  variables->history = cons(cons(variables->histnum, what), variables->history);
+  variables->histnum = add1(variables->histnum);
 }
 
 /*
@@ -47,8 +47,8 @@ void top::addhist(LISPT what)
  */
 void top::remhist()
 {
-  history = history->cdr();
-  histnum = sub1(histnum);
+  variables->history = variables->history->cdr();
+  variables->histnum = sub1(variables->histnum);
 }
 
 /*
@@ -56,8 +56,8 @@ void top::remhist()
  */
 void top::trimhist()
 {
-  LISPT hl = history;
-  for(int i = 0; i < histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
+  LISPT hl = variables->history;
+  for(int i = 0; i < variables->histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
     ;
   if(!is_NIL(hl))
     rplacd(hl, NIL);
@@ -148,7 +148,7 @@ void top::promptprint(LISPT prompt)
     {
       if(c == '!')
       {
-        current_prompt += std::to_string(top::histnum->intval());
+        current_prompt += std::to_string(top::variables->histnum->intval());
         continue;
       }
       else if(c == '\\')
@@ -173,15 +173,15 @@ LISPT top::operator()(LISPT exp)
     //
     if(options.interactive)
     {
-      if(type_of(eval(l, promptform)) == type::ERROR)
+      if(type_of(eval(l, variables->promptform)) == type::ERROR)
       {
         print(mkstring(l, "Error in promptform, reset to nil"), T);
-        promptform = NIL;
+        variables->promptform = NIL;
       }
       if(_level > 1)
-        promptprint(brkprompt);
+        promptprint(variables->brkprompt);
       else
-        promptprint(topprompt);
+        promptprint(variables->topprompt);
     }
     input_exp = readline(file);
     if(type_of(input_exp) == type::ENDOFFILE)
@@ -246,13 +246,13 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
   if(issepr(l, c))
     return C_EXCL;
   l.echoline = true;
-  LISPT tmp = histget(0L, history);
+  LISPT tmp = histget(0L, variables->history);
   if(type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
     tmp = tmp->car();
   switch(c)
   {
     case '!':
-      return histget(0L, history);
+      return histget(0L, variables->history);
       break;
     case '$':
       while(type_of(tmp->cdr()) == type::CONS) tmp = tmp->cdr();
@@ -270,12 +270,12 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
       at = io(l).ratom(file);
       if(type_of(at) == type::INTEGER)
       {
-        tmp = histget(at->intval(), history);
+        tmp = histget(at->intval(), variables->history);
         return tmp;
       }
       if(type_of(at) == type::SYMBOL)
       {
-        for(auto h: history)
+        for(auto h: variables->history)
         {
           tmp = histget(0L, h);
           if(!is_NIL(tmp) && type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
@@ -294,25 +294,15 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
   return NIL;
 }
 
-void top::init()
+void top::init(alloc& a)
 {
-  history = initcvar("history", NIL);
-  histnum = initcvar("histnum", mknumber(1L));
-  histmax = initcvar("histmax", mknumber(100L));
-  topprompt = initcvar("prompt", mkstring("!_"));
-  brkprompt = initcvar("brkprompt", mkstring("!:"));
-  promptform = initcvar("promptform", NIL);
+  variables = std::make_unique<cvariables>(a);
   mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }
 
-cvariable top::history;
-cvariable top::histnum;
-cvariable top::histmax;
 LISPT top::input_exp;           // The input expression.
 std::function<LISPT(LISPT)> top::transform_hook;;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded;
-cvariable top::topprompt;
-cvariable top::brkprompt;
-cvariable top::promptform;
+std::unique_ptr<top::cvariables> top::variables;
