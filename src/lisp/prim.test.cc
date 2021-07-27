@@ -41,35 +41,77 @@ TEST_CASE("Primary functions")
 
   SUBCASE("C.R, C..R, C...R should return NIL for non-CONS types")
   {
-    CHECK(eval(l, "(car 'a)") == NIL);
-    CHECK(eval(l, "(cdr 'a)") == NIL);
+    auto sym = mkatom("a");
+    CHECK(car(sym) == NIL);
+    CHECK(cdr(sym) == NIL);
 
-    CHECK(eval(l, "(caar 'a)") == NIL);
-    CHECK(eval(l, "(cadr 'a)") == NIL);
-    CHECK(eval(l, "(cdar 'a)") == NIL);
-    CHECK(eval(l, "(cddr 'a)") == NIL);
-
-    CHECK(eval(l, "(caaar 'a)") == NIL);
-    CHECK(eval(l, "(caadr 'a)") == NIL);
-    CHECK(eval(l, "(cadar 'a)") == NIL);
-    CHECK(eval(l, "(caddr 'a)") == NIL);
-    CHECK(eval(l, "(cdaar 'a)") == NIL);
-    CHECK(eval(l, "(cdadr 'a)") == NIL);
-    CHECK(eval(l, "(cddar 'a)") == NIL);
-    CHECK(eval(l, "(cdddr 'a)") == NIL);
+    CHECK(caar(sym) == NIL);
+    CHECK(cadr(sym) == NIL);
+    CHECK(cdar(sym) == NIL);
+    CHECK(cddr(sym) == NIL);
+    
+    CHECK(caaar(sym) == NIL);
+    CHECK(caadr(sym) == NIL);
+    CHECK(cadar(sym) == NIL);
+    CHECK(caddr(sym) == NIL);
+    CHECK(cdaar(sym) == NIL);
+    CHECK(cdadr(sym) == NIL);
+    CHECK(cddar(sym) == NIL);
+    CHECK(cdddr(sym) == NIL);
   }
 
   SUBCASE("append")
   {
-    auto list0 = eval("(list 1 2)");
-    auto list1 = eval("(list 3)");
-    auto list2 = eval("(list 4)");
+    auto list0 = mklist(1_l, 2_l);
+    auto list1 = mklist(3_l);
     auto list = append(cons(list0, cons(list1, NIL)));
-    auto r0 = iplus(list);
-    CHECK(r0->intval() == 6);
-    list = append(cons(list, cons(list2, NIL)));
+    // Original list is unchanged
+    auto r0 = iplus(list0);
+    CHECK(r0->intval() == 3);
     auto r1 = iplus(list);
-    CHECK(r1->intval() == 10);
+    CHECK(r1->intval() == 6);
+    auto list2 = mklist(4_l);
+    list = append(cons(list, cons(list2, NIL)));
+    auto r2 = iplus(list);
+    CHECK(r2->intval() == 10);
+  }
+
+  SUBCASE("nconc")
+  {
+    auto list0 = mklist(1_l, 2_l);
+    auto list1 = mklist(3_l);
+    auto list = nconc(cons(list0, cons(list1, NIL)));
+    // Original list changes
+    auto r0 = iplus(list0);
+    CHECK(r0->intval() == 6);
+    auto r1 = iplus(list);
+    CHECK(r1->intval() == 6);
+    auto list2 = mklist(4_l);
+    list = nconc(cons(list, cons(list2, NIL)));
+    // Original list changes
+    auto r2 = iplus(list0);
+    CHECK(r2->intval() == 10);
+    auto r3 = iplus(list);
+    CHECK(r3->intval() == 10);
+  }
+
+  SUBCASE("tconc")
+  {
+    // This example is from the Interlisp manual page 6.2.
+    auto foo = tconc(NIL, 1_l);
+    tconc(foo, 4_l);
+    tconc(foo, 3_l);
+    tconc(foo, 2_l);
+    tconc(foo, 1_l);
+    CHECK(equal(car(foo), mklist(1_l, 4_l, 3_l, 2_l, 1_l)));
+    // Another example from the Interlisp manual
+    foo = cons(NIL, NIL);
+    tconc(foo, 5_l);
+    tconc(foo, 4_l);
+    tconc(foo, 3_l);
+    tconc(foo, 2_l);
+    tconc(foo, 1_l);
+    CHECK(equal(car(foo), mklist(5_l, 4_l, 3_l, 2_l, 1_l)));
   }
 }
 
