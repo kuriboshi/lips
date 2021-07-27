@@ -21,9 +21,6 @@ static int macro(lisp::lisp& l, lisp::LISPT*)
 
 int main(int argc, const char** argv)
 {
-  lisp::lisp lisp;
-  lisp::repl repl(lisp);
-  lisp.repl = [&repl](lisp::LISPT) -> lisp::LISPT { return repl(lisp::NIL); };
   bool test = false;
   std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
@@ -35,6 +32,7 @@ int main(int argc, const char** argv)
     }
     lisp::load(lisp::mkstring(f));
   }
+  lisp::lisp lisp;
   if(test)
   {
     doctest::Context context;
@@ -42,6 +40,8 @@ int main(int argc, const char** argv)
     auto result = context.run();
     return result;
   }
+  lisp::repl repl(lisp);
+  lisp.repl = [&repl](lisp::LISPT) -> lisp::LISPT { return repl(lisp::NIL); };
   while(true)
   {
     try
