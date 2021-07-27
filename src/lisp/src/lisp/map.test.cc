@@ -10,23 +10,51 @@ namespace lisp
 
 TEST_CASE("Map functions")
 {
+  lisp l;
+  current c(l);
+
   SUBCASE("map")
   {
+    auto& cvar = initcvar("cvar", NIL);
+    auto r0 = eval(l, R"(
+(mapc '(1 2 3)
+      (lambda (a)
+       (setq cvar (cons a cvar)))))");
+    CHECK(type_of(cvar) == type::CONS);
+    CHECK(car(cvar)->intval() == 3);
+    CHECK(cadr(cvar)->intval() == 2);
+    CHECK(caddr(cvar)->intval() == 1);
   }
 
   SUBCASE("mapc")
   {
+    auto& cvar = initcvar("cvar", NIL);
+    auto r0 = eval(l, R"(
+(map '(1 2 3)
+      (lambda (a)
+       (setq cvar (cons (car a) cvar)))))");
+    CHECK(type_of(cvar) == type::CONS);
+    CHECK(car(cvar)->intval() == 3);
+    CHECK(cadr(cvar)->intval() == 2);
+    CHECK(caddr(cvar)->intval() == 1);
   }
 
   SUBCASE("maplist")
   {
+    auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
+    auto f = eval(l, "(lambda (a) (car a))");
+    auto r0 = maplist(l, ls, f, NIL);
+    CHECK(car(r0)->intval() == 1);
+    CHECK(cadr(r0)->intval() == 2);
+    CHECK(caddr(r0)->intval() == 3);
+    auto r1 = maplist(ls, f, NIL);
+    CHECK(car(r1)->intval() == 1);
+    CHECK(cadr(r1)->intval() == 2);
+    CHECK(caddr(r1)->intval() == 3);
   }
 
   SUBCASE("mapcar")
   {
-    lisp l;
-    current c(l);
-
     auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
     auto f = eval(l, "(lambda (a) (+ a 1))");
     auto r0 = mapcar(l, ls, f, NIL);
