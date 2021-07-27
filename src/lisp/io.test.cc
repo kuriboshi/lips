@@ -69,6 +69,12 @@ TEST_CASE("Read lisp objects")
     auto result1 = readline(lisp, f1);
     CHECK(equal(lisp, result0, result1) != NIL);
   }
+
+  SUBCASE("floatp")
+  {
+    auto f0 = lispread("-1.2345E-2");
+    CHECK(f0->floatval() == doctest::Approx(-1.2345E-2).epsilon(0.01));
+  }
 }
 
 }

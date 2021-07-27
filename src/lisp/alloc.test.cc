@@ -107,6 +107,10 @@ TEST_CASE("obarray")
   auto a1 = mkatom("bar");
   obs = obarray();
   CHECK(length(obs)->intval() == 2);
+
+  // Test calling from lisp
+  obs = eval(l, "(obarray)");
+  CHECK(length(obs)->intval() == 2);
 }
 
 TEST_CASE("reclaim + freecount")
