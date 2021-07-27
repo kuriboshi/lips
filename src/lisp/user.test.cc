@@ -34,6 +34,19 @@ TEST_CASE("User defined functions")
     CHECK(equal(r0, mklist(mkatom("f0"), mkatom("f1"))));
   }
 
+  SUBCASE("getrep")
+  {
+    auto f = lambda(mklist(mkatom("a")), mklist(mklist(mkatom("cons"), mkatom("a"), NIL)));
+    auto rep0 = getrep(f);
+    // There is a problem here that the symbol 'nil' is not considered equal to
+    // the empty list '()'.
+    std::string s("(lambda (a) (cons a ()))\n");
+    auto expected = lispread(s);
+    CHECK(!is_NIL(equal(rep0, expected)));
+    auto r0 = apply(f, mklist(0_l));
+    CHECK(equal(r0, cons(0_l, NIL)));
+  }
+
   SUBCASE("Verbose flag")
   {
     CHECK(is_NIL(l.verbose()));
