@@ -213,19 +213,19 @@ void file::init()
   C_READ = intern(pn::READ);
 
   // clang-format off
-  mkprim(pn::CLOSE,    ::lisp::close,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::OPEN,     ::lisp::open,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CLOSE,    ::lisp::close,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::OPEN,     ::lisp::open,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

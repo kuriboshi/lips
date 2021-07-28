@@ -18,10 +18,10 @@ alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection()
   newpage(); // Allocate one page of storage
 
   // clang-format off
-  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

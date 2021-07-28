@@ -93,10 +93,10 @@ inline constexpr auto MAPCAR = "mapcar";   // mapc and build result
 void Map::init()
 {
   // clang-format off
-  mkprim(pn::MAP,     ::lisp::map,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::MAPC,    ::lisp::mapc,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::MAPLIST, ::lisp::maplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::MAPCAR,  ::lisp::mapcar,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::MAP,     ::lisp::map,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPC,    ::lisp::mapc,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPLIST, ::lisp::maplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPCAR,  ::lisp::mapcar,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

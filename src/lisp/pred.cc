@@ -181,16 +181,16 @@ inline constexpr auto TYPEOF = "typeof";   // return type as an atom
 void pred::init()
 {
   // clang-format off
-  mkprim(pn::LISTP,   ::lisp::listp,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::NLISTP,  ::lisp::nlistp,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::NEQ,     ::lisp::neq,     subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::NUMBERP, ::lisp::numberp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::MEMB,    ::lisp::memb,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::EQUAL,   ::lisp::equal,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::BOUNDP,  ::lisp::boundp,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::LITATOM, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SYMBOLP, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::TYPEOF,  ::lisp::xtypeof, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::LISTP,   ::lisp::listp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NLISTP,  ::lisp::nlistp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NEQ,     ::lisp::neq,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NUMBERP, ::lisp::numberp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MEMB,    ::lisp::memb,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EQUAL,   ::lisp::equal,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::BOUNDP,  ::lisp::boundp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LITATOM, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SYMBOLP, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TYPEOF,  ::lisp::xtypeof, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

@@ -421,7 +421,7 @@ bool evaluator::peval1()
         push_func(&evaluator::ev2);
         dest = mkdestblock(fun->subrval().argcount());
         noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
-        if(fun->subrval().spread == subr_t::spread::SPREAD)
+        if(fun->subrval().spread == subr_t::spread::NOSPREAD)
         {
           if(!noeval)
           {
@@ -484,7 +484,7 @@ bool evaluator::peval2()
         push_func(&evaluator::ev2);
         noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
         dest = mkdestblock(fun->subrval().argcount());
-        if(fun->subrval().spread == subr_t::spread::SPREAD)
+        if(fun->subrval().spread == subr_t::spread::NOSPREAD)
           cont = &evaluator::spread;
         else
           cont = &evaluator::evalargs;
@@ -1045,13 +1045,13 @@ inline constexpr auto ENVGET = "envget";         // examine environment
 void evaluator::init()
 {
   // clang-format off
-  mkprim(pn::E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::APPLY,      ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::APPLYSTAR,  ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::BAKTRACE,   ::lisp::baktrace,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::E,          ::lisp::eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EVAL,       ::lisp::eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::APPLY,      ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::APPLYSTAR,  ::lisp::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::BAKTRACE,   ::lisp::baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::TOPOFSTACK, ::lisp::topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ENVGET,     ::lisp::envget,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
 }
 

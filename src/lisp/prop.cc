@@ -87,11 +87,11 @@ inline constexpr auto REMPROP = "remprop";   // remove prop
 void prop::init()
 {
   // clang-format off
-  mkprim(pn::SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

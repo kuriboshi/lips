@@ -66,10 +66,10 @@ inline constexpr auto IF = "if";   // if a then b else c
 void logic::init()
 {
   // clang-format off
-  mkprim(pn::AND, ::lisp::p_and, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::OR,  ::lisp::p_or,  subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NOT, ::lisp::p_not, subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::IF,  ::lisp::xif,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::AND, ::lisp::p_and, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::OR,  ::lisp::p_or,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::NOT, ::lisp::p_not, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::IF,  ::lisp::xif,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

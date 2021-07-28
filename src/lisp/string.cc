@@ -100,13 +100,13 @@ inline constexpr auto STRCMP = "strcmp";   // compare strings
 void string::init()
 {
   // clang-format off
-  mkprim(pn::STRINGP, ::lisp::stringp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::STREQ,   ::lisp::streq,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::CONCAT,  ::lisp::concat,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::STRCMP,  ::lisp::strcmp, subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRINGP, ::lisp::stringp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STREQ,   ::lisp::streq,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CONCAT,  ::lisp::concat,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STRCMP,  ::lisp::strcmp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

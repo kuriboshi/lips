@@ -137,11 +137,11 @@ inline constexpr auto DF = "df";           // define nlambda function
 void user::init()
 {
   // clang-format off
-  mkprim(pn::DEFINE,  ::lisp::define,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::DEFINEQ, ::lisp::defineq, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GETREP,  ::lisp::getrep,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::DE,      ::lisp::de,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::DF,      ::lisp::df,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::DEFINE,  ::lisp::define,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::DEFINEQ, ::lisp::defineq, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETREP,  ::lisp::getrep,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::DE,      ::lisp::de,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::DF,      ::lisp::df,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
