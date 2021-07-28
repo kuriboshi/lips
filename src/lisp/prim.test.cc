@@ -113,6 +113,33 @@ TEST_CASE("Primary functions")
     tconc(foo, 1_l);
     CHECK(equal(car(foo), mklist(5_l, 4_l, 3_l, 2_l, 1_l)));
   }
+
+  SUBCASE("attach")
+  {
+    auto foo = mklist(2_l);
+    attach(1_l, foo);
+    CHECK(equal(foo, mklist(1_l, 2_l)));
+  }
+
+  SUBCASE("nth and nthd")
+  {
+    {
+      auto foo = mklist(1_l, 2_l, 3_l, 4_l, 5_l);
+      CHECK(eq(nth(foo, 2_l), 2_l));
+      CHECK(eq(nth(foo, 3_l), 3_l));
+      CHECK(eq(nth(foo, 4_l), 4_l));
+      CHECK(eq(nth(foo, 5_l), 5_l));
+    }
+    {
+      // In Interlisp nth behaves like nthd and there appears to be no
+      // equivalent to our nth.
+      auto foo = mklist(1_l, 2_l, 3_l, 4_l, 5_l);
+      CHECK(equal(nthd(foo, 2_l), mklist(2_l, 3_l, 4_l, 5_l)));
+      CHECK(equal(nthd(foo, 3_l), mklist(3_l, 4_l, 5_l)));
+      CHECK(equal(nthd(foo, 4_l), mklist(4_l, 5_l)));
+      CHECK(equal(nthd(foo, 5_l), mklist(5_l)));
+    }
+  }
 }
 
 }
