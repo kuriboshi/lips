@@ -18,25 +18,46 @@ TEST_CASE("Primary functions")
     auto sample = eval("(cons 1 2)");
     CHECK(car(sample)->intval() == 1);
     CHECK(cdr(sample)->intval() == 2);
+
+    CHECK(car(l, sample)->intval() == 1);
+    CHECK(cdr(l, sample)->intval() == 2);
   }
 
   SUBCASE("C..R and C...R")
   {
-    auto sample0 = eval("(quote ((1 . 2) 3 . 4))");
-    CHECK(caar(sample0)->intval() == 1);
-    CHECK(cdar(sample0)->intval() == 2);
-    CHECK(cadr(sample0)->intval() == 3);
-    CHECK(cddr(sample0)->intval() == 4);
+    {
+      auto sample = eval("(quote ((1 . 2) 3 . 4))");
+      CHECK(caar(sample)->intval() == 1);
+      CHECK(cdar(sample)->intval() == 2);
+      CHECK(cadr(sample)->intval() == 3);
+      CHECK(cddr(sample)->intval() == 4);
 
-    auto sample1 = eval("(quote (((1 . 2) 3 . 4) (5 . 6) 7 . 8))");
-    CHECK(caaar(sample1)->intval() == 1);
-    CHECK(cdaar(sample1)->intval() == 2);
-    CHECK(cadar(sample1)->intval() == 3);
-    CHECK(cddar(sample1)->intval() == 4);
-    CHECK(caadr(sample1)->intval() == 5);
-    CHECK(cdadr(sample1)->intval() == 6);
-    CHECK(caddr(sample1)->intval() == 7);
-    CHECK(cdddr(sample1)->intval() == 8);
+      CHECK(caar(l, sample)->intval() == 1);
+      CHECK(cdar(l, sample)->intval() == 2);
+      CHECK(cadr(l, sample)->intval() == 3);
+      CHECK(cddr(l, sample)->intval() == 4);
+    }
+
+    {
+      auto sample = eval("(quote (((1 . 2) 3 . 4) (5 . 6) 7 . 8))");
+      CHECK(caaar(sample)->intval() == 1);
+      CHECK(cdaar(sample)->intval() == 2);
+      CHECK(cadar(sample)->intval() == 3);
+      CHECK(cddar(sample)->intval() == 4);
+      CHECK(caadr(sample)->intval() == 5);
+      CHECK(cdadr(sample)->intval() == 6);
+      CHECK(caddr(sample)->intval() == 7);
+      CHECK(cdddr(sample)->intval() == 8);
+
+      CHECK(caaar(l, sample)->intval() == 1);
+      CHECK(cdaar(l, sample)->intval() == 2);
+      CHECK(cadar(l, sample)->intval() == 3);
+      CHECK(cddar(l, sample)->intval() == 4);
+      CHECK(caadr(l, sample)->intval() == 5);
+      CHECK(cdadr(l, sample)->intval() == 6);
+      CHECK(caddr(l, sample)->intval() == 7);
+      CHECK(cdddr(l, sample)->intval() == 8);
+    }
   }
 
   SUBCASE("C.R, C..R, C...R should return NIL for non-CONS types")
@@ -58,6 +79,13 @@ TEST_CASE("Primary functions")
     CHECK(cdadr(sym) == NIL);
     CHECK(cddar(sym) == NIL);
     CHECK(cdddr(sym) == NIL);
+  }
+
+  SUBCASE("atom")
+  {
+    auto sym = mkatom("sym");
+    CHECK(!is_NIL(atom(sym)));
+    CHECK(!is_NIL(atom(l, sym)));
   }
 
   SUBCASE("append")
@@ -87,7 +115,7 @@ TEST_CASE("Primary functions")
     auto r1 = iplus(list);
     CHECK(r1->intval() == 6);
     auto list2 = mklist(4_l);
-    list = nconc(cons(list, cons(list2, NIL)));
+    list = nconc(l, cons(list, cons(list2, NIL)));
     // Original list changes
     auto r2 = iplus(list0);
     CHECK(r2->intval() == 10);
@@ -106,11 +134,11 @@ TEST_CASE("Primary functions")
     CHECK(equal(car(foo), mklist(1_l, 4_l, 3_l, 2_l, 1_l)));
     // Another example from the Interlisp manual
     foo = cons(NIL, NIL);
-    tconc(foo, 5_l);
+    tconc(l, foo, 5_l);
     tconc(foo, 4_l);
-    tconc(foo, 3_l);
+    tconc(l, foo, 3_l);
     tconc(foo, 2_l);
-    tconc(foo, 1_l);
+    tconc(l, foo, 1_l);
     CHECK(equal(car(foo), mklist(5_l, 4_l, 3_l, 2_l, 1_l)));
   }
 
@@ -119,6 +147,15 @@ TEST_CASE("Primary functions")
     auto foo = mklist(2_l);
     attach(1_l, foo);
     CHECK(equal(foo, mklist(1_l, 2_l)));
+    attach(l, 0_l, foo);
+    CHECK(equal(foo, mklist(0_l, 1_l, 2_l)));
+  }
+
+  SUBCASE("length")
+  {
+    auto list = mklist(0_l, 1_l, 2_l, 3_l);
+    CHECK(length(list)->intval() == 4);
+    CHECK(length(l, list)->intval() == 4);
   }
 
   SUBCASE("nth and nthd")
@@ -139,6 +176,14 @@ TEST_CASE("Primary functions")
       CHECK(equal(nthd(foo, 4_l), mklist(4_l, 5_l)));
       CHECK(equal(nthd(foo, 5_l), mklist(5_l)));
     }
+  }
+
+  SUBCASE("null")
+  {
+    CHECK(!is_NIL(null(NIL)));
+    CHECK(!is_NIL(null(l, NIL)));
+    CHECK(is_NIL(null(0_l)));
+    CHECK(is_NIL(null(l, 0_l)));
   }
 }
 
