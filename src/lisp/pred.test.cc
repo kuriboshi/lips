@@ -39,6 +39,16 @@ TEST_CASE("Predicate functions")
     CHECK(nlistp(mkstring("hello")) != NIL);
   }
 
+  SUBCASE("boundp")
+  {
+    CHECK(is_NIL(boundp("string"_l)));
+    auto ub = mkatom("ub");
+    CHECK(is_NIL(boundp(l, ub)));
+    auto bd = mkatom("bd");
+    set(bd, NIL);
+    CHECK(is_T(boundp(l, bd)));
+  }
+
   SUBCASE("memb")
   {
     CHECK(memb(l, mknumber(2), mklist(mknumber(1), mknumber(2), mknumber(3))) != NIL);
