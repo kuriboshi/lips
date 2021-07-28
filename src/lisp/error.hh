@@ -39,7 +39,8 @@ inline constexpr int UNBOUND_VARIABLE = (PRINT_ARG | 25);
 inline constexpr int KBD_BREAK = (PRINT_ARG | 26);
 inline constexpr int AMBIGUOUS = (PRINT_ARG | 27);
 inline constexpr int USER_ERROR = (PRINT_ARG | 28);
-inline constexpr int MAXMESSAGE = 29;
+inline constexpr int CANT_LOAD = (PRINT_ARG | 29);
+inline constexpr int MAXMESSAGE = 30;
 
 inline constexpr int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
 

@@ -25,7 +25,15 @@ int main(int argc, const char** argv)
       test = true;
       break;
     }
-    lisp::load(lisp::mkstring(f));
+    try
+    {
+      lisp::load(lisp::mkstring(f));
+    }
+    catch(const std::exception& ex)
+    {
+      std::cout << f << ": " << ex.what() << std::endl;
+      return 1;
+    }
   }
   if(test)
   {

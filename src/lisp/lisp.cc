@@ -58,6 +58,7 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     messages[error_code(KBD_BREAK)] = "Break";
     messages[error_code(AMBIGUOUS)] = "Ambiguous";
     messages[error_code(USER_ERROR)] = "";
+    messages[error_code(CANT_LOAD)] = "Can't load file";
 
     auto intern = [this](const auto s) { return a().intern(s); };
 

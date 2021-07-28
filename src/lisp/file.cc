@@ -113,7 +113,7 @@ LISPT file::load(LISPT f)
 {
   l.check(f, type::STRING, type::SYMBOL);
   if(!loadfile(f->getstr()))
-    return l.error(CANT_OPEN, f);
+    l.fatal(CANT_LOAD);
   return f;
 }
 
