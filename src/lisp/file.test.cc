@@ -81,6 +81,49 @@ TEST_CASE("File functions")
     // versions print/prin1/princ.
     CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
   }
+
+  SUBCASE("readc")
+  {
+    std::string is = R"(test)";
+    LISPT f = l.a().getobject();
+    f->set(std::make_shared<file_t>(is));
+    auto ch0 = readc(l, f);
+    CHECK(ch0->intval() == 't');
+    auto ch1 = readc(l, f);
+    CHECK(ch1->intval() == 'e');
+    auto ch2 = readc(l, f);
+    CHECK(ch2->intval() == 's');
+    auto ch3 = readc(l, f);
+    CHECK(ch3->intval() == 't');
+  }
+
+  SUBCASE("read")
+  {
+    std::string is = R"((a b c))";
+    LISPT f = l.a().getobject();
+    f->set(std::make_shared<file_t>(is));
+    auto sexpr = read(l, f);
+    CHECK(!is_NIL(equal(sexpr, mklist(mkatom("a"), mkatom("b"), mkatom("c")))));
+  }
+
+  SUBCASE("spaces")
+  {
+    std::ostringstream cout;
+    auto out = std::make_unique<file_t>(cout);
+    l.primout(std::move(out));
+    spaces(l, 8_l, NIL);
+    CHECK(cout.str() == "        ");
+  }
+
+  SUBCASE("readline")
+  {
+    std::string is = R"(test)";
+    LISPT f = l.a().getobject();
+    f->set(std::make_shared<file_t>(is));
+    auto r = readline(l, f);
+    CHECK(type_of(r) == type::CONS);
+    CHECK(equal(r, mklist(mkatom("test"))));
+  }
 }
 
 }
