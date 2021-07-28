@@ -642,7 +642,7 @@ bool io::checkeof(lisp& l, int c, bool line)
   {
     if(line || is_NIL(l.top->car()))
       return true;
-    l.error(UNEXPECTED_EOF, NIL);
+    l.fatal(UNEXPECTED_EOF);
   }
   return false;
 }

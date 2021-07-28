@@ -331,10 +331,9 @@ PRIMITIVE prim::error(LISPT mess)
 PRIMITIVE prim::uxexit(LISPT status)
 {
   if(is_NIL(status))
-    throw lisp_finish("prim::uxexit called", 0);
+    throw lisp_finish("exit called", 0);
   l.check(status, type::INTEGER);
-  throw lisp_finish("prim::uxexit called", status->intval());
-  return NIL;
+  throw lisp_finish("exit called", status->intval());
 }
 
 namespace pn

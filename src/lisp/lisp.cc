@@ -134,21 +134,27 @@ void lisp::primout(std::unique_ptr<file_t> f)
 {
   _primout = std::move(f);
 }
+
 void lisp::primerr(std::unique_ptr<file_t> f)
 {
   _primerr = std::move(f);
 }
+
 void lisp::primin(std::unique_ptr<file_t> f)
 {
   _primin = std::move(f);
 }
 
-LISPT lisp::perror(int messnr, LISPT arg)
+inline std::string lisp::geterror(int messnr)
 {
   if(NOT_A & messnr)
-    primerr().format("{} ", errmess[error_code(messnr)]);
-  else
-    primerr().format("{} ", messages[error_code(messnr)]);
+    return errmess[error_code(messnr)];
+  return messages[error_code(messnr)];
+}
+
+LISPT lisp::perror(int messnr, LISPT arg)
+{
+  primerr().format("{} ", geterror(messnr));
   if(messnr & (PRINT_ARG | NOT_A))
     prin2(*this, arg, T);
   return C_ERROR;
@@ -157,7 +163,12 @@ LISPT lisp::perror(int messnr, LISPT arg)
 LISPT lisp::error(int messnr, LISPT arg)
 {
   perror(messnr, arg);
-  throw lisp_error("lisp_error");
+  throw lisp_error(geterror(messnr));
+}
+
+void lisp::fatal(int messnr)
+{
+  throw lisp_error(geterror(messnr));
 }
 
 LISPT lisp::syserr(LISPT fault)

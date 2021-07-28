@@ -6,23 +6,18 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
-#include <iostream>
 #include <vector>
 #include <string>
 #include "libisp.hh"
 #include "except.hh"
 #include "repl.hh"
-
-static int macro(lisp::lisp& l, lisp::LISPT*)
-{
-  l.e().unwind();
-  throw lisp::lisp_reset();
-}
+#include "main.hh"
 
 int main(int argc, const char** argv)
 {
   bool test = false;
   std::vector<std::string> args{argv + 1, argv + argc};
+  lisp::lisp lisp;
   for(auto f: args)
   {
     if(f == "--test")
@@ -32,7 +27,6 @@ int main(int argc, const char** argv)
     }
     lisp::load(lisp::mkstring(f));
   }
-  lisp::lisp lisp;
   if(test)
   {
     doctest::Context context;
@@ -40,28 +34,5 @@ int main(int argc, const char** argv)
     auto result = context.run();
     return result;
   }
-  lisp::repl repl(lisp);
-  lisp.repl = [&repl](lisp::LISPT) -> lisp::LISPT { return repl(lisp::NIL); };
-  while(true)
-  {
-    try
-    {
-      lisp.repl(lisp::NIL);
-      // If we return normally from repl we exit the program
-      return 0;
-    }
-    catch(const lisp::lisp_reset& ex)
-    {
-      lisp.e().reset();
-    }
-    catch(const lisp::lisp_error& ex)
-    {
-      std::cout << ex.what() << std::endl;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << ex.what() << std::endl;
-    }
-  }
-  return 0;
+  return lisp::run(lisp);
 }

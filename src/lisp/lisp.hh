@@ -348,8 +348,10 @@ public:
   file_t& stderr() const { return *_stderr; }
   file_t& stdin() const { return *_stdin; }
 
+  std::string geterror(int);
   LISPT perror(int, LISPT);
   LISPT error(int, LISPT);
+  void fatal(int);
   LISPT syserr(LISPT);
   LISPT break0(LISPT);
 

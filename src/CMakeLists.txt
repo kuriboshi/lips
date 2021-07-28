@@ -36,6 +36,7 @@ target_sources(lisp PRIVATE
   lisp/logic.hh
   lisp/low.hh
   lisp/map.hh
+  lisp/main.hh
   lisp/debug.hh
   lisp/pred.hh
   lisp/prim.hh
@@ -63,6 +64,7 @@ target_sources(main PRIVATE
   lisp/logic.test.cc
   lisp/low.test.cc
   lisp/map.test.cc
+  lisp/main.test.cc
   lisp/pred.test.cc
   lisp/prim.test.cc
   lisp/prop.test.cc

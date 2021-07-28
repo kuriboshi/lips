@@ -8,6 +8,8 @@
 
 #include "lisp.hh"
 #include "alloc.hh"
+#include "io.hh"
+#include "eval.hh"
 
 namespace lisp
 {
