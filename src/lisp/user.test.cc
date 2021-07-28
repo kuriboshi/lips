@@ -17,12 +17,22 @@ TEST_CASE("User defined functions")
   {
     auto a = mkatom("a");
     auto b = mkatom("b");
-    auto nlam = df(l, mkatom("f0"), mklist(mkatom("a")), mklist(mkatom("a")));
-    auto lam = de(l, mkatom("f1"), mklist(mkatom("a")), mklist(mkatom("a")));
-    set(l, a, b);
-    auto r0 = eval(l, "(cons (f0 a) (f1 a))");
-    CHECK(car(r0) == a);
-    CHECK(cdr(r0) == b);
+    {
+      auto nlam = df(l, mkatom("f0"), mklist(mkatom("a")), mklist(mkatom("a")));
+      auto lam = de(l, mkatom("f1"), mklist(mkatom("a")), mklist(mkatom("a")));
+      set(l, a, b);
+      auto r0 = eval(l, "(cons (f0 a) (f1 a))");
+      CHECK(car(r0) == a);
+      CHECK(cdr(r0) == b);
+    }
+    {
+      auto nlam = df(mkatom("f0"), mklist(mkatom("a")), mklist(mkatom("a")));
+      auto lam = de(mkatom("f1"), mklist(mkatom("a")), mklist(mkatom("a")));
+      set(l, a, b);
+      auto r0 = eval(l, "(cons (f0 a) (f1 a))");
+      CHECK(car(r0) == a);
+      CHECK(cdr(r0) == b);
+    }
   }
 
   SUBCASE("defineq")
@@ -32,6 +42,9 @@ TEST_CASE("User defined functions")
     auto r0 = defineq(f0);
     REQUIRE(type_of(r0) == type::CONS);
     CHECK(equal(r0, mklist(mkatom("f0"), mkatom("f1"))));
+    auto r1 = defineq(l, f0);
+    REQUIRE(type_of(r1) == type::CONS);
+    CHECK(equal(r1, mklist(mkatom("f0"), mkatom("f1"))));
   }
 
   SUBCASE("getrep")
@@ -43,6 +56,8 @@ TEST_CASE("User defined functions")
     std::string s("(lambda (a) (cons a ()))\n");
     auto expected = lispread(s);
     CHECK(!is_NIL(equal(rep0, expected)));
+    auto rep1 = getrep(l, f);
+    CHECK(!is_NIL(equal(rep0, rep1)));
     auto r0 = apply(f, mklist(0_l));
     CHECK(equal(r0, cons(0_l, NIL)));
   }
