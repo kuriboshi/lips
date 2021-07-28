@@ -14,7 +14,7 @@ string::string(): base() {}
 string::string(lisp& lisp): base(lisp) {}
 
 /* Return symbols print name as a string. */
-PRIMITIVE string::symstr(LISPT sym)
+LISPT string::symstr(LISPT sym)
 {
   l.check(sym, type::SYMBOL, type::T, type::NIL);
   if(type_of(sym) == type::NIL)
@@ -23,7 +23,7 @@ PRIMITIVE string::symstr(LISPT sym)
 }
 
 /* T if s is a string, NIL otherwise. */
-PRIMITIVE string::stringp(LISPT s)
+LISPT string::stringp(LISPT s)
 {
   if(type_of(s) == type::STRING)
     return s;
@@ -31,7 +31,7 @@ PRIMITIVE string::stringp(LISPT s)
 }
 
 /* T if both strings are equal */
-PRIMITIVE string::streq(LISPT s1, LISPT s2)
+LISPT string::streq(LISPT s1, LISPT s2)
 {
   l.check(s1, type::STRING);
   l.check(s2, type::STRING);
@@ -40,7 +40,7 @@ PRIMITIVE string::streq(LISPT s1, LISPT s2)
   return NIL;
 }
 
-PRIMITIVE string::strcmp(LISPT s1, LISPT s2)
+LISPT string::strcmp(LISPT s1, LISPT s2)
 {
   l.check(s1, type::STRING);
   l.check(s2, type::STRING);
@@ -49,7 +49,7 @@ PRIMITIVE string::strcmp(LISPT s1, LISPT s2)
 
 /* Concatenate arbitrary many strings to
    to one string */
-PRIMITIVE string::concat(LISPT strlist)
+LISPT string::concat(LISPT strlist)
 {
   std::string result;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
@@ -61,7 +61,7 @@ PRIMITIVE string::concat(LISPT strlist)
 }
 
 /* Return string length of s */
-PRIMITIVE string::strlen(LISPT s)
+LISPT string::strlen(LISPT s)
 {
   l.check(s, type::STRING);
   return mknumber(l, s->stringval().length());
@@ -72,7 +72,7 @@ PRIMITIVE string::strlen(LISPT s)
    NIL. If end is one less than start the
    zero length string is returned. end equal
    to zero if start is equal to one is accepted. */
-PRIMITIVE string::substr(LISPT str, LISPT start, LISPT end)
+LISPT string::substr(LISPT str, LISPT start, LISPT end)
 {
   l.check(str, type::STRING);
   l.check(start, type::INTEGER);

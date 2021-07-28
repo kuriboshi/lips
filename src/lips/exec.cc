@@ -545,7 +545,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-PRIMITIVE exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -579,7 +579,7 @@ PRIMITIVE exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -613,7 +613,7 @@ PRIMITIVE exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -647,7 +647,7 @@ PRIMITIVE exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE exec::pipecmd(LISPT cmds)
+LISPT exec::pipecmd(LISPT cmds)
 {
   int pd[2];
   int pid;
@@ -690,7 +690,7 @@ PRIMITIVE exec::pipecmd(LISPT cmds)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-PRIMITIVE exec::back(LISPT x)
+LISPT exec::back(LISPT x)
 {
   int pid;
 
@@ -709,13 +709,13 @@ PRIMITIVE exec::back(LISPT x)
   return mknumber(l, pid);
 }
 
-PRIMITIVE exec::stop()
+LISPT exec::stop()
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-PRIMITIVE exec::rehash()
+LISPT exec::rehash()
 {
   exechash.clear();
 
@@ -730,7 +730,7 @@ PRIMITIVE exec::rehash()
   return NIL;
 }
 
-PRIMITIVE exec::jobs()
+LISPT exec::jobs()
 {
 #ifdef JOB_CONTROL
   for(auto* j = joblist; j; j = j->next) printjob(j);
@@ -738,7 +738,7 @@ PRIMITIVE exec::jobs()
   return NIL;
 }
 
-PRIMITIVE exec::fg(LISPT job)
+LISPT exec::fg(LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -774,7 +774,7 @@ PRIMITIVE exec::fg(LISPT job)
 #endif
 }
 
-PRIMITIVE exec::bg(LISPT job)
+LISPT exec::bg(LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -809,7 +809,7 @@ PRIMITIVE exec::bg(LISPT job)
 #endif
 }
 
-PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
+LISPT exec::p_setenv(LISPT var, LISPT val)
 {
   l.check(var, type::STRING, type::SYMBOL);
   l.check(val, type::STRING, type::SYMBOL);
@@ -817,7 +817,7 @@ PRIMITIVE exec::p_setenv(LISPT var, LISPT val)
   return var;
 }
 
-PRIMITIVE exec::getenviron(LISPT var)
+LISPT exec::getenviron(LISPT var)
 {
   l.check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
@@ -826,7 +826,7 @@ PRIMITIVE exec::getenviron(LISPT var)
   return mkstring(l, s);
 }
 
-PRIMITIVE exec::cd(LISPT dir, LISPT emess)
+LISPT exec::cd(LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -859,7 +859,7 @@ PRIMITIVE exec::cd(LISPT dir, LISPT emess)
   return ndir; // TODO: Is this correct?
 }
 
-PRIMITIVE exec::doexec(LISPT cmd)
+LISPT exec::doexec(LISPT cmd)
 {
   LISPT res;
 

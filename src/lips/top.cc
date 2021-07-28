@@ -90,7 +90,7 @@ LISPT top::histget(int num, LISPT hlist)
   return NIL;
 }
 
-PRIMITIVE top::printhist()
+LISPT top::printhist()
 {
   remhist(); /* Removes itself from history. */
   phist();

@@ -45,119 +45,119 @@ LISPT prim::closobj(LISPT vars)
   return cons(l, mkindirect(l, vars->car()->symvalue()), closobj(vars->cdr()));
 }
 
-PRIMITIVE prim::car(LISPT a)
+LISPT prim::car(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a->car();
   return NIL;
 }
 
-PRIMITIVE prim::cdr(LISPT a)
+LISPT prim::cdr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a->cdr();
   return NIL;
 }
 
-PRIMITIVE prim::cadr(LISPT a)
+LISPT prim::cadr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(a->cdr());
   return NIL;
 }
 
-PRIMITIVE prim::cdar(LISPT a)
+LISPT prim::cdar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(a->car());
   return NIL;
 }
 
-PRIMITIVE prim::caar(LISPT a)
+LISPT prim::caar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(a->car());
   return NIL;
 }
 
-PRIMITIVE prim::cddr(LISPT a)
+LISPT prim::cddr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(a->cdr());
   return NIL;
 }
 
-PRIMITIVE prim::cdddr(LISPT a)
+LISPT prim::cdddr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(cdr(a->cdr()));
   return NIL;
 }
 
-PRIMITIVE prim::caddr(LISPT a)
+LISPT prim::caddr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(cdr(a->cdr()));
   return NIL;
 }
 
-PRIMITIVE prim::cdadr(LISPT a)
+LISPT prim::cdadr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(car(a->cdr()));
   return NIL;
 }
 
-PRIMITIVE prim::caadr(LISPT a)
+LISPT prim::caadr(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(car(a->cdr()));
   return NIL;
 }
 
-PRIMITIVE prim::cddar(LISPT a)
+LISPT prim::cddar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(cdr(a->car()));
   return NIL;
 }
 
-PRIMITIVE prim::cadar(LISPT a)
+LISPT prim::cadar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(cdr(a->car()));
   return NIL;
 }
 
-PRIMITIVE prim::cdaar(LISPT a)
+LISPT prim::cdaar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return cdr(car(a->car()));
   return NIL;
 }
 
-PRIMITIVE prim::caaar(LISPT a)
+LISPT prim::caaar(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return car(car(a->car()));
   return NIL;
 }
 
-PRIMITIVE prim::rplaca(LISPT x, LISPT y)
+LISPT prim::rplaca(LISPT x, LISPT y)
 {
   l.check(x, type::CONS);
   x->car(y);
   return x;
 }
 
-PRIMITIVE prim::rplacd(LISPT x, LISPT y)
+LISPT prim::rplacd(LISPT x, LISPT y)
 {
   l.check(x, type::CONS);
   x->cdr(y);
   return x;
 }
 
-PRIMITIVE prim::eq(LISPT a, LISPT b)
+LISPT prim::eq(LISPT a, LISPT b)
 {
   if(EQ(a, b))
     return T;
@@ -167,14 +167,14 @@ PRIMITIVE prim::eq(LISPT a, LISPT b)
   return NIL;
 }
 
-PRIMITIVE prim::atom(LISPT a)
+LISPT prim::atom(LISPT a)
 {
   if(is_NIL(a) || is_T(a) || type_of(a) == type::SYMBOL || type_of(a) == type::INTEGER || type_of(a) == type::FLOAT)
     return T;
   return NIL;
 }
 
-PRIMITIVE prim::nconc(LISPT x)
+LISPT prim::nconc(LISPT x)
 {
   LISPT cl;
 
@@ -200,7 +200,7 @@ PRIMITIVE prim::nconc(LISPT x)
   return newl;
 }
 
-PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
+LISPT prim::tconc(LISPT cell, LISPT obj)
 {
   if(is_NIL(cell))
   {
@@ -217,7 +217,7 @@ PRIMITIVE prim::tconc(LISPT cell, LISPT obj)
   return rplacd(cell, cell->cdr()->cdr());
 }
 
-PRIMITIVE prim::attach(LISPT obj, LISPT list)
+LISPT prim::attach(LISPT obj, LISPT list)
 {
   if(is_NIL(list))
     return cons(l, obj, NIL);
@@ -226,7 +226,7 @@ PRIMITIVE prim::attach(LISPT obj, LISPT list)
   return rplaca(list, obj);
 }
 
-PRIMITIVE prim::append(LISPT x)
+LISPT prim::append(LISPT x)
 {
   LISPT cl;
 
@@ -247,22 +247,22 @@ PRIMITIVE prim::append(LISPT x)
   return newl->cdr();
 }
 
-PRIMITIVE prim::null(LISPT a)
+LISPT prim::null(LISPT a)
 {
   if(EQ(a, NIL))
     return T;
   return NIL;
 }
 
-PRIMITIVE prim::quote(LISPT x) { return x; }
+LISPT prim::quote(LISPT x) { return x; }
 
-PRIMITIVE prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::LAMBDA); }
+LISPT prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::LAMBDA); }
 
-PRIMITIVE prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::NLAMBDA); }
+LISPT prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::NLAMBDA); }
 
-PRIMITIVE prim::list(LISPT x) { return x; }
+LISPT prim::list(LISPT x) { return x; }
 
-PRIMITIVE prim::length(LISPT x)
+LISPT prim::length(LISPT x)
 {
   int i = 0;
   while(!is_NIL(x) && type_of(x) == type::CONS)
@@ -273,7 +273,7 @@ PRIMITIVE prim::length(LISPT x)
   return mknumber(l, i);
 }
 
-PRIMITIVE prim::closure(LISPT fun, LISPT vars)
+LISPT prim::closure(LISPT fun, LISPT vars)
 {
   closure_t c;
   c.cfunction = fun;
@@ -301,7 +301,7 @@ inline LISPT _nth(LISPT list, int n)
     return NIL;
 }
 
-PRIMITIVE prim::nth(LISPT x, LISPT p)
+LISPT prim::nth(LISPT x, LISPT p)
 {
   l.check(p, type::INTEGER);
   if(is_NIL(x))
@@ -310,7 +310,7 @@ PRIMITIVE prim::nth(LISPT x, LISPT p)
   return _nth(x, p->intval());
 }
 
-PRIMITIVE prim::nthd(LISPT list, LISPT pos)
+LISPT prim::nthd(LISPT list, LISPT pos)
 {
   l.check(pos, type::INTEGER);
   int p = pos->intval();
@@ -322,13 +322,13 @@ PRIMITIVE prim::nthd(LISPT list, LISPT pos)
   return l;
 }
 
-PRIMITIVE prim::error(LISPT mess)
+LISPT prim::error(LISPT mess)
 {
   l.check(mess, type::STRING);
   return l.error(USER_ERROR, mess);
 }
 
-PRIMITIVE prim::uxexit(LISPT status)
+LISPT prim::uxexit(LISPT status)
 {
   if(is_NIL(status))
     throw lisp_finish("exit called", 0);

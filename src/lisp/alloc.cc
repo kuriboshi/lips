@@ -41,7 +41,7 @@ alloc::conscells_t* alloc::newpage()
   return newp;
 }
 
-PRIMITIVE alloc::reclaim(LISPT incr)
+LISPT alloc::reclaim(LISPT incr)
 {
   int i = 0;
   if(!is_NIL(incr))
@@ -69,14 +69,14 @@ LISPT alloc::getobject()
   return r;
 }
 
-PRIMITIVE alloc::cons(LISPT a, LISPT b)
+LISPT alloc::cons(LISPT a, LISPT b)
 {
   auto f = getobject();
   f->set(cons_t{a, b});
   return f;
 }
 
-PRIMITIVE alloc::obarray()
+LISPT alloc::obarray()
 {
   LISPT o = NIL;
   for(auto i: local_symbols)
@@ -84,7 +84,7 @@ PRIMITIVE alloc::obarray()
   return o;
 }
 
-PRIMITIVE alloc::freecount()
+LISPT alloc::freecount()
 {
   return mknumber(freelist.size());
 }

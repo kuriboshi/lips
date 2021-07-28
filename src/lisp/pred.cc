@@ -15,7 +15,7 @@ namespace lisp
 pred::pred(): base() {}
 pred::pred(lisp& lisp): base(lisp) {}
 
-PRIMITIVE pred::numberp(LISPT a)
+LISPT pred::numberp(LISPT a)
 {
   switch(type_of(a))
   {
@@ -27,7 +27,7 @@ PRIMITIVE pred::numberp(LISPT a)
   }
 }
 
-PRIMITIVE pred::listp(LISPT a)
+LISPT pred::listp(LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a;
@@ -35,7 +35,7 @@ PRIMITIVE pred::listp(LISPT a)
     return NIL;
 }
 
-PRIMITIVE pred::memb(LISPT x, LISPT l)
+LISPT pred::memb(LISPT x, LISPT l)
 {
   while(!eq(l, NIL))
   {
@@ -46,7 +46,7 @@ PRIMITIVE pred::memb(LISPT x, LISPT l)
   return NIL;
 }
 
-PRIMITIVE pred::equal(LISPT l1, LISPT l2)
+LISPT pred::equal(LISPT l1, LISPT l2)
 {
   LISPT x = NIL;
 
@@ -82,7 +82,7 @@ PRIMITIVE pred::equal(LISPT l1, LISPT l2)
   return NIL;
 }
 
-PRIMITIVE pred::nlistp(LISPT a)
+LISPT pred::nlistp(LISPT a)
 {
   if(type_of(a) != type::CONS)
     return a;
@@ -90,7 +90,7 @@ PRIMITIVE pred::nlistp(LISPT a)
     return NIL;
 }
 
-PRIMITIVE pred::neq(LISPT a, LISPT b)
+LISPT pred::neq(LISPT a, LISPT b)
 {
   if(!EQ(a, b))
     return T;
@@ -98,7 +98,7 @@ PRIMITIVE pred::neq(LISPT a, LISPT b)
     return NIL;
 }
 
-PRIMITIVE pred::boundp(LISPT a)
+LISPT pred::boundp(LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
     return NIL;
@@ -108,7 +108,7 @@ PRIMITIVE pred::boundp(LISPT a)
     return NIL;
 }
 
-PRIMITIVE pred::litatom(LISPT a)
+LISPT pred::litatom(LISPT a)
 {
   if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
     return T;
@@ -116,7 +116,7 @@ PRIMITIVE pred::litatom(LISPT a)
     return NIL;
 }
 
-PRIMITIVE pred::xtypeof(LISPT a)
+LISPT pred::xtypeof(LISPT a)
 {
   switch(type_of(a))
   {

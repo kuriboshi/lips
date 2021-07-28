@@ -27,7 +27,7 @@ LISPT user::getargs(LISPT al)
     return cons(l, al->car(), getargs(al->cdr()));
 }
 
-PRIMITIVE user::getrep(LISPT fun)
+LISPT user::getrep(LISPT fun)
 {
   LISPT args;
 
@@ -82,7 +82,7 @@ LISPT user::checkfn(LISPT name, LISPT lam)
   return NIL;
 }
 
-PRIMITIVE user::define(LISPT name, LISPT lam)
+LISPT user::define(LISPT name, LISPT lam)
 {
   l.check(name, type::SYMBOL);
   l.check(lam, type::LAMBDA, type::NLAMBDA);
@@ -91,7 +91,7 @@ PRIMITIVE user::define(LISPT name, LISPT lam)
   return name;
 }
 
-PRIMITIVE user::defineq(LISPT defs)
+LISPT user::defineq(LISPT defs)
 {
   if(is_NIL(defs))
     return NIL;
@@ -121,9 +121,9 @@ LISPT user::def(LISPT name, LISPT pars, LISPT body, type type)
   return cons(l, name, NIL);
 }
 
-PRIMITIVE user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::LAMBDA); }
+LISPT user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::LAMBDA); }
 
-PRIMITIVE user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::NLAMBDA); }
+LISPT user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::NLAMBDA); }
 
 namespace pn
 {

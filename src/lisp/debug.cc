@@ -14,7 +14,7 @@ namespace lisp
 debug::debug(): base() {}
 debug::debug(lisp& lisp): base(lisp) {}
 
-PRIMITIVE debug::evaltrace(LISPT state)
+LISPT debug::evaltrace(LISPT state)
 {
   auto i = l.e().trace();
 

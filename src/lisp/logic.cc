@@ -14,7 +14,7 @@ namespace lisp
 logic::logic(): base() {}
 logic::logic(lisp& lisp): base(lisp) {}
 
-PRIMITIVE logic::p_and(LISPT x)
+LISPT logic::p_and(LISPT x)
 {
   LISPT foo = T;
   while(!is_NIL(x))
@@ -27,7 +27,7 @@ PRIMITIVE logic::p_and(LISPT x)
   return foo;
 }
 
-PRIMITIVE logic::p_or(LISPT x)
+LISPT logic::p_or(LISPT x)
 {
   LISPT foo = NIL;
   while(!is_NIL(x))
@@ -40,14 +40,14 @@ PRIMITIVE logic::p_or(LISPT x)
   return foo;
 }
 
-PRIMITIVE logic::p_not(LISPT x)
+LISPT logic::p_not(LISPT x)
 {
   if(is_NIL(x))
     return T;
   return NIL;
 }
 
-PRIMITIVE logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
+LISPT logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo = eval(l, pred);
   if(is_NIL(foo))

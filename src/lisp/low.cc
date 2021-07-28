@@ -13,11 +13,7 @@ namespace lisp
 low::low(): base() {}
 low::low(lisp& lisp): base(lisp) {}
 
-/*
-Dummy definition for cpprint.
-PRIMITIVE low::set(var, val)
-*/
-PRIMITIVE low::set(LISPT var, LISPT val)
+LISPT low::set(LISPT var, LISPT val)
 {
   l.check(var, type::SYMBOL);
   if(var->symbol().constant)
@@ -35,9 +31,9 @@ PRIMITIVE low::set(LISPT var, LISPT val)
   return val;
 }
 
-PRIMITIVE low::setq(LISPT var, LISPT val) { return set(var, eval(l, val)); }
+LISPT low::setq(LISPT var, LISPT val) { return set(var, eval(l, val)); }
 
-PRIMITIVE low::progn(LISPT lexp)
+LISPT low::progn(LISPT lexp)
 {
   if(is_NIL(lexp))
     return NIL;
@@ -49,7 +45,7 @@ PRIMITIVE low::progn(LISPT lexp)
   return eval(l, lexp->car());
 }
 
-PRIMITIVE low::cond(LISPT args)
+LISPT low::cond(LISPT args)
 {
   LISPT res = NIL;
   if(is_NIL(args))
@@ -73,7 +69,7 @@ PRIMITIVE low::cond(LISPT args)
   return NIL;
 }
 
-PRIMITIVE low::xwhile(LISPT pred, LISPT exp)
+LISPT low::xwhile(LISPT pred, LISPT exp)
 {
   LISPT res = eval(l, pred);
   while(!is_NIL(res))
@@ -84,9 +80,9 @@ PRIMITIVE low::xwhile(LISPT pred, LISPT exp)
   return NIL;
 }
 
-PRIMITIVE low::prog1(LISPT a1, LISPT) { return a1; }
+LISPT low::prog1(LISPT a1, LISPT) { return a1; }
 
-PRIMITIVE low::prog2(LISPT, LISPT a2, LISPT) { return a2; }
+LISPT low::prog2(LISPT, LISPT a2, LISPT) { return a2; }
 
 namespace pn
 {

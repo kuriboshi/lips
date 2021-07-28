@@ -33,11 +33,11 @@ public:
 
   void reset();
 
-  PRIMITIVE eval(LISPT);
-  PRIMITIVE apply(LISPT, LISPT);
-  PRIMITIVE baktrace();
-  PRIMITIVE topofstack();
-  PRIMITIVE envget(LISPT, LISPT);
+  LISPT eval(LISPT);
+  LISPT apply(LISPT, LISPT);
+  LISPT baktrace();
+  LISPT topofstack();
+  LISPT envget(LISPT, LISPT);
 
   void bt();
   void unwind();

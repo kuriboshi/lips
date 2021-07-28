@@ -180,7 +180,7 @@ public:
   ///
   /// @param incr [in] Number of blocks of cons cells to allocate.
   ///
-  PRIMITIVE reclaim(LISPT incr); // Number of blocks to increase with
+  LISPT reclaim(LISPT incr); // Number of blocks to increase with
 
   /// @brief Builds a cons cell out of the arguments.
   ///
@@ -192,19 +192,19 @@ public:
   ///
   /// @return The cons cell.
   ///
-  PRIMITIVE cons(LISPT, LISPT);
+  LISPT cons(LISPT, LISPT);
 
   /// @brief Build a list of symbols in the local symbol table.
   ///
   /// @return Returns a list of local symbols in no particular order.
   ///
-  PRIMITIVE obarray();
+  LISPT obarray();
 
   /// @brief Number of free cell in the free cell list.
   ///
   /// @return The number of free cells.
   ///
-  PRIMITIVE freecount();
+  LISPT freecount();
   
 private:
   /// @brief The lisp interpreter.

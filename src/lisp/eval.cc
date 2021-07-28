@@ -186,9 +186,9 @@ LISPT evaluator::call(LISPT fun)
  */
 /*
 Dummy definition for the pretty printer.
-PRIMITIVE eval(LISPT expr)
+LISPT eval(LISPT expr)
 */
-PRIMITIVE evaluator::eval(LISPT expr)
+LISPT evaluator::eval(LISPT expr)
 {
   /* 
    * Set the current expression to `expr' and push the current
@@ -231,9 +231,9 @@ bool evaluator::eval0()
 
 /*
 Dummy definition for the pretty printer.
-PRIMITIVE apply(f, a)
+LISPT apply(f, a)
 */
-PRIMITIVE evaluator::apply(LISPT f, LISPT x)
+LISPT evaluator::apply(LISPT f, LISPT x)
 {
   push_point(dest);
   dest = mkdestblock(1);
@@ -910,7 +910,7 @@ bool evaluator::evseq3()
   return false;
 }
 
-PRIMITIVE evaluator::baktrace()
+LISPT evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
@@ -1005,7 +1005,7 @@ PRIMITIVE evaluator::baktrace()
   return NIL;
 }
 
-PRIMITIVE evaluator::topofstack()
+LISPT evaluator::topofstack()
 {
   auto x = a.getobject();
   x->settype(type::ENVIRON);
@@ -1013,7 +1013,7 @@ PRIMITIVE evaluator::topofstack()
   return x;
 }
 
-PRIMITIVE evaluator::envget(LISPT e, LISPT n)
+LISPT evaluator::envget(LISPT e, LISPT n)
 {
   LISPT foo = nullptr;
 #if 0

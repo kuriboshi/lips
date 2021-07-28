@@ -14,7 +14,6 @@ option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
 option(ENABLE_SELECT "Enable using select when asking about core dumps" ON)
 option(ENABLE_JOB_CONTROL "Enable job control in the shell" ON)
 option(ENABLE_FANCY_SIGNALS "Enable catching signals and offer to skip dumping core" ON)
-option(ENABLE_CPPRINT "Enable ability to print source code of primitives" OFF)
 option(ENABLE_LIPSRC "Enable loading a global lipsrc file" OFF)
 option(ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
 option(ENABLE_OBJECT_SIZES "Enable printing object sizes with --test" OFF)
@@ -82,13 +81,6 @@ endif()
 
 if(ENABLE_FANCY_SIGNALS)
   target_compile_definitions(lips PRIVATE FANCY_SIGNALS)
-endif()
-
-if(ENABLE_CPPRINT)
-  # Defines where the source is for cpprint.
-  target_compile_definitions(lisp PRIVATE "LIPSLIB=\"${LIPS_SOURCE_LOCATION}\"")
-  # File that is used to find source code for primitives.
-  target_compile_definitions(lisp PRIVATE "TAGSFILE=\"${LIPS_SOURCE_LOCATION}/Tags\"")
 endif()
 
 if(ENABLE_LIPSRC)

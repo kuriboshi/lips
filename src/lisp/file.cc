@@ -13,7 +13,7 @@ namespace lisp
 file::file(): base() {}
 file::file(lisp& lisp): base(lisp) {}
 
-PRIMITIVE file::open(LISPT filename, LISPT mode)
+LISPT file::open(LISPT filename, LISPT mode)
 {
   l.check(filename, type::STRING, type::SYMBOL);
   bool readmode = true;
@@ -45,7 +45,7 @@ PRIMITIVE file::open(LISPT filename, LISPT mode)
   return newfile;
 }
 
-PRIMITIVE file::close(LISPT fildes)
+LISPT file::close(LISPT fildes)
 {
   l.check(fildes, type::FILET);
   fildes->fileval().flush();
@@ -54,7 +54,7 @@ PRIMITIVE file::close(LISPT fildes)
   return NIL;
 }
 
-PRIMITIVE file::ratom(LISPT file)
+LISPT file::ratom(LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::ratom(l, l.primin());
@@ -64,7 +64,7 @@ PRIMITIVE file::ratom(LISPT file)
   return ::lisp::ratom(l, file->fileval());
 }
 
-PRIMITIVE file::readc(LISPT file)
+LISPT file::readc(LISPT file)
 {
   if(is_NIL(file))
     return a.mknumber(l.primin().getch());
@@ -74,7 +74,7 @@ PRIMITIVE file::readc(LISPT file)
   return a.mknumber(file->fileval().getch());
 }
 
-PRIMITIVE file::read(LISPT file)
+LISPT file::read(LISPT file)
 {
   if(is_NIL(file))
     return lispread(l, l.primin(), false);
@@ -84,7 +84,7 @@ PRIMITIVE file::read(LISPT file)
   return lispread(l, file->fileval(), false);
 }
 
-PRIMITIVE file::print(LISPT x, LISPT file)
+LISPT file::print(LISPT x, LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::print(l, x, l.primout());
@@ -109,7 +109,7 @@ bool file::loadfile(const std::string& lf)
   return true;
 }
 
-PRIMITIVE file::load(LISPT f)
+LISPT file::load(LISPT f)
 {
   l.check(f, type::STRING, type::SYMBOL);
   if(!loadfile(f->getstr()))
@@ -117,7 +117,7 @@ PRIMITIVE file::load(LISPT f)
   return f;
 }
 
-PRIMITIVE file::terpri(LISPT file)
+LISPT file::terpri(LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::terpri(l, l.primout());
@@ -127,7 +127,7 @@ PRIMITIVE file::terpri(LISPT file)
   return ::lisp::terpri(l, file->fileval());
 }
 
-PRIMITIVE file::prin1(LISPT x, LISPT file)
+LISPT file::prin1(LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -138,7 +138,7 @@ PRIMITIVE file::prin1(LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), false);
 }
 
-PRIMITIVE file::prin2(LISPT x, LISPT file)
+LISPT file::prin2(LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -149,7 +149,7 @@ PRIMITIVE file::prin2(LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), true);
 }
 
-PRIMITIVE file::plevel(LISPT newl)
+LISPT file::plevel(LISPT newl)
 {
   auto x = l.printlevel;
   if(!is_NIL(newl))
@@ -160,7 +160,7 @@ PRIMITIVE file::plevel(LISPT newl)
   return a.mknumber(x);
 }
 
-PRIMITIVE file::spaces(LISPT n, LISPT file)
+LISPT file::spaces(LISPT n, LISPT file)
 {
   int i;
   file_t* f;
@@ -179,7 +179,7 @@ PRIMITIVE file::spaces(LISPT n, LISPT file)
   return NIL;
 }
 
-PRIMITIVE file::readline(LISPT file)
+LISPT file::readline(LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::readline(l, l.primin());
@@ -187,95 +187,6 @@ PRIMITIVE file::readline(LISPT file)
     return ::lisp::readline(l, l.stdin());
   l.check(file, type::FILET);
   return ::lisp::readline(l, file->fileval());
-}
-
-PRIMITIVE file::cpprint(LISPT oname, LISPT file)
-{
-#if defined(LIPSLIB) && defined(TAGSFILE)
-  FILE *f, *tagsfile, *cfile;
-  char buf[120];
-  const char* funn;
-  char lname[20], cname[20], fname[20];
-  int line, acnt;
-
-  if(is_NIL(file))
-    f = primout;
-  else if(is_T(file))
-    f = primerr;
-  else
-  {
-    check(file, FILET);
-    f = file->fileval();
-  }
-  check(oname, SYMBOL);
-  check(oname->symval().value, SUBR, FSUBR);
-  funn = oname->symval().pname;
-  if((tagsfile = fopen(TAGSFILE, "r")) == nullptr)
-    return error(CANT_OPEN, mkstring(_lisp, TAGSFILE));
-  while(fgets(buf, 120, tagsfile) != nullptr)
-    if(strncmp(buf, funn, strlen(funn)) == 0 && buf[strlen(funn)] == '\t')
-    {
-      sscanf(buf, "%s %s %[^:]:%d", lname, cname, fname, &line);
-      strcpy(buf, LIPSLIB);
-      strcat(buf, "/");
-      strcat(buf, fname);
-      fclose(tagsfile);
-      if((cfile = fopen(buf, "r")) == nullptr)
-        return error(CANT_OPEN, mkstring(_lisp, buf));
-      for(; line > 1; line--) fgets(buf, 120, cfile);
-      fgets(buf, 120, cfile);
-      putch('(', f, 0);
-      prin2(oname, file);
-      putch(' ', f, 0);
-      putch('(', f, 0);
-      if(type_of(oname->symvalue()) == SUBR)
-        prin1(C_SUBR, file);
-      else
-        prin1(C_FSUBR, file);
-      putch(' ', f, 0);
-      std::size_t i;
-      for(i = 0; buf[i] != '(' && i < sizeof(buf); i++)
-        ;
-      if((acnt = oname->symval().value->subrval().argcount()) == -1)
-        i++;
-      for(; buf[i] != ')' && i < sizeof(buf); i++)
-        if(buf[i] != ',')
-          putch(buf[i], f, 0);
-        else
-        {
-          acnt++;
-          if(acnt == -1)
-          {
-            putch(' ', f, 0);
-            putch('.', f, 0);
-            acnt++;
-          }
-        }
-      if(acnt != -1)
-        putch(')', f, 0);
-      putch('\n', f, 0);
-      while(buf[0] != '{')
-      {
-        fgets(buf, 120, cfile);
-        fgets(buf, 120, cfile);
-      }
-      while(buf[0] != '}')
-      {
-        fputs(buf, f);
-        fgets(buf, 120, cfile);
-      }
-      putch('}', f, 0);
-      putch(')', f, 0);
-      putch(')', f, 0);
-      putch('\n', f, 0);
-      fclose(cfile);
-      return oname;
-    }
-  fclose(tagsfile);
-  return error(NOT_PRINTABLE, oname);
-#else
-  return NIL;
-#endif
 }
 
 namespace pn
@@ -293,7 +204,6 @@ inline constexpr auto READC = "readc";       // read characte
 inline constexpr auto READLINE = "readline"; // read a line
 inline constexpr auto SPACES = "spaces";     // print some spaces
 inline constexpr auto TERPRI = "terpri";     // print new-line
-inline constexpr auto CPPRINT = "cpprint";   // find and prettyprint c function
 } // namespace pn
 
 LISPT C_READ;
@@ -316,7 +226,6 @@ void file::init()
   mkprim(pn::READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::CPPRINT,  ::lisp::cpprint,   subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

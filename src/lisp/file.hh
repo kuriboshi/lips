@@ -31,7 +31,6 @@ public:
   LISPT plevel(LISPT);
   LISPT spaces(LISPT, LISPT);
   LISPT readline(LISPT);
-  LISPT cpprint(LISPT, LISPT);
 
   bool loadfile(const std::string&);
 };
@@ -64,8 +63,6 @@ inline LISPT spaces(lisp& l, LISPT a, LISPT b) { return file(l).spaces(a, b); }
 inline LISPT spaces(LISPT a, LISPT b) { return file().spaces(a, b); }
 inline LISPT readline(lisp& l, LISPT a) { return file(l).readline(a); }
 inline LISPT readline(LISPT a) { return file().readline(a); }
-inline LISPT cpprint(lisp& l, LISPT a, LISPT b) { return file(l).cpprint(a, b); }
-inline LISPT cpprint(LISPT a, LISPT b) { return file().cpprint(a, b); }
 
 inline bool loadfile(lisp& l, const std::string& filename) { return file(l).loadfile(filename); }
 inline bool loadfile(const std::string& filename) { return file().loadfile(filename); }

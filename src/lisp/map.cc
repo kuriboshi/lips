@@ -14,7 +14,7 @@ namespace lisp
 Map::Map(): base() {}
 Map::Map(lisp& lisp): base(lisp) {}
 
-PRIMITIVE Map::map(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::map(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -27,7 +27,7 @@ PRIMITIVE Map::map(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-PRIMITIVE Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -40,7 +40,7 @@ PRIMITIVE Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-PRIMITIVE Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
@@ -61,7 +61,7 @@ PRIMITIVE Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-PRIMITIVE Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)

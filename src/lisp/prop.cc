@@ -14,20 +14,20 @@ namespace lisp
 prop::prop(): base() {}
 prop::prop(lisp& lisp): base(lisp) {}
 
-PRIMITIVE prop::setplist(LISPT x, LISPT pl)
+LISPT prop::setplist(LISPT x, LISPT pl)
 {
   l.check(x, type::SYMBOL);
   x->symbol().plist = pl;
   return pl;
 }
 
-PRIMITIVE prop::getplist(LISPT x)
+LISPT prop::getplist(LISPT x)
 {
   l.check(x, type::SYMBOL);
   return x->symbol().plist;
 }
 
-PRIMITIVE prop::putprop(LISPT x, LISPT p, LISPT v)
+LISPT prop::putprop(LISPT x, LISPT p, LISPT v)
 {
   l.check(x, type::SYMBOL);
   l.check(p, type::SYMBOL);
@@ -41,7 +41,7 @@ PRIMITIVE prop::putprop(LISPT x, LISPT p, LISPT v)
   return v;
 }
 
-PRIMITIVE prop::getprop(LISPT x, LISPT p)
+LISPT prop::getprop(LISPT x, LISPT p)
 {
   l.check(x, type::SYMBOL);
   l.check(p, type::SYMBOL);
@@ -53,7 +53,7 @@ PRIMITIVE prop::getprop(LISPT x, LISPT p)
   return NIL;
 }
 
-PRIMITIVE prop::remprop(LISPT x, LISPT p)
+LISPT prop::remprop(LISPT x, LISPT p)
 {
   LISPT pl, pl2;
 

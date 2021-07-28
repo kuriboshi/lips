@@ -63,9 +63,6 @@ extern LISPT C_SUBR;
 extern LISPT C_SYMBOL;
 extern LISPT C_WRITE;
 
-// This is used to recognize c-functions for cpprint.
-using PRIMITIVE = LISPT;
-
 template<typename Enum>
 constexpr auto to_underlying(Enum e) noexcept
 {
