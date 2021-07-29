@@ -55,11 +55,11 @@ LISPT file::close(lisp& l, LISPT fildes)
 LISPT file::ratom(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return ::lisp::ratom(l, l.primin());
+    return io::ratom(l, l.primin());
   if(is_T(file))
-    return ::lisp::ratom(l, l.stdin());
+    return io::ratom(l, l.stdin());
   check(file, type::FILET);
-  return ::lisp::ratom(l, file->fileval());
+  return io::ratom(l, file->fileval());
 }
 
 LISPT file::readc(lisp& l, LISPT file)
@@ -85,11 +85,11 @@ LISPT file::read(lisp& l, LISPT file)
 LISPT file::print(lisp& l, LISPT x, LISPT file)
 {
   if(is_NIL(file))
-    return ::lisp::print(l, x, l.primout());
+    return io::print(l, x, l.primout());
   if(is_T(file))
-    return ::lisp::print(l, x, l.primerr());
+    return io::print(l, x, l.primerr());
   check(file, type::FILET);
-  return ::lisp::print(l, x, file->fileval());
+  return io::print(l, x, file->fileval());
 }
 
 bool file::loadfile(lisp& l, const std::string& lf)
@@ -118,11 +118,11 @@ LISPT file::load(lisp& l, LISPT f)
 LISPT file::terpri(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return ::lisp::terpri(l, l.primout());
+    return io::terpri(l, l.primout());
   if(is_T(file))
-    return ::lisp::terpri(l, l.primerr());
+    return io::terpri(l, l.primerr());
   check(file, type::FILET);
-  return ::lisp::terpri(l, file->fileval());
+  return io::terpri(l, file->fileval());
 }
 
 LISPT file::prin1(lisp& l, LISPT x, LISPT file)
@@ -180,11 +180,11 @@ LISPT file::spaces(lisp& l, LISPT n, LISPT file)
 LISPT file::readline(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return ::lisp::readline(l, l.primin());
+    return io::readline(l, l.primin());
   else if(is_T(file))
-    return ::lisp::readline(l, l.stdin());
+    return io::readline(l, l.stdin());
   check(file, type::FILET);
-  return ::lisp::readline(l, file->fileval());
+  return io::readline(l, file->fileval());
 }
 
 namespace pn

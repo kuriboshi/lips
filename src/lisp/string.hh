@@ -6,16 +6,12 @@
 #pragma once
 
 #include "lisp.hh"
-#include "base.hh"
 
 namespace lisp
 {
-class string: public base
+class string
 {
 public:
-  string();
-  string(lisp&);
-  ~string() = default;
   static void init();
 
   static LISPT symstr(lisp&, LISPT);

@@ -12,34 +12,30 @@
 #include <string_view>
 #include <fmt/format.h>
 #include "lisp.hh"
-#include "base.hh"
 #include "except.hh"
 
 namespace lisp
 {
 class lisp;
 
-class io: public base
+class io
 {
 public:
-  io(): base() {}
-  io(lisp& lisp): base(lisp) {}
-  ~io() = default;
   static void set_read_table(lisp&);
 
-  void pushr(LISPT w);
-  void popr(LISPT& w);
+  static void pushr(lisp& l, LISPT w);
+  static void popr(lisp& l, LISPT& w);
 
-  LISPT ratom(file_t&);
-  LISPT lispread(file_t&, bool line = false);
-  LISPT readline(file_t&);
+  static LISPT ratom(lisp& l, file_t&);
+  static LISPT lispread(lisp& l, file_t&, bool line = false);
+  static LISPT readline(lisp& l, file_t&);
 
-  LISPT patom(LISPT, file_t&, bool esc = false);
-  LISPT prinbody(LISPT, file_t&, bool esc = false);
-  LISPT prin0(LISPT, file_t&, bool esc = false);
-  LISPT print(LISPT, file_t&);
-  LISPT terpri(file_t&);
-  LISPT getline(LISPT);
+  static LISPT patom(lisp& l, LISPT, file_t&, bool esc = false);
+  static LISPT prinbody(lisp& l, LISPT, file_t&, bool esc = false);
+  static LISPT prin0(lisp& l, LISPT, file_t&, bool esc = false);
+  static LISPT print(lisp& l, LISPT, file_t&);
+  static LISPT terpri(lisp& l, file_t&);
+  static LISPT getline(lisp& l, LISPT);
 
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
   static LISPT rmdquote(lisp&, file_t&, LISPT, char);
@@ -54,12 +50,12 @@ public:
 #endif
 
 private:
-  LISPT splice(LISPT, LISPT, bool);
-  LISPT parsebuf(const std::string&);
-  bool integerp(const std::string&, int& res);
-  bool floatp(const std::string&);
-  bool checkeof(lisp& l, int c, bool line);
-  std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
+  static LISPT splice(lisp& l, LISPT, LISPT, bool);
+  static LISPT parsebuf(lisp& l, const std::string&);
+  static bool integerp(const std::string&, int& res);
+  static bool floatp(const std::string&);
+  static bool checkeof(lisp& l, int c, bool line);
+  static std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
 
 class io_source
@@ -364,49 +360,65 @@ inline bool issplice(int c) { return issplice(lisp::current(), c); }
 inline bool isinfix(lisp& l, int c) { return is_charclass(l, c, char_class::INFIX); }
 inline bool isinfix(int c) { return isinfix(lisp::current(), c); }
 
-inline LISPT ratom(lisp& l, file_t& f) { return io(l).ratom(f); }
-inline LISPT ratom(file_t& f) { return io().ratom(f); }
-inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io(l).lispread(f, esc); }
-inline LISPT lispread(file_t& f, bool esc = false) { return io().lispread(f, esc); }
-inline LISPT lispread(const std::string& s, bool esc = false) { file_t f(s); return io().lispread(f, esc); }
-inline LISPT readline(lisp& l, file_t& f) { return io(l).readline(f); }
-inline LISPT readline(file_t& f) { return io().readline(f); }
-inline LISPT getline(lisp& l, LISPT f) { return io(l).getline(f); }
-inline LISPT getline(LISPT f) { return io().getline(f); }
+inline LISPT ratom(lisp& l, file_t& f) { return io::ratom(l, f); }
+inline LISPT ratom(file_t& f) { return io::ratom(lisp::current(), f); }
+inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io::lispread(l, f, esc); }
+inline LISPT lispread(file_t& f, bool esc = false) { return io::lispread(lisp::current(), f, esc); }
+inline LISPT lispread(const std::string& s, bool esc = false) { file_t f(s); return io::lispread(lisp::current(), f, esc); }
+inline LISPT readline(lisp& l, file_t& f) { return io::readline(l, f); }
+inline LISPT readline(file_t& f) { return io::readline(lisp::current(), f); }
+inline LISPT getline(lisp& l, LISPT f) { return io::getline(l, f); }
+inline LISPT getline(LISPT f) { return io::getline(lisp::current(), f); }
 
-inline LISPT patom(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).patom(a, f, esc); }
-inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io().patom(a, f, esc); }
+inline LISPT patom(lisp& l, LISPT a, file_t& f, bool esc = false) { return io::patom(l, a, f, esc); }
+inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io::patom(lisp::current(), a, f, esc); }
 inline LISPT patom(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
-  return io(l).patom(a, out ? l.primerr() : l.primout(), esc);
+  return io::patom(l, a, out ? l.primerr() : l.primout(), esc);
 }
-inline LISPT patom(LISPT a, bool out = false, bool esc = false) { return patom(lisp::current(), a, out, esc); }
-inline LISPT terpri(lisp& l, file_t& f) { return io(l).terpri(f); }
-inline LISPT terpri(file_t& f) { return io().terpri(f); }
-inline LISPT terpri(lisp& l, bool out = false) { return io(l).terpri(out ? l.primerr() : l.primout()); }
-inline LISPT terpri(bool out = false) { return terpri(lisp::current(), out); }
-inline LISPT prinbody(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).prinbody(a, f, esc); }
-inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io().prinbody(a, f, esc); }
+inline LISPT patom(LISPT a, bool out = false, bool esc = false)
+{
+  auto& l = lisp::current();
+  return io::patom(l, a, out ? l.primerr() : l.primout(), esc);
+}
+inline LISPT terpri(lisp& l, file_t& f) { return io::terpri(l, f); }
+inline LISPT terpri(file_t& f) { return io::terpri(lisp::current(), f); }
+inline LISPT terpri(lisp& l, bool out = false) { return io::terpri(l, out ? l.primerr() : l.primout()); }
+inline LISPT terpri(bool out = false)
+{
+  auto& l = lisp::current();
+  return io::terpri(l, out ? l.primerr() : l.primout());
+}
+inline LISPT prinbody(lisp& l, LISPT a, file_t& f, bool esc = false) { return io::prinbody(l, a, f, esc); }
+inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io::prinbody(lisp::current(), a, f, esc); }
 inline LISPT prinbody(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
-  return io(l).prinbody(a, out ? l.primerr() : l.primout(), esc);
+  return io::prinbody(l, a, out ? l.primerr() : l.primout(), esc);
 }
-inline LISPT prinbody(LISPT a, bool out = false, bool esc = false) { return prinbody(lisp::current(), a, out, esc); }
-inline LISPT prin0(lisp& l, LISPT a, file_t& f, bool esc = false) { return io(l).prin0(a, f, esc); }
-inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io().prin0(a, f, esc); }
+inline LISPT prinbody(LISPT a, bool out = false, bool esc = false)
+{
+  auto& l = lisp::current();
+  return io::prinbody(l, a, out ? l.primerr() : l.primout(), esc);
+}
+inline LISPT prin0(lisp& l, LISPT a, file_t& f, bool esc = false) { return io::prin0(l, a, f, esc); }
+inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io::prin0(lisp::current(), a, f, esc); }
 inline LISPT prin0(lisp& l, LISPT a, bool out = false, bool esc = false)
 {
-  return io(l).prin0(a, out ? l.primerr() : l.primout(), esc);
+  return io::prin0(l, a, out ? l.primerr() : l.primout(), esc);
 }
-inline LISPT prin0(LISPT a, bool out = false, bool esc = false) { return prin0(lisp::current(), a, out, esc); }
-inline LISPT print(lisp& l, LISPT a, file_t& f) { return io(l).print(a, f); }
-inline LISPT print(LISPT a, file_t& f) { return io().print(a, f); }
-inline LISPT print(lisp& l, LISPT a, bool out = false) { return io(l).print(a, out ? l.primerr() : l.primout()); }
-inline LISPT print(LISPT a, bool out = false) { return print(lisp::current(), a, out); }
-inline file_t& primout() { return lisp::current().primout(); }
-inline file_t& primin() { return lisp::current().primin(); }
-inline file_t& primerr() { return lisp::current().primerr(); }
-
+inline LISPT prin0(LISPT a, bool out = false, bool esc = false)
+{
+  auto& l = lisp::current();
+  return io::prin0(l, a, out ? l.primerr() : l.primout(), esc);
+}
+inline LISPT print(lisp& l, LISPT a, file_t& f) { return io::print(l, a, f); }
+inline LISPT print(LISPT a, file_t& f) { return io::print(lisp::current(), a, f); }
+inline LISPT print(lisp& l, LISPT a, bool out = false) { return io::print(l, a, out ? l.primerr() : l.primout()); }
+inline LISPT print(LISPT a, bool out = false)
+{
+  auto& l = lisp::current();
+  return io::print(l, a, out ? l.primerr() : l.primout());
+}
 
 template<typename T>
 std::string to_string(T& sink)

@@ -6,16 +6,12 @@
 #pragma once
 
 #include "lisp.hh"
-#include "base.hh"
 
 namespace lisp
 {
-class user: public base
+class user
 {
 public:
-  user();
-  user(lisp&);
-  ~user() = default;
   static void init();
 
   static LISPT getrep(lisp&, LISPT);

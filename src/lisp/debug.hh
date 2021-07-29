@@ -6,17 +6,12 @@
 #pragma once
 
 #include "lisp.hh"
-#include "base.hh"
 
 namespace lisp
 {
-class debug: public base
+class debug
 {
 public:
-  debug();
-  debug(lisp&);
-  ~debug() = default;
-
   static LISPT evaltrace(lisp&, LISPT);
 
   static void init();

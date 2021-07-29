@@ -24,7 +24,6 @@ target_sources(lisp PRIVATE
 target_sources(lisp PRIVATE
   lisp/alloc.hh
   lisp/arith.hh
-  lisp/base.hh
   lisp/error.hh
   lisp/eval.hh
   lisp/except.hh

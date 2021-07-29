@@ -250,7 +250,7 @@ LISPT eval(lisp& l, const std::string& expr)
 
 LISPT eval(const std::string& expr)
 {
-  return ::lisp::eval(lisp::current(), expr);
+  return eval(lisp::current(), expr);
 }
 
 //

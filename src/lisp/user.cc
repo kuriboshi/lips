@@ -16,9 +16,6 @@
 
 namespace lisp
 {
-user::user(): base() {}
-user::user(lisp& lisp): base(lisp) {}
-
 LISPT user::getargs(lisp& l, LISPT al)
 {
   if(is_NIL(al->cdr()))

@@ -10,7 +10,6 @@
 #include <variant>
 
 #include "lisp.hh"
-#include "base.hh"
 #include "io.hh"
 
 namespace lisp

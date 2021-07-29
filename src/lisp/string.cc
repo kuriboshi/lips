@@ -10,9 +10,6 @@
 
 namespace lisp
 {
-string::string(): base() {}
-string::string(lisp& lisp): base(lisp) {}
-
 /* Return symbols print name as a string. */
 LISPT string::symstr(lisp& l, LISPT sym)
 {
