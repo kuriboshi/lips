@@ -56,6 +56,25 @@ TEST_CASE("lisp.cc: current")
     // Same printname atom from different interpreters should be FALSE.
     CHECK(eq(lisp1, v3->symvalue(), mkatom(lisp0, "world")) == NIL);
   }
+
+  SUBCASE("mkprim")
+  {
+    std::vector<int> result;
+    mkprim(
+      "printall",
+      [&result](lisp& l, LISPT a) -> LISPT {
+        for(auto p: a)
+        {
+          result.push_back(p->intval());
+        }
+        return NIL;
+      },
+      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    eval("(printall 0 1 2)");
+    CHECK(result[0] == 0);
+    CHECK(result[1] == 1);
+    CHECK(result[2] == 2);
+  }
 }
 
 }

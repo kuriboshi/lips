@@ -127,10 +127,10 @@ struct subr_t
     NOSPREAD
   };
 
-  using func0_t = LISPT (*)(lisp&);
-  using func1_t = LISPT (*)(lisp&, LISPT);
-  using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
-  using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
+  using func0_t = std::function<LISPT(lisp&)>;
+  using func1_t = std::function<LISPT(lisp&, LISPT)>;
+  using func2_t = std::function<LISPT(lisp&, LISPT, LISPT)>;
+  using func3_t = std::function<LISPT(lisp&, LISPT, LISPT, LISPT)>;
 
   subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
     : name(pname), f(fun), subr(subr), spread(spread)

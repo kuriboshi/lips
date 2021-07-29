@@ -26,6 +26,21 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_L
   target_link_libraries(lips PRIVATE stdc++fs)
 endif()
 target_compile_options(lips PRIVATE -Wall -Werror)
+if(ENABLE_SELECT)
+  target_compile_definitions(lips PRIVATE SELECT)
+endif()
+
+if(ENABLE_JOB_CONTROL)
+  target_compile_definitions(lips PRIVATE JOB_CONTROL)
+endif()
+
+if(ENABLE_FANCY_SIGNALS)
+  target_compile_definitions(lips PRIVATE FANCY_SIGNALS)
+endif()
+
+if(ENABLE_LIPSRC)
+  target_compile_definitions(lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/lipsrc\"")
+endif()
 
 find_package(Curses)
 
