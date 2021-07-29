@@ -45,7 +45,7 @@ LISPT evaluator::printwhere()
       {
         foo = *lsp;
         l.primerr().format(" [in ");
-        file(l).prin2(foo->car(), T);
+        file::prin2(l, foo->car(), T);
         l.primerr().putch(']');
         break;
       }
@@ -116,7 +116,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     _breakhook();
   if(env == nullptr)
     throw lisp_reset();
-  file(l).print(cons(l, fault, cons(l, C_BROKEN, NIL)), T);
+  file::print(l, cons(l, fault, cons(l, C_BROKEN, NIL)), T);
   push_func(next);
   cont = &evaluator::everr;
 }
@@ -181,10 +181,6 @@ LISPT evaluator::call(LISPT fun)
  * This is the evaluator, it allocates a destination
  * slot for the result and start munching continuations.
  */
-/*
-Dummy definition for the pretty printer.
-LISPT eval(LISPT expr)
-*/
 LISPT evaluator::eval(LISPT expr)
 {
   /* 
@@ -226,10 +222,6 @@ bool evaluator::eval0()
   return true;
 }
 
-/*
-Dummy definition for the pretty printer.
-LISPT apply(f, a)
-*/
 LISPT evaluator::apply(LISPT f, LISPT x)
 {
   push_point(dest);
@@ -272,7 +264,7 @@ bool evaluator::peval()
 {
 #ifdef TRACE
   if(_trace)
-    file(l).print(expression, T);
+    file::print(l, expression, T);
 #endif
   push_lisp(expression);
   push_func(&evaluator::ev0);
@@ -350,7 +342,7 @@ void evaluator::do_unbound(continuation_t continuation)
   {
     push_lisp(expression);
     push_point(dest);
-    file(l).load(al);
+    file::load(l, al);
     dest = pop_point();
     expression = pop_lisp();
     fun = expression->car()->symvalue();
@@ -527,7 +519,7 @@ void evaluator::bt()
   for(int i = toctrl - 1; i; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::ev0)
-      file(l).print(std::get<LISPT>(control[i - 1]), T);
+      file::print(l, std::get<LISPT>(control[i - 1]), T);
   }
   l.printlevel = op;
 }
@@ -917,7 +909,7 @@ LISPT evaluator::baktrace()
         using ArgType = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<ArgType, LISPT>)
         {
-          file(l).print(arg, T);
+          file::print(l, arg, T);
         }
         else if constexpr(std::is_same_v<ArgType, destblock_t*>)
         {

@@ -17,12 +17,12 @@ public:
   debug(lisp&);
   ~debug() = default;
 
-  LISPT evaltrace(LISPT);
+  static LISPT evaltrace(lisp&, LISPT);
 
   static void init();
 };
 
-inline LISPT evaltrace(lisp& l, LISPT x) { return debug(l).evaltrace(x); }
-inline LISPT evaltrace(LISPT x) { return debug().evaltrace(x); }
+inline LISPT evaltrace(lisp& l, LISPT x) { return debug::evaltrace(l, x); }
+inline LISPT evaltrace(LISPT x) { return debug::evaltrace(lisp::current(), x); }
 
 } // namespace lisp

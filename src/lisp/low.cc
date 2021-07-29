@@ -10,10 +10,7 @@
 
 namespace lisp
 {
-low::low(): base() {}
-low::low(lisp& lisp): base(lisp) {}
-
-LISPT low::set(LISPT var, LISPT val)
+LISPT low::set(lisp& l, LISPT var, LISPT val)
 {
   l.check(var, type::SYMBOL);
   if(var->symbol().constant)
@@ -31,9 +28,9 @@ LISPT low::set(LISPT var, LISPT val)
   return val;
 }
 
-LISPT low::setq(LISPT var, LISPT val) { return set(var, eval(l, val)); }
+LISPT low::setq(lisp& l, LISPT var, LISPT val) { return set(l, var, eval(l, val)); }
 
-LISPT low::progn(LISPT lexp)
+LISPT low::progn(lisp& l, LISPT lexp)
 {
   if(is_NIL(lexp))
     return NIL;
@@ -45,7 +42,7 @@ LISPT low::progn(LISPT lexp)
   return eval(l, lexp->car());
 }
 
-LISPT low::cond(LISPT args)
+LISPT low::cond(lisp& l, LISPT args)
 {
   LISPT res = NIL;
   if(is_NIL(args))
@@ -60,7 +57,7 @@ LISPT low::cond(LISPT args)
       if(is_NIL(alt->cdr()))
         return res;
       else
-        return progn(alt->cdr());
+        return progn(l, alt->cdr());
     }
     args = args->cdr();
     if(is_NIL(args))
@@ -69,20 +66,20 @@ LISPT low::cond(LISPT args)
   return NIL;
 }
 
-LISPT low::xwhile(LISPT pred, LISPT exp)
+LISPT low::xwhile(lisp& l, LISPT pred, LISPT exp)
 {
   LISPT res = eval(l, pred);
   while(!is_NIL(res))
   {
-    progn(exp);
+    progn(l, exp);
     res = eval(l, pred);
   }
   return NIL;
 }
 
-LISPT low::prog1(LISPT a1, LISPT) { return a1; }
+LISPT low::prog1(lisp& l, LISPT a1, LISPT) { return a1; }
 
-LISPT low::prog2(LISPT, LISPT a2, LISPT) { return a2; }
+LISPT low::prog2(lisp& l, LISPT, LISPT a2, LISPT) { return a2; }
 
 namespace pn
 {
@@ -99,14 +96,14 @@ inline constexpr auto PROG2 = "prog2"; // return second expression
 void low::init()
 {
   // clang-format off
-  mkprim(pn::SET,   ::lisp::set,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::SETQ,  ::lisp::setq,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SETQQ, ::lisp::set,    subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::COND,  ::lisp::cond,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::WHILE, ::lisp::xwhile, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PROGN, ::lisp::progn,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PROG1, ::lisp::prog1,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::PROG2, ::lisp::prog2,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::SET,   set,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::SETQ,  setq,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SETQQ, set,    subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::COND,  cond,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::WHILE, xwhile, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PROGN, progn,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PROG1, prog1,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::PROG2, prog2,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

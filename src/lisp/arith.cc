@@ -12,9 +12,6 @@
 
 namespace lisp
 {
-arith::arith(): base() {}
-arith::arith(lisp& lisp): base(lisp) {}
-
 /*
  * Functions with an i as a prefix are for integer arithmetic and those whith
  * an f are for floats.  Without a prefix, the functions are generic and
@@ -22,7 +19,7 @@ arith::arith(lisp& lisp): base(lisp) {}
  * generic function results in a float.
  */
 
-LISPT arith::plus(LISPT x)
+LISPT arith::plus(lisp& l, LISPT x)
 {
   double fsum = 0.0;
   int sum = 0;
@@ -58,7 +55,7 @@ LISPT arith::plus(LISPT x)
   return mknumber(l, sum);
 }
 
-LISPT arith::iplus(LISPT x)
+LISPT arith::iplus(lisp& l, LISPT x)
 {
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
@@ -69,7 +66,7 @@ LISPT arith::iplus(LISPT x)
   return mknumber(l, sum);
 }
 
-LISPT arith::fplus(LISPT x)
+LISPT arith::fplus(lisp& l, LISPT x)
 {
   l.check(x->car(), type::FLOAT);
   auto sum = x->car()->floatval();
@@ -83,7 +80,7 @@ LISPT arith::fplus(LISPT x)
   return mkfloat(l, sum);
 }
 
-LISPT arith::difference(LISPT x, LISPT y)
+LISPT arith::difference(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::INTEGER, type::FLOAT);
   l.check(y, type::INTEGER, type::FLOAT);
@@ -97,21 +94,21 @@ LISPT arith::difference(LISPT x, LISPT y)
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
-LISPT arith::idifference(LISPT x, LISPT y)
+LISPT arith::idifference(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::INTEGER);
   l.check(y, type::INTEGER);
   return mknumber(l, x->intval() - y->intval());
 }
 
-LISPT arith::fdifference(LISPT x, LISPT y)
+LISPT arith::fdifference(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::FLOAT);
   l.check(y, type::FLOAT);
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
-LISPT arith::ltimes(LISPT x)
+LISPT arith::ltimes(lisp& l, LISPT x)
 {
   double fprod = 1.0;
   int prod = 1;
@@ -144,7 +141,7 @@ LISPT arith::ltimes(LISPT x)
   return mknumber(l, prod);
 }
 
-LISPT arith::itimes(LISPT x)
+LISPT arith::itimes(lisp& l, LISPT x)
 {
   l.check(x->car(), type::INTEGER);
   auto prod = x->car()->intval();
@@ -158,7 +155,7 @@ LISPT arith::itimes(LISPT x)
   return mknumber(l, prod);
 }
 
-LISPT arith::ftimes(LISPT x)
+LISPT arith::ftimes(lisp& l, LISPT x)
 {
   l.check(x->car(), type::FLOAT);
   auto prod = x->car()->floatval();
@@ -172,7 +169,7 @@ LISPT arith::ftimes(LISPT x)
   return mkfloat(l, prod);
 }
 
-LISPT arith::divide(LISPT x, LISPT y)
+LISPT arith::divide(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::INTEGER, type::FLOAT);
   l.check(y, type::INTEGER, type::FLOAT);
@@ -200,7 +197,7 @@ LISPT arith::divide(LISPT x, LISPT y)
   return mkfloat(l, x->floatval() / y->floatval());
 }
 
-LISPT arith::iquotient(LISPT x, LISPT y)
+LISPT arith::iquotient(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::INTEGER);
   l.check(y, type::INTEGER);
@@ -209,7 +206,7 @@ LISPT arith::iquotient(LISPT x, LISPT y)
   return mknumber(l, x->intval() / y->intval());
 }
 
-LISPT arith::iremainder(LISPT x, LISPT y)
+LISPT arith::iremainder(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::INTEGER);
   l.check(y, type::INTEGER);
@@ -218,7 +215,7 @@ LISPT arith::iremainder(LISPT x, LISPT y)
   return mknumber(l, x->intval() % y->intval());
 }
 
-LISPT arith::fdivide(LISPT x, LISPT y)
+LISPT arith::fdivide(lisp& l, LISPT x, LISPT y)
 {
   l.check(x, type::FLOAT);
   l.check(y, type::FLOAT);
@@ -227,7 +224,7 @@ LISPT arith::fdivide(LISPT x, LISPT y)
   return mkfloat(l, x->floatval() / y->floatval());
 }
 
-LISPT arith::minus(LISPT x)
+LISPT arith::minus(lisp& l, LISPT x)
 {
   l.check(x, type::FLOAT, type::INTEGER);
   if(type_of(x) == type::INTEGER)
@@ -235,13 +232,13 @@ LISPT arith::minus(LISPT x)
   return mkfloat(l, -x->floatval());
 }
 
-LISPT arith::iminus(LISPT x)
+LISPT arith::iminus(lisp& l, LISPT x)
 {
   l.check(x, type::INTEGER);
   return mknumber(l, -x->intval());
 }
 
-LISPT arith::absval(LISPT x)
+LISPT arith::absval(lisp& l, LISPT x)
 {
   int sign;
 
@@ -253,19 +250,19 @@ LISPT arith::absval(LISPT x)
   return mknumber(l, x->intval() * sign);
 }
 
-LISPT arith::itof(LISPT x)
+LISPT arith::itof(lisp& l, LISPT x)
 {
   l.check(x, type::INTEGER);
   return mkfloat(l, (double)x->intval());
 }
 
-LISPT arith::add1(LISPT x)
+LISPT arith::add1(lisp& l, LISPT x)
 {
   l.check(x, type::INTEGER);
   return mknumber(l, x->intval() + 1);
 }
 
-LISPT arith::sub1(LISPT x)
+LISPT arith::sub1(lisp& l, LISPT x)
 {
   l.check(x, type::INTEGER);
   return mknumber(l, x->intval() - 1);
@@ -337,26 +334,26 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
   return l.error(BUG, NIL);
 }
 
-LISPT arith::greaterp(LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
+LISPT arith::greaterp(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
 
-LISPT arith::lessp(LISPT x, LISPT y) { return numcheck<std::less>(l, x, y); }
+LISPT arith::lessp(lisp& l, LISPT x, LISPT y) { return numcheck<std::less>(l, x, y); }
 
-LISPT arith::eqp(LISPT x, LISPT y) { return numcheck<std::equal_to>(l, x, y); }
+LISPT arith::eqp(lisp& l, LISPT x, LISPT y) { return numcheck<std::equal_to>(l, x, y); }
 
-LISPT arith::geq(LISPT x, LISPT y) { return numcheck<std::greater_equal>(l, x, y); }
+LISPT arith::geq(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater_equal>(l, x, y); }
 
-LISPT arith::leq(LISPT x, LISPT y) { return numcheck<std::less_equal>(l, x, y); }
+LISPT arith::leq(lisp& l, LISPT x, LISPT y) { return numcheck<std::less_equal>(l, x, y); }
 
-LISPT arith::neqp(LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, x, y); }
+LISPT arith::neqp(lisp& l, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, x, y); }
 
-LISPT arith::zerop(LISPT x)
+LISPT arith::zerop(lisp& l, LISPT x)
 {
   if(type_of(x) == type::INTEGER && x->intval() == 0)
     return T;
   return NIL;
 }
 
-LISPT arith::minusp(LISPT x)
+LISPT arith::minusp(lisp& l, LISPT x)
 {
   if(type_of(x) == type::FLOAT)
   {
@@ -409,33 +406,33 @@ inline constexpr auto MINUSP = "minusp";     // t if negative
 void arith::init()
 {
   // clang-format off
-  mkprim(pn::PLUS,        ::lisp::plus,        subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::DIFFERENCE,  ::lisp::difference,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::TIMES,       ::lisp::ltimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::DIVIDE,      ::lisp::divide,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::IPLUS,       ::lisp::iplus,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::IDIFFERENCE, ::lisp::idifference, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ITIMES,      ::lisp::itimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::IQUOTIENT,   ::lisp::iquotient,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::IREMAINDER,  ::lisp::iremainder,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::IMINUS,      ::lisp::iminus,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MINUS,       ::lisp::minus,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ADD1,        ::lisp::add1,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SUB1,        ::lisp::sub1,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::FPLUS,       ::lisp::fplus,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::FDIFFERENCE, ::lisp::fdifference, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::FTIMES,      ::lisp::ftimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::FDIVIDE,     ::lisp::fdivide,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ITOF,        ::lisp::itof,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GREATERP,    ::lisp::greaterp,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GEQ,         ::lisp::geq,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::LESSP,       ::lisp::lessp,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::LEQ,         ::lisp::leq,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ZEROP,       ::lisp::zerop,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::EQP,         ::lisp::eqp,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NEQP,        ::lisp::neqp,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MINUSP,      ::lisp::minusp,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ABS,         ::lisp::absval,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PLUS,        plus,        subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::DIFFERENCE,  difference,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TIMES,       ltimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::DIVIDE,      divide,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::IPLUS,       iplus,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::IDIFFERENCE, idifference, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ITIMES,      itimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::IQUOTIENT,   iquotient,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::IREMAINDER,  iremainder,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::IMINUS,      iminus,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MINUS,       minus,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ADD1,        add1,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SUB1,        sub1,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::FPLUS,       fplus,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::FDIFFERENCE, fdifference, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::FTIMES,      ftimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::FDIVIDE,     fdivide,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ITOF,        itof,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GREATERP,    greaterp,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GEQ,         geq,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LESSP,       lessp,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LEQ,         leq,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ZEROP,       zerop,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EQP,         eqp,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NEQP,        neqp,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MINUSP,      minusp,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ABS,         absval,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

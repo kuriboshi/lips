@@ -12,10 +12,7 @@
 
 namespace lisp
 {
-pred::pred(): base() {}
-pred::pred(lisp& lisp): base(lisp) {}
-
-LISPT pred::numberp(LISPT a)
+LISPT pred::numberp(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
@@ -27,7 +24,7 @@ LISPT pred::numberp(LISPT a)
   }
 }
 
-LISPT pred::listp(LISPT a)
+LISPT pred::listp(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a;
@@ -35,18 +32,18 @@ LISPT pred::listp(LISPT a)
     return NIL;
 }
 
-LISPT pred::memb(LISPT x, LISPT l)
+LISPT pred::memb(lisp& l, LISPT x, LISPT ls)
 {
-  while(!eq(l, NIL))
+  while(!eq(ls, NIL))
   {
-    if(eq(x, l->car()))
-      return l;
-    l = l->cdr();
+    if(eq(x, ls->car()))
+      return ls;
+    ls = ls->cdr();
   }
   return NIL;
 }
 
-LISPT pred::equal(LISPT l1, LISPT l2)
+LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
 {
   LISPT x = NIL;
 
@@ -59,7 +56,7 @@ LISPT pred::equal(LISPT l1, LISPT l2)
     case type::CONS:
       while(!EQ(l1, NIL) && !EQ(l2, NIL))
       {
-        x = equal(l1->car(), l2->car());
+        x = equal(l, l1->car(), l2->car());
         if(EQ(x, T))
         {
           l1 = l1->cdr();
@@ -82,7 +79,7 @@ LISPT pred::equal(LISPT l1, LISPT l2)
   return NIL;
 }
 
-LISPT pred::nlistp(LISPT a)
+LISPT pred::nlistp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::CONS)
     return a;
@@ -90,7 +87,7 @@ LISPT pred::nlistp(LISPT a)
     return NIL;
 }
 
-LISPT pred::neq(LISPT a, LISPT b)
+LISPT pred::neq(lisp& l, LISPT a, LISPT b)
 {
   if(!EQ(a, b))
     return T;
@@ -98,7 +95,7 @@ LISPT pred::neq(LISPT a, LISPT b)
     return NIL;
 }
 
-LISPT pred::boundp(LISPT a)
+LISPT pred::boundp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
     return NIL;
@@ -108,7 +105,7 @@ LISPT pred::boundp(LISPT a)
     return NIL;
 }
 
-LISPT pred::litatom(LISPT a)
+LISPT pred::litatom(lisp& l, LISPT a)
 {
   if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
     return T;
@@ -116,7 +113,7 @@ LISPT pred::litatom(LISPT a)
     return NIL;
 }
 
-LISPT pred::xtypeof(LISPT a)
+LISPT pred::xtypeof(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
@@ -181,16 +178,16 @@ inline constexpr auto TYPEOF = "typeof";   // return type as an atom
 void pred::init()
 {
   // clang-format off
-  mkprim(pn::LISTP,   ::lisp::listp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NLISTP,  ::lisp::nlistp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NEQ,     ::lisp::neq,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::NUMBERP, ::lisp::numberp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MEMB,    ::lisp::memb,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::EQUAL,   ::lisp::equal,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::BOUNDP,  ::lisp::boundp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::LITATOM, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SYMBOLP, ::lisp::litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::TYPEOF,  ::lisp::xtypeof, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LISTP,   listp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NLISTP,  nlistp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NEQ,     neq,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::NUMBERP, numberp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MEMB,    memb,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EQUAL,   equal,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::BOUNDP,  boundp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LITATOM, litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SYMBOLP, litatom, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TYPEOF,  xtypeof, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

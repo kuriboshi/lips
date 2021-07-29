@@ -10,10 +10,8 @@
 
 namespace lisp
 {
-file::file(): base() {}
-file::file(lisp& lisp): base(lisp) {}
 
-LISPT file::open(LISPT filename, LISPT mode)
+LISPT file::open(lisp& l, LISPT filename, LISPT mode)
 {
   l.check(filename, type::STRING, type::SYMBOL);
   bool readmode = true;
@@ -45,7 +43,7 @@ LISPT file::open(LISPT filename, LISPT mode)
   return newfile;
 }
 
-LISPT file::close(LISPT fildes)
+LISPT file::close(lisp& l, LISPT fildes)
 {
   l.check(fildes, type::FILET);
   fildes->fileval().flush();
@@ -54,7 +52,7 @@ LISPT file::close(LISPT fildes)
   return NIL;
 }
 
-LISPT file::ratom(LISPT file)
+LISPT file::ratom(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::ratom(l, l.primin());
@@ -64,17 +62,17 @@ LISPT file::ratom(LISPT file)
   return ::lisp::ratom(l, file->fileval());
 }
 
-LISPT file::readc(LISPT file)
+LISPT file::readc(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return a.mknumber(l.primin().getch());
+    return l.a().mknumber(l.primin().getch());
   if(is_T(file))
-    return a.mknumber(l.stdin().getch());
+    return l.a().mknumber(l.stdin().getch());
   l.check(file, type::FILET);
-  return a.mknumber(file->fileval().getch());
+  return l.a().mknumber(file->fileval().getch());
 }
 
-LISPT file::read(LISPT file)
+LISPT file::read(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return lispread(l, l.primin(), false);
@@ -84,7 +82,7 @@ LISPT file::read(LISPT file)
   return lispread(l, file->fileval(), false);
 }
 
-LISPT file::print(LISPT x, LISPT file)
+LISPT file::print(lisp& l, LISPT x, LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::print(l, x, l.primout());
@@ -94,13 +92,13 @@ LISPT file::print(LISPT x, LISPT file)
   return ::lisp::print(l, x, file->fileval());
 }
 
-bool file::loadfile(const std::string& lf)
+bool file::loadfile(lisp& l, const std::string& lf)
 {
   try
   {
     auto foo = std::make_unique<file_t>(std::make_unique<file_source>(lf));
     for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != type::ENDOFFILE; rval = lispread(l, *foo.get(), false))
-      rval = e.eval(rval);
+      rval = l.e().eval(rval);
   }
   catch(const lisp_error&)
   {
@@ -109,15 +107,15 @@ bool file::loadfile(const std::string& lf)
   return true;
 }
 
-LISPT file::load(LISPT f)
+LISPT file::load(lisp& l, LISPT f)
 {
   l.check(f, type::STRING, type::SYMBOL);
-  if(!loadfile(f->getstr()))
+  if(!loadfile(l, f->getstr()))
     l.fatal(CANT_LOAD);
   return f;
 }
 
-LISPT file::terpri(LISPT file)
+LISPT file::terpri(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::terpri(l, l.primout());
@@ -127,7 +125,7 @@ LISPT file::terpri(LISPT file)
   return ::lisp::terpri(l, file->fileval());
 }
 
-LISPT file::prin1(LISPT x, LISPT file)
+LISPT file::prin1(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -138,7 +136,7 @@ LISPT file::prin1(LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), false);
 }
 
-LISPT file::prin2(LISPT x, LISPT file)
+LISPT file::prin2(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -149,7 +147,7 @@ LISPT file::prin2(LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), true);
 }
 
-LISPT file::plevel(LISPT newl)
+LISPT file::plevel(lisp& l, LISPT newl)
 {
   auto x = l.printlevel;
   if(!is_NIL(newl))
@@ -157,10 +155,10 @@ LISPT file::plevel(LISPT newl)
     l.check(newl, type::INTEGER);
     l.printlevel = newl->intval();
   }
-  return a.mknumber(x);
+  return l.a().mknumber(x);
 }
 
-LISPT file::spaces(LISPT n, LISPT file)
+LISPT file::spaces(lisp& l, LISPT n, LISPT file)
 {
   int i;
   file_t* f;
@@ -179,7 +177,7 @@ LISPT file::spaces(LISPT n, LISPT file)
   return NIL;
 }
 
-LISPT file::readline(LISPT file)
+LISPT file::readline(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return ::lisp::readline(l, l.primin());
@@ -213,19 +211,19 @@ void file::init()
   C_READ = intern(pn::READ);
 
   // clang-format off
-  mkprim(pn::CLOSE,    ::lisp::close,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::OPEN,     ::lisp::open,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::LOAD,     ::lisp::load,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRIN1,    ::lisp::prin1,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRIN2,    ::lisp::prin2,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRINT,    ::lisp::print,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PLEVEL,   ::lisp::plevel,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::RATOM,    ::lisp::ratom,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READ,     ::lisp::read,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READC,    ::lisp::readc,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READLINE, ::lisp::readline,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SPACES,   ::lisp::spaces,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::TERPRI,   ::lisp::terpri,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CLOSE,    close,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::OPEN,     open,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LOAD,     load,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN1,    prin1,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN2,    prin2,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRINT,    print,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PLEVEL,   plevel,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RATOM,    ratom,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READ,     read,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READC,    readc,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READLINE, readline,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SPACES,   spaces,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TERPRI,   terpri,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

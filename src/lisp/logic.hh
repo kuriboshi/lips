@@ -10,33 +10,30 @@
 
 namespace lisp
 {
-class logic: public base
+class logic
 {
 public:
-  logic();
-  logic(lisp&);
-  ~logic() = default;
   static void init();
 
-  LISPT p_and(LISPT);
-  LISPT p_or(LISPT);
-  LISPT p_not(LISPT);
-  LISPT xif(LISPT, LISPT, LISPT);
+  static LISPT p_and(lisp&, LISPT);
+  static LISPT p_or(lisp&, LISPT);
+  static LISPT p_not(lisp&, LISPT);
+  static LISPT xif(lisp&, LISPT, LISPT, LISPT);
 };
 
-inline LISPT p_and(lisp& l, LISPT x) { return logic(l).p_and(x); }
-inline LISPT p_and(LISPT x) { return logic().p_and(x); }
-inline LISPT p_or(lisp& l, LISPT x) { return logic(l).p_or(x); }
-inline LISPT p_or(LISPT x) { return logic().p_or(x); }
-inline LISPT p_not(lisp& l, LISPT x) { return logic(l).p_not(x); }
-inline LISPT p_not(LISPT x) { return logic().p_not(x); }
+inline LISPT p_and(lisp& l, LISPT x) { return logic::p_and(l, x); }
+inline LISPT p_and(LISPT x) { return logic::p_and(lisp::current(), x); }
+inline LISPT p_or(lisp& l, LISPT x) { return logic::p_or(l, x); }
+inline LISPT p_or(LISPT x) { return logic().p_or(lisp::current(), x); }
+inline LISPT p_not(lisp& l, LISPT x) { return logic::p_not(l, x); }
+inline LISPT p_not(LISPT x) { return logic::p_not(lisp::current(), x); }
 inline LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  return logic(l).xif(pred, true_expr, false_expr);
+  return logic::xif(l, pred, true_expr, false_expr);
 }
 inline LISPT xif(LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  return logic().xif(pred, true_expr, false_expr);
+  return logic::xif(lisp::current(), pred, true_expr, false_expr);
 }
 
 } // namespace lisp

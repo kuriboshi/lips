@@ -11,10 +11,7 @@
 
 namespace lisp
 {
-logic::logic(): base() {}
-logic::logic(lisp& lisp): base(lisp) {}
-
-LISPT logic::p_and(LISPT x)
+LISPT logic::p_and(lisp& l, LISPT x)
 {
   LISPT foo = T;
   while(!is_NIL(x))
@@ -27,7 +24,7 @@ LISPT logic::p_and(LISPT x)
   return foo;
 }
 
-LISPT logic::p_or(LISPT x)
+LISPT logic::p_or(lisp& l, LISPT x)
 {
   LISPT foo = NIL;
   while(!is_NIL(x))
@@ -40,14 +37,14 @@ LISPT logic::p_or(LISPT x)
   return foo;
 }
 
-LISPT logic::p_not(LISPT x)
+LISPT logic::p_not(lisp& l, LISPT x)
 {
   if(is_NIL(x))
     return T;
   return NIL;
 }
 
-LISPT logic::xif(LISPT pred, LISPT true_expr, LISPT false_expr)
+LISPT logic::xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo = eval(l, pred);
   if(is_NIL(foo))
@@ -66,10 +63,10 @@ inline constexpr auto IF = "if";   // if a then b else c
 void logic::init()
 {
   // clang-format off
-  mkprim(pn::AND, ::lisp::p_and, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::OR,  ::lisp::p_or,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::NOT, ::lisp::p_not, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::IF,  ::lisp::xif,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::AND, p_and, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::OR,  p_or,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::NOT, p_not, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::IF,  xif,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
