@@ -126,8 +126,6 @@ TEST_CASE("Object sizes")
 {
   std::cout << "sizeof conscells_t: " << sizeof(alloc::conscells_t) << std::endl;
   std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;
-  std::cout << "sizeof freelist: " << sizeof(lisp::current().a().freelist) << std::endl;
-  std::cout << "freelist.size(): " << lisp::current().a().freelist.size() << std::endl;
   std::cout << "sizeof lisp_t*: " << sizeof(lisp_t*) << std::endl;
 
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
@@ -141,8 +139,8 @@ TEST_CASE("Object sizes")
   std::cout << "lambda_t: " << sizeof(lambda_t) << std::endl;
   std::cout << "closure_t: " << sizeof(closure_t) << std::endl;
   std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
-  std::cout << "std::unique_ptr<file_t>: " << sizeof(std::unique_ptr<file_t>) << std::endl;
-  std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
+  std::cout << "std::shared_ptr<file_t>: " << sizeof(std::shared_ptr<file_t>) << std::endl;
+  std::cout << "cvariable: " << sizeof(cvariable) << std::endl;
 }
 #endif
 

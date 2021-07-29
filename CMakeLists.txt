@@ -68,7 +68,7 @@ if(ENABLE_TRACE)
 endif()
 
 if(ENABLE_OBJECT_SIZES)
-  target_compile_definitions(lisp PRIVATE ENABLE_OBJECT_SIZES)
+  target_compile_definitions(main PRIVATE ENABLE_OBJECT_SIZES)
 endif()
 
 if(ENABLE_SELECT)

@@ -206,17 +206,17 @@ public:
   ///
   LISPT freecount();
   
-private:
-  /// @brief The lisp interpreter.
-  lisp& _lisp;
-  /// @brief Returns the evaluator.
-  evaluator& e() { return _lisp.e(); }
-
   struct conscells_t
   {
     static constexpr int CONSCELLS = 10240; // Number of cells in each block
     std::array<lisp_t, CONSCELLS> cells;
   };
+
+private:
+  /// @brief The lisp interpreter.
+  lisp& _lisp;
+  /// @brief Returns the evaluator.
+  evaluator& e() { return _lisp.e(); }
 
   /// @brief Allocates a new block of cons cells.
   ///
