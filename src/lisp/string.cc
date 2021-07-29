@@ -14,16 +14,16 @@ string::string(): base() {}
 string::string(lisp& lisp): base(lisp) {}
 
 /* Return symbols print name as a string. */
-LISPT string::symstr(LISPT sym)
+LISPT string::symstr(lisp& l, LISPT sym)
 {
-  l.check(sym, type::SYMBOL, type::T, type::NIL);
+  check(sym, type::SYMBOL, type::T, type::NIL);
   if(type_of(sym) == type::NIL)
     return mkstring("nil");
   return mkstring(l, sym->symbol().pname.name);
 }
 
 /* T if s is a string, NIL otherwise. */
-LISPT string::stringp(LISPT s)
+LISPT string::stringp(lisp& l, LISPT s)
 {
   if(type_of(s) == type::STRING)
     return s;
@@ -31,39 +31,39 @@ LISPT string::stringp(LISPT s)
 }
 
 /* T if both strings are equal */
-LISPT string::streq(LISPT s1, LISPT s2)
+LISPT string::streq(lisp& l, LISPT s1, LISPT s2)
 {
-  l.check(s1, type::STRING);
-  l.check(s2, type::STRING);
+  check(s1, type::STRING);
+  check(s2, type::STRING);
   if(s1->stringval() == s2->stringval())
     return T;
   return NIL;
 }
 
-LISPT string::strcmp(LISPT s1, LISPT s2)
+LISPT string::strcmp(lisp& l, LISPT s1, LISPT s2)
 {
-  l.check(s1, type::STRING);
-  l.check(s2, type::STRING);
+  check(s1, type::STRING);
+  check(s2, type::STRING);
   return mknumber(l, s1->stringval().compare(s2->stringval()));
 }
 
 /* Concatenate arbitrary many strings to
    to one string */
-LISPT string::concat(LISPT strlist)
+LISPT string::concat(lisp& l, LISPT strlist)
 {
   std::string result;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
-    l.check(sl->car(), type::STRING);
+    check(sl->car(), type::STRING);
     result += sl->car()->stringval();
   }
   return mkstring(l, result);
 }
 
 /* Return string length of s */
-LISPT string::strlen(LISPT s)
+LISPT string::strlen(lisp& l, LISPT s)
 {
-  l.check(s, type::STRING);
+  check(s, type::STRING);
   return mknumber(l, s->stringval().length());
 }
 
@@ -72,11 +72,11 @@ LISPT string::strlen(LISPT s)
    NIL. If end is one less than start the
    zero length string is returned. end equal
    to zero if start is equal to one is accepted. */
-LISPT string::substr(LISPT str, LISPT start, LISPT end)
+LISPT string::substr(lisp& l, LISPT str, LISPT start, LISPT end)
 {
-  l.check(str, type::STRING);
-  l.check(start, type::INTEGER);
-  l.check(end, type::INTEGER);
+  check(str, type::STRING);
+  check(start, type::INTEGER);
+  check(end, type::INTEGER);
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
@@ -100,13 +100,13 @@ inline constexpr auto STRCMP = "strcmp";   // compare strings
 void string::init()
 {
   // clang-format off
-  mkprim(pn::STRINGP, ::lisp::stringp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::STREQ,   ::lisp::streq,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::CONCAT,  ::lisp::concat,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::STRLEN,  ::lisp::strlen,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SUBSTR,  ::lisp::substr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SYMSTR,  ::lisp::symstr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::STRCMP,  ::lisp::strcmp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STRINGP, stringp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STREQ,   streq,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CONCAT,  concat,  subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRLEN,  strlen,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SUBSTR,  substr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SYMSTR,  symstr,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STRCMP,  strcmp, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

@@ -101,8 +101,8 @@ TEST_CASE("Predicate functions")
     CHECK(xtypeof(mkfloat(0.0)) == C_FLOAT);
     CHECK(xtypeof(cons(NIL, NIL)) == C_CONS);
     CHECK(xtypeof(mkstring("foo")) == C_STRING);
-    CHECK(xtypeof(eval("+")) == C_SUBR);
-    CHECK(xtypeof(eval("quote")) == C_FSUBR);
+    CHECK(xtypeof(eval(l, "+")) == C_SUBR);
+    CHECK(xtypeof(eval(l, "quote")) == C_FSUBR);
     CHECK(xtypeof(lambda(NIL, NIL)) == C_LAMBDA);
     CHECK(xtypeof(nlambda(NIL, NIL)) == C_NLAMBDA);
     CHECK(xtypeof(closure(NIL, NIL)) == C_CLOSURE);

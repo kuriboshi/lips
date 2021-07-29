@@ -552,12 +552,12 @@ LISPT exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  l.check(file, type::STRING, type::SYMBOL);
+  check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    l.check(filed, type::INTEGER);
+    check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
@@ -586,12 +586,12 @@ LISPT exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  l.check(file, type::STRING, type::SYMBOL);
+  check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    l.check(filed, type::INTEGER);
+    check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
@@ -620,12 +620,12 @@ LISPT exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  l.check(file, type::STRING, type::SYMBOL);
+  check(file, type::STRING, type::SYMBOL);
   if(is_NIL(filed))
     oldfd = 0;
   else
   {
-    l.check(filed, type::INTEGER);
+    check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1)
@@ -751,7 +751,7 @@ LISPT exec::fg(LISPT job)
   }
   else
   {
-    l.check(job, type::INTEGER);
+    check(job, type::INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -787,7 +787,7 @@ LISPT exec::bg(LISPT job)
   }
   else
   {
-    l.check(job, type::INTEGER);
+    check(job, type::INTEGER);
     for(j = joblist; j; j = j->next)
       if(j->jobnum == job->intval())
         break;
@@ -811,15 +811,15 @@ LISPT exec::bg(LISPT job)
 
 LISPT exec::p_setenv(LISPT var, LISPT val)
 {
-  l.check(var, type::STRING, type::SYMBOL);
-  l.check(val, type::STRING, type::SYMBOL);
+  check(var, type::STRING, type::SYMBOL);
+  check(val, type::STRING, type::SYMBOL);
   setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
 LISPT exec::getenviron(LISPT var)
 {
-  l.check(var, type::STRING, type::SYMBOL);
+  check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
     return NIL;

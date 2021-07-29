@@ -16,14 +16,6 @@
 
 namespace lisp
 {
-namespace pn
-{
-inline constexpr auto RECLAIM = "reclaim";     // Initiate garbage collection
-inline constexpr auto CONS = "cons";           // Make a new cons cell
-inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
-inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
-} // namespace pn
-
 class evaluator;
 
 /// @brief Destination block is used to collect the parameters to a function.
@@ -214,8 +206,6 @@ public:
     std::array<lisp_t, CONSCELLS> cells;
   };
 
-  static void init();
-
 private:
   /// @brief The lisp interpreter.
   lisp& _lisp;
@@ -261,15 +251,6 @@ private:
   /// @brief Index to last slot in destblock.
   int destblockused = 0;
 };
-
-inline LISPT cons(lisp& l, LISPT a, LISPT b) { return l.a().cons(a, b); }
-inline LISPT cons(LISPT a, LISPT b) { return cons(lisp::current(), a, b); }
-inline LISPT reclaim(lisp& l, LISPT a) { return l.a().reclaim(a); }
-inline LISPT reclaim(LISPT a) { return reclaim(lisp::current(), a); }
-inline LISPT obarray(lisp& l) { return l.a().obarray(); }
-inline LISPT obarray() { return obarray(lisp::current()); }
-inline LISPT freecount(lisp& l) { return l.a().freecount(); }
-inline LISPT freecount() { return freecount(lisp::current()); }
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 

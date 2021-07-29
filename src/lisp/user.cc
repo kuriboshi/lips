@@ -19,15 +19,15 @@ namespace lisp
 user::user(): base() {}
 user::user(lisp& lisp): base(lisp) {}
 
-LISPT user::getargs(LISPT al)
+LISPT user::getargs(lisp& l, LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
   else
-    return cons(l, al->car(), getargs(al->cdr()));
+    return cons(l, al->car(), getargs(l, al->cdr()));
 }
 
-LISPT user::getrep(LISPT fun)
+LISPT user::getrep(lisp& l, LISPT fun)
 {
   LISPT args;
 
@@ -37,7 +37,7 @@ LISPT user::getrep(LISPT fun)
   if(x.argcnt == -1)
     args = x.arglist->car();
   else if(x.argcnt < 0)
-    args = getargs(x.arglist);
+    args = getargs(l, x.arglist);
   else
     args = x.arglist;
   if(type_of(fun) == type::LAMBDA)
@@ -45,7 +45,7 @@ LISPT user::getrep(LISPT fun)
   return cons(l, C_NLAMBDA, cons(l, args, x.lambdarep));
 }
 
-LISPT user::funeq(LISPT f1, LISPT f2)
+LISPT user::funeq(lisp& l, LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
     return T;
@@ -66,12 +66,12 @@ LISPT user::funeq(LISPT f1, LISPT f2)
   return NIL;
 }
 
-LISPT user::checkfn(LISPT name, LISPT lam)
+LISPT user::checkfn(lisp& l, LISPT name, LISPT lam)
 {
   if(type_of(name->symvalue()) != type::UNBOUND)
     if(type_of(name->symvalue()) == type::LAMBDA || type_of(name->symvalue()) == type::NLAMBDA)
     {
-      LISPT t = funeq(name->symvalue(), lam);
+      LISPT t = funeq(l, name->symvalue(), lam);
       if(is_NIL(t))
       {
         putprop(l, name, C_OLDDEF, name->symvalue());
@@ -82,16 +82,16 @@ LISPT user::checkfn(LISPT name, LISPT lam)
   return NIL;
 }
 
-LISPT user::define(LISPT name, LISPT lam)
+LISPT user::define(lisp& l, LISPT name, LISPT lam)
 {
-  l.check(name, type::SYMBOL);
-  l.check(lam, type::LAMBDA, type::NLAMBDA);
-  checkfn(name, lam);
+  check(name, type::SYMBOL);
+  check(lam, type::LAMBDA, type::NLAMBDA);
+  checkfn(l, name, lam);
   name->symvalue(lam);
   return name;
 }
 
-LISPT user::defineq(LISPT defs)
+LISPT user::defineq(lisp& l, LISPT defs)
 {
   if(is_NIL(defs))
     return NIL;
@@ -101,29 +101,29 @@ LISPT user::defineq(LISPT defs)
   {
     auto name = car(l, d);
     auto lam = eval(l, cadr(l, d));
-    auto def = cons(define(name, lam), NIL);
+    auto def = cons(l, define(l, name, lam), NIL);
     rplacd(r, def);
     r = def;
   }
   return result->cdr();
 }
 
-LISPT user::def(LISPT name, LISPT pars, LISPT body, type type)
+LISPT user::def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
 {
-  l.check(name, type::SYMBOL);
+  check(name, type::SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != type::SYMBOL)
-    l.check(pars, type::CONS);
+    check(pars, type::CONS);
   LISPT foo = mklambda(l, pars, body, type);
   if(type_of(foo) == type::ERROR)
     return NIL;
-  checkfn(name, foo);
+  checkfn(l, name, foo);
   name->symvalue(foo);
   return cons(l, name, NIL);
 }
 
-LISPT user::de(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::LAMBDA); }
+LISPT user::de(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::LAMBDA); }
 
-LISPT user::df(LISPT name, LISPT pars, LISPT body) { return def(name, pars, body, type::NLAMBDA); }
+LISPT user::df(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::NLAMBDA); }
 
 namespace pn
 {
@@ -137,11 +137,11 @@ inline constexpr auto DF = "df";           // define nlambda function
 void user::init()
 {
   // clang-format off
-  mkprim(pn::DEFINE,  ::lisp::define,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::DEFINEQ, ::lisp::defineq, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::GETREP,  ::lisp::getrep,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::DE,      ::lisp::de,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::DF,      ::lisp::df,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::DEFINE,  define,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::DEFINEQ, defineq, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETREP,  getrep,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::DE,      de,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::DF,      df,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

@@ -12,7 +12,7 @@ namespace lisp
 {
 LISPT low::set(lisp& l, LISPT var, LISPT val)
 {
-  l.check(var, type::SYMBOL);
+  check(var, type::SYMBOL);
   if(var->symbol().constant)
     return l.error(ATTEMPT_TO_CLOBBER, var);
   if(type_of(var->symvalue()) == type::INDIRECT)
@@ -50,7 +50,7 @@ LISPT low::cond(lisp& l, LISPT args)
   while(is_NIL(res))
   {
     LISPT alt = args->car();
-    l.check(alt, type::CONS);
+    check(alt, type::CONS);
     res = eval(l, alt->car());
     if(!is_NIL(res))
     {

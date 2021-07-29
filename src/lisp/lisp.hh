@@ -370,6 +370,17 @@ public:
   static lisp& current() { return *_current; }
   static void current(lisp& lisp) { _current = &lisp; }
 
+  static LISPT eval(lisp& l, LISPT expr);
+  static LISPT apply(lisp& l, LISPT fun, LISPT args);
+  static LISPT baktrace(lisp& l);
+  static LISPT topofstack(lisp& l);
+  static LISPT envget(lisp& l, LISPT a, LISPT b);
+
+  static LISPT cons(lisp& l, LISPT a, LISPT b);
+  static LISPT reclaim(lisp& l, LISPT a);
+  static LISPT obarray(lisp& l);
+  static LISPT freecount(lisp& l);
+
   file_t& primout() const { return *_primout; }
   file_t& primerr() const { return *_primerr; }
   file_t& primin() const { return *_primin; }
@@ -386,24 +397,6 @@ public:
   void fatal(int);
   LISPT syserr(LISPT);
   LISPT break0(LISPT);
-
-  void check(LISPT arg, type type)
-  {
-    if(type_of(arg) != type)
-      error(NOT_A | to_underlying(type), arg);
-  }
-
-  void check(LISPT arg, type type0, type type1)
-  {
-    if(type_of(arg) != type0 && type_of(arg) != type1)
-      error(ILLEGAL_ARG, arg);
-  }
-
-  void check(LISPT arg, type type0, type type1, type type2)
-  {
-    if(type_of(arg) != type0 && type_of(arg) != type1 && type_of(arg) != type2)
-      error(ILLEGAL_ARG, arg);
-  }
 
   enum class break_return
   {
@@ -599,10 +592,46 @@ inline LISPT syserr(LISPT a) { return syserr(lisp::current(), a); }
 inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
 inline LISPT break0(LISPT a) { return break0(lisp::current(), a); }
 
-inline void check(lisp& l, LISPT arg, type type) { l.check(arg, type); }
-inline void check(LISPT arg, type type) { check(lisp::current(), arg, type); }
-inline void check(lisp& l, LISPT arg, type type0, type type1) { l.check(arg, type0, type1); }
-inline void check(LISPT arg, type type0, type type1) { check(lisp::current(), arg, type0, type1); }
+inline LISPT eval(lisp& l, LISPT expr) { return lisp::eval(l, expr); }
+inline LISPT eval(LISPT expr) { return lisp::eval(lisp::current(), expr); }
+LISPT eval(lisp&, const std::string&);
+LISPT eval(const std::string& expr);
+inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return lisp::apply(l, fun, args); }
+inline LISPT apply(LISPT fun, LISPT args) { return lisp::apply(lisp::current(), fun, args); }
+inline LISPT baktrace(lisp& l) { return lisp::baktrace(l); }
+inline LISPT baktrace() { return lisp::baktrace(lisp::current()); }
+inline LISPT topofstack(lisp& l) { return lisp::topofstack(l); }
+inline LISPT topofstack() { return lisp::topofstack(lisp::current()); }
+inline LISPT envget(lisp& l, LISPT a, LISPT b) { return lisp::envget(l, a, b); }
+inline LISPT envget(LISPT a, LISPT b) { return lisp::envget(lisp::current(), a, b); }
+
+inline LISPT cons(lisp& l, LISPT a, LISPT b) { return lisp::cons(l, a, b); }
+inline LISPT cons(LISPT a, LISPT b) { return lisp::cons(lisp::current(), a, b); }
+inline LISPT reclaim(lisp& l, LISPT a) { return lisp::reclaim(l, a); }
+inline LISPT reclaim(LISPT a) { return lisp::reclaim(lisp::current(), a); }
+inline LISPT obarray(lisp& l) { return lisp::obarray(l); }
+inline LISPT obarray() { return lisp::obarray(lisp::current()); }
+inline LISPT freecount(lisp& l) { return lisp::freecount(l); }
+inline LISPT freecount() { return lisp::freecount(lisp::current()); }
+
+inline void check(LISPT arg, type type)
+{
+  if(type_of(arg) != type)
+    error(NOT_A | to_underlying(type), arg);
+}
+
+inline void check(LISPT arg, type type0, type type1)
+{
+  if(type_of(arg) != type0 && type_of(arg) != type1)
+    error(ILLEGAL_ARG, arg);
+}
+
+inline void check(LISPT arg, type type0, type type1, type type2)
+{
+  if(type_of(arg) != type0 && type_of(arg) != type1 && type_of(arg) != type2)
+    error(ILLEGAL_ARG, arg);
+}
+
 inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
 inline void break_flag(bool val) { lisp::current().brkflg = val; }
 

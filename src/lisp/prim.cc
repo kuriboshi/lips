@@ -11,9 +11,6 @@
 
 namespace lisp
 {
-prim::prim(): base() {}
-prim::prim(lisp& lisp): base(lisp) {}
-
 /* 
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
  *              indirect object,  return it.
@@ -36,128 +33,128 @@ static LISPT mkindirect(lisp& l, LISPT obj)
  * closobj - builds a list of indirect pointers to the values of the 
  *           symbols in the list VARS. Used to construct a closure.
  */
-LISPT prim::closobj(LISPT vars)
+LISPT prim::closobj(lisp& l, LISPT vars)
 {
   if(is_NIL(vars))
     return NIL;
-  l.check(vars, type::CONS);
-  l.check(vars->car(), type::SYMBOL);
-  return cons(l, mkindirect(l, vars->car()->symvalue()), closobj(vars->cdr()));
+  check(vars, type::CONS);
+  check(vars->car(), type::SYMBOL);
+  return cons(l, mkindirect(l, vars->car()->symvalue()), closobj(l, vars->cdr()));
 }
 
-LISPT prim::car(LISPT a)
+LISPT prim::car(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a->car();
   return NIL;
 }
 
-LISPT prim::cdr(LISPT a)
+LISPT prim::cdr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a->cdr();
   return NIL;
 }
 
-LISPT prim::cadr(LISPT a)
+LISPT prim::cadr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(a->cdr());
+    return car(l, a->cdr());
   return NIL;
 }
 
-LISPT prim::cdar(LISPT a)
+LISPT prim::cdar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(a->car());
+    return cdr(l, a->car());
   return NIL;
 }
 
-LISPT prim::caar(LISPT a)
+LISPT prim::caar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(a->car());
+    return car(l, a->car());
   return NIL;
 }
 
-LISPT prim::cddr(LISPT a)
+LISPT prim::cddr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(a->cdr());
+    return cdr(l, a->cdr());
   return NIL;
 }
 
-LISPT prim::cdddr(LISPT a)
+LISPT prim::cdddr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(cdr(a->cdr()));
+    return cdr(l, cdr(l, a->cdr()));
   return NIL;
 }
 
-LISPT prim::caddr(LISPT a)
+LISPT prim::caddr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(cdr(a->cdr()));
+    return car(l, cdr(l, a->cdr()));
   return NIL;
 }
 
-LISPT prim::cdadr(LISPT a)
+LISPT prim::cdadr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(car(a->cdr()));
+    return cdr(l, car(l, a->cdr()));
   return NIL;
 }
 
-LISPT prim::caadr(LISPT a)
+LISPT prim::caadr(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(car(a->cdr()));
+    return car(l, car(l, a->cdr()));
   return NIL;
 }
 
-LISPT prim::cddar(LISPT a)
+LISPT prim::cddar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(cdr(a->car()));
+    return cdr(l, cdr(l, a->car()));
   return NIL;
 }
 
-LISPT prim::cadar(LISPT a)
+LISPT prim::cadar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(cdr(a->car()));
+    return car(l, cdr(l, a->car()));
   return NIL;
 }
 
-LISPT prim::cdaar(LISPT a)
+LISPT prim::cdaar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return cdr(car(a->car()));
+    return cdr(l, car(l, a->car()));
   return NIL;
 }
 
-LISPT prim::caaar(LISPT a)
+LISPT prim::caaar(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
-    return car(car(a->car()));
+    return car(l, car(l, a->car()));
   return NIL;
 }
 
-LISPT prim::rplaca(LISPT x, LISPT y)
+LISPT prim::rplaca(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::CONS);
+  check(x, type::CONS);
   x->car(y);
   return x;
 }
 
-LISPT prim::rplacd(LISPT x, LISPT y)
+LISPT prim::rplacd(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::CONS);
+  check(x, type::CONS);
   x->cdr(y);
   return x;
 }
 
-LISPT prim::eq(LISPT a, LISPT b)
+LISPT prim::eq(lisp& l, LISPT a, LISPT b)
 {
   if(EQ(a, b))
     return T;
@@ -167,14 +164,14 @@ LISPT prim::eq(LISPT a, LISPT b)
   return NIL;
 }
 
-LISPT prim::atom(LISPT a)
+LISPT prim::atom(lisp& l, LISPT a)
 {
   if(is_NIL(a) || is_T(a) || type_of(a) == type::SYMBOL || type_of(a) == type::INTEGER || type_of(a) == type::FLOAT)
     return T;
   return NIL;
 }
 
-LISPT prim::nconc(LISPT x)
+LISPT prim::nconc(lisp& l, LISPT x)
 {
   LISPT cl;
 
@@ -184,14 +181,14 @@ LISPT prim::nconc(LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      l.check(x->car(), type::CONS);
+      check(x->car(), type::CONS);
       if(is_NIL(curp))
       {
         curp = x->car();
         newl = curp;
       }
       else
-        rplacd(curp, x->car());
+        rplacd(l, curp, x->car());
       for(cl = x->car(); !is_NIL(cl->cdr()); cl = cl->cdr())
         ;
       curp = cl;
@@ -200,33 +197,33 @@ LISPT prim::nconc(LISPT x)
   return newl;
 }
 
-LISPT prim::tconc(LISPT cell, LISPT obj)
+LISPT prim::tconc(lisp& l, LISPT cell, LISPT obj)
 {
   if(is_NIL(cell))
   {
     cell = cons(l, cons(l, obj, NIL), NIL);
-    return rplacd(cell, cell->car());
+    return rplacd(l, cell, cell->car());
   }
-  l.check(cell, type::CONS);
+  check(cell, type::CONS);
   if(type_of(cell->car()) != type::CONS)
   {
-    rplacd(cell, cons(l, obj, NIL));
-    return rplaca(cell, cell->cdr());
+    rplacd(l, cell, cons(l, obj, NIL));
+    return rplaca(l, cell, cell->cdr());
   }
-  rplacd(cell->cdr(), cons(l, obj, NIL));
-  return rplacd(cell, cell->cdr()->cdr());
+  rplacd(l, cell->cdr(), cons(l, obj, NIL));
+  return rplacd(l, cell, cell->cdr()->cdr());
 }
 
-LISPT prim::attach(LISPT obj, LISPT list)
+LISPT prim::attach(lisp& l, LISPT obj, LISPT list)
 {
   if(is_NIL(list))
     return cons(l, obj, NIL);
-  l.check(list, type::CONS);
-  rplacd(list, cons(l, list->car(), list->cdr()));
-  return rplaca(list, obj);
+  check(list, type::CONS);
+  rplacd(l, list, cons(l, list->car(), list->cdr()));
+  return rplaca(l, list, obj);
 }
 
-LISPT prim::append(LISPT x)
+LISPT prim::append(lisp& l, LISPT x)
 {
   LISPT cl;
 
@@ -236,10 +233,10 @@ LISPT prim::append(LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      l.check(x->car(), type::CONS);
+      check(x->car(), type::CONS);
       for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
       {
-        rplacd(curp, cons(l, cl->car(), NIL));
+        rplacd(l, curp, cons(l, cl->car(), NIL));
         curp = curp->cdr();
       }
     }
@@ -247,22 +244,22 @@ LISPT prim::append(LISPT x)
   return newl->cdr();
 }
 
-LISPT prim::null(LISPT a)
+LISPT prim::null(lisp& l, LISPT a)
 {
   if(EQ(a, NIL))
     return T;
   return NIL;
 }
 
-LISPT prim::quote(LISPT x) { return x; }
+LISPT prim::quote(lisp& l, LISPT x) { return x; }
 
-LISPT prim::lambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::LAMBDA); }
+LISPT prim::lambda(lisp& l, LISPT x, LISPT f) { return mklambda(l, x, f, type::LAMBDA); }
 
-LISPT prim::nlambda(LISPT x, LISPT f) { return mklambda(l, x, f, type::NLAMBDA); }
+LISPT prim::nlambda(lisp& l, LISPT x, LISPT f) { return mklambda(l, x, f, type::NLAMBDA); }
 
-LISPT prim::list(LISPT x) { return x; }
+LISPT prim::list(lisp& l, LISPT x) { return x; }
 
-LISPT prim::length(LISPT x)
+LISPT prim::length(lisp& l, LISPT x)
 {
   int i = 0;
   while(!is_NIL(x) && type_of(x) == type::CONS)
@@ -273,66 +270,68 @@ LISPT prim::length(LISPT x)
   return mknumber(l, i);
 }
 
-LISPT prim::closure(LISPT fun, LISPT vars)
+LISPT prim::closure(lisp& l, LISPT fun, LISPT vars)
 {
   closure_t c;
   c.cfunction = fun;
   c.closed = vars;
-  auto f = length(vars);
+  auto f = length(l, vars);
   c.count = f->intval();
-  f = closobj(vars);
+  f = closobj(l, vars);
   if(type_of(f) == type::ERROR)
     return f;
   c.cvalues = f;
-  auto clos = a.getobject();
+  auto clos = l.a().getobject();
   clos->set(c);
   return clos;
 }
 
-inline LISPT _nth(LISPT list, int n)
+inline LISPT _nth(lisp& l, LISPT list, int n)
 {
-  LISPT l;
+  LISPT ls;
 
-  for(l = list; n > 1 && !is_NIL(l); n--, l = l->cdr())
+  for(ls = list; n > 1 && !is_NIL(ls); n--, ls = ls->cdr())
     ;
-  if(!is_NIL(l))
-    return l->car();
-  else
-    return NIL;
+  if(!is_NIL(ls))
+    return ls->car();
+  return NIL;
 }
 
-LISPT prim::nth(LISPT x, LISPT p)
+LISPT prim::nth(lisp& l, LISPT x, LISPT p)
 {
-  l.check(p, type::INTEGER);
+  check(p, type::INTEGER);
   if(is_NIL(x))
     return NIL;
-  l.check(x, type::CONS);
-  return _nth(x, p->intval());
+  check(x, type::CONS);
+  return _nth(l, x, p->intval());
 }
 
-LISPT prim::nthd(LISPT list, LISPT pos)
+LISPT prim::nthd(lisp& l, LISPT list, LISPT pos)
 {
-  l.check(pos, type::INTEGER);
+  check(pos, type::INTEGER);
   int p = pos->intval();
   if(is_NIL(list))
     return NIL;
-  l.check(list, type::CONS);
-  LISPT l;
-  for(l = list; type_of(l) == type::CONS && p > 1; l = l->cdr()) p--;
-  return l;
+  check(list, type::CONS);
+  LISPT ls;
+  for(ls = list; type_of(ls) == type::CONS && p > 1; ls = ls->cdr())
+  {
+    --p;
+  }
+  return ls;
 }
 
-LISPT prim::error(LISPT mess)
+LISPT prim::error(lisp& l, LISPT mess)
 {
-  l.check(mess, type::STRING);
+  check(mess, type::STRING);
   return l.error(USER_ERROR, mess);
 }
 
-LISPT prim::uxexit(LISPT status)
+LISPT prim::uxexit(lisp& l, LISPT status)
 {
   if(is_NIL(status))
     throw lisp_finish("exit called", 0);
-  l.check(status, type::INTEGER);
+  check(status, type::INTEGER);
   throw lisp_finish("exit called", status->intval());
 }
 
@@ -389,39 +388,39 @@ void prim::init()
   C_QUOTE = intern(pn::QUOTE);
 
   // clang-format off
-  mkprim(pn::ATOM,    ::lisp::atom,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::ATTACH,  ::lisp::attach,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::APPEND,  ::lisp::append,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::CAR,     ::lisp::car,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDR,     ::lisp::cdr,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CADR,    ::lisp::cadr,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDAR,    ::lisp::cdar,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CAAR,    ::lisp::caar,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDDR,    ::lisp::cddr,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDDDR,   ::lisp::cdddr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CADDR,   ::lisp::caddr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDADR,   ::lisp::cdadr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CAADR,   ::lisp::caadr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDDAR,   ::lisp::cddar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CADAR,   ::lisp::cadar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CDAAR,   ::lisp::cdaar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CAAAR,   ::lisp::caaar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::CLOSURE, ::lisp::closure, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::EQ,      ::lisp::eq,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::ERROR,   ::lisp::error,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::EXIT,    ::lisp::uxexit,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::LAMBDA,  ::lisp::lambda,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::LENGTH,  ::lisp::length,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::LIST,    ::lisp::list,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::NCONC,   ::lisp::nconc,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::NLAMBDA, ::lisp::nlambda, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::NTH,     ::lisp::nth,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::NULL_,   ::lisp::null,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::QUOTE,   ::lisp::quote,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::RPLACA,  ::lisp::rplaca,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::RPLACD,  ::lisp::rplacd,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::TCONC,   ::lisp::tconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::NTHD,    ::lisp::nthd,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ATOM,    atom,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ATTACH,  attach,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::APPEND,  append,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CAR,     car,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDR,     cdr,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CADR,    cadr,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDAR,    cdar,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CAAR,    caar,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDDR,    cddr,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDDDR,   cdddr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CADDR,   caddr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDADR,   cdadr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CAADR,   caadr,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDDAR,   cddar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CADAR,   cadar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CDAAR,   cdaar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CAAAR,   caaar,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::CLOSURE, closure, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::EQ,      eq,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ERROR,   error,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::EXIT,    uxexit,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::LAMBDA,  lambda,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::LENGTH,  length,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::LIST,    list,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::NCONC,   nconc,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::NLAMBDA, nlambda, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::NTH,     nth,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::NULL_,   null,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::QUOTE,   quote,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RPLACA,  rplaca,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::RPLACD,  rplacd,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::TCONC,   tconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::NTHD,    nthd,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
 }
 

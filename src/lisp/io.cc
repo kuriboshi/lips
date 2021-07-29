@@ -448,7 +448,7 @@ LISPT io::readline(file_t& file)
 
 LISPT io::getline(LISPT file)
 {
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   auto line = file->fileval().getline();
   if(line)
     return mkstring(*line);

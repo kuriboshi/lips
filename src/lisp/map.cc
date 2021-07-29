@@ -11,10 +11,7 @@
 
 namespace lisp
 {
-Map::Map(): base() {}
-Map::Map(lisp& lisp): base(lisp) {}
-
-LISPT Map::map(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -27,7 +24,7 @@ LISPT Map::map(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-LISPT Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
@@ -40,7 +37,7 @@ LISPT Map::mapc(LISPT obj, LISPT fn1, LISPT fn2)
   return NIL;
 }
 
-LISPT Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
@@ -61,7 +58,7 @@ LISPT Map::maplist(LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
-LISPT Map::mapcar(LISPT obj, LISPT fn1, LISPT fn2)
+LISPT Map::mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
@@ -93,10 +90,10 @@ inline constexpr auto MAPCAR = "mapcar";   // mapc and build result
 void Map::init()
 {
   // clang-format off
-  mkprim(pn::MAP,     ::lisp::map,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MAPC,    ::lisp::mapc,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MAPLIST, ::lisp::maplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::MAPCAR,  ::lisp::mapcar,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAP,     map,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPC,    mapc,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPLIST, maplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::MAPCAR,  mapcar,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

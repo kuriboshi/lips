@@ -15,7 +15,7 @@ TEST_CASE("Primary functions")
 
   SUBCASE("CAR and CDR")
   {
-    auto sample = eval("(cons 1 2)");
+    auto sample = eval(l, "(cons 1 2)");
     CHECK(car(sample)->intval() == 1);
     CHECK(cdr(sample)->intval() == 2);
 
@@ -26,7 +26,7 @@ TEST_CASE("Primary functions")
   SUBCASE("C..R and C...R")
   {
     {
-      auto sample = eval("(quote ((1 . 2) 3 . 4))");
+      auto sample = eval(l, "(quote ((1 . 2) 3 . 4))");
       CHECK(caar(sample)->intval() == 1);
       CHECK(cdar(sample)->intval() == 2);
       CHECK(cadr(sample)->intval() == 3);
@@ -39,7 +39,7 @@ TEST_CASE("Primary functions")
     }
 
     {
-      auto sample = eval("(quote (((1 . 2) 3 . 4) (5 . 6) 7 . 8))");
+      auto sample = eval(l, "(quote (((1 . 2) 3 . 4) (5 . 6) 7 . 8))");
       CHECK(caaar(sample)->intval() == 1);
       CHECK(cdaar(sample)->intval() == 2);
       CHECK(cadar(sample)->intval() == 3);

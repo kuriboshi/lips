@@ -11,26 +11,23 @@
 
 namespace lisp
 {
-prop::prop(): base() {}
-prop::prop(lisp& lisp): base(lisp) {}
-
-LISPT prop::setplist(LISPT x, LISPT pl)
+LISPT prop::setplist(lisp& l, LISPT x, LISPT pl)
 {
-  l.check(x, type::SYMBOL);
+  check(x, type::SYMBOL);
   x->symbol().plist = pl;
   return pl;
 }
 
-LISPT prop::getplist(LISPT x)
+LISPT prop::getplist(lisp& l, LISPT x)
 {
-  l.check(x, type::SYMBOL);
+  check(x, type::SYMBOL);
   return x->symbol().plist;
 }
 
-LISPT prop::putprop(LISPT x, LISPT p, LISPT v)
+LISPT prop::putprop(lisp& l, LISPT x, LISPT p, LISPT v)
 {
-  l.check(x, type::SYMBOL);
-  l.check(p, type::SYMBOL);
+  check(x, type::SYMBOL);
+  check(p, type::SYMBOL);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
     if(EQ(pl->car(), p))
     {
@@ -41,10 +38,10 @@ LISPT prop::putprop(LISPT x, LISPT p, LISPT v)
   return v;
 }
 
-LISPT prop::getprop(LISPT x, LISPT p)
+LISPT prop::getprop(lisp& l, LISPT x, LISPT p)
 {
-  l.check(x, type::SYMBOL);
-  l.check(p, type::SYMBOL);
+  check(x, type::SYMBOL);
+  check(p, type::SYMBOL);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(EQ(pl->car(), p))
@@ -53,12 +50,12 @@ LISPT prop::getprop(LISPT x, LISPT p)
   return NIL;
 }
 
-LISPT prop::remprop(LISPT x, LISPT p)
+LISPT prop::remprop(lisp& l, LISPT x, LISPT p)
 {
   LISPT pl, pl2;
 
-  l.check(x, type::SYMBOL);
-  l.check(p, type::SYMBOL);
+  check(x, type::SYMBOL);
+  check(p, type::SYMBOL);
   LISPT r = NIL;
   for(pl = x->symbol().plist, pl2 = NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
@@ -87,11 +84,11 @@ inline constexpr auto REMPROP = "remprop";   // remove prop
 void prop::init()
 {
   // clang-format off
-  mkprim(pn::SETPLIST, ::lisp::setplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GETPLIST, ::lisp::getplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PUTPROP,  ::lisp::putprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GETPROP,  ::lisp::getprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::REMPROP,  ::lisp::remprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SETPLIST, setplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETPLIST, getplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PUTPROP,  putprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETPROP,  getprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::REMPROP,  remprop,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

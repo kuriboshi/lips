@@ -20,7 +20,7 @@ LISPT debug::evaltrace(lisp& l, LISPT state)
 
   if(!is_NIL(state))
   {
-    l.check(state, type::INTEGER);
+    check(state, type::INTEGER);
     l.e().trace(state->intval());
   }
   return mknumber(l, i);

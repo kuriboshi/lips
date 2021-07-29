@@ -13,12 +13,12 @@ namespace lisp
 
 LISPT file::open(lisp& l, LISPT filename, LISPT mode)
 {
-  l.check(filename, type::STRING, type::SYMBOL);
+  check(filename, type::STRING, type::SYMBOL);
   bool readmode = true;
   bool appendmode = false;
   if(!is_NIL(mode))
   {
-    l.check(mode, type::SYMBOL);
+    check(mode, type::SYMBOL);
     if(EQ(mode, C_READ))
       readmode = true;
     else if(EQ(mode, C_WRITE))
@@ -45,7 +45,7 @@ LISPT file::open(lisp& l, LISPT filename, LISPT mode)
 
 LISPT file::close(lisp& l, LISPT fildes)
 {
-  l.check(fildes, type::FILET);
+  check(fildes, type::FILET);
   fildes->fileval().flush();
   if(fildes->fileval().close())
     return T;
@@ -58,7 +58,7 @@ LISPT file::ratom(lisp& l, LISPT file)
     return ::lisp::ratom(l, l.primin());
   if(is_T(file))
     return ::lisp::ratom(l, l.stdin());
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return ::lisp::ratom(l, file->fileval());
 }
 
@@ -68,7 +68,7 @@ LISPT file::readc(lisp& l, LISPT file)
     return l.a().mknumber(l.primin().getch());
   if(is_T(file))
     return l.a().mknumber(l.stdin().getch());
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return l.a().mknumber(file->fileval().getch());
 }
 
@@ -78,7 +78,7 @@ LISPT file::read(lisp& l, LISPT file)
     return lispread(l, l.primin(), false);
   if(is_T(file))
     return lispread(l, l.stdin(), false);
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return lispread(l, file->fileval(), false);
 }
 
@@ -88,7 +88,7 @@ LISPT file::print(lisp& l, LISPT x, LISPT file)
     return ::lisp::print(l, x, l.primout());
   if(is_T(file))
     return ::lisp::print(l, x, l.primerr());
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return ::lisp::print(l, x, file->fileval());
 }
 
@@ -109,7 +109,7 @@ bool file::loadfile(lisp& l, const std::string& lf)
 
 LISPT file::load(lisp& l, LISPT f)
 {
-  l.check(f, type::STRING, type::SYMBOL);
+  check(f, type::STRING, type::SYMBOL);
   if(!loadfile(l, f->getstr()))
     l.fatal(CANT_LOAD);
   return f;
@@ -121,7 +121,7 @@ LISPT file::terpri(lisp& l, LISPT file)
     return ::lisp::terpri(l, l.primout());
   if(is_T(file))
     return ::lisp::terpri(l, l.primerr());
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return ::lisp::terpri(l, file->fileval());
 }
 
@@ -132,7 +132,7 @@ LISPT file::prin1(lisp& l, LISPT x, LISPT file)
     return prin0(l, x, l.primout(), false);
   if(is_T(file))
     return prin0(l, x, l.primerr(), false);
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return prin0(l, x, file->fileval(), false);
 }
 
@@ -143,7 +143,7 @@ LISPT file::prin2(lisp& l, LISPT x, LISPT file)
     return prin0(l, x, l.primout(), true);
   if(is_T(file))
     return prin0(l, x, l.primerr(), true);
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return prin0(l, x, file->fileval(), true);
 }
 
@@ -152,7 +152,7 @@ LISPT file::plevel(lisp& l, LISPT newl)
   auto x = l.printlevel;
   if(!is_NIL(newl))
   {
-    l.check(newl, type::INTEGER);
+    check(newl, type::INTEGER);
     l.printlevel = newl->intval();
   }
   return l.a().mknumber(x);
@@ -163,14 +163,14 @@ LISPT file::spaces(lisp& l, LISPT n, LISPT file)
   int i;
   file_t* f;
 
-  l.check(n, type::INTEGER);
+  check(n, type::INTEGER);
   if(is_NIL(file))
     f = &l.primout();
   else if(is_T(file))
     f = &l.primerr();
   else
   {
-    l.check(file, type::FILET);
+    check(file, type::FILET);
     f = &file->fileval();
   }
   for(i = n->intval(); i > 0; i--) f->putch(' ');
@@ -183,7 +183,7 @@ LISPT file::readline(lisp& l, LISPT file)
     return ::lisp::readline(l, l.primin());
   else if(is_T(file))
     return ::lisp::readline(l, l.stdin());
-  l.check(file, type::FILET);
+  check(file, type::FILET);
   return ::lisp::readline(l, file->fileval());
 }
 

@@ -39,7 +39,7 @@ LISPT alloc::reclaim(LISPT incr)
   int i = 0;
   if(!is_NIL(incr))
   {
-    _lisp.check(incr, type::INTEGER);
+    check(incr, type::INTEGER);
     i = incr->intval();
   }
   for(; i > 0; --i)
@@ -194,15 +194,5 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
  * dzero - Frees all destination blocks.
  */
 void alloc::dzero() { destblockused = 0; }
-
-void alloc::init()
-{
-  // clang-format off
-  mkprim(subr_t(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD));
-  mkprim(subr_t(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD));
-  mkprim(subr_t(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD));
-  mkprim(subr_t(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD));
-  // clang-format on
-}
 
 } // namespace lisp

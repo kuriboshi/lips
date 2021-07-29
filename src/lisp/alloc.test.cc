@@ -77,11 +77,11 @@ TEST_CASE("C Variables")
   auto r0 = eval(cvar);
   CHECK(r0->intval() == 321);
 
-  auto r1 = eval("(setq cvar 444)");
+  auto r1 = eval(l, "(setq cvar 444)");
   CHECK(r1->intval() == 444);
   CHECK(cvar->intval() == 444);
 
-  auto r2 = eval("cvar");
+  auto r2 = eval(l, "cvar");
   CHECK(r2->intval() == 444);
 
   cvar = mkstring("hello");

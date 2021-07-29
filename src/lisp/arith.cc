@@ -60,7 +60,7 @@ LISPT arith::iplus(lisp& l, LISPT x)
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
   {
-    l.check(*i, type::INTEGER);
+    check(*i, type::INTEGER);
     sum += (**i).intval();
   }
   return mknumber(l, sum);
@@ -68,12 +68,12 @@ LISPT arith::iplus(lisp& l, LISPT x)
 
 LISPT arith::fplus(lisp& l, LISPT x)
 {
-  l.check(x->car(), type::FLOAT);
+  check(x->car(), type::FLOAT);
   auto sum = x->car()->floatval();
   x = x->cdr();
   while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), type::FLOAT);
+    check(x->car(), type::FLOAT);
     sum = sum + x->car()->floatval();
     x = x->cdr();
   }
@@ -82,8 +82,8 @@ LISPT arith::fplus(lisp& l, LISPT x)
 
 LISPT arith::difference(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::INTEGER, type::FLOAT);
-  l.check(y, type::INTEGER, type::FLOAT);
+  check(x, type::INTEGER, type::FLOAT);
+  check(y, type::INTEGER, type::FLOAT);
   if(type_of(x) == type::INTEGER)
     if(type_of(y) == type::INTEGER)
       return mknumber(l, x->intval() - y->intval());
@@ -96,15 +96,15 @@ LISPT arith::difference(lisp& l, LISPT x, LISPT y)
 
 LISPT arith::idifference(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::INTEGER);
-  l.check(y, type::INTEGER);
+  check(x, type::INTEGER);
+  check(y, type::INTEGER);
   return mknumber(l, x->intval() - y->intval());
 }
 
 LISPT arith::fdifference(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::FLOAT);
-  l.check(y, type::FLOAT);
+  check(x, type::FLOAT);
+  check(y, type::FLOAT);
   return mkfloat(l, x->floatval() - y->floatval());
 }
 
@@ -143,12 +143,12 @@ LISPT arith::ltimes(lisp& l, LISPT x)
 
 LISPT arith::itimes(lisp& l, LISPT x)
 {
-  l.check(x->car(), type::INTEGER);
+  check(x->car(), type::INTEGER);
   auto prod = x->car()->intval();
   x = x->cdr();
   while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), type::INTEGER);
+    check(x->car(), type::INTEGER);
     prod = prod * x->car()->intval();
     x = x->cdr();
   }
@@ -157,12 +157,12 @@ LISPT arith::itimes(lisp& l, LISPT x)
 
 LISPT arith::ftimes(lisp& l, LISPT x)
 {
-  l.check(x->car(), type::FLOAT);
+  check(x->car(), type::FLOAT);
   auto prod = x->car()->floatval();
   x = x->cdr();
   while(type_of(x) == type::CONS)
   {
-    l.check(x->car(), type::FLOAT);
+    check(x->car(), type::FLOAT);
     prod = prod * x->car()->floatval();
     x = x->cdr();
   }
@@ -171,8 +171,8 @@ LISPT arith::ftimes(lisp& l, LISPT x)
 
 LISPT arith::divide(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::INTEGER, type::FLOAT);
-  l.check(y, type::INTEGER, type::FLOAT);
+  check(x, type::INTEGER, type::FLOAT);
+  check(y, type::INTEGER, type::FLOAT);
   if(type_of(x) == type::INTEGER)
     if(type_of(y) == type::INTEGER)
     {
@@ -199,8 +199,8 @@ LISPT arith::divide(lisp& l, LISPT x, LISPT y)
 
 LISPT arith::iquotient(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::INTEGER);
-  l.check(y, type::INTEGER);
+  check(x, type::INTEGER);
+  check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, NIL);
   return mknumber(l, x->intval() / y->intval());
@@ -208,8 +208,8 @@ LISPT arith::iquotient(lisp& l, LISPT x, LISPT y)
 
 LISPT arith::iremainder(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::INTEGER);
-  l.check(y, type::INTEGER);
+  check(x, type::INTEGER);
+  check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, NIL);
   return mknumber(l, x->intval() % y->intval());
@@ -217,8 +217,8 @@ LISPT arith::iremainder(lisp& l, LISPT x, LISPT y)
 
 LISPT arith::fdivide(lisp& l, LISPT x, LISPT y)
 {
-  l.check(x, type::FLOAT);
-  l.check(y, type::FLOAT);
+  check(x, type::FLOAT);
+  check(y, type::FLOAT);
   if(y->floatval() == 0.0)
     return l.error(DIVIDE_ZERO, NIL);
   return mkfloat(l, x->floatval() / y->floatval());
@@ -226,7 +226,7 @@ LISPT arith::fdivide(lisp& l, LISPT x, LISPT y)
 
 LISPT arith::minus(lisp& l, LISPT x)
 {
-  l.check(x, type::FLOAT, type::INTEGER);
+  check(x, type::FLOAT, type::INTEGER);
   if(type_of(x) == type::INTEGER)
     return mknumber(l, -x->intval());
   return mkfloat(l, -x->floatval());
@@ -234,7 +234,7 @@ LISPT arith::minus(lisp& l, LISPT x)
 
 LISPT arith::iminus(lisp& l, LISPT x)
 {
-  l.check(x, type::INTEGER);
+  check(x, type::INTEGER);
   return mknumber(l, -x->intval());
 }
 
@@ -242,7 +242,7 @@ LISPT arith::absval(lisp& l, LISPT x)
 {
   int sign;
 
-  l.check(x, type::INTEGER);
+  check(x, type::INTEGER);
   if(x->intval() < 0)
     sign = -1;
   else
@@ -252,19 +252,19 @@ LISPT arith::absval(lisp& l, LISPT x)
 
 LISPT arith::itof(lisp& l, LISPT x)
 {
-  l.check(x, type::INTEGER);
+  check(x, type::INTEGER);
   return mkfloat(l, (double)x->intval());
 }
 
 LISPT arith::add1(lisp& l, LISPT x)
 {
-  l.check(x, type::INTEGER);
+  check(x, type::INTEGER);
   return mknumber(l, x->intval() + 1);
 }
 
 LISPT arith::sub1(lisp& l, LISPT x)
 {
-  l.check(x, type::INTEGER);
+  check(x, type::INTEGER);
   return mknumber(l, x->intval() - 1);
 }
 

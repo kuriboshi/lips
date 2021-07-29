@@ -13,6 +13,22 @@
 
 namespace lisp
 {
+namespace pn
+{
+inline constexpr auto E = "e";                   // noeval version of eval
+inline constexpr auto EVAL = "eval";             // evaluate exp
+inline constexpr auto APPLY = "apply";           // apply function on args
+inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
+inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
+inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr auto ENVGET = "envget";         // examine environment
+
+inline constexpr auto RECLAIM = "reclaim";       // Initiate garbage collection
+inline constexpr auto CONS = "cons";             // Make a new cons cell
+inline constexpr auto FREECOUNT = "freecount";   // Number of free cells
+inline constexpr auto OBARRAY = "obarray";       // Return list of all atoms
+} // namespace pn
+
 lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 {
   if(_current == nullptr)
@@ -109,10 +125,8 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     e().breakhook(nullptr);
 
     Map::init();
-    alloc::init();
     arith::init();
     debug::init();
-    evaluator::init();
     file::init();
     logic::init();
     low::init();
@@ -121,7 +135,22 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     prop::init();
     string::init();
     user::init();
-  }
+
+    // clang-format off
+    mkprim(pn::E,          eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+    mkprim(pn::EVAL,       eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::APPLY,      apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+    mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::ENVGET,     envget,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+
+    mkprim(pn::RECLAIM,   reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+    mkprim(pn::CONS,      cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+    mkprim(pn::FREECOUNT, freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+    mkprim(pn::OBARRAY,   obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+    // clang-format on
+ }
 
   _variables = std::make_unique<cvariables>(_alloc);
 
@@ -133,6 +162,17 @@ lisp::~lisp()
   if(_current == this)
     _current = nullptr;
 }
+
+LISPT lisp::eval(lisp& l, LISPT expr) { return l._eval.eval(expr); }
+LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l._eval.apply(fun, args); }
+LISPT lisp::baktrace(lisp& l) { return l._eval.baktrace(); }
+LISPT lisp::topofstack(lisp& l) { return l._eval.topofstack(); }
+LISPT lisp::envget(lisp& l, LISPT a, LISPT b) { return l._eval.envget(a, b); }
+
+LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
+LISPT lisp::reclaim(lisp& l, LISPT a) { return l._alloc.reclaim(a); }
+LISPT lisp::obarray(lisp& l) { return l._alloc.obarray(); }
+LISPT lisp::freecount(lisp& l) { return l._alloc.freecount(); }
 
 void lisp::primout(std::unique_ptr<file_t> f)
 {
@@ -200,6 +240,18 @@ lisp* lisp::_current = nullptr;
 std::map<int, std::string> lisp::messages;
 std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;
 subr_t::subr_vector subr_t::subr_store;
+
+LISPT eval(lisp& l, const std::string& expr)
+{
+  file_t in(expr);
+  auto e = lispread(l, in, false);
+  return lisp::eval(l, e);
+}
+
+LISPT eval(const std::string& expr)
+{
+  return ::lisp::eval(lisp::current(), expr);
+}
 
 //
 // All lisp constants needed internally.
