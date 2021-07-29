@@ -82,34 +82,6 @@ LISPT alloc::freecount()
   return mknumber(freelist.size());
 }
 
-void alloc::mkprim(subr_t subr)
-{
-  auto s = LISPT(new lisp_t);
-  s->set(subr_index{subr_t::put(subr)});
-  LISPT f = intern(subr.name);
-  f->symvalue(s);
-}
-
-void alloc::mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  mkprim(subr_t(pname, subr, spread, fun));
-}
-
-void alloc::mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  mkprim(subr_t(pname, subr, spread, fun));
-}
-
-void alloc::mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  mkprim(subr_t(pname, subr, spread, fun));
-}
-
-void alloc::mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  mkprim(subr_t(pname, subr, spread, fun));
-}
-
 LISPT alloc::mkstring(const std::string& str)
 {
   LISPT s = getobject();
@@ -226,10 +198,10 @@ void alloc::dzero() { destblockused = 0; }
 void alloc::init()
 {
   // clang-format off
-  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(subr_t(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD));
+  mkprim(subr_t(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD));
+  mkprim(subr_t(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD));
+  mkprim(subr_t(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD));
   // clang-format on
 }
 

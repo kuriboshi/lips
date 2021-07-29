@@ -132,17 +132,17 @@ struct subr_t
   using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
   using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
 
-  subr_t(const std::string& pname, enum subr subr, enum spread spread, func0_t fun)
-    : name(pname), subr(subr), spread(spread), f(fun)
+  subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
+    : name(pname), f(fun), subr(subr), spread(spread)
   {}
-  subr_t(const std::string& pname, enum subr subr, enum spread spread, func1_t fun)
-    : name(pname), subr(subr), spread(spread), f(fun)
+  subr_t(const std::string& pname, func1_t fun, enum subr subr, enum spread spread)
+    : name(pname), f(fun), subr(subr), spread(spread)
   {}
-  subr_t(const std::string& pname, enum subr subr, enum spread spread, func2_t fun)
-    : name(pname), subr(subr), spread(spread), f(fun)
+  subr_t(const std::string& pname, func2_t fun, enum subr subr, enum spread spread)
+    : name(pname), f(fun), subr(subr), spread(spread)
   {}
-  subr_t(const std::string& pname, enum subr subr, enum spread spread, func3_t fun)
-    : name(pname), subr(subr), spread(spread), f(fun)
+  subr_t(const std::string& pname, func3_t fun, enum subr subr, enum spread spread)
+    : name(pname), f(fun), subr(subr), spread(spread)
   {}
   constexpr std::size_t argcount() const noexcept { return f.index(); }
 
@@ -152,9 +152,9 @@ struct subr_t
   LISPT operator()(lisp& l, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(l, a, b, c); }
 
   std::string name;
+  std::variant<func0_t, func1_t, func2_t, func3_t> f;
   enum subr subr = subr::EVAL;
   enum spread spread = spread::SPREAD;
-  std::variant<func0_t, func1_t, func2_t, func3_t> f;
 
   using subr_vector = std::vector<subr_t>;
   using subr_index = subr_vector::size_type;

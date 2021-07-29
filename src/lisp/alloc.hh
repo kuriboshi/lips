@@ -126,11 +126,13 @@ public:
   /// number of parameters, whether the function is spread, nospread, or
   /// halfspread, whether the function should evaluate it's arguments or not.
   ///
-  static void mkprim(subr_t subr);
-  static void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr, enum subr_t::spread);
-  static void mkprim(const std::string& pname, subr_t::func1_t fname, enum subr_t::subr, enum subr_t::spread);
-  static void mkprim(const std::string& pname, subr_t::func2_t fname, enum subr_t::subr, enum subr_t::spread);
-  static void mkprim(const std::string& pname, subr_t::func3_t fname, enum subr_t::subr, enum subr_t::spread);
+  static void mkprim(subr_t subr)
+  {
+    auto s = LISPT(new lisp_t);
+    s->set(subr_index{subr_t::put(subr)});
+    LISPT f = intern(subr.name);
+    f->symvalue(s);
+  }
 
   LISPT mkatom(const std::string&);
 
@@ -326,22 +328,22 @@ inline cvariable& initcvar(const std::string& name, LISPT val) { return alloc::i
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, subr, spread, fun));
+  alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, subr, spread, fun));
+  alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, subr, spread, fun));
+  alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, subr, spread, fun));
+  alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 } // namespace lisp

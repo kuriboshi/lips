@@ -124,25 +124,25 @@ TEST_CASE("reclaim + freecount")
 #ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {
+  std::cout << "==========\n";
   std::cout << "sizeof conscells_t: " << sizeof(alloc::conscells_t) << std::endl;
   std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;
-  std::cout << "sizeof lisp_t*: " << sizeof(lisp_t*) << std::endl;
-
+  std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
-  std::cout << "symbol_t: " << sizeof(symbol::symbol_t) << std::endl;
   std::cout << "symbol::print_name: " << sizeof(symbol::print_name) << std::endl;
   std::cout << "int: " << sizeof(int) << std::endl;
   std::cout << "double: " << sizeof(double) << std::endl;
   std::cout << "indirect_t: " << sizeof(indirect_t) << std::endl;
   std::cout << "cons_t: " << sizeof(cons_t) << std::endl;
   std::cout << "std::string: " << sizeof(std::string) << std::endl;
-  std::cout << "subr_t: " << sizeof(subr_t) << std::endl;
   std::cout << "subr_index: " << sizeof(subr_index) << std::endl;
   std::cout << "lambda_t: " << sizeof(lambda_t) << std::endl;
   std::cout << "closure_t: " << sizeof(closure_t) << std::endl;
   std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
   std::cout << "std::shared_ptr<file_t>: " << sizeof(std::shared_ptr<file_t>) << std::endl;
   std::cout << "cvariable: " << sizeof(cvariable) << std::endl;
+  std::cout << "==========\n";
+  std::cout << "subr_t: " << sizeof(subr_t) << std::endl;
 }
 #endif
 
