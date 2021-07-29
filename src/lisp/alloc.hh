@@ -126,7 +126,7 @@ public:
   /// number of parameters, whether the function is spread, nospread, or
   /// halfspread, whether the function should evaluate it's arguments or not.
   ///
-  static void mkprim(const std::string& pname, subr_t subr);
+  static void mkprim(subr_t subr);
   static void mkprim(const std::string& pname, subr_t::func0_t fname, enum subr_t::subr, enum subr_t::spread);
   static void mkprim(const std::string& pname, subr_t::func1_t fname, enum subr_t::subr, enum subr_t::spread);
   static void mkprim(const std::string& pname, subr_t::func2_t fname, enum subr_t::subr, enum subr_t::spread);
@@ -211,6 +211,8 @@ public:
     static constexpr int CONSCELLS = 10240; // Number of cells in each block
     std::array<lisp_t, CONSCELLS> cells;
   };
+
+  static void init();
 
 private:
   /// @brief The lisp interpreter.
@@ -324,22 +326,22 @@ inline cvariable& initcvar(const std::string& name, LISPT val) { return alloc::i
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, subr_t(subr, spread, fun));
+  alloc::mkprim(subr_t(pname, subr, spread, fun));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, subr_t(subr, spread, fun));
+  alloc::mkprim(subr_t(pname, subr, spread, fun));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, subr_t(subr, spread, fun));
+  alloc::mkprim(subr_t(pname, subr, spread, fun));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(pname, subr_t(subr, spread, fun));
+  alloc::mkprim(subr_t(pname, subr, spread, fun));
 }
 
 } // namespace lisp

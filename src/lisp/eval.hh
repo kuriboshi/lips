@@ -41,7 +41,7 @@ public:
 
   void bt();
   void unwind();
-  void init();
+  static void init();
   int trace() const { return _trace; }
   void trace(int t) { _trace = t; }
 

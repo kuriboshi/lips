@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "error.hh"
+#include "except.hh"
 #include "symbol.hh"
 
 namespace lisp
@@ -115,32 +116,61 @@ struct cons_t
 ///
 struct subr_t
 {
-  enum class subr {
+  enum class subr
+  {
     EVAL,
     NOEVAL
-  } subr = subr::EVAL;
-  enum class spread {
+  };
+  enum class spread
+  {
     SPREAD,
     NOSPREAD
-  } spread = spread::SPREAD;
+  };
 
   using func0_t = LISPT (*)(lisp&);
   using func1_t = LISPT (*)(lisp&, LISPT);
   using func2_t = LISPT (*)(lisp&, LISPT, LISPT);
   using func3_t = LISPT (*)(lisp&, LISPT, LISPT, LISPT);
 
-  subr_t(enum subr subr, enum spread spread, func0_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(enum subr subr, enum spread spread, func1_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(enum subr subr, enum spread spread, func2_t fun) : subr(subr), spread(spread), f(fun) {}
-  subr_t(enum subr subr, enum spread spread, func3_t fun) : subr(subr), spread(spread), f(fun) {}
-  constexpr std::size_t argcount() const noexcept { return f.index() - 1; }
+  subr_t(const std::string& pname, enum subr subr, enum spread spread, func0_t fun)
+    : name(pname), subr(subr), spread(spread), f(fun)
+  {}
+  subr_t(const std::string& pname, enum subr subr, enum spread spread, func1_t fun)
+    : name(pname), subr(subr), spread(spread), f(fun)
+  {}
+  subr_t(const std::string& pname, enum subr subr, enum spread spread, func2_t fun)
+    : name(pname), subr(subr), spread(spread), f(fun)
+  {}
+  subr_t(const std::string& pname, enum subr subr, enum spread spread, func3_t fun)
+    : name(pname), subr(subr), spread(spread), f(fun)
+  {}
+  constexpr std::size_t argcount() const noexcept { return f.index(); }
 
   LISPT operator()(lisp& l) const { return std::get<func0_t>(f)(l); }
   LISPT operator()(lisp& l, LISPT a) const { return std::get<func1_t>(f)(l, a); }
   LISPT operator()(lisp& l, LISPT a, LISPT b) const { return std::get<func2_t>(f)(l, a, b); }
   LISPT operator()(lisp& l, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(l, a, b, c); }
 
-  std::variant<std::monostate, func0_t, func1_t, func2_t, func3_t> f;
+  std::string name;
+  enum subr subr = subr::EVAL;
+  enum spread spread = spread::SPREAD;
+  std::variant<func0_t, func1_t, func2_t, func3_t> f;
+
+  using subr_vector = std::vector<subr_t>;
+  using subr_index = subr_vector::size_type;
+  static std::unordered_map<std::string, subr_index> subr_map;
+  static subr_vector subr_store;
+  static const subr_t& get(subr_index index) { return subr_store[index]; }
+  static subr_index put(const subr_t& subr)
+  {
+    auto p = subr_map.find(subr.name);
+    if(p != subr_map.end())
+      throw lisp_error("redefinition of subr not allowed");
+    auto index = subr_store.size();
+    subr_store.push_back(subr);
+    subr_map.insert(std::pair(subr.name, index));
+    return index;
+  }
 };
 
 /// @brief Lambda representation.
@@ -163,6 +193,11 @@ struct closure_t
   LISPT closed = NIL;
   LISPT cvalues = NIL;
   std::uint8_t count = 0;
+};
+
+struct subr_index
+{
+  subr_t::subr_index index;
 };
 
 /// @brief A representation of a C++ variable linked to a lisp variable.
@@ -249,10 +284,10 @@ public:
     _type = type::STRING;
     _u = s;
   }
-  auto subrval() const -> const subr_t& { return std::get<subr_t>(_u); }
-  void set(subr_t x)
+  auto subrval() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
+  void set(subr_index x)
   {
-    _type = x.subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
+    _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
     _u = x;
   }
   auto lamval() -> lambda_t& { return std::get<lambda_t>(_u); }
@@ -290,7 +325,7 @@ private:
     indirect_t,                 // INDIRECT (4)
     cons_t,                     // CONS (5)
     std::string,                // STRING (6)
-    subr_t,                     // SUBR (7)
+    subr_index,                 // SUBR (7)
     lambda_t,                   // LAMBDA (8)
     closure_t,                  // CLOSURE (9)
     destblock_t*,               // ENVIRON (10)

@@ -16,13 +16,6 @@ alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection()
 {
   destblockused = 0;
   newpage(); // Allocate one page of storage
-
-  // clang-format off
-  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  // clang-format on
 }
 
 // TODO: Free all memory
@@ -89,32 +82,32 @@ LISPT alloc::freecount()
   return mknumber(freelist.size());
 }
 
-void alloc::mkprim(const std::string& pname, subr_t subr)
+void alloc::mkprim(subr_t subr)
 {
   auto s = LISPT(new lisp_t);
-  s->set(subr);
-  LISPT f = intern(pname);
+  s->set(subr_index{subr_t::put(subr)});
+  LISPT f = intern(subr.name);
   f->symvalue(s);
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, subr_t(subr, spread, fun));
+  mkprim(subr_t(pname, subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, subr_t(subr, spread, fun));
+  mkprim(subr_t(pname, subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, subr_t(subr, spread, fun));
+  mkprim(subr_t(pname, subr, spread, fun));
 }
 
 void alloc::mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  mkprim(pname, subr_t(subr, spread, fun));
+  mkprim(subr_t(pname, subr, spread, fun));
 }
 
 LISPT alloc::mkstring(const std::string& str)
@@ -229,5 +222,15 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
  * dzero - Frees all destination blocks.
  */
 void alloc::dzero() { destblockused = 0; }
+
+void alloc::init()
+{
+  // clang-format off
+  mkprim(pn::RECLAIM,   ::lisp::reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CONS,      ::lisp::cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::FREECOUNT, ::lisp::freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::OBARRAY,   ::lisp::obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  // clang-format on
+}
 
 } // namespace lisp

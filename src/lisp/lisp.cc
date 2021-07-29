@@ -107,22 +107,25 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
 
     e().undefhook(nullptr);
     e().breakhook(nullptr);
+
+    Map::init();
+    alloc::init();
+    arith::init();
+    debug::init();
+    evaluator::init();
+    file::init();
+    logic::init();
+    low::init();
+    pred::init();
+    prim::init();
+    prop::init();
+    string::init();
+    user::init();
   }
 
   _variables = std::make_unique<cvariables>(_alloc);
 
-  Map::init();
-  arith::init();
-  debug::init();
-  file::init();
-  io::init(*this);
-  logic::init();
-  low::init();
-  pred::init();
-  prim::init();
-  prop::init();
-  string::init();
-  user::init();
+  io::set_read_table(*this);
 }
 
 lisp::~lisp()
@@ -195,6 +198,8 @@ lisp::cvariables::cvariables(alloc& a)
 
 lisp* lisp::_current = nullptr;
 std::map<int, std::string> lisp::messages;
+std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;
+subr_t::subr_vector subr_t::subr_store;
 
 //
 // All lisp constants needed internally.

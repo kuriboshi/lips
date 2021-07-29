@@ -25,7 +25,7 @@ public:
   io(): base() {}
   io(lisp& lisp): base(lisp) {}
   ~io() = default;
-  static void init(lisp&);
+  static void set_read_table(lisp&);
 
   void pushr(LISPT w);
   void popr(LISPT& w);

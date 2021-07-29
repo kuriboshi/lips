@@ -16,10 +16,7 @@ using namespace std::literals;
 
 namespace lisp
 {
-evaluator::evaluator(lisp& lisp): l(lisp), a(lisp.a())
-{
-  init();
-}
+evaluator::evaluator(lisp& lisp): l(lisp), a(lisp.a()) {}
 
 void evaluator::reset()
 {

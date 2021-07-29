@@ -630,7 +630,7 @@ LISPT io::print(LISPT x, file_t& file)
   return x;
 }
 
-void io::init(lisp& l)
+void io::set_read_table(lisp& l)
 {
   l.set_read_table('"', char_class::INSERT, io::rmdquote);
   l.set_read_table('\'', char_class::INSERT, io::rmsquote);
