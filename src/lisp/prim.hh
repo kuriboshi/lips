@@ -9,52 +9,50 @@
 
 namespace lisp
 {
-class prim
+namespace prim
 {
-public:
-  static void init();
+void init();
 
-  static LISPT car(lisp&, LISPT);
-  static LISPT cdr(lisp&, LISPT);
-  static LISPT cadr(lisp&, LISPT);
-  static LISPT cdar(lisp&, LISPT);
-  static LISPT caar(lisp&, LISPT);
-  static LISPT cddr(lisp&, LISPT);
-  static LISPT cdddr(lisp&, LISPT);
-  static LISPT caddr(lisp&, LISPT);
-  static LISPT cdadr(lisp&, LISPT);
-  static LISPT caadr(lisp&, LISPT);
-  static LISPT cddar(lisp&, LISPT);
-  static LISPT cadar(lisp&, LISPT);
-  static LISPT cdaar(lisp&, LISPT);
-  static LISPT caaar(lisp&, LISPT);
-  static LISPT rplaca(lisp&, LISPT, LISPT);
-  static LISPT rplacd(lisp&, LISPT, LISPT);
-  static LISPT eq(lisp&, LISPT, LISPT);
-  static LISPT atom(lisp&, LISPT);
-  static LISPT nconc(lisp&, LISPT);
-  static LISPT tconc(lisp&, LISPT, LISPT);
-  static LISPT attach(lisp&, LISPT, LISPT);
-  static LISPT append(lisp&, LISPT);
-  static LISPT null(lisp&, LISPT);
-  static LISPT quote(lisp&, LISPT);
-  static LISPT lambda(lisp&, LISPT, LISPT);
-  static LISPT nlambda(lisp&, LISPT, LISPT);
-  static LISPT list(lisp&, LISPT);
-  static LISPT length(lisp&, LISPT);
-  static LISPT closure(lisp&, LISPT, LISPT);
+LISPT car(lisp&, LISPT);
+LISPT cdr(lisp&, LISPT);
+LISPT cadr(lisp&, LISPT);
+LISPT cdar(lisp&, LISPT);
+LISPT caar(lisp&, LISPT);
+LISPT cddr(lisp&, LISPT);
+LISPT cdddr(lisp&, LISPT);
+LISPT caddr(lisp&, LISPT);
+LISPT cdadr(lisp&, LISPT);
+LISPT caadr(lisp&, LISPT);
+LISPT cddar(lisp&, LISPT);
+LISPT cadar(lisp&, LISPT);
+LISPT cdaar(lisp&, LISPT);
+LISPT caaar(lisp&, LISPT);
+LISPT rplaca(lisp&, LISPT, LISPT);
+LISPT rplacd(lisp&, LISPT, LISPT);
+LISPT eq(lisp&, LISPT, LISPT);
+LISPT atom(lisp&, LISPT);
+LISPT nconc(lisp&, LISPT);
+LISPT tconc(lisp&, LISPT, LISPT);
+LISPT attach(lisp&, LISPT, LISPT);
+LISPT append(lisp&, LISPT);
+LISPT null(lisp&, LISPT);
+LISPT quote(lisp&, LISPT);
+LISPT lambda(lisp&, LISPT, LISPT);
+LISPT nlambda(lisp&, LISPT, LISPT);
+LISPT list(lisp&, LISPT);
+LISPT length(lisp&, LISPT);
+LISPT closure(lisp&, LISPT, LISPT);
 
-  /// @brief Return the N'th element in the list LIST.  If N is greater than
-  /// the length of LIST, return NIL.
-  ///
-  static LISPT nth(lisp&, LISPT, LISPT);
-  static LISPT nthd(lisp&, LISPT, LISPT);
-  static LISPT error(lisp&, LISPT);
-  static LISPT uxexit(lisp&, LISPT);
+/// @brief Return the N'th element in the list LIST.  If N is greater than
+/// the length of LIST, return NIL.
+///
+LISPT nth(lisp&, LISPT, LISPT);
+LISPT nthd(lisp&, LISPT, LISPT);
+LISPT error(lisp&, LISPT);
+LISPT uxexit(lisp&, LISPT);
 
-private:
-  static LISPT closobj(lisp&, LISPT);
-};
+LISPT closobj(lisp&, LISPT);
+} // namespace prim
 
 extern LISPT C_ERROR;
 extern LISPT C_LAMBDA;

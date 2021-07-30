@@ -18,7 +18,7 @@ LISPT getplist(lisp&, LISPT);
 LISPT putprop(lisp&, LISPT, LISPT, LISPT);
 LISPT getprop(lisp&, LISPT, LISPT);
 LISPT remprop(lisp&, LISPT, LISPT);
-}
+} // namespace prop
 
 inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return prop::setplist(l, a, b); }
 inline LISPT setplist(LISPT a, LISPT b) { return prop::setplist(lisp::current(), a, b); }

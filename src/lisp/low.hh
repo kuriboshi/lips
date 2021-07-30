@@ -9,19 +9,18 @@
 
 namespace lisp
 {
-class low
+namespace low
 {
-public:
-  static void init();
+void init();
 
-  static LISPT set(lisp&, LISPT, LISPT);
-  static LISPT setq(lisp&, LISPT, LISPT);
-  static LISPT progn(lisp&, LISPT);
-  static LISPT cond(lisp&, LISPT);
-  static LISPT xwhile(lisp&, LISPT, LISPT);
-  static LISPT prog1(lisp&, LISPT, LISPT);
-  static LISPT prog2(lisp&, LISPT, LISPT, LISPT);
-};
+LISPT set(lisp&, LISPT, LISPT);
+LISPT setq(lisp&, LISPT, LISPT);
+LISPT progn(lisp&, LISPT);
+LISPT cond(lisp&, LISPT);
+LISPT xwhile(lisp&, LISPT, LISPT);
+LISPT prog1(lisp&, LISPT, LISPT);
+LISPT prog2(lisp&, LISPT, LISPT, LISPT);
+} // namespace low
 
 inline LISPT set(lisp& l, LISPT a, LISPT b) { return low::set(l, a, b); }
 inline LISPT set(LISPT a, LISPT b) { return low::set(lisp::current(), a, b); }

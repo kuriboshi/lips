@@ -9,21 +9,20 @@
 
 namespace lisp
 {
-class logic
+namespace logic
 {
-public:
-  static void init();
+void init();
 
-  static LISPT p_and(lisp&, LISPT);
-  static LISPT p_or(lisp&, LISPT);
-  static LISPT p_not(lisp&, LISPT);
-  static LISPT xif(lisp&, LISPT, LISPT, LISPT);
-};
+LISPT p_and(lisp&, LISPT);
+LISPT p_or(lisp&, LISPT);
+LISPT p_not(lisp&, LISPT);
+LISPT xif(lisp&, LISPT, LISPT, LISPT);
+} // namespace logic
 
 inline LISPT p_and(lisp& l, LISPT x) { return logic::p_and(l, x); }
 inline LISPT p_and(LISPT x) { return logic::p_and(lisp::current(), x); }
 inline LISPT p_or(lisp& l, LISPT x) { return logic::p_or(l, x); }
-inline LISPT p_or(LISPT x) { return logic().p_or(lisp::current(), x); }
+inline LISPT p_or(LISPT x) { return logic::p_or(lisp::current(), x); }
 inline LISPT p_not(lisp& l, LISPT x) { return logic::p_not(l, x); }
 inline LISPT p_not(LISPT x) { return logic::p_not(lisp::current(), x); }
 inline LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)

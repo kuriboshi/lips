@@ -9,9 +9,9 @@
 #include "eval.hh"
 #include "low.hh"
 
-namespace lisp
+namespace lisp::logic
 {
-LISPT logic::p_and(lisp& l, LISPT x)
+LISPT p_and(lisp& l, LISPT x)
 {
   LISPT foo = T;
   while(!is_NIL(x))
@@ -24,7 +24,7 @@ LISPT logic::p_and(lisp& l, LISPT x)
   return foo;
 }
 
-LISPT logic::p_or(lisp& l, LISPT x)
+LISPT p_or(lisp& l, LISPT x)
 {
   LISPT foo = NIL;
   while(!is_NIL(x))
@@ -37,14 +37,14 @@ LISPT logic::p_or(lisp& l, LISPT x)
   return foo;
 }
 
-LISPT logic::p_not(lisp& l, LISPT x)
+LISPT p_not(lisp& l, LISPT x)
 {
   if(is_NIL(x))
     return T;
   return NIL;
 }
 
-LISPT logic::xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
+LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo = eval(l, pred);
   if(is_NIL(foo))
@@ -60,7 +60,7 @@ inline constexpr auto NOT = "not"; // not
 inline constexpr auto IF = "if";   // if a then b else c
 } // namespace pn
 
-void logic::init()
+void init()
 {
   // clang-format off
   mkprim(pn::AND, p_and, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
@@ -70,4 +70,4 @@ void logic::init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::logic

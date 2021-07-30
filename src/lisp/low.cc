@@ -8,9 +8,9 @@
 #include "alloc.hh"
 #include "eval.hh"
 
-namespace lisp
+namespace lisp::low
 {
-LISPT low::set(lisp& l, LISPT var, LISPT val)
+LISPT set(lisp& l, LISPT var, LISPT val)
 {
   check(var, type::SYMBOL);
   if(var->symbol().constant)
@@ -28,9 +28,9 @@ LISPT low::set(lisp& l, LISPT var, LISPT val)
   return val;
 }
 
-LISPT low::setq(lisp& l, LISPT var, LISPT val) { return set(l, var, eval(l, val)); }
+LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(l, val)); }
 
-LISPT low::progn(lisp& l, LISPT lexp)
+LISPT progn(lisp& l, LISPT lexp)
 {
   if(is_NIL(lexp))
     return NIL;
@@ -42,7 +42,7 @@ LISPT low::progn(lisp& l, LISPT lexp)
   return eval(l, lexp->car());
 }
 
-LISPT low::cond(lisp& l, LISPT args)
+LISPT cond(lisp& l, LISPT args)
 {
   LISPT res = NIL;
   if(is_NIL(args))
@@ -57,7 +57,7 @@ LISPT low::cond(lisp& l, LISPT args)
       if(is_NIL(alt->cdr()))
         return res;
       else
-        return progn(l, alt->cdr());
+        return low::progn(l, alt->cdr());
     }
     args = args->cdr();
     if(is_NIL(args))
@@ -66,20 +66,20 @@ LISPT low::cond(lisp& l, LISPT args)
   return NIL;
 }
 
-LISPT low::xwhile(lisp& l, LISPT pred, LISPT exp)
+LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
 {
   LISPT res = eval(l, pred);
   while(!is_NIL(res))
   {
-    progn(l, exp);
+    low::progn(l, exp);
     res = eval(l, pred);
   }
   return NIL;
 }
 
-LISPT low::prog1(lisp& l, LISPT a1, LISPT) { return a1; }
+LISPT prog1(lisp& l, LISPT a1, LISPT) { return a1; }
 
-LISPT low::prog2(lisp& l, LISPT, LISPT a2, LISPT) { return a2; }
+LISPT prog2(lisp& l, LISPT, LISPT a2, LISPT) { return a2; }
 
 namespace pn
 {
@@ -93,7 +93,7 @@ inline constexpr auto PROG1 = "prog1"; // return first expression
 inline constexpr auto PROG2 = "prog2"; // return second expression
 } // namespace pn
 
-void low::init()
+void init()
 {
   // clang-format off
   mkprim(pn::SET,   set,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
@@ -107,4 +107,4 @@ void low::init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::low
