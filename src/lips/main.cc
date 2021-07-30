@@ -28,9 +28,6 @@
 #include "top.hh"
 #include "term.hh"
 
-using lisp::primin;
-using lisp::primerr;
-
 std::jmp_buf jumper;
 int mypgrp;     /* lips process group. */
 char* progname; /* Name of the game. */
@@ -326,19 +323,19 @@ inline std::unique_ptr<::lisp::lisp> init()
 
   C_ALIAS = alloc::intern("alias");
   C_AMPER = alloc::intern("&");
-  C_BACK = alloc::intern(PN_BACK);
+  C_BACK = alloc::intern(pn::BACK);
   C_BAR = alloc::intern("|");
   C_EXCL = alloc::intern("!");
-  C_EXEC = alloc::intern(PN_EXEC);
+  C_EXEC = alloc::intern(pn::EXEC);
   C_GGT = alloc::intern(">>");
   C_GT = alloc::intern(">");
   C_LT = alloc::intern("<");
   C_OLDVAL = alloc::intern("oldval");
-  C_PIPE = alloc::intern(PN_PIPECMD);
+  C_PIPE = alloc::intern(pn::PIPECMD);
   C_PROGN = alloc::intern("progn");
-  C_REDIR_APPEND = alloc::intern(PN_REDIR_APPEND);
-  C_REDIR_FROM = alloc::intern(PN_REDIR_FROM);
-  C_REDIR_TO = alloc::intern(PN_REDIR_TO);
+  C_REDIR_APPEND = alloc::intern(pn::REDIR_APPEND);
+  C_REDIR_FROM = alloc::intern(pn::REDIR_FROM);
+  C_REDIR_TO = alloc::intern(pn::REDIR_TO);
   C_SEMI = alloc::intern(";");
 
   top::init(l->a());

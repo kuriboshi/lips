@@ -545,7 +545,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-LISPT exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -579,7 +579,7 @@ LISPT exec::redir_to(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -613,7 +613,7 @@ LISPT exec::redir_append(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
+LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
   UNION_WAIT status;
@@ -647,7 +647,7 @@ LISPT exec::redir_from(LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::pipecmd(LISPT cmds)
+LISPT exec::pipecmd(lisp& l, LISPT cmds)
 {
   int pd[2];
   int pid;
@@ -690,7 +690,7 @@ LISPT exec::pipecmd(LISPT cmds)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::back(LISPT x)
+LISPT exec::back(lisp& l, LISPT x)
 {
   int pid;
 
@@ -709,13 +709,19 @@ LISPT exec::back(LISPT x)
   return mknumber(l, pid);
 }
 
-LISPT exec::stop()
+LISPT exec::stop(lisp& l)
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-LISPT exec::rehash()
+LISPT exec::rehash(lisp&)
+{
+  do_rehash();
+  return NIL;
+}
+
+void exec::do_rehash()
 {
   exechash.clear();
 
@@ -727,10 +733,9 @@ LISPT exec::rehash()
     for(auto& odir: std::filesystem::directory_iterator(p->getstr()))
       exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }
-  return NIL;
 }
 
-LISPT exec::jobs()
+LISPT exec::jobs(lisp& l)
 {
 #ifdef JOB_CONTROL
   for(auto* j = joblist; j; j = j->next) printjob(j);
@@ -738,7 +743,7 @@ LISPT exec::jobs()
   return NIL;
 }
 
-LISPT exec::fg(LISPT job)
+LISPT exec::fg(lisp& l, LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -774,7 +779,7 @@ LISPT exec::fg(LISPT job)
 #endif
 }
 
-LISPT exec::bg(LISPT job)
+LISPT exec::bg(lisp& l, LISPT job)
 {
 #ifdef JOB_CONTROL
   job_t* j = nullptr;
@@ -809,7 +814,7 @@ LISPT exec::bg(LISPT job)
 #endif
 }
 
-LISPT exec::p_setenv(LISPT var, LISPT val)
+LISPT exec::p_setenv(lisp& l, LISPT var, LISPT val)
 {
   check(var, type::STRING, type::SYMBOL);
   check(val, type::STRING, type::SYMBOL);
@@ -817,7 +822,7 @@ LISPT exec::p_setenv(LISPT var, LISPT val)
   return var;
 }
 
-LISPT exec::getenviron(LISPT var)
+LISPT exec::getenviron(lisp& l, LISPT var)
 {
   check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
@@ -826,7 +831,7 @@ LISPT exec::getenviron(LISPT var)
   return mkstring(l, s);
 }
 
-LISPT exec::cd(LISPT dir, LISPT emess)
+LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -834,7 +839,7 @@ LISPT exec::cd(LISPT dir, LISPT emess)
     ndir = env->home;
   else
   {
-    ndir = expand(dir);
+    ndir = expand(l, dir, NIL, NIL);
     if(type_of(ndir) == type::CONS)
       ndir = ndir->car();
   }
@@ -859,7 +864,7 @@ LISPT exec::cd(LISPT dir, LISPT emess)
   return ndir; // TODO: Is this correct?
 }
 
-LISPT exec::doexec(LISPT cmd)
+LISPT exec::doexec(lisp& l, LISPT cmd)
 {
   LISPT res;
 
@@ -875,27 +880,25 @@ LISPT exec::doexec(LISPT cmd)
   return NIL;
 }
 
-exec::exec(lisp& lisp): base(lisp) {}
-
 void exec::init()
 {
   // clang-format off
-  // mkprim(PN_EXPAND, expand, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(PN_REDIR_TO,     ::lisp::redir_to,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_REDIR_FROM,   ::lisp::redir_from,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_REDIR_APPEND, ::lisp::redir_append, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_PIPECMD,      ::lisp::pipecmd,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(PN_BACK,         ::lisp::back,         subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(PN_STOP,         ::lisp::stop,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_CD,           ::lisp::cd,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_REHASH,       ::lisp::rehash,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_JOBS,         ::lisp::jobs,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_FG,           ::lisp::fg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_BG,           ::lisp::bg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_SETENV,       ::lisp::p_setenv,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_GETENV,       ::lisp::getenviron,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(PN_EXEC,         ::lisp::doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  // mkprim(pn::EXPAND, expand, subr_t::S_EVAL, subr_t::S_NOSPREAD);
+  mkprim(pn::REDIR_TO,     redir_to,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::REDIR_FROM,   redir_from,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::REDIR_APPEND, redir_append, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PIPECMD,      pipecmd,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::BACK,         back,         subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STOP,         stop,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CD,           cd,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::REHASH,       rehash,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::JOBS,         jobs,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SETENV,       p_setenv,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::EXEC,         doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
-  rehash();
+  do_rehash();
   undefhook(execcommand);
 }

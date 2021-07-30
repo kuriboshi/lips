@@ -8,16 +8,15 @@
 
 #include <functional>
 #include <lisp/lisp.hh>
-#include <lisp/base.hh>
 
 namespace lisp
 {
 inline constexpr auto PN_PRINTHIST = "??"; // print history
 
-class top: public base
+class top
 {
 public:
-  top(lisp& lisp, const options_t& options, file_t& file) : base(lisp), options(options), file(file) {}
+  top(lisp& lisp, const options_t& options, file_t& file) : l(lisp), options(options), file(file) {}
   ~top() = default;
 
   static void init(alloc&);
@@ -67,6 +66,7 @@ private:
   };
   static std::unique_ptr<cvariables> variables;
 
+  lisp& l;
   const options_t& options;
   file_t& file;
   int _level = 0;

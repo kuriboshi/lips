@@ -267,7 +267,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
       break;
     default:
       file.ungetch(c);
-      at = io(l).ratom(file);
+      at = io::ratom(l, file);
       if(type_of(at) == type::INTEGER)
       {
         tmp = histget(at->intval(), variables->history);

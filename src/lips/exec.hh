@@ -8,68 +8,70 @@
 
 #include <unordered_map>
 #include <lisp/lisp.hh>
-#include <lisp/base.hh>
 
 namespace lisp
 {
-inline constexpr auto PN_CD = "cd";                  // change directory
-inline constexpr auto PN_EXPAND = "expand";          // expand wildcards
-inline constexpr auto PN_REDIR_TO = "redir-to";      // redirect to file
-inline constexpr auto PN_REDIR_FROM = "redir-from";  // redirect from file
-inline constexpr auto PN_REDIR_APPEND = "append-to"; // redirect appending to file
-inline constexpr auto PN_PIPECMD = "pipe-cmd";       // pipe commands
-inline constexpr auto PN_BACK = "back";              // run command in background
-inline constexpr auto PN_STOP = "stop-lips";         // stop lips, return to superior
-inline constexpr auto PN_REHASH = "rehash";          // recalculate hash table
-inline constexpr auto PN_JOBS = "jobs";              // list jobs
-inline constexpr auto PN_FG = "fg";                  // run job in foreground
-inline constexpr auto PN_BG = "bg";                  // run job in background
-inline constexpr auto PN_SETENV = "setenv";          // set environment variable
-inline constexpr auto PN_GETENV = "getenv";          // get value of variable
-inline constexpr auto PN_EXEC = "exec";              // overlay lips with command
+namespace pn
+{
+inline constexpr auto CD = "cd";                  // change directory
+inline constexpr auto EXPAND = "expand";          // expand wildcards
+inline constexpr auto REDIR_TO = "redir-to";      // redirect to file
+inline constexpr auto REDIR_FROM = "redir-from";  // redirect from file
+inline constexpr auto REDIR_APPEND = "append-to"; // redirect appending to file
+inline constexpr auto PIPECMD = "pipe-cmd";       // pipe commands
+inline constexpr auto BACK = "back";              // run command in background
+inline constexpr auto STOP = "stop-lips";         // stop lips, return to superior
+inline constexpr auto REHASH = "rehash";          // recalculate hash table
+inline constexpr auto JOBS = "jobs";              // list jobs
+inline constexpr auto FG = "fg";                  // run job in foreground
+inline constexpr auto BG = "bg";                  // run job in background
+inline constexpr auto SETENV = "setenv";          // set environment variable
+inline constexpr auto GETENV = "getenv";          // get value of variable
+inline constexpr auto EXEC = "exec";              // overlay lips with command
+}
 
-class exec: public base
+class exec
 {
 public:
-  exec(lisp&);
-  ~exec() = default;
   static void init();
 
-  LISPT redir_to(LISPT cmd, LISPT file, LISPT filed);
-  LISPT redir_append(LISPT cmd, LISPT file, LISPT filed);
-  LISPT redir_from(LISPT cmd, LISPT file, LISPT filed);
-  LISPT pipecmd(LISPT cmds);
-  LISPT back(LISPT x);
-  LISPT stop();
-  LISPT jobs();
-  LISPT fg(LISPT job);
-  LISPT bg(LISPT job);
-  LISPT p_setenv(LISPT var, LISPT val);
-  LISPT getenviron(LISPT var);
-  LISPT cd(LISPT dir, LISPT emess);
-  LISPT doexec(LISPT cmd);
-  static LISPT rehash();
+  static LISPT redir_to(lisp&, LISPT cmd, LISPT file, LISPT filed);
+  static LISPT redir_append(lisp&, LISPT cmd, LISPT file, LISPT filed);
+  static LISPT redir_from(lisp&, LISPT cmd, LISPT file, LISPT filed);
+  static LISPT pipecmd(lisp&, LISPT cmds);
+  static LISPT back(lisp&, LISPT x);
+  static LISPT stop(lisp&);
+  static LISPT jobs(lisp&);
+  static LISPT fg(lisp&, LISPT job);
+  static LISPT bg(lisp&, LISPT job);
+  static LISPT p_setenv(lisp&, LISPT var, LISPT val);
+  static LISPT getenviron(lisp&, LISPT var);
+  static LISPT cd(lisp&, LISPT dir, LISPT emess);
+  static LISPT doexec(lisp&, LISPT cmd);
+
+  static LISPT rehash(lisp&);
+  static void do_rehash();
 
 private:
   static int execcommand(LISPT, LISPT*);
   static std::unordered_map<std::string, std::string> exechash;
 };
 
-inline LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec(l).redir_to(cmd, file, filed); }
-inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec(l).redir_append(cmd, file, filed); }
-inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec(l).redir_from(cmd, file, filed); }
-inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec(l).pipecmd(cmds); }
-inline LISPT back(lisp& l, LISPT x) { return exec(l).back(x); }
-inline LISPT stop(lisp& l) { return exec(l).stop(); }
-inline LISPT rehash(lisp&) { return exec::rehash(); }
-inline LISPT rehash() { return exec::rehash(); }
-inline LISPT jobs(lisp& l) { return exec(l).jobs(); }
-inline LISPT fg(lisp& l, LISPT job) { return exec(l).fg(job); }
-inline LISPT bg(lisp& l, LISPT job) { return exec(l).bg(job); }
-inline LISPT p_setenv(lisp& l, LISPT var, LISPT val) { return exec(l).p_setenv(var, val); }
-inline LISPT getenviron(lisp& l, LISPT var) { return exec(l).getenviron(var); }
-inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec(l).cd(dir, emess); }
-inline LISPT doexec(lisp& l, LISPT cmd) { return exec(l).doexec(cmd); }
+inline LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(l, cmd, file, filed); }
+inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_append(l, cmd, file, filed); }
+inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(l, cmd, file, filed); }
+inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec::pipecmd(l, cmds); }
+inline LISPT back(lisp& l, LISPT x) { return exec::back(l, x); }
+inline LISPT stop(lisp& l) { return exec::stop(l); }
+inline LISPT rehash(lisp&) { exec::do_rehash(); return NIL; }
+inline LISPT rehash() { exec::do_rehash(); return NIL; }
+inline LISPT jobs(lisp& l) { return exec::jobs(l); }
+inline LISPT fg(lisp& l, LISPT job) { return exec::fg(l, job); }
+inline LISPT bg(lisp& l, LISPT job) { return exec::bg(l, job); }
+inline LISPT p_setenv(lisp& l, LISPT var, LISPT val) { return exec::p_setenv(l, var, val); }
+inline LISPT getenviron(lisp& l, LISPT var) { return exec::getenviron(l, var); }
+inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess); }
+inline LISPT doexec(lisp& l, LISPT cmd) { return exec::doexec(l, cmd); }
 
 } // namespace lisp
 
