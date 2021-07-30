@@ -372,7 +372,6 @@ inline constexpr auto APPEND = "append";   // append lists
 inline constexpr auto EXIT = "exit";       // exit lips
 } // namespace pn
 
-LISPT C_APPEND;
 LISPT C_ERROR;
 LISPT C_LAMBDA;
 LISPT C_NLAMBDA;
@@ -380,7 +379,6 @@ LISPT C_QUOTE;
 
 void prim::init()
 {
-  C_APPEND = intern(pn::APPEND);
   C_ERROR = intern(pn::ERROR);
   C_ERROR->settype(type::ERROR);
   C_LAMBDA = intern(pn::LAMBDA);

@@ -9,23 +9,17 @@
 
 namespace lisp
 {
-class user
+namespace user
 {
-public:
-  static void init();
+void init();
 
-  static LISPT getrep(lisp&, LISPT);
-  static LISPT define(lisp&, LISPT, LISPT);
-  static LISPT defineq(lisp&, LISPT);
-  static LISPT de(lisp&, LISPT, LISPT, LISPT);
-  static LISPT df(lisp&, LISPT, LISPT, LISPT);
-  static LISPT funeq(lisp&, LISPT, LISPT);
-
-private:
-  static LISPT getargs(lisp&, LISPT);
-  static LISPT def(lisp&, LISPT, LISPT, LISPT, type);
-  static LISPT checkfn(lisp&, LISPT, LISPT);
-};
+LISPT getrep(lisp&, LISPT);
+LISPT define(lisp&, LISPT, LISPT);
+LISPT defineq(lisp&, LISPT);
+LISPT de(lisp&, LISPT, LISPT, LISPT);
+LISPT df(lisp&, LISPT, LISPT, LISPT);
+LISPT funeq(lisp&, LISPT, LISPT);
+} // namespace user
 
 inline LISPT funeq(lisp& l, LISPT a, LISPT b) { return user::funeq(l, a, b); }
 inline LISPT funeq(LISPT a, LISPT b) { return user::funeq(lisp::current(), a, b); }

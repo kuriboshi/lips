@@ -8,10 +8,9 @@
 #include "alloc.hh"
 #include "eval.hh"
 
-namespace lisp
+namespace lisp::file
 {
-
-LISPT file::open(lisp& l, LISPT filename, LISPT mode)
+LISPT open(lisp& l, LISPT filename, LISPT mode)
 {
   check(filename, type::STRING, type::SYMBOL);
   bool readmode = true;
@@ -43,7 +42,7 @@ LISPT file::open(lisp& l, LISPT filename, LISPT mode)
   return newfile;
 }
 
-LISPT file::close(lisp& l, LISPT fildes)
+LISPT close(lisp& l, LISPT fildes)
 {
   check(fildes, type::FILET);
   fildes->fileval().flush();
@@ -52,7 +51,7 @@ LISPT file::close(lisp& l, LISPT fildes)
   return NIL;
 }
 
-LISPT file::ratom(lisp& l, LISPT file)
+LISPT ratom(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return io::ratom(l, l.primin());
@@ -62,7 +61,7 @@ LISPT file::ratom(lisp& l, LISPT file)
   return io::ratom(l, file->fileval());
 }
 
-LISPT file::readc(lisp& l, LISPT file)
+LISPT readc(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return l.a().mknumber(l.primin().getch());
@@ -72,7 +71,7 @@ LISPT file::readc(lisp& l, LISPT file)
   return l.a().mknumber(file->fileval().getch());
 }
 
-LISPT file::read(lisp& l, LISPT file)
+LISPT read(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return lispread(l, l.primin(), false);
@@ -82,7 +81,7 @@ LISPT file::read(lisp& l, LISPT file)
   return lispread(l, file->fileval(), false);
 }
 
-LISPT file::print(lisp& l, LISPT x, LISPT file)
+LISPT print(lisp& l, LISPT x, LISPT file)
 {
   if(is_NIL(file))
     return io::print(l, x, l.primout());
@@ -92,12 +91,13 @@ LISPT file::print(lisp& l, LISPT x, LISPT file)
   return io::print(l, x, file->fileval());
 }
 
-bool file::loadfile(lisp& l, const std::string& lf)
+bool loadfile(lisp& l, const std::string& lf)
 {
   try
   {
     auto foo = std::make_unique<file_t>(std::make_unique<file_source>(lf));
-    for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != type::ENDOFFILE; rval = lispread(l, *foo.get(), false))
+    for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != type::ENDOFFILE;
+        rval = lispread(l, *foo.get(), false))
       rval = l.e().eval(rval);
   }
   catch(const lisp_error&)
@@ -107,15 +107,15 @@ bool file::loadfile(lisp& l, const std::string& lf)
   return true;
 }
 
-LISPT file::load(lisp& l, LISPT f)
+LISPT load(lisp& l, LISPT f)
 {
   check(f, type::STRING, type::SYMBOL);
-  if(!loadfile(l, f->getstr()))
+  if(!file::loadfile(l, f->getstr()))
     l.fatal(CANT_LOAD);
   return f;
 }
 
-LISPT file::terpri(lisp& l, LISPT file)
+LISPT terpri(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return io::terpri(l, l.primout());
@@ -125,7 +125,7 @@ LISPT file::terpri(lisp& l, LISPT file)
   return io::terpri(l, file->fileval());
 }
 
-LISPT file::prin1(lisp& l, LISPT x, LISPT file)
+LISPT prin1(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -136,7 +136,7 @@ LISPT file::prin1(lisp& l, LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), false);
 }
 
-LISPT file::prin2(lisp& l, LISPT x, LISPT file)
+LISPT prin2(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
@@ -147,7 +147,7 @@ LISPT file::prin2(lisp& l, LISPT x, LISPT file)
   return prin0(l, x, file->fileval(), true);
 }
 
-LISPT file::plevel(lisp& l, LISPT newl)
+LISPT plevel(lisp& l, LISPT newl)
 {
   auto x = l.printlevel;
   if(!is_NIL(newl))
@@ -158,7 +158,7 @@ LISPT file::plevel(lisp& l, LISPT newl)
   return l.a().mknumber(x);
 }
 
-LISPT file::spaces(lisp& l, LISPT n, LISPT file)
+LISPT spaces(lisp& l, LISPT n, LISPT file)
 {
   int i;
   file_t* f;
@@ -177,7 +177,7 @@ LISPT file::spaces(lisp& l, LISPT n, LISPT file)
   return NIL;
 }
 
-LISPT file::readline(lisp& l, LISPT file)
+LISPT readline(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return io::readline(l, l.primin());
@@ -204,9 +204,7 @@ inline constexpr auto SPACES = "spaces";     // print some spaces
 inline constexpr auto TERPRI = "terpri";     // print new-line
 } // namespace pn
 
-LISPT C_READ;
-
-void file::init()
+void init()
 {
   C_READ = intern(pn::READ);
 
@@ -227,4 +225,5 @@ void file::init()
   // clang-format on
 }
 
-} // namespace lisp
+}
+

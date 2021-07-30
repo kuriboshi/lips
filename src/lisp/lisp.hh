@@ -34,7 +34,6 @@ class file_t;
 // All lisp constants used internally.
 //
 extern LISPT T;
-extern LISPT C_APPEND;
 extern LISPT C_AUTOLOAD;
 extern LISPT C_BROKEN;
 extern LISPT C_BT;
@@ -62,7 +61,9 @@ extern LISPT C_RETURN;
 extern LISPT C_STRING;
 extern LISPT C_SUBR;
 extern LISPT C_SYMBOL;
+extern LISPT C_READ;
 extern LISPT C_WRITE;
+extern LISPT C_APPEND;
 
 template<typename Enum>
 constexpr auto to_underlying(Enum e) noexcept

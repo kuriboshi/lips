@@ -14,9 +14,9 @@
 #include "prop.hh"
 #include "prim.hh"
 
-namespace lisp
+namespace lisp::user
 {
-LISPT user::getargs(lisp& l, LISPT al)
+LISPT getargs(lisp& l, LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
@@ -24,7 +24,7 @@ LISPT user::getargs(lisp& l, LISPT al)
     return cons(l, al->car(), getargs(l, al->cdr()));
 }
 
-LISPT user::getrep(lisp& l, LISPT fun)
+LISPT getrep(lisp& l, LISPT fun)
 {
   LISPT args;
 
@@ -42,7 +42,7 @@ LISPT user::getrep(lisp& l, LISPT fun)
   return cons(l, C_NLAMBDA, cons(l, args, x.lambdarep));
 }
 
-LISPT user::funeq(lisp& l, LISPT f1, LISPT f2)
+LISPT funeq(lisp& l, LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
     return T;
@@ -63,12 +63,12 @@ LISPT user::funeq(lisp& l, LISPT f1, LISPT f2)
   return NIL;
 }
 
-LISPT user::checkfn(lisp& l, LISPT name, LISPT lam)
+LISPT checkfn(lisp& l, LISPT name, LISPT lam)
 {
   if(type_of(name->symvalue()) != type::UNBOUND)
     if(type_of(name->symvalue()) == type::LAMBDA || type_of(name->symvalue()) == type::NLAMBDA)
     {
-      LISPT t = funeq(l, name->symvalue(), lam);
+      LISPT t = user::funeq(l, name->symvalue(), lam);
       if(is_NIL(t))
       {
         putprop(l, name, C_OLDDEF, name->symvalue());
@@ -79,7 +79,7 @@ LISPT user::checkfn(lisp& l, LISPT name, LISPT lam)
   return NIL;
 }
 
-LISPT user::define(lisp& l, LISPT name, LISPT lam)
+LISPT define(lisp& l, LISPT name, LISPT lam)
 {
   check(name, type::SYMBOL);
   check(lam, type::LAMBDA, type::NLAMBDA);
@@ -88,7 +88,7 @@ LISPT user::define(lisp& l, LISPT name, LISPT lam)
   return name;
 }
 
-LISPT user::defineq(lisp& l, LISPT defs)
+LISPT defineq(lisp& l, LISPT defs)
 {
   if(is_NIL(defs))
     return NIL;
@@ -98,14 +98,14 @@ LISPT user::defineq(lisp& l, LISPT defs)
   {
     auto name = car(l, d);
     auto lam = eval(l, cadr(l, d));
-    auto def = cons(l, define(l, name, lam), NIL);
+    auto def = cons(l, user::define(l, name, lam), NIL);
     rplacd(r, def);
     r = def;
   }
   return result->cdr();
 }
 
-LISPT user::def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
+LISPT def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
 {
   check(name, type::SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != type::SYMBOL)
@@ -118,9 +118,9 @@ LISPT user::def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
   return cons(l, name, NIL);
 }
 
-LISPT user::de(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::LAMBDA); }
+LISPT de(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::LAMBDA); }
 
-LISPT user::df(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::NLAMBDA); }
+LISPT df(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::NLAMBDA); }
 
 namespace pn
 {
@@ -131,7 +131,7 @@ inline constexpr auto DE = "de";           // defile lambda function
 inline constexpr auto DF = "df";           // define nlambda function
 } // namespace pn
 
-void user::init()
+void init()
 {
   // clang-format off
   mkprim(pn::DEFINE,  define,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
@@ -142,4 +142,4 @@ void user::init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::user

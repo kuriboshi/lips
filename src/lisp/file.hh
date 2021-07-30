@@ -9,29 +9,26 @@
 
 namespace lisp
 {
-class file
+namespace file
 {
-public:
-  static void init();
+void init();
 
-  static LISPT open(lisp&, LISPT, LISPT);
-  static LISPT close(lisp&, LISPT);
-  static LISPT ratom(lisp&, LISPT);
-  static LISPT readc(lisp&, LISPT);
-  static LISPT read(lisp&, LISPT);
-  static LISPT print(lisp&, LISPT, LISPT);
-  static LISPT load(lisp&, LISPT);
-  static LISPT terpri(lisp&, LISPT);
-  static LISPT prin1(lisp&, LISPT, LISPT);
-  static LISPT prin2(lisp&, LISPT, LISPT);
-  static LISPT plevel(lisp&, LISPT);
-  static LISPT spaces(lisp&, LISPT, LISPT);
-  static LISPT readline(lisp&, LISPT);
+LISPT open(lisp&, LISPT, LISPT);
+LISPT close(lisp&, LISPT);
+LISPT ratom(lisp&, LISPT);
+LISPT readc(lisp&, LISPT);
+LISPT read(lisp&, LISPT);
+LISPT print(lisp&, LISPT, LISPT);
+LISPT load(lisp&, LISPT);
+LISPT terpri(lisp&, LISPT);
+LISPT prin1(lisp&, LISPT, LISPT);
+LISPT prin2(lisp&, LISPT, LISPT);
+LISPT plevel(lisp&, LISPT);
+LISPT spaces(lisp&, LISPT, LISPT);
+LISPT readline(lisp&, LISPT);
 
-  static bool loadfile(lisp&, const std::string&);
-};
-
-extern LISPT C_READ;
+bool loadfile(lisp&, const std::string&);
+}
 
 inline LISPT open(lisp& l, LISPT a, LISPT b) { return file::open(l, a, b); }
 inline LISPT open(LISPT a, LISPT b) { return file::open(lisp::current(), a, b); }

@@ -119,7 +119,9 @@ lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
     C_STRING = intern("string");
     C_SUBR = intern("subr");
     C_SYMBOL = intern("symbol");
+    C_READ = intern("read");
     C_WRITE = intern("write");
+    C_APPEND = intern("append");
 
     e().undefhook(nullptr);
     e().breakhook(nullptr);
@@ -281,6 +283,8 @@ LISPT C_STRING;
 LISPT C_SUBR;
 LISPT C_SYMBOL;
 LISPT C_UNBOUND;
+LISPT C_READ;
 LISPT C_WRITE;
+LISPT C_APPEND;
 
 } // namespace lisp

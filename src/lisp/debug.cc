@@ -9,9 +9,9 @@
 #include "io.hh"
 #include "eval.hh"
 
-namespace lisp
+namespace lisp::debug
 {
-LISPT debug::evaltrace(lisp& l, LISPT state)
+LISPT evaltrace(lisp& l, LISPT state)
 {
   auto i = l.e().trace();
 
@@ -28,11 +28,11 @@ namespace pn
 inline constexpr auto EVALTRACE = "evaltrace"; // evaltrace
 }
 
-void debug::init()
+void init()
 {
   // clang-format off
   mkprim(pn::EVALTRACE, evaltrace, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format in
 }
 
-} // namespace lisp
+}

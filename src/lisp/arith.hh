@@ -9,42 +9,41 @@
 
 namespace lisp
 {
-class arith
+namespace arith
 {
-public:
-  static void init();
+void init();
 
-  /// @brief Calculate sum of all parameters.
-  static LISPT plus(lisp&, LISPT);
-  /// @brief Calculate integer sum of all paramerers.
-  static LISPT iplus(lisp&, LISPT);
-  /// @brief Calculate floating point sum of all paramerers.
-  static LISPT fplus(lisp&, LISPT);
-  static LISPT difference(lisp&, LISPT, LISPT);
-  static LISPT idifference(lisp&, LISPT, LISPT);
-  static LISPT fdifference(lisp&, LISPT, LISPT);
-  static LISPT ltimes(lisp&, LISPT);
-  static LISPT itimes(lisp&, LISPT);
-  static LISPT ftimes(lisp&, LISPT);
-  static LISPT divide(lisp&, LISPT, LISPT);
-  static LISPT iquotient(lisp&, LISPT, LISPT);
-  static LISPT iremainder(lisp&, LISPT, LISPT);
-  static LISPT fdivide(lisp&, LISPT, LISPT);
-  static LISPT minus(lisp&, LISPT);
-  static LISPT iminus(lisp&, LISPT);
-  static LISPT absval(lisp&, LISPT);
-  static LISPT itof(lisp&, LISPT);
-  static LISPT add1(lisp&, LISPT);
-  static LISPT sub1(lisp&, LISPT);
-  static LISPT greaterp(lisp&, LISPT, LISPT);
-  static LISPT lessp(lisp&, LISPT, LISPT);
-  static LISPT eqp(lisp&, LISPT, LISPT);
-  static LISPT geq(lisp&, LISPT, LISPT);
-  static LISPT leq(lisp&, LISPT, LISPT);
-  static LISPT neqp(lisp&, LISPT, LISPT);
-  static LISPT zerop(lisp&, LISPT);
-  static LISPT minusp(lisp&, LISPT);
-};
+/// @brief Calculate sum of all parameters.
+LISPT plus(lisp&, LISPT);
+/// @brief Calculate integer sum of all paramerers.
+LISPT iplus(lisp&, LISPT);
+/// @brief Calculate floating point sum of all paramerers.
+LISPT fplus(lisp&, LISPT);
+LISPT difference(lisp&, LISPT, LISPT);
+LISPT idifference(lisp&, LISPT, LISPT);
+LISPT fdifference(lisp&, LISPT, LISPT);
+LISPT ltimes(lisp&, LISPT);
+LISPT itimes(lisp&, LISPT);
+LISPT ftimes(lisp&, LISPT);
+LISPT divide(lisp&, LISPT, LISPT);
+LISPT iquotient(lisp&, LISPT, LISPT);
+LISPT iremainder(lisp&, LISPT, LISPT);
+LISPT fdivide(lisp&, LISPT, LISPT);
+LISPT minus(lisp&, LISPT);
+LISPT iminus(lisp&, LISPT);
+LISPT absval(lisp&, LISPT);
+LISPT itof(lisp&, LISPT);
+LISPT add1(lisp&, LISPT);
+LISPT sub1(lisp&, LISPT);
+LISPT greaterp(lisp&, LISPT, LISPT);
+LISPT lessp(lisp&, LISPT, LISPT);
+LISPT eqp(lisp&, LISPT, LISPT);
+LISPT geq(lisp&, LISPT, LISPT);
+LISPT leq(lisp&, LISPT, LISPT);
+LISPT neqp(lisp&, LISPT, LISPT);
+LISPT zerop(lisp&, LISPT);
+LISPT minusp(lisp&, LISPT);
+}
 
 inline LISPT plus(lisp& l, LISPT a) { return arith::plus(l, a); }
 inline LISPT plus(LISPT a) { return arith::plus(lisp::current(), a); }

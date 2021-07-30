@@ -9,13 +9,11 @@
 
 namespace lisp
 {
-class debug
+namespace debug
 {
-public:
-  static LISPT evaltrace(lisp&, LISPT);
-
-  static void init();
-};
+LISPT evaltrace(lisp&, LISPT);
+void init();
+}
 
 inline LISPT evaltrace(lisp& l, LISPT x) { return debug::evaltrace(l, x); }
 inline LISPT evaltrace(LISPT x) { return debug::evaltrace(lisp::current(), x); }

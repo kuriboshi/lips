@@ -56,7 +56,6 @@ private:
   static LISPT closobj(lisp&, LISPT);
 };
 
-extern LISPT C_APPEND;
 extern LISPT C_ERROR;
 extern LISPT C_LAMBDA;
 extern LISPT C_NLAMBDA;

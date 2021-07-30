@@ -9,19 +9,18 @@
 
 namespace lisp
 {
-class string
+namespace string
 {
-public:
-  static void init();
+void init();
 
-  static LISPT symstr(lisp&, LISPT);
-  static LISPT stringp(lisp&, LISPT);
-  static LISPT streq(lisp&, LISPT, LISPT);
-  static LISPT strcmp(lisp&, LISPT, LISPT);
-  static LISPT concat(lisp&, LISPT);
-  static LISPT strlen(lisp&, LISPT);
-  static LISPT substr(lisp&, LISPT, LISPT, LISPT);
-};
+LISPT symstr(lisp&, LISPT);
+LISPT stringp(lisp&, LISPT);
+LISPT streq(lisp&, LISPT, LISPT);
+LISPT strcmp(lisp&, LISPT, LISPT);
+LISPT concat(lisp&, LISPT);
+LISPT strlen(lisp&, LISPT);
+LISPT substr(lisp&, LISPT, LISPT, LISPT);
+} // namespace string
 
 inline LISPT symstr(lisp& l, LISPT x) { return string::symstr(l, x); }
 inline LISPT symstr(LISPT x) { return string::symstr(lisp::current(), x); }

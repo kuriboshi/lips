@@ -9,22 +9,22 @@
 #include "io.hh"
 #include "prim.hh"
 
-namespace lisp
+namespace lisp::prop
 {
-LISPT prop::setplist(lisp& l, LISPT x, LISPT pl)
+LISPT setplist(lisp& l, LISPT x, LISPT pl)
 {
   check(x, type::SYMBOL);
   x->symbol().plist = pl;
   return pl;
 }
 
-LISPT prop::getplist(lisp& l, LISPT x)
+LISPT getplist(lisp& l, LISPT x)
 {
   check(x, type::SYMBOL);
   return x->symbol().plist;
 }
 
-LISPT prop::putprop(lisp& l, LISPT x, LISPT p, LISPT v)
+LISPT putprop(lisp& l, LISPT x, LISPT p, LISPT v)
 {
   check(x, type::SYMBOL);
   check(p, type::SYMBOL);
@@ -38,7 +38,7 @@ LISPT prop::putprop(lisp& l, LISPT x, LISPT p, LISPT v)
   return v;
 }
 
-LISPT prop::getprop(lisp& l, LISPT x, LISPT p)
+LISPT getprop(lisp& l, LISPT x, LISPT p)
 {
   check(x, type::SYMBOL);
   check(p, type::SYMBOL);
@@ -50,7 +50,7 @@ LISPT prop::getprop(lisp& l, LISPT x, LISPT p)
   return NIL;
 }
 
-LISPT prop::remprop(lisp& l, LISPT x, LISPT p)
+LISPT remprop(lisp& l, LISPT x, LISPT p)
 {
   LISPT pl, pl2;
 
@@ -81,7 +81,7 @@ inline constexpr auto GETPROP = "getprop";   // get property value
 inline constexpr auto REMPROP = "remprop";   // remove prop
 } // namespace pn
 
-void prop::init()
+void init()
 {
   // clang-format off
   mkprim(pn::SETPLIST, setplist, subr_t::subr::EVAL, subr_t::spread::SPREAD);
