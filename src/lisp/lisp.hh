@@ -614,22 +614,19 @@ inline LISPT obarray() { return lisp::obarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return lisp::freecount(l); }
 inline LISPT freecount() { return lisp::freecount(lisp::current()); }
 
-inline void check(LISPT arg, type type)
+template<typename T>
+void check(LISPT arg, T type)
 {
   if(type_of(arg) != type)
-    error(NOT_A | to_underlying(type), arg);
-}
-
-inline void check(LISPT arg, type type0, type type1)
-{
-  if(type_of(arg) != type0 && type_of(arg) != type1)
     error(ILLEGAL_ARG, arg);
 }
 
-inline void check(LISPT arg, type type0, type type1, type type2)
+template<typename T, typename ...Ts>
+void check(LISPT arg, T type, Ts ...types)
 {
-  if(type_of(arg) != type0 && type_of(arg) != type1 && type_of(arg) != type2)
-    error(ILLEGAL_ARG, arg);
+  if(type_of(arg) == type)
+    return;
+  check(arg, types...);
 }
 
 inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
