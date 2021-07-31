@@ -15,8 +15,6 @@
 
 namespace lisp
 {
-class evaluator;
-
 /// @brief Destination block is used to collect the parameters to a function.
 ///
 /// @details The destblock_t is used to store variables and their values.  Each
@@ -64,7 +62,7 @@ public:
 class alloc
 {
 public:
-  alloc(lisp&);
+  alloc();
   ~alloc();
 
   /// @brief Return a cons cell from storage.
@@ -206,11 +204,6 @@ public:
   };
 
 private:
-  /// @brief The lisp interpreter.
-  lisp& _lisp;
-  /// @brief Returns the evaluator.
-  evaluator& e() { return _lisp.e(); }
-
   /// @brief Allocates a new block of cons cells.
   ///
   /// @details The new block is linked into the current list of blocks.

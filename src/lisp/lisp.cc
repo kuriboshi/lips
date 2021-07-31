@@ -29,7 +29,7 @@ inline constexpr auto FREECOUNT = "freecount";   // Number of free cells
 inline constexpr auto OBARRAY = "obarray";       // Return list of all atoms
 } // namespace pn
 
-lisp::lisp(): _alloc(*new alloc(*this)), _eval(*new evaluator(*this))
+lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
 {
   if(_current == nullptr)
     _current = this;

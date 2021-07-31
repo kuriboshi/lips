@@ -4,15 +4,10 @@
 //
 
 #include "alloc.hh"
-#include "error.hh"
-#include "eval.hh"
-#include "io.hh"
-#include "except.hh"
-#include "low.hh"
 
 namespace lisp
 {
-alloc::alloc(lisp& lisp): _lisp(lisp), local_symbols(lisp_t::symbol_collection().create())
+alloc::alloc(): local_symbols(lisp_t::symbol_collection().create())
 {
   destblockused = 0;
   newpage(); // Allocate one page of storage
