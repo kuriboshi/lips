@@ -19,7 +19,6 @@ LISPT progn(lisp&, LISPT);
 LISPT cond(lisp&, LISPT);
 LISPT xwhile(lisp&, LISPT, LISPT);
 LISPT prog1(lisp&, LISPT, LISPT);
-LISPT prog2(lisp&, LISPT, LISPT, LISPT);
 } // namespace low
 
 inline LISPT set(lisp& l, LISPT a, LISPT b) { return low::set(l, a, b); }
@@ -36,7 +35,5 @@ inline LISPT progn(lisp& l, LISPT a) { return low::progn(l, a); }
 inline LISPT progn(LISPT a) { return low::progn(lisp::current(), a); }
 inline LISPT prog1(lisp& l, LISPT a, LISPT b) { return low::prog1(l, a, b); }
 inline LISPT prog1(LISPT a, LISPT b) { return low::prog1(lisp::current(), a, b); }
-inline LISPT prog2(lisp& l, LISPT a, LISPT b, LISPT c) { return low::prog2(l, a, b, c); }
-inline LISPT prog2(LISPT a, LISPT b, LISPT c) { return low::prog2(lisp::current(), a, b, c); }
 
 } // namespace lisp

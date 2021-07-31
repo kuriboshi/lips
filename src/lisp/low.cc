@@ -79,8 +79,6 @@ LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
 
 LISPT prog1(lisp& l, LISPT a1, LISPT) { return a1; }
 
-LISPT prog2(lisp& l, LISPT, LISPT a2, LISPT) { return a2; }
-
 namespace pn
 {
 inline constexpr auto SET = "set";     // set variable
@@ -90,7 +88,6 @@ inline constexpr auto COND = "cond";   // cond
 inline constexpr auto WHILE = "while"; // while t
 inline constexpr auto PROGN = "progn"; // return last expression
 inline constexpr auto PROG1 = "prog1"; // return first expression
-inline constexpr auto PROG2 = "prog2"; // return second expression
 } // namespace pn
 
 void init()
@@ -103,7 +100,6 @@ void init()
   mkprim(pn::WHILE, xwhile, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::PROGN, progn,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::PROG1, prog1,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::PROG2, prog2,  subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

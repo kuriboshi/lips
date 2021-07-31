@@ -46,14 +46,6 @@ TEST_CASE("Low level functions")
     CHECK(r1->intval() == 1);
   }
 
-  SUBCASE("prog2")
-  {
-    auto r0 = prog2(l, mknumber(1), mknumber(2), mklist(mknumber(3), mknumber(4), mknumber(5)));
-    CHECK(r0->intval() == 2);
-    auto r1 = prog2(mknumber(1), mknumber(2), mklist(mknumber(3), mknumber(4), mknumber(5)));
-    CHECK(r1->intval() == 2);
-  }
-
   SUBCASE("while")
   {
     std::string p0 = R"(
