@@ -1,4 +1,5 @@
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
+file(
+  WRITE "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
   [[
 cmake_minimum_required(VERSION 3.18.0)
 
@@ -25,11 +26,9 @@ ExternalProject_Add(fmt.external
   )
 ]])
 configure_file("${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt")
+               "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt")
 
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" --build .
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
+execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
