@@ -11,7 +11,7 @@
  */
 
 #include <unistd.h>
-#ifdef TERMCAP
+#ifdef HAVE_CURSES
 #include <term.h>
 #endif
 
@@ -74,7 +74,7 @@ void term_source::init_term()
     newterm.c_lflag |= ISIG;
     newterm.c_cc[VMIN] = 1;
     newterm.c_cc[VTIME] = 0;
-#ifdef TERMCAP
+#ifdef HAVE_CURSES
     curup = nullptr;
     curfwd = nullptr;
     char* termc = tcap;
@@ -223,7 +223,7 @@ int term_source::outc(int c)
  */
 void term_source::retype(int all)
 {
-#ifdef TERMCAP
+#ifdef HAVE_CURSES
   int nl = 0;
 
   if(!nocap)
@@ -467,7 +467,7 @@ void term_source::scan(int begin)
  */
 void term_source::nput(const char* str, int ntim)
 {
-#ifdef TERMCAP
+#ifdef HAVE_CURSES
   for(; ntim > 0; ntim--) tputs(str, 1, outc);
 #endif
 }
@@ -477,7 +477,7 @@ void term_source::nput(const char* str, int ntim)
  */
 void term_source::blink()
 {
-#ifdef TERMCAP
+#ifdef HAVE_CURSES
   if(nocap)
     return; // Requires termcap and enough capability
   scan(linepos - 1);
@@ -520,7 +520,11 @@ void term_source::blink()
 #endif
 }
 
-void term_source::clearscr() { tputs(clear, 1, outc); }
+void term_source::clearscr() {
+#ifdef HAVE_CURSES
+  tputs(clear, 1, outc);
+#endif
+}
 
 /*
  * Get a line from stdin.  Do line editing functions such as kill line, retype

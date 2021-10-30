@@ -45,6 +45,6 @@ endif()
 find_package(Curses)
 
 if(CURSES_FOUND)
-  target_compile_definitions(lips PRIVATE TERMCAP)
+  target_compile_definitions(lips PRIVATE HAVE_CURSES)
   target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
 endif()
