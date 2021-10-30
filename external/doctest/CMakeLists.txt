@@ -7,8 +7,8 @@ project(doctest.download NONE)
 include(ExternalProject)
 
 ExternalProject_Add(doctest.external
-  URL https://github.com/onqtam/doctest/archive/2.3.7.tar.gz
-  #URL_HASH SHA256=5cae7072042b3043e12d53d50ef404bbb76949dad1de368d7f993a15c8c05ecc
+  URL https://github.com/onqtam/doctest/archive/2.4.6.tar.gz
+  URL_HASH SHA256=39110778e6baf373ef04342d7cb3fe35da104cb40769103e8a2f0035f5a5f1cb
   SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/build
   INSTALL_DIR ${PROJECT_BINARY_DIR}/install
