@@ -54,9 +54,9 @@ public:
   }
 
   void var(LISPT x) { std::get<var_val_pair>(u).var = x; }
-  LISPT var() { return std::get<var_val_pair>(u).var; }
+  LISPT var() const { return std::get<var_val_pair>(u).var; }
   void val(LISPT x) { std::get<var_val_pair>(u).val = x; }
-  LISPT val() { return std::get<var_val_pair>(u).val; }
+  LISPT val() const { return std::get<var_val_pair>(u).val; }
 };
 
 class alloc
