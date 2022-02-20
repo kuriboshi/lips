@@ -21,7 +21,7 @@ inline constexpr auto APPLY = "apply";           // apply function on args
 inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
 inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
 inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
-inline constexpr auto ENVGET = "envget";         // examine environment
+inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 
 inline constexpr auto RECLAIM = "reclaim";       // Initiate garbage collection
 inline constexpr auto CONS = "cons";             // Make a new cons cell
@@ -145,7 +145,7 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
     mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::ENVGET,     envget,     subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
 
     mkprim(pn::RECLAIM,   reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
     mkprim(pn::CONS,      cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
@@ -169,7 +169,7 @@ LISPT lisp::eval(lisp& l, LISPT expr) { return l._eval.eval(expr); }
 LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l._eval.apply(fun, args); }
 LISPT lisp::baktrace(lisp& l) { return l._eval.baktrace(); }
 LISPT lisp::topofstack(lisp& l) { return l._eval.topofstack(); }
-LISPT lisp::envget(lisp& l, LISPT a, LISPT b) { return l._eval.envget(a, b); }
+LISPT lisp::destblock(lisp& l, LISPT a) { return l._eval.destblock(a); }
 
 LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
 LISPT lisp::reclaim(lisp& l, LISPT a) { return l._alloc.reclaim(a); }

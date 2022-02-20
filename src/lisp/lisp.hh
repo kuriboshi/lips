@@ -375,7 +375,7 @@ public:
   static LISPT apply(lisp& l, LISPT fun, LISPT args);
   static LISPT baktrace(lisp& l);
   static LISPT topofstack(lisp& l);
-  static LISPT envget(lisp& l, LISPT a, LISPT b);
+  static LISPT destblock(lisp& l, LISPT a);
 
   static LISPT cons(lisp& l, LISPT a, LISPT b);
   static LISPT reclaim(lisp& l, LISPT a);
@@ -603,8 +603,8 @@ inline LISPT baktrace(lisp& l) { return lisp::baktrace(l); }
 inline LISPT baktrace() { return lisp::baktrace(lisp::current()); }
 inline LISPT topofstack(lisp& l) { return lisp::topofstack(l); }
 inline LISPT topofstack() { return lisp::topofstack(lisp::current()); }
-inline LISPT envget(lisp& l, LISPT a, LISPT b) { return lisp::envget(l, a, b); }
-inline LISPT envget(LISPT a, LISPT b) { return lisp::envget(lisp::current(), a, b); }
+inline LISPT destblock(lisp& l, LISPT a) { return lisp::destblock(l, a); }
+inline LISPT destblock(LISPT a) { return lisp::destblock(lisp::current(), a); }
 
 inline LISPT cons(lisp& l, LISPT a, LISPT b) { return lisp::cons(l, a, b); }
 inline LISPT cons(LISPT a, LISPT b) { return lisp::cons(lisp::current(), a, b); }

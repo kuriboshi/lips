@@ -92,4 +92,20 @@ TEST_CASE("Closure")
   CHECK(equal(r0, r1) != NIL);
 }
 
+TEST_CASE("topofstack")
+{
+  lisp l;
+  current c(l);
+
+  auto a = set(l, mkatom("a"), 88_l);
+  eval(l, R"(
+(defineq (f0 (lambda (a) (destblock (topofstack))))
+         (f1 (lambda (a) (f0 a))))
+)");
+  auto r0 = eval(l, "(f0 101)");
+  CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 88_l)), r0)));
+  auto r1 = eval(l, "(f1 99)");
+  CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 99_l)), r1)));
+}
+
 }

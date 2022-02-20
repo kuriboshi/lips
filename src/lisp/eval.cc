@@ -8,6 +8,7 @@
 #include "alloc.hh"
 #include "except.hh"
 #include "file.hh"
+#include "prim.hh"
 #include "prop.hh"
 
 // extern lisp::LISPT findalias(lisp::LISPT);
@@ -899,6 +900,18 @@ bool evaluator::evseq3()
   return false;
 }
 
+LISPT evaluator::destblock(lisp& l, const destblock_t* block)
+{
+  if(block == nullptr)
+    return NIL;
+  LISPT foo = tconc(l, NIL, mknumber(l, block->size()));
+  for(int i = 0; i != block->size(); ++i)
+  {
+    foo = tconc(l, foo, cons(l, (block + i + 1)->var(), (block + i + 1)->val()));
+  }
+  return car(l, foo);
+}
+
 LISPT evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
@@ -908,12 +921,19 @@ LISPT evaluator::baktrace()
       [this](auto&& arg) {
         using ArgType = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<ArgType, LISPT>)
-        {
-          file::print(l, arg, T);
-        }
+          print(l, arg, T);
         else if constexpr(std::is_same_v<ArgType, destblock_t*>)
         {
-          l.primerr().format("destblock\n");
+          if(arg != nullptr)
+          {
+            prin1(l, "destblock_t: "_l, T);
+            print(l, destblock(l, arg), T);
+          }
+          else
+          {
+            prin1(l, "destblock_t: nullptr"_l, T);
+            terpri(l, T);
+          }
         }
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
         {
@@ -1002,22 +1022,10 @@ LISPT evaluator::topofstack()
   return x;
 }
 
-LISPT evaluator::envget(LISPT e, LISPT n)
+LISPT evaluator::destblock(LISPT e)
 {
-  LISPT foo = nullptr;
-#if 0
-  l.check(e, type::ENVIRON);
-  l.check(n, type::INTEGER);
-  if(n->intval() <= 0)
-    foo = cons(l, e->envval()->car(), mknumber(l, e->envval()->cdr()));
-  else
-    if(n->intval() <= e->cdr()->intval())
-      foo = cons(l, e->envval()->car() + n->intval(),
-        e->envval()->cdr() + n->intval());
-    else
-      foo = NIL;
-#endif
-  return foo;
+  check(e, type::ENVIRON);
+  return destblock(l, e->envval());
 }
 
 } // namespace lisp

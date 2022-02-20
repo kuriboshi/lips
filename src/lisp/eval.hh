@@ -35,8 +35,10 @@ public:
   LISPT eval(LISPT);
   LISPT apply(LISPT, LISPT);
   LISPT baktrace();
+  /// @brief Return the current environment.
   LISPT topofstack();
-  LISPT envget(LISPT, LISPT);
+  /// @brief Convert an environment to a list.
+  LISPT destblock(LISPT);
 
   void bt();
   void unwind();
@@ -111,6 +113,7 @@ private:
   LISPT printwhere();
   void abort(int m, LISPT v);
   void overflow();
+  LISPT destblock(lisp&, const destblock_t*);
 
   lisp& l;
   alloc& a;
