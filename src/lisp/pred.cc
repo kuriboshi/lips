@@ -54,7 +54,7 @@ LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
   switch(type_of(l1))
   {
     case type::CONS:
-      while(!EQ(l1, NIL) && !EQ(l2, NIL))
+      while(type_of(l1) == type_of(l2) && type_of(l1) == type::CONS && !EQ(l1, NIL) && !EQ(l2, NIL))
       {
         x = equal(l, l1->car(), l2->car());
         if(EQ(x, T))
