@@ -31,3 +31,5 @@ target_compile_definitions(lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/li
 
 find_package(Curses REQUIRED)
 target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
+
+add_test(NAME lips_test COMMAND lips -T)

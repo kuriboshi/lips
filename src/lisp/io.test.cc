@@ -46,17 +46,19 @@ TEST_CASE("Read lisp objects")
 
   SUBCASE("Read utf-8 from file")
   {
+    constexpr const char* test_file{"test.lisp"};
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     {
-      std::ofstream o{"test.lisp"};
+      std::ofstream o{test_file};
       o << s_nihongo;
     }
-    auto f = file_t(std::make_unique<file_source>("test.lisp"));
+    auto f = file_t(std::make_unique<file_source>(test_file));
     auto nihongo = lispread(lisp, f, false);
     file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("lispread vs. readline")

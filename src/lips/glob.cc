@@ -435,6 +435,7 @@ TEST_CASE("glob::expandfiles")
     }
     CHECK(count == 0);
   }
+
   SUBCASE("Expand only one file")
   {
     auto result = glob::expandfiles("testdir/??", false, false, true);
@@ -459,7 +460,7 @@ TEST_CASE("glob::expandfiles")
   SUBCASE("testdir/*")
   {
     LISPT wild = mkstring("testdir/*");
-    auto e = ::expand(wild, NIL, NIL);
+    auto e = expand(wild, NIL, NIL);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
       for(auto d: dirs)
@@ -472,10 +473,10 @@ TEST_CASE("glob::expandfiles")
       }
   }
 
-  SUBCASE("test*/*")
+  SUBCASE("testd*/*")
   {
     LISPT wild = mkstring("testd*/*");
-    auto e = ::expand(wild, NIL, NIL);
+    auto e = expand(wild, NIL, NIL);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
       for(auto d: dirs)

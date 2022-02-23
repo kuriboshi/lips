@@ -3,6 +3,7 @@
 // Copyright 2021 Krister Joas
 //
 #include <fstream>
+#include <filesystem>
 #include <doctest/doctest.h>
 #include "libisp.hh"
 
@@ -16,70 +17,82 @@ TEST_CASE("File functions")
 
   SUBCASE("ratom")
   {
+    constexpr const char* test_file{"test.lisp"};
     {
-      std::ofstream of("test.lisp");
+      std::ofstream of(test_file);
       of << "atom\n";
     }
     auto in0 = open(mkstring("test.lisp"), C_READ);
     auto e0 = ratom(in0);
     REQUIRE(type_of(e0) == type::SYMBOL);
     CHECK(e0->getstr() == "atom");
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("load")
   {
+    constexpr const char* test_file{"test.lisp"};
     {
-      std::ofstream of("test.lisp");
+      std::ofstream of(test_file);
       of << "(quote (a b c))\n";
     }
-    auto e0 = load(mkstring("test.lisp"));
+    auto e0 = load(mkstring(test_file));
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("print")
   {
-    auto f0 = open(mkstring("test_print.lisp"), intern("write"));
+    constexpr const char* test_file{"test_print.lisp"};
+    auto f0 = open(mkstring(test_file), intern("write"));
     print(mkstring("hello"), f0);
     close(f0);
-    auto f1 = open(mkstring("test_print.lisp"), intern("read"));
+    auto f1 = open(mkstring(test_file), intern("read"));
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "\"hello\"");
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("terpri")
   {
-    auto f0 = open(mkstring("test_terpri.lisp"), intern("write"));
+    constexpr const char* test_file{"test_terpri.lisp"};
+    auto f0 = open(mkstring(test_file), intern("write"));
     print(mkstring("hello"), f0);
     terpri(f0);
     close(f0);
-    auto f1 = open(mkstring("test_terpri.lisp"), intern("read"));
+    auto f1 = open(mkstring(test_file), intern("read"));
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "\"hello\"");
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("prin1")
   {
-    auto f0 = open(mkstring("test_prin1.lisp"), intern("write"));
+    constexpr const char* test_file{"test_prin1.lisp"};
+    auto f0 = open(mkstring(test_file), intern("write"));
     prin1(mkstring("hello \"world\""), f0);
     close(f0);
-    auto f1 = open(mkstring("test_prin1.lisp"), intern("read"));
+    auto f1 = open(mkstring(test_file), intern("read"));
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "hello \"world\"");
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("prin2")
   {
-    auto f0 = open(mkstring("test_prin2.lisp"), intern("write"));
+    constexpr const char* test_file = "test_prin2.lisp";
+    auto f0 = open(mkstring(test_file), intern("write"));
     prin2(mkstring("hello \"world\""), f0);
     close(f0);
-    auto f1 = open(mkstring("test_prin2.lisp"), intern("read"));
+    auto f1 = open(mkstring(test_file), intern("read"));
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
     // versions print/prin1/princ.
     CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
+    std::filesystem::remove(test_file);
   }
 
   SUBCASE("readc")
