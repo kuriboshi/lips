@@ -11,15 +11,12 @@
  */
 
 #include <unistd.h>
-#ifdef HAVE_CURSES
 #include <term.h>
-#endif
 
 #include <iostream>
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
-#include <csetjmp>
 
 #include <lisp/libisp.hh>
 #include "main.hh"
@@ -74,7 +71,6 @@ void term_source::init_term()
     newterm.c_lflag |= ISIG;
     newterm.c_cc[VMIN] = 1;
     newterm.c_cc[VTIME] = 0;
-#ifdef HAVE_CURSES
     curup = nullptr;
     curfwd = nullptr;
     char* termc = tcap;
@@ -94,7 +90,6 @@ void term_source::init_term()
           nocap = false;
       }
     }
-#endif
     init_keymap();
     initialized = true;
   }
@@ -223,7 +218,6 @@ int term_source::outc(int c)
  */
 void term_source::retype(int all)
 {
-#ifdef HAVE_CURSES
   int nl = 0;
 
   if(!nocap)
@@ -264,7 +258,6 @@ void term_source::retype(int all)
     tputs(cleol, 1, outc);
   }
   else
-#endif
   {
     if(all == 0)
     {
@@ -467,9 +460,10 @@ void term_source::scan(int begin)
  */
 void term_source::nput(const char* str, int ntim)
 {
-#ifdef HAVE_CURSES
-  for(; ntim > 0; ntim--) tputs(str, 1, outc);
-#endif
+  for(; ntim > 0; ntim--)
+  {
+    tputs(str, 1, outc);
+  }
 }
 
 /*
@@ -477,7 +471,6 @@ void term_source::nput(const char* str, int ntim)
  */
 void term_source::blink()
 {
-#ifdef HAVE_CURSES
   if(nocap)
     return; // Requires termcap and enough capability
   scan(linepos - 1);
@@ -517,7 +510,6 @@ void term_source::blink()
     for(i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout);
   }
   fflush(stdout);
-#endif
 }
 
 void term_source::clearscr() {

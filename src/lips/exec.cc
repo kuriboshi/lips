@@ -43,7 +43,6 @@ bool insidefork = false;        // Is nonzero in the child after a fork
 
 static int pgrp;                    /* Process group of current job */
 
-#ifdef JOB_CONTROL
 struct job_t
 {
   int jobnum;        /* Job number */
@@ -58,7 +57,6 @@ struct job_t
 
 static job_t* joblist = nullptr;  /* List of jobs */
 static job_t* cjoblist = nullptr; /* List of collected jobs */
-#endif
 
 /* 
  * preparefork - Sets the processgroup to the group currently beeing built. 
@@ -89,7 +87,6 @@ static void preparefork()
  *            [n]   Status (other info)  (command line)
  *            Status is Done if job has exited.
  */
-#ifdef JOB_CONTROL
 static void printjob(job_t* job)
 {
   std::string buffer = fmt::format("[{}]  {} ", job->jobnum, job->procid);
@@ -109,7 +106,6 @@ static void printjob(job_t* job)
   primout().format(buffer);
   print(job->exp, false);
 }
-#endif
 
 /* 
  * recordjob - register job with process id PID in the linked list of jobs. If 
@@ -118,7 +114,6 @@ static void printjob(job_t* job)
  */
 static bool recordjob(int pid, int bg)
 {
-#ifdef JOB_CONTROL
   if(insidefork)
     return true; /* Skip this if in a fork. */
   auto* job = new job_t;
@@ -136,7 +131,6 @@ static bool recordjob(int pid, int bg)
   job->background = bg;
   job->running = 1;
   joblist = job;
-#endif
   return true;
 }
 
@@ -146,7 +140,6 @@ static bool recordjob(int pid, int bg)
  */
 static void collectjob(int pid, UNION_WAIT stat)
 {
-#ifdef JOB_CONTROL
   job_t* i = nullptr;
   for(auto* j = joblist; j; i = j, j = j->next)
     if(j->procid == pid)
@@ -176,20 +169,17 @@ static void collectjob(int pid, UNION_WAIT stat)
         printjob(j);
       break;
     }
-#endif
 }
 
 /* printdone - Sweeps CJOBLIST and prints each job it frees. */
 void printdone()
 {
-#ifdef JOB_CONTROL
   for(; cjoblist; cjoblist = cjoblist->next)
   {
     printjob(cjoblist);
     free(cjoblist->wdir);
     free((char*)cjoblist);
   }
-#endif
 }
 
 /* 
@@ -741,15 +731,15 @@ void exec::do_rehash()
 
 LISPT exec::jobs(lisp& l)
 {
-#ifdef JOB_CONTROL
-  for(auto* j = joblist; j; j = j->next) printjob(j);
-#endif
+  for(auto* j = joblist; j; j = j->next)
+  {
+    printjob(j);
+  }
   return NIL;
 }
 
 LISPT exec::fg(lisp& l, LISPT job)
 {
-#ifdef JOB_CONTROL
   job_t* j = nullptr;
 
   if(is_NIL(job))
@@ -780,12 +770,10 @@ LISPT exec::fg(lisp& l, LISPT job)
     return mknumber(l, WEXITSTATUS(status));
   }
   return l.error(NO_SUCH_JOB, job);
-#endif
 }
 
 LISPT exec::bg(lisp& l, LISPT job)
 {
-#ifdef JOB_CONTROL
   job_t* j = nullptr;
 
   if(is_NIL(job))
@@ -815,7 +803,6 @@ LISPT exec::bg(lisp& l, LISPT job)
     return T;
   }
   return l.error(NO_SUCH_JOB, job);
-#endif
 }
 
 LISPT exec::p_setenv(lisp& l, LISPT var, LISPT val)

@@ -11,11 +11,6 @@ if(POLICY CMP0114)
 endif()
 
 option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
-option(ENABLE_SELECT "Enable using select when asking about core dumps" ON)
-option(ENABLE_JOB_CONTROL "Enable job control in the shell" ON)
-option(ENABLE_FANCY_SIGNALS
-       "Enable catching signals and offer to skip dumping core" ON)
-option(ENABLE_LIPSRC "Enable loading a global lipsrc file" OFF)
 option(ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
 option(ENABLE_OBJECT_SIZES "Enable printing object sizes with --test" OFF)
 

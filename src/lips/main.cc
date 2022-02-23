@@ -8,9 +8,7 @@
 #include <doctest/doctest.h>
 
 #include <sys/types.h>
-#ifdef SELECT
 #include <sys/select.h>
-#endif
 #include <pwd.h>
 #include <unistd.h>
 
@@ -32,29 +30,14 @@ std::jmp_buf jumper;
 int mypgrp;     /* lips process group. */
 char* progname; /* Name of the game. */
 
-void onintr(int sig)
-{
-  if(insidefork)
-    exit(0);
-  std::longjmp(jumper, sig);
-}
-
-/*
- * The stop key means to break inside a lisp expression. The
- * brkflg is checked on every entry to eval.
- */
-void onstop(int) { lisp::break_flag(true); }
-
 static void fixpgrp()
 {
   mypgrp = getpgrp();
   tcsetpgrp(0, mypgrp);
 }
 
-#ifdef FANCY_SIGNALS
 static int getuser(int def)
 {
-#ifdef SELECT
   fd_set readfs;
   struct timeval timeout;
 
@@ -76,9 +59,6 @@ static int getuser(int def)
       break;
   }
   return def;
-#else
-  return primin().getch();
-#endif
 }
 
 /*
@@ -129,58 +109,55 @@ void core(int sig)
   }
 }
 
-void onquit(int sig)
+void onsignal(int sig)
 {
-  primerr().puts("Quit!");
   std::longjmp(jumper, sig);
 }
-
-void onbus(int sig)
-{
-  primerr().format("{}: Bus error!", progname);
-  std::longjmp(jumper, sig);
-}
-
-void onsegv(int sig)
-{
-  primerr().format("{}: Segmentation violation!", progname);
-  std::longjmp(jumper, sig);
-}
-
-void onill(int sig)
-{
-  primerr().format("{}: Illegal instruction!", progname);
-  std::longjmp(jumper, sig);
-}
-
-void onhup() { exit(0); }
-#endif
 
 void init_all_signals()
 {
-  signal(SIGINT, onintr);
+  signal(SIGINT, onsignal);
   signal(SIGHUP, SIG_DFL);
-  signal(SIGTSTP, onstop);
-#ifdef FANCY_SIGNALS
-  signal(SIGQUIT, onquit);
-  signal(SIGILL, onill);
+  signal(SIGTSTP, onsignal);
+  signal(SIGQUIT, onsignal);
+  signal(SIGILL, onsignal);
 #ifdef SIGEMT
-  signal(SIGEMT, onill);
+  signal(SIGEMT, onsignal);
 #endif
-  signal(SIGBUS, onbus);
-  signal(SIGSEGV, onsegv);
-#endif
+  signal(SIGBUS, onsignal);
+  //signal(SIGSEGV, onsignal);
   int sig = setjmp(jumper);
   if(sig == 0)
     return;
   switch(sig)
   {
     case SIGINT:
+      if(insidefork)
+        exit(0);
       throw lisp::lisp_reset();
+    case SIGHUP:
+      exit(0);
+    case SIGQUIT:
+      primerr().format("{}: Quit", progname);
+      break;
+    case SIGILL:
+    case SIGEMT:
+      primerr().format("{}: Illegal instruction", progname);
+      break;
+    case SIGBUS:
+      primerr().format("{}: Bus error", progname);
+      break;
+    case SIGSEGV:
+      primerr().format("{}: Segmentation fault", progname);
+      break;
+    case SIGTSTP:
+      primerr().format("{}: Stop", progname);
+      lisp::break_flag(true);
+      return;
     default:
-      core(sig);
       break;
   }
+  core(sig);
 }
 
 using namespace lisp;
@@ -351,16 +328,13 @@ inline std::unique_ptr<::lisp::lisp> init()
   return l;
 }
 
-#ifdef LIPSRC
 /*
  * Loads the file INITFILE.
  */
 static void loadinit(const char* initfile)
 {
-  if(!loadfile(*L, initfile))
-    std::cout << "Can't open file " << initfile << '\n'; // System init file
+  loadfile(initfile);
 }
-#endif
 
 /*
  * Greet user who, or if who is nil, $USER. This means loading
@@ -441,9 +415,7 @@ int main(int argc, char* const* argv)
   {
     try
     {
-#ifdef LIPSRC
       loadinit(LIPSRC);
-#endif
       greet(NIL);
     }
     catch(const lisp_error& error)

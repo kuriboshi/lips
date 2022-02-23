@@ -108,7 +108,6 @@ private:
 
   const options_t& options;
 
-#ifdef HAVE_CURSES
   char tcap[128]; /* Buffer for terminal capabilties.  */
   const char* curup = nullptr;
   const char* curfwd = nullptr; /* Various term cap strings.  */
@@ -116,5 +115,4 @@ private:
   const char* curdn = nullptr;
   const char* clear = nullptr;
   bool nocap = false; /* true if insufficient term cap. */
-#endif
 };
