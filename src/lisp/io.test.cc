@@ -3,6 +3,7 @@
 // Copyright 2021 Krister Joas
 //
 #include <doctest/doctest.h>
+#include <filesystem>
 #include "libisp.hh"
 
 namespace lisp
