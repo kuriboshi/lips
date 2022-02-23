@@ -178,7 +178,7 @@ void printdone()
   {
     printjob(cjoblist);
     free(cjoblist->wdir);
-    free((char*)cjoblist);
+    delete cjoblist;
   }
 }
 
