@@ -162,7 +162,7 @@ static void collectjob(int pid, UNION_WAIT stat)
         else
         {
           free(j->wdir);
-          free((char*)j);
+          delete j;
         }
       }
       else
