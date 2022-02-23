@@ -45,18 +45,17 @@ static int pgrp;                    /* Process group of current job */
 
 struct job_t
 {
-  int jobnum;        /* Job number */
-  int procid;        /* Process id */
-  UNION_WAIT status; /* Return value */
-  char* wdir;        /* Working directory */
-  LISPT exp;         /* Job expression */
-  job_t* next;       /* Pointer to next job */
-  int background;    /* Nonzero means job runs in bg */
-  int running;       /* Nonzero if running */
+  int jobnum;        // Job number
+  int procid;        // Process id
+  UNION_WAIT status; // Return value
+  std::string wdir;  // Working directory
+  LISPT exp;         // Job expression
+  bool background;   // Nonzero means job runs in bg
+  bool running;      // Nonzero if running
 };
 
-static job_t* joblist = nullptr;  /* List of jobs */
-static job_t* cjoblist = nullptr; /* List of collected jobs */
+static std::list<job_t> joblist;  // List of jobs
+static std::list<job_t> cjoblist; // List of collected jobs
 
 /* 
  * preparefork - Sets the processgroup to the group currently beeing built. 
@@ -87,24 +86,24 @@ static void preparefork()
  *            [n]   Status (other info)  (command line)
  *            Status is Done if job has exited.
  */
-static void printjob(job_t* job)
+static void printjob(const job_t& job)
 {
-  std::string buffer = fmt::format("[{}]  {} ", job->jobnum, job->procid);
-  if(job->running)
+  std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
+  if(job.running)
     buffer += "Running";
-  else if(WIFEXITED(job->status))
+  else if(WIFEXITED(job.status))
     buffer += "Done";
-  else if(WIFSTOPPED(job->status))
-    buffer += strsignal(WSTOPSIG(job->status));
+  else if(WIFSTOPPED(job.status))
+    buffer += strsignal(WSTOPSIG(job.status));
   else
   {
-    buffer += strsignal(WTERMSIG(job->status));
-    if(WCOREDUMP(job->status))
+    buffer += strsignal(WTERMSIG(job.status));
+    if(WCOREDUMP(job.status))
       buffer += " (core dumped)";
   }
   buffer += "\t";
   primout().format(buffer);
-  print(job->exp, false);
+  print(job.exp, false);
 }
 
 /* 
@@ -112,25 +111,22 @@ static void printjob(job_t* job)
  *             BG is non-zero, job is registered as running in background.
  *             Returns true if all went well, false otherwise.
  */
-static bool recordjob(int pid, int bg)
+static bool recordjob(int pid, bool bg)
 {
   if(insidefork)
     return true; /* Skip this if in a fork. */
-  auto* job = new job_t;
-  if(job == nullptr)
-    return false;
-  if(joblist)
-    job->jobnum = (joblist->jobnum) + 1;
+  job_t job;
+  if(!joblist.empty())
+    job.jobnum = joblist.front().jobnum + 1;
   else
-    job->jobnum = 1;
-  job->procid = pid;
-  job->status = 0;
-  job->wdir = getcwd(nullptr, 0); /* Not a fatal error if nullptr */
-  job->next = joblist;
-  job->exp = top::input_exp;
-  job->background = bg;
-  job->running = 1;
-  joblist = job;
+    job.jobnum = 1;
+  job.procid = pid;
+  job.status = 0;
+  job.wdir = std::filesystem::current_path().string();
+  job.exp = top::input_exp;
+  job.background = bg;
+  job.running = true;
+  joblist.push_front(job);
   return true;
 }
 
@@ -140,46 +136,36 @@ static bool recordjob(int pid, int bg)
  */
 static void collectjob(int pid, UNION_WAIT stat)
 {
-  job_t* i = nullptr;
-  for(auto* j = joblist; j; i = j, j = j->next)
-    if(j->procid == pid)
+  for(auto job = joblist.begin(); job != joblist.end(); ++job)
+  {
+    if(job->procid == pid)
     {
-      j->running = 0;
-      j->status = stat;
-      if(!WIFSTOPPED(j->status))
+      job->running = false;
+      job->status = stat;
+      if(!WIFSTOPPED(job->status))
       {
-        if(i)
-          i->next = j->next;
-        else
-          joblist = j->next;
-        if(WIFSIGNALED(j->status) && WTERMSIG(j->status) != SIGINT)
-          printjob(j);        /* Print if not interrupted. */
-        if(j->background)     /* When running in background, */
-        {                     /* save on another list to be */
-          j->next = cjoblist; /* collected when signaled with */
-          cjoblist = j;       /* SIGCHLD. */
+        if(!job->background && WIFSIGNALED(job->status) && WTERMSIG(job->status) != SIGINT)
+          printjob(*job);       // Print if not interrupted
+        if(job->background) // When running in background, save on another list to be
+        {                     
+          // Collected when signaled with SIGCHLD
+          cjoblist.push_front(*job);
         }
-        else
-        {
-          free(j->wdir);
-          delete j;
-        }
+        job = joblist.erase(job);
       }
       else
-        printjob(j);
+        printjob(*job);
       break;
     }
+  }
 }
 
 /* printdone - Sweeps CJOBLIST and prints each job it frees. */
 void printdone()
 {
-  for(; cjoblist; cjoblist = cjoblist->next)
-  {
-    printjob(cjoblist);
-    free(cjoblist->wdir);
-    delete cjoblist;
-  }
+  for(const auto& job: cjoblist)
+    printjob(job);
+  cjoblist.clear();
 }
 
 /* 
@@ -699,7 +685,7 @@ LISPT exec::back(lisp& l, LISPT x)
   else if(pid < 0)
     return C_ERROR;
   recordjob(pid, 1);
-  std::cout << fmt::format("[{}] {}\n", joblist->jobnum, pid);
+  std::cout << fmt::format("[{}] {}\n", joblist.front().jobnum, pid);
   return mknumber(l, pid);
 }
 
@@ -731,42 +717,50 @@ void exec::do_rehash()
 
 LISPT exec::jobs(lisp& l)
 {
-  for(auto* j = joblist; j; j = j->next)
-  {
-    printjob(j);
-  }
+  for(const auto& job: joblist)
+    printjob(job);
   return NIL;
 }
 
 LISPT exec::fg(lisp& l, LISPT job)
 {
-  job_t* j = nullptr;
+  job_t* current = nullptr;
 
   if(is_NIL(job))
   {
-    for(j = joblist; j; j = j->next)
-      if(WIFSTOPPED(j->status))
+    for(auto& j: joblist)
+    {
+      if(WIFSTOPPED(j.status))
+      {
+        current = &j;
         break;
+      }
+    }
   }
   else
   {
     check(job, type::INTEGER);
-    for(j = joblist; j; j = j->next)
-      if(j->jobnum == job->intval())
+    for(auto& j: joblist)
+    {
+      if(j.jobnum == job->intval())
+      {
+        current = &j;
         break;
+      }
+    }
   }
-  if(j)
+  if(current)
   {
-    auto pgrp = getpgid(j->procid);
-    j->running = 1;
-    printjob(j);
+    auto pgrp = getpgid(current->procid);
+    current->running = true;
+    printjob(*current);
     tcsetpgrp(1, pgrp);
-    if(WIFSTOPPED(j->status))
+    if(WIFSTOPPED(current->status))
       if(killpg(pgrp, SIGCONT) < 0)
         return syserr(l, mknumber(l, pgrp));
-    j->status = 0;
-    j->background = 0;
-    auto status = waitfork(j->procid);
+    current->status = 0;
+    current->background = false;
+    auto status = waitfork(current->procid);
     return mknumber(l, WEXITSTATUS(status));
   }
   return l.error(NO_SUCH_JOB, job);
@@ -774,32 +768,42 @@ LISPT exec::fg(lisp& l, LISPT job)
 
 LISPT exec::bg(lisp& l, LISPT job)
 {
-  job_t* j = nullptr;
+  job_t* current = nullptr;
 
   if(is_NIL(job))
   {
-    for(j = joblist; j; j = j->next)
-      if(!j->background)
+    for(auto& j: joblist)
+    {
+      if(!j.background)
+      {
+        current = &j;
         break;
+      }
+    }
   }
   else
   {
     check(job, type::INTEGER);
-    for(j = joblist; j; j = j->next)
-      if(j->jobnum == job->intval())
+    for(auto& j: joblist)
+    {
+      if(j.jobnum == job->intval())
+      {
+        current = &j;
         break;
+      }
+    }
   }
-  if(j)
+  if(current)
   {
-    auto pgrp = getpgid(j->procid);
-    j->status = 0;
-    j->running = 1;
-    printjob(j);
+    auto pgrp = getpgid(current->procid);
+    current->status = 0;
+    current->running = true;
+    printjob(*current);
     tcsetpgrp(1, pgrp);
-    if(!j->background)
+    if(!current->background)
       if(killpg(pgrp, SIGCONT) < 0)
         return syserr(l, mknumber(l, pgrp));
-    j->background = 1;
+    current->background = true;
     return T;
   }
   return l.error(NO_SUCH_JOB, job);
