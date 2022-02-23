@@ -659,7 +659,11 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
     return eval(l, cmds->car());
   if((pid = mfork()) == 0)
   {
-    pipe(pd);
+    if(pipe(pd) == -1)
+    {
+      l.stderr().format("{}\n", strerror(errno));
+      exit(1);
+    }
     if((pid = mfork()) == 0)
     {
       ::close(pd[0]);
