@@ -36,7 +36,6 @@ target_sources(
           lisp/logic.hh
           lisp/low.hh
           lisp/map.hh
-          lisp/main.hh
           lisp/debug.hh
           lisp/pred.hh
           lisp/prim.hh
@@ -70,7 +69,8 @@ target_sources(
           lisp/repl.test.cc
           lisp/string.test.cc
           lisp/symbol.test.cc
-          lisp/user.test.cc)
+          lisp/user.test.cc
+          lisp/main.hh)
 target_link_libraries(main PUBLIC lisp doctest::doctest)
 add_test(NAME lisp_test COMMAND main --test)
 
