@@ -141,7 +141,9 @@ void init_all_signals()
       primerr().format("{}: Quit", progname);
       break;
     case SIGILL:
+#ifdef SIGEMT
     case SIGEMT:
+#endif
       primerr().format("{}: Illegal instruction", progname);
       break;
     case SIGBUS:
