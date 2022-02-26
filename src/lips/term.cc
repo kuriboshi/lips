@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 1988, 2020 Krister Joas
+ * Copyright 1988, 2020-2021 Krister Joas
  *
  */
 

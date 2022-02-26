@@ -4,7 +4,7 @@
 # numeric (note that read can't handle supers yet). Tries to cram as many atoms
 # as possible on a line. Long lists are sometimes indented incorrectly.
 #
-# Copyright 1989, Krister Joas
+# Copyright 1989, 2020 Krister Joas
 #
 # $Id$
 #

@@ -1,6 +1,6 @@
 #
 # alias -- functions defining the alias commands
-# Copyright 1989, Krister Joas.
+# Copyright 1989, 2020 Krister Joas.
 #
 # $Id$
 #

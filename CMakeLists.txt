@@ -1,5 +1,5 @@
 #
-# Copyright 2020-2021 Krister Joas
+# Copyright 2020-2022 Krister Joas
 #
 cmake_minimum_required(VERSION 3.18.0)
 

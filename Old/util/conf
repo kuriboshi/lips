@@ -2,7 +2,7 @@
 # conf -- configures lips
 # @(#)conf 90/02/03
 #
-# Copyright 1990, Krister Joas
+# Copyright 1990, 2020 Krister Joas
 #
 # No options makes a pessimistic makefile that works
 # with most versions of make.

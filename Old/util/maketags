@@ -1,7 +1,7 @@
 #!/bin/sh
 # maketags -- builds the Tags file for the pretty printer
 # @(#)maketags 90/02/03
-# Copyright 1989, 1990 Krister Joas
+# Copyright 1989-1990, 2020 Krister Joas
 #
 # This file builds the Tags file used by the lips function
 # pprint to print internal c functions.

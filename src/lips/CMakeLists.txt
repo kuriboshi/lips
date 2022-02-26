@@ -1,5 +1,5 @@
 #
-# Copyright 2020 Krister Joas
+# Copyright 2020-2022 Krister Joas
 #
 add_executable(lips)
 target_sources(

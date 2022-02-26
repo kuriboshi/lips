@@ -1,6 +1,6 @@
 #
 # A simple demonstration of the closure construct.
-# Copyright 1992, Krister Joas.
+# Copyright 1992, 2020 Krister Joas.
 #
 # How to use:
 #   (setq acct (make-account 1000)) -> #<closure 7fe0a8024c20>
