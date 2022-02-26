@@ -1,6 +1,6 @@
 Lips -- lisp shell
 
-Copyright (c) 1988-1989, 1992, 2020 Krister Joas.
+Copyright 1988-1989, 1992, 2020-2022 Krister Joas
 
 # What is it?
 
@@ -18,7 +18,7 @@ embeddable lisp interpreter can be used.
 
 # Requirements
 
-The code requires C++17 and CMake 3.13 or newer.
+The code requires C++17 and CMake 3.18 or newer.
 
 # Platforms
 

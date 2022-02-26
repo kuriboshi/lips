@@ -1,7 +1,12 @@
 #!/bin/sh
 
+# Copyright 2022 Krister Joas
+
 for file in $(git grep -l Copyright)
 do
+    # Skip README.md since it should contain a list of all copyright years.
+    [[ "$file" == "README.md" ]] && continue
+
     awk '
 function add_year(year) {
   if(!(year in years)) {
@@ -82,5 +87,6 @@ function output_years(first, last) {
 {
   print
 }' $file > ${file}~
+
     mv ${file}~ ${file}
 done
