@@ -134,82 +134,6 @@ TEST_CASE("match")
     CHECK(match("b...", "[abc].??"));
   }
 }
-}
-
-namespace glob
-{
-//
-// Expands tilde character in first position to home directory or other users
-// home directory.
-//
-std::optional<std::string> extilde(const std::string& w)
-{
-  if(w.empty() || w[0] != '~')
-    return w;
-  auto p = w.begin();
-  ++p;
-  std::string s;
-  if(p == w.end() || *p == '/')
-  {
-    s = env->home->getstr();
-    std::copy(p, w.end(), std::back_inserter(s));
-  }
-  else
-  {
-    auto first = std::find(p, w.end(), '/');
-    if(first == w.end())
-      std::copy(p, w.end(), std::back_inserter(s));
-    else
-      std::copy(p, first - 1, std::back_inserter(s));
-    auto* pw = getpwnam(s.c_str());
-    if(pw == nullptr)
-    {
-      return {};
-    }
-    s = pw->pw_dir;
-    std::copy(first, w.end(), std::back_inserter(s));
-  }
-  return s;
-}
-
-TEST_CASE("extilde")
-{
-  std::string home = std::getenv("HOME");
-  SUBCASE("~ == HOME")
-  {
-    auto dir = extilde("~");
-    REQUIRE(dir);
-    CHECK(home == *dir);
-  }
-  SUBCASE("~/ == HOME/")
-  {
-    auto dir = extilde("~/");
-    REQUIRE(dir);
-    home.push_back('/');
-    CHECK(home == *dir);
-  }
-  SUBCASE("~/hello/ == HOME/")
-  {
-    auto dir = extilde("~/hello/");
-    REQUIRE(dir);
-    home += "/hello/";
-    CHECK(home == *dir);
-  }
-  SUBCASE("~USER == HOME")
-  {
-    std::string user = std::getenv("USER");
-    auto tilde_user = "~" + user;
-    auto dir = extilde(tilde_user);
-    REQUIRE(dir);
-    CHECK(home == *dir);
-  }
-  SUBCASE("~UNKNOWN != ")
-  {
-    std::string unknown = "~foobar";
-    auto dir = extilde(unknown);
-    REQUIRE(!dir);
-  }
-}
 
 ///
 /// @brief Walks through files and returns an unsorted vector of files and
@@ -324,6 +248,82 @@ LISPT buildlist(const std::vector<std::string>& list)
   LISPT l = NIL;
   for(auto r: list) l = cons(mkstring(r), l);
   return l;
+}
+}
+
+namespace glob
+{
+//
+// Expands tilde character in first position to home directory or other users
+// home directory.
+//
+std::optional<std::string> extilde(const std::string& w)
+{
+  if(w.empty() || w[0] != '~')
+    return w;
+  auto p = w.begin();
+  ++p;
+  std::string s;
+  if(p == w.end() || *p == '/')
+  {
+    s = env->home->getstr();
+    std::copy(p, w.end(), std::back_inserter(s));
+  }
+  else
+  {
+    auto first = std::find(p, w.end(), '/');
+    if(first == w.end())
+      std::copy(p, w.end(), std::back_inserter(s));
+    else
+      std::copy(p, first - 1, std::back_inserter(s));
+    auto* pw = getpwnam(s.c_str());
+    if(pw == nullptr)
+    {
+      return {};
+    }
+    s = pw->pw_dir;
+    std::copy(first, w.end(), std::back_inserter(s));
+  }
+  return s;
+}
+
+TEST_CASE("extilde")
+{
+  std::string home = std::getenv("HOME");
+  SUBCASE("~ == HOME")
+  {
+    auto dir = extilde("~");
+    REQUIRE(dir);
+    CHECK(home == *dir);
+  }
+  SUBCASE("~/ == HOME/")
+  {
+    auto dir = extilde("~/");
+    REQUIRE(dir);
+    home.push_back('/');
+    CHECK(home == *dir);
+  }
+  SUBCASE("~/hello/ == HOME/")
+  {
+    auto dir = extilde("~/hello/");
+    REQUIRE(dir);
+    home += "/hello/";
+    CHECK(home == *dir);
+  }
+  SUBCASE("~USER == HOME")
+  {
+    std::string user = std::getenv("USER");
+    auto tilde_user = "~" + user;
+    auto dir = extilde(tilde_user);
+    REQUIRE(dir);
+    CHECK(home == *dir);
+  }
+  SUBCASE("~UNKNOWN != ")
+  {
+    std::string unknown = "~foobar";
+    auto dir = extilde(unknown);
+    REQUIRE(!dir);
+  }
 }
 
 //
