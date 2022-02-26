@@ -134,65 +134,6 @@ TEST_CASE("match")
     CHECK(match("b...", "[abc].??"));
   }
 }
-
-//
-// Inserts element WHAT in list WHERE keeping alphabetic order.
-//
-LISPT orderinsert(LISPT what, LISPT where)
-{
-  LISPT p1 = NIL;
-  auto p2 = where;
-  while(!is_NIL(p2))
-  {
-    if(what->getstr() < p2->car()->getstr())
-    {
-      if(!is_NIL(p1))
-      {
-        rplacd(p1, cons(what, NIL));
-        rplacd(p1->cdr(), p2);
-      }
-      else
-        where = cons(what, where);
-      break;
-    }
-    p1 = p2;
-    p2 = p2->cdr();
-  }
-  if(is_NIL(where))
-    where = cons(what, NIL);
-  else if(is_NIL(p2))
-    rplacd(p1, cons(what, NIL));
-  return where;
-}
-
-TEST_CASE("orderinsert")
-{
-  auto list = cons(mkstring("a"), cons(mkstring("c"), NIL));
-  SUBCASE("Insert in the middle")
-  {
-    auto b = mkstring("b");
-    auto result = orderinsert(b, list);
-    REQUIRE(type_of(result) == type::CONS);
-    CHECK(result->cdr()->car()->getstr() == b->getstr());
-    CHECK(equal(list, result));
-  }
-  SUBCASE("Insert at the end")
-  {
-    auto d = mkstring("d");
-    auto result = orderinsert(d, list);
-    REQUIRE(type_of(result) == type::CONS);
-    CHECK(result->cdr()->cdr()->car()->getstr() == d->getstr());
-    CHECK(equal(list, result));
-  }
-  SUBCASE("Insert at the beginning")
-  {
-    auto A = mkstring("A");
-    auto result = orderinsert(A, list);
-    REQUIRE(type_of(result) == type::CONS);
-    CHECK(result->car()->getstr() == A->getstr());
-    CHECK(equal(result->cdr(), list));
-  }
-}
 }
 
 namespace glob
