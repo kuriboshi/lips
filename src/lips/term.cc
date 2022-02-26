@@ -527,11 +527,8 @@ void term_source::clearscr() {
 std::optional<std::string> term_source::getline()
 {
   char c;
-  const char *s;
-  int origpar;
-  int instring = 0;
+  bool instring = false;
   int escaped = 0;
-  LISPT ex;
 
   if(options.command)
   {
@@ -541,7 +538,7 @@ std::optional<std::string> term_source::getline()
   }
   position = 0;
   linepos = 0;
-  origpar = parcount;
+  int origpar = parcount;
   while(true)
   {
     if(escaped)
@@ -565,7 +562,7 @@ std::optional<std::string> term_source::getline()
         linepos = 0;
         parcount = origpar;
         escaped = 0;
-        instring = 0;
+        instring = false;
         break;
       case term_fun::T_RETYPE:
         retype(1);
@@ -576,18 +573,20 @@ std::optional<std::string> term_source::getline()
         break;
       case term_fun::T_TAB:
       {
-        s = mkexstr();
+        auto s = mkexstr();
         auto t = glob::extilde(s, 0);
         if(!t)
         {
           putc(BELL, stdout);
           break;
         }
-        ex = glob::expandfiles(t->c_str(), false, false, true);
+        auto ex = glob::expandfiles(*t, false, false, true);
         if(type_of(ex) == type::CONS && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
         if(type_of(ex) == type::CONS && is_NIL(ex->cdr()))
+        {
           fillrest(ex->car()->getstr().c_str());
+        }
         else
         {
           if(type_of(ex) == type::CONS)

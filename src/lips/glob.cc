@@ -270,58 +270,55 @@ TEST_CASE("glob::extilde")
   }
 }
 
-//
-// walkfiles - walks through files as specified by WILD and builds an unsorted
-//             array of character strings.  Returns true if any file matched
-//             the pattern, false otherwise.
-//
-std::vector<std::string> walkfiles(const std::filesystem::path& root, const std::string& wild, bool all, bool report)
+std::vector<std::string> walkfiles(const std::filesystem::path& wild, bool = false, bool = false)
 {
-  std::vector<std::string> result;
-
-  auto last = wild.find('/');
-  auto w = [&]() {
-    if(last == std::string::npos)
-      return wild;
-    return wild.substr(0, last);
-  }();
-
-  auto rest = [&]() {
-    if(last == std::string::npos)
-      return ""s;
-    auto first = wild.find_first_not_of('/', last);
-    return wild.substr(first);
-  }();
-
-  if(last == 0)
-    return walkfiles("/", rest, all, report);
-
-  auto walkentry = [&](const std::filesystem::path& path) -> void {
-    if((all || path.filename().string()[0] != '.' || w[0] == '.') && match(path.filename().string(), w))
+  std::vector<std::filesystem::path> files;
+  std::vector<std::filesystem::path> directories;
+  if(wild.is_absolute())
+    directories.push_back("/");
+  else
+    directories.push_back("");
+  for(const auto& w: wild)
+  {
+    if(w == "/")
+      continue;
+    files.clear();
+    auto process = std::move(directories);
+    for(const auto& p: process)
     {
-      if(!rest.empty() && std::filesystem::is_directory(path))
+      auto dir_path = p;
+      if(dir_path.empty())
+        dir_path = ".";
+      if(!w.empty() && *w.begin()->string().begin() == '.')
       {
-        auto subdir = root;
-        if(subdir == "."s)
-          subdir = path.filename();
-        else
-          subdir /= path.filename();
-        for(auto& p: walkfiles(subdir, rest, all, report)) result.push_back(p);
+        if(match(".", w))
+          directories.push_back(p / ".");
+        if(match("..", w))
+          directories.push_back(p / "..");
+      }
+
+      if(std::filesystem::is_directory(dir_path))
+      {
+        for(const auto& e: std::filesystem::directory_iterator(dir_path))
+        {
+          if(match(e.path().filename().string(), w))
+          {
+            if(std::filesystem::is_directory(e))
+              directories.push_back(p / e.path().filename());
+            else
+              files.push_back(p / e.path().filename());
+          }
+        }
       }
       else
-      {
-        if(root == "."s)
-          result.push_back(path.filename());
-        else
-          result.push_back(root / path.filename());
-      }
+        files.push_back(dir_path);
     }
-  };
-
-  // Work around the fact that directory_iterator skips "." and "..".
-  walkentry(".");
-  walkentry("..");
-  for(auto& d: std::filesystem::directory_iterator(root)) walkentry(d.path());
+  }
+  std::vector<std::string> result;
+  for(const auto& d: directories)
+    result.push_back(d.string());
+  for(const auto& f: files)
+    result.push_back(f.string());
   return result;
 }
 
@@ -336,19 +333,19 @@ TEST_CASE("glob::walkfiles")
 
   SUBCASE("test 1")
   {
-    auto result = glob::walkfiles(".", "*", false, false);
+    auto result = glob::walkfiles("*", false, false);
     CHECK(!result.empty());
   }
   SUBCASE("test 2")
   {
-    auto result = glob::walkfiles(".", "testdi*", false, false);
+    auto result = glob::walkfiles("testdi*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     CHECK(result[0] == "testdir"s);
   }
   SUBCASE("test 3")
   {
-    auto result = glob::walkfiles(".", "testdir/*", false, false);
+    auto result = glob::walkfiles("testdir/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 4);
     for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
@@ -356,17 +353,24 @@ TEST_CASE("glob::walkfiles")
   }
   SUBCASE("test 4")
   {
-    auto result = glob::walkfiles(".", "testdir/*/*", false, false);
+    auto result = glob::walkfiles("testdir/*/*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SUBCASE("test 5")
   {
-    auto result = glob::walkfiles(".", "testdir/[b]*", false, false);
+    auto result = glob::walkfiles("testdir/[b]*", false, false);
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
+  }
+  SUBCASE("test 6")
+  {
+    auto result = glob::walkfiles("./testd*", false, false);
+    REQUIRE(!result.empty());
+    CHECK(result.size() == 1);
+    CHECK(*result.begin() == "./testdir");
   }
 
   for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y", "testdir/x", "testdir"})
@@ -393,7 +397,7 @@ LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort)
 {
   if(wild == "/"s)
     return cons(mkstring(wild), NIL);
-  auto files = glob::walkfiles(".", wild, all, report);
+  auto files = glob::walkfiles(wild, all, report);
   if(files.empty())
     return C_ERROR;
   struct
@@ -412,7 +416,7 @@ TEST_CASE("glob::expandfiles")
   for(auto d: dirs)
   {
     std::filesystem::create_directories(d, ec);
-    CHECK(!ec);
+    REQUIRE(!ec);
   }
 
   SUBCASE("Expand all files")
@@ -487,6 +491,14 @@ TEST_CASE("glob::expandfiles")
           break;
         }
       }
+  }
+
+  SUBCASE("./testd*")
+  {
+    std::string s{"./testd*"};
+    auto e = expandfiles(s, false, false, true);
+    REQUIRE(length(e)->intval() >= 1);
+    CHECK(e->car()->getstr() == "./testdir");
   }
 
   for(auto d: dirs)
