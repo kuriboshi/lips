@@ -1,9 +1,0 @@
-#!/bin/sh
-# mkdiffs -- makes diff files for patches
-# @(#) mkdiffs 90/02/02
-
-/bin/rm -f DIFFS
-foreach i (*.[ch] *.ul Makefile README lips.man .lipsrc)
-  echo $i
-  diff -c2 Release/$i $i | grep -v 'No differences encountered' >> DIFFS
-end
