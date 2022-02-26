@@ -270,20 +270,22 @@ TEST_CASE("glob::extilde")
   }
 }
 
+//
+// walkfiles - walks through files as specified by WILD and builds an unsorted
+//             array of character strings.
+//
 std::vector<std::string> walkfiles(const std::filesystem::path& wild, bool = false, bool = false)
 {
-  std::vector<std::filesystem::path> files;
-  std::vector<std::filesystem::path> directories;
+  std::vector<std::filesystem::path> result;
   if(wild.is_absolute())
-    directories.push_back("/");
+    result.push_back("/");
   else
-    directories.push_back("");
+    result.push_back("");
   for(const auto& w: wild)
   {
     if(w == "/")
       continue;
-    files.clear();
-    auto process = std::move(directories);
+    auto process = std::move(result);
     for(const auto& p: process)
     {
       auto dir_path = p;
@@ -292,9 +294,9 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild, bool = fal
       if(!w.empty() && *w.begin()->string().begin() == '.')
       {
         if(match(".", w))
-          directories.push_back(p / ".");
+          result.push_back(p / ".");
         if(match("..", w))
-          directories.push_back(p / "..");
+          result.push_back(p / "..");
       }
 
       if(std::filesystem::is_directory(dir_path))
@@ -302,23 +304,16 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild, bool = fal
         for(const auto& e: std::filesystem::directory_iterator(dir_path))
         {
           if(match(e.path().filename().string(), w))
-          {
-            if(std::filesystem::is_directory(e))
-              directories.push_back(p / e.path().filename());
-            else
-              files.push_back(p / e.path().filename());
-          }
+            result.push_back(p / e.path().filename());
         }
       }
       else
-        files.push_back(dir_path);
+        result.push_back(dir_path);
     }
   }
   std::vector<std::string> result;
-  for(const auto& d: directories)
+  for(const auto& d: result)
     result.push_back(d.string());
-  for(const auto& f: files)
-    result.push_back(f.string());
   return result;
 }
 
