@@ -574,13 +574,13 @@ std::optional<std::string> term_source::getline()
       case term_fun::T_TAB:
       {
         auto s = mkexstr();
-        auto t = glob::extilde(s, 0);
+        auto t = glob::extilde(s);
         if(!t)
         {
           putc(BELL, stdout);
           break;
         }
-        auto ex = glob::expandfiles(*t, false, false, true);
+        auto ex = glob::expandfiles(*t, true);
         if(type_of(ex) == type::CONS && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
         if(type_of(ex) == type::CONS && is_NIL(ex->cdr()))

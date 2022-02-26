@@ -267,7 +267,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
   std::vector<std::string> args;
   if(type_of(arg) == type::SYMBOL)
   {
-    auto c = glob::extilde(arg->getstr(), true);
+    auto c = glob::extilde(arg->getstr());
     if(!c)
       return {};
     auto [meta, str] = check_meta(*c);
@@ -275,7 +275,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
       args.push_back(str);
     else
     {
-      auto files = glob::expandfiles(*c, false, false, true);
+      auto files = glob::expandfiles(*c, true);
       if(type_of(files) == type::CONS)
       {
         for(auto f: files)
@@ -482,7 +482,7 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
 int exec::execcommand(LISPT exp, LISPT* res)
 {
   *res = T;
-  auto command = glob::extilde(exp->car()->getstr(), true);
+  auto command = glob::extilde(exp->car()->getstr());
   if(!command || command->empty())
     return -1;
   if(command->at(0) == '/' || strpbrk(command->c_str(), "/") != nullptr)
@@ -834,7 +834,7 @@ LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
     ndir = env->home;
   else
   {
-    ndir = expand(l, dir, NIL, NIL);
+    ndir = expand(l, dir);
     if(type_of(ndir) == type::CONS)
       ndir = ndir->car();
   }

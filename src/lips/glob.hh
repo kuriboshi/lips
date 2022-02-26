@@ -17,16 +17,16 @@ namespace glob
 void init();
 using LISPT = lisp::LISPT;
 
-std::optional<std::string> extilde(const std::string& w, bool report);
-LISPT expandfiles(const std::string& wild, bool all, bool report, bool sort);
-LISPT expand(LISPT wild, LISPT rep, LISPT all);
+std::optional<std::string> extilde(const std::string& w);
+LISPT expandfiles(const std::string& wild, bool sort);
+LISPT expand(LISPT wild);
 }
 
-inline lisp::LISPT expand(lisp::lisp&, lisp::LISPT a, lisp::LISPT b, lisp::LISPT c)
+inline lisp::LISPT expand(lisp::lisp&, lisp::LISPT wild)
 {
-  return glob::expand(a, b, c);
+  return glob::expand(wild);
 }
-inline lisp::LISPT expand(lisp::LISPT a, lisp::LISPT b, lisp::LISPT c)
+inline lisp::LISPT expand(lisp::LISPT wild)
 {
-  return glob::expand(a, b, c);
+  return glob::expand(wild);
 }
