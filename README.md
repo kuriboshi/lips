@@ -1,5 +1,9 @@
 Lips -- lisp shell
 
+![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-18.04.yml/badge.svg)
+![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
+![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
+
 Copyright 1988-1989, 1992, 2020-2022 Krister Joas
 
 # What is it?
@@ -23,5 +27,7 @@ file requires CMake 3.21.0 or newer.
 
 # Platforms
 
-The project has been successfully compiled on MacOS 10.15 (Catalina),
-FreeBSD 12.1, and Ubuntu 19.10.
+The project is developed on macOS 12 (Monterey) and may work on older
+releases of macOS if you install a newer compiler.
+It's also regularly tested on FreeBSD 13 as well as Ubuntu 21.10 and
+20.04.
