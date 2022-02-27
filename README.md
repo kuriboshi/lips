@@ -18,7 +18,8 @@ embeddable lisp interpreter can be used.
 
 # Requirements
 
-The code requires C++17 and CMake 3.18 or newer.
+The code requires C++17 and CMake 3.18 or newer. The CMakePresets.json
+file requires CMake 3.21.0 or newer.
 
 # Platforms
 
