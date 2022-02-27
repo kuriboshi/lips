@@ -148,38 +148,46 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
     collect.push_back("/");
   else
     collect.push_back("");
-  for(const auto& w: wild)
+  std::vector<std::string> result;
+  try
   {
-    // The iterating over an absolute path starts with a forward slash. We skip this one 
-    if(w == "/")
-      continue;
-    auto process = std::move(collect);
-    for(const auto& p: process)
+    for(const auto& w: wild)
     {
-      auto dir_path = p;
-      if(dir_path.empty())
-        dir_path = ".";
-      if(!w.empty() && *w.begin()->string().begin() == '.')
+      // The iterating over an absolute path starts with a forward slash. We skip this one 
+      if(w == "/")
+        continue;
+      auto process = std::move(collect);
+      for(const auto& p: process)
       {
-        if(match(".", w))
-          collect.push_back(p / ".");
-        if(match("..", w))
-          collect.push_back(p / "..");
-      }
-
-      if(std::filesystem::is_directory(dir_path))
-      {
-        for(const auto& e: std::filesystem::directory_iterator(dir_path))
+        auto dir_path = p;
+        if(dir_path.empty())
+          dir_path = ".";
+        if(!w.empty() && *w.begin()->string().begin() == '.')
         {
-          if(match(e.path().filename().string(), w))
-            collect.push_back(p / e.path().filename());
+          if(match(".", w))
+            collect.push_back(p / ".");
+          if(match("..", w))
+            collect.push_back(p / "..");
         }
+
+        if(std::filesystem::is_directory(dir_path))
+        {
+          for(const auto& e: std::filesystem::directory_iterator(dir_path))
+          {
+            if(match(e.path().filename().string(), w))
+              collect.push_back(p / e.path().filename());
+          }
+        }
+        else
+          collect.push_back(dir_path);
       }
-      else
-        collect.push_back(dir_path);
     }
   }
-  std::vector<std::string> result;
+  catch(const std::exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+    return result;
+  }
   for(const auto& d: collect)
     result.push_back(d.string());
   return result;
