@@ -88,5 +88,7 @@ function output_years(first, last) {
   print
 }' $file > ${file}~
 
-    mv ${file}~ ${file}
+    # Copy and remove to preserve original file mode.
+    cp ${file}~ ${file}
+    rm -f ${file}~
 done
