@@ -21,33 +21,33 @@ using namespace lisp;
 
 namespace
 {
-//
-// If *wild is a slash then str must be a directory to match wild completely.
-// Used by match.
-//
-// str is the rest of the file and has to be the empty string for the function
-// to return true.  wild should end with a slash or one or more stars, in which
-// case the original glob expression had at least two stars.  The final
-// parameter, ss, is the complete original path and is used to verify that the
-// path refers to a directory.
-//
-bool dircheck(const std::string& str, const std::string& wild, const std::string& ss)
+///
+/// @brief Checks if the original file should be a directory or not.
+///
+/// @details If the glob pattern ends with a slash or multiple stars then the
+/// original file should be a directory. Regular files should not match such a
+/// pattern.
+///
+/// @param wild The rest of the glob pattern if we've reached the end of the
+/// string we are comparing or empty in which case we return true.
+/// @param original The original filename we're matching. Used to check if it's
+/// a directory or not.
+///
+/// @returns True if the glob ends with multiple stars or a slash and the
+/// original file is a directory or if wild is empty.
+///
+bool dircheck(const std::string& wild, const std::string& original)
 {
-  auto sbegin = str.begin();
   auto wbegin = wild.begin();
   if(*wbegin == '/')
-  {
-    if(sbegin != str.end())
-      return false;
-    return std::filesystem::is_directory(ss);
-  }
-  while(*wbegin == '*') ++wbegin;
-  if(sbegin != str.end() || wbegin != wild.end())
+    return std::filesystem::is_directory(original);
+  while(wbegin != wild.end() && *wbegin == '*') ++wbegin;
+  if(wbegin != wild.end())
     return false;
   return true;
 }
 
-TEST_CASE("dircheck") { CHECK(dircheck("", "/", "/")); }
+TEST_CASE("dircheck") { CHECK(dircheck("/", "/")); }
 
 //
 // Returns true if s matches wildcard pattern in w, false otherwise. STR is a
@@ -69,7 +69,7 @@ bool match(const std::string& str, const std::string& wild)
             return true;
           ++sbegin;
         }
-        return dircheck(std::string(sbegin, str.end()), std::string(wbegin, wild.end()), str);
+        return sbegin == str.end() && dircheck(std::string(wbegin, wild.end()), str);
       case '?':
         break;
       case '[':
@@ -96,11 +96,24 @@ bool match(const std::string& str, const std::string& wild)
     ++sbegin;
     ++wbegin;
   }
-  return dircheck(std::string(sbegin, str.end()), std::string(wbegin, wild.end()), str);
+  return sbegin == str.end() && dircheck(std::string(wbegin, wild.end()), str);
 }
 
 TEST_CASE("match")
 {
+  std::error_code ec;
+  std::filesystem::create_directories("testdir", ec);
+  REQUIRE(!ec);
+  {
+    std::ofstream of("testfile");
+  }
+
+  SUBCASE("match: dircheck")
+  {
+    CHECK(match("testdir", "test*/"));
+    CHECK(!match("testfile", "testf*/"));
+    CHECK(match("testdir", "testd**"));
+  }
   SUBCASE("pattern a*")
   {
     CHECK(match("alpha", "a*"));
