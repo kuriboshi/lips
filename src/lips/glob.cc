@@ -148,46 +148,42 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
     collect.push_back("/");
   else
     collect.push_back("");
-  std::vector<std::string> result;
-  try
+  for(const auto& w: wild)
   {
-    for(const auto& w: wild)
+    // The iterating over an absolute path starts with a forward slash. We skip this one 
+    if(w == "/")
+      continue;
+    auto process = std::move(collect);
+    for(const auto& p: process)
     {
-      // The iterating over an absolute path starts with a forward slash. We skip this one 
-      if(w == "/")
-        continue;
-      auto process = std::move(collect);
-      for(const auto& p: process)
+      auto dir_path = p;
+      if(dir_path.empty())
+        dir_path = ".";
+      if(!w.empty() && *w.begin()->string().begin() == '.')
       {
-        auto dir_path = p;
-        if(dir_path.empty())
-          dir_path = ".";
-        if(!w.empty() && *w.begin()->string().begin() == '.')
-        {
-          if(match(".", w))
-            collect.push_back(p / ".");
-          if(match("..", w))
-            collect.push_back(p / "..");
-        }
+        if(match(".", w))
+          collect.push_back(p / ".");
+        if(match("..", w))
+          collect.push_back(p / "..");
+      }
 
-        if(std::filesystem::is_directory(dir_path))
+      std::error_code ec;
+      auto is_dir = std::filesystem::is_directory(dir_path, ec);
+      if(is_dir && !ec)
+      {
+        for(const auto& e: std::filesystem::directory_iterator(dir_path, ec))
         {
-          for(const auto& e: std::filesystem::directory_iterator(dir_path))
-          {
-            if(match(e.path().filename().string(), w))
-              collect.push_back(p / e.path().filename());
-          }
+          if(match(e.path().filename().string(), w))
+            collect.push_back(p / e.path().filename());
         }
-        else
-          collect.push_back(dir_path);
+      }
+      else if(!ec)
+      {
+        collect.push_back(dir_path);
       }
     }
   }
-  catch(const std::exception& ex)
-  {
-    std::cout << ex.what() << std::endl;
-    return result;
-  }
+  std::vector<std::string> result;
   for(const auto& d: collect)
     result.push_back(d.string());
   return result;
@@ -202,19 +198,19 @@ TEST_CASE("walkfiles")
     REQUIRE(!ec);
   }
 
-  SUBCASE("test 1")
+  SUBCASE("walkfiles: *")
   {
     auto result = walkfiles("*");
     CHECK(!result.empty());
   }
-  SUBCASE("test 2")
+  SUBCASE("walkfiles: testdi*")
   {
     auto result = walkfiles("testdi*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     CHECK(result[0] == "testdir"s);
   }
-  SUBCASE("test 3")
+  SUBCASE("walkfiles: testdir/*")
   {
     auto result = walkfiles("testdir/*");
     REQUIRE(!result.empty());
@@ -222,21 +218,21 @@ TEST_CASE("walkfiles")
     for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
       CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("test 4")
+  SUBCASE("walkfiles: testdir/*/*")
   {
     auto result = walkfiles("testdir/*/*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("test 5")
+  SUBCASE("walkfiles: testdir/[b]*")
   {
     auto result = walkfiles("testdir/[b]*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("test 6")
+  SUBCASE("walkfiles: ./testd*")
   {
     auto result = walkfiles("./testd*");
     REQUIRE(!result.empty());
