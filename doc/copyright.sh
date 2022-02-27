@@ -88,7 +88,11 @@ function output_years(first, last) {
   print
 }' $file > ${file}~
 
-    # Copy and remove to preserve original file mode.
-    cp ${file}~ ${file}
+    # Only update file if it changed. Copy and remove to preserve
+    # original file mode.
+    if ! cmp -s ${file} ${file}~
+    then
+        cp ${file}~ ${file}
+    fi
     rm -f ${file}~
 done
