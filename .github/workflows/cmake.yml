@@ -25,4 +25,6 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: |
+        ./src/main --test
+        ./src/lips/lips -T
