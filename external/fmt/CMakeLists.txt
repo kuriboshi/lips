@@ -8,8 +8,8 @@ project(fmt.download NONE)
 include(ExternalProject)
 
 ExternalProject_Add(fmt.external
-  URL https://github.com/fmtlib/fmt/archive/7.1.3.tar.gz
-  URL_HASH SHA256=5cae7072042b3043e12d53d50ef404bbb76949dad1de368d7f993a15c8c05ecc
+  URL https://github.com/fmtlib/fmt/archive/8.1.1.tar.gz
+  URL_HASH SHA256=3d794d3cf67633b34b2771eb9f073bde87e846e0d395d254df7b211ef1ec7346
   SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/build
   INSTALL_DIR ${PROJECT_BINARY_DIR}/install
