@@ -7,6 +7,13 @@
 
 namespace lisp
 {
+void ref_deleter(lisp_t* obj)
+{
+  obj->settype(type::FREE);
+  obj->set();
+  alloc::freelist.push_back(obj);
+}
+
 alloc::alloc(): local_symbols(lisp_t::symbol_collection().create())
 {
   destblockused = 0;
@@ -49,11 +56,7 @@ LISPT alloc::getobject()
 
   auto f = freelist.front();
   freelist.pop_front();
-  auto r = LISPT(f, [this](lisp_t* obj) {
-    obj->settype(type::FREE);
-    obj->set();
-    freelist.push_back(obj);
-  });
+  auto r = LISPT(f);
   return r;
 }
 
@@ -189,5 +192,7 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
  * dzero - Frees all destination blocks.
  */
 void alloc::dzero() { destblockused = 0; }
+
+std::deque<lisp_t*> alloc::freelist;
 
 } // namespace lisp

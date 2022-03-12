@@ -19,6 +19,7 @@
 #include <variant>
 #include <vector>
 
+#include "ref_ptr.hh"
 #include "error.hh"
 #include "except.hh"
 #include "symbol.hh"
@@ -29,6 +30,15 @@ class lisp;
 class evaluator;
 class alloc;
 class file_t;
+
+///
+/// @brief Puts the lisp_t object back on the freelist.
+///
+/// @details The definition can be found in alloc.hh. See also ref_ptr.hh.
+///
+/// @param obj The object to be returned to the freelist.
+///
+void ref_deleter(lisp_t* obj);
 
 //
 // All lisp constants used internally.
@@ -92,7 +102,7 @@ enum class type
   FREE,      // an object on the freelist, used for consistency checks
   ENDOFFILE, // returned from read at end of file
   ERROR,     // returned from primitive when an error occured
-  CVARIABLE // is a pointer to c-variable
+  CVARIABLE  // is a pointer to c-variable
 };
 
 inline constexpr auto NIL = nullptr;
@@ -247,7 +257,7 @@ struct indirect_t
 
 class destblock_t;
 
-class lisp_t
+class lisp_t final : public ref_count<lisp_t>
 {
 public:
   lisp_t() = default;
@@ -297,7 +307,7 @@ public:
   void set(closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
-  auto fileval() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u).get(); }
+  auto fileval() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
   void set(std::shared_ptr<file_t> f) { _type = type::FILET; _u = f; }
   auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
   void set(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }

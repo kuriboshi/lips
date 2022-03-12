@@ -40,6 +40,7 @@ target_sources(
           lisp/pred.hh
           lisp/prim.hh
           lisp/prop.hh
+          lisp/ref_ptr.hh
           lisp/repl.hh
           lisp/string.hh
           lisp/user.hh

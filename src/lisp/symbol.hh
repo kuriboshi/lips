@@ -11,12 +11,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "ref_ptr.hh"
 #include "lisp.hh"
 
 namespace lisp
 {
 class lisp_t;
-using LISPT = std::shared_ptr<lisp_t>;
+using LISPT = ref_ptr<lisp_t>;
 extern LISPT C_UNBOUND;
 
 namespace symbol
@@ -43,10 +44,10 @@ struct print_name
 struct symbol_t
 {
   print_name pname;      // The printname of the atom
-  LISPT self;            // The LISPT object for this symbol
-  LISPT value;           // Value
-  LISPT plist;           // The property list
-  LISPT topval;          // Holds top value (not used yet)
+  LISPT self{};          // The LISPT object for this symbol
+  LISPT value{};         // Value
+  LISPT plist{};         // The property list
+  LISPT topval{};        // Holds top value (not used yet)
   bool constant = false; // If true this is a constant which can't be set
 };
 

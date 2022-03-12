@@ -68,9 +68,9 @@ public:
   /// @brief Return a cons cell from storage.
   ///
   /// @details If the free cell list is empty a new block of cons cells is
-  /// allocated.  The LISPT shared_ptr created by this function will have its
-  /// delete function overridden with a function which puts the cell back on the
-  /// free cell list.
+  /// allocated.  The LISPT ref_ptr created by this function will have its
+  /// delete function overridden with a function which puts the cell back on
+  /// the free cell list.
   ///
   /// @return A new empty cons cell.
   ///
@@ -218,7 +218,7 @@ private:
   /// @brief The local symbol table, local for each lisp instance.
   symbol::symbol_store_t& local_symbols;
   /// @brief List of free objects.
-  std::deque<lisp_t*> freelist;
+  static std::deque<lisp_t*> freelist;
 
   /// @brief Builds an argument list.
   ///
@@ -242,6 +242,8 @@ private:
   std::array<destblock_t, DESTBLOCKSIZE> destblock;
   /// @brief Index to last slot in destblock.
   int destblockused = 0;
+
+  friend void ref_deleter(lisp_t*);
 };
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
