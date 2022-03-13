@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 1989, 2020-2021 Krister Joas
+// Copyright 1989, 2020-2022 Krister Joas
 //
 
 #ifndef LISP_LISP_HH

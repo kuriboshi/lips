@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 2021 Krister Joas
+// Copyright 2021-2022 Krister Joas
 //
 #include <doctest/doctest.h>
 #include <filesystem>
