@@ -15,9 +15,11 @@ target_sources(
           lisp/low.cc
           lisp/map.cc
           lisp/debug.cc
+          lisp/parser.cc
           lisp/pred.cc
           lisp/prim.cc
           lisp/prop.cc
+          lisp/reader.cc
           lisp/string.cc
           lisp/user.cc
           lisp/version.cc)
@@ -37,9 +39,11 @@ target_sources(
           lisp/low.hh
           lisp/map.hh
           lisp/debug.hh
+          lisp/parser.hh
           lisp/pred.hh
           lisp/prim.hh
           lisp/prop.hh
+          lisp/reader.hh
           lisp/ref_ptr.hh
           lisp/repl.hh
           lisp/string.hh
@@ -64,9 +68,11 @@ target_sources(
           lisp/low.test.cc
           lisp/map.test.cc
           lisp/main.test.cc
+          lisp/parser.test.cc
           lisp/pred.test.cc
           lisp/prim.test.cc
           lisp/prop.test.cc
+          lisp/reader.test.cc
           lisp/repl.test.cc
           lisp/string.test.cc
           lisp/symbol.test.cc

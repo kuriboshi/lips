@@ -95,6 +95,10 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     t->settype(type::T);
     t->symbol().constant = true;
 
+    C_EMPTY = intern("empty");
+    C_EMPTY->symbol().constant = true;
+    C_EMPTY->set(nullptr);
+
     C_AUTOLOAD = intern("autoload");
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
@@ -264,6 +268,7 @@ LISPT eval(const std::string& expr)
 // All lisp constants needed internally.
 //
 LISPT T;
+LISPT C_EMPTY;
 LISPT C_AUTOLOAD;
 LISPT C_BROKEN;
 LISPT C_BT;

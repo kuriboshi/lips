@@ -44,6 +44,7 @@ void ref_deleter(lisp_t* obj);
 // All lisp constants used internally.
 //
 extern LISPT T;
+extern LISPT C_EMPTY;
 extern LISPT C_AUTOLOAD;
 extern LISPT C_BROKEN;
 extern LISPT C_BT;
@@ -85,6 +86,7 @@ enum class type
 {
   NIL = 0,   // so that nullptr also becomes NIL
   T,         // the truth object
+  EMPTY,     // the empty object, contains no value
   SYMBOL,    // an atomic symbol
   INTEGER,   // 24 bit integer in same word
   FLOAT,     // a double
@@ -264,7 +266,9 @@ public:
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  void set() { _u = {}; }
+  void set() { _type = type::NIL; _u = {}; }
+  void set(std::nullptr_t) { _type = type::EMPTY; _u = nullptr; }
+  bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(_u)); }
   void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
   auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
@@ -329,19 +333,20 @@ private:
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<
-    std::monostate,             // NIL (0)
-    symbol::print_name,         // SYMBOL (1)
-    int,                        // INTEGER (2)
-    double,                     // FLOAT (3)
-    indirect_t,                 // INDIRECT (4)
-    cons_t,                     // CONS (5)
-    std::string,                // STRING (6)
-    subr_index,                 // SUBR (7)
-    lambda_t,                   // LAMBDA (8)
-    closure_t,                  // CLOSURE (9)
-    destblock_t*,               // ENVIRON (10)
-    std::shared_ptr<file_t>,    // FILE (11)
-    cvariable                   // CVARIABLE (12)
+    std::monostate,             // NIL
+    std::nullptr_t,             // EMPTY
+    symbol::print_name,         // SYMBOL
+    int,                        // INTEGER
+    double,                     // FLOAT
+    indirect_t,                 // INDIRECT
+    cons_t,                     // CONS
+    std::string,                // STRING
+    subr_index,                 // SUBR
+    lambda_t,                   // LAMBDA
+    closure_t,                  // CLOSURE
+    destblock_t*,               // ENVIRON
+    std::shared_ptr<file_t>,    // FILE
+    cvariable                   // CVARIABLE
     > _u;
 };
 

@@ -427,3 +427,10 @@ std::string to_string(T& sink)
 }
 
 } // namespace lisp
+
+inline std::ostream& operator<<(std::ostream& os, const lisp::LISPT& obj)
+{
+  lisp::file_t out(os);
+  prin0(obj, out, true);
+  return os;
+}

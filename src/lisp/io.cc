@@ -559,6 +559,9 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
     case type::NIL:
       ps("nil", file, false);
       break;
+    case type::EMPTY:
+      ps("empty", file, false);
+      break;
     case type::T:
       file.putch('t');
       break;
@@ -615,7 +618,7 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
       pp("#<error", file, x);
       break;
     default:
-      ps("#<illegal ", file, false);
+      ps("#<illegal type_of:", file, false);
       pi(to_underlying(type_of(x)), l.currentbase()->intval(), file);
       pp("", file, x);
   }
