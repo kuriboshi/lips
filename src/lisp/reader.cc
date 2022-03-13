@@ -8,6 +8,14 @@
 namespace lisp
 {
 
+int Reader::next()
+{
+  auto curc = _file.getch();
+  if(curc == EOF)
+    _eof = true;
+  return curc;
+}
+
 /// @brief Read the next token from the input string.
 /// @return Returns either the token as a string or nothing when the input
 ///   string reaches the end.
@@ -21,7 +29,7 @@ std::optional<token_t> Reader::read()
     _token.reset();
     return t;
   }
-  if(_pos == _line.end())
+  if(_eof)
     return {};
   token_t token;
   enum class state_t
@@ -34,12 +42,12 @@ std::optional<token_t> Reader::read()
     IN_DOT
   };
   state_t state{state_t::NORMAL};
-  while(_pos != _line.end())
+  while(!_eof)
   {
     switch(state)
     {
       case state_t::NORMAL:
-        switch(*_pos)
+        switch(_curc)
         {
           case '(':
           case ')':
@@ -49,15 +57,15 @@ std::optional<token_t> Reader::read()
             if(!token.token.empty())
               return token;
             token.type = token_t::type::MACRO;
-            token.token.push_back(*_pos);
-            ++_pos;
+            token.token.push_back(_curc);
+            _curc = next();
             return token;
           case '.':
             // A symbol may start with a dot so we assume it's a macro
             // character but look ahead one character.
             state = state_t::IN_DOT;
             token.type = token_t::type::MACRO;
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
           case ' ':
           case '\n':
@@ -86,18 +94,18 @@ std::optional<token_t> Reader::read()
               return token;
             state = state_t::IN_INT;
             token.type = token_t::type::INT;
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
           default:
             state = state_t::IN_SYMBOL;
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
         }
         break;
       case state_t::IN_SYMBOL:
         // Any character except unquoted terminating macro characters are
         // included in the symbol. This includes double quotes.
-        switch(*_pos)
+        switch(_curc)
         {
           case '(':
           case ')':
@@ -110,22 +118,22 @@ std::optional<token_t> Reader::read()
             return token;
             break;
           case '\\':
-            ++_pos;
-            if(_pos == _line.end())
+            _curc = next();
+            if(_eof)
               return token;
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
           default:
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
         }
         break;
       case state_t::IN_QUOTE:
-        token.token.push_back(*_pos);
+        token.token.push_back(_curc);
         state = state_t::IN_STRING;
         break;
       case state_t::IN_STRING:
-        switch(*_pos)
+        switch(_curc)
         {
           case '\\':
             state = state_t::IN_QUOTE;
@@ -134,12 +142,12 @@ std::optional<token_t> Reader::read()
             state = state_t::NORMAL;
             break;
           default:
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
         }
         break;
       case state_t::IN_INT:
-        switch(*_pos)
+        switch(_curc)
         {
           case '0':
           case '1':
@@ -151,7 +159,7 @@ std::optional<token_t> Reader::read()
           case '7':
           case '8':
           case '9':
-            token.token.push_back(*_pos);
+            token.token.push_back(_curc);
             break;
           default:
             state = state_t::NORMAL;
@@ -161,7 +169,7 @@ std::optional<token_t> Reader::read()
         break;
       case state_t::IN_DOT:
         state = state_t::NORMAL;
-        switch(*_pos)
+        switch(_curc)
         {
           case '(':
           case ')':
@@ -181,7 +189,7 @@ std::optional<token_t> Reader::read()
       default:
         break;
     }
-    ++_pos;
+    _curc = next();
   }
   if(!token.token.empty())
     return token;

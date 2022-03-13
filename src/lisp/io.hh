@@ -294,6 +294,7 @@ public:
   file_t(std::istream& stream): _source(std::make_unique<stream_source>(stream)) {}
   file_t(std::ostream& stream): _sink(std::make_unique<stream_sink>(stream)) {}
   file_t(const std::string& string): _source(std::make_unique<string_source>(string)) {}
+  file_t(file_t&& file) noexcept: _source(std::move(file._source)), _sink(std::move(file._sink)) {}
   ~file_t() {}
 
   // io_source

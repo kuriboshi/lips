@@ -9,6 +9,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include "io.hh"
 
 namespace lisp
 {
@@ -35,15 +36,19 @@ struct token_t
 class Reader
 {
 public:
-  Reader(const std::string& line) : _line(line), _pos(_line.begin()) {}
+  Reader(const std::string& s) : _file(s), _curc(next()) {}
+  Reader(file_t file) : _file(std::move(file)) {}
   /// @brief Read the next token from the input string.
   std::optional<token_t> read();
   void unread(token_t);
 
 private:
+  int next();
+
   std::optional<token_t> _token;
-  std::string _line;
-  std::string::iterator _pos;
+  bool _eof{false};
+  file_t _file;
+  int _curc;
 };
 
 inline bool operator==(const token_t& l, const token_t& r)
