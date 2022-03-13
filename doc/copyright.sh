@@ -7,7 +7,7 @@ do
     # Skip README.md since it should contain a list of all copyright years.
     [[ "$file" == "README.md" ]] && continue
 
-    awk '
+    awk -v exclude="$(dirname "$0")/exclude.txt" '
 function add_year(year) {
   if(!(year in years)) {
     if(length(all_years) != 0) {
@@ -52,7 +52,7 @@ function output_years(first, last) {
       add_year(b[ix])
     }
   }
-  while(("git log --reverse --format=%ai --follow " FILENAME | getline) > 0) {
+  while(("git log --format=\"%ai %H\" --follow " FILENAME " | grep -v -f " exclude " | sed '\''1!G;h;$!d'\''" | getline) > 0) {
     split($0, d, "-")
     add_year(d[1])
   }
