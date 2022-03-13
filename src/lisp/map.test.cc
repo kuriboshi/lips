@@ -15,7 +15,7 @@ TEST_CASE("Map functions")
 
   SUBCASE("map")
   {
-    auto& cvar = initcvar("cvar", NIL);
+    auto& cvar = l.a().initcvar("cvar", NIL);
     auto r0 = eval(l, R"(
 (map '(1 2 3)
       (lambda (a)
@@ -33,7 +33,7 @@ TEST_CASE("Map functions")
 
   SUBCASE("mapc")
   {
-    auto& cvar = initcvar("cvar", NIL);
+    auto& cvar = l.a().initcvar("cvar", NIL);
     auto r0 = eval(l, R"(
 (mapc '(1 2 3)
        (lambda (a)

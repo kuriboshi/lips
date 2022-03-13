@@ -431,7 +431,7 @@ public:
 
   cvariable& currentbase() const { return _variables->_currentbase; }
   cvariable& verbose() const { return _variables->_verbose; }
-  cvariable& version() const { return _variables->_version; }
+  const cvariable& version() const { return _version; }
 
   // clang-format off
   rtinfo currentrt =
@@ -545,8 +545,8 @@ private:
     cvariables(alloc&);
     cvariable& _currentbase;
     cvariable& _verbose;
-    cvariable& _version;
   };
+  cvariable _version;
   std::unique_ptr<cvariables> _variables;
 
   static std::map<int, std::string> messages;

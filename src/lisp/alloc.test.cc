@@ -68,7 +68,7 @@ TEST_CASE("C Variables")
   lisp l;
   current c(l);
 
-  auto& cvar = initcvar("cvar", 123_l);
+  auto& cvar = l.a().initcvar("cvar", 123_l);
   auto a = eval(cvar);
   CHECK(eq(cvar, 123_l));
   cvar = 321_l;
@@ -87,11 +87,11 @@ TEST_CASE("C Variables")
   cvar = mkstring("hello");
   CHECK(cvar->getstr() == "hello");
 
-  auto& xvar = initcvar("xvar", "hello"_l);
+  auto& xvar = l.a().initcvar("xvar", "hello"_l);
   eval(l, "(setq xvar \"world\")");
   CHECK(xvar->getstr() == "world");
 
-  auto& yvar = initcvar("yvar", 0_l);
+  auto& yvar = l.a().initcvar("yvar", 0_l);
   eval(l, "(setq yvar \"string\")");
   CHECK(yvar->getstr() == "string");
 }
@@ -103,14 +103,16 @@ TEST_CASE("obarray")
 
   auto a0 = mkatom("foo");
   auto obs = obarray();
-  CHECK(length(obs)->intval() == 1);
+  // The reason this is not 1 is that there are already two symbols in the
+  // local symbol table: base and verbose.
+  CHECK(length(obs)->intval() == 3);
   auto a1 = mkatom("bar");
   obs = obarray();
-  CHECK(length(obs)->intval() == 2);
+  CHECK(length(obs)->intval() == 4);
 
   // Test calling from lisp
   obs = eval(l, "(obarray)");
-  CHECK(length(obs)->intval() == 2);
+  CHECK(length(obs)->intval() == 4);
 }
 
 TEST_CASE("reclaim + freecount")

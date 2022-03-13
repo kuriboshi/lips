@@ -154,6 +154,12 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     // clang-format on
  }
 
+  if(_current == this)
+  {
+    // We only need one instance of the version variable.
+    intern("version");
+    _version = std::move(_alloc.initcvar("version", _alloc.mkstring(VERSION)));
+  }
   _variables = std::make_unique<cvariables>(_alloc);
 
   io::set_read_table(*this);
@@ -234,8 +240,7 @@ LISPT lisp::break0(LISPT exp)
 }
 
 lisp::cvariables::cvariables(alloc& a)
-  : _currentbase(initcvar("base", a.mknumber(10L))), _verbose(initcvar("verbose", NIL)),
-    _version(initcvar("version", a.mkstring(VERSION)))
+  : _currentbase(a.initcvar("base", a.mknumber(10L))), _verbose(a.initcvar("verbose", NIL))
 {}
 
 lisp* lisp::_current = nullptr;

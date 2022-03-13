@@ -90,9 +90,9 @@ public:
   ///
   /// @return A reference of type cvariable which wraps the LISPT value.
   ///
-  static cvariable& initcvar(const std::string& name, LISPT val)
+  cvariable& initcvar(const std::string& name, LISPT val)
   {
-    auto t = intern(name);
+    auto t = mkatom(name);
     t->symbol().value = LISPT(new lisp_t);
     t->symvalue()->set(cvariable(val));
     return t->symvalue()->cvarval();
@@ -299,7 +299,8 @@ LISPT mklist(LISPT t, Ts ...ts)
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 inline LISPT getobject() { return getobject(lisp::current()); }
 
-inline cvariable& initcvar(const std::string& name, LISPT val) { return alloc::initcvar(name, val); }
+inline cvariable& initcvar(const std::string& name, LISPT val) { return lisp::current().a().initcvar(name, val); }
+inline cvariable& initcvar(alloc& a, const std::string& name, LISPT val) { return a.initcvar(name, val); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
