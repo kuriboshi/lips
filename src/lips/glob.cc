@@ -146,6 +146,10 @@ TEST_CASE("match")
     CHECK(!match("b.c", "[abc].??"));
     CHECK(match("b...", "[abc].??"));
   }
+
+  std::filesystem::remove("testfile", ec);
+  std::filesystem::remove("testdir", ec);
+  REQUIRE(!ec);
 }
 
 ///
