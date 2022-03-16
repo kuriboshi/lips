@@ -5,6 +5,8 @@
 #include "io.hh"
 #include "alloc.hh"
 #include "prim.hh"
+#include "reader.hh"
+#include "parser.hh"
 
 namespace lisp
 {
@@ -191,174 +193,16 @@ LISPT io::splice(lisp& l, LISPT x, LISPT y, bool tailp)
   return rplacd(l, t2, t);
 }
 
-/*
- * LISPREAD reads a lisp expression from file FILE.  If LINE is true then it is
- * assumed that it was called from READLINE.  READLINE initializes by itself
- * TOP so that an extra level of parentheses is in effect.  An explicit stack
- * is used to store TOP when LISPREAD recurses.
- */
-/*
- * If you don't like goto's, keep your eyes shut.
- */
+//
+// LISPREAD reads a lisp expression from file FILE.  If LINE is true then it is
+// assumed that it was called from READLINE.  READLINE initializes by itself
+// TOP so that an extra level of parentheses is in effect.  An explicit stack
+// is used to store TOP when LISPREAD recurses.
+//
 LISPT io::lispread(lisp& l, file_t& file, bool line)
 {
-  LISPT curr, temp, curatom;
-  if(!line)
-  {
-    l.top = cons(l, NIL, NIL);
-    curr = l.top;
-  }
-  else
-    curr = l.top->car();
-head:
-  auto [eof, c] = getchar(l, file, line);
-  if(eof)
-    return C_EOF;
-  auto curc = c;
-  if(isinsert(l, curc))
-  {
-    pushr(l, l.top);
-    rplaca(l, curr, (*l.currentrt.rmacros[curc])(l, file, curr, curc));
-    popr(l, l.top);
-    goto check;
-  }
-  else if(issplice(l, curc))
-  {
-    pushr(l, l.top);
-    temp = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
-    popr(l, l.top);
-    curr = splice(l, curr, temp, 0);
-    goto check;
-  }
-  else if(curc == '(')
-  {
-  head2:
-    rplaca(l, curr, cons(l, NIL, NIL));
-    rplacd(l, curr->car(), curr);
-    curr = curr->car();
-    goto head;
-  }
-  else if(curc == ')')
-  {
-    curr = curr->cdr();
-    rplaca(l, curr, NIL);
-    goto check;
-  }
-  else
-  {
-    file.ungetch(curc);
-    curatom = ratom(l, file);
-    rplaca(l, curr, curatom);
-  check:
-    if(is_NIL(curr->cdr()))
-    {
-      temp = l.top->car();
-      l.top = NIL;
-      return temp;
-    }
-    else if(line && file.eoln() && EQ(curr->cdr(), l.top))
-      goto addparen;
-    goto tail;
-  }
-tail:
-  if(line && file.eoln() && EQ(curr->cdr(), l.top))
-    goto addparen;
-  {
-    auto [eof, c] = getchar(l, file, line);
-    if(eof)
-      return C_EOF;
-    curc = c;
-  }
-  if(isinsert(l, curc))
-  {
-    temp = curr->cdr();
-    rplacd(l, curr, cons(l, NIL, temp));
-    curr = curr->cdr();
-    pushr(l, l.top);
-    rplaca(l, curr, (*l.currentrt.rmacros[curc])(l, file, curr, curc));
-    popr(l, l.top);
-    goto tail;
-  }
-  else if(issplice(l, curc))
-  {
-    pushr(l, l.top);
-    temp = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
-    popr(l, l.top);
-    curr = splice(l, curr, temp, 1);
-    goto tail;
-  }
-  else if(isinfix(l, curc))
-  {
-    curr = (*l.currentrt.rmacros[curc])(l, file, curr, curc);
-    goto head;
-  }
-  else if(curc == ')')
-  {
-  addparen:
-    temp = curr->cdr();
-    rplacd(l, curr, NIL);
-    curr = temp;
-    goto check;
-  }
-  else if(curc == '(')
-  {
-    temp = curr->cdr();
-    rplacd(l, curr, cons(l, NIL, NIL));
-    curr = curr->cdr();
-    rplacd(l, curr, temp);
-    goto head2;
-  }
-  else if(curc == '.')
-  {
-    curc = file.getch();
-    if(checkeof(l, curc, line))
-      return C_EOF;
-    if(!issepr(l, curc) && !isbrk(l, curc))
-    {
-      file.ungetch(curc);
-      file.ungetch('.'); /* cross your fingers */
-      goto atom;
-    }
-    if(curc == ')' || file.eoln())
-    {
-      file.ungetch(curc);
-      curatom = C_DOT;
-      goto insert;
-    }
-    if(isbrk(l, curc))
-      file.ungetch(curc);
-    curatom = ratom(l, file);
-    temp = curr->cdr();
-    {
-      auto [eof, c] = getchar(l, file, line);
-      if(eof)
-        return C_EOF;
-      curc = c;
-    }
-    if(curc != ')')
-    {
-      rplacd(l, curr, cons(l, C_DOT, cons(l, NIL, temp)));
-      curr = curr->cdr()->cdr();
-      rplaca(l, curr, curatom);
-      goto another;
-    }
-    rplacd(l, curr, curatom);
-    curr = temp;
-    goto check;
-  }
-  else
-  {
-  another:
-    file.ungetch(curc);
-  atom:
-    curatom = ratom(l, file);
-  insert:
-    temp = curr->cdr();
-    rplacd(l, curr, cons(l, NIL, temp));
-    curr = curr->cdr();
-    rplaca(l, curr, curatom);
-    goto tail;
-  }
+  Reader reader(file.source());
+  return Parser(reader).parse();
 }
 
 //

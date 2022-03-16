@@ -72,6 +72,10 @@ public:
   virtual bool close() = 0;
   virtual std::optional<std::string> getline() = 0;
 
+  using iterator = std::istreambuf_iterator<char>;
+  virtual iterator begin() = 0;
+  virtual iterator end() { return iterator(); }  
+
 protected:
   int getch(std::istream& stream, bool inside_string)
   {
@@ -138,6 +142,8 @@ public:
     return getline(*_file);
   }
 
+  iterator begin() override { return iterator(*_file); }
+
 private:
   std::unique_ptr<std::ifstream> _file;
 };
@@ -167,6 +173,8 @@ public:
     return getline(_stream);
   }
 
+  iterator begin() override { return iterator(_stream); }
+
 private:
   std::istream& _stream;
 };
@@ -188,6 +196,8 @@ public:
   virtual bool eoln() override { return eoln(_string); }
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override { return getline(_string); }
+
+  iterator begin() override { return iterator(_string); }
 
 private:
   std::istringstream _string;

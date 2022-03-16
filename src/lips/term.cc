@@ -1,14 +1,13 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
-/*
- * This file contains all functions dealing with low level terminal and file
- * i/o.  Terminal i/o uses its own buffering and line editing.  It sets the
- * terminal in cbreak and no echo mode.
- */
+//
+// This file contains all functions dealing with low level terminal and file
+// i/o.  Terminal i/o uses its own buffering and line editing.  It sets the
+// terminal in cbreak and no echo mode.
+//
 
 #include <unistd.h>
 #include <term.h>
@@ -138,12 +137,10 @@ int term_source::getch(bool)
       return linebuffer[position++];
     else
     {
-      init_term();
-      if(!getline())
-      {
-        end_term();
+      auto line = getline();
+      end_term();
+      if(line)
         return EOF;
-      }
       end_term();
     }
   }
@@ -518,17 +515,19 @@ void term_source::clearscr() {
 #endif
 }
 
-/*
- * Get a line from stdin.  Do line editing functions such as kill line, retype
- * line and delete character.  Count parethesis pairs and terminate line if
- * matching right paren.  Typing just a return puts a right paren in the buffer
- * as well as the newline.  Returns empty optional on EOF.
- */
+//
+// Get a line from stdin.  Do line editing functions such as kill line, retype
+// line and delete character.  Count parethesis pairs and terminate line if
+// matching right paren.  Typing just a return puts a right paren in the buffer
+// as well as the newline.  Returns empty optional on EOF.
+//
 std::optional<std::string> term_source::getline()
 {
   char c;
   bool instring = false;
   int escaped = 0;
+
+  init_term();
 
   if(options.command)
   {
@@ -545,13 +544,17 @@ std::optional<std::string> term_source::getline()
       escaped--;
     fflush(stdout);
     if(readchar(stdin, &c) == 0)
+    {
+      end_term();
       return {};
+    }
     switch(key_tab[static_cast<int>(c)])
     {
       case term_fun::T_EOF:
         if(linepos == 0)
         {
           linebuffer[linepos++] = EOF;
+          end_term();
           return {};
         }
         pputc(c, stdout);
@@ -657,6 +660,7 @@ std::optional<std::string> term_source::getline()
             break; /* paren expression not first (for readline) */
           linebuffer[linepos++] = '\n';
           pputc('\n', stdout);
+          end_term();
           return linebuffer;
         }
         else
@@ -672,7 +676,10 @@ std::optional<std::string> term_source::getline()
         }
         linebuffer[linepos++] = '\n';
         if(parcount <= 0 && !instring)
+        {
+          end_term();
           return linebuffer;
+        }
         break;
       case term_fun::T_INSERT:
         pputc(c, stdout);

@@ -53,7 +53,7 @@ public:
       prin0(l, _break_prompt, l.primout());
       auto com = lispread(l, l.primin(), false);
       if(com == C_EOF)
-        return com;
+        return C_EOF;
       /* OK, EVAL, ^, ... */
       if(type_of(com) != type::CONS)
         continue;

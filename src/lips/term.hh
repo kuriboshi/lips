@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #pragma once
 
@@ -13,7 +12,7 @@
 class term_source: public lisp::io_source
 {
 public:
-  term_source(const options_t& options) : options(options) {}
+  term_source(const options_t& options) : is(linebuffer), options(options) {}
   virtual ~term_source();
 
   // io::source
@@ -25,6 +24,8 @@ public:
 
   static void end_term();
   void clearlbuf();
+
+  iterator begin() override { is.seekg(0); return iterator(is); }
 
 private:
   bool getline(lisp::lisp&);
@@ -51,9 +52,9 @@ private:
   static inline constexpr char COMMENTCHAR = '#';
   static inline constexpr char BELL = '\007';
 
-  /*
-   * Routines for paren blinking.
-   */
+  //
+  // Routines for paren blinking.
+  //
   enum class paren_blink
   {
     NORMAL,
@@ -71,10 +72,10 @@ private:
     char* line_start = nullptr;
   };
 
-  /*
-   * Terminal functions.  Each constant stands for a function provided by the
-   * line editor.
-   */
+  //
+  // Terminal functions.  Each constant stands for a function provided by the
+  // line editor.
+  //
   enum class term_fun
   {
     T_INSERT = 0,
@@ -91,28 +92,29 @@ private:
     T_ESCAPE
   };
 
-  struct curpos parpos;     /* Saves position of matching par.  */
-  struct curpos currentpos; /* Current position.  */
+  struct curpos parpos;         // Saves position of matching par.
+  struct curpos currentpos; // Current position.
 
-  /*
-   * Variables for terminal characteristics, old and new.
-   */
+  //
+  // Variables for terminal characteristics, old and new.
+  //
   struct termios newterm;
   static struct termios oldterm;
 
-  char linebuffer[BUFSIZ];         /* Line buffer for terminal input.  */
-  int parcount = 0;                /* Counts paranthesis.  */
-  int linepos = 0;                 /* End of line buffer.  */
-  int position = 0;                /* Current position in line buffer.  */
-  enum term_fun key_tab[NUM_KEYS]; /* Table specifying key functions.  */
+  char linebuffer[BUFSIZ];         // Line buffer for terminal input.
+  std::istringstream is;           // For input stream.
+  int parcount = 0;                // Counts paranthesis.
+  int linepos = 0;                 // End of line buffer.
+  int position = 0;                // Current position in line buffer.
+  enum term_fun key_tab[NUM_KEYS]; // Table specifying key functions.
 
   const options_t& options;
 
-  char tcap[128]; /* Buffer for terminal capabilties.  */
+  char tcap[128];               // Buffer for terminal capabilties.
   const char* curup = nullptr;
-  const char* curfwd = nullptr; /* Various term cap strings.  */
+  const char* curfwd = nullptr; // Various term cap strings.
   const char* cleol = nullptr;
   const char* curdn = nullptr;
   const char* clear = nullptr;
-  bool nocap = false; /* true if insufficient term cap. */
+  bool nocap = false;           // true if insufficient term cap.
 };

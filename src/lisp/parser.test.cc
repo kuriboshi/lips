@@ -1,19 +1,20 @@
 //
 // Lips, lisp shell.
+//
 // Copyright 2022 Krister Joas
 //
+
 #include <sstream>
 #include <catch2/catch.hpp>
 #include "parser.hh"
-#include "io.hh"
-#include "prim.hh"
-#include "pred.hh"
 
 namespace
 {
-void lisp_compare(const std::string& input, const std::string& result)
+using StringReader = lisp::Reader<std::string>;
+
+void lisp_compare(std::string input, const std::string& result)
 {
-  lisp::Reader reader{input};
+  StringReader reader{input};
   auto res = lisp::Parser(reader).parse();
   std::ostringstream os;
   os << res;
@@ -31,7 +32,8 @@ const std::string& pname(LISPT sym)
 
 TEST_CASE("Parser (a b . c)")
 {
-  Reader reader{"(a b . c)"};
+  std::string s{"(a b . c)"};
+  StringReader reader{s};
   auto res = Parser(reader).parse();
   CHECK(pname(cdr(cdr(res))) == "c");
 }
@@ -59,7 +61,8 @@ LISPT nth(LISPT o, int n)
 //
 TEST_CASE("Parser (a b . c d)")
 {
-  Reader reader{"(a b . c d)"}; // -> (a b . c d)
+  std::string s{"(a b . c d)"};
+  StringReader reader{s}; // -> (a b . c d)
   auto res = Parser(reader).parse();
   CHECK(pname(nth(res, 0)) == "a");
   CHECK(pname(nth(res, 1)) == "b");
@@ -70,7 +73,8 @@ TEST_CASE("Parser (a b . c d)")
 
 TEST_CASE("Parser (a b . (c d))")
 {
-  Reader reader{"(a b . (c d))"}; // -> (a b c d)
+  std::string s{"(a b . (c d))"};
+  StringReader reader{s}; // -> (a b c d)
   auto res = Parser(reader).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
@@ -78,7 +82,8 @@ TEST_CASE("Parser (a b . (c d))")
 
 TEST_CASE("Parser (a b . (c d]")
 {
-  Reader reader{"(a b . (c d]"}; // -> (a b c d)
+  std::string s{"(a b . (c d]"};
+  StringReader reader{s}; // -> (a b c d)
   auto res = Parser(reader).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
@@ -178,6 +183,13 @@ TEST_CASE("Parser parse")
   lisp_compare("[(a]", "((a))");
   lisp_compare("[(a b]", "((a b))");
   lisp_compare("([(a b] c)", "(((a b)) c)");
+}
+
+TEST_CASE("dot")
+{
+  lisp_compare("(list a (cadr x))", "(list a (cadr x))");
+  lisp_compare("(lambda (a . x) (list a (cadr x)))", "(lambda (a . x) (list a (cadr x)))");
+  lisp_compare("(setq f (lambda (a . x) (list a (cadr x))))", "(setq f (lambda (a . x) (list a (cadr x))))");
 }
 
 }

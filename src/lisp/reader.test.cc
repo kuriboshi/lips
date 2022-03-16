@@ -1,5 +1,6 @@
 //
-// Lips, lisp shell.
+// Lisp reader -- reads an s-expression from the input source.
+//
 // Copyright 2022 Krister Joas
 //
 
@@ -11,8 +12,19 @@ using namespace std::literals;
 
 namespace
 {
-void reader_check(lisp::Reader& reader, enum lisp::token_t::type type, const std::string& token)
+using StringReader = lisp::Reader<std::string>;
+
+void reader_check(StringReader& reader, enum lisp::token_t::type type, const std::string& token)
 {
+  auto b = reader.read();
+  REQUIRE(b);
+  CHECK(b->type == type);
+  CHECK(b->token == token);
+}
+
+void reader_check(std::string string, enum lisp::token_t::type type, const std::string& token)
+{
+  StringReader reader{string};
   auto b = reader.read();
   REQUIRE(b);
   CHECK(b->type == type);
@@ -23,98 +35,102 @@ void reader_check(lisp::Reader& reader, enum lisp::token_t::type type, const std
 namespace lisp
 {
 
-TEST_CASE("Reader a.")
+TEST_CASE("Reader symbols")
 {
-  Reader reader{"a."};
-  reader_check(reader, token_t::type::SYMBOL, "a.");
+  SECTION("Symbol a.")
+  {
+    reader_check("a.", token_t::type::SYMBOL, "a.");
+  }
+  SECTION("Symbol .a")
+  {
+    reader_check(".a", token_t::type::SYMBOL, ".a");
+  }
+  SECTION("Symbol a01")
+  {
+    reader_check("a01", token_t::type::SYMBOL, "a01");
+  }
 }
 
-TEST_CASE("Reader .a")
+TEST_CASE("Reader (a b c)")
 {
-  Reader reader{".a"};
-  reader_check(reader, token_t::type::SYMBOL, ".a");
-}
-
-TEST_CASE("Reader a01")
-{
-  Reader reader{"a01"};
-  reader_check(reader, token_t::type::SYMBOL, "a01");
-}
-
-TEST_CASE("Reader::read (a b c)")
-{
-  Reader reader{"(a b c)"};
-  reader_check(reader, token_t::type::MACRO, "("s);
-  reader_check(reader, token_t::type::SYMBOL, "a"s);
-  reader_check(reader, token_t::type::SYMBOL, "b"s);
-  reader_check(reader, token_t::type::SYMBOL, "c"s);
-  reader_check(reader, token_t::type::MACRO, ")"s);
+  std::string s{"(a b c)"};
+  StringReader reader{s};
+  reader_check(reader, token_t::type::MACRO, "(");
+  reader_check(reader, token_t::type::SYMBOL, "a");
+  reader_check(reader, token_t::type::SYMBOL, "b");
+  reader_check(reader, token_t::type::SYMBOL, "c");
+  reader_check(reader, token_t::type::MACRO, ")");
   CHECK(!reader.read());
 }
 
-TEST_CASE("Reader::read ( a b c )")
+TEST_CASE("Reader ( a b c )")
 {
-  Reader reader{"( a b c )"};
-  reader_check(reader, token_t::type::MACRO, "("s);
-  reader_check(reader, token_t::type::SYMBOL, "a"s);
-  reader_check(reader, token_t::type::SYMBOL, "b"s);
-  reader_check(reader, token_t::type::SYMBOL, "c"s);
-  reader_check(reader, token_t::type::MACRO, ")"s);
+  std::string s{"( a b c )"};
+  StringReader reader{s};
+  reader_check(reader, token_t::type::MACRO, "(");
+  reader_check(reader, token_t::type::SYMBOL, "a");
+  reader_check(reader, token_t::type::SYMBOL, "b");
+  reader_check(reader, token_t::type::SYMBOL, "c");
+  reader_check(reader, token_t::type::MACRO, ")");
   CHECK(!reader.read());
 }
 
-TEST_CASE("Reader::read \"string\"")
+TEST_CASE("Reader strings")
 {
-  Reader reader{"\"string\""};
-  reader_check(reader, token_t::type::STRING, "string"s);
+  SECTION("\"string\"")
+  {
+    reader_check("\"string\"", token_t::type::STRING, "string");
+  }
+  SECTION("\"string\" hello")
+  {
+    std::string s{"\"string\" hello"};
+    StringReader reader{s};
+    reader_check(reader, token_t::type::STRING, "string");
+    reader_check(reader, token_t::type::SYMBOL, "hello");
+  }
+  SECTION("\"st\\\"ring\"")
+  {
+    reader_check("\"st\\\"ring\"", token_t::type::STRING, "st\"ring");
+  }
+  SECTION("\"st\\\\ring\"")
+  {
+    reader_check("\"st\\\\ring\"", token_t::type::STRING, "st\\ring");
+  }
+  SECTION("\"st\\\\\\\"ring\"")
+  {
+    reader_check("\"st\\\\\\\"ring\"", token_t::type::STRING, "st\\\"ring");
+  }
+  SECTION("\"(hello)\"")
+  {
+    reader_check("\"(hello)\"", token_t::type::STRING, "(hello)");
+  }
 }
 
-TEST_CASE("Reader::read \"string\" hello")
+TEST_CASE("Reader integers")
 {
-  Reader reader{"\"string\" hello"};
-  reader_check(reader, token_t::type::STRING, "string"s);
-  reader_check(reader, token_t::type::SYMBOL, "hello"s);
+  reader_check("123", token_t::type::INT, "123");
+  // A bit weird so this may change in the future.
+  reader_check("123abc", token_t::type::INT, "123");
+  reader_check("0123456789", token_t::type::INT, "0123456789");
 }
 
-TEST_CASE("Reader::read \"st\\\"ring\"")
+TEST_CASE("Reader floats")
 {
-  Reader reader{"\"st\\\"ring\""};
-  reader_check(reader, token_t::type::STRING, "st\"ring"s);
+  reader_check("1.234", token_t::type::FLOAT, "1.234");
+  reader_check("-1.234", token_t::type::FLOAT, "-1.234");
+  reader_check("1.23e-2", token_t::type::FLOAT, "1.23e-2");
+  reader_check("1.23e+2", token_t::type::FLOAT, "1.23e+2");
+  reader_check("1.23E-2", token_t::type::FLOAT, "1.23E-2");
+  reader_check("+1.234", token_t::type::FLOAT, "+1.234");
+  reader_check(".1.234", token_t::type::SYMBOL, ".1.234");
+  reader_check(".1,234", token_t::type::SYMBOL, ".1,234");
+  reader_check("1.23e--2", token_t::type::SYMBOL, "1.23e--2");
 }
 
-TEST_CASE("Reader::read \"st\\ring\"")
+TEST_CASE("Reader unread")
 {
-  Reader reader{"\"st\\\\ring\""};
-  reader_check(reader, token_t::type::STRING, "st\\ring"s);
-}
-
-TEST_CASE("Reader::read \"st\\\\\\\"ring\"")
-{
-  Reader reader{"\"st\\\\\\\"ring\""};
-  reader_check(reader, token_t::type::STRING, "st\\\"ring"s);
-}
-
-TEST_CASE("Reader::read \"(hello)\"")
-{
-  Reader reader{"\"(hello)\""};
-  reader_check(reader, token_t::type::STRING, "(hello)"s);
-}
-
-TEST_CASE("Reader::read 123")
-{
-  Reader reader{"123"};
-  reader_check(reader, token_t::type::INT, "123");
-}
-
-TEST_CASE("Reader::read 0123456789")
-{
-  Reader reader{"0123456789"};
-  reader_check(reader, token_t::type::INT, "0123456789");
-}
-
-TEST_CASE("Reader::unread")
-{
-  Reader reader{"()"};
+  std::string s{"()"};
+  StringReader reader{s};
   auto token = reader.read();
   CHECK(token->token == "(");
   reader.unread(*token);
