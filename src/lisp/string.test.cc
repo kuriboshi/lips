@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("String functions")
   lisp l;
   current c(l);
 
-  SUBCASE("stringp")
+  SECTION("stringp")
   {
     auto s = mkstring("hello");
     auto r0 = stringp(s);
@@ -23,7 +23,7 @@ TEST_CASE("String functions")
     auto r1 = stringp(l, i);
     CHECK(r1 == NIL);
   }
-  SUBCASE("streq")
+  SECTION("streq")
   {
     auto s0 = mkstring("lorem");
     auto s1 = mkstring("lorem");
@@ -33,7 +33,7 @@ TEST_CASE("String functions")
     auto r1 = streq(l, s0, s2);
     CHECK(r1 == NIL);
   }
-  SUBCASE("concat")
+  SECTION("concat")
   {
     auto s0 = mkstring("hello ");
     auto s1 = mkstring("world");
@@ -42,7 +42,7 @@ TEST_CASE("String functions")
     auto s3 = concat(l, cons(s0, cons(s1, NIL)));
     CHECK(s3->stringval() == mkstring("hello world")->stringval());
   }
-  SUBCASE("strlen")
+  SECTION("strlen")
   {
     auto s0 = mkstring("lorem");
     auto l0 = strlen(s0);
@@ -50,7 +50,7 @@ TEST_CASE("String functions")
     auto l1 = strlen(l, s0);
     CHECK(l1->intval() == 5);
   }
-  SUBCASE("substr")
+  SECTION("substr")
   {
     auto s0 = mkstring("hello world");
     auto s1 = substr(s0, mknumber(0), mknumber(5));
@@ -66,7 +66,7 @@ TEST_CASE("String functions")
     auto s5 = substr(l, s0, mknumber(0), mknumber(-1));
     CHECK(s5 == NIL);
   }
-  SUBCASE("symstr")
+  SECTION("symstr")
   {
     auto p0 = intern("symbol");
     auto r0 = symstr(p0);
@@ -76,7 +76,7 @@ TEST_CASE("String functions")
     CHECK(type_of(r1) == type::STRING);
     CHECK(r1->stringval() == p0->getstr());
   }
-  SUBCASE("strcmp")
+  SECTION("strcmp")
   {
     auto s0 = mkstring("alpha");
     auto s1 = mkstring("zeta");

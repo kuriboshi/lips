@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include <iostream>
 #include "libisp.hh"
 #include "repl.hh"
@@ -23,7 +23,7 @@ TEST_CASE("Interactive tests")
   auto err = std::make_unique<file_t>(cerr);
   l.primerr(std::move(err));
 
-  SUBCASE("Simple repl")
+  SECTION("Simple repl")
   {
     std::string is = R"((print "hello"))";
     l.primin(std::move(std::make_unique<file_t>(is)));
@@ -35,7 +35,7 @@ TEST_CASE("Interactive tests")
     CHECK(cout.str() == expected);
   }
   
-  SUBCASE("Break repl (reset)")
+  SECTION("Break repl (reset)")
   {
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
@@ -52,7 +52,7 @@ TEST_CASE("Interactive tests")
     CHECK(cerr.str() == expected_err);
   }
 
-  SUBCASE("Break repl (bt)")
+  SECTION("Break repl (bt)")
   {
     std::string is = R"(((lambda () (xyzzy)))
 (bt)
@@ -74,7 +74,7 @@ TEST_CASE("Interactive tests")
     CHECK(cerr.str() == expected_err);
   }
 
-  SUBCASE("Break repl (return)")
+  SECTION("Break repl (return)")
   {
     std::string is = R"(((lambda () (xyzzy)))
 (return "hello")

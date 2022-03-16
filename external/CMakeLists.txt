@@ -1,2 +1,2 @@
-add_subdirectory(doctest)
+add_subdirectory(catch2)
 add_subdirectory(fmt)

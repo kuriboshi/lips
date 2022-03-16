@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021-2022 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("Map functions")
   lisp l;
   current c(l);
 
-  SUBCASE("map")
+  SECTION("map")
   {
     auto& cvar = l.a().initcvar("cvar", NIL);
     auto r0 = eval(l, R"(
@@ -31,7 +31,7 @@ TEST_CASE("Map functions")
     CHECK(cvar->intval() == 6);
   }
 
-  SUBCASE("mapc")
+  SECTION("mapc")
   {
     auto& cvar = l.a().initcvar("cvar", NIL);
     auto r0 = eval(l, R"(
@@ -49,7 +49,7 @@ TEST_CASE("Map functions")
     CHECK(cvar->intval() == 3);
   }
 
-  SUBCASE("maplist")
+  SECTION("maplist")
   {
     auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
     auto f = eval(l, "(lambda (a) (car a))");
@@ -63,7 +63,7 @@ TEST_CASE("Map functions")
     CHECK(caddr(r1)->intval() == 3);
   }
 
-  SUBCASE("mapcar")
+  SECTION("mapcar")
   {
     auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
     auto f = eval(l, "(lambda (a) (+ a 1))");

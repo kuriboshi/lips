@@ -3,8 +3,8 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#define DOCTEST_CONFIG_IMPLEMENT
-#include <doctest/doctest.h>
+#define CATCH_CONFIG_RUNNER
+#include <catch2/catch.hpp>
 
 #include <vector>
 #include <string>
@@ -16,15 +16,21 @@
 int main(int argc, const char** argv)
 {
   bool test = false;
-  std::vector<std::string> args{argv + 1, argv + argc};
+  Catch::Session session;
+  using namespace Catch::clara;
+  auto cli = session.cli() | Opt(test) ["--test"]("Turn on test");
+  session.cli( cli ); 
+  session.applyCommandLine(argc, argv);
+
   lisp::lisp lisp;
+  if(test)
+  {
+    auto result = session.run();
+    return result;
+  }
+  std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
   {
-    if(f == "--test")
-    {
-      test = true;
-      break;
-    }
     try
     {
       lisp::load(lisp::mkstring(f));
@@ -34,13 +40,6 @@ int main(int argc, const char** argv)
       std::cout << f << ": " << ex.what() << std::endl;
       return 1;
     }
-  }
-  if(test)
-  {
-    doctest::Context context;
-    context.applyCommandLine(argc, argv);
-    auto result = context.run();
-    return result;
   }
   return lisp::run(lisp);
 }

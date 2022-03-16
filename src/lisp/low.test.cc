@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("Low level functions")
   lisp l;
   current c(l);
 
-  SUBCASE("cond")
+  SECTION("cond")
   {
     std::string cond0 = R"(
 (progn
@@ -38,7 +38,7 @@ TEST_CASE("Low level functions")
     CHECK(a3->getstr() == "A");
   }
 
-  SUBCASE("prog1")
+  SECTION("prog1")
   {
     auto r0 = prog1(l, mknumber(1), mklist(mknumber(2), mknumber(3), mknumber(4)));
     CHECK(r0->intval() == 1);
@@ -46,7 +46,7 @@ TEST_CASE("Low level functions")
     CHECK(r1->intval() == 1);
   }
 
-  SUBCASE("while")
+  SECTION("while")
   {
     std::string p0 = R"(
 (progn
@@ -62,7 +62,7 @@ TEST_CASE("Low level functions")
     CHECK(r0->intval() == 10);
   }
 
-  SUBCASE("set")
+  SECTION("set")
   {
     std::ostringstream os;
     auto of = std::make_unique<file_t>(os);

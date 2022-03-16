@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 #include <iostream>
@@ -21,7 +21,7 @@ TEST_CASE("Logic functions")
   lisp l;
   current c(l);
 
-  SUBCASE("and")
+  SECTION("and")
   {
     CHECK(p_and(cons(T, cons(T, NIL))) == T);
     CHECK(p_and(cons(NIL, cons(T, NIL))) == NIL);
@@ -33,7 +33,7 @@ TEST_CASE("Logic functions")
     CHECK(p_and(l, cons(NIL, cons(NIL, NIL))) == NIL);
   }
 
-  SUBCASE("or")
+  SECTION("or")
   {
     CHECK(p_or(cons(T, cons(T, NIL))) == T);
     CHECK(p_or(cons(NIL, cons(T, NIL))) == T);
@@ -45,7 +45,7 @@ TEST_CASE("Logic functions")
     CHECK(p_or(l, cons(NIL, cons(NIL, NIL))) == NIL);
   }
 
-  SUBCASE("not")
+  SECTION("not")
   {
     CHECK(p_not(l, T) == NIL);
     CHECK(p_not(l, NIL) == T);
@@ -53,7 +53,7 @@ TEST_CASE("Logic functions")
     CHECK(p_not(NIL) == T);
   }
 
-  SUBCASE("if")
+  SECTION("if")
   {
     auto s0 = mkstring("true");
     auto s1 = mkstring("false");

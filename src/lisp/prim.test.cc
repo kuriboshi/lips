@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("Primary functions")
   lisp l;
   current c(l);
 
-  SUBCASE("CAR and CDR")
+  SECTION("CAR and CDR")
   {
     auto sample = eval(l, "(cons 1 2)");
     CHECK(car(sample)->intval() == 1);
@@ -23,7 +23,7 @@ TEST_CASE("Primary functions")
     CHECK(cdr(l, sample)->intval() == 2);
   }
 
-  SUBCASE("C..R and C...R")
+  SECTION("C..R and C...R")
   {
     {
       auto sample = eval(l, "(quote ((1 . 2) 3 . 4))");
@@ -60,7 +60,7 @@ TEST_CASE("Primary functions")
     }
   }
 
-  SUBCASE("C.R, C..R, C...R should return NIL for non-CONS types")
+  SECTION("C.R, C..R, C...R should return NIL for non-CONS types")
   {
     auto sym = mkatom("a");
     CHECK(car(sym) == NIL);
@@ -81,14 +81,14 @@ TEST_CASE("Primary functions")
     CHECK(cdddr(sym) == NIL);
   }
 
-  SUBCASE("atom")
+  SECTION("atom")
   {
     auto sym = mkatom("sym");
     CHECK(!is_NIL(atom(sym)));
     CHECK(!is_NIL(atom(l, sym)));
   }
 
-  SUBCASE("append")
+  SECTION("append")
   {
     auto list0 = mklist(1_l, 2_l);
     auto list1 = mklist(3_l);
@@ -104,7 +104,7 @@ TEST_CASE("Primary functions")
     CHECK(r2->intval() == 10);
   }
 
-  SUBCASE("nconc")
+  SECTION("nconc")
   {
     auto list0 = mklist(1_l, 2_l);
     auto list1 = mklist(3_l);
@@ -123,7 +123,7 @@ TEST_CASE("Primary functions")
     CHECK(r3->intval() == 10);
   }
 
-  SUBCASE("tconc")
+  SECTION("tconc")
   {
     // This example is from the Interlisp manual page 6.2.
     auto foo = tconc(NIL, 1_l);
@@ -142,7 +142,7 @@ TEST_CASE("Primary functions")
     CHECK(equal(car(foo), mklist(5_l, 4_l, 3_l, 2_l, 1_l)));
   }
 
-  SUBCASE("attach")
+  SECTION("attach")
   {
     auto foo = mklist(2_l);
     attach(1_l, foo);
@@ -151,14 +151,14 @@ TEST_CASE("Primary functions")
     CHECK(equal(foo, mklist(0_l, 1_l, 2_l)));
   }
 
-  SUBCASE("length")
+  SECTION("length")
   {
     auto list = mklist(0_l, 1_l, 2_l, 3_l);
     CHECK(length(list)->intval() == 4);
     CHECK(length(l, list)->intval() == 4);
   }
 
-  SUBCASE("nth and nthd")
+  SECTION("nth and nthd")
   {
     {
       auto foo = mklist(1_l, 2_l, 3_l, 4_l, 5_l);
@@ -178,7 +178,7 @@ TEST_CASE("Primary functions")
     }
   }
 
-  SUBCASE("null")
+  SECTION("null")
   {
     CHECK(!is_NIL(null(NIL)));
     CHECK(!is_NIL(null(l, NIL)));

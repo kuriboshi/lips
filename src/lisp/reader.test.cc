@@ -2,10 +2,10 @@
 // Lips, lisp shell.
 // Copyright 2022 Krister Joas
 //
-#include <doctest/doctest.h>
-#include "reader.hh"
 
-using namespace std::literals;
+#include <catch2/catch.hpp>
+#include <string>
+#include "reader.hh"
 
 namespace
 {

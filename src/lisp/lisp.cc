@@ -3,7 +3,6 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#include <doctest/doctest.h>
 #include <cstring>              // For strerror
 #include <cerrno>               // For errno
 #include <iostream>

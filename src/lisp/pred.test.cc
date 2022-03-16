@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("Predicate functions")
   lisp l;
   current c(l);
 
-  SUBCASE("numberp")
+  SECTION("numberp")
   {
     CHECK(numberp(l, mknumber(1)) != NIL);
     CHECK(numberp(mknumber(1)) != NIL);
@@ -23,7 +23,7 @@ TEST_CASE("Predicate functions")
     CHECK(numberp(mkstring("hello")) == NIL);
   }
 
-  SUBCASE("listp")
+  SECTION("listp")
   {
     CHECK(listp(l, cons(l, mknumber(1), NIL)) != NIL);
     CHECK(listp(cons(l, mknumber(1), NIL)) != NIL);
@@ -31,7 +31,7 @@ TEST_CASE("Predicate functions")
     CHECK(listp(mkstring("hello")) == NIL);
   }
 
-  SUBCASE("nlistp")
+  SECTION("nlistp")
   {
     CHECK(nlistp(l, cons(l, mknumber(1), NIL)) == NIL);
     CHECK(nlistp(cons(l, mknumber(1), NIL)) == NIL);
@@ -39,7 +39,7 @@ TEST_CASE("Predicate functions")
     CHECK(nlistp(mkstring("hello")) != NIL);
   }
 
-  SUBCASE("boundp")
+  SECTION("boundp")
   {
     CHECK(is_NIL(boundp("string"_l)));
     auto ub = mkatom("ub");
@@ -49,7 +49,7 @@ TEST_CASE("Predicate functions")
     CHECK(is_T(boundp(l, bd)));
   }
 
-  SUBCASE("memb")
+  SECTION("memb")
   {
     CHECK(memb(l, mknumber(2), mklist(mknumber(1), mknumber(2), mknumber(3))) != NIL);
     CHECK(memb(mknumber(2), mklist(mknumber(1), mknumber(2), mknumber(3))) != NIL);
@@ -57,7 +57,7 @@ TEST_CASE("Predicate functions")
     CHECK(memb(mknumber(4), mklist(mknumber(1), mknumber(2), mknumber(3))) == NIL);
   }
 
-  SUBCASE("litatom")
+  SECTION("litatom")
   {
     CHECK(litatom(l, mkatom("a")) != NIL);
     CHECK(litatom(mkatom("a")) != NIL);
@@ -67,7 +67,7 @@ TEST_CASE("Predicate functions")
     CHECK(litatom(mkstring("a")) == NIL);
   }
 
-  SUBCASE("equal")
+  SECTION("equal")
   {
     auto num0 = mknumber(0);
     auto num1 = mknumber(1);
@@ -93,7 +93,7 @@ TEST_CASE("Predicate functions")
     CHECK(equal(mklist(num0, num1, num0), mklist(num1, num0, num1)) == NIL);
   }
 
-  SUBCASE("typeof")
+  SECTION("typeof")
   {
     CHECK(xtypeof(NIL) == NIL);
     CHECK(xtypeof(mkatom("symbol")) == C_SYMBOL);

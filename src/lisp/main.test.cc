@@ -3,7 +3,7 @@
 // Copyright 2021 Krister Joas
 //
 
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include <sstream>
 #include <string>
 #include "main.hh"

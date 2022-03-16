@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +13,7 @@ TEST_CASE("lisp.cc: current")
   lisp lisp0;
   lisp lisp1;
 
-  SUBCASE("test 1")
+  SECTION("test 1")
   {
     auto v0 = mkatom(lisp0, "v0");
     setqq(lisp0, v0, mkatom(lisp0, "world"));
@@ -23,7 +23,7 @@ TEST_CASE("lisp.cc: current")
     CHECK(eq(lisp0, v0->symvalue(), mkatom(lisp1, "world")) == NIL);
   }
 
-  SUBCASE("test 2")
+  SECTION("test 2")
   {
     auto v1 = mkatom(lisp1, "v1");
     setqq(lisp1, v1, mkatom(lisp1, "world"));
@@ -33,7 +33,7 @@ TEST_CASE("lisp.cc: current")
     CHECK(eq(lisp1, v1->symvalue(), mkatom(lisp0, "world")) == NIL);
   }
 
-  SUBCASE("current 1")
+  SECTION("current 1")
   {
     // Set default lisp interpreter to lisp0
     current c(lisp0);
@@ -45,7 +45,7 @@ TEST_CASE("lisp.cc: current")
     CHECK(eq(lisp1, v2->symvalue(), mkatom(lisp1, "world")) == NIL);
   }
 
-  SUBCASE("current 2")
+  SECTION("current 2")
   {
     // Set default lisp interpreter to lisp1
     current c(lisp1);
@@ -57,7 +57,7 @@ TEST_CASE("lisp.cc: current")
     CHECK(eq(lisp1, v3->symvalue(), mkatom(lisp0, "world")) == NIL);
   }
 
-  SUBCASE("mkprim")
+  SECTION("mkprim")
   {
     std::vector<int> result;
     mkprim(

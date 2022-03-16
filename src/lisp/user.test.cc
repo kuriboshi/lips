@@ -2,7 +2,8 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -13,7 +14,7 @@ TEST_CASE("User defined functions")
   lisp l;
   current c(l);
 
-  SUBCASE("de/df")
+  SECTION("de/df")
   {
     auto a = mkatom("a");
     auto b = mkatom("b");
@@ -35,7 +36,7 @@ TEST_CASE("User defined functions")
     }
   }
 
-  SUBCASE("defineq")
+  SECTION("defineq")
   {
     auto f0 = mklist(mklist(mkatom("f0"), lambda(mklist(mkatom("a")), mklist(mkatom("a")))),
       mklist(mkatom("f1"), lambda(mklist(mkatom("b")), mklist(mkatom("b")))));
@@ -47,7 +48,7 @@ TEST_CASE("User defined functions")
     CHECK(equal(r1, mklist(mkatom("f0"), mkatom("f1"))));
   }
 
-  SUBCASE("getrep")
+  SECTION("getrep")
   {
     auto f = lambda(mklist(mkatom("a")), mklist(mklist(mkatom("cons"), mkatom("a"), NIL)));
     auto rep0 = getrep(f);
@@ -62,14 +63,14 @@ TEST_CASE("User defined functions")
     CHECK(equal(r0, cons(0_l, NIL)));
   }
 
-  SUBCASE("Verbose flag")
+  SECTION("Verbose flag")
   {
     CHECK(is_NIL(l.verbose()));
     eval(l, "(setq verbose t)");
     CHECK(is_T(l.verbose()));
   }
 
-  SUBCASE("Redefine function")
+  SECTION("Redefine function")
   {
     auto f0 = define(l, mkatom("f"), lambda(mklist(mkatom("a")), mklist(mkatom("a"))));
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));

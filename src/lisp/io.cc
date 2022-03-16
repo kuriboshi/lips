@@ -2,7 +2,6 @@
  * Lips, lisp shell.
  * Copyright 1988, 2020-2022 Krister Joas
  */
-#include <doctest/doctest.h>
 #include "io.hh"
 #include "alloc.hh"
 #include "prim.hh"

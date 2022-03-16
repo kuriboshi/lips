@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -16,7 +16,7 @@ TEST_CASE("Arithmetic functions")
   auto of = std::make_unique<file_t>(os);
   l.primerr(std::move(of));
 
-  SUBCASE("+")
+  SECTION("+")
   {
     {
       auto r0 = plus(l, mklist(1_l, 2_l, 3_l, 4_l, 5_l));
@@ -45,7 +45,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("-")
+  SECTION("-")
   {
     {
       auto r0 = difference(l, 1_l, 2_l);
@@ -59,13 +59,13 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("*")
+  SECTION("*")
   {
     auto r0 = ltimes(l, mklist(5_l, 7_l));
     CHECK(r0->intval() == 35);
   }
 
-  SUBCASE("/")
+  SECTION("/")
   {
     {
       auto r0 = divide(l, 4_l, 2_l);
@@ -85,7 +85,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("i+")
+  SECTION("i+")
   {
     {
       auto r0 = iplus(l, mklist(1_l, 2_l, 7_l));
@@ -97,7 +97,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("i-")
+  SECTION("i-")
   {
     {
       auto r0 = idifference(l, 1_l, 2_l);
@@ -111,7 +111,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("i*")
+  SECTION("i*")
   {
     {
       auto r0 = itimes(l, mklist(6_l, 8_l));
@@ -123,7 +123,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("i/")
+  SECTION("i/")
   {
     {
       auto r0 = iquotient(l, 5_l, 2_l);
@@ -135,7 +135,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("i%")
+  SECTION("i%")
   {
     {
       auto r0 = iremainder(l, 5_l, 2_l);
@@ -147,7 +147,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("minus")
+  SECTION("minus")
   {
     {
       auto r0 = minus(l, 1.0_l);
@@ -159,7 +159,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("iminus")
+  SECTION("iminus")
   {
     {
       auto r0 = iminus(l, 1_l);
@@ -171,7 +171,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("add1")
+  SECTION("add1")
   {
     {
       auto r = add1(l, 2_l);
@@ -183,7 +183,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("sub1")
+  SECTION("sub1")
   {
     {
       auto r = sub1(l, 3_l);
@@ -195,7 +195,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("abs")
+  SECTION("abs")
   {
     {
       auto r = absval(l, mknumber(-1));
@@ -207,14 +207,14 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("f+")
+  SECTION("f+")
   {
     auto r = eval(l, "(f+ (itof 5) (itof 2))");
     REQUIRE(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 7.0);
   }
 
-  SUBCASE("f-")
+  SECTION("f-")
   {
     {
       auto r0 = fdifference(l, 1.0_l, 2.0_l);
@@ -228,28 +228,28 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("f*")
+  SECTION("f*")
   {
     auto r = eval(l, "(f* (itof 5) (itof 2))");
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 10.0);
   }
 
-  SUBCASE("f/")
+  SECTION("f/")
   {
     auto r = eval(l, "(f/ (itof 5) (itof 2))");
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 2.5);
   }
 
-  SUBCASE("itof")
+  SECTION("itof")
   {
     auto r = eval(l, "(itof 8)");
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 8.0);
   }
 
-  SUBCASE("greaterp")
+  SECTION("greaterp")
   {
     CHECK(is_T(greaterp(l, mknumber(2), mknumber(1))));
     CHECK(is_NIL(greaterp(l, mknumber(1), mknumber(2))));
@@ -264,7 +264,7 @@ TEST_CASE("Arithmetic functions")
     CHECK_THROWS(eval(l, "(greaterp 1 \"b\")"));
   }
 
-  SUBCASE("lessp")
+  SECTION("lessp")
   {
     CHECK(is_NIL(lessp(l, mknumber(2), mknumber(1))));
     CHECK(is_T(lessp(l, mknumber(1), mknumber(2))));
@@ -279,7 +279,7 @@ TEST_CASE("Arithmetic functions")
     CHECK_THROWS(eval(l, "(lessp 1 \"b\")"));
   }
 
-  SUBCASE("eqp")
+  SECTION("eqp")
   {
     CHECK(is_NIL(eqp(l, mknumber(2), mknumber(1))));
     CHECK(is_NIL(eqp(l, mknumber(1), mknumber(2))));
@@ -295,7 +295,7 @@ TEST_CASE("Arithmetic functions")
     CHECK_THROWS(eval(l, "(eqp 1 \"b\")"));
   }
 
-  SUBCASE("geq")
+  SECTION("geq")
   {
     CHECK(is_T(geq(l, mknumber(2), mknumber(1))));
     CHECK(is_NIL(geq(l, mknumber(1), mknumber(2))));
@@ -311,7 +311,7 @@ TEST_CASE("Arithmetic functions")
     CHECK_THROWS(eval(l, "(geq 1 \"b\")"));
   }
 
-  SUBCASE("leq")
+  SECTION("leq")
   {
     CHECK(is_NIL(leq(l, mknumber(2), mknumber(1))));
     CHECK(is_T(leq(l, mknumber(1), mknumber(2))));
@@ -327,11 +327,11 @@ TEST_CASE("Arithmetic functions")
     CHECK_THROWS(eval(l, "(leq 1 \"b\")"));
   }
 
-  SUBCASE("neqp")
+  SECTION("neqp")
   {
   }
 
-  SUBCASE("zerop")
+  SECTION("zerop")
   {
     {
       auto r = zerop(l, 0_l);
@@ -351,7 +351,7 @@ TEST_CASE("Arithmetic functions")
     }
   }
 
-  SUBCASE("minusp")
+  SECTION("minusp")
   {
     {
       auto r = minusp(l, mknumber(-5));

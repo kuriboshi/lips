@@ -2,7 +2,7 @@
 // Lips, lisp shell.
 // Copyright 2021-2022 Krister Joas
 //
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include <filesystem>
 #include "libisp.hh"
 
@@ -24,7 +24,7 @@ TEST_CASE("Read lisp objects")
   lisp lisp;
   current c(lisp);
 
-  SUBCASE("Read from utf-8")
+  SECTION("Read from utf-8")
   {
     std::string s_nihongo{"\"日本語\"\n"};
     file_t in{s_nihongo};
@@ -34,7 +34,7 @@ TEST_CASE("Read lisp objects")
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
-  SUBCASE("Read from utf-8 2")
+  SECTION("Read from utf-8 2")
   {
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
@@ -45,7 +45,7 @@ TEST_CASE("Read lisp objects")
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
-  SUBCASE("Read utf-8 from file")
+  SECTION("Read utf-8 from file")
   {
     constexpr const char* test_file{"test.lisp"};
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
@@ -62,7 +62,7 @@ TEST_CASE("Read lisp objects")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("lispread vs. readline")
+  SECTION("lispread vs. readline")
   {
     std::string s0{R"((hello world))"};
     auto f0 = file_t(s0);
@@ -73,10 +73,10 @@ TEST_CASE("Read lisp objects")
     CHECK(equal(lisp, result0, result1) != NIL);
   }
 
-  SUBCASE("floatp")
+  SECTION("floatp")
   {
     auto f0 = lispread("-1.2345E-2");
-    CHECK(f0->floatval() == doctest::Approx(-1.2345E-2).epsilon(0.01));
+    CHECK(f0->floatval() == Approx(-1.2345E-2).epsilon(0.01));
   }
 }
 

@@ -3,20 +3,20 @@ file(
   [[
 cmake_minimum_required(VERSION 3.18.0)
 
-project(doctest.download NONE)
+project(catch2.download NONE)
 
 include(ExternalProject)
 
-ExternalProject_Add(doctest.external
-  URL https://github.com/doctest/doctest/archive/v2.4.8.tar.gz
-  URL_HASH SHA256=f52763630aa17bd9772b54e14b6cdd632c87adf0169455a86a49bd94abf2cd83
+ExternalProject_Add(catch2.external
+  URL https://github.com/catchorg/Catch2/archive/v2.13.8.tar.gz
+  URL_HASH SHA256=b9b592bd743c09f13ee4bf35fc30eeee2748963184f6bea836b146e6cc2a585a
   SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/build
   INSTALL_DIR ${PROJECT_BINARY_DIR}/install
   CONFIGURE_COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}"
                                        $<$<PLATFORM_ID:Darwin>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
                                        -D CMAKE_BUILD_TYPE=Release
-                                       -D DOCTEST_WITH_TESTS=OFF
+                                       -D CATCH_BUILD_TESTING=OFF
                                        -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>
                                        <SOURCE_DIR>
   BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release

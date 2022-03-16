@@ -3,7 +3,7 @@
 // Copyright 2021-2022 Krister Joas
 //
 #include <iostream>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -14,26 +14,26 @@ TEST_CASE("Create lisp objects")
   lisp lisp;
   current c(lisp);
 
-  SUBCASE("Multiple calls to intern should return the same object for the same string")
+  SECTION("Multiple calls to intern should return the same object for the same string")
   {
     auto hello0 = intern("hello");
     auto hello1 = intern("hello");
     CHECK(hello0 == hello1);
   }
 
-  SUBCASE("Check constants are the same as interned strings")
+  SECTION("Check constants are the same as interned strings")
   {
     auto lambda = intern("lambda");
     CHECK(lambda == C_LAMBDA);
   }
 
-  SUBCASE("Check constants are the same as a local atom")
+  SECTION("Check constants are the same as a local atom")
   {
     auto lambda = mkatom(lisp, "lambda");
     CHECK(lambda == C_LAMBDA);
   }
 
-  SUBCASE("Set variable")
+  SECTION("Set variable")
   {
     auto i = mkatom(lisp, "i");
     auto j = mkatom(lisp, "j");

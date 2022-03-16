@@ -3,7 +3,7 @@
 // Copyright 2022 Krister Joas
 //
 #include <sstream>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "parser.hh"
 #include "io.hh"
 #include "prim.hh"

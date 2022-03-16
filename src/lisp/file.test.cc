@@ -4,7 +4,7 @@
 //
 #include <fstream>
 #include <filesystem>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include "libisp.hh"
 
 namespace lisp
@@ -15,7 +15,7 @@ TEST_CASE("File functions")
   lisp l;
   current c(l);
 
-  SUBCASE("ratom")
+  SECTION("ratom")
   {
     constexpr const char* test_file{"test.lisp"};
     {
@@ -29,7 +29,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("load")
+  SECTION("load")
   {
     constexpr const char* test_file{"test.lisp"};
     {
@@ -40,7 +40,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("print")
+  SECTION("print")
   {
     constexpr const char* test_file{"test_print.lisp"};
     auto f0 = open(mkstring(test_file), intern("write"));
@@ -53,7 +53,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("terpri")
+  SECTION("terpri")
   {
     constexpr const char* test_file{"test_terpri.lisp"};
     auto f0 = open(mkstring(test_file), intern("write"));
@@ -67,7 +67,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("prin1")
+  SECTION("prin1")
   {
     constexpr const char* test_file{"test_prin1.lisp"};
     auto f0 = open(mkstring(test_file), intern("write"));
@@ -80,7 +80,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("prin2")
+  SECTION("prin2")
   {
     constexpr const char* test_file = "test_prin2.lisp";
     auto f0 = open(mkstring(test_file), intern("write"));
@@ -95,7 +95,7 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
-  SUBCASE("readc")
+  SECTION("readc")
   {
     std::string is = R"(test)";
     LISPT f = l.a().getobject();
@@ -110,7 +110,7 @@ TEST_CASE("File functions")
     CHECK(ch3->intval() == 't');
   }
 
-  SUBCASE("read")
+  SECTION("read")
   {
     std::string is = R"((a b c))";
     LISPT f = l.a().getobject();
@@ -119,7 +119,7 @@ TEST_CASE("File functions")
     CHECK(!is_NIL(equal(sexpr, mklist(mkatom("a"), mkatom("b"), mkatom("c")))));
   }
 
-  SUBCASE("spaces")
+  SECTION("spaces")
   {
     std::ostringstream cout;
     auto out = std::make_unique<file_t>(cout);
@@ -128,7 +128,7 @@ TEST_CASE("File functions")
     CHECK(cout.str() == "        ");
   }
 
-  SUBCASE("readline")
+  SECTION("readline")
   {
     std::string is = R"(test)";
     LISPT f = l.a().getobject();

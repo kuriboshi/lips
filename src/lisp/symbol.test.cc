@@ -1,5 +1,11 @@
+//
+// Lips, lisp shell.
+//
+// Copyright 2021-2022 Krister Joas
+//
+
 #include <iostream>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 
 #include "alloc.hh"
 #include "lisp.hh"

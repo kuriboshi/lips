@@ -4,7 +4,6 @@
  *
  */
 
-#include <doctest/doctest.h>
 #include "arith.hh"
 #include "alloc.hh"
 #include "iter.hh"
