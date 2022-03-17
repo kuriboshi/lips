@@ -11,8 +11,10 @@
 namespace lisp
 {
 
-TEST_CASE("run")
+TEST_CASE("incomplete input")
 {
+  // An incomplete input expression is treated as ending with a super
+  // parenthesis so there should be no error message in this case.
   lisp l;
   current c(l);
   std::ostringstream cout;
@@ -23,7 +25,10 @@ TEST_CASE("run")
   l.primin(std::move(std::make_unique<file_t>(is)));
   std::ostringstream os;
   run(l, os);
-  CHECK(os.str() == "Unexpected end of file\n");
+  CHECK(os.str() == "");
+  CHECK(cout.str() == R"(> "hello"
+"hello"
+> )");
 }
 
 TEST_CASE("exit")

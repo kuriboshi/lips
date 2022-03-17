@@ -101,8 +101,6 @@ LISPT Parser<Input>::parse()
   while(true)
   {
     auto o = parse_object();
-    if(o == C_EOF)
-      return head;
     if(empty(o))
       break;
     if(tail == NIL)
@@ -110,8 +108,6 @@ LISPT Parser<Input>::parse()
     else
       tail = cdr(rplacd(tail, cons(o, NIL)));
   }
-  if(empty(head))
-    return NIL;
   return head;
 }
 

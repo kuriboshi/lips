@@ -146,7 +146,7 @@ TEST_CASE("Parser .")
 //
 TEST_CASE("Parser top level single object")
 {
-  lisp_compare("", "nil");
+  lisp_compare("", "");
   lisp_compare("a)", "a");
   lisp_compare("a]", "a");
 }

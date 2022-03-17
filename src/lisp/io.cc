@@ -400,7 +400,7 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
       ps("nil", file, false);
       break;
     case type::EMPTY:
-      ps("empty", file, false);
+      ps("", file, false);
       break;
     case type::T:
       file.putch('t');
