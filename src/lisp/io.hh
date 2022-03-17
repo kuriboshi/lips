@@ -27,7 +27,7 @@ public:
   static void popr(lisp& l, LISPT& w);
 
   static LISPT ratom(lisp& l, file_t&);
-  static LISPT lispread(lisp& l, file_t&, bool line = false);
+  static LISPT lispread(lisp& l, file_t&);
   static LISPT readline(lisp& l, file_t&);
 
   static LISPT patom(lisp& l, LISPT, file_t&, bool esc = false);
@@ -373,9 +373,9 @@ inline bool isinfix(int c) { return isinfix(lisp::current(), c); }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io::ratom(l, f); }
 inline LISPT ratom(file_t& f) { return io::ratom(lisp::current(), f); }
-inline LISPT lispread(lisp& l, file_t& f, bool esc = false) { return io::lispread(l, f, esc); }
-inline LISPT lispread(file_t& f, bool esc = false) { return io::lispread(lisp::current(), f, esc); }
-inline LISPT lispread(const std::string& s, bool esc = false) { file_t f(s); return io::lispread(lisp::current(), f, esc); }
+inline LISPT lispread(lisp& l, file_t& f) { return io::lispread(l, f); }
+inline LISPT lispread(file_t& f) { return io::lispread(lisp::current(), f); }
+inline LISPT lispread(const std::string& s) { file_t f(s); return io::lispread(lisp::current(), f); }
 inline LISPT readline(lisp& l, file_t& f) { return io::readline(l, f); }
 inline LISPT readline(file_t& f) { return io::readline(lisp::current(), f); }
 inline LISPT getline(lisp& l, LISPT f) { return io::getline(l, f); }

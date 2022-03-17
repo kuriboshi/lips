@@ -56,7 +56,7 @@ TEST_CASE("Create lisp objects")
 
     std::string s_hello{"(hello)"};
     file_t in(s_hello);
-    auto hello = lispread(lisp, in, false);
+    auto hello = lispread(lisp, in);
     file_t out2(std::make_unique<string_sink>());
     prin0(lisp, hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);

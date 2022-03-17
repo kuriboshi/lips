@@ -28,7 +28,7 @@ TEST_CASE("Read lisp objects")
   {
     std::string s_nihongo{"\"日本語\"\n"};
     file_t in{s_nihongo};
-    auto nihongo = lispread(lisp, in, false);
+    auto nihongo = lispread(lisp, in);
     file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
@@ -39,7 +39,7 @@ TEST_CASE("Read lisp objects")
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     file_t in{s_nihongo};
-    auto nihongo = lispread(lisp, in, false);
+    auto nihongo = lispread(lisp, in);
     file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
@@ -55,7 +55,7 @@ TEST_CASE("Read lisp objects")
       o << s_nihongo;
     }
     auto f = file_t(std::make_unique<file_source>(test_file));
-    auto nihongo = lispread(lisp, f, false);
+    auto nihongo = lispread(lisp, f);
     file_t out(std::make_unique<string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
@@ -66,7 +66,7 @@ TEST_CASE("Read lisp objects")
   {
     std::string s0{R"((hello world))"};
     auto f0 = file_t(s0);
-    auto result0 = lispread(lisp, f0, false);
+    auto result0 = lispread(lisp, f0);
     std::string s1{R"(hello world)"};
     auto f1 = file_t(s1);
     auto result1 = readline(lisp, f1);

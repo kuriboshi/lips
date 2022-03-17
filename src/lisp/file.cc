@@ -74,11 +74,11 @@ LISPT readc(lisp& l, LISPT file)
 LISPT read(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return lispread(l, l.primin(), false);
+    return lispread(l, l.primin());
   if(is_T(file))
-    return lispread(l, l.stdin(), false);
+    return lispread(l, l.stdin());
   check(file, type::FILET);
-  return lispread(l, file->fileval(), false);
+  return lispread(l, file->fileval());
 }
 
 LISPT print(lisp& l, LISPT x, LISPT file)
@@ -96,8 +96,8 @@ bool loadfile(lisp& l, const std::string& lf)
   try
   {
     auto foo = std::make_unique<file_t>(std::make_unique<file_source>(lf));
-    for(auto rval = lispread(l, *foo.get(), false); type_of(rval) != type::ENDOFFILE;
-        rval = lispread(l, *foo.get(), false))
+    for(auto rval = lispread(l, *foo.get()); type_of(rval) != type::EMPTY;
+        rval = lispread(l, *foo.get()))
       rval = l.e().eval(rval);
   }
   catch(const lisp_error&)
@@ -184,7 +184,7 @@ LISPT readline(lisp& l, LISPT file)
   else if(is_T(file))
     return io::readline(l, l.stdin());
   check(file, type::FILET);
-  return io::readline(l, file->fileval());
+  return cons(io::readline(l, file->fileval()), NIL);
 }
 
 namespace pn

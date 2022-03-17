@@ -41,8 +41,8 @@ public:
       while(true)
       {
         prin0(l, _prompt, l.primout());
-        auto expr = lispread(l, l.primin(), false);
-        if(expr == C_EOF)
+        auto expr = lispread(l, l.primin());
+        if(expr == C_EMPTY)
           break;
         print(l, eval(l, expr), l.primout());
       }
@@ -51,8 +51,8 @@ public:
     while(true)
     {
       prin0(l, _break_prompt, l.primout());
-      auto com = lispread(l, l.primin(), false);
-      if(com == C_EOF)
+      auto com = lispread(l, l.primin());
+      if(com == C_EMPTY)
         return C_EOF;
       /* OK, EVAL, ^, ... */
       if(type_of(com) != type::CONS)

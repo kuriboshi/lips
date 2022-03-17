@@ -254,7 +254,7 @@ subr_t::subr_vector subr_t::subr_store;
 LISPT eval(lisp& l, const std::string& expr)
 {
   file_t in(expr);
-  auto e = lispread(l, in, false);
+  auto e = lispread(l, in);
   return lisp::eval(l, e);
 }
 

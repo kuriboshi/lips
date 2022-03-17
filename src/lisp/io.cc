@@ -194,12 +194,9 @@ LISPT io::splice(lisp& l, LISPT x, LISPT y, bool tailp)
 }
 
 //
-// LISPREAD reads a lisp expression from file FILE.  If LINE is true then it is
-// assumed that it was called from READLINE.  READLINE initializes by itself
-// TOP so that an extra level of parentheses is in effect.  An explicit stack
-// is used to store TOP when LISPREAD recurses.
+// LISPREAD reads a lisp expression from file FILE.
 //
-LISPT io::lispread(lisp& l, file_t& file, bool line)
+LISPT io::lispread(lisp& l, file_t& file)
 {
   Reader reader(file.source());
   return Parser(reader).parse();
@@ -231,7 +228,7 @@ LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
     return C_QUOTE;
   }
   file.ungetch(c);
-  return cons(l, C_QUOTE, cons(l, lispread(l, file, false), NIL));
+  return cons(l, C_QUOTE, cons(l, lispread(l, file), NIL));
 }
 
 #if 0
@@ -285,7 +282,7 @@ LISPT io::readline(lisp& l, file_t& file)
 {
   l.top = cons(l, NIL, NIL); /* Init first paren level */
   rplaca(l, l.top, cons(l, NIL, l.top));
-  LISPT rd = lispread(l, file, true);
+  LISPT rd = lispread(l, file);
   return rd;
 }
 
