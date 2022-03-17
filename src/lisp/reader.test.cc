@@ -75,6 +75,34 @@ TEST_CASE("Reader ( a b c )")
   CHECK(!reader.read());
 }
 
+TEST_CASE("Reader +")
+{
+  SECTION("+")
+  {
+    std::string s{"+"};
+    StringReader reader{s};
+    reader_check(reader, token_t::type::SYMBOL, "+");
+  }
+  SECTION("(+)")
+  {
+    std::string s{"(+)"};
+    StringReader reader{s};
+    reader_check(reader, token_t::type::MACRO, "(");
+    reader_check(reader, token_t::type::SYMBOL, "+");
+    reader_check(reader, token_t::type::MACRO, ")");
+  }
+  SECTION("(+ 1 2)")
+  {
+    std::string s{"(+ 1 2)"};
+    StringReader reader{s};
+    reader_check(reader, token_t::type::MACRO, "(");
+    reader_check(reader, token_t::type::SYMBOL, "+");
+    reader_check(reader, token_t::type::INT, "1");
+    reader_check(reader, token_t::type::INT, "2");
+    reader_check(reader, token_t::type::MACRO, ")");
+  }
+}
+
 TEST_CASE("Reader strings")
 {
   SECTION("\"string\"")

@@ -75,6 +75,7 @@ std::optional<token_t> Reader<Input>::read()
     IN_DOT,                    // A dot may be the start of a float or a symbol
                                // unless it's followed by a terminating
                                // character, like '(', ')', or a white space.
+    IN_SIGN,                   // A lone '+' or '-' is an atom, not an integer.
     // A non-numeric character terminates the integer, e.g 123abc is parsed as
     // two tokens '123' and 'abc'.
     IN_INT,                    // An integer which may turn into a float if an
@@ -125,6 +126,10 @@ std::optional<token_t> Reader<Input>::read()
             token.type = token_t::type::STRING;
             break;
           case '-': case '+':
+            state = state_t::IN_SIGN;
+            token.type = token_t::type::SYMBOL; // Assume symbol
+            token.token.push_back(*_pos);
+            break;
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             if(!token.token.empty())
@@ -175,6 +180,20 @@ std::optional<token_t> Reader<Input>::read()
           default:
             token.token.push_back(*_pos);
             break;
+        }
+        break;
+      case state_t::IN_SIGN:
+        switch(*_pos)
+        {
+          case '0': case '1': case '2': case '3': case '4':
+          case '5': case '6': case '7': case '8': case '9':
+            state = state_t::IN_INT;
+            token.token.push_back(*_pos);
+            break;
+          default:
+            state = state_t::IN_SYMBOL;
+            token.type = token_t::type::SYMBOL;
+            continue;
         }
         break;
       case state_t::IN_INT:
