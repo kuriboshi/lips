@@ -128,7 +128,9 @@ template<typename Input>
 LISPT Parser<Input>::parse_object()
 {
   if(!next())
-    return C_EOF;
+    return C_EMPTY;
+  if(_token.is_macro('\''))
+    return cons(mkatom("quote"), cons(parse_object(), NIL));
   if(_token.is_macro('('))
     return parse_list('(');
   if(_token.is_macro('['))

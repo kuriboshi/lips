@@ -101,6 +101,11 @@ std::optional<token_t> Reader<Input>::read()
             token.token.push_back(*_pos);
             ++_pos;
             return token;
+          case '\'':
+            token.type = token_t::type::MACRO;
+            token.token.push_back(*_pos);
+            ++_pos;
+            return token;
           case '.':
             // A symbol may start with a dot so we assume it's a macro
             // character but look ahead one character.
