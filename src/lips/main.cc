@@ -4,8 +4,8 @@
  *
  */
 
-#define DOCTEST_CONFIG_IMPLEMENT
-#include <doctest/doctest.h>
+#define CATCH_CONFIG_RUNNER
+#include <catch2/catch.hpp>
 
 #include <sys/types.h>
 #include <sys/select.h>
@@ -363,7 +363,7 @@ LISPT greet(LISPT who)
 
 int main(int argc, char* const* argv)
 {
-  doctest::Context context;
+  Catch::Session session;
 
   int option;
   options_t options;
@@ -409,8 +409,7 @@ int main(int argc, char* const* argv)
   auto lisp = init();
   if(options.test)
   {
-    context.applyCommandLine(argc, argv);
-    auto result = context.run();
+    auto result = session.run();
     return result;
   }
   if(!options.fast)

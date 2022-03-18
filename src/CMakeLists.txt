@@ -78,7 +78,7 @@ target_sources(
           lisp/symbol.test.cc
           lisp/user.test.cc
           lisp/main.hh)
-target_link_libraries(main PUBLIC lisp doctest::doctest)
+target_link_libraries(main PUBLIC lisp Catch2::Catch2)
 add_test(NAME lisp_test COMMAND main --test)
 
 add_subdirectory(lips)

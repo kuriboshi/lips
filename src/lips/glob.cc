@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <string>
 #include <optional>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 
 #include <pwd.h>
 
@@ -108,35 +108,35 @@ TEST_CASE("match")
     std::ofstream of("testfile");
   }
 
-  SUBCASE("match: dircheck")
+  SECTION("match: dircheck")
   {
     CHECK(match("testdir", "test*/"));
     CHECK(!match("testfile", "testf*/"));
     CHECK(match("testdir", "testd**"));
   }
-  SUBCASE("pattern a*")
+  SECTION("pattern a*")
   {
     CHECK(match("alpha", "a*"));
     CHECK(!match("beta", "a*"));
     CHECK(match("aaa", "a*"));
   }
-  SUBCASE("pattern *a*")
+  SECTION("pattern *a*")
   {
     CHECK(match("xxxaxxx", "*a*"));
     CHECK(match("xxxa", "*a*"));
     CHECK(match("axxx", "*a*"));
   }
-  SUBCASE("pattern *.cc")
+  SECTION("pattern *.cc")
   {
     CHECK(match("glob.cc", "*.cc"));
     CHECK(!match("glob.hh", "*.cc"));
   }
-  SUBCASE("pattern *.??")
+  SECTION("pattern *.??")
   {
     CHECK(match("foo.cc", "*.??"));
     CHECK(!match("foo.cpp", "*.??"));
   }
-  SUBCASE("pattern [abc].??")
+  SECTION("pattern [abc].??")
   {
     CHECK(match("a.cc", "[abc].??"));
     CHECK(match("b.cc", "[abc].??"));
@@ -215,19 +215,19 @@ TEST_CASE("walkfiles")
     REQUIRE(!ec);
   }
 
-  SUBCASE("walkfiles: *")
+  SECTION("walkfiles: *")
   {
     auto result = walkfiles("*");
     CHECK(!result.empty());
   }
-  SUBCASE("walkfiles: testdi*")
+  SECTION("walkfiles: testdi*")
   {
     auto result = walkfiles("testdi*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     CHECK(result[0] == "testdir"s);
   }
-  SUBCASE("walkfiles: testdir/*")
+  SECTION("walkfiles: testdir/*")
   {
     auto result = walkfiles("testdir/*");
     REQUIRE(!result.empty());
@@ -235,21 +235,21 @@ TEST_CASE("walkfiles")
     for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
       CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("walkfiles: testdir/*/*")
+  SECTION("walkfiles: testdir/*/*")
   {
     auto result = walkfiles("testdir/*/*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("walkfiles: testdir/[b]*")
+  SECTION("walkfiles: testdir/[b]*")
   {
     auto result = walkfiles("testdir/[b]*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
     for(auto r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
-  SUBCASE("walkfiles: ./testd*")
+  SECTION("walkfiles: ./testd*")
   {
     auto result = walkfiles("./testd*");
     REQUIRE(!result.empty());
@@ -311,27 +311,27 @@ std::optional<std::string> extilde(const std::string& w)
 TEST_CASE("extilde")
 {
   std::string home = std::getenv("HOME");
-  SUBCASE("~ == HOME")
+  SECTION("~ == HOME")
   {
     auto dir = extilde("~");
     REQUIRE(dir);
     CHECK(home == *dir);
   }
-  SUBCASE("~/ == HOME/")
+  SECTION("~/ == HOME/")
   {
     auto dir = extilde("~/");
     REQUIRE(dir);
     home.push_back('/');
     CHECK(home == *dir);
   }
-  SUBCASE("~/hello/ == HOME/")
+  SECTION("~/hello/ == HOME/")
   {
     auto dir = extilde("~/hello/");
     REQUIRE(dir);
     home += "/hello/";
     CHECK(home == *dir);
   }
-  SUBCASE("~USER == HOME")
+  SECTION("~USER == HOME")
   {
     std::string user = std::getenv("USER");
     auto tilde_user = "~" + user;
@@ -339,7 +339,7 @@ TEST_CASE("extilde")
     REQUIRE(dir);
     CHECK(home == *dir);
   }
-  SUBCASE("~UNKNOWN != ")
+  SECTION("~UNKNOWN != ")
   {
     std::string unknown = "~foobar";
     auto dir = extilde(unknown);
@@ -377,7 +377,7 @@ TEST_CASE("expandfiles")
     REQUIRE(!ec);
   }
 
-  SUBCASE("Expand all files")
+  SECTION("Expand all files")
   {
     auto result = expandfiles("testdir/*", true);
     CHECK(length(result)->intval() == 3);
@@ -398,7 +398,7 @@ TEST_CASE("expandfiles")
     CHECK(count == 0);
   }
 
-  SUBCASE("Expand only one file")
+  SECTION("Expand only one file")
   {
     auto result = expandfiles("testdir/??", true);
     CHECK(length(result)->intval() == 1);
@@ -419,7 +419,7 @@ TEST_CASE("expandfiles")
     CHECK(count == 0);
   }
 
-  SUBCASE("testdir/*")
+  SECTION("testdir/*")
   {
     LISPT wild = mkstring("testdir/*");
     auto e = expand(wild);
@@ -435,7 +435,7 @@ TEST_CASE("expandfiles")
       }
   }
 
-  SUBCASE("testd*/*")
+  SECTION("testd*/*")
   {
     LISPT wild = mkstring("testd*/*");
     auto e = expand(wild);
@@ -451,7 +451,7 @@ TEST_CASE("expandfiles")
       }
   }
 
-  SUBCASE("./testd*")
+  SECTION("./testd*")
   {
     std::string s{"./testd*"};
     auto e = expandfiles(s, true);

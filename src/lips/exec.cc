@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #include <fmt/format.h>
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include <filesystem>
 #include <string>
 #include <iostream>
@@ -232,29 +232,29 @@ static std::pair<bool, std::string> check_meta(const std::string& s)
 
 TEST_CASE("exec.cc: check_meta")
 {
-  SUBCASE("test 1")
+  SECTION("test 1")
   {
     auto b = check_meta("hello");
     CHECK(!b.first);
   }
-  SUBCASE("test 2")
+  SECTION("test 2")
   {
     auto b = check_meta("hello*");
     CHECK(b.first);
   }
-  SUBCASE("test 3")
+  SECTION("test 3")
   {
     auto b = check_meta("hello\\*");
     CHECK(!b.first);
     CHECK(b.second == "hello*"s);
   }
-  SUBCASE("test 4")
+  SECTION("test 4")
   {
     auto b = check_meta("hello\\*\\[\\]");
     CHECK(!b.first);
     CHECK(b.second == "hello*[]"s);
   }
-  SUBCASE("test 5")
+  SECTION("test 5")
   {
     auto b = check_meta("hello\\*[a]\\*");
     CHECK(b.first);
@@ -329,7 +329,7 @@ static std::optional<std::vector<std::string>> make_exec(LISPT command)
 
 TEST_CASE("exec.cc: make_exec")
 {
-  SUBCASE("(make_exec (a b c)) -> a b c")
+  SECTION("(make_exec (a b c)) -> a b c")
   {
     auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), NIL))));
     REQUIRE(result);
@@ -339,20 +339,20 @@ TEST_CASE("exec.cc: make_exec")
     CHECK(*i++ == "b");
     CHECK(*i++ == "c");
   }
-  SUBCASE("(make_exec (100)) -> 100")
+  SECTION("(make_exec (100)) -> 100")
   {
     auto result = make_exec(cons(mknumber(100), NIL));
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
-  SUBCASE("(make_exec (+ 1 2)) -> 3")
+  SECTION("(make_exec (+ 1 2)) -> 3")
   {
     auto expr = lispread("((+ 1 2))");
     auto result = make_exec(expr);
     REQUIRE(result);
     CHECK(result->at(0) == "3"s);
   }
-  SUBCASE("(make_exec (/b*)) -> /bin")
+  SECTION("(make_exec (/b*)) -> /bin")
   {
     auto expr = lispread("(/b*)");
     auto result = make_exec(expr);
@@ -360,7 +360,7 @@ TEST_CASE("exec.cc: make_exec")
     REQUIRE(!result->empty());
     CHECK(result->at(0) == "/bin"s);
   }
-  SUBCASE("(make_exec (/a*)) -> <empty>")
+  SECTION("(make_exec (/a*)) -> <empty>")
   {
     auto expr = lispread("(/a*)");
     auto result = make_exec(expr);

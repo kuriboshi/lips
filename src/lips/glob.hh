@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <doctest/doctest.h>
+#include <catch2/catch.hpp>
 #include <lisp/libisp.hh>
 #include <optional>
 #include <string>
