@@ -8,18 +8,13 @@
     "configurePresets": [
         {
             "name": "default",
-            "displayName": "Default debug preset",
+            "displayName": "Default Config",
+            "description": "Default build using Ninja generator",
             "binaryDir": "${sourceDir}/build/debug",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
-        },
-        {
-            "name": "ninja",
-            "inherits": "default",
-            "displayName": "Ninja debug preset",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/ninja"
         },
         {
             "name": "xcode",
@@ -34,10 +29,6 @@
             "configurePreset": "default"
         },
         {
-            "name": "ninja",
-            "configurePreset": "ninja"
-        },
-        {
             "name": "xcode",
             "configurePreset": "xcode"
         }
@@ -46,10 +37,6 @@
         {
             "name": "default",
             "configurePreset": "default"
-        },
-        {
-            "name": "ninja",
-            "configurePreset": "ninja"
         },
         {
             "name": "xcode",
