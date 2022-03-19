@@ -97,6 +97,8 @@ template<typename Input>
 LISPT Parser<Input>::parse()
 {
   auto head = parse_object();
+  if(empty(head))
+    return head;
   LISPT tail;
   while(true)
   {

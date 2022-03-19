@@ -185,7 +185,7 @@ TEST_CASE("Parser parse")
   lisp_compare("([(a b] c)", "(((a b)) c)");
 }
 
-TEST_CASE("dot")
+TEST_CASE("Parser dot")
 {
   lisp_compare("(list a (cadr x))", "(list a (cadr x))");
   lisp_compare("(lambda (a . x) (list a (cadr x)))", "(lambda (a . x) (list a (cadr x)))");

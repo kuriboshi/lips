@@ -1,5 +1,5 @@
 //
-// Lisp reader -- reads an s-expression from the input source.
+// Lips, lisp shell.
 //
 // Copyright 2022 Krister Joas
 //
