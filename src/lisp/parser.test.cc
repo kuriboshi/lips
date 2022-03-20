@@ -10,12 +10,12 @@
 
 namespace
 {
-using StringReader = lisp::Reader<std::string>;
+using string_reader = lisp::reader<std::string>;
 
 void lisp_compare(std::string input, const std::string& result)
 {
-  StringReader reader{input};
-  auto res = lisp::Parser(reader).parse();
+  string_reader reader{input};
+  auto res = lisp::parser(reader).parse();
   std::ostringstream os;
   os << res;
   CHECK(os.str() == result);
@@ -30,15 +30,15 @@ const std::string& pname(LISPT sym)
   return sym->symbol().pname.name;
 }
 
-TEST_CASE("Parser (a b . c)")
+TEST_CASE("parser (a b . c)")
 {
   std::string s{"(a b . c)"};
-  StringReader reader{s};
-  auto res = Parser(reader).parse();
+  string_reader reader{s};
+  auto res = parser(reader).parse();
   CHECK(pname(cdr(cdr(res))) == "c");
 }
 
-TEST_CASE("Parser (a . (b))")
+TEST_CASE("parser (a . (b))")
 {
   lisp_compare("(a . (b))", "(a b)");
 }
@@ -59,11 +59,11 @@ LISPT nth(LISPT o, int n)
 //
 // Dotted pair tests.
 //
-TEST_CASE("Parser (a b . c d)")
+TEST_CASE("parser (a b . c d)")
 {
   std::string s{"(a b . c d)"};
-  StringReader reader{s}; // -> (a b . c d)
-  auto res = Parser(reader).parse();
+  string_reader reader{s}; // -> (a b . c d)
+  auto res = parser(reader).parse();
   CHECK(pname(nth(res, 0)) == "a");
   CHECK(pname(nth(res, 1)) == "b");
   CHECK(pname(nth(res, 2)) == ".");
@@ -71,25 +71,25 @@ TEST_CASE("Parser (a b . c d)")
   CHECK(pname(nth(res, 4)) == "d");
 }
 
-TEST_CASE("Parser (a b . (c d))")
+TEST_CASE("parser (a b . (c d))")
 {
   std::string s{"(a b . (c d))"};
-  StringReader reader{s}; // -> (a b c d)
-  auto res = Parser(reader).parse();
+  string_reader reader{s}; // -> (a b c d)
+  auto res = parser(reader).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
 }
 
-TEST_CASE("Parser (a b . (c d]")
+TEST_CASE("parser (a b . (c d]")
 {
   std::string s{"(a b . (c d]"};
-  StringReader reader{s}; // -> (a b c d)
-  auto res = Parser(reader).parse();
+  string_reader reader{s}; // -> (a b c d)
+  auto res = parser(reader).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
 }
 
-TEST_CASE("Parser (a . (b . c))")
+TEST_CASE("parser (a . (b . c))")
 {
   lisp_compare("(a . (b . c))", "(a b . c)");
 }
@@ -97,13 +97,13 @@ TEST_CASE("Parser (a . (b . c))")
 //
 // Regular objects and lists.
 //
-TEST_CASE("Parser string")
+TEST_CASE("parser string")
 {
   lisp_compare("\"hello\"", "\"hello\"");
   lisp_compare("\"he\\\"llo\"", "\"he\\\"llo\"");
 }
 
-TEST_CASE("Parser normal")
+TEST_CASE("parser normal")
 {
   lisp_compare("a", "a");
   lisp_compare("(a b c)", "(a b c)");
@@ -115,7 +115,7 @@ TEST_CASE("Parser normal")
 //
 // Super parenthesis tests.
 ///
-TEST_CASE("Parser super")
+TEST_CASE("parser super")
 {
   lisp_compare("(a b c]", "(a b c)");
   lisp_compare("[a b c]", "(a b c)");
@@ -126,22 +126,22 @@ TEST_CASE("Parser super")
   lisp_compare("(a [b (c] d)", "(a (b (c)) d)");
 }
 
-TEST_CASE("Parser [a b) c)]")
+TEST_CASE("parser [a b) c)]")
 {
   lisp_compare("[a b) c)]", "(((a b) c))");
 }
 
-TEST_CASE("Parser [a b) c))]")
+TEST_CASE("parser [a b) c))]")
 {
   lisp_compare("[a b) c))]", "((((a b) c)))");
 }
 
-TEST_CASE("Parser .")
+TEST_CASE("parser .")
 {
   lisp_compare(".", ".");
 }
 
-TEST_CASE("Parser end parenthesis")
+TEST_CASE("parser end parenthesis")
 {
   lisp_compare(")", "nil");
   lisp_compare("]", "nil");
@@ -151,14 +151,14 @@ TEST_CASE("Parser end parenthesis")
 //
 // Numeric objects.
 //
-TEST_CASE("Parser numbers")
+TEST_CASE("parser numbers")
 {
   lisp_compare("123", "123");
   lisp_compare("00123", "123");
   lisp_compare("(00000)", "(0)");
 }
 
-TEST_CASE("Parser parse")
+TEST_CASE("parser parse")
 {
   lisp_compare("()", "nil");
   lisp_compare("a", "a");
@@ -174,7 +174,7 @@ TEST_CASE("Parser parse")
   lisp_compare("([(a b] c)", "(((a b)) c)");
 }
 
-TEST_CASE("Parser dot")
+TEST_CASE("parser dot")
 {
   lisp_compare("(list a (cadr x))", "(list a (cadr x))");
   lisp_compare("(lambda (a . x) (list a (cadr x)))", "(lambda (a . x) (list a (cadr x)))");

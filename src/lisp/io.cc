@@ -198,8 +198,8 @@ LISPT io::splice(lisp& l, LISPT x, LISPT y, bool tailp)
 //
 LISPT io::lispread(lisp& l, file_t& file)
 {
-  Reader reader(file.source());
-  return Parser(reader).parse();
+  reader reader(file.source());
+  return parser(reader).parse();
 }
 
 //
@@ -236,8 +236,8 @@ LISPT io::readline(lisp& l, file_t& file)
   auto line = file.getline();
   if(line)
   {
-    Reader reader(*line);
-    Parser parser(reader);
+    reader reader(*line);
+    parser parser(reader);
     auto head = parser.parse();
     if(head && head->empty())
       return head;

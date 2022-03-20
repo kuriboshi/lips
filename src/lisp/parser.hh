@@ -27,22 +27,22 @@ inline bool empty(T& t)
 }
 
 template<typename Input>
-class Reader;
+class reader;
 
 /// @brief The LISP input parser.
 ///
 /// @details The main attraction.
 ///  
 template<typename Input>
-class Parser
+class parser
 {
 public:
   /// @brief Constructor.
-  /// @details The Parser takes a Reader as the only parameter.  The Parser
-  ///   calls the Reader every time it needs the next token.
-  /// @param reader A Reader object which returns the next token.
-  explicit Parser(Reader<Input>& reader) : _reader(reader) {}
-  /// @brief Parse the sequence of tokens supplied by the Reader.
+  /// @details The parser takes a reader as the only parameter.  The parser
+  ///   calls the reader every time it needs the next token.
+  /// @param reader A reader object which returns the next token.
+  explicit parser(reader<Input>& reader) : _reader(reader) {}
+  /// @brief Parse the sequence of tokens supplied by the reader.
   /// @return The return value is the SEXPR.
   LISPT parse();
 
@@ -87,20 +87,20 @@ private:
     return mkatom(symbol);
   }
 
-  /// @brief Holds the Reader object.
-  Reader<Input>& _reader;
+  /// @brief Holds the reader object.
+  reader<Input>& _reader;
   /// @brief The current input token.
   token_t _token;
 };
 
 template<typename Input>
-LISPT Parser<Input>::parse()
+LISPT parser<Input>::parse()
 {
   return parse_object();
 }
 
 template<typename Input>
-bool Parser<Input>::next()
+bool parser<Input>::next()
 {
   auto token = _reader.read();
   if(token)
@@ -109,7 +109,7 @@ bool Parser<Input>::next()
 }
 
 template<typename Input>
-LISPT Parser<Input>::parse_object()
+LISPT parser<Input>::parse_object()
 {
   if(!next())
     return C_EMPTY;
@@ -127,7 +127,7 @@ LISPT Parser<Input>::parse_object()
 }
 
 template<typename Input>
-LISPT Parser<Input>::parse_list(char c)
+LISPT parser<Input>::parse_list(char c)
 {
   LISPT head;
   LISPT tail;
@@ -163,7 +163,7 @@ LISPT Parser<Input>::parse_list(char c)
 }
 
 template<typename Input>
-LISPT Parser<Input>::parse_tail()
+LISPT parser<Input>::parse_tail()
 {
   if(_token.is_macro('.'))
   {

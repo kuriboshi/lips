@@ -34,10 +34,10 @@ struct token_t
 
 /// @brief A reader/lexer of a string input.
 template<typename Input>
-class Reader
+class reader
 {
 public:
-  Reader(Input& input) : _input(input), _pos(_input.begin()) {}
+  reader(Input& input) : _input(input), _pos(_input.begin()) {}
   /// @brief Read the next token from the input string.
   std::optional<token_t> read();
   void unread(token_t);
@@ -52,7 +52,7 @@ private:
 /// @return Returns either the token as a string or nothing when the input
 ///   string reaches the end.
 template<typename Input>
-std::optional<token_t> Reader<Input>::read()
+std::optional<token_t> reader<Input>::read()
 {
   if(_token)
   {
@@ -286,7 +286,7 @@ std::optional<token_t> Reader<Input>::read()
 }
 
 template<typename Input>
-void Reader<Input>::unread(token_t token)
+void reader<Input>::unread(token_t token)
 {
   _token = token;
 }
