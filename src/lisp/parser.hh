@@ -99,6 +99,8 @@ LISPT Parser<Input>::parse()
   auto head = parse_object();
   if(empty(head))
     return head;
+  if(listp(head) || head == NIL)
+    return head;
   LISPT tail;
   while(true)
   {

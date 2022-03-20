@@ -280,8 +280,6 @@ LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
 
 LISPT io::readline(lisp& l, file_t& file)
 {
-  l.top = cons(l, NIL, NIL); /* Init first paren level */
-  rplaca(l, l.top, cons(l, NIL, l.top));
   LISPT rd = lispread(l, file);
   return rd;
 }
