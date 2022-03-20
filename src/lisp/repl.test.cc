@@ -35,6 +35,23 @@ TEST_CASE("Interactive tests")
     CHECK(cout.str() == expected);
   }
   
+  SECTION("Example interaction")
+  {
+    std::string is = R"(
+()
+(setq a 100)
+a
+)";
+    l.primin(std::move(std::make_unique<file_t>(is)));
+    repl repl(l);
+    repl(NIL);
+    std::string expected = R"(> nil
+> 100
+> 100
+> )";
+    CHECK(cout.str() == expected);
+  }
+
   SECTION("Break repl (reset)")
   {
     std::string is = R"(((lambda () (xyzzy)))
