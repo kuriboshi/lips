@@ -11,9 +11,15 @@
 
 namespace lisp
 {
-class iterator: public std::iterator<std::forward_iterator_tag, LISPT>
+class iterator
 {
 public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = LISPT;
+  using difference_type = std::ptrdiff_t;
+  using pointer = LISPT*;
+  using reference = LISPT&;
+
   iterator(LISPT l): _car(l) {}
   bool operator==(const iterator& x) const { return _car == x._car; }
   bool operator!=(const iterator& x) const { return _car != x._car; }
