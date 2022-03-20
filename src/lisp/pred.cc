@@ -45,8 +45,6 @@ LISPT pred::memb(lisp& l, LISPT x, LISPT ls)
 
 LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
 {
-  LISPT x = NIL;
-
   if(type_of(l1) != type_of(l2))
     return NIL;
   if(EQ(l1, l2))
@@ -54,18 +52,12 @@ LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
   switch(type_of(l1))
   {
     case type::CONS:
-      while(type_of(l1) == type_of(l2) && type_of(l1) == type::CONS && !EQ(l1, NIL) && !EQ(l2, NIL))
+      while(type_of(l1) == type_of(l2))
       {
-        x = equal(l, l1->car(), l2->car());
-        if(EQ(x, T))
-        {
-          l1 = l1->cdr();
-          l2 = l2->cdr();
-        }
-        else
-          return NIL;
+        if(equal(l, l1->car(), l2->car()) != NIL)
+          return equal(l, l1->cdr(), l2->cdr());
+        return NIL;
       }
-      return x;
     case type::STRING:
       return (l1->stringval() == l2->stringval()) ? T : NIL;
     case type::LAMBDA:
