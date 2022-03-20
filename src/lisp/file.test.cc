@@ -130,12 +130,26 @@ TEST_CASE("File functions")
 
   SECTION("readline")
   {
-    std::string is = R"(test)";
-    LISPT f = l.a().getobject();
-    f->set(std::make_shared<file_t>(is));
-    auto r = readline(l, f);
-    CHECK(type_of(r) == type::CONS);
-    CHECK(equal(r, mklist(mkatom("test"))));
+    SECTION("One atom")
+    {
+      std::string is = R"(test)";
+      LISPT f = l.a().getobject();
+      f->set(std::make_shared<file_t>(is));
+      auto r = readline(l, f);
+      CHECK(type_of(r) == type::CONS);
+      auto expected = mklist(mkatom("test"));
+      CHECK(equal(r, expected));
+    }
+    SECTION("Two atoms")
+    {
+      std::string is = R"(test test)";
+      LISPT f = l.a().getobject();
+      f->set(std::make_shared<file_t>(is));
+      auto r = readline(l, f);
+      CHECK(type_of(r) == type::CONS);
+      auto expected = mklist(mkatom("test"), mkatom("test"));
+      CHECK(equal(r, expected));
+    }
   }
 }
 

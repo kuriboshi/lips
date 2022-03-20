@@ -96,23 +96,7 @@ private:
 template<typename Input>
 LISPT Parser<Input>::parse()
 {
-  auto head = parse_object();
-  if(empty(head))
-    return head;
-  if(listp(head) || head == NIL)
-    return head;
-  LISPT tail;
-  while(true)
-  {
-    auto o = parse_object();
-    if(empty(o))
-      break;
-    if(tail == NIL)
-      tail = cdr(head = cons(head, cons(o, NIL)));
-    else
-      tail = cdr(rplacd(tail, cons(o, NIL)));
-  }
-  return head;
+  return parse_object();
 }
 
 template<typename Input>

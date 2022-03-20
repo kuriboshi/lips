@@ -280,8 +280,32 @@ LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
 
 LISPT io::readline(lisp& l, file_t& file)
 {
-  LISPT rd = lispread(l, file);
-  return rd;
+  auto line = file.getline();
+  if(line)
+  {
+    Reader reader(*line);
+    Parser parser(reader);
+    auto head = parser.parse();
+    if(head && head->empty())
+      return head;
+    if(listp(head) || head == NIL)
+      return head;
+    LISPT tail;
+    while(true)
+    {
+      auto o = parser.parse();
+      if(o && o->empty())
+        break;
+      if(tail == NIL)
+        tail = cdr(head = cons(head, cons(o, NIL)));
+      else
+        tail = cdr(rplacd(tail, cons(o, NIL)));
+    }
+    if(tail == NIL)
+      return cons(l, head, NIL);
+    return head;
+  }
+  return NIL;
 }
 
 LISPT io::getline(lisp& l, LISPT file)

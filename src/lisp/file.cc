@@ -184,7 +184,7 @@ LISPT readline(lisp& l, LISPT file)
   else if(is_T(file))
     return io::readline(l, l.stdin());
   check(file, type::FILET);
-  return cons(io::readline(l, file->fileval()), NIL);
+  return io::readline(l, file->fileval());
 }
 
 namespace pn

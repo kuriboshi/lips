@@ -142,24 +142,6 @@ TEST_CASE("Parser .")
 }
 
 //
-// Missing top level parenthesis should parse as if they where there.
-//
-TEST_CASE("Parser top level single object")
-{
-  lisp_compare("", "");
-  lisp_compare("a)", "a");
-  lisp_compare("a]", "a");
-}
-
-TEST_CASE("Parser top level multiple objects")
-{
-  lisp_compare("a b)", "(a b)");
-  lisp_compare("a b", "(a b)");
-  lisp_compare("a b c]", "(a b c)");
-  lisp_compare("a b c ()", "(a b c nil)");
-}
-
-//
 // Numeric objects.
 //
 TEST_CASE("Parser numbers")
