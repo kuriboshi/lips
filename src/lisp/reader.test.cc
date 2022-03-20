@@ -7,6 +7,8 @@
 #include <string>
 #include "reader.hh"
 
+using namespace std::literals;
+
 namespace
 {
 void reader_check(lisp::Reader& reader, enum lisp::token_t::type type, const std::string& token)
