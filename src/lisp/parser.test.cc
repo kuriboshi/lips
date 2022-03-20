@@ -141,6 +141,13 @@ TEST_CASE("Parser .")
   lisp_compare(".", ".");
 }
 
+TEST_CASE("Parser end parenthesis")
+{
+  lisp_compare(")", "nil");
+  lisp_compare("]", "nil");
+  lisp_compare("a)", "a");
+}
+
 //
 // Numeric objects.
 //

@@ -120,9 +120,9 @@ LISPT Parser<Input>::parse_object()
   if(_token.is_macro('['))
     return parse_list('[');
   if(_token.is_macro(')'))
-    return C_EMPTY;
+    return NIL;
   if(_token.is_macro(']'))
-    return C_EMPTY;
+    return NIL;
   return create(_token);
 }
 
