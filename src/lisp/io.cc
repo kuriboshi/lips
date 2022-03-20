@@ -231,53 +231,6 @@ LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
   return cons(l, C_QUOTE, cons(l, lispread(l, file), NIL));
 }
 
-#if 0
-LISPT io::rmpipe(lisp& l, file_t&, LISPT curr, char)
-{
-  LISPT t1, t2;
-
-  t1 = curr->cdr();
-  rplaca(
-    t1, cons(l, C_PIPE, cons(l, curr->cdr()->car(), cons(l, t2 = cons(l, NIL, t1), NIL))));
-  rplacd(l, curr, NIL);
-  return t2;
-}
-
-LISPT io::rmredir(lisp& l, file_t& file, LISPT curr, char curc)
-{
-  LISPT t1, t2;
-  char c;
-
-  t1 = curr->cdr();
-  c = file.getch();
-  rplaca(l, t1,
-    cons(l, (curc == '<') ? C_FROM : ((c == '>') ? C_TOTO : C_TO),
-      cons(l, curr->cdr()->car(), t2 = cons(l, NIL, t1))));
-  if (!(c == '>' || curc == '>'))
-    file.ungetch(c);
-  rplacd(l, curr, NIL);
-  return t2;
-}
-
-LISPT io::rmbg(lisp& l, file_t*, LISPT curr, char)
-{
-  rplaca(l, curr->cd(), cons(l, C_BACK, curr->cdr()->car()));
-  rplacd(l, curr, cons(l, NIL, curr->cdr()));
-  return curr->cdr();
-}
-
-/*
- * Handles user macros.
- */
-LISPT io::rmuser(lisp& l, file_t&, LISPT curr, char curc)
-{
-  if (is_NIL(userreadmacros[static_cast<int>(curc)]))
-    return curr;
-  curr = apply(userreadmacros[static_cast<int>(curc)], curr);
-  return curr;
-}
-#endif
-
 LISPT io::readline(lisp& l, file_t& file)
 {
   auto line = file.getline();

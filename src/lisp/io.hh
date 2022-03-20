@@ -40,14 +40,6 @@ public:
   static LISPT rmexcl(lisp&, file_t&, LISPT, char);
   static LISPT rmdquote(lisp&, file_t&, LISPT, char);
   static LISPT rmsquote(lisp&, file_t&, LISPT, char);
-  static LISPT rmpipe(lisp&, file_t&, LISPT, char);
-  static LISPT rmredir(lisp&, file_t&, LISPT, char);
-  static LISPT rmbg(lisp&, file_t&, LISPT, char);
-  static LISPT rmuser(lisp&, file_t&, LISPT, char);
-
-#if 0
-  static LISPT userreadmacros[128];
-#endif
 
 private:
   static LISPT splice(lisp& l, LISPT, LISPT, bool);
