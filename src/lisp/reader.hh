@@ -84,11 +84,13 @@ private:
                                // unless it's followed by a terminating
                                // character, like '(', ')', or a white space.
     IN_SIGN,                   // A lone '+' or '-' is an atom, not an integer.
-    // A non-numeric character terminates the integer, e.g 123abc is parsed as
-    // two tokens '123' and 'abc'.
+    // If we fail to parse an integer or floating point number the token will
+    // turn into a symbol.
     IN_INT,                    // An integer which may turn into a float if an
-                               // 'e' or a decimal point is found.
-    // If we fail to parse a floating point the token will turn into a symbol.
+                               // 'e' or a decimal point is found. It may also
+                               // turn into a symbol if there are any
+                               // non-number, non-break characters in the
+                               // sequence, e.g. '123abc'.
     IN_FLOAT,                  // Try to parse a floating point number.
     IN_EXP1,                   // The state after finding an 'e'.
     IN_EXP2,                   // Next state after finding a '+', '-', or a
@@ -231,9 +233,14 @@ token_t reader<Input>::read()
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             break;
-          default:
+          case ' ': case '\t': case '\n':
+          case '(': case ')': case '[': case ']':
             state = state_t::START;
             return token;
+          default:
+            token.type = token_t::type::SYMBOL;
+            state = state_t::IN_SYMBOL;
+            break;
         }
         token.token.push_back(*_pos);
         break;

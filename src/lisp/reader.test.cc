@@ -137,8 +137,7 @@ TEST_CASE("reader strings")
 TEST_CASE("reader integers")
 {
   reader_check("123", token_t::type::INT, "123");
-  // A bit weird so this may change in the future.
-  reader_check("123abc", token_t::type::INT, "123");
+  reader_check("123abc", token_t::type::SYMBOL, "123abc");
   reader_check("0123456789", token_t::type::INT, "0123456789");
 }
 
