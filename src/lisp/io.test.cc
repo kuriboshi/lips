@@ -9,7 +9,7 @@
 namespace lisp
 {
 
-TEST_CASE("Basic I/O")
+TEST_CASE("io Basic I/O")
 {
   lisp lisp;
   current c(lisp);
@@ -19,7 +19,37 @@ TEST_CASE("Basic I/O")
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
 
-TEST_CASE("Read lisp objects")
+TEST_CASE("io ratom")
+{
+  lisp lisp;
+  current c(lisp);
+
+  SECTION("integer")
+  {
+    std::string s{"124"};
+    file_t in{s};
+    auto r = ratom(in);
+    CHECK(type_of(r) == type::INTEGER);
+  }
+  SECTION("symbol")
+  {
+    std::string s{"124abc"};
+    file_t in{s};
+    auto r = ratom(in);
+    CHECK(type_of(r) == type::SYMBOL);
+  }
+  SECTION("string")
+  {
+    // This does not match the behaviour of Interlisp which would return the
+    // symbol \".
+    std::string s{"\"hello\""};
+    file_t in{s};
+    auto r = ratom(in);
+    CHECK(type_of(r) == type::STRING);
+  }
+}
+
+TEST_CASE("io Read lisp objects")
 {
   lisp lisp;
   current c(lisp);

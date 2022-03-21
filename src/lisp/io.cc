@@ -1,7 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 #include "io.hh"
 #include "alloc.hh"
 #include "prim.hh"
@@ -10,31 +10,13 @@
 
 namespace lisp
 {
-/* clang-format off */
-/*
- * This state table parses a floating point number.
- */
-static int nxtstate[4][10] = {
-  { 1,-1,-1,-1,-1,-1,-1, 8,-1,-1}, 
-  { 2, 2, 2, 4, 4, 6, 6, 9, 9, 9}, 
-  {-1,-1, 7, 7, 7,-1, 7,-1,-1,-1}, 
-  { 5, 5, 3,-1,-1,-1,-1,-1,-1,-1}
-};
-
+// clang-format off
 static char digits[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
   'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
   'u', 'v', 'w', 'x', 'y', 'z'};
-/* clang-format on */
-
-void io::pushr(lisp& l, LISPT w) { l.rstack = cons(l, w, l.rstack); }
-
-void io::popr(lisp& l, LISPT& w)
-{
-  w = l.rstack->car();
-  l.rstack = l.rstack->cdr();
-}
+// clang-format on
 
 //
 // INTEGERP returns nonzero if the characters in buffer BUF represents an
@@ -67,108 +49,32 @@ bool io::integerp(const std::string& buf, int& res)
   return i == buf.end();
 }
 
-//
-// Returns nonzero if buffer BUF is a floating point constant.
-//
-bool io::floatp(const std::string& buf)
-{
-  int state = 0;
-  auto i = buf.begin();
-  while(state >= 0 && i != buf.end())
-  {
-    switch(*i)
-    {
-      case '+':
-      case '-':
-        state = nxtstate[0][state];
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        state = nxtstate[1][state];
-        break;
-      case 'e':
-      case 'E':
-        state = nxtstate[2][state];
-        break;
-      case '.':
-        state = nxtstate[3][state];
-        break;
-      default:
-        state = -1;
-    }
-    ++i;
-  }
-  if(state == 3 || state == 4 || state == 6 || state == 9)
-    return true;
-  return false;
-}
-
-//
-// Find out if the buffer can be interpreted as numbers of any kind.
-//
-LISPT io::parsebuf(lisp& l, const std::string& buf)
-{
-  int longval;
-  if(integerp(buf, longval))
-    return mknumber(l, longval);
-  else if(floatp(buf))
-    return mkfloat(l, std::stod(buf));
-  return mkatom(l, buf);
-}
-
-//
-// Read an atom from FILE.
-//
+///
+/// @brief Read an atom from FILE.
+///
+/// @details Reads one token from the file and creates a lisp object from that
+/// token.
+///
+/// @param l The lisp interpreter to use.
+/// @param file The source file.
+///
+/// @returns A lisp object which is either an integer, float, symbol, or
+/// string. This differs from Interlisp which will never return a
+/// string. Instead the first double quote is returned as a symbol.
+///
 LISPT io::ratom(lisp& l, file_t& file)
 {
-  std::string buffer;
-  while(true)
-  {
-    int c = file.getch();
-    if(c == EOF)
-      return C_EOF;
-    else if(issepr(l, c))
-      ;
-    else if(isbrk(l, c))
-    {
-      buffer.push_back(c);
-      return mkatom(l, buffer);
-    }
-    else
-    {
-      while(true)
-      {
-        if(c == EOF)
-          return parsebuf(l, buffer);
-        if(c == '\\')
-          c = file.getch();
-        buffer.push_back(c);
-        c = file.getch();
-        if(isbrk(l, c))
-        {
-          file.ungetch(c);
-          return parsebuf(l, buffer);
-        }
-        else if(issepr(l, c))
-          return parsebuf(l, buffer);
-      }
-    }
-  }
+  reader reader{file.source()};
+  auto token = reader.read();
+  parser parser{reader};
+  return parser.create(token);
 }
 
-/*
- * Splice list y into x keeping cdr of x. If y is not a list put it in car of x
- * and return x, otherwise return last cell of y with cdr set to original (cdr
- * x).  If tailp is true, don't clobber car of x.
- */
+//
+// Splice list y into x keeping cdr of x. If y is not a list put it in car of x
+// and return x, otherwise return last cell of y with cdr set to original (cdr
+// x).  If tailp is true, don't clobber car of x.
+//
 LISPT io::splice(lisp& l, LISPT x, LISPT y, bool tailp)
 {
   LISPT t = x->cdr();

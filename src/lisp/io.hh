@@ -23,9 +23,6 @@ class io
 public:
   static void set_read_table(lisp&);
 
-  static void pushr(lisp& l, LISPT w);
-  static void popr(lisp& l, LISPT& w);
-
   static LISPT ratom(lisp& l, file_t&);
   static LISPT lispread(lisp& l, file_t&);
   static LISPT readline(lisp& l, file_t&);
