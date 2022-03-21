@@ -12,8 +12,26 @@
 namespace lisp
 {
 
+///
+/// @brief Represents one token in a stream of tokens.
+///
+/// @details Each token can be of one of the following types.
+///
+/// @li @c EMPTY An empty token signalling the end of a stream or an error
+///   tokenizing the stream.
+/// @li @c MACRO A macro token. This includes the left and right parenthesis,
+///   the left and right super parenthesis, a single quote, and a dot used to
+///   create dotted pairs.
+/// @li @c STRING A string. Double quotes can be embedded by using the
+///   backslash, common in other Unix tools. Note that this differs from
+///   Interlisp which uses a percent sign for this purpose.
+/// @li @c SYMBOL A literal symbol.
+/// @li @c INT An integer.
+/// @li @c FLOAT A floating point value.
+///
 struct token_t final
 {
+  /// @brief The type of token.
   enum class type
   {
     EMPTY,
@@ -24,31 +42,58 @@ struct token_t final
     FLOAT
   };
 
+  /// @brief Token type.
   enum type type;
+  /// @brief A string representation of the token.
   std::string token;
 
+  /// @brief Default constructor is the empty token.
   token_t() : type(type::EMPTY) {}
+  /// @brief Construct a token of a certain type but with an empty token
+  /// string.
+  ///
+  /// @param t The type of token.
   token_t(enum type t) : type(t) {}
+  /// @brief Construct a token of a certain type with the token string
+  /// representation given.
+  ///
+  /// @param t The type of token.
+  /// @param s The token string.
   token_t(enum type t, const std::string& s) : type(t), token(s) {}
+  /// @brief Default destructor.
   ~token_t() = default;
+  /// @brief The operator bool for use in bool contexts.
+  ///
+  /// @returns True if the token is not the empty token (type EMPTY).
   explicit operator bool() const { return type != type::EMPTY; }
 
+  /// @brief Default copy constructor.
   token_t(const token_t& t) = default;
+  /// @brief Copy and move assignment operator.
   token_t& operator=(token_t t) noexcept
   {
     swap(*this, t);
     return *this;
   }
+  /// @brief The move constructor.
+  ///
+  /// @details The moved from token becomes an empty token.
   token_t(token_t&& t) : type(t.type), token(std::move(t.token))
   {
     t.type = type::EMPTY;
   }
 
+  /// @brief Checks that the token is of type MACRO and the value matches the
+  /// character in the argument.
+  ///
+  /// @param c The macro character.
+  /// @returns True if the MACRO character matches the @c c.
   bool is_macro(char c) const
   {
     return type == type::MACRO && !token.empty() && token[0] == c;
   }
 
+  /// @brief The swap function for use in the assignment operators.
   friend void swap(token_t& left, token_t& right) noexcept
   {
     using std::swap;
