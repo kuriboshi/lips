@@ -9,21 +9,20 @@
 
 namespace lisp
 {
-class pred
+namespace pred
 {
-public:
-  static void init();
+void init();
 
-  static LISPT numberp(lisp&, LISPT);
-  static LISPT listp(lisp&, LISPT);
-  static LISPT memb(lisp&, LISPT, LISPT);
-  static LISPT equal(lisp&, LISPT, LISPT);
-  static LISPT nlistp(lisp&, LISPT);
-  static LISPT neq(lisp&, LISPT, LISPT);
-  static LISPT boundp(lisp&, LISPT);
-  static LISPT litatom(lisp&, LISPT);
-  static LISPT xtypeof(lisp&, LISPT);
-};
+LISPT numberp(lisp&, LISPT);
+LISPT listp(lisp&, LISPT);
+LISPT memb(lisp&, LISPT, LISPT);
+LISPT equal(lisp&, LISPT, LISPT);
+LISPT nlistp(lisp&, LISPT);
+LISPT neq(lisp&, LISPT, LISPT);
+LISPT boundp(lisp&, LISPT);
+LISPT litatom(lisp&, LISPT);
+LISPT xtypeof(lisp&, LISPT);
+}
 
 inline LISPT numberp(lisp& l, LISPT a) { return pred::numberp(l, a); }
 inline LISPT numberp(LISPT a) { return pred::numberp(lisp::current(), a); }

@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #include "pred.hh"
 #include "alloc.hh"
@@ -10,9 +9,9 @@
 #include "io.hh"
 #include "prim.hh"
 
-namespace lisp
+namespace lisp::pred
 {
-LISPT pred::numberp(lisp& l, LISPT a)
+LISPT numberp(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
@@ -24,7 +23,7 @@ LISPT pred::numberp(lisp& l, LISPT a)
   }
 }
 
-LISPT pred::listp(lisp& l, LISPT a)
+LISPT listp(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a;
@@ -32,7 +31,7 @@ LISPT pred::listp(lisp& l, LISPT a)
     return NIL;
 }
 
-LISPT pred::memb(lisp& l, LISPT x, LISPT ls)
+LISPT memb(lisp& l, LISPT x, LISPT ls)
 {
   while(!eq(ls, NIL))
   {
@@ -43,7 +42,7 @@ LISPT pred::memb(lisp& l, LISPT x, LISPT ls)
   return NIL;
 }
 
-LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
+LISPT equal(lisp& l, LISPT l1, LISPT l2)
 {
   if(type_of(l1) != type_of(l2))
     return NIL;
@@ -54,8 +53,8 @@ LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
     case type::CONS:
       while(type_of(l1) == type_of(l2))
       {
-        if(equal(l, l1->car(), l2->car()) != NIL)
-          return equal(l, l1->cdr(), l2->cdr());
+        if(pred::equal(l, l1->car(), l2->car()) != NIL)
+          return pred::equal(l, l1->cdr(), l2->cdr());
         return NIL;
       }
     case type::STRING:
@@ -71,7 +70,7 @@ LISPT pred::equal(lisp& l, LISPT l1, LISPT l2)
   return NIL;
 }
 
-LISPT pred::nlistp(lisp& l, LISPT a)
+LISPT nlistp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::CONS)
     return a;
@@ -79,7 +78,7 @@ LISPT pred::nlistp(lisp& l, LISPT a)
     return NIL;
 }
 
-LISPT pred::neq(lisp& l, LISPT a, LISPT b)
+LISPT neq(lisp& l, LISPT a, LISPT b)
 {
   if(!EQ(a, b))
     return T;
@@ -87,7 +86,7 @@ LISPT pred::neq(lisp& l, LISPT a, LISPT b)
     return NIL;
 }
 
-LISPT pred::boundp(lisp& l, LISPT a)
+LISPT boundp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
     return NIL;
@@ -97,7 +96,7 @@ LISPT pred::boundp(lisp& l, LISPT a)
     return NIL;
 }
 
-LISPT pred::litatom(lisp& l, LISPT a)
+LISPT litatom(lisp& l, LISPT a)
 {
   if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
     return T;
@@ -105,7 +104,7 @@ LISPT pred::litatom(lisp& l, LISPT a)
     return NIL;
 }
 
-LISPT pred::xtypeof(lisp& l, LISPT a)
+LISPT xtypeof(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
@@ -167,7 +166,7 @@ inline constexpr auto SYMBOLP = "symbolp"; // t if is a symbol (CL)
 inline constexpr auto TYPEOF = "typeof";   // return type as an atom
 } // namespace pn
 
-void pred::init()
+void init()
 {
   // clang-format off
   mkprim(pn::LISTP,   listp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
@@ -183,4 +182,4 @@ void pred::init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::pred
