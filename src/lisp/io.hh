@@ -16,28 +16,26 @@
 
 namespace lisp
 {
-class lisp;
+// class lisp;
 
-class io
+namespace io
 {
-public:
-  static void set_read_table(lisp&);
+LISPT ratom(lisp& l, file_t&);
+LISPT lispread(lisp& l, file_t&);
+LISPT readline(lisp& l, file_t&);
+LISPT getline(lisp& l, LISPT);
 
-  static LISPT ratom(lisp& l, file_t&);
-  static LISPT lispread(lisp& l, file_t&);
-  static LISPT readline(lisp& l, file_t&);
+LISPT patom(lisp& l, LISPT, file_t&, bool esc = false);
+LISPT prinbody(lisp& l, LISPT, file_t&, bool esc = false);
+LISPT prin0(lisp& l, LISPT, file_t&, bool esc = false);
+LISPT print(lisp& l, LISPT, file_t&);
+LISPT terpri(lisp& l, file_t&);
 
-  static LISPT patom(lisp& l, LISPT, file_t&, bool esc = false);
-  static LISPT prinbody(lisp& l, LISPT, file_t&, bool esc = false);
-  static LISPT prin0(lisp& l, LISPT, file_t&, bool esc = false);
-  static LISPT print(lisp& l, LISPT, file_t&);
-  static LISPT terpri(lisp& l, file_t&);
-  static LISPT getline(lisp& l, LISPT);
-
-  static LISPT splice(lisp&, LISPT, LISPT, bool);
-  static LISPT rmdquote(lisp&, file_t&, LISPT, char);
-  static LISPT rmsquote(lisp&, file_t&, LISPT, char);
-};
+LISPT splice(lisp&, LISPT, LISPT, bool);
+LISPT rmdquote(lisp&, file_t&, LISPT, char);
+LISPT rmsquote(lisp&, file_t&, LISPT, char);
+void set_read_table(lisp&);
+}
 
 class io_source
 {

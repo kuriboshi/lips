@@ -18,6 +18,8 @@ static char digits[] = {
   'u', 'v', 'w', 'x', 'y', 'z'};
 // clang-format on
 
+namespace io
+{
 ///
 /// @brief Read an atom from FILE.
 ///
@@ -31,7 +33,7 @@ static char digits[] = {
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
 ///
-LISPT io::ratom(lisp& l, file_t& file)
+LISPT ratom(lisp& l, file_t& file)
 {
   reader reader{file.source()};
   auto token = reader.read();
@@ -40,73 +42,15 @@ LISPT io::ratom(lisp& l, file_t& file)
 }
 
 //
-// Splice list y into x keeping cdr of x. If y is not a list put it in car of x
-// and return x, otherwise return last cell of y with cdr set to original (cdr
-// x).  If tailp is true, don't clobber car of x.
-//
-LISPT io::splice(lisp& l, LISPT x, LISPT y, bool tailp)
-{
-  LISPT t = x->cdr();
-  if(type_of(x) != type::CONS)
-  {
-    if(tailp)
-      rplacd(l, x, cons(l, y, t));
-    else
-      rplaca(l, x, y);
-    return x;
-  }
-  if(!tailp)
-  {
-    rplaca(l, x, y->car());
-    y = y->cdr();
-  }
-  if(is_NIL(y))
-    return x;
-  rplacd(l, x, y);
-  LISPT t2 = NIL;
-  for(; type_of(y) == type::CONS; y = y->cdr()) t2 = y;
-  return rplacd(l, t2, t);
-}
-
-//
 // LISPREAD reads a lisp expression from file FILE.
 //
-LISPT io::lispread(lisp& l, file_t& file)
+LISPT lispread(lisp& l, file_t& file)
 {
   reader reader(file.source());
   return parser(reader).parse();
 }
 
-//
-// Read macros.
-//
-LISPT io::rmdquote(lisp& l, file_t& file, LISPT, char)
-{
-  std::string buffer;
-  auto c = file.getch(true);
-  while(c != '"')
-  {
-    if(c == '\\')
-      c = file.getch(true);
-    buffer.push_back(c);
-    c = file.getch(true);
-  }
-  return mkstring(l, buffer);
-}
-
-LISPT io::rmsquote(lisp& l, file_t& file, LISPT, char)
-{
-  int c;
-  if((c = file.getch()) == ')' || issepr(l, c))
-  {
-    file.ungetch(c);
-    return C_QUOTE;
-  }
-  file.ungetch(c);
-  return cons(l, C_QUOTE, cons(l, lispread(l, file), NIL));
-}
-
-LISPT io::readline(lisp& l, file_t& file)
+LISPT readline(lisp& l, file_t& file)
 {
   auto line = file.getline();
   if(line)
@@ -136,7 +80,7 @@ LISPT io::readline(lisp& l, file_t& file)
   return NIL;
 }
 
-LISPT io::getline(lisp& l, LISPT file)
+LISPT getline(lisp& l, LISPT file)
 {
   check(file, type::FILET);
   auto line = file->fileval().getline();
@@ -145,14 +89,13 @@ LISPT io::getline(lisp& l, LISPT file)
   return NIL;
 }
 
-/* print the string s, on stream file */
-static void ps(const std::string& s, file_t& file, bool esc)
+// Print the string s, on stream file
+inline void ps(const std::string& s, file_t& file, bool esc)
 {
-  for(auto c: s)
-    file.putch(c, esc);
+  for(auto c: s) file.putch(c, esc);
 }
 
-static void pi(std::int64_t i, int base, file_t& file)
+inline void pi(std::int64_t i, int base, file_t& file)
 {
   char ss[33];
   int sign;
@@ -176,14 +119,14 @@ static void pi(std::int64_t i, int base, file_t& file)
   ps(ss + j + 1, file, false);
 }
 
-static void pf(double d, file_t& file)
+inline void pf(double d, file_t& file)
 {
   auto ss = fmt::format("{:#g}", d);
   ps(ss.c_str(), file, false);
 }
 
 // Print pointer type object
-static void pp(const char* s, file_t& file, LISPT x)
+inline void pp(const char* s, file_t& file, LISPT x)
 {
   ps(s, file, false);
   ps(" ", file, false);
@@ -191,24 +134,17 @@ static void pp(const char* s, file_t& file, LISPT x)
   ps(">", file, false);
 }
 
-LISPT io::patom(lisp&, LISPT x, file_t& file, bool esc)
+LISPT patom(lisp&, LISPT x, file_t& file, bool esc)
 {
   ps(x->symbol().pname.name, file, esc);
   return x;
 }
 
-LISPT io::terpri(lisp&, file_t& file)
-{
-  file.putch('\n');
-  file.flush();
-  return NIL;
-}
-
-LISPT io::prinbody(lisp& l, LISPT x, file_t& file, bool esc)
+LISPT prinbody(lisp& l, LISPT x, file_t& file, bool esc)
 {
   LISPT xx = x;
 nxtelt:
-  prin0(l, xx->car(), file, esc);
+  io::prin0(l, xx->car(), file, esc);
   if(EQ(xx->cdr(), NIL))
     ;
   else if(type_of(xx->cdr()) == type::CONS)
@@ -222,12 +158,12 @@ nxtelt:
     file.putch(' ');
     file.putch('.');
     file.putch(' ');
-    prin0(l, xx->cdr(), file, esc);
+    io::prin0(l, xx->cdr(), file, esc);
   }
   return x;
 }
 
-LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
+LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
@@ -236,7 +172,7 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
       if(l.thisplevel <= l.printlevel || l.printlevel <= 0)
       {
         file.putch('(');
-        prinbody(l, x, file, esc);
+        io::prinbody(l, x, file, esc);
         file.putch(')');
       }
       else
@@ -244,7 +180,7 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
       l.thisplevel--;
       break;
     case type::SYMBOL:
-      return patom(l, x, file, esc);
+      return io::patom(l, x, file, esc);
       break;
     case type::NIL:
       ps("nil", file, false);
@@ -315,19 +251,86 @@ LISPT io::prin0(lisp& l, LISPT x, file_t& file, bool esc)
   return x;
 }
 
-LISPT io::print(lisp& l, LISPT x, file_t& file)
+LISPT print(lisp& l, LISPT x, file_t& file)
 {
   l.thisplevel = 0;
-  prin0(l, x, file, true);
-  terpri(l, file);
+  io::prin0(l, x, file, true);
+  io::terpri(l, file);
   return x;
 }
 
-void io::set_read_table(lisp& l)
+LISPT terpri(lisp&, file_t& file)
+{
+  file.putch('\n');
+  file.flush();
+  return NIL;
+}
+
+//
+// Splice list y into x keeping cdr of x. If y is not a list put it in car of x
+// and return x, otherwise return last cell of y with cdr set to original (cdr
+// x).  If tailp is true, don't clobber car of x.
+//
+LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
+{
+  LISPT t = x->cdr();
+  if(type_of(x) != type::CONS)
+  {
+    if(tailp)
+      rplacd(l, x, cons(l, y, t));
+    else
+      rplaca(l, x, y);
+    return x;
+  }
+  if(!tailp)
+  {
+    rplaca(l, x, y->car());
+    y = y->cdr();
+  }
+  if(is_NIL(y))
+    return x;
+  rplacd(l, x, y);
+  LISPT t2 = NIL;
+  for(; type_of(y) == type::CONS; y = y->cdr()) t2 = y;
+  return rplacd(l, t2, t);
+}
+
+//
+// Read macros.
+//
+LISPT rmdquote(lisp& l, file_t& file, LISPT, char)
+{
+  std::string buffer;
+  auto c = file.getch(true);
+  while(c != '"')
+  {
+    if(c == '\\')
+      c = file.getch(true);
+    buffer.push_back(c);
+    c = file.getch(true);
+  }
+  return mkstring(l, buffer);
+}
+
+LISPT rmsquote(lisp& l, file_t& file, LISPT, char)
+{
+  int c;
+  if((c = file.getch()) == ')' || issepr(l, c))
+  {
+    file.ungetch(c);
+    return C_QUOTE;
+  }
+  file.ungetch(c);
+  return cons(l, C_QUOTE, cons(l, io::lispread(l, file), NIL));
+}
+
+void set_read_table(lisp& l)
 {
   l.set_read_table('"', char_class::INSERT, io::rmdquote);
   l.set_read_table('\'', char_class::INSERT, io::rmsquote);
 }
+
+} // namespace io
 
 file_source::file_source(const std::string& name)
 {
