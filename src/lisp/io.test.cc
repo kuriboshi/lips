@@ -14,7 +14,7 @@ TEST_CASE("io Basic I/O")
   lisp lisp;
   current c(lisp);
 
-  lisp.primout(std::make_unique<file_t>(std::make_unique<string_sink>()));
+  lisp.primout(std::make_unique<file_t>(std::make_unique<io::string_sink>()));
   lisp.primout().format("hello world {}", 123);
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
@@ -59,7 +59,7 @@ TEST_CASE("io Read lisp objects")
     std::string s_nihongo{"\"日本語\"\n"};
     file_t in{s_nihongo};
     auto nihongo = lispread(lisp, in);
-    file_t out(std::make_unique<string_sink>());
+    file_t out(std::make_unique<io::string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
@@ -70,7 +70,7 @@ TEST_CASE("io Read lisp objects")
 )"};
     file_t in{s_nihongo};
     auto nihongo = lispread(lisp, in);
-    file_t out(std::make_unique<string_sink>());
+    file_t out(std::make_unique<io::string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
@@ -84,9 +84,9 @@ TEST_CASE("io Read lisp objects")
       std::ofstream o{test_file};
       o << s_nihongo;
     }
-    auto f = file_t(std::make_unique<file_source>(test_file));
+    auto f = file_t(std::make_unique<io::file_source>(test_file));
     auto nihongo = lispread(lisp, f);
-    file_t out(std::make_unique<string_sink>());
+    file_t out(std::make_unique<io::string_sink>());
     print(lisp, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
     std::filesystem::remove(test_file);

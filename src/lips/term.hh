@@ -9,7 +9,7 @@
 
 #include <lisp/io.hh>
 
-class term_source: public lisp::io_source
+class term_source: public lisp::io::source
 {
 public:
   term_source(const options_t& options) : is(linebuffer), options(options) {}

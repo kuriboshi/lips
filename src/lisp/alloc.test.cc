@@ -46,18 +46,18 @@ TEST_CASE("Create lisp objects")
     set(lisp, j, a);
     CHECK(i != j);
 
-    file_t out0(std::make_unique<string_sink>());
+    file_t out0(std::make_unique<io::string_sink>());
     prin0(lisp, i, out0);
     CHECK(to_string(out0.sink()) == std::string(i->getstr()));
 
-    file_t out1(std::make_unique<string_sink>());
+    file_t out1(std::make_unique<io::string_sink>());
     prin0(lisp, j, out1);
     CHECK(to_string(out1.sink()) == std::string(j->getstr()));
 
     std::string s_hello{"(hello)"};
     file_t in(s_hello);
     auto hello = lispread(lisp, in);
-    file_t out2(std::make_unique<string_sink>());
+    file_t out2(std::make_unique<io::string_sink>());
     prin0(lisp, hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);
   }

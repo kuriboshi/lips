@@ -330,8 +330,6 @@ void set_read_table(lisp& l)
   l.set_read_table('\'', char_class::INSERT, io::rmsquote);
 }
 
-} // namespace io
-
 file_source::file_source(const std::string& name)
 {
   _file = std::make_unique<std::ifstream>();
@@ -352,4 +350,5 @@ file_sink::file_sink(const std::string& name, bool append)
     throw lisp_error("Can't open file " + name);
 }
 
+} // namespace io
 } // namespace lisp

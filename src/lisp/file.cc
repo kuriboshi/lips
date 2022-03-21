@@ -32,8 +32,8 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
   }
   auto f = [&]() {
     if(readmode)
-      return std::make_unique<file_t>(std::make_unique<file_source>(filename->getstr()));
-    return std::make_unique<file_t>(std::make_unique<file_sink>(filename->getstr(), appendmode));
+      return std::make_unique<file_t>(std::make_unique<io::file_source>(filename->getstr()));
+    return std::make_unique<file_t>(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
   if(!f)
     return l.error(CANT_OPEN, filename);
@@ -95,7 +95,7 @@ bool loadfile(lisp& l, const std::string& lf)
 {
   try
   {
-    auto foo = std::make_unique<file_t>(std::make_unique<file_source>(lf));
+    auto foo = std::make_unique<file_t>(std::make_unique<io::file_source>(lf));
     for(auto rval = lispread(l, *foo.get()); type_of(rval) != type::EMPTY;
         rval = lispread(l, *foo.get()))
       rval = l.e().eval(rval);

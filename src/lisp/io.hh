@@ -35,13 +35,12 @@ LISPT splice(lisp&, LISPT, LISPT, bool);
 LISPT rmdquote(lisp&, file_t&, LISPT, char);
 LISPT rmsquote(lisp&, file_t&, LISPT, char);
 void set_read_table(lisp&);
-}
 
-class io_source
+class source
 {
 public:
-  io_source() {}
-  virtual ~io_source() = default;
+  source() {}
+  virtual ~source() = default;
 
   static inline constexpr char COMMENTCHAR = '#';
 
@@ -92,15 +91,15 @@ protected:
   int _curc = 0;
 };
 
-class file_source: public io_source
+class file_source: public source
 {
 public:
   file_source(const std::string& filename);
   ~file_source() = default;
 
-  using io_source::getch;
-  using io_source::eoln;
-  using io_source::getline;
+  using source::getch;
+  using source::eoln;
+  using source::getline;
 
   virtual int getch(bool inside_string) override
   {
@@ -127,15 +126,15 @@ private:
   std::unique_ptr<std::ifstream> _file;
 };
 
-class stream_source: public io_source
+class stream_source: public source
 {
 public:
   stream_source(std::istream& stream): _stream(stream) {}
   ~stream_source() = default;
 
-  using io_source::getch;
-  using io_source::eoln;
-  using io_source::getline;
+  using source::getch;
+  using source::eoln;
+  using source::getline;
 
   virtual int getch(bool inside_string) override
   {
@@ -158,14 +157,14 @@ private:
   std::istream& _stream;
 };
 
-class string_source: public io_source
+class string_source: public source
 {
 public:
   string_source(const std::string& string): _string(string) {}
 
-  using io_source::getch;
-  using io_source::eoln;
-  using io_source::getline;
+  using source::getch;
+  using source::eoln;
+  using source::getline;
 
   virtual int getch(bool inside_string) override
   {
@@ -182,11 +181,11 @@ private:
   std::istringstream _string;
 };
 
-class io_sink
+class sink
 {
 public:
-  io_sink() {}
-  virtual ~io_sink() = default;
+  sink() {}
+  virtual ~sink() = default;
 
   virtual void putch(int, bool esc = false) = 0;
   virtual void puts(const std::string_view) = 0;
@@ -219,12 +218,12 @@ protected:
   }
 };
 
-class file_sink final: public io_sink
+class file_sink final: public sink
 {
 public:
   file_sink(const std::string& filename, bool append = false);
 
-  using io_sink::putch;
+  using sink::putch;
 
   virtual void putch(int c, bool esc) override { putch(c, *_file, esc); }
   virtual void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
@@ -240,13 +239,13 @@ private:
   std::unique_ptr<std::ofstream> _file;
 };
 
-class stream_sink final: public io_sink
+class stream_sink final: public sink
 {
 public:
   stream_sink(std::ostream& stream): _stream(stream) {}
   ~stream_sink() = default;
 
-  using io_sink::putch;
+  using sink::putch;
 
   virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
   virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
@@ -258,7 +257,7 @@ private:
   std::ostream& _stream;
 };
 
-class string_sink final: public io_sink
+class string_sink final: public sink
 {
 public:
   string_sink() {}
@@ -274,27 +273,29 @@ private:
   std::string _string;
 };
 
+}
+
 class file_t final
 {
 public:
-  file_t(std::unique_ptr<io_source> source): _source(std::move(source)) {}
-  file_t(std::unique_ptr<io_sink> sink): _sink(std::move(sink)) {}
-  file_t(std::unique_ptr<io_source> source, std::unique_ptr<io_sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
-  file_t(std::istream& stream): _source(std::make_unique<stream_source>(stream)) {}
-  file_t(std::ostream& stream): _sink(std::make_unique<stream_sink>(stream)) {}
-  file_t(const std::string& string): _source(std::make_unique<string_source>(string)) {}
+  file_t(std::unique_ptr<io::source> source): _source(std::move(source)) {}
+  file_t(std::unique_ptr<io::sink> sink): _sink(std::move(sink)) {}
+  file_t(std::unique_ptr<io::source> source, std::unique_ptr<io::sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
+  file_t(std::istream& stream): _source(std::make_unique<io::stream_source>(stream)) {}
+  file_t(std::ostream& stream): _sink(std::make_unique<io::stream_sink>(stream)) {}
+  file_t(const std::string& string): _source(std::make_unique<io::string_source>(string)) {}
   file_t(file_t&& file) noexcept: _source(std::move(file._source)), _sink(std::move(file._sink)) {}
   ~file_t() {}
 
-  // io_source
-  io_source& source() { return *_source.get(); }
+  // source
+  io::source& source() { return *_source.get(); }
   int getch(bool inside_string = false) { ptrcheck(_source); return _source->getch(inside_string); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   bool eoln() { ptrcheck(_source); return _source->eoln(); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
 
-  // io_sink
-  io_sink& sink() { return *_sink.get(); }
+  // sink
+  io::sink& sink() { return *_sink.get(); }
   void putch(char c, bool esc = false) { ptrcheck(_sink); _sink->putch(c, esc); }
   void puts(const std::string_view s) { ptrcheck(_sink); _sink->puts(s); }
   void terpri() { ptrcheck(_sink); _sink->terpri(); }
@@ -315,16 +316,16 @@ public:
   }
 
 private:
-  std::unique_ptr<io_source> _source;
-  std::unique_ptr<io_sink> _sink;
+  std::unique_ptr<io::source> _source;
+  std::unique_ptr<io::sink> _sink;
 
-  void ptrcheck(const std::unique_ptr<io_source>&) const
+  void ptrcheck(const std::unique_ptr<io::source>&) const
   {
     if(!_source)
       throw lisp_error("file_t: No source");
   }
 
-  void ptrcheck(const std::unique_ptr<io_sink>&) const
+  void ptrcheck(const std::unique_ptr<io::sink>&) const
   {
     if(!_sink)
       throw lisp_error("file_t: No sink");
@@ -413,7 +414,7 @@ inline LISPT print(LISPT a, bool out = false)
 template<typename T>
 std::string to_string(T& sink)
 {
-  return dynamic_cast<string_sink&>(sink).string();
+  return dynamic_cast<io::string_sink&>(sink).string();
 }
 
 } // namespace lisp
