@@ -18,37 +18,6 @@ static char digits[] = {
   'u', 'v', 'w', 'x', 'y', 'z'};
 // clang-format on
 
-//
-// INTEGERP returns nonzero if the characters in buffer BUF represents an
-// integer, and the result as a long in res.
-//
-bool io::integerp(const std::string& buf, int& res)
-{
-  res = 0;
-  if(buf.empty())
-    return false;
-
-  auto i = buf.begin();
-  int sign = 1;
-  if(*i == '-')
-  {
-    sign = -1;
-    ++i;
-  }
-  else if(*i == '+')
-    ++i;
-  if(i == buf.end())
-    return false;
-  for(; i != buf.end(); ++i)
-  {
-    if(!isdigit(*i))
-      return false;
-    res = res * 10 + *i - '0';
-  }
-  res *= sign;
-  return i == buf.end();
-}
-
 ///
 /// @brief Read an atom from FILE.
 ///
@@ -358,28 +327,6 @@ void io::set_read_table(lisp& l)
 {
   l.set_read_table('"', char_class::INSERT, io::rmdquote);
   l.set_read_table('\'', char_class::INSERT, io::rmsquote);
-}
-
-bool io::checkeof(lisp& l, int c, bool line)
-{
-  if(c == EOF)
-  {
-    if(line || is_NIL(l.top->car()))
-      return true;
-    l.fatal(UNEXPECTED_EOF);
-  }
-  return false;
-}
-
-std::pair<bool, int> io::getchar(lisp& l, file_t& file, bool line)
-{
-  int curc = 0;
-  do
-    curc = file.getch();
-  while(curc != EOF && issepr(l, curc));
-  if(checkeof(l, curc, line))
-    return std::make_pair(true, curc);
-  return std::make_pair(false, curc);
 }
 
 file_source::file_source(const std::string& name)

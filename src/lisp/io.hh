@@ -34,17 +34,9 @@ public:
   static LISPT terpri(lisp& l, file_t&);
   static LISPT getline(lisp& l, LISPT);
 
-  static LISPT rmexcl(lisp&, file_t&, LISPT, char);
+  static LISPT splice(lisp&, LISPT, LISPT, bool);
   static LISPT rmdquote(lisp&, file_t&, LISPT, char);
   static LISPT rmsquote(lisp&, file_t&, LISPT, char);
-
-private:
-  static LISPT splice(lisp& l, LISPT, LISPT, bool);
-  static LISPT parsebuf(lisp& l, const std::string&);
-  static bool integerp(const std::string&, int& res);
-  static bool floatp(const std::string&);
-  static bool checkeof(lisp& l, int c, bool line);
-  static std::pair<bool, int> getchar(lisp& l, file_t& file, bool line);
 };
 
 class io_source
