@@ -102,6 +102,37 @@ struct token_t final
   }
 };
 
+inline bool operator==(const token_t& l, const token_t& r)
+{
+  return l.type == r.type && l.token == r.token;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const token_t& t)
+{
+  switch(t.type)
+  {
+    case token_t::type::MACRO:
+      os << "MACRO:";
+      break;
+    case token_t::type::STRING:
+      os << "STRING:";
+      break;
+    case token_t::type::SYMBOL:
+      os << "SYMBOL:";
+      break;
+    case token_t::type::INT:
+      os << "INT:";
+      break;
+    case token_t::type::FLOAT:
+      os << "FLOAT:";
+    default:
+      os << "?:";
+      break;
+  }
+  os << t.token;
+  return os;
+}
+
 /// @brief A reader/lexer of a string input.
 template<typename Input>
 class reader
@@ -142,18 +173,56 @@ private:
     IN_EXP2,                   // Next state after finding a '+', '-', or a
                                // digit.
   };
+  friend std::ostream& operator<<(std::ostream& os, enum state_t state)
+  {
+    switch(state)
+    {
+      case state_t::START:
+        os << "START";
+        break;
+      case state_t::IN_STRING:
+        os << "IN_STRING";
+        break;
+      case state_t::IN_SYMBOL:
+        os << "IN_SYMBOL";
+        break;
+      case state_t::IN_QUOTE:
+        os << "IN_QUOTE";
+        break;
+      case state_t::IN_COMMENT:
+        os << "IN_COMMENT";
+        break;
+      case state_t::IN_DOT:
+        os << "IN_DOT";
+        break;
+      case state_t::IN_SIGN:
+        os << "IN_SIGN";
+        break;
+      case state_t::IN_INT:
+        os << "IN_INT";
+        break;
+      case state_t::IN_FLOAT:
+        os << "IN_FLOAT";
+        break;
+      case state_t::IN_EXP1:
+        os << "IN_EXP1";
+        break;
+      case state_t::IN_EXP2:
+        os << "IN_EXP2";
+        break;
+    }
+    return os;
+  }
 };
 
-/// @brief Read the next token from the input string.
-/// @return Returns either the token as a string or nothing when the input
-///   string reaches the end.
+/// @brief Read the next token from the input stream.
+/// @returns Returns either the token as a string or the empty token when the
+///   input stream reaches the end.
 template<typename Input>
 token_t reader<Input>::read()
 {
   if(_token)
     return std::move(_token);
-  if(_pos == _input.end())
-    return {};
   token_t token;
   state_t state{state_t::START};
   while(_pos != _input.end())
@@ -164,18 +233,11 @@ token_t reader<Input>::read()
         switch(*_pos)
         {
           case '#':
-            if(!token.token.empty())
-              return token;
             state = state_t::IN_COMMENT;
             break;
+          case ' ': case '\n': case '\t':
+            break;
           case '(': case ')': case '[': case ']':
-            // These characters are terminating macro characters.
-            if(!token.token.empty())
-              return token;
-            token.type = token_t::type::MACRO;
-            token.token.push_back(*_pos);
-            ++_pos;
-            return token;
           case '\'':
             token.type = token_t::type::MACRO;
             token.token.push_back(*_pos);
@@ -188,14 +250,7 @@ token_t reader<Input>::read()
             token.type = token_t::type::MACRO;
             token.token.push_back(*_pos);
             break;
-          case ' ': case '\n': case '\t':
-            // Terminate and return the current token.
-            if(!token.token.empty())
-              return token;
-            break;
           case '"':
-            if(!token.token.empty())
-              return token;
             state = state_t::IN_STRING;
             token.type = token_t::type::STRING;
             break;
@@ -206,8 +261,6 @@ token_t reader<Input>::read()
             break;
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
-            if(!token.token.empty())
-              return token;
             state = state_t::IN_INT;
             token.type = token_t::type::INT;
             token.token.push_back(*_pos);
@@ -226,7 +279,7 @@ token_t reader<Input>::read()
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case '(': case ')': case '[': case ']':
           case ' ': case '\n': case '\t':
             state = state_t::START;
@@ -253,8 +306,9 @@ token_t reader<Input>::read()
             state = state_t::IN_QUOTE;
             break;
           case '"':
+            ++_pos;
             state = state_t::START;
-            break;
+            return token;
           default:
             token.token.push_back(*_pos);
             break;
@@ -263,6 +317,8 @@ token_t reader<Input>::read()
       case state_t::IN_COMMENT:
         if(*_pos == '\n')
           state = state_t::START;
+        if(!token.token.empty())
+          return token;
         break;
       case state_t::IN_SIGN:
         switch(*_pos)
@@ -283,7 +339,7 @@ token_t reader<Input>::read()
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case '.':
             state = state_t::IN_FLOAT;
             token.type = token_t::type::FLOAT;
@@ -310,7 +366,7 @@ token_t reader<Input>::read()
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case 'e': case 'E':
             state = state_t::IN_EXP1;
             break;
@@ -329,7 +385,7 @@ token_t reader<Input>::read()
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case '-': case '+':
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
@@ -347,7 +403,7 @@ token_t reader<Input>::read()
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             break;
@@ -359,20 +415,21 @@ token_t reader<Input>::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_DOT:
-        state = state_t::START;
         switch(*_pos)
         {
           case '#':
             state = state_t::IN_COMMENT;
-            break;
+            return token;
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             state = state_t::IN_FLOAT;
             continue;
           case '(': case ')': case '[': case ']':
           case '\n': case '\t': case ' ':
+            state = state_t::START;
             return token;
           default:
+            state = state_t::IN_SYMBOL;
             token.type = token_t::type::SYMBOL;
             continue;
         }
@@ -382,46 +439,13 @@ token_t reader<Input>::read()
     }
     ++_pos;
   }
-  if(!token.token.empty())
-    return token;
-  return {};
+  return token;
 }
 
 template<typename Input>
 void reader<Input>::unread(token_t token)
 {
   _token = token;
-}
-
-inline bool operator==(const token_t& l, const token_t& r)
-{
-  return l.type == r.type && l.token == r.token;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const token_t& t)
-{
-  switch(t.type)
-  {
-    case token_t::type::MACRO:
-      os << "MACRO:";
-      break;
-    case token_t::type::STRING:
-      os << "STRING:";
-      break;
-    case token_t::type::SYMBOL:
-      os << "SYMBOL:";
-      break;
-    case token_t::type::INT:
-      os << "INT:";
-      break;
-    case token_t::type::FLOAT:
-      os << "FLOAT:";
-    default:
-      os << "?:";
-      break;
-  }
-  os << t.token;
-  return os;
 }
 
 }

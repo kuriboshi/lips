@@ -170,4 +170,36 @@ TEST_CASE("reader unread")
   CHECK(token.token == ")");
 }
 
+TEST_CASE("reader comments")
+{
+  SECTION("inside s-expr")
+  {
+    std::string s{"(#comment\n)"};
+    string_reader reader{s};
+    auto token = reader.read();
+    REQUIRE(token);
+    CHECK(token.is_macro('('));
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.is_macro(')'));
+  }
+  SECTION("inside s-expr with int")
+  {
+    std::string s{"(100#comment\n200)"};
+    string_reader reader{s};
+    auto token = reader.read();
+    REQUIRE(token);
+    CHECK(token.is_macro('('));
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.token == "100");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.token == "200");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.is_macro(')'));
+  }
+}
+
 }
