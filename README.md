@@ -26,6 +26,18 @@ Don't expect a solid, or even useful, program or library.  I wrote
 this as a learning exercise and to scratch an itch.  The shell
 functionality is minimal and serves more as a proof of concept.
 
+## LISP Dialect
+
+The LISP dialect implemented doesn't strictly follow any existing LISP
+implementation or standard. It's closer to Interlisp[1] in spirit than
+Common Lisp[2]. There are some influences from other dialects such as
+Scheme[3].
+
+The interpreter uses shallow, dynamic binding. Originally it used a
+stop-and-sweep garbage collector but now uses reference counting. The
+implementation was heavily influenced by the work of John Allen as
+published in the book _Anatomy of LISP_[4].
+
 ## Requirements
 
 The code requires C++20 and CMake 3.18 or newer. The CMakePresets.json
@@ -137,3 +149,10 @@ cmake --preset default -D LIPS_USE_SSHFS=ON
 ```
 
 From then on the target `test-linux` should work automatically.
+
+## References
+
+[1] _Interlisp Reference Manual_, Xerox, 1983.<br>
+[2] Guy L. Steele, _Common Lisp the Language_, 2nd edition, Digital Press, 1990.<br>
+[3] H. Abelson, G. Sussman, and J. Sussman, _Structure and Interpretation of Computer Programs_, MIT Press, 1985.<br>
+[4] Allen, John, _Anatomy of LISP_, McGraw-Hill, Inc, 1978.
