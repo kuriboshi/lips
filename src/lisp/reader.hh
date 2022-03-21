@@ -282,7 +282,6 @@ token_t reader<Input>::read()
             return token;
           case '(': case ')': case '[': case ']':
           case ' ': case '\n': case '\t':
-            state = state_t::START;
             return token;
           case '\\':
             ++_pos;
@@ -307,7 +306,6 @@ token_t reader<Input>::read()
             break;
           case '"':
             ++_pos;
-            state = state_t::START;
             return token;
           default:
             token.token.push_back(*_pos);
@@ -317,8 +315,6 @@ token_t reader<Input>::read()
       case state_t::IN_COMMENT:
         if(*_pos == '\n')
           state = state_t::START;
-        if(!token.token.empty())
-          return token;
         break;
       case state_t::IN_SIGN:
         switch(*_pos)
@@ -352,7 +348,6 @@ token_t reader<Input>::read()
             break;
           case ' ': case '\t': case '\n':
           case '(': case ')': case '[': case ']':
-            state = state_t::START;
             return token;
           default:
             token.type = token_t::type::SYMBOL;
@@ -426,7 +421,6 @@ token_t reader<Input>::read()
             continue;
           case '(': case ')': case '[': case ']':
           case '\n': case '\t': case ' ':
-            state = state_t::START;
             return token;
           default:
             state = state_t::IN_SYMBOL;
