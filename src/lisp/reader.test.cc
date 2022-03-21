@@ -18,8 +18,8 @@ void reader_check(string_reader& reader, enum lisp::token_t::type type, const st
 {
   auto b = reader.read();
   REQUIRE(b);
-  CHECK(b->type == type);
-  CHECK(b->token == token);
+  CHECK(b.type == type);
+  CHECK(b.token == token);
 }
 
 void reader_check(std::string string, enum lisp::token_t::type type, const std::string& token)
@@ -27,8 +27,8 @@ void reader_check(std::string string, enum lisp::token_t::type type, const std::
   string_reader reader{string};
   auto b = reader.read();
   REQUIRE(b);
-  CHECK(b->type == type);
-  CHECK(b->token == token);
+  CHECK(b.type == type);
+  CHECK(b.token == token);
 }
 }
 
@@ -160,12 +160,15 @@ TEST_CASE("reader unread")
   std::string s{"()"};
   string_reader reader{s};
   auto token = reader.read();
-  CHECK(token->token == "(");
-  reader.unread(*token);
+  REQUIRE(token);
+  CHECK(token.token == "(");
+  reader.unread(token);
   token = reader.read();
-  CHECK(token->token == "(");
+  REQUIRE(token);
+  CHECK(token.token == "(");
   token = reader.read();
-  CHECK(token->token == ")");
+  REQUIRE(token);
+  CHECK(token.token == ")");
 }
 
 }

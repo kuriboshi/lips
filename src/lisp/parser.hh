@@ -102,10 +102,8 @@ LISPT parser<Input>::parse()
 template<typename Input>
 bool parser<Input>::next()
 {
-  auto token = _reader.read();
-  if(token)
-    _token = *token;
-  return !!token;
+  _token = _reader.read();
+  return !!_token;
 }
 
 template<typename Input>

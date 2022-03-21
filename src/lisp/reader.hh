@@ -7,28 +7,53 @@
 #pragma once
 
 #include <iostream>
-#include <optional>
 #include <string>
 
 namespace lisp
 {
 
-struct token_t
+struct token_t final
 {
   enum class type
   {
+    EMPTY,
     MACRO,
     STRING,
     SYMBOL,
     INT,
     FLOAT
-  } type;
-  token_t() : type(type::SYMBOL) {}
-  token_t(enum type t, const std::string& s) : type(t), token(s) {}
+  };
+
+  enum type type;
   std::string token;
+
+  token_t() : type(type::EMPTY) {}
+  token_t(enum type t) : type(t) {}
+  token_t(enum type t, const std::string& s) : type(t), token(s) {}
+  ~token_t() = default;
+  explicit operator bool() const { return type != type::EMPTY; }
+
+  token_t(const token_t& t) = default;
+  token_t& operator=(token_t t) noexcept
+  {
+    swap(*this, t);
+    return *this;
+  }
+  token_t(token_t&& t) : type(t.type), token(std::move(t.token))
+  {
+    t.type = type::EMPTY;
+  }
+
   bool is_macro(char c) const
   {
     return type == type::MACRO && !token.empty() && token[0] == c;
+  }
+
+  friend void swap(token_t& left, token_t& right) noexcept
+  {
+    using std::swap;
+    swap(left.token, right.token);
+    swap(left.type, right.type);
   }
 };
 
@@ -39,32 +64,15 @@ class reader
 public:
   reader(Input& input) : _input(input), _pos(_input.begin()) {}
   /// @brief Read the next token from the input string.
-  std::optional<token_t> read();
+  token_t read();
   void unread(token_t);
+  token_t ratom();
 
 private:
   Input& _input;
   typename Input::iterator _pos;
-  std::optional<token_t> _token;
-};
+  token_t _token;
 
-/// @brief Read the next token from the input string.
-/// @return Returns either the token as a string or nothing when the input
-///   string reaches the end.
-template<typename Input>
-std::optional<token_t> reader<Input>::read()
-{
-  if(_token)
-  {
-    // A simple move from _token doesn't work because the moved from object
-    // will still contain a value.
-    auto t = _token;
-    _token.reset();
-    return t;
-  }
-  if(_pos == _input.end())
-    return {};
-  token_t token;
   enum class state_t
   {
     START,                     // Starting state
@@ -86,6 +94,19 @@ std::optional<token_t> reader<Input>::read()
     IN_EXP2,                   // Next state after finding a '+', '-', or a
                                // digit.
   };
+};
+
+/// @brief Read the next token from the input string.
+/// @return Returns either the token as a string or nothing when the input
+///   string reaches the end.
+template<typename Input>
+token_t reader<Input>::read()
+{
+  if(_token)
+    return std::move(_token);
+  if(_pos == _input.end())
+    return {};
+  token_t token;
   state_t state{state_t::START};
   while(_pos != _input.end())
   {
@@ -140,6 +161,7 @@ std::optional<token_t> reader<Input>::read()
             break;
           default:
             state = state_t::IN_SYMBOL;
+            token.type = token_t::type::SYMBOL;
             token.token.push_back(*_pos);
             break;
         }
