@@ -125,6 +125,7 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
       break;
     case token_t::type::FLOAT:
       os << "FLOAT:";
+      break;
     default:
       os << "?:";
       break;
@@ -322,6 +323,7 @@ token_t reader<Input>::read()
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             state = state_t::IN_INT;
+            token.type = token_t::type::INT;
             token.token.push_back(*_pos);
             break;
           default:
@@ -342,6 +344,7 @@ token_t reader<Input>::read()
             break;
           case 'e': case 'E':
             state = state_t::IN_EXP1;
+            token.type = token_t::type::FLOAT;
             break;
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
