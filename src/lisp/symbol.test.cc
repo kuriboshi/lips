@@ -46,6 +46,21 @@ TEST_CASE("New symbol store")
   print_name pname{1000, 0, "hello"};
   CHECK_THROWS(all_symbols.get(pname));
   CHECK_THROWS(all_symbols.get(1000, 99));
+
+  SECTION("symbol: symbol_collection")
+  {
+    symbol_collection collection;
+    CHECK_THROWS(collection.symbol_store(2));
+    auto& sym0 = collection.get(0, "hello");
+    auto& sym1 = collection.get(0, sym0.pname.index);
+  }
+
+  SECTION("symbol: symbol_store_t")
+  {
+    symbol_store_t store0{100};
+    auto store1 = std::move(store0);
+    store0 = std::move(store1);
+  }
 }
 
 }
