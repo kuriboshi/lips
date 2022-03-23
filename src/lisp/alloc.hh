@@ -274,6 +274,11 @@ inline LISPT operator"" _l(long double d)
   return mkfloat(d);
 }
 
+inline LISPT operator"" _a(const char* s, std::size_t)
+{
+  return mkatom(s);
+}
+
 inline LISPT mklist(lisp& l, LISPT t)
 {
   return cons(l, t, NIL);

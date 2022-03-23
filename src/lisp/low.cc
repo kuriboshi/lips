@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2021 Krister Joas
+//
 
 #include "low.hh"
 #include "alloc.hh"
@@ -42,26 +41,49 @@ LISPT progn(lisp& l, LISPT lexp)
   return eval(l, lexp->car());
 }
 
+/// @brief The cond special form.
+///
+/// @details The generalized conditional special form. The function takes zero
+/// or more clauses. Each clause has one test followed by zero or more
+/// expressions called consequents. The function evaluates each test in
+/// sequence until one of them is evaluated to true (not @c NIL). It then
+/// evaluates each consequent in order and returns the value of the last
+/// consequent. If there are no consequents the result is the value of the test
+/// expression. The degenerate @c cond expression with no clauses at all
+/// evaluates to @c NIL.
+///
+/// In the following example the return value is the value of the expression
+/// @c r0 if @c e0 evaluates to non-NIL, @c r2 if @c e1 is evaluated to non-NIL,
+/// @c e2 if @c e2 evaluates to non-NIL. Finally, if none of the expressions
+/// @c e0, @c e1, or @c e2 is non-nil the final @c t provides a default
+/// value. If none of the test expressions evaluate to non-NIL then the result
+/// of the entire @c cond expression is @c NIL.
+///
+/// Note that the expressions after the conditional expressions are evaluated
+/// in an implicit @c progn which is why the result of @c e1 being non-NIL is
+/// the value of @c r2.
+///
+/// @code{.lisp}
+/// (cond (e0 r0)
+///       (e1 r1 r2)
+///       (e2)
+///       (t r3))
+/// @endcode
+///
 LISPT cond(lisp& l, LISPT args)
 {
-  LISPT res = NIL;
-  if(is_NIL(args))
-    return NIL;
-  while(is_NIL(res))
+  while(!is_NIL(args))
   {
-    LISPT alt = args->car();
+    auto alt = args->car();
     check(alt, type::CONS);
-    res = eval(l, alt->car());
+    auto res = eval(l, alt->car());
     if(!is_NIL(res))
     {
       if(is_NIL(alt->cdr()))
         return res;
-      else
-        return low::progn(l, alt->cdr());
+      return low::progn(l, alt->cdr());
     }
     args = args->cdr();
-    if(is_NIL(args))
-      break;
   }
   return NIL;
 }
