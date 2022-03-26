@@ -63,6 +63,8 @@ TEST_CASE("Arithmetic functions")
   {
     auto r0 = ltimes(l, mklist(5_l, 7_l));
     CHECK(r0->intval() == 35);
+    r0 = ltimes(mklist(5_l, 7_l));
+    CHECK(r0->intval() == 35);
   }
 
   SECTION("/")
@@ -166,7 +168,7 @@ TEST_CASE("Arithmetic functions")
       CHECK(r0->intval() == -1);
     }
     {
-      auto r0 = eval(l, "(iminus 1)");
+      auto r0 = iminus(1_l);
       CHECK(r0->intval() == -1);
     }
   }
@@ -209,7 +211,10 @@ TEST_CASE("Arithmetic functions")
 
   SECTION("f+")
   {
-    auto r = eval(l, "(f+ (itof 5) (itof 2))");
+    auto r = fplus(l, mklist(2.0_l, 5.0_l));
+    REQUIRE(type_of(r) == type::FLOAT);
+    CHECK(r->floatval() == 7.0);
+    r = fplus(mklist(2.0_l, 5.0_l));
     REQUIRE(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 7.0);
   }
@@ -230,23 +235,32 @@ TEST_CASE("Arithmetic functions")
 
   SECTION("f*")
   {
-    auto r = eval(l, "(f* (itof 5) (itof 2))");
+    auto r = ftimes(l, mklist(5.0_l, 2.0_l));
+    CHECK(type_of(r) == type::FLOAT);
+    CHECK(r->floatval() == 10.0);
+    r = ftimes(mklist(5.0_l, 2.0_l));
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 10.0);
   }
 
   SECTION("f/")
   {
-    auto r = eval(l, "(f/ (itof 5) (itof 2))");
+    auto r = fdivide(l, 5.0_l, 2.0_l);
+    CHECK(type_of(r) == type::FLOAT);
+    CHECK(r->floatval() == 2.5);
+    r = fdivide(5.0_l, 2.0_l);
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 2.5);
   }
 
   SECTION("itof")
   {
-    auto r = eval(l, "(itof 8)");
+    auto r = itof(l, 8_l);
     CHECK(type_of(r) == type::FLOAT);
     CHECK(r->floatval() == 8.0);
+    r = itof(9_l);
+    CHECK(type_of(r) == type::FLOAT);
+    CHECK(r->floatval() == 9.0);
   }
 
   SECTION("greaterp")
@@ -329,6 +343,18 @@ TEST_CASE("Arithmetic functions")
 
   SECTION("neqp")
   {
+    CHECK(is_T(neqp(l, mknumber(2), mknumber(1))));
+    CHECK(is_T(neqp(l, mknumber(1), mknumber(2))));
+    CHECK(is_T(neqp(l, mkfloat(2.0), mknumber(1))));
+    CHECK(is_T(neqp(l, mkfloat(1.0), mknumber(2))));
+    CHECK(is_T(neqp(l, mknumber(2), mkfloat(1.0))));
+    CHECK(is_T(neqp(l, mknumber(1), mkfloat(2.0))));
+    CHECK(is_T(neqp(l, mkfloat(2.0), mkfloat(1.0))));
+    CHECK(is_T(neqp(l, mkfloat(1.0), mkfloat(2.0))));
+    CHECK(is_NIL(neqp(l, mknumber(1), mknumber(1))));
+    CHECK(is_NIL(neqp(mknumber(1), mknumber(1))));
+    CHECK_THROWS(neqp(l, "a"_s, 1_l));
+    CHECK_THROWS(neqp(l, 1_l, "b"_s));
   }
 
   SECTION("zerop")
@@ -368,6 +394,17 @@ TEST_CASE("Arithmetic functions")
     {
       auto r = minusp(5_l);
       CHECK(is_NIL(r));
+    }
+    {
+      auto r = minusp(mknumber(-1.0));
+      CHECK(is_T(r));
+    }
+    {
+      auto r = minusp(1.0_l);
+      CHECK(is_NIL(r));
+    }
+    {
+      CHECK_THROWS(minusp("string"_s));
     }
   }
 

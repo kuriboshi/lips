@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #include "arith.hh"
 #include "alloc.hh"
@@ -11,12 +10,12 @@
 
 namespace lisp::arith
 {
-/*
- * Functions with an i as a prefix are for integer arithmetic and those whith
- * an f are for floats.  Without a prefix, the functions are generic and
- * converts arguments to the apropriate type.  Any float as an argument to a
- * generic function results in a float.
- */
+//
+// Functions with an i as a prefix are for integer arithmetic and those whith
+// an f are for floats.  Without a prefix, the functions are generic and
+// converts arguments to the apropriate type.  Any float as an argument to a
+// generic function results in a float.
+//
 
 LISPT plus(lisp& l, LISPT x)
 {
@@ -327,10 +326,8 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
     case num_type::ILLEGAL2:
       illegalreturn(l, y);
       break;
-    default:
-      break;
   }
-  return l.error(BUG, NIL);
+  throw lisp_error("never happens");
 }
 
 LISPT greaterp(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
