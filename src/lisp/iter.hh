@@ -37,7 +37,7 @@ public:
     ++(*this);
     return tmp;
   }
-  LISPT operator*() const { return _car->car(); }
+  LISPT operator*() const { if(type_of(_car) == type::CONS) return _car->car(); else return nullptr; }
 
 private:
   LISPT _car;
