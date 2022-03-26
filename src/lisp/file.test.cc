@@ -43,10 +43,10 @@ TEST_CASE("File functions")
   SECTION("print")
   {
     constexpr const char* test_file{"test_print.lisp"};
-    auto f0 = open(mkstring(test_file), intern("write"));
+    auto f0 = open(mkstring(test_file), C_WRITE);
     print(mkstring("hello"), f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), intern("read"));
+    auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "\"hello\"");
@@ -56,11 +56,11 @@ TEST_CASE("File functions")
   SECTION("terpri")
   {
     constexpr const char* test_file{"test_terpri.lisp"};
-    auto f0 = open(mkstring(test_file), intern("write"));
+    auto f0 = open(mkstring(test_file), C_WRITE);
     print(mkstring("hello"), f0);
     terpri(f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), intern("read"));
+    auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "\"hello\"");
@@ -70,10 +70,10 @@ TEST_CASE("File functions")
   SECTION("prin1")
   {
     constexpr const char* test_file{"test_prin1.lisp"};
-    auto f0 = open(mkstring(test_file), intern("write"));
+    auto f0 = open(mkstring(test_file), C_WRITE);
     prin1(mkstring("hello \"world\""), f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), intern("read"));
+    auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "hello \"world\"");
@@ -83,10 +83,10 @@ TEST_CASE("File functions")
   SECTION("prin2")
   {
     constexpr const char* test_file = "test_prin2.lisp";
-    auto f0 = open(mkstring(test_file), intern("write"));
+    auto f0 = open(mkstring(test_file), C_WRITE);
     prin2(mkstring("hello \"world\""), f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), intern("read"));
+    auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
@@ -116,7 +116,7 @@ TEST_CASE("File functions")
     LISPT f = l.a().getobject();
     f->set(std::make_shared<file_t>(is));
     auto sexpr = read(l, f);
-    CHECK(!is_NIL(equal(sexpr, mklist(mkatom("a"), mkatom("b"), mkatom("c")))));
+    CHECK(!is_NIL(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
   }
 
   SECTION("spaces")
@@ -137,7 +137,7 @@ TEST_CASE("File functions")
       f->set(std::make_shared<file_t>(is));
       auto r = readline(l, f);
       CHECK(type_of(r) == type::CONS);
-      auto expected = mklist(mkatom("test"));
+      auto expected = mklist("test"_a);
       CHECK(equal(r, expected));
     }
     SECTION("Two atoms")
@@ -147,7 +147,7 @@ TEST_CASE("File functions")
       f->set(std::make_shared<file_t>(is));
       auto r = readline(l, f);
       CHECK(type_of(r) == type::CONS);
-      auto expected = mklist(mkatom("test"), mkatom("test"));
+      auto expected = mklist("test"_a, "test"_a);
       CHECK(equal(r, expected));
     }
   }
