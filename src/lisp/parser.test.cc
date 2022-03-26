@@ -181,4 +181,15 @@ TEST_CASE("parser dot")
   lisp_compare("(setq f (lambda (a . x) (list a (cadr x))))", "(setq f (lambda (a . x) (list a (cadr x))))");
 }
 
+TEST_CASE("parser: (greaterp 1.0 \"b\")")
+{
+  std::string s{"(greaterp 1.0 \"b\")"};
+  string_reader reader{s};
+  auto res = parser(reader).parse();
+  REQUIRE(type_of(res) == type::CONS);
+  CHECK(car(res) == "greaterp"_a);
+  CHECK(cadr(res)->floatval() == 1.0);
+  CHECK(caddr(res)->stringval() == "b");
+}
+
 }

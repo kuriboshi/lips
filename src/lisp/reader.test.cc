@@ -160,6 +160,9 @@ TEST_CASE("reader: integers")
 
 TEST_CASE("reader: floats")
 {
+  reader_check("1.0 ", token_t::type::FLOAT, "1.0");
+  reader_check("1.0)", token_t::type::FLOAT, "1.0");
+  reader_check("1.0(", token_t::type::FLOAT, "1.0");
   reader_check("1.234", token_t::type::FLOAT, "1.234");
   reader_check("-1.234", token_t::type::FLOAT, "-1.234");
   reader_check("1.23e-2", token_t::type::FLOAT, "1.23e-2");
