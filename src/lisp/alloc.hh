@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "lisp.hh"
+#include "io.hh"
 
 namespace lisp
 {
@@ -259,24 +260,42 @@ inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
-inline LISPT operator"" _l(const char* s, std::size_t)
+/// @brief Creates a lisp string.
+inline LISPT operator"" _s(const char* s, std::size_t)
 {
   return mkstring(s);
 }
 
+/// @brief Creates a number.
 inline LISPT operator"" _l(unsigned long long i)
 {
   return mknumber(i);
 }
 
+/// @brief Creates a floating point value.
 inline LISPT operator"" _l(long double d)
 {
   return mkfloat(d);
 }
 
+/// @brief Creates a lisp expression.
+inline LISPT operator"" _l(const char* s, std::size_t)
+{
+  file_t in(s);
+  auto e = lispread(lisp::current(), in);
+  return e;
+}
+
+/// @brief Simpler way to create an atom.
 inline LISPT operator"" _a(const char* s, std::size_t)
 {
   return mkatom(s);
+}
+
+/// @brief Evaluates a lisp expression in a string.
+inline LISPT operator"" _e(const char* s, std::size_t)
+{
+  return eval(s);
 }
 
 inline LISPT mklist(lisp& l, LISPT t)

@@ -19,8 +19,8 @@ class repl
 public:
   repl(lisp& lisp) : l(lisp)
   {
-    _prompt = "> "_l;
-    _break_prompt = ": "_l;
+    _prompt = "> "_s;
+    _break_prompt = ": "_s;
   }
   ~repl() = default;
 

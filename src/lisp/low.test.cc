@@ -47,8 +47,8 @@ TEST_CASE("Low level functions")
 
   SECTION("low: while")
   {
-    set("a"_a, 0_l);
-    set("i"_a, 3_l);
+    set("a"_l, 0_l);
+    set("i"_l, 3_l);
     xwhile(mklist("greaterp"_a, "i"_a, 0_l),
       mklist(
         mklist("setq"_a, "a"_a, mklist("+"_a, "a"_a, "i"_a)),
