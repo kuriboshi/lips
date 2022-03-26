@@ -459,9 +459,9 @@ public:
       // FS GS RS US
       char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
       // SP  !   "   #
-      char_class::SEPR, char_class::/*SPLICE*/NONE, char_class::/*INSERT*/NONE, char_class::NONE,
+      char_class::SEPR, char_class::SPLICE, char_class::INSERT, char_class::NONE,
       // $   %   &   '
-      char_class::NONE, char_class::NONE, char_class::BRK, char_class::/*INSERT*/NONE,
+      char_class::NONE, char_class::NONE, char_class::BRK, char_class::INSERT,
       // (   )   *   +
       char_class::BRK, char_class::BRK, char_class::NONE, char_class::NONE,
       // ,   -   .   /

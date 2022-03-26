@@ -110,4 +110,27 @@ TEST_CASE("io Read lisp objects")
   }
 }
 
+TEST_CASE("io: Read tables")
+{
+  lisp l;
+  current c(l);
+
+  CHECK(isascii(0));
+  CHECK(isascii(127));
+  CHECK(!isascii(128));
+
+  CHECK(issepr(l, ' '));
+  CHECK(issepr(' '));
+  CHECK(isbrk(l, '('));
+  CHECK(isbrk('('));
+  CHECK(isctrl(l, '\b'));
+  CHECK(isctrl('\a'));
+  CHECK(isinsert(l, '"'));
+  CHECK(isinsert('"'));
+  CHECK(issplice(l, '!'));
+  CHECK(issplice('!'));
+  CHECK(!isinfix(l, '$'));
+  CHECK(!isinfix('$'));
+}
+
 }
