@@ -83,10 +83,11 @@ LISPT difference(lisp& l, LISPT x, LISPT y)
   check(x, type::INTEGER, type::FLOAT);
   check(y, type::INTEGER, type::FLOAT);
   if(type_of(x) == type::INTEGER)
+  {
     if(type_of(y) == type::INTEGER)
       return mknumber(l, x->intval() - y->intval());
-    else
-      return mkfloat(l, static_cast<double>(x->intval()) - y->floatval());
+    return mkfloat(l, static_cast<double>(x->intval()) - y->floatval());
+  }
   else if(type_of(y) == type::INTEGER)
     return mkfloat(l, x->floatval() - static_cast<double>(y->intval()));
   return mkfloat(l, x->floatval() - y->floatval());
@@ -305,7 +306,7 @@ inline LISPT docheck(Type x, Type y, Comparor cmp)
   return NIL;
 }
 
-inline void illegalreturn(lisp& l, LISPT x) { l.error(ILLEGAL_ARG, x); }
+inline LISPT illegalreturn(lisp& l, LISPT x) { return l.error(ILLEGAL_ARG, x); }
 
 template<template<typename> typename Comparer>
 inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
@@ -315,19 +316,16 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
     case num_type::FLOATFLOAT:
       return docheck(x->floatval(), y->floatval(), Comparer<double>());
     case num_type::FLOATINT:
-      return docheck(x->floatval(), (double)y->intval(), Comparer<double>());
+      return docheck(x->floatval(), static_cast<double>(y->intval()), Comparer<double>());
     case num_type::INTFLOAT:
-      return docheck((double)x->intval(), y->floatval(), Comparer<double>());
+      return docheck(static_cast<double>(x->intval()), y->floatval(), Comparer<double>());
     case num_type::INTINT:
       return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
-      illegalreturn(l, x);
-      break;
+      return illegalreturn(l, x);
     case num_type::ILLEGAL2:
-      illegalreturn(l, y);
-      break;
+      return illegalreturn(l, y);
   }
-  throw lisp_error("never happens");
 }
 
 LISPT greaterp(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
@@ -355,15 +353,13 @@ LISPT minusp(lisp& l, LISPT x)
   {
     if(x->floatval() < 0.0)
       return T;
-    else
-      return NIL;
+    return NIL;
   }
   else if(type_of(x) == type::INTEGER)
   {
     if(x->intval() < 0)
       return T;
-    else
-      return NIL;
+    return NIL;
   }
   return l.error(ILLEGAL_ARG, x);
 }
