@@ -53,26 +53,14 @@ TEST_CASE("Logic functions")
     CHECK(p_not(NIL) == T);
   }
 
-  SECTION("if")
+  SECTION("logic: if")
   {
-    auto s0 = mkstring("true");
-    auto s1 = mkstring("false");
-    auto r0 = xif(T, s0, s1);
-    REQUIRE(type_of(r0) == type::STRING);
-    CHECK(r0->stringval() == "true");
-
-    // Last argument is treated as a progn
-    auto r1 = xif(NIL, s0, cons(s1, NIL));
-    REQUIRE(type_of(r1) == type::STRING);
-    CHECK(r1->stringval() == "false");
-
-    // Check that we only evaluate the branch taken
-    auto e0 = eval(R"(
-(progn (setq a "a")
-       (if t nil (setq a "b"))
-       a))");
-    REQUIRE(type_of(e0) == type::STRING);
-    CHECK(e0->stringval() == "a");
+    auto r0 = "(if t 0 1)"_e;
+    REQUIRE(type_of(r0) == type::INTEGER);
+    CHECK(r0->intval() == 0);
+    r0 = "(if nil 0 1)"_e;
+    REQUIRE(type_of(r0) == type::INTEGER);
+    CHECK(r0->intval() == 1);
   }
 }
 
