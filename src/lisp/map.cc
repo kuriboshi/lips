@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #include "map.hh"
 #include "alloc.hh"
@@ -11,6 +10,14 @@
 
 namespace lisp::Map
 {
+/// @brief Apply function FN1 on each tail of OBJ.
+///
+/// @param l The lisp interpreter.
+/// @param obj A list of items.
+/// @param fn1 The function to apply on each tail of obj.
+/// @param fn2 Function to apply to get the next element of the list (default is CDR).
+///
+/// @returns NIL
 LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
@@ -19,11 +26,19 @@ LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(l, fn2, obj);
+      obj = apply(l, fn2, cons(l, obj, NIL));
   }
   return NIL;
 }
 
+/// @brief Apply function on each CAR of a list.
+///
+/// @param l The lisp interpreter.
+/// @param obj A list of items. If not a list the function is a no-op.
+/// @param fn1 The function to apply on each CAR of the list.
+/// @param fn2 Function to apply to get the next element (default is CDR).
+///
+/// @returns NIL
 LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
@@ -32,11 +47,19 @@ LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(l, fn2, cons(l, obj, NIL));
   }
   return NIL;
 }
 
+/// @brief Apply FN1 on each consecutive tail of OBJ.
+///
+/// @param l The lisp interpreter.
+/// @param obj A list of items.
+/// @param fn1 The function to apply on each tail of the list.
+/// @param fn2 Function to apply to get the next element (default is CDR).
+///
+/// @returns A list of the result of applying FN1 on each element in the list.
 LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
@@ -58,6 +81,14 @@ LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
   return rval;
 }
 
+/// @brief Apply FN1 on each element of OBJ.
+///
+/// @param l The lisp interpreter.
+/// @param obj A list of items.
+/// @param fn1 The function to apply on each element of the list.
+/// @param fn2 Function to apply to get the next element (default is CDR).
+///
+/// @returns A list of the result of applying FN1 on each element in the list.
 LISPT mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
@@ -74,7 +105,7 @@ LISPT mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(l, fn2, cons(l, obj, NIL));
   }
   return rval;
 }
