@@ -13,6 +13,27 @@ TEST_CASE("Primary functions")
   lisp l;
   current c(l);
 
+  SECTION("QUOTE")
+  {
+    auto a0 = quote(l, "a"_a);
+    CHECK(a0 == "a"_a);
+    auto a1 = quote("a"_a);
+    CHECK(a1 == "a"_a);
+  }
+
+  SECTION("LAMBDA")
+  {
+    set(l, "a"_a, 1_l);
+    auto f0 = lambda(l, mklist("a"_a), cons(mklist("+"_a, "a"_a, 1_l), NIL));
+    auto r0 = apply(l, f0, mklist(2_l));
+    CHECK(type_of(r0) == type::INTEGER);
+    CHECK(type_of(3_l) == type::INTEGER);
+    // TODO: Can't do this because Catch2 goes into an infinite loop when
+    // converting a LISPT to a string.
+    // CHECK(r0 == 3_l);
+    CHECK(r0->intval() == 3_l->intval());
+  }
+
   SECTION("CAR and CDR")
   {
     auto sample = eval(l, "(cons 1 2)");
