@@ -44,6 +44,7 @@ public:
   void unwind();
   int trace() const { return _trace; }
   void trace(int t) { _trace = t; }
+  void interactive(bool b) { _interactive = b; }
 
   destblock_t* dest = nullptr; // Current destination being built.
 
@@ -126,6 +127,7 @@ private:
   continuation_t cont = nullptr; // Current continuation.
   destblock_t* env = nullptr;    // Current environment.
   int _trace = 0;
+  bool _interactive = false;
 };
 
 inline void breakhook(lisp& l, evaluator::breakhook_t fun) { l.e().breakhook(fun); }

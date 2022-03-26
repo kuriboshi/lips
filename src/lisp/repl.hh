@@ -21,6 +21,7 @@ public:
   {
     _prompt = "> "_s;
     _break_prompt = ": "_s;
+    lisp.e().interactive(true);
   }
   ~repl() = default;
 

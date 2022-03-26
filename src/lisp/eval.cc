@@ -730,7 +730,8 @@ bool evaluator::ev2()
   {}
   catch(const lisp_error& ex)
   {
-    // fprintf(primerr, "%s ", ex.what());
+    if(!_interactive)
+      throw;
     auto foo = printwhere();
     if(is_NIL(foo))
       xbreak(0, NIL, &evaluator::peval1);
