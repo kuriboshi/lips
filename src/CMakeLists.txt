@@ -61,6 +61,6 @@ target_sources(
 target_link_libraries(lisp PUBLIC liblisp Catch2::Catch2)
 
 add_subdirectory(lips)
-if(LIPS_ENABLE_TEST)
+if(LIPS_ENABLE_TESTS)
   add_subdirectory(test)
 endif()

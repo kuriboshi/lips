@@ -12,7 +12,7 @@ endif()
 
 option(LIPS_ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
 option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
-option(LIPS_ENABLE_TEST "Enable compiling test code" ON)
+option(LIPS_ENABLE_TESTS "Enable compiling test code" ON)
 option(LIPS_ENABLE_OBJECT_SIZES "Enable printing object sizes with" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
