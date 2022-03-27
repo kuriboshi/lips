@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 2020-2021 Krister Joas
+// Copyright 2020-2022 Krister Joas
 //
 
 #define CATCH_CONFIG_RUNNER
