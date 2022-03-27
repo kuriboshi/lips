@@ -7,7 +7,7 @@
 #include <catch2/catch.hpp>
 #include <string>
 #include <sstream>
-#include "reader.hh"
+#include <lisp/reader.hh>
 
 using namespace std::literals;
 

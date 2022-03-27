@@ -60,29 +60,29 @@ target_sources(
   PRIVATE lisp/main.hh)
 target_link_libraries(lisp PUBLIC liblisp Catch2::Catch2)
 
-add_executable(lisp_test lisp/lisp_test.cc)
+add_executable(lisp_test test/lisp_test.cc)
 target_sources(
   lisp_test
-  PRIVATE lisp/alloc.test.cc
-          lisp/arith.test.cc
-          lisp/debug.test.cc
-          lisp/eval.test.cc
-          lisp/file.test.cc
-          lisp/io.test.cc
-          lisp/lisp.test.cc
-          lisp/logic.test.cc
-          lisp/low.test.cc
-          lisp/map.test.cc
-          lisp/main.test.cc
-          lisp/parser.test.cc
-          lisp/pred.test.cc
-          lisp/prim.test.cc
-          lisp/prop.test.cc
-          lisp/reader.test.cc
-          lisp/repl.test.cc
-          lisp/string.test.cc
-          lisp/symbol.test.cc
-          lisp/user.test.cc)
+  PRIVATE test/alloc.test.cc
+          test/arith.test.cc
+          test/debug.test.cc
+          test/eval.test.cc
+          test/file.test.cc
+          test/io.test.cc
+          test/lisp.test.cc
+          test/logic.test.cc
+          test/low.test.cc
+          test/map.test.cc
+          test/main.test.cc
+          test/parser.test.cc
+          test/pred.test.cc
+          test/prim.test.cc
+          test/prop.test.cc
+          test/reader.test.cc
+          test/repl.test.cc
+          test/string.test.cc
+          test/symbol.test.cc
+          test/user.test.cc)
 target_link_libraries(lisp_test PUBLIC liblisp Catch2::Catch2)
 add_test(NAME lisp_test COMMAND lisp_test)
 

@@ -7,10 +7,10 @@
 #include <iostream>
 #include <catch2/catch.hpp>
 
-#include "alloc.hh"
-#include "lisp.hh"
-#include "io.hh"
-#include "symbol.hh"
+#include <lisp/alloc.hh>
+#include <lisp/lisp.hh>
+#include <lisp/io.hh>
+#include <lisp/symbol.hh>
 
 namespace lisp::symbol
 {

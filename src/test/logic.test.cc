@@ -3,9 +3,9 @@
 // Copyright 2021-2022 Krister Joas
 //
 #include <catch2/catch.hpp>
-#include "libisp.hh"
 
 #include <iostream>
+#include <lisp/libisp.hh>
 
 template<typename Enumeration>
 typename std::underlying_type<Enumeration>::type as_integer(Enumeration const value)

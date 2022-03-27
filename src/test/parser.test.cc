@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include <catch2/catch.hpp>
-#include "parser.hh"
+#include <lisp/parser.hh>
 
 namespace
 {

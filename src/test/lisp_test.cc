@@ -6,7 +6,7 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
-#include "libisp.hh"
+#include <lisp/libisp.hh>
 
 int main(int argc, const char** argv)
 {

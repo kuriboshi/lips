@@ -6,7 +6,7 @@
 #include <catch2/catch.hpp>
 #include <sstream>
 #include <string>
-#include "main.hh"
+#include <lisp/main.hh>
 
 namespace lisp
 {
