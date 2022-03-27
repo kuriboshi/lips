@@ -77,7 +77,7 @@ LISPT readline(lisp& l, file_t& file)
       return cons(l, head, NIL);
     return head;
   }
-  return NIL;
+  return C_EOF;
 }
 
 LISPT getline(lisp& l, LISPT file)
