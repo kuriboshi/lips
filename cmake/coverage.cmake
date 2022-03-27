@@ -16,11 +16,11 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
   set(CMAKE_CXX_FLAGS
     "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 
-  set(TARGET_NAME main)
+  set(TARGET_NAME lisp_test)
   add_custom_target(
     ccov-preprocessing
     COMMAND LLVM_PROFILE_FILE=${TARGET_NAME}.profraw
-            $<TARGET_FILE:${TARGET_NAME}> --test
+            $<TARGET_FILE:${TARGET_NAME}>
     COMMAND ${LLVM_PROFDATA} merge -sparse ${TARGET_NAME}.profraw
             -o ${TARGET_NAME}.profdata
     DEPENDS ${TARGET_NAME})

@@ -20,7 +20,7 @@ target_sources(
           os.hh
           term.hh
           top.hh)
-target_link_libraries(lips PRIVATE lisp)
+target_link_libraries(lips PRIVATE liblisp)
 target_link_libraries(lips PRIVATE Catch2::Catch2)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
                                             VERSION_LESS 9.0)

@@ -1,10 +1,10 @@
 #
 # Copyright 2020-2022 Krister Joas
 #
-add_library(lisp)
-add_library(lips::lisp ALIAS lisp)
+add_library(liblisp)
+add_library(lips::lisp ALIAS liblisp)
 target_sources(
-  lisp
+  liblisp
   PRIVATE lisp/alloc.cc
           lisp/arith.cc
           lisp/eval.cc
@@ -24,7 +24,7 @@ target_sources(
           lisp/user.cc
           lisp/version.cc)
 target_sources(
-  lisp
+  liblisp
   PRIVATE lisp/alloc.hh
           lisp/arith.hh
           lisp/error.hh
@@ -50,13 +50,19 @@ target_sources(
           lisp/user.hh
           lisp/version.hh)
 target_include_directories(
-  lisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-              $<INSTALL_INTERFACE:include/lisp>)
-target_link_libraries(lisp PUBLIC fmt::fmt)
+  liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                 $<INSTALL_INTERFACE:include/lisp>)
+target_link_libraries(liblisp PUBLIC fmt::fmt)
 
-add_executable(main lisp/main.cc)
+add_executable(lisp lisp/main.cc)
 target_sources(
-  main
+  lisp
+  PRIVATE lisp/main.hh)
+target_link_libraries(lisp PUBLIC liblisp Catch2::Catch2)
+
+add_executable(lisp_test lisp/lisp_test.cc)
+target_sources(
+  lisp_test
   PRIVATE lisp/alloc.test.cc
           lisp/arith.test.cc
           lisp/debug.test.cc
@@ -76,9 +82,8 @@ target_sources(
           lisp/repl.test.cc
           lisp/string.test.cc
           lisp/symbol.test.cc
-          lisp/user.test.cc
-          lisp/main.hh)
-target_link_libraries(main PUBLIC lisp Catch2::Catch2)
-add_test(NAME lisp_test COMMAND main --test)
+          lisp/user.test.cc)
+target_link_libraries(lisp_test PUBLIC liblisp Catch2::Catch2)
+add_test(NAME lisp_test COMMAND lisp_test)
 
 add_subdirectory(lips)

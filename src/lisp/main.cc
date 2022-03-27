@@ -3,9 +3,6 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
-
 #include <vector>
 #include <string>
 #include "libisp.hh"
@@ -15,19 +12,7 @@
 
 int main(int argc, const char** argv)
 {
-  bool test = false;
-  Catch::Session session;
-  using namespace Catch::clara;
-  auto cli = session.cli() | Opt(test) ["--test"]("Turn on test");
-  session.cli( cli ); 
-  session.applyCommandLine(argc, argv);
-
   lisp::lisp lisp;
-  if(test)
-  {
-    auto result = session.run();
-    return result;
-  }
   std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
   {
