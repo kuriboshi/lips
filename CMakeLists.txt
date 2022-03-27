@@ -10,13 +10,14 @@ if(POLICY CMP0114)
   cmake_policy(SET CMP0114 NEW)
 endif()
 
-option(ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
-option(ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
-option(ENABLE_OBJECT_SIZES "Enable printing object sizes with --test" OFF)
+option(LIPS_ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
+option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
+option(LIPS_ENABLE_TEST "Enable compiling test code" ON)
+option(LIPS_ENABLE_OBJECT_SIZES "Enable printing object sizes with" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-if(ENABLE_CODE_COVERAGE AND NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
+if(LIPS_ENABLE_CODE_COVERAGE AND NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
   include(coverage)
 endif()
 
@@ -32,12 +33,12 @@ find_package(Catch2 REQUIRED)
 
 add_subdirectory(src)
 
-if(ENABLE_TRACE)
+if(LIPS_ENABLE_TRACE)
   # Enable ability to trace calls to peval.
   target_compile_definitions(lisp PRIVATE TRACE)
 endif()
 
-if(ENABLE_OBJECT_SIZES)
+if(LIPS_ENABLE_OBJECT_SIZES)
   target_compile_definitions(main PRIVATE ENABLE_OBJECT_SIZES)
 endif()
 
