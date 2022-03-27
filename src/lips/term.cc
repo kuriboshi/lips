@@ -661,6 +661,7 @@ std::optional<std::string> term_source::getline()
           linebuffer[linepos++] = '\n';
           pputc('\n', stdout);
           end_term();
+          linebuffer[linepos++] = '\0';
           return linebuffer;
         }
         else
@@ -678,6 +679,7 @@ std::optional<std::string> term_source::getline()
         if(parcount <= 0 && !instring)
         {
           end_term();
+          linebuffer[linepos++] = '\0';
           return linebuffer;
         }
         break;

@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
@@ -12,7 +11,6 @@
 #include <pwd.h>
 #include <unistd.h>
 
-#include <csetjmp>
 #include <csignal>
 #include <cstdlib>
 #include <cerrno>
@@ -26,92 +24,22 @@
 #include "top.hh"
 #include "term.hh"
 
-std::jmp_buf jumper;
-int mypgrp;     /* lips process group. */
-char* progname; /* Name of the game. */
+using namespace lisp;
 
-static void fixpgrp()
+namespace
 {
-  mypgrp = getpgrp();
-  tcsetpgrp(0, mypgrp);
-}
-
-static int getuser(int def)
-{
-  fd_set readfs;
-  struct timeval timeout;
-
-  timeout.tv_sec = 10;
-  timeout.tv_usec = 0;
-  FD_ZERO(&readfs);
-  FD_SET(0, &readfs);
-  switch(select(FD_SETSIZE, &readfs, nullptr, nullptr, &timeout))
-  {
-    case -1:
-      primerr().format("(error in select {}) ", errno);
-      return 'n';
-      break;
-    case 0:
-      return def;
-      break;
-    default:
-      return primin().getch();
-      break;
-  }
-  return def;
-}
-
-/*
- * This routine handles signals that produces core dumps.
- * It gives the user an option to continue or to halt and
- * dump a core. If continued there is no garantee anything will
- * work correctly.
- */
-void core(int sig)
-{
-  // init_term();
-  if(insidefork)
-  {
-    primerr().format(" -- (in fork) core dumped\n");
-    killpg(getpgrp(), sig);
-  }
-  primerr().format(" -- Continue? ");
-  primerr().flush();
-  int c = getuser('y');
-  while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
-  if((islower(c) ? c : tolower(c)) == 'n')
-  {
-    primerr().format("No\n");
-    primerr().format("Core dump? ");
-    primerr().flush();
-    c = getuser('y');
-    while('y' != (islower(c) ? c : tolower(c)) && 'n' != (islower(c) ? c : tolower(c))) c = getuser('y');
-    if((islower(c) ? c : tolower(c)) == 'n')
-    {
-      primerr().format("No\n");
-      throw lisp::lisp_finish("core", 0);
-    }
-    else
-    {
-      signal(sig, SIG_DFL);
-      std::cout << "Yes\n";
-      term_source::end_term();
-      killpg(mypgrp, sig);
-    }
-  }
-  else
-  {
-    primerr().format("Yes\n");
-    primerr().format("Warning: continued after signal {}.\n", sig);
-    primerr().format("Save your work and exit.\n");
-    term_source::end_term();
-    throw lisp::lisp_error("continue after signal");
-  }
-}
+volatile sig_atomic_t signal_flag;
+int mypgrp;     // lips process group
 
 void onsignal(int sig)
 {
-  std::longjmp(jumper, sig);
+  signal_flag = sig;
+}
+
+void fixpgrp()
+{
+  mypgrp = getpgrp();
+  tcsetpgrp(0, mypgrp);
 }
 
 void init_all_signals()
@@ -119,88 +47,9 @@ void init_all_signals()
   signal(SIGINT, onsignal);
   signal(SIGHUP, SIG_DFL);
   signal(SIGTSTP, onsignal);
-  signal(SIGQUIT, onsignal);
-  signal(SIGILL, onsignal);
-#ifdef SIGEMT
-  signal(SIGEMT, onsignal);
-#endif
-  signal(SIGBUS, onsignal);
-  //signal(SIGSEGV, onsignal);
-  int sig = setjmp(jumper);
-  if(sig == 0)
-    return;
-  switch(sig)
-  {
-    case SIGINT:
-      if(insidefork)
-        exit(0);
-      throw lisp::lisp_reset();
-    case SIGHUP:
-      exit(0);
-    case SIGQUIT:
-      primerr().format("{}: Quit", progname);
-      break;
-    case SIGILL:
-#ifdef SIGEMT
-    case SIGEMT:
-#endif
-      primerr().format("{}: Illegal instruction", progname);
-      break;
-    case SIGBUS:
-      primerr().format("{}: Bus error", progname);
-      break;
-    case SIGSEGV:
-      primerr().format("{}: Segmentation fault", progname);
-      break;
-    case SIGTSTP:
-      primerr().format("{}: Stop", progname);
-      lisp::break_flag(true);
-      return;
-    default:
-      break;
-  }
-  core(sig);
 }
 
-using namespace lisp;
-
-LISPT C_ALIAS;
-LISPT C_AMPER;
-LISPT C_BACK;
-LISPT C_BAR;
-LISPT C_EXCL;
-LISPT C_EXEC;
-LISPT C_GGT;
-LISPT C_GT;
-LISPT C_LT;
-LISPT C_OLDVAL;
-LISPT C_PIPE;
-LISPT C_PROGN;
-LISPT C_REDIR_APPEND;
-LISPT C_REDIR_FROM;
-LISPT C_REDIR_TO;
-LISPT C_SEMI;
-
-std::unique_ptr<environment> env;
-
-void onbreak()
-{
-  if(insidefork)
-    exit(1);
-}
-
-void promptfun()
-{
-  tcsetpgrp(0, mypgrp); /* Get control of tty */
-  insidefork = false;
-  /*
-   * Check for jobs that are finished and print them.
-   */
-  checkfork();
-  printdone();
-}
-
-static LISPT put_end(LISPT list, LISPT obj, bool conc)
+LISPT put_end(LISPT list, LISPT obj, bool conc)
 {
   if(is_NIL(list))
   {
@@ -218,7 +67,7 @@ static LISPT put_end(LISPT list, LISPT obj, bool conc)
   return list;
 }
 
-static LISPT transform(LISPT list)
+LISPT transform(LISPT list)
 {
   LISPT tl = NIL;
   LISPT res = NIL;
@@ -291,10 +140,27 @@ static LISPT transform(LISPT list)
   return res;
 }
 
-inline std::unique_ptr<::lisp::lisp> init()
+void promptfun()
+{
+  tcsetpgrp(0, mypgrp); // Get control of tty
+  insidefork = false;
+  //
+  // Check for jobs that are finished and print them.
+  //
+  checkfork();
+  printdone();
+}
+
+void onbreak()
+{
+  if(insidefork)
+    exit(1);
+}
+
+std::unique_ptr<::lisp::lisp> init()
 {
   signal(SIGTTIN, SIG_IGN);
-  signal(SIGTTOU, SIG_IGN); /* otherwise can't get ctrl tty back */
+  signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back
 
   fixpgrp();
 
@@ -330,18 +196,18 @@ inline std::unique_ptr<::lisp::lisp> init()
   return l;
 }
 
-/*
- * Loads the file INITFILE.
- */
-static void loadinit(const char* initfile)
+//
+// Loads the file INITFILE.
+//
+void loadinit(const char* initfile)
 {
   loadfile(initfile);
 }
 
-/*
- * Greet user who, or if who is nil, $USER. This means loading
- * the user's init file, .lipsrc.
- */
+//
+// Greet user who, or if who is nil, $USER. This means loading
+// the user's init file, .lipsrc.
+//
 LISPT greet(LISPT who)
 {
   const char* s;
@@ -360,11 +226,32 @@ LISPT greet(LISPT who)
   loadfile(loadf);
   return T;
 }
+}
+
+LISPT C_ALIAS;
+LISPT C_AMPER;
+LISPT C_BACK;
+LISPT C_BAR;
+LISPT C_EXCL;
+LISPT C_EXEC;
+LISPT C_GGT;
+LISPT C_GT;
+LISPT C_LT;
+LISPT C_OLDVAL;
+LISPT C_PIPE;
+LISPT C_PROGN;
+LISPT C_REDIR_APPEND;
+LISPT C_REDIR_FROM;
+LISPT C_REDIR_TO;
+LISPT C_SEMI;
+
+std::unique_ptr<environment> env;
 
 int main(int argc, char* const* argv)
 {
   Catch::Session session;
 
+  signal_flag = 0;
   int option;
   options_t options;
   while((option = getopt(argc, argv, "c:fvidT")) != EOF)
@@ -401,11 +288,10 @@ int main(int argc, char* const* argv)
     options.interactive = isatty(0);
   if(options.version)
     std::cout << VERSION << '\n';
-  progname = argv[0];
 
-  /*
-   * Init shell and lisp interpreter.
-   */
+  //
+  // Init shell and lisp interpreter.
+  //
   auto lisp = init();
   if(options.test)
   {
@@ -420,7 +306,9 @@ int main(int argc, char* const* argv)
       greet(NIL);
     }
     catch(const lisp_error& error)
-    {}
+    {
+      std::cout << "Error loading rc file: " << error.what() << '\n';
+    }
   }
   file_t terminal(std::make_unique<term_source>(options));
   top toploop(*lisp, options, terminal);
@@ -442,11 +330,11 @@ int main(int argc, char* const* argv)
     catch(const lisp_error& error)
     {
       static_cast<term_source&>(terminal.source()).clearlbuf();
-      std::cout << "error: " << error.what() << '\n';
+      std::cerr << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)
     {
-      lisp->primerr().format("finish: {}", fin.what());
+      lisp->primerr().format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

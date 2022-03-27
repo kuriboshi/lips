@@ -183,9 +183,6 @@ LISPT top::operator()(LISPT exp)
       else
         promptprint(variables->topprompt);
     }
-    auto line = file.getline();
-    if(!line)
-      return NIL;
     input_exp = readline(file);
     if(type_of(input_exp) == type::ENDOFFILE)
       return NIL;
