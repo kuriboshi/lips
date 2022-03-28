@@ -18,7 +18,7 @@ TEST_CASE("String functions")
     auto s = mkstring("hello");
     auto r0 = stringp(s);
     CHECK(r0 != NIL);
-    CHECK(r0->stringval() == s->stringval());
+    CHECK(r0->string() == s->string());
     auto i = mknumber(100);
     auto r1 = stringp(l, i);
     CHECK(r1 == NIL);
@@ -38,9 +38,9 @@ TEST_CASE("String functions")
     auto s0 = mkstring("hello ");
     auto s1 = mkstring("world");
     auto s2 = concat(cons(s0, cons(s1, NIL)));
-    CHECK(s2->stringval() == mkstring("hello world")->stringval());
+    CHECK(s2->string() == mkstring("hello world")->string());
     auto s3 = concat(l, cons(s0, cons(s1, NIL)));
-    CHECK(s3->stringval() == mkstring("hello world")->stringval());
+    CHECK(s3->string() == mkstring("hello world")->string());
   }
   SECTION("strlen")
   {
@@ -55,10 +55,10 @@ TEST_CASE("String functions")
     auto s0 = mkstring("hello world");
     auto s1 = substr(s0, mknumber(0), mknumber(5));
     REQUIRE(s1 != NIL);
-    CHECK(s1->stringval() == "hello");
+    CHECK(s1->string() == "hello");
     auto s2 = substr(s0, mknumber(6), mknumber(10));
     REQUIRE(s2 != NIL);
-    CHECK(s2->stringval() == "world");
+    CHECK(s2->string() == "world");
     auto s3 = substr(s0, mknumber(-1), mknumber(5));
     CHECK(s3 == NIL);
     auto s4 = substr(s0, mknumber(0), mknumber(15));
@@ -71,10 +71,10 @@ TEST_CASE("String functions")
     auto p0 = intern("symbol");
     auto r0 = symstr(p0);
     CHECK(type_of(r0) == type::STRING);
-    CHECK(r0->stringval() == p0->getstr());
+    CHECK(r0->string() == p0->getstr());
     auto r1 = symstr(l, p0);
     CHECK(type_of(r1) == type::STRING);
-    CHECK(r1->stringval() == p0->getstr());
+    CHECK(r1->string() == p0->getstr());
   }
   SECTION("strcmp")
   {

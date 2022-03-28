@@ -44,8 +44,8 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
 LISPT close(lisp& l, LISPT fildes)
 {
   check(fildes, type::FILET);
-  fildes->fileval().flush();
-  if(fildes->fileval().close())
+  fildes->file().flush();
+  if(fildes->file().close())
     return T;
   return NIL;
 }
@@ -57,7 +57,7 @@ LISPT ratom(lisp& l, LISPT file)
   if(is_T(file))
     return io::ratom(l, l.stdin());
   check(file, type::FILET);
-  return io::ratom(l, file->fileval());
+  return io::ratom(l, file->file());
 }
 
 LISPT readc(lisp& l, LISPT file)
@@ -67,7 +67,7 @@ LISPT readc(lisp& l, LISPT file)
   if(is_T(file))
     return l.a().mknumber(l.stdin().getch());
   check(file, type::FILET);
-  return l.a().mknumber(file->fileval().getch());
+  return l.a().mknumber(file->file().getch());
 }
 
 LISPT read(lisp& l, LISPT file)
@@ -77,7 +77,7 @@ LISPT read(lisp& l, LISPT file)
   if(is_T(file))
     return lispread(l, l.stdin());
   check(file, type::FILET);
-  return lispread(l, file->fileval());
+  return lispread(l, file->file());
 }
 
 LISPT print(lisp& l, LISPT x, LISPT file)
@@ -87,7 +87,7 @@ LISPT print(lisp& l, LISPT x, LISPT file)
   if(is_T(file))
     return io::print(l, x, l.primerr());
   check(file, type::FILET);
-  return io::print(l, x, file->fileval());
+  return io::print(l, x, file->file());
 }
 
 bool loadfile(lisp& l, const std::string& lf)
@@ -121,7 +121,7 @@ LISPT terpri(lisp& l, LISPT file)
   if(is_T(file))
     return io::terpri(l, l.primerr());
   check(file, type::FILET);
-  return io::terpri(l, file->fileval());
+  return io::terpri(l, file->file());
 }
 
 LISPT prin1(lisp& l, LISPT x, LISPT file)
@@ -132,7 +132,7 @@ LISPT prin1(lisp& l, LISPT x, LISPT file)
   if(is_T(file))
     return prin0(l, x, l.primerr(), false);
   check(file, type::FILET);
-  return prin0(l, x, file->fileval(), false);
+  return prin0(l, x, file->file(), false);
 }
 
 LISPT prin2(lisp& l, LISPT x, LISPT file)
@@ -143,7 +143,7 @@ LISPT prin2(lisp& l, LISPT x, LISPT file)
   if(is_T(file))
     return prin0(l, x, l.primerr(), true);
   check(file, type::FILET);
-  return prin0(l, x, file->fileval(), true);
+  return prin0(l, x, file->file(), true);
 }
 
 LISPT plevel(lisp& l, LISPT newl)
@@ -170,7 +170,7 @@ LISPT spaces(lisp& l, LISPT n, LISPT file)
   else
   {
     check(file, type::FILET);
-    f = &file->fileval();
+    f = &file->file();
   }
   for(i = n->intval(); i > 0; i--) f->putch(' ');
   return NIL;
@@ -183,7 +183,7 @@ LISPT readline(lisp& l, LISPT file)
   else if(is_T(file))
     return io::readline(l, l.stdin());
   check(file, type::FILET);
-  return io::readline(l, file->fileval());
+  return io::readline(l, file->file());
 }
 
 namespace pn

@@ -95,8 +95,8 @@ public:
   {
     auto t = mkatom(name);
     t->symbol().value = LISPT(new lisp_t);
-    t->symvalue()->set(cvariable(val));
-    return t->symvalue()->cvarval();
+    t->value()->set(cvariable(val));
+    return t->value()->cvarval();
   }
 
   /// @brief Create a symbol in the global symbol table, accessable from all
@@ -121,7 +121,7 @@ public:
     auto s = LISPT(new lisp_t);
     s->set(subr_index{subr_t::put(subr)});
     LISPT f = intern(subr.name);
-    f->symvalue(s);
+    f->value(s);
   }
 
   LISPT mkatom(const std::string&);

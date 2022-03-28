@@ -14,16 +14,16 @@ LISPT set(lisp& l, LISPT var, LISPT val)
   check(var, type::SYMBOL);
   if(var->symbol().constant)
     return l.error(ATTEMPT_TO_CLOBBER, var);
-  if(type_of(var->symvalue()) == type::INDIRECT)
-    var->symvalue()->set(indirect_t{val});
-  else if(type_of(var->symvalue()) == type::CVARIABLE)
+  if(type_of(var->value()) == type::INDIRECT)
+    var->value()->set(indirect_t{val});
+  else if(type_of(var->value()) == type::CVARIABLE)
   {
-    auto symval = var->symvalue();
+    auto symval = var->value();
     auto& cvar = symval->cvarval();
     cvar = val;
   }
   else
-    var->symvalue(val);
+    var->value(val);
   return val;
 }
 

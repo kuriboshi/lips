@@ -189,7 +189,7 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
   REQUIRE(type_of(res) == type::CONS);
   CHECK(car(res) == "greaterp"_a);
   CHECK(cadr(res)->floatval() == 1.0);
-  CHECK(caddr(res)->stringval() == "b");
+  CHECK(caddr(res)->string() == "b");
 }
 
 }

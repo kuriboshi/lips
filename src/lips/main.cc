@@ -214,7 +214,7 @@ LISPT greet(LISPT who)
   if(is_NIL(who))
     s = getenv("USER");
   else
-    s = who->stringval().c_str();
+    s = who->string().c_str();
   if(s == nullptr)
     return NIL;
   struct passwd* pws = getpwnam(s);

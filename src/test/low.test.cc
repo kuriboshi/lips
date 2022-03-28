@@ -40,9 +40,9 @@ TEST_CASE("Low level functions")
   {
     auto a = mkatom("a");
     setq(l, a, mknumber(100));
-    CHECK(a->symvalue()->intval() == 100);
+    CHECK(a->value()->intval() == 100);
     setq(a, mknumber(200));
-    CHECK(a->symvalue()->intval() == 200);
+    CHECK(a->value()->intval() == 200);
   }
 
   SECTION("low: while")
@@ -53,7 +53,7 @@ TEST_CASE("Low level functions")
       mklist(
         mklist("setq"_a, "a"_a, mklist("+"_a, "a"_a, "i"_a)),
         mklist("setq"_a, "i"_a, mklist("-"_a, "i"_a, 1_l))));
-    CHECK("a"_a->symvalue()->intval() == 6);
+    CHECK("a"_a->value()->intval() == 6);
     set("i"_a, 3_l);
     xwhile(l, mklist(l, "greaterp"_a, "i"_a, 0_l),
       mklist(l, 

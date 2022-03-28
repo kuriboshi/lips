@@ -83,7 +83,7 @@ LISPT readline(lisp& l, file_t& file)
 LISPT getline(lisp& l, LISPT file)
 {
   check(file, type::FILET);
-  auto line = file->fileval().getline();
+  auto line = file->file().getline();
   if(line)
     return mkstring(l, *line);
   return NIL;
@@ -201,11 +201,11 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       if(esc)
       {
         file.putch('"');
-        ps(x->stringval(), file, esc);
+        ps(x->string(), file, esc);
         file.putch('"');
       }
       else
-        ps(x->stringval(), file, false);
+        ps(x->string(), file, false);
       break;
     case type::CLOSURE:
       pp("#<closure", file, x);

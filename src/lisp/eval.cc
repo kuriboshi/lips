@@ -346,7 +346,7 @@ void evaluator::do_unbound(continuation_t continuation)
     file::load(l, al);
     dest = pop_point();
     expression = pop_lisp();
-    fun = expression->car()->symvalue();
+    fun = expression->car()->value();
     if(type_of(fun) == type::UNBOUND)
     {
       if(!evalhook(expression))
@@ -362,7 +362,7 @@ void evaluator::do_unbound(continuation_t continuation)
     expression = findalias(expression);
 #endif
     if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
-      && type_of(expression->car()->symvalue()) == type::UNBOUND)
+      && type_of(expression->car()->value()) == type::UNBOUND)
     {
       if(!evalhook(expression))
         xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -383,7 +383,7 @@ bool evaluator::do_default(continuation_t continuation)
   expression = findalias(expression);
 #endif
   if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
-    && type_of(expression->car()->symvalue()) == type::UNBOUND)
+    && type_of(expression->car()->value()) == type::UNBOUND)
   {
     if(!evalhook(expression))
       xbreak(UNDEF_FUNCTION, expression->car(), continuation);
@@ -439,7 +439,7 @@ bool evaluator::peval1()
         cont = &evaluator::peval;
         break;
       case type::SYMBOL:
-        fun = fun->symvalue();
+        fun = fun->value();
         cont = &evaluator::peval1;
         break;
       case type::UNBOUND:
@@ -491,7 +491,7 @@ bool evaluator::peval2()
         cont = &evaluator::peval;
         break;
       case type::SYMBOL:
-        fun = fun->symvalue();
+        fun = fun->value();
         cont = &evaluator::peval2;
         break;
       case type::UNBOUND:
@@ -667,14 +667,14 @@ bool evaluator::evlam()
   push_point(dest);
   int ac = 0;
   auto spr = false;
-  if((ac = fun->lamval().argcnt) < 0)
+  if((ac = fun->lambda().count) < 0)
   {
     ac = -ac;
     spr = true;
   }
   dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = fun->lamval().arglist; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(auto foo = fun->lambda().args; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
   push_func(&evaluator::evlam1);
   if(spr)
   {
@@ -769,8 +769,8 @@ void evaluator::link()
   env = dest;
   for(auto i = dest[0].size(); i > 0; i--)
   {
-    LISPT t = dest[i].var()->symvalue();
-    dest[i].var()->symvalue(dest[i].val());
+    LISPT t = dest[i].var()->value();
+    dest[i].var()->value(dest[i].val());
     dest[i].val(t);
   }
 }
@@ -779,7 +779,7 @@ bool evaluator::evlam1()
 {
   link();
   dest = pop_point();
-  args = fun->lamval().lambdarep;
+  args = fun->lambda().body;
   push_func(&evaluator::evlam0);
   cont = &evaluator::evsequence;
   return false;
@@ -789,7 +789,7 @@ void evaluator::restore_env()
 {
   auto* c = env;
   for(auto i = c[0].size(); i > 0; i--)
-    c[i].var()->symvalue(c[i].val());
+    c[i].var()->value(c[i].val());
 }
 
 bool evaluator::evlam0()
@@ -812,7 +812,7 @@ void evaluator::unwind()
 
 bool evaluator::lookup()
 {
-  LISPT t = expression->symvalue();
+  LISPT t = expression->value();
   switch(type_of(t))
   {
     case type::UNBOUND:
@@ -840,14 +840,14 @@ bool evaluator::evclosure()
 
   push_point(env);
   push_point(dest);
-  dest = mkdestblock(fun->closval().count);
-  for(foo = fun->closval().closed, i = fun->closval().count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
-  for(foo = fun->closval().cvalues; !is_NIL(foo); foo = foo->cdr())
+  dest = mkdestblock(fun->closure().count);
+  for(foo = fun->closure().closed, i = fun->closure().count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(foo = fun->closure().cvalues; !is_NIL(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
   }
-  fun = fun->closval().cfunction;
+  fun = fun->closure().cfunction;
   link();
   dest = pop_point();
   auto envir = pop_point();

@@ -176,10 +176,10 @@ inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 {
   lambda_t lambda;
-  lambda.lambdarep = def;
+  lambda.body = def;
   std::int8_t count = 0;
-  lambda.arglist = mkarglist(args, count);
-  lambda.argcnt = count;
+  lambda.args = mkarglist(args, count);
+  lambda.count = count;
   LISPT s = getobject();
   s->set(lambda, type == type::LAMBDA);
   return s;

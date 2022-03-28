@@ -18,7 +18,7 @@ TEST_CASE("LAMBDA and NLAMBDA")
     auto a = eval(l, "(setq f (lambda () \"hello\"))");
     auto b = eval(l, "(f)");
     CHECK(type_of(b) == type::STRING);
-    CHECK(b->stringval() == "hello");
+    CHECK(b->string() == "hello");
   }
   SECTION("LAMBDA - one argument")
   {

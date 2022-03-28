@@ -58,7 +58,7 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
         return NIL;
       }
     case type::STRING:
-      return (l1->stringval() == l2->stringval()) ? T : NIL;
+      return (l1->string() == l2->string()) ? T : NIL;
     case type::LAMBDA:
     case type::NLAMBDA:
       return funeq(l, l1, l2);
@@ -90,7 +90,7 @@ LISPT boundp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
     return NIL;
-  else if(type_of(a->symvalue()) != type::UNBOUND)
+  else if(type_of(a->value()) != type::UNBOUND)
     return T;
   else
     return NIL;

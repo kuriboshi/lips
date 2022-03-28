@@ -191,11 +191,11 @@ struct subr_t
 struct lambda_t
 {
   /// @brief The S-expression representation of the lambda function.
-  LISPT lambdarep = NIL;
+  LISPT body = NIL;
   /// @brief The list of arguments.
-  LISPT arglist = NIL;
+  LISPT args = NIL;
   /// @brief The number of arguments.
-  std::int8_t argcnt = 0;
+  std::int8_t count = 0;
 };
 
 /// @brief A closure (static binding).
@@ -271,8 +271,8 @@ public:
   bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(_u)); }
   void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
-  auto symvalue() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
-  void symvalue(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(_u)).value = x; }
+  auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
+  void value(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(_u)).value = x; }
   auto intval() const -> int { return std::get<int>(_u); }
   void set(int x)
   {
@@ -287,13 +287,13 @@ public:
   }
   auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
   void set(indirect_t x) { _type = type::INDIRECT; _u = x; }
-  auto consval() const -> const cons_t& { return std::get<cons_t>(_u); }
+  auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
   void set(cons_t x) { _type = type::CONS; _u = x; }
   auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
   auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
   void car(LISPT x) { std::get<cons_t>(_u).car = x; }
   void cdr(LISPT x) { std::get<cons_t>(_u).cdr = x; }
-  auto stringval() const -> const std::string& { return std::get<std::string>(_u); }
+  auto string() const -> const std::string& { return std::get<std::string>(_u); }
   void set(const std::string& s)
   {
     _type = type::STRING;
@@ -305,18 +305,18 @@ public:
     _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
     _u = x;
   }
-  auto lamval() -> lambda_t& { return std::get<lambda_t>(_u); }
+  auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
   void set(lambda_t x, bool lambda) { _type = lambda ? type::LAMBDA : type::NLAMBDA; _u = x; }
-  auto closval() -> closure_t& { return std::get<closure_t>(_u); }
+  auto closure() -> closure_t& { return std::get<closure_t>(_u); }
   void set(closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
-  auto fileval() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
+  auto file() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
   void set(std::shared_ptr<file_t> f) { _type = type::FILET; _u = f; }
   auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
   void set(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
-  const std::string& getstr() const { return _type == type::STRING ? stringval() : std::get<symbol::print_name>(_u).name; }
+  const std::string& getstr() const { return _type == type::STRING ? string() : std::get<symbol::print_name>(_u).name; }
 
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }

@@ -32,7 +32,7 @@ LISPT streq(lisp& l, LISPT s1, LISPT s2)
 {
   check(s1, type::STRING);
   check(s2, type::STRING);
-  if(s1->stringval() == s2->stringval())
+  if(s1->string() == s2->string())
     return T;
   return NIL;
 }
@@ -42,7 +42,7 @@ LISPT strcmp(lisp& l, LISPT s1, LISPT s2)
 {
   check(s1, type::STRING);
   check(s2, type::STRING);
-  return mknumber(l, s1->stringval().compare(s2->stringval()));
+  return mknumber(l, s1->string().compare(s2->string()));
 }
 
 /// @brief Concatenate arbitrary many strings to one string.
@@ -52,7 +52,7 @@ LISPT concat(lisp& l, LISPT strlist)
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
     check(sl->car(), type::STRING);
-    result += sl->car()->stringval();
+    result += sl->car()->string();
   }
   return mkstring(l, result);
 }
@@ -61,7 +61,7 @@ LISPT concat(lisp& l, LISPT strlist)
 LISPT strlen(lisp& l, LISPT s)
 {
   check(s, type::STRING);
-  return mknumber(l, s->stringval().length());
+  return mknumber(l, s->string().length());
 }
 
 /// @brief Extract a substring from start to end.
@@ -77,9 +77,9 @@ LISPT substr(lisp& l, LISPT str, LISPT start, LISPT end)
   auto s = start->intval();
   auto e = end->intval();
   auto size = e - s + 1;
-  if(size < 0 || s > str->stringval().length() || e > str->stringval().length() || s < 0 || e < 0)
+  if(size < 0 || s > str->string().length() || e > str->string().length() || s < 0 || e < 0)
     return NIL;
-  return mkstring(l, str->stringval().substr(s, e));
+  return mkstring(l, str->string().substr(s, e));
 }
 
 namespace pn

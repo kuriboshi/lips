@@ -18,9 +18,9 @@ TEST_CASE("lisp: current")
     auto v0 = mkatom(lisp0, "v0");
     setqq(lisp0, v0, mkatom(lisp0, "world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp0, v0->symvalue(), mkatom(lisp0, "world")) != NIL);
+    CHECK(eq(lisp0, v0->value(), mkatom(lisp0, "world")) != NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp0, v0->symvalue(), mkatom(lisp1, "world")) == NIL);
+    CHECK(eq(lisp0, v0->value(), mkatom(lisp1, "world")) == NIL);
   }
 
   SECTION("test 2")
@@ -28,9 +28,9 @@ TEST_CASE("lisp: current")
     auto v1 = mkatom(lisp1, "v1");
     setqq(lisp1, v1, mkatom(lisp1, "world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v1->symvalue(), mkatom(lisp1, "world")) != NIL);
+    CHECK(eq(lisp1, v1->value(), mkatom(lisp1, "world")) != NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v1->symvalue(), mkatom(lisp0, "world")) == NIL);
+    CHECK(eq(lisp1, v1->value(), mkatom(lisp0, "world")) == NIL);
   }
 
   SECTION("current 1")
@@ -40,9 +40,9 @@ TEST_CASE("lisp: current")
     auto v2 = mkatom("v2");
     setqq(v2, mkatom("world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v2->symvalue(), mkatom(lisp0, "world")) != NIL);
+    CHECK(eq(lisp1, v2->value(), mkatom(lisp0, "world")) != NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v2->symvalue(), mkatom(lisp1, "world")) == NIL);
+    CHECK(eq(lisp1, v2->value(), mkatom(lisp1, "world")) == NIL);
   }
 
   SECTION("current 2")
@@ -52,9 +52,9 @@ TEST_CASE("lisp: current")
     auto v3 = mkatom("v3");
     setqq(v3, mkatom("world"));
     // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v3->symvalue(), mkatom(lisp1, "world")) != NIL);
+    CHECK(eq(lisp1, v3->value(), mkatom(lisp1, "world")) != NIL);
     // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v3->symvalue(), mkatom(lisp0, "world")) == NIL);
+    CHECK(eq(lisp1, v3->value(), mkatom(lisp0, "world")) == NIL);
   }
 
   SECTION("mkprim")

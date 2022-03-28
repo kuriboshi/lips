@@ -47,7 +47,7 @@ LISPT closobj(lisp& l, LISPT vars)
     return NIL;
   check(vars, type::CONS);
   check(vars->car(), type::SYMBOL);
-  return cons(l, mkindirect(l, vars->car()->symvalue()), closobj(l, vars->cdr()));
+  return cons(l, mkindirect(l, vars->car()->value()), closobj(l, vars->cdr()));
 }
 
 LISPT car(lisp& l, LISPT a)

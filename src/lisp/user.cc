@@ -30,31 +30,31 @@ LISPT getrep(lisp& l, LISPT fun)
 
   if(type_of(fun) != type::LAMBDA && type_of(fun) != type::NLAMBDA)
     return NIL;
-  auto& x = fun->lamval();
-  if(x.argcnt == -1)
-    args = x.arglist->car();
-  else if(x.argcnt < 0)
-    args = getargs(l, x.arglist);
+  auto& x = fun->lambda();
+  if(x.count == -1)
+    args = x.args->car();
+  else if(x.count < 0)
+    args = getargs(l, x.args);
   else
-    args = x.arglist;
+    args = x.args;
   if(type_of(fun) == type::LAMBDA)
-    return cons(l, C_LAMBDA, cons(l, args, x.lambdarep));
-  return cons(l, C_NLAMBDA, cons(l, args, x.lambdarep));
+    return cons(l, C_LAMBDA, cons(l, args, x.body));
+  return cons(l, C_NLAMBDA, cons(l, args, x.body));
 }
 
 LISPT funeq(lisp& l, LISPT f1, LISPT f2)
 {
   if(EQ(f1, f2))
     return T;
-  if(f1->lamval().argcnt == f2->lamval().argcnt)
+  if(f1->lambda().count == f2->lambda().count)
   {
-    LISPT t1 = f1->lamval().arglist;
-    LISPT t2 = f2->lamval().arglist;
+    LISPT t1 = f1->lambda().args;
+    LISPT t2 = f2->lambda().args;
     LISPT tmp = equal(l, t1, t2);
     if(!is_NIL(tmp))
     {
-      t1 = f1->lamval().lambdarep;
-      t2 = f2->lamval().lambdarep;
+      t1 = f1->lambda().body;
+      t2 = f2->lambda().body;
       tmp = equal(l, t1, t2);
       if(!is_NIL(tmp))
         return T;
@@ -65,13 +65,13 @@ LISPT funeq(lisp& l, LISPT f1, LISPT f2)
 
 LISPT checkfn(lisp& l, LISPT name, LISPT lam)
 {
-  if(type_of(name->symvalue()) != type::UNBOUND)
-    if(type_of(name->symvalue()) == type::LAMBDA || type_of(name->symvalue()) == type::NLAMBDA)
+  if(type_of(name->value()) != type::UNBOUND)
+    if(type_of(name->value()) == type::LAMBDA || type_of(name->value()) == type::NLAMBDA)
     {
-      LISPT t = user::funeq(l, name->symvalue(), lam);
+      LISPT t = user::funeq(l, name->value(), lam);
       if(is_NIL(t))
       {
-        putprop(l, name, C_OLDDEF, name->symvalue());
+        putprop(l, name, C_OLDDEF, name->value());
         if(!is_NIL(l.verbose()))
           print(l, cons(l, name, cons(l, C_REDEFINED, NIL)));
       }
@@ -84,7 +84,7 @@ LISPT define(lisp& l, LISPT name, LISPT lam)
   check(name, type::SYMBOL);
   check(lam, type::LAMBDA, type::NLAMBDA);
   checkfn(l, name, lam);
-  name->symvalue(lam);
+  name->value(lam);
   return name;
 }
 
@@ -114,7 +114,7 @@ LISPT def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
   if(type_of(foo) == type::ERROR)
     return NIL;
   checkfn(l, name, foo);
-  name->symvalue(foo);
+  name->value(foo);
   return cons(l, name, NIL);
 }
 

@@ -85,12 +85,12 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     C_UNBOUND->settype(type::UNBOUND);
 
     auto nil = intern("nil");
-    nil->symvalue(NIL);
+    nil->value(NIL);
     nil->symbol().constant = true;
 
     auto t = intern("t");
     T = t;
-    t->symvalue(T);
+    t->value(T);
     t->settype(type::T);
     t->symbol().constant = true;
 
