@@ -7,22 +7,39 @@
 
 namespace lisp
 {
-void ref_deleter(lisp_t* obj)
+/// @brief Returns the lisp_t object to the list of free objects.
+///
+/// @details Instead of new/delete lisp_t objects are allocated from the list
+/// of free objects. When an object is deleted it's returned to the list of
+/// free lisp_t objects.
+///
+/// @param object A pointer to the lisp_t object to "delete".
+void ref_deleter(lisp_t* object)
 {
-  obj->settype(type::FREE);
-  obj->set();
-  alloc::freelist.push_back(obj);
+  object->settype(type::FREE);
+  object->set();
+  alloc::freelist.push_back(object);
 }
 
+/// @brief Class handling allocation of objects.
 alloc::alloc(): local_symbols(lisp_t::symbol_collection().create())
 {
   destblockused = 0;
   newpage(); // Allocate one page of storage
 }
 
+/// @brief Default destructor.
+///
 // TODO: Free all memory
 alloc::~alloc() = default;
 
+/// @brief Allocates a new page of lisp_t objects.
+///
+/// @details lisp_t objects are managed like a memory pool. A number of blocks
+/// are used to store lisp_t objects. Free objects are kept on a list of
+/// available objects. If there are no available blocks on the list of free
+/// objects a new page is allocated and new objects are added to the list of
+/// free objects. The new objects are marked with the type "FREE".
 alloc::conscells_t* alloc::newpage()
 {
   auto* newp = new conscells_t;
@@ -36,6 +53,14 @@ alloc::conscells_t* alloc::newpage()
   return newp;
 }
 
+/// @brief Allocate a number of pages of lisp_t objects.
+///
+/// @details As there is no garbage collection this function simply adds more
+/// pages and increases the number of available free objects with the number
+/// that fits in the number of pages allocated.
+///
+/// @param incr The number of pages to allocate.
+/// @returns Always returns NIL.
 LISPT alloc::reclaim(LISPT incr)
 {
   int i = 0;
@@ -49,6 +74,11 @@ LISPT alloc::reclaim(LISPT incr)
   return NIL;
 }
 
+/// @brief Allocates an object from the list of free objects.
+///
+/// @details If there are no free objects available a new page is allocated.
+///
+/// @returns A new lisp_t object.
 LISPT alloc::getobject()
 {
   if(freelist.empty())
@@ -60,6 +90,11 @@ LISPT alloc::getobject()
   return r;
 }
 
+/// @brief Creates a cons pair.
+///
+/// @param a The car of the pair.
+/// @param b The cdr of the pair.
+/// @returns The cons pair.
 LISPT alloc::cons(LISPT a, LISPT b)
 {
   auto f = getobject();
@@ -87,14 +122,29 @@ LISPT alloc::mkstring(const std::string& str)
   return s;
 }
 
-LISPT alloc::mknumber(int i)
+/// @brief Creates an integer number.
+///
+/// @param number The integer number.
+/// @returns An integer number as a LISP object.
+LISPT alloc::mknumber(int number)
 {
   LISPT c = getobject();
-  c->set(i);
+  c->set(number);
   return c;
 }
 
-LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
+/// @brief Create a floating point number.
+///
+/// @param number The floating point number.
+/// @returns A floating point number as a LISP object.
+LISPT alloc::mkfloat(double number)
+{
+  LISPT c = getobject();
+  c->set(number);
+  return c;
+}
+
+inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 {
   if(type_of(alist) == type::CONS)
   {
@@ -110,6 +160,19 @@ LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
   }
 }
 
+/// @brief Creates a lambda function.
+///
+/// @details Not meant to be used directly. Call the functions LAMBDA and
+/// NLAMBDA instead.
+///
+/// @param args The parameters of the lambda function. For a spread type
+/// function this is a list of atoms. For a nospread function it's a single
+/// atom. For a half spread function the list should end with a dotted pair.
+/// @param def The definition of the lambda function. The body of the function
+/// should be a list of expressions.
+/// @param type The type is either type::LAMBDA or type::NLAMBDA.
+///
+/// @returns A lambda function.
 LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 {
   lambda_t lambda;
@@ -122,10 +185,12 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
   return s;
 }
 
-/*
- * intern - Make interned symbol in hasharray obarray. Str is not copied so
- *          this is only used with global constant strings during init.
- */
+/// @brief Make interned symbol in obarray.
+///
+/// @details Create an interned symbol in the global symbol table.
+///
+/// @param str Name of the symbol.
+/// @returns The symbol as a LISP object.
 LISPT alloc::intern(const std::string& str)
 {
   auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
@@ -138,10 +203,14 @@ LISPT alloc::intern(const std::string& str)
   return sym.self;
 }
 
-/*
- * mkatom - Generates interned symbol like intern but create it in the local
- *          obarray if not found in the global.
- */
+/// @brief Get an existing symbol.
+///
+/// @details Get an existing symbol in either the global symbol table or the
+/// local one. If the symbol doesn't exist then create a new one in the local
+/// symol table.
+///
+/// @param str The name of the symbol.
+/// @returns The symbol as a LISP object.
 LISPT alloc::mkatom(const std::string& str)
 {
   if(global_symbols().exists(str))
@@ -155,20 +224,11 @@ LISPT alloc::mkatom(const std::string& str)
   return sym.self;
 }
 
-/*
- * mkfloat - Make a floating point number.
- */
-LISPT alloc::mkfloat(double num)
-{
-  LISPT rval = getobject();
-  rval->set(num);
-  return rval;
-}
-
-/*
- * dalloc - Allocates a destination block of size size. Returns nullptr if
- *          no more space available.
- */
+///
+/// @brief Allocates a destination block of size size.
+///
+/// @param size The size of the destination block.
+/// @returns A destblock or nullptr if no more space available.
 destblock_t* alloc::dalloc(int size)
 {
   if(size <= DESTBLOCKSIZE - destblockused - 1)
@@ -183,16 +243,15 @@ destblock_t* alloc::dalloc(int size)
   return nullptr;
 }
 
-/*
- * dfree - Free a destination block.
- */
+/// @brief Free a destination block.
+///
+/// @param ptr The destination block to free.
 void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
 
-/*
- * dzero - Frees all destination blocks.
- */
+/// @brief Frees all destination blocks.
 void alloc::dzero() { destblockused = 0; }
 
+/// @brief The list of available lisp_t objects.
 std::deque<lisp_t*> alloc::freelist;
 
 } // namespace lisp

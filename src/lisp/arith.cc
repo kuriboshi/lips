@@ -67,15 +67,15 @@ LISPT iplus(lisp& l, LISPT x)
 LISPT fplus(lisp& l, LISPT x)
 {
   check(x->car(), type::FLOAT);
-  auto sum = x->car()->floatval();
+  auto fsum = x->car()->floatval();
   x = x->cdr();
   while(type_of(x) == type::CONS)
   {
     check(x->car(), type::FLOAT);
-    sum = sum + x->car()->floatval();
+    fsum = fsum + x->car()->floatval();
     x = x->cdr();
   }
-  return mkfloat(l, sum);
+  return mkfloat(l, fsum);
 }
 
 LISPT difference(lisp& l, LISPT x, LISPT y)
@@ -252,7 +252,7 @@ LISPT absval(lisp& l, LISPT x)
 LISPT itof(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
-  return mkfloat(l, (double)x->intval());
+  return mkfloat(l, static_cast<double>(x->intval()));
 }
 
 LISPT add1(lisp& l, LISPT x)
