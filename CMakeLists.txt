@@ -38,10 +38,6 @@ if(LIPS_ENABLE_TRACE)
   target_compile_definitions(lisp PRIVATE TRACE)
 endif()
 
-if(LIPS_ENABLE_OBJECT_SIZES)
-  target_compile_definitions(main PRIVATE ENABLE_OBJECT_SIZES)
-endif()
-
 include(GNUInstallDirs)
 install(TARGETS lisp EXPORT lisp)
 install(

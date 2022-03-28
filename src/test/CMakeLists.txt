@@ -25,4 +25,8 @@ target_sources(
           symbol.test.cc
           user.test.cc)
 target_link_libraries(lisp_test PUBLIC liblisp Catch2::Catch2)
+if(LIPS_ENABLE_OBJECT_SIZES)
+  target_compile_definitions(lisp_test PRIVATE ENABLE_OBJECT_SIZES)
+endif()
+
 add_test(NAME lisp_test COMMAND lisp_test)
