@@ -56,12 +56,19 @@ public:
   destblock_t* environment() const { return env; }
 
 private:
-  void push_lisp(LISPT);
-  LISPT pop_lisp();
-  void push_point(destblock_t*);
-  destblock_t* pop_point();
-  void push_func(continuation_t);
-  continuation_t pop_func();
+  // @brief Pushes continuations, destinations, or LISPT objects on the control
+  // stack.
+  template<typename T>
+  void push(T t)
+  {
+    control[toctrl++] = t;
+    if(toctrl >= CTRLBLKSIZE)
+      overflow();
+  }
+  // @brief Pops continuations, destinations, or LISPT objects from the control
+  // stack.
+  template<typename T>
+  T pop() { return std::get<T>(control[--toctrl]); }
   destblock_t* pop_env();
 
   void xbreak(int mess, LISPT fault, continuation_t next);
