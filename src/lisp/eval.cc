@@ -695,7 +695,7 @@ bool evaluator::spread()
 {
   while(true)
   {
-    if(EQ(args, NIL))
+    if(is_NIL(args))
     {
       cont = pop_func();
       break;
@@ -867,7 +867,7 @@ bool evaluator::evclosure1()
 
 bool evaluator::evsequence()
 {
-  if(EQ(args, NIL))
+  if(is_NIL(args))
   {
     cont = pop_func();
   }
@@ -881,7 +881,7 @@ bool evaluator::evsequence()
 
 bool evaluator::evseq1()
 {
-  if(EQ(args->cdr(), NIL))
+  if(is_NIL(args->cdr()))
   {
     cont = &evaluator::peval;
   }

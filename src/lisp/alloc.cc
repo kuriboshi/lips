@@ -151,7 +151,7 @@ inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
     ++count;
     return cons(alist->car(), mkarglist(alist->cdr(), count));
   }
-  else if(EQ(alist, NIL))
+  else if(is_NIL(alist))
     return NIL;
   else
   {

@@ -254,7 +254,7 @@ LISPT append(lisp& l, LISPT x)
 
 LISPT null(lisp& l, LISPT a)
 {
-  if(EQ(a, NIL))
+  if(is_NIL(a))
     return T;
   return NIL;
 }

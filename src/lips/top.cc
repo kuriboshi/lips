@@ -187,7 +187,7 @@ LISPT top::operator()(LISPT exp)
       return NIL;
     if(is_NIL(input_exp))
       continue;
-    if(EQ(input_exp->car(), NIL))
+    if(is_NIL(input_exp->car()))
       continue;
 #if 0
     if(transform_hook)

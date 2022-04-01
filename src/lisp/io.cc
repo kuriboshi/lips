@@ -142,23 +142,25 @@ LISPT patom(lisp&, LISPT x, file_t& file, bool esc)
 
 LISPT prinbody(lisp& l, LISPT x, file_t& file, bool esc)
 {
-  LISPT xx = x;
-nxtelt:
-  io::prin0(l, xx->car(), file, esc);
-  if(EQ(xx->cdr(), NIL))
-    ;
-  else if(type_of(xx->cdr()) == type::CONS)
+  auto i = x;
+  for(;;)
   {
-    file.putch(' ');
-    xx = xx->cdr();
-    goto nxtelt;
-  }
-  else
-  {
-    file.putch(' ');
-    file.putch('.');
-    file.putch(' ');
-    io::prin0(l, xx->cdr(), file, esc);
+    io::prin0(l, i->car(), file, esc);
+    if(is_NIL(i->cdr()))
+      break;
+    if(type_of(i->cdr()) == type::CONS)
+    {
+      file.putch(' ');
+      i = i->cdr();
+    }
+    else
+    {
+      file.putch(' ');
+      file.putch('.');
+      file.putch(' ');
+      io::prin0(l, i->cdr(), file, esc);
+      break;
+    }
   }
   return x;
 }
