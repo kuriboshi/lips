@@ -142,7 +142,7 @@ TEST_CASE("Object sizes")
   std::cout << "closure_t: " << sizeof(closure_t) << std::endl;
   std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
   std::cout << "std::shared_ptr<file_t>: " << sizeof(std::shared_ptr<file_t>) << std::endl;
-  std::cout << "cvariable: " << sizeof(cvariable) << std::endl;
+  std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
   std::cout << "==========\n";
   std::cout << "subr_t: " << sizeof(subr_t) << std::endl;
 }

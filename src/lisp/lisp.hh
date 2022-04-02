@@ -219,24 +219,24 @@ struct subr_index
 /// from either the C++ context of the lisp context and have the value be
 /// reflected to both.
 ///
-class cvariable
+class cvariable_t
 {
 public:
-  explicit cvariable(LISPT value): _value(value) {}
-  cvariable(): _value(NIL) {}
-  ~cvariable() = default;
-  cvariable(const cvariable& other) = delete;
-  cvariable(cvariable&& other) noexcept
+  explicit cvariable_t(LISPT value): _value(value) {}
+  cvariable_t(): _value(NIL) {}
+  ~cvariable_t() = default;
+  cvariable_t(const cvariable_t& other) = delete;
+  cvariable_t(cvariable_t&& other) noexcept
   {
     _value = std::move(other._value);
   }
-  cvariable& operator=(cvariable&& other) noexcept
+  cvariable_t& operator=(cvariable_t&& other) noexcept
   {
     std::swap(_value, other._value);
     return *this;
   }
-  cvariable& operator=(const cvariable& other) = delete;
-  cvariable& operator=(LISPT value)
+  cvariable_t& operator=(const cvariable_t& other) = delete;
+  cvariable_t& operator=(LISPT value)
   {
     _value = value;
     return *this;
@@ -313,8 +313,8 @@ public:
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
   auto file() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
   void set(std::shared_ptr<file_t> f) { _type = type::FILET; _u = f; }
-  auto cvarval() -> cvariable& { return std::get<cvariable>(_u); }
-  void set(cvariable&& x) { _type = type::CVARIABLE; _u = std::move(x); }
+  auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
+  void set(cvariable_t&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
   const std::string& getstr() const { return _type == type::STRING ? string() : std::get<symbol::print_name>(_u).name; }
 
@@ -346,7 +346,7 @@ private:
     closure_t,                  // CLOSURE
     destblock_t*,               // ENVIRON
     std::shared_ptr<file_t>,    // FILE
-    cvariable                   // CVARIABLE
+    cvariable_t                 // CVARIABLE
     > _u;
 };
 
@@ -433,9 +433,9 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  cvariable& currentbase() const { return _variables->_currentbase; }
-  cvariable& verbose() const { return _variables->_verbose; }
-  const cvariable& version() const { return _version; }
+  cvariable_t& currentbase() const { return _variables->_currentbase; }
+  cvariable_t& verbose() const { return _variables->_verbose; }
+  const cvariable_t& version() const { return _version; }
 
   // clang-format off
   rtinfo currentrt =
@@ -547,10 +547,10 @@ private:
   {
   public:
     cvariables(alloc&);
-    cvariable& _currentbase;
-    cvariable& _verbose;
+    cvariable_t& _currentbase;
+    cvariable_t& _verbose;
   };
-  cvariable _version;
+  cvariable_t _version;
   std::unique_ptr<cvariables> _variables;
 
   static std::map<int, std::string> messages;

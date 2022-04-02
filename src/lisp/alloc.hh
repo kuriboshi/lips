@@ -82,20 +82,20 @@ public:
   /// @details This function links a variable in lisp with a variable in C++ so
   /// that changing the value in one domain will be reflected in the other.
   /// The lisp variable will have the print name NAME.  In C++ the type
-  /// cvariable will work in many contexts which expects a value of type LISPT.
-  /// If assigned to the lisp value changes if the value is set with setq in
-  /// lisp the C++ value will change.
+  /// cvariable_t will work in many contexts which expects a value of type
+  /// LISPT.  If assigned to the lisp value changes if the value is set with
+  /// setq in lisp the C++ value will change.
   ///
   /// @param name The lisp print name.
   /// @param val The initial value.
   ///
   /// @return A reference of type cvariable which wraps the LISPT value.
   ///
-  cvariable& initcvar(const std::string& name, LISPT val)
+  cvariable_t& initcvar(const std::string& name, LISPT val)
   {
     auto t = mkatom(name);
     t->symbol().value = LISPT(new lisp_t);
-    t->value()->set(cvariable(val));
+    t->value()->set(cvariable_t(val));
     return t->value()->cvarval();
   }
 
@@ -323,8 +323,8 @@ LISPT mklist(LISPT t, Ts ...ts)
 inline LISPT getobject(lisp& l) { return l.a().getobject(); }
 inline LISPT getobject() { return getobject(lisp::current()); }
 
-inline cvariable& initcvar(const std::string& name, LISPT val) { return lisp::current().a().initcvar(name, val); }
-inline cvariable& initcvar(alloc& a, const std::string& name, LISPT val) { return a.initcvar(name, val); }
+inline cvariable_t& initcvar(const std::string& name, LISPT val) { return lisp::current().a().initcvar(name, val); }
+inline cvariable_t& initcvar(alloc& a, const std::string& name, LISPT val) { return a.initcvar(name, val); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {

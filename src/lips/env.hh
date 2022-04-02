@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 2021 Krister Joas
+// Copyright 2021-2022 Krister Joas
 //
 
 #ifndef LIPS_ENV_HH
@@ -17,9 +17,9 @@ class environment
 public:
   environment();
 
-  cvariable& path;     // Search path for executables.
-  cvariable& home;     // Home directory.
-  cvariable& globsort;
+  cvariable_t& path;            // Search path for executables.
+  cvariable_t& home;            // Home directory.
+  cvariable_t& globsort;
 
 private:
   /*

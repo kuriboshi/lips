@@ -1,6 +1,6 @@
 /*
  * Lips, lisp shell.
- * Copyright 2020-2021 Krister Joas
+ * Copyright 2020-2022 Krister Joas
  *
  */
 
@@ -57,12 +57,12 @@ private:
         promptform(initcvar("promptform", NIL))
     {}
 
-    cvariable& history; // Holds the history list.
-    cvariable& histnum; // Current event number.
-    cvariable& histmax; // Maximum number of events to save.
-    cvariable& topprompt;
-    cvariable& brkprompt;
-    cvariable& promptform;     // Evaluated before printing the prompt.
+    cvariable_t& history;       // Holds the history list.
+    cvariable_t& histnum;       // Current event number.
+    cvariable_t& histmax;       // Maximum number of events to save.
+    cvariable_t& topprompt;
+    cvariable_t& brkprompt;
+    cvariable_t& promptform;    // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables;
 
