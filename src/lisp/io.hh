@@ -287,15 +287,18 @@ public:
   file_t(file_t&& file) noexcept: _source(std::move(file._source)), _sink(std::move(file._sink)) {}
   ~file_t() {}
 
+  bool has_source() { return !!_source; }
+  bool has_sink() { return !!_sink; }
+
   // source
-  io::source& source() { return *_source.get(); }
+  io::source& source() { return *_source; }
   int getch(bool inside_string = false) { ptrcheck(_source); return _source->getch(inside_string); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   bool eoln() { ptrcheck(_source); return _source->eoln(); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
 
   // sink
-  io::sink& sink() { return *_sink.get(); }
+  io::sink& sink() { return *_sink; }
   void putch(char c, bool esc = false) { ptrcheck(_sink); _sink->putch(c, esc); }
   void puts(const std::string_view s) { ptrcheck(_sink); _sink->puts(s); }
   void terpri() { ptrcheck(_sink); _sink->terpri(); }

@@ -44,7 +44,8 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
 LISPT close(lisp& l, LISPT fildes)
 {
   check(fildes, type::FILET);
-  fildes->file().flush();
+  if(fildes->file().has_sink())
+    fildes->file().flush();
   if(fildes->file().close())
     return T;
   return NIL;
