@@ -18,7 +18,6 @@ public:
   // io::source
   virtual int getch(bool inside_string) override;
   virtual void ungetch(int) override;
-  virtual bool eoln() override;
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override;
 

@@ -690,19 +690,3 @@ std::optional<std::string> term_source::getline()
     }
   }
 }
-
-/*
- * Return true if currently at end of line, or at end of line after skipping
- * blanks.
- */
-bool term_source::eoln()
-{
-  for(int i = position; i < linepos; ++i)
-  {
-    if(linebuffer[i] != ' ' && linebuffer[i] != '\t' && linebuffer[i] != '\n')
-      return false;
-    if(linebuffer[i] == '\n')
-      return true;
-  }
-  return true;
-}

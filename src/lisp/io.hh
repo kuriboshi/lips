@@ -46,7 +46,6 @@ public:
 
   virtual int getch(bool inside_string = false) = 0;
   virtual void ungetch(int) = 0;
-  virtual bool eoln() = 0;
   virtual bool close() = 0;
   virtual std::optional<std::string> getline() = 0;
 
@@ -62,21 +61,6 @@ protected:
       while((_curc = stream.get()) != '\n')
         ;
     return _curc;
-  }
-
-  bool eoln(std::istream& stream)
-  {
-    while(true)
-    {
-      if(stream.eof())
-        return true;
-      if(_curc != ' ' && _curc != '\t' && _curc != '\n')
-        return false;
-      if(_curc == '\n')
-        return true;
-      _curc = stream.get();
-    }
-    return true;
   }
 
   std::optional<std::string> getline(std::istream& stream)
@@ -98,7 +82,6 @@ public:
   ~file_source() = default;
 
   using source::getch;
-  using source::eoln;
   using source::getline;
 
   virtual int getch(bool inside_string) override
@@ -106,10 +89,6 @@ public:
     return getch(*_file, inside_string);
   }
   virtual void ungetch(int c) override { _file->putback(c); }
-  virtual bool eoln() override
-  {
-    return eoln(*_file);
-  }
   virtual bool close() override
   {
     _file->close();
@@ -133,7 +112,6 @@ public:
   ~stream_source() = default;
 
   using source::getch;
-  using source::eoln;
   using source::getline;
 
   virtual int getch(bool inside_string) override
@@ -141,10 +119,6 @@ public:
     return getch(_stream, inside_string);
   }
   virtual void ungetch(int c) override { _stream.putback(c); }
-  virtual bool eoln() override
-  {
-    return eoln(_stream);
-  }
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override
   {
@@ -163,7 +137,6 @@ public:
   string_source(const std::string& string): _string(string) {}
 
   using source::getch;
-  using source::eoln;
   using source::getline;
 
   virtual int getch(bool inside_string) override
@@ -171,7 +144,6 @@ public:
     return getch(_string, inside_string);
   }
   virtual void ungetch(int c) override { _string.putback(c); }
-  virtual bool eoln() override { return eoln(_string); }
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override { return getline(_string); }
 
@@ -294,7 +266,6 @@ public:
   io::source& source() { return *_source; }
   int getch(bool inside_string = false) { ptrcheck(_source); return _source->getch(inside_string); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
-  bool eoln() { ptrcheck(_source); return _source->eoln(); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
 
   // sink
