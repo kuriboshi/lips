@@ -8,6 +8,31 @@
 namespace lisp
 {
 
+TEST_CASE("lisp: to_underlying")
+{
+  CHECK(to_underlying(type::NIL) == 0);
+  CHECK(to_underlying(type::T) == 1);
+  CHECK(to_underlying(type::EMPTY) == 2);
+  CHECK(to_underlying(type::SYMBOL) == 3);
+  CHECK(to_underlying(type::INTEGER) == 4);
+  CHECK(to_underlying(type::FLOAT) == 5);
+  CHECK(to_underlying(type::INDIRECT) == 6);
+  CHECK(to_underlying(type::CONS) == 7);
+  CHECK(to_underlying(type::STRING) == 8);
+  CHECK(to_underlying(type::SUBR) == 9);
+  CHECK(to_underlying(type::FSUBR) == 10);
+  CHECK(to_underlying(type::LAMBDA) == 11);
+  CHECK(to_underlying(type::NLAMBDA) == 12);
+  CHECK(to_underlying(type::CLOSURE) == 13);
+  CHECK(to_underlying(type::UNBOUND) == 14);
+  CHECK(to_underlying(type::ENVIRON) == 15);
+  CHECK(to_underlying(type::FILET) == 16);
+  CHECK(to_underlying(type::FREE) == 17);
+  CHECK(to_underlying(type::ENDOFFILE) == 18);
+  CHECK(to_underlying(type::ERROR) == 19);
+  CHECK(to_underlying(type::CVARIABLE) == 20);
+}
+
 TEST_CASE("lisp: current")
 {
   lisp lisp0;
