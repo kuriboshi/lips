@@ -58,19 +58,19 @@ public:
       /* OK, EVAL, ^, ... */
       if(type_of(com) != type::CONS)
         continue;
-      else if(EQ(com->car(), C_GO))
+      else if(com->car() == C_GO)
         return print(l, eval(l, exp), false);
-      else if(EQ(com->car(), C_RESET))
+      else if(com->car() == C_RESET)
       {
         l.e().unwind();
         throw lisp_reset();
       }
-      else if(EQ(com->car(), C_BT))
+      else if(com->car() == C_BT)
       {
         l.e().bt();
         continue;
       }
-      else if(EQ(com->car(), C_RETURN))
+      else if(com->car() == C_RETURN)
         return is_NIL(com->cdr()) ? NIL : com->cdr()->car();
     }
   }

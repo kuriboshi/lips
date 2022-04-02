@@ -487,7 +487,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
     return -1;
   if(command->at(0) == '/' || strpbrk(command->c_str(), "/") != nullptr)
   {
-    if(EQ(execute(*command, exp), C_ERROR))
+    if(execute(*command, exp) == C_ERROR)
       return -1;
     else
       return 1;
@@ -508,7 +508,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
     {
       comdir += "/";
       comdir += *command;
-      if(EQ(execute(comdir, exp), C_ERROR))
+      if(execute(comdir, exp) == C_ERROR)
         return -1;
       else
         return 1;

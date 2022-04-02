@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2021 Krister Joas
+//
 
 #include "prim.hh"
 #include "alloc.hh"
@@ -164,7 +163,7 @@ LISPT rplacd(lisp& l, LISPT x, LISPT y)
 
 LISPT eq(lisp& l, LISPT a, LISPT b)
 {
-  if(EQ(a, b))
+  if(a == b)
     return T;
   if(type_of(a) == type::INTEGER && type_of(b) == type::INTEGER
     && a->intval() == b->intval())

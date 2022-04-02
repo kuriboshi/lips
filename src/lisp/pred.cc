@@ -46,7 +46,7 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
 {
   if(type_of(l1) != type_of(l2))
     return NIL;
-  if(EQ(l1, l2))
+  if(l1 == l2)
     return T;
   switch(type_of(l1))
   {
@@ -80,7 +80,7 @@ LISPT nlistp(lisp& l, LISPT a)
 
 LISPT neq(lisp& l, LISPT a, LISPT b)
 {
-  if(!EQ(a, b))
+  if(a != b)
     return T;
   else
     return NIL;

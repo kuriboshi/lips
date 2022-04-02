@@ -117,8 +117,8 @@ TEST_CASE("lisp: cons")
 {
   auto v = cons("a"_a, "b"_a);
   REQUIRE(type_of(v) == type::CONS);
-  CHECK(EQ(v->cons().car, "a"_a));
-  CHECK(EQ(v->cons().cdr, "b"_a));
+  CHECK(v->cons().car == "a"_a);
+  CHECK(v->cons().cdr == "b"_a);
 }
 
 TEST_CASE("lisp: type_of")
@@ -186,9 +186,9 @@ TEST_CASE("lisp: iter")
     auto list = "(a b c)"_l;
     auto i = begin(list);
     CHECK(type_of(*i) == type::SYMBOL);
-    CHECK(EQ(*i, "a"_a));
-    CHECK(EQ(*++i, "b"_a));
-    CHECK(EQ(*i++, "b"_a));
+    CHECK(*i == "a"_a);
+    CHECK(*++i == "b"_a);
+    CHECK(*i++ == "b"_a);
     ++i;
     CHECK(i == end(list));
   }
@@ -201,9 +201,9 @@ TEST_CASE("lisp: iter")
     auto list = "(a b . c)"_l;
     auto i = begin(list);
     CHECK(type_of(*i) == type::SYMBOL);
-    CHECK(EQ(*i, "a"_a));
-    CHECK(EQ(*++i, "b"_a));
-    CHECK(EQ(*i++, "b"_a));
+    CHECK(*i == "a"_a);
+    CHECK(*++i == "b"_a);
+    CHECK(*i++ == "b"_a);
     CHECK(i != end(list));
     ++i;
     CHECK(i == end(list));

@@ -17,11 +17,11 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
   if(!is_NIL(mode))
   {
     check(mode, type::SYMBOL);
-    if(EQ(mode, C_READ))
+    if(mode == C_READ)
       readmode = true;
-    else if(EQ(mode, C_WRITE))
+    else if(mode == C_WRITE)
       readmode = false;
-    else if(EQ(mode, C_APPEND))
+    else if(mode == C_APPEND)
     {
       readmode = false;
       appendmode = true;

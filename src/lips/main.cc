@@ -76,7 +76,7 @@ LISPT transform(LISPT list)
   {
     if(type_of(ll->car()) == type::CONS)
       tl = put_end(tl, transform(ll->car()), conc);
-    else if(EQ(ll->car(), C_BAR))
+    else if(ll->car() == C_BAR)
     {
       if(is_NIL(res))
         res = cons(C_PIPE, cons(tl, NIL));
@@ -85,7 +85,7 @@ LISPT transform(LISPT list)
       tl = NIL;
       conc = false;
     }
-    else if(EQ(ll->car(), C_SEMI))
+    else if(ll->car() == C_SEMI)
     {
       if(is_NIL(res))
         res = cons(C_PROGN, cons(tl, NIL));
@@ -94,7 +94,7 @@ LISPT transform(LISPT list)
       tl = NIL;
       conc = false;
     }
-    else if(EQ(ll->car(), C_GT))
+    else if(ll->car() == C_GT)
     {
       if(is_NIL(res))
         res = cons(C_REDIR_TO, cons(tl, NIL));
@@ -103,7 +103,7 @@ LISPT transform(LISPT list)
       tl = NIL;
       conc = true;
     }
-    else if(EQ(ll->car(), C_GGT))
+    else if(ll->car() == C_GGT)
     {
       if(is_NIL(res))
         res = cons(C_REDIR_APPEND, cons(tl, NIL));
@@ -112,7 +112,7 @@ LISPT transform(LISPT list)
       tl = NIL;
       conc = true;
     }
-    else if(EQ(ll->car(), C_LT))
+    else if(ll->car() == C_LT)
     {
       if(is_NIL(res))
         res = cons(C_REDIR_FROM, cons(tl, NIL));
@@ -121,7 +121,7 @@ LISPT transform(LISPT list)
       tl = NIL;
       conc = true;
     }
-    else if(EQ(ll->car(), C_AMPER))
+    else if(ll->car() == C_AMPER)
     {
       if(is_NIL(res))
         res = cons(C_BACK, cons(tl, NIL));

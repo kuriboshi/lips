@@ -350,7 +350,6 @@ private:
     > _u;
 };
 
-inline bool EQ(LISPT x, LISPT y) { return x == y; }
 inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
 inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }

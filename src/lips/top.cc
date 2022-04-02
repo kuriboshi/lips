@@ -119,7 +119,7 @@ LISPT top::findalias(LISPT exp)
     if(type_of(rval) == type::CONS && type_of(rval->car()) == type::SYMBOL)
     {
       auto alias = getprop(rval->car(), C_ALIAS);
-      if(!is_NIL(alias) && (is_NIL(alias_expanded) || !EQ(rval->car(), alias_expanded->car())))
+      if(!is_NIL(alias) && (is_NIL(alias_expanded) || rval->car() != alias_expanded->car()))
       {
         if(!is_NIL(memb(rval->car(), alias_expanded)))
           throw lisp_error("Alias loop");

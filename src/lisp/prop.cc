@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2021 Krister Joas
+//
 
 #include "prop.hh"
 #include "alloc.hh"
@@ -29,7 +28,7 @@ LISPT putprop(lisp& l, LISPT x, LISPT p, LISPT v)
   check(x, type::SYMBOL);
   check(p, type::SYMBOL);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
-    if(EQ(pl->car(), p))
+    if(pl->car() == p)
     {
       rplaca(l, pl->cdr(), v);
       return v;
@@ -44,7 +43,7 @@ LISPT getprop(lisp& l, LISPT x, LISPT p)
   check(p, type::SYMBOL);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
-    if(EQ(pl->car(), p))
+    if(pl->car() == p)
       return pl->cdr()->car();
   }
   return NIL;
@@ -59,7 +58,7 @@ LISPT remprop(lisp& l, LISPT x, LISPT p)
   LISPT r = NIL;
   for(pl = x->symbol().plist, pl2 = NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
-    if(EQ(pl->car(), p))
+    if(pl->car() == p)
     {
       r = pl->cdr()->car();
       if(is_NIL(pl2))

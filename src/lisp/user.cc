@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2021 Krister Joas
+//
 
 #include "user.hh"
 #include "alloc.hh"
@@ -44,7 +43,7 @@ LISPT getrep(lisp& l, LISPT fun)
 
 LISPT funeq(lisp& l, LISPT f1, LISPT f2)
 {
-  if(EQ(f1, f2))
+  if(f1 == f2)
     return T;
   if(f1->lambda().count == f2->lambda().count)
   {
