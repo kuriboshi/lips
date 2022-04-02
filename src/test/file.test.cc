@@ -7,49 +7,94 @@
 #include <catch2/catch.hpp>
 #include <lisp/libisp.hh>
 
+namespace
+{
+struct create_test_file final
+{
+  static constexpr const char* file{"test.lisp"};
+  create_test_file(const std::string& contents)
+  {
+    std::ofstream of(file);
+    of << contents;
+  }
+  ~create_test_file()
+  {
+    std::filesystem::remove(file);
+  }
+};
+}
+
 namespace lisp
 {
 
-TEST_CASE("File functions")
+TEST_CASE("file: functions")
 {
   lisp l;
   current c(l);
 
+  SECTION("open and close")
+  {
+    create_test_file test("()");
+    {
+      auto f = open(l, mkstring(test.file), C_READ);
+      auto r = read(l, f);
+      CHECK(is_NIL(r));
+      CHECK(is_T(close(l, f)));
+    }
+
+    {
+      auto f = open(mkstring(test.file), C_READ);
+      auto r = read(f);
+      CHECK(is_NIL(r));
+      CHECK(is_T(close(f)));
+    }
+  }
+
   SECTION("ratom")
   {
-    constexpr const char* test_file{"test.lisp"};
+    create_test_file test("atom\n");
     {
-      std::ofstream of(test_file);
-      of << "atom\n";
+      auto in0 = open(l, mkstring(test.file), C_READ);
+      auto e0 = ratom(l, in0);
+      REQUIRE(type_of(e0) == type::SYMBOL);
+      CHECK(e0->getstr() == "atom");
     }
-    auto in0 = open(mkstring("test.lisp"), C_READ);
-    auto e0 = ratom(in0);
-    REQUIRE(type_of(e0) == type::SYMBOL);
-    CHECK(e0->getstr() == "atom");
-    std::filesystem::remove(test_file);
+    {
+      auto in0 = open(mkstring(test.file), C_READ);
+      auto e0 = ratom(in0);
+      REQUIRE(type_of(e0) == type::SYMBOL);
+      CHECK(e0->getstr() == "atom");
+    }
   }
 
   SECTION("load")
   {
-    constexpr const char* test_file{"test.lisp"};
     {
-      std::ofstream of(test_file);
-      of << "(quote (a b c))\n";
+      create_test_file test("(setq a 1)\n");
+      auto e0 = load(mkstring(test.file));
+      CHECK("a"_a->value()->intval() == 1);
     }
-    auto e0 = load(mkstring(test_file));
-    std::filesystem::remove(test_file);
+    {
+      create_test_file test("(setq a 2)\n");
+      auto e0 = load(l, mkstring(test.file));
+      CHECK("a"_a->value()->intval() == 2);
+    }
   }
 
   SECTION("print")
   {
     constexpr const char* test_file{"test_print.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
-    print(mkstring("hello"), f0);
+    print(l, "hello"_s, f0);
+    print("world"_s, f0);
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != NIL);
     CHECK(r1->getstr() == "\"hello\"");
+    auto r2 = getline(f1);
+    REQUIRE(r2 != NIL);
+    CHECK(r2->getstr() == "\"world\"");
     std::filesystem::remove(test_file);
   }
 
@@ -57,13 +102,16 @@ TEST_CASE("File functions")
   {
     constexpr const char* test_file{"test_terpri.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
-    print(mkstring("hello"), f0);
+    prin1("\"hello"_a, f0);
+    terpri(l, f0);
     terpri(f0);
+    prin1("world\""_a, f0);
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
-    auto r1 = getline(f1);
+    auto r1 = read(f1);
     REQUIRE(r1 != NIL);
-    CHECK(r1->getstr() == "\"hello\"");
+    CHECK(type_of(r1) == type::STRING);
+    CHECK(r1->getstr() == "hello\n\nworld");
     std::filesystem::remove(test_file);
   }
 
@@ -71,7 +119,8 @@ TEST_CASE("File functions")
   {
     constexpr const char* test_file{"test_prin1.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
-    prin1(mkstring("hello \"world\""), f0);
+    prin1(l, mkstring("hello "), f0);
+    prin1(mkstring("\"world\""), f0);
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
@@ -128,11 +177,11 @@ TEST_CASE("File functions")
     f->set(std::make_shared<file_t>(is));
     auto ch0 = readc(l, f);
     CHECK(ch0->intval() == 't');
-    auto ch1 = readc(l, f);
+    auto ch1 = readc(f);
     CHECK(ch1->intval() == 'e');
     auto ch2 = readc(l, f);
     CHECK(ch2->intval() == 's');
-    auto ch3 = readc(l, f);
+    auto ch3 = readc(f);
     CHECK(ch3->intval() == 't');
   }
 
@@ -147,11 +196,20 @@ TEST_CASE("File functions")
 
   SECTION("spaces")
   {
-    std::ostringstream cout;
-    auto out = std::make_unique<file_t>(cout);
-    l.primout(std::move(out));
-    spaces(l, 8_l, NIL);
-    CHECK(cout.str() == "        ");
+    {
+      std::ostringstream cout;
+      auto out = std::make_unique<file_t>(cout);
+      l.primout(std::move(out));
+      spaces(l, 8_l, NIL);
+      CHECK(cout.str() == "        ");
+    }
+    {
+      std::ostringstream cout;
+      auto out = std::make_unique<file_t>(cout);
+      l.primout(std::move(out));
+      spaces(8_l, NIL);
+      CHECK(cout.str() == "        ");
+    }
   }
 
   SECTION("readline")
@@ -171,10 +229,23 @@ TEST_CASE("File functions")
       std::string is = R"(test test)";
       LISPT f = l.a().getobject();
       f->set(std::make_shared<file_t>(is));
-      auto r = readline(l, f);
+      auto r = readline(f);
       CHECK(type_of(r) == type::CONS);
       auto expected = mklist("test"_a, "test"_a);
       CHECK(equal(r, expected));
+    }
+  }
+
+  SECTION("loadfile")
+  {
+    create_test_file test("(setq a \"loadfile\")");
+    {
+      CHECK(loadfile(l, test.file));
+      CHECK("a"_a->value()->string() == "loadfile");
+    }
+    {
+      CHECK(loadfile(test.file));
+      CHECK("a"_a->value()->string() == "loadfile");
     }
   }
 }
