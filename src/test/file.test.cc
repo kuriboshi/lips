@@ -95,6 +95,32 @@ TEST_CASE("File functions")
     std::filesystem::remove(test_file);
   }
 
+  SECTION("printlevel")
+  {
+    constexpr const char* test_file = "test_printlevel.lisp";
+    {
+      auto f0 = open(mkstring(test_file), C_WRITE);
+      printlevel(1_l);
+      print("(a (b (c)))"_l, f0);
+      close(f0);
+      auto f1 = open(mkstring(test_file), C_READ);
+      auto r1 = getline(f1);
+      REQUIRE(r1 != NIL);
+      CHECK(r1->getstr() == "(a &)");
+    }
+    {
+      auto f0 = open(mkstring(test_file), C_WRITE);
+      printlevel(l, 2_l);
+      print(l, "(a (b (c)))"_l, f0);
+      close(l, f0);
+      auto f1 = open(l, mkstring(test_file), C_READ);
+      auto r1 = getline(l, f1);
+      REQUIRE(r1 != NIL);
+      CHECK(r1->getstr() == "(a (b &))");
+      std::filesystem::remove(test_file);
+    }
+  }
+
   SECTION("readc")
   {
     std::string is = R"(test)";

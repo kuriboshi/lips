@@ -23,7 +23,7 @@ LISPT load(lisp&, LISPT);
 LISPT terpri(lisp&, LISPT);
 LISPT prin1(lisp&, LISPT, LISPT);
 LISPT prin2(lisp&, LISPT, LISPT);
-LISPT plevel(lisp&, LISPT);
+LISPT printlevel(lisp&, LISPT);
 LISPT spaces(lisp&, LISPT, LISPT);
 LISPT readline(lisp&, LISPT);
 
@@ -50,8 +50,8 @@ inline LISPT prin1(lisp& l, LISPT a, LISPT b) { return file::prin1(l, a, b); }
 inline LISPT prin1(LISPT a, LISPT b) { return file::prin1(lisp::current(), a, b); }
 inline LISPT prin2(lisp& l, LISPT a, LISPT b) { return file::prin2(l, a, b); }
 inline LISPT prin2(LISPT a, LISPT b) { return file::prin2(lisp::current(), a, b); }
-inline LISPT plevel(lisp& l, LISPT a) { return file::plevel(l, a); }
-inline LISPT plevel(LISPT a) { return file::plevel(lisp::current(), a); }
+inline LISPT printlevel(lisp& l, LISPT a) { return file::printlevel(l, a); }
+inline LISPT printlevel(LISPT a) { return file::printlevel(lisp::current(), a); }
 inline LISPT spaces(lisp& l, LISPT a, LISPT b) { return file::spaces(l, a, b); }
 inline LISPT spaces(LISPT a, LISPT b) { return file::spaces(lisp::current(), a, b); }
 inline LISPT readline(lisp& l, LISPT a) { return file::readline(l, a); }

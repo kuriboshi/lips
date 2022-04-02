@@ -147,7 +147,7 @@ LISPT prin2(lisp& l, LISPT x, LISPT file)
   return prin0(l, x, file->file(), true);
 }
 
-LISPT plevel(lisp& l, LISPT newl)
+LISPT printlevel(lisp& l, LISPT newl)
 {
   auto x = l.printlevel;
   if(!is_NIL(newl))
@@ -195,7 +195,7 @@ inline constexpr auto LOAD = "load";         // load file
 inline constexpr auto PRIN1 = "prin1";       // print without escapes
 inline constexpr auto PRIN2 = "prin2";       // print without new-line
 inline constexpr auto PRINT = "print";       // print
-inline constexpr auto PLEVEL = "printlevel"; // how deep to print
+inline constexpr auto PRINTLEVEL = "printlevel"; // how deep to print
 inline constexpr auto RATOM = "ratom";       // read atom
 inline constexpr auto READ = "read";         // read expression
 inline constexpr auto READC = "readc";       // read characte
@@ -209,19 +209,19 @@ void init()
   C_READ = intern(pn::READ);
 
   // clang-format off
-  mkprim(pn::CLOSE,    close,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::OPEN,     open,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::LOAD,     load,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRIN1,    prin1,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRIN2,    prin2,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PRINT,    print,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::PLEVEL,   plevel,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::RATOM,    ratom,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READ,     read,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READC,    readc,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::READLINE, readline,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::SPACES,   spaces,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::TERPRI,   terpri,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::CLOSE,      close,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::OPEN,       open,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::LOAD,       load,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN1,      prin1,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRIN2,      prin2,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRINT,      print,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PRINTLEVEL, printlevel, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RATOM,      ratom,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READ,       read,       subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READC,      readc,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::READLINE,   readline,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SPACES,     spaces,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::TERPRI,     terpri,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 
