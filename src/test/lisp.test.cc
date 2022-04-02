@@ -81,8 +81,11 @@ TEST_CASE("lisp: current")
     // Same printname atom from different interpreters should be FALSE.
     CHECK(eq(lisp1, v3->value(), mkatom(lisp0, "world")) == NIL);
   }
+}
 
-  SECTION("mkprim")
+TEST_CASE("lisp: mkprim")
+{
+  SECTION("Define a new function")
   {
     std::vector<int> result;
     mkprim(
@@ -100,6 +103,34 @@ TEST_CASE("lisp: current")
     CHECK(result[1] == 1);
     CHECK(result[2] == 2);
   }
+
+  SECTION("Redefine subr")
+  {
+    CHECK_THROWS_WITH(mkprim(
+      "+", [](lisp& l) -> LISPT { return NIL; },
+      subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+      "redefinition of subr not allowed");
+  }
+}
+
+TEST_CASE("lisp: cons")
+{
+  auto v = cons("a"_a, "b"_a);
+  REQUIRE(type_of(v) == type::CONS);
+  CHECK(EQ(v->cons().car, "a"_a));
+  CHECK(EQ(v->cons().cdr, "b"_a));
+}
+
+TEST_CASE("lisp: type_of")
+{
+  auto v = "string"_s;
+  CHECK(type_of(*v) == type::STRING);
+}
+
+TEST_CASE("lisp: version")
+{
+  auto& version = lisp::current().version();
+  CHECK(type_of(version) == type::STRING);
 }
 
 TEST_CASE("lisp: literals")
@@ -145,6 +176,40 @@ TEST_CASE("lisp: literals")
     auto e = "(+ 1 2)"_e;
     REQUIRE(type_of(e) == type::INTEGER);
     CHECK(e->intval() == 3);
+  }
+}
+
+TEST_CASE("lisp: iter")
+{
+  SECTION("regular list")
+  {
+    auto list = "(a b c)"_l;
+    auto i = begin(list);
+    CHECK(type_of(*i) == type::SYMBOL);
+    CHECK(EQ(*i, "a"_a));
+    CHECK(EQ(*++i, "b"_a));
+    CHECK(EQ(*i++, "b"_a));
+    ++i;
+    CHECK(i == end(list));
+  }
+
+  SECTION("dotted pair")
+  {
+    // The current behaviour for a dotted pair is strange and should be
+    // considered undefined. In the case below it will iterate over three
+    // elements but the last one will be nil and 'c' will never be accessed.
+    auto list = "(a b . c)"_l;
+    auto i = begin(list);
+    CHECK(type_of(*i) == type::SYMBOL);
+    CHECK(EQ(*i, "a"_a));
+    CHECK(EQ(*++i, "b"_a));
+    CHECK(EQ(*i++, "b"_a));
+    CHECK(i != end(list));
+    ++i;
+    CHECK(i == end(list));
+    // It's possible to dereference the end marker because it's a LISPT with a
+    // nil value.
+    CHECK(is_NIL(*end(list)));
   }
 }
 
