@@ -8,7 +8,7 @@
 namespace lisp
 {
 
-TEST_CASE("LAMBDA and NLAMBDA")
+TEST_CASE("eval: LAMBDA and NLAMBDA")
 {
   lisp l;
   current c(l);
@@ -54,7 +54,7 @@ TEST_CASE("LAMBDA and NLAMBDA")
   }
 }
 
-TEST_CASE("Eval functions")
+TEST_CASE("eval: Eval functions")
 {
   lisp lisp;
   current c(lisp);
@@ -79,7 +79,7 @@ TEST_CASE("Eval functions")
   }
 }
 
-TEST_CASE("Closure")
+TEST_CASE("eval: Closure")
 {
   lisp l;
   current c(l);
@@ -92,7 +92,7 @@ TEST_CASE("Closure")
   CHECK(equal(r0, r1) != NIL);
 }
 
-TEST_CASE("topofstack")
+TEST_CASE("eval: topofstack")
 {
   lisp l;
   current c(l);

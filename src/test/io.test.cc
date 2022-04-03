@@ -353,6 +353,82 @@ TEST_CASE("io: prinbody")
   }
 }
 
+TEST_CASE("io: prin0")
+{
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(C_EMPTY, *f);
+    CHECK(os.str().empty());
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(NIL, *f);
+    CHECK(os.str() == "nil");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(T, *f);
+    CHECK(os.str() == "t");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(1.0_l, *f);
+    CHECK(os.str() == "1.00000");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(lambda("a"_a, NIL), *f);
+    CHECK(os.str().substr(0, 8) == "#<lambda");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(nlambda("a"_a, NIL), *f);
+    CHECK(os.str().substr(0, 9) == "#<nlambda");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(closure(lambda(NIL, "(a)"_l), "(a)"_l), *f);
+    CHECK(os.str().substr(0, 9) == "#<closure");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0("+"_e, *f);
+    CHECK(os.str().substr(0, 6) == "#<subr");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0("quote"_e, *f);
+    CHECK(os.str().substr(0, 7) == "#<fsubr");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(C_UNBOUND, *f);
+    CHECK(os.str() == "#<unbound>");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(C_EOF, *f);
+    CHECK(os.str().substr(0, 11) == "#<endoffile");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prin0(C_ERROR, *f);
+    CHECK(os.str().substr(0, 7) == "#<error");
+  }
+}
+
 TEST_CASE("io: Read tables")
 {
   lisp l;

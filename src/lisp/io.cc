@@ -183,7 +183,6 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       break;
     case type::SYMBOL:
       return io::patom(l, x, file, esc);
-      break;
     case type::NIL:
       ps("nil", file, false);
       break;
