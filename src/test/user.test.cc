@@ -62,7 +62,6 @@ TEST_CASE("user: User defined functions")
     auto expected = lispread(s);
     CHECK(!is_NIL(equal(rep0, expected)));
     auto rep1 = getrep(l, f0);
-    print(rep1);
     CHECK(!is_NIL(equal(rep0, rep1)));
     auto r0 = apply(f0, mklist(0_l));
     CHECK(!is_NIL(equal(r0, cons(0_l, NIL))));
