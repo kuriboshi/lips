@@ -9,7 +9,7 @@
 namespace lisp
 {
 
-TEST_CASE("User defined functions")
+TEST_CASE("user: User defined functions")
 {
   lisp l;
   current c(l);
@@ -46,21 +46,32 @@ TEST_CASE("User defined functions")
     auto r1 = defineq(l, f0);
     REQUIRE(type_of(r1) == type::CONS);
     CHECK(equal(r1, mklist(mkatom("f0"), mkatom("f1"))));
+    auto r2 = defineq(l, NIL);
+    CHECK(is_NIL(r2));
   }
 
   SECTION("getrep")
   {
-    auto f = lambda(mklist(mkatom("a")), mklist(mklist(mkatom("cons"), mkatom("a"), NIL)));
-    auto rep0 = getrep(f);
-    // There is a problem here that the symbol 'nil' is not considered equal to
-    // the empty list '()'.
+    auto nil0 = getrep(NIL);
+    CHECK(is_NIL(nil0));
+    auto f0 = lambda("(a)"_l, "((cons a ()))"_l);
+    auto rep0 = getrep(l, f0);
+    // TODO: There is a problem here that the symbol 'nil' is not considered
+    // equal to the empty list '()'.
     std::string s("(lambda (a) (cons a ()))\n");
     auto expected = lispread(s);
     CHECK(!is_NIL(equal(rep0, expected)));
-    auto rep1 = getrep(l, f);
+    auto rep1 = getrep(l, f0);
+    print(rep1);
     CHECK(!is_NIL(equal(rep0, rep1)));
-    auto r0 = apply(f, mklist(0_l));
-    CHECK(equal(r0, cons(0_l, NIL)));
+    auto r0 = apply(f0, mklist(0_l));
+    CHECK(!is_NIL(equal(r0, cons(0_l, NIL))));
+    auto f2 = nlambda("a"_a, "(a)"_l);
+    auto rep2 = getrep(f2);
+    CHECK(!is_NIL(equal(rep2, "(nlambda a a)"_l)));
+    auto f3 = lambda("(a b . c)"_l, "((cons a b))"_l);
+    auto rep3 = getrep(f3);
+    CHECK(!is_NIL(equal(rep3, "(lambda (a b . c) (cons a b))"_l)));
   }
 
   SECTION("Verbose flag")
@@ -79,7 +90,7 @@ TEST_CASE("User defined functions")
     auto out = std::make_unique<file_t>(cout);
     l.primout(std::move(out));
     eval(l, "(setq verbose t)");
-    auto f1 = define(l, mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
+    auto f1 = define(mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
     auto redef1 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(!is_NIL(redef1));
     CHECK(cout.str() == "(f redefined)\n");

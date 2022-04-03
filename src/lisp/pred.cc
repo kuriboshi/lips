@@ -61,7 +61,7 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
       return (l1->string() == l2->string()) ? T : NIL;
     case type::LAMBDA:
     case type::NLAMBDA:
-      return funeq(l, l1, l2);
+      return user::funeq(l, l1, l2);
     case type::INTEGER:
       return (l1->intval() == l2->intval() ? T : NIL);
     default:

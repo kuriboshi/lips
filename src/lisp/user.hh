@@ -21,8 +21,6 @@ LISPT df(lisp&, LISPT, LISPT, LISPT);
 LISPT funeq(lisp&, LISPT, LISPT);
 } // namespace user
 
-inline LISPT funeq(lisp& l, LISPT a, LISPT b) { return user::funeq(l, a, b); }
-inline LISPT funeq(LISPT a, LISPT b) { return user::funeq(lisp::current(), a, b); }
 inline LISPT getrep(lisp& l, LISPT a) { return user::getrep(l, a); }
 inline LISPT getrep(LISPT a) { return user::getrep(lisp::current(), a); }
 inline LISPT define(lisp& l, LISPT a, LISPT b) { return user::define(l, a, b); }
