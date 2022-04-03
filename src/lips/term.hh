@@ -16,7 +16,7 @@ public:
   virtual ~term_source();
 
   // io::source
-  virtual int getch(bool inside_string) override;
+  virtual int getch() override;
   virtual void ungetch(int) override;
   virtual bool close() override { return true; }
   virtual std::optional<std::string> getline() override;

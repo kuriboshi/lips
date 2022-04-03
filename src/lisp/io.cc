@@ -303,13 +303,13 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
 LISPT rmdquote(lisp& l, file_t& file, LISPT, char)
 {
   std::string buffer;
-  auto c = file.getch(true);
+  auto c = file.getch();
   while(c != '"')
   {
     if(c == '\\')
-      c = file.getch(true);
+      c = file.getch();
     buffer.push_back(c);
-    c = file.getch(true);
+    c = file.getch();
   }
   return mkstring(l, buffer);
 }

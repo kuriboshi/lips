@@ -42,9 +42,7 @@ public:
   source() {}
   virtual ~source() = default;
 
-  static inline constexpr char COMMENTCHAR = '#';
-
-  virtual int getch(bool inside_string = false) = 0;
+  virtual int getch() = 0;
   virtual void ungetch(int) = 0;
   virtual bool close() = 0;
   virtual std::optional<std::string> getline() = 0;
@@ -54,13 +52,9 @@ public:
   virtual iterator end() { return iterator(); }  
 
 protected:
-  int getch(std::istream& stream, bool inside_string)
+  int getch(std::istream& stream)
   {
-    auto _curc = stream.get();
-    if(!inside_string && _curc == COMMENTCHAR) /* Skip comments.  */
-      while((_curc = stream.get()) != '\n')
-        ;
-    return _curc;
+    return stream.get();
   }
 
   std::optional<std::string> getline(std::istream& stream)
@@ -84,9 +78,9 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch(bool inside_string) override
+  virtual int getch() override
   {
-    return getch(*_file, inside_string);
+    return getch(*_file);
   }
   virtual void ungetch(int c) override { _file->putback(c); }
   virtual bool close() override
@@ -114,9 +108,9 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch(bool inside_string) override
+  virtual int getch() override
   {
-    return getch(_stream, inside_string);
+    return getch(_stream);
   }
   virtual void ungetch(int c) override { _stream.putback(c); }
   virtual bool close() override { return true; }
@@ -139,9 +133,9 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch(bool inside_string) override
+  virtual int getch() override
   {
-    return getch(_string, inside_string);
+    return getch(_string);
   }
   virtual void ungetch(int c) override { _string.putback(c); }
   virtual bool close() override { return true; }
@@ -264,7 +258,7 @@ public:
 
   // source
   io::source& source() { return *_source; }
-  int getch(bool inside_string = false) { ptrcheck(_source); return _source->getch(inside_string); }
+  int getch() { ptrcheck(_source); return _source->getch(); }
   void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
   std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
 

@@ -129,7 +129,7 @@ void term_source::putch(int c, FILE* file, int esc)
  * Get a character.  Buffer input with procedure getline, and get characters
  * from linebuffer.
  */
-int term_source::getch(bool)
+int term_source::getch()
 {
   while(true)
   {
