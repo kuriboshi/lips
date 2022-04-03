@@ -452,4 +452,45 @@ TEST_CASE("io: Read tables")
   CHECK(!isinfix('$'));
 }
 
+TEST_CASE("io: splice")
+{
+  lisp l;
+  current c(l);
+  {
+    auto x = "(a b c)"_l;
+    auto y = "(x y z)"_l;
+    auto r = io::splice(l, x, y, false);
+    CHECK(!is_NIL(equal(x, "(x y z b c)"_l)));
+    CHECK(!is_NIL(equal(r, "(z b c)"_l)));
+  }
+  {
+    auto x = "(a b c)"_l;
+    auto y = "(x y z)"_l;
+    auto r = io::splice(l, cdr(l, x), y, false);
+    CHECK(!is_NIL(equal(x, "(a x y z c)"_l)));
+    CHECK(!is_NIL(equal(r, "(z c)"_l)));
+  }
+  {
+    auto x = "(a b c)"_l;
+    auto y = "(x y z)"_l;
+    auto r = io::splice(l, cdr(l, x), y, true);
+    CHECK(!is_NIL(equal(x, "(a b x y z c)"_l)));
+    CHECK(!is_NIL(equal(r, "(z c)"_l)));
+  }
+  {
+    auto x = "(a b c)"_l;
+    auto y = "x"_l;
+    auto r = io::splice(l, x, y, false);
+    CHECK(!is_NIL(equal(x, "(x b c)"_l)));
+    CHECK(!is_NIL(equal(r, "(x b c)"_l)));
+  }
+  {
+    auto x = "(a b c)"_l;
+    auto y = "x"_l;
+    auto r = io::splice(l, x, y, true);
+    CHECK(!is_NIL(equal(x, "(a x b c)"_l)));
+    CHECK(!is_NIL(equal(r, "(a x b c)"_l)));
+  }
+}
+
 }

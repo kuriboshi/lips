@@ -267,15 +267,35 @@ LISPT terpri(lisp&, file_t& file)
   return NIL;
 }
 
-//
-// Splice list y into x keeping cdr of x. If y is not a list put it in car of x
-// and return x, otherwise return last cell of y with cdr set to original (cdr
-// x).  If tailp is true, don't clobber car of x.
-//
+/// @brief Splice an object into a list.
+///
+/// @details Splices list y into x keeping cdr of x. For example:
+/// @code{.lisp}
+/// (let ((x '(a b c))
+///       (y '(x y z)))
+///  (splice x y)
+///  x)
+/// @endcode
+/// Modifies x to hold the value (x y x b c).
+///
+/// Another example:
+/// @code{.lisp}
+/// (let ((x '(a b c))
+///       (y '(x y z)))
+///  (splice (cdr x) y)
+///  x)
+/// @endcode
+/// Modifies x to hold the value (a x y z c).
+///
+/// If y is not a list put it in car of x and return x, otherwise return last
+/// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
+/// car of x.
+///
 LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
 {
+  check(x, type::CONS);
   LISPT t = x->cdr();
-  if(type_of(x) != type::CONS)
+  if(type_of(y) != type::CONS)
   {
     if(tailp)
       rplacd(l, x, cons(l, y, t));
