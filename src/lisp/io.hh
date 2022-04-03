@@ -228,15 +228,18 @@ class string_sink final: public sink
 public:
   string_sink() {}
 
-  std::string string() const { return _string; }
+  using sink::putch;
 
-  virtual void putch(int c, bool) override { _string.push_back(static_cast<char>(c)); }
-  virtual void puts(const std::string_view s) override { _string.append(s); }
-  virtual void terpri() override { _string.push_back('\n'); }
+  std::string string() const { return _stream.str(); }
+
+  virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
+  virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  virtual void terpri() override { _stream.put('\n'); }
+  virtual void flush() override { _stream.flush(); }
   virtual bool close() override { return true; }
 
 private:
-  std::string _string;
+  std::ostringstream _stream;
 };
 
 }
