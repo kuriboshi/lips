@@ -20,16 +20,6 @@ public:
   evaluator(lisp&);
   ~evaluator() = default;
 
-  using continuation_t = bool (evaluator::*)();
-
-  //
-  // The control stack.
-  //
-  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
-  static constexpr int CTRLBLKSIZE = 4000;
-  std::array<control_t, CTRLBLKSIZE> control; // Control-stack
-  int toctrl = 0;                             // Control-stack stack pointer
-
   void reset();
 
   LISPT eval(LISPT);
@@ -56,6 +46,15 @@ public:
   destblock_t* environment() const { return env; }
 
 private:
+  //
+  // The control stack.
+  //
+  using continuation_t = bool (evaluator::*)();
+  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
+  static constexpr int CTRLBLKSIZE = 4000;
+  std::array<control_t, CTRLBLKSIZE> control; // Control-stack
+  int toctrl = 0;                             // Control-stack stack pointer
+
   // @brief Pushes continuations, destinations, or LISPT objects on the control
   // stack.
   template<typename T>
