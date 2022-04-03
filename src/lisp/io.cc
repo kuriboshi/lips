@@ -294,6 +294,8 @@ LISPT terpri(lisp&, file_t& file)
 LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
 {
   check(x, type::CONS);
+  if(is_NIL(y))
+    return x;
   LISPT t = x->cdr();
   if(type_of(y) != type::CONS)
   {
@@ -308,8 +310,6 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
     rplaca(l, x, y->car());
     y = y->cdr();
   }
-  if(is_NIL(y))
-    return x;
   rplacd(l, x, y);
   LISPT t2 = NIL;
   for(; type_of(y) == type::CONS; y = y->cdr()) t2 = y;
