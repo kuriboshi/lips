@@ -44,7 +44,7 @@ LISPT evaluator::printwhere()
         lsp && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
       {
         foo = *lsp;
-        l.primerr().format(" [in ");
+        l.primerr().format("[in ");
         file::prin2(l, foo->car(), T);
         l.primerr().putch(']');
         break;
@@ -59,7 +59,7 @@ LISPT evaluator::printwhere()
 /// level.
 void evaluator::abort(int m, LISPT v)
 {
-  l.error(m, v);
+  l.perror(m, v);
   printwhere();
   unwind();
   throw lisp_error("abort");

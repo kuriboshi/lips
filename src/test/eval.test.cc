@@ -108,4 +108,15 @@ TEST_CASE("topofstack")
   CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 99_l)), r1)));
 }
 
+TEST_CASE("eval: control limits")
+{
+  lisp l;
+  current c(l);
+  std::ostringstream err;
+  l.primerr(std::make_unique<file_t>(err));
+  "(defineq (f (lambda () (f))))"_e;
+  CHECK_THROWS_WITH("(f)"_e, "abort");
+  CHECK(err.str() == "Stack overflow [in f]\n");
+}
+
 }
