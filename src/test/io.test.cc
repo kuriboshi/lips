@@ -274,6 +274,85 @@ TEST_CASE("io: sink")
   }
 }
 
+TEST_CASE("io: patom primout/primerr")
+{
+  lisp l;
+  current c(l);
+
+  {
+    std::ostringstream out;
+    l.primout(std::make_unique<file_t>(out));
+    patom(l, "foo"_a, false);
+    terpri(l, false);
+    CHECK(out.str() == "foo\n");
+  }
+  {
+    std::ostringstream err;
+    l.primerr(std::make_unique<file_t>(err));
+    patom(l, "bar"_a, true);
+    terpri(l, true);
+    CHECK(err.str() == "bar\n");
+  }
+  {
+    std::ostringstream out;
+    l.primout(std::make_unique<file_t>(out));
+    patom("foo"_a, false);
+    terpri(false);
+    CHECK(out.str() == "foo\n");
+  }
+  {
+    std::ostringstream err;
+    l.primerr(std::make_unique<file_t>(err));
+    patom("bar"_a, true);
+    terpri(true);
+    CHECK(err.str() == "bar\n");
+  }
+}
+
+TEST_CASE("io: prinbody")
+{
+  lisp l;
+  current c(l);
+
+  auto list = "(a b c . d)"_l;
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prinbody(l, list, *f);
+    CHECK(os.str() == "a b c . d");
+  }
+  {
+    std::ostringstream os;
+    auto f = std::make_unique<file_t>(os);
+    prinbody(list, *f);
+    CHECK(os.str() == "a b c . d");
+  }
+  {
+    std::ostringstream os;
+    l.primout(std::make_unique<file_t>(os));
+    prinbody(l, list, false);
+    CHECK(os.str() == "a b c . d");
+  }
+  {
+    std::ostringstream os;
+    l.primerr(std::make_unique<file_t>(os));
+    prinbody(l, list, true);
+    CHECK(os.str() == "a b c . d");
+  }
+  {
+    std::ostringstream os;
+    l.primout(std::make_unique<file_t>(os));
+    prinbody(list, false);
+    CHECK(os.str() == "a b c . d");
+  }
+  {
+    std::ostringstream os;
+    l.primerr(std::make_unique<file_t>(os));
+    prinbody(list, true);
+    CHECK(os.str() == "a b c . d");
+  }
+}
+
 TEST_CASE("io: Read tables")
 {
   lisp l;
