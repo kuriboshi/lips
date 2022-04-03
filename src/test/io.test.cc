@@ -38,8 +38,8 @@ TEST_CASE("io: Basic I/O")
 
 TEST_CASE("io: ratom")
 {
-  lisp lisp;
-  current c(lisp);
+  lisp l;
+  current c(l);
 
   SECTION("integer")
   {
@@ -50,10 +50,18 @@ TEST_CASE("io: ratom")
   }
   SECTION("symbol")
   {
-    std::string s{"124abc"};
-    file_t in{s};
-    auto r = ratom(in);
-    CHECK(type_of(r) == type::SYMBOL);
+    {
+      std::string s{"124abc"};
+      file_t in{s};
+      auto r = ratom(in);
+      CHECK(type_of(r) == type::SYMBOL);
+    }
+    {
+      std::string s{"124abc"};
+      file_t in{s};
+      auto r = ratom(l, in);
+      CHECK(type_of(r) == type::SYMBOL);
+    }
   }
   SECTION("string")
   {
@@ -66,18 +74,18 @@ TEST_CASE("io: ratom")
   }
 }
 
-TEST_CASE("io: Read lisp objects")
+TEST_CASE("io: lispread/readline")
 {
-  lisp lisp;
-  current c(lisp);
+  lisp l;
+  current c(l);
 
   SECTION("Read from utf-8")
   {
     std::string s_nihongo{"\"日本語\"\n"};
     file_t in{s_nihongo};
-    auto nihongo = lispread(lisp, in);
+    auto nihongo = lispread(l, in);
     file_t out(std::make_unique<io::string_sink>());
-    print(lisp, nihongo, out);
+    print(l, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
@@ -86,9 +94,9 @@ TEST_CASE("io: Read lisp objects")
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     file_t in{s_nihongo};
-    auto nihongo = lispread(lisp, in);
+    auto nihongo = lispread(l, in);
     file_t out(std::make_unique<io::string_sink>());
-    print(lisp, nihongo, out);
+    print(l, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
@@ -102,9 +110,9 @@ TEST_CASE("io: Read lisp objects")
       o << s_nihongo;
     }
     auto f = file_t(std::make_unique<io::file_source>(test_file));
-    auto nihongo = lispread(lisp, f);
+    auto nihongo = lispread(l, f);
     file_t out(std::make_unique<io::string_sink>());
-    print(lisp, nihongo, out);
+    print(l, nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
     std::filesystem::remove(test_file);
   }
@@ -113,11 +121,11 @@ TEST_CASE("io: Read lisp objects")
   {
     std::string s0{R"((hello world))"};
     auto f0 = file_t(s0);
-    auto result0 = lispread(lisp, f0);
+    auto result0 = lispread(l, f0);
     std::string s1{R"(hello world)"};
     auto f1 = file_t(s1);
-    auto result1 = readline(lisp, f1);
-    CHECK(equal(lisp, result0, result1) != NIL);
+    auto result1 = readline(l, f1);
+    CHECK(equal(l, result0, result1) != NIL);
   }
 
   SECTION("floatp")
@@ -125,6 +133,42 @@ TEST_CASE("io: Read lisp objects")
     auto f0 = lispread("-1.2345E-2");
     CHECK(f0->floatval() == Approx(-1.2345E-2).epsilon(0.01));
   }
+
+  SECTION("lispread & readline")
+  {
+    std::string s0{"hello"};
+    auto f0 = file_t(s0);
+    auto r0 = lispread(f0);
+    CHECK(r0 == "hello"_a);
+    auto f1 = file_t(s0);
+    auto r1 = readline(f1);
+    CHECK(r0 == "hello"_a);
+  }
+}
+
+TEST_CASE("io: source/sink")
+{
+  file_t f0(std::make_unique<io::string_source>("(a)"));
+  CHECK(f0.has_source());
+  CHECK(!f0.has_sink());
+  CHECK_THROWS_WITH(f0.terpri(), "file_t: No sink");
+  file_t f1(std::make_unique<io::string_sink>());
+  CHECK(!f1.has_source());
+  CHECK(f1.has_sink());
+  CHECK_THROWS_WITH(f1.getline(), "file_t: No source");
+}
+
+TEST_CASE("io: file_t functions")
+{
+  lisp l;
+  current c(l);
+
+  file_t f0(std::make_unique<io::string_sink>());
+  patom("hello"_a, f0);
+  terpri(f0);
+  patom(l, "world"_a, f0);
+  terpri(l, f0);
+  CHECK(to_string(f0.sink()) == "hello\nworld\n");
 }
 
 TEST_CASE("io: source")
