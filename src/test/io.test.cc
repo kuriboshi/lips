@@ -6,10 +6,27 @@
 #include <filesystem>
 #include <lisp/libisp.hh>
 
+namespace
+{
+struct create_test_file final
+{
+  static constexpr const char* file{"test.lisp"};
+  create_test_file(const std::string& contents)
+  {
+    std::ofstream of(file);
+    of << contents;
+  }
+  ~create_test_file()
+  {
+    std::filesystem::remove(file);
+  }
+};
+}
+
 namespace lisp
 {
 
-TEST_CASE("io Basic I/O")
+TEST_CASE("io: Basic I/O")
 {
   lisp lisp;
   current c(lisp);
@@ -19,7 +36,7 @@ TEST_CASE("io Basic I/O")
   CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
 }
 
-TEST_CASE("io ratom")
+TEST_CASE("io: ratom")
 {
   lisp lisp;
   current c(lisp);
@@ -49,7 +66,7 @@ TEST_CASE("io ratom")
   }
 }
 
-TEST_CASE("io Read lisp objects")
+TEST_CASE("io: Read lisp objects")
 {
   lisp lisp;
   current c(lisp);
@@ -107,6 +124,82 @@ TEST_CASE("io Read lisp objects")
   {
     auto f0 = lispread("-1.2345E-2");
     CHECK(f0->floatval() == Approx(-1.2345E-2).epsilon(0.01));
+  }
+}
+
+TEST_CASE("io: source")
+{
+  SECTION("io::file_source")
+  {
+    create_test_file test("#!\n");
+    io::file_source f{test.file};
+    auto c = f.getch();
+    CHECK(c == '#');
+    f.ungetch(c);
+    c = f.getch();
+    CHECK(c == '#');
+    c = f.getch();
+    CHECK(c == '!');
+    CHECK(f.close());
+  }
+
+  SECTION("io::stream_source")
+  {
+    create_test_file test("#!\n");
+    {
+      std::ifstream is{test.file};
+      io::stream_source f{is};
+      auto c = f.getch();
+      CHECK(c == '#');
+      f.ungetch(c);
+      c = f.getch();
+      CHECK(c == '#');
+      c = f.getch();
+      CHECK(c == '!');
+      CHECK(f.close());
+    }
+    {
+      std::ifstream is{test.file};
+      io::stream_source f{is};
+      auto l = f.getline();
+      REQUIRE(l);
+      CHECK(*l == "#!");
+    }
+    {
+      std::ifstream is{test.file};
+      io::stream_source f{is};
+      auto b = f.begin();
+      CHECK(*b == '#');
+      ++b;
+      CHECK(*b == '!');
+      ++b;
+      CHECK(*b == '\n');
+      ++b;
+      CHECK(b == f.end());
+    }
+  }
+
+  SECTION("io::string_source")
+  {
+    io::string_source ss{"#!\n"};
+    auto c = ss.getch();
+    CHECK(c == '#');
+    ss.ungetch(c);
+    c = ss.getch();
+    CHECK(c == '#');
+    CHECK(ss.close());
+  }
+}
+
+TEST_CASE("io: sink")
+{
+  SECTION("io::string_sink")
+  {
+    io::string_sink ss;
+    ss.putch('\03', false);
+    ss.terpri();
+    ss.close();
+    CHECK(ss.string() == "^C\n");
   }
 }
 
