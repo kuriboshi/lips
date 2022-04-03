@@ -36,7 +36,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
   }();
   if(!f)
     return l.error(CANT_OPEN, filename);
-  LISPT newfile = getobject(l);
+  LISPT newfile = l.a().getobject();
   newfile->set(std::move(f));
   return newfile;
 }

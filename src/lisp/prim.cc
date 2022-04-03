@@ -260,9 +260,9 @@ LISPT null(lisp& l, LISPT a)
 
 LISPT quote(lisp& l, LISPT x) { return x; }
 
-LISPT lambda(lisp& l, LISPT x, LISPT f) { return mklambda(l, x, f, type::LAMBDA); }
+LISPT lambda(lisp& l, LISPT x, LISPT f) { return l.a().mklambda(x, f, type::LAMBDA); }
 
-LISPT nlambda(lisp& l, LISPT x, LISPT f) { return mklambda(l, x, f, type::NLAMBDA); }
+LISPT nlambda(lisp& l, LISPT x, LISPT f) { return l.a().mklambda(x, f, type::NLAMBDA); }
 
 LISPT list(lisp& l, LISPT x) { return x; }
 

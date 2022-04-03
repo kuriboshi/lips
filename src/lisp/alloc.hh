@@ -249,14 +249,12 @@ private:
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 
-inline LISPT mklambda(lisp& l, LISPT args, LISPT def, type type) { return l.a().mklambda(args, def, type); }
-inline LISPT mklambda(LISPT args, LISPT def, type type) { return mklambda(lisp::current(), args, def, type); }
 inline LISPT mkstring(lisp& l, const std::string& s) { return l.a().mkstring(s); }
 inline LISPT mkstring(const std::string& s) { return mkstring(lisp::current(), s); }
-inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
-inline LISPT mknumber(int i) { return mknumber(lisp::current(), i); }
 inline LISPT mkatom(lisp& l, const std::string& s) { return l.a().mkatom(s); }
 inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
+inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
+inline LISPT mknumber(int i) { return mknumber(lisp::current(), i); }
 inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
@@ -264,6 +262,12 @@ inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 inline LISPT operator"" _s(const char* s, std::size_t)
 {
   return mkstring(s);
+}
+
+/// @brief Simpler way to create an atom.
+inline LISPT operator"" _a(const char* s, std::size_t)
+{
+  return mkatom(s);
 }
 
 /// @brief Creates a number.
@@ -284,12 +288,6 @@ inline LISPT operator"" _l(const char* s, std::size_t)
   file_t in(s);
   auto e = lispread(lisp::current(), in);
   return e;
-}
-
-/// @brief Simpler way to create an atom.
-inline LISPT operator"" _a(const char* s, std::size_t)
-{
-  return mkatom(s);
 }
 
 /// @brief Evaluates a lisp expression in a string.
@@ -319,9 +317,6 @@ LISPT mklist(LISPT t, Ts ...ts)
 {
   return cons(t, mklist(ts...));
 }
-
-inline LISPT getobject(lisp& l) { return l.a().getobject(); }
-inline LISPT getobject() { return getobject(lisp::current()); }
 
 inline cvariable_t& initcvar(const std::string& name, LISPT val) { return lisp::current().a().initcvar(name, val); }
 inline cvariable_t& initcvar(alloc& a, const std::string& name, LISPT val) { return a.initcvar(name, val); }

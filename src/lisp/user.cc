@@ -109,7 +109,7 @@ LISPT def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
   check(name, type::SYMBOL);
   if(!is_NIL(pars) && type_of(pars) != type::SYMBOL)
     check(pars, type::CONS);
-  LISPT foo = mklambda(l, pars, body, type);
+  LISPT foo = l.a().mklambda(pars, body, type);
   checkfn(l, name, foo);
   name->value(foo);
   return cons(l, name, NIL);

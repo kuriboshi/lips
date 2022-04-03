@@ -91,9 +91,14 @@ TEST_CASE("C Variables")
   eval(l, "(setq xvar \"world\")");
   CHECK(xvar->getstr() == "world");
 
-  auto& yvar = l.a().initcvar("yvar", 0_l);
+  auto& yvar = initcvar(l.a(), "yvar", 0_l);
   eval(l, "(setq yvar \"string\")");
   CHECK(yvar->getstr() == "string");
+
+  auto& zvar = initcvar("zvar", 22_l);
+  CHECK(zvar->intval() == 22);
+  eval("(setq zvar \"foo\")");
+  CHECK(zvar->getstr() == "foo");
 }
 
 TEST_CASE("obarray")
