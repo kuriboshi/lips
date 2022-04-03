@@ -193,6 +193,33 @@ TEST_CASE("io: source")
 
 TEST_CASE("io: sink")
 {
+  SECTION("io::file_sink")
+  {
+    create_test_file test("");
+    io::file_sink f(test.file);
+    f.puts("hello");
+    f.terpri();
+    CHECK(f.close());
+    std::ifstream fs(test.file);
+    std::ostringstream ss;
+    ss << fs.rdbuf();
+    CHECK(ss.str() == "hello\n");
+  }
+
+  SECTION("io::stream_sink")
+  {
+    create_test_file test("world");
+    std::ofstream of(test.file);
+    io::stream_sink f(of);
+    f.puts("hello");
+    f.terpri();
+    CHECK(f.close());
+    std::ifstream fs(test.file);
+    std::ostringstream ss;
+    ss << fs.rdbuf();
+    CHECK(ss.str() == "hello\n");
+  }
+
   SECTION("io::string_sink")
   {
     io::string_sink ss;

@@ -217,7 +217,11 @@ public:
   virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
   virtual void terpri() override { _stream.put('\n'); }
   virtual void flush() override { _stream.flush(); }
-  virtual bool close() override { return true; }
+  virtual bool close() override
+  {
+    _stream.flush();
+    return true;
+  }
 
 private:
   std::ostream& _stream;
