@@ -277,9 +277,9 @@ public:
   void flush() { ptrcheck(_sink); _sink->flush(); }
 
   template<typename... Ts>
-  void format(Ts&&... t)
+  void format(std::string_view f, Ts&&... t)
   {
-    auto ret = fmt::format(t...);
+    auto ret = fmt::vformat(f, fmt::make_format_args(t...));
     _sink->puts(ret);
   }
 
