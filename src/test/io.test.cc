@@ -383,31 +383,31 @@ TEST_CASE("io: prin0")
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(lambda("a"_a, NIL), *f);
-    CHECK(os.str().substr(0, 8) == "#<lambda");
+    CHECK(os.str().starts_with("#<lambda"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(nlambda("a"_a, NIL), *f);
-    CHECK(os.str().substr(0, 9) == "#<nlambda");
+    CHECK(os.str().starts_with("#<nlambda"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(closure(lambda(NIL, "(a)"_l), "(a)"_l), *f);
-    CHECK(os.str().substr(0, 9) == "#<closure");
+    CHECK(os.str().starts_with("#<closure"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0("+"_e, *f);
-    CHECK(os.str().substr(0, 6) == "#<subr");
+    CHECK(os.str().starts_with("#<subr"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0("quote"_e, *f);
-    CHECK(os.str().substr(0, 7) == "#<fsubr");
+    CHECK(os.str().starts_with("#<fsubr"));
   }
   {
     std::ostringstream os;
@@ -419,13 +419,13 @@ TEST_CASE("io: prin0")
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(C_EOF, *f);
-    CHECK(os.str().substr(0, 11) == "#<endoffile");
+    CHECK(os.str().starts_with("#<endoffile"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(C_ERROR, *f);
-    CHECK(os.str().substr(0, 7) == "#<error");
+    CHECK(os.str().starts_with("#<error"));
   }
 }
 
