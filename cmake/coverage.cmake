@@ -19,20 +19,20 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
   set(TARGET_NAME lisp_test)
   add_custom_target(
     ccov-preprocessing
-    COMMAND LLVM_PROFILE_FILE=${TARGET_NAME}.profraw
+    COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
             $<TARGET_FILE:${TARGET_NAME}>
-    COMMAND ${LLVM_PROFDATA} merge -sparse ${TARGET_NAME}.profraw
-            -o ${TARGET_NAME}.profdata
+    COMMAND ${LLVM_PROFDATA} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
+            -o ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
     DEPENDS ${TARGET_NAME})
   add_custom_target(
     ccov-report
     COMMAND ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
-            -instr-profile=${TARGET_NAME}.profdata
+            -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
     DEPENDS ccov-preprocessing)
   add_custom_target(
     ccov
     COMMAND ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
-            -instr-profile=${TARGET_NAME}.profdata -show-line-counts-or-regions
+            -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata -show-line-counts-or-regions
             -output-dir=${CMAKE_CURRENT_BINARY_DIR}/html -format="html"
     DEPENDS ccov-preprocessing)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
