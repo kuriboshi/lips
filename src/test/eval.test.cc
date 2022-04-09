@@ -68,12 +68,12 @@ TEST_CASE("eval: Eval functions")
     CHECK(r0->intval() == 123);
   }
 
-  SECTION("Evaluate simple expression: (+ 123 1)")
+  SECTION("Evaluate simple expression: (plus 123 1)")
   {
-    auto e1 = cons(lisp, mkatom(lisp, "+"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
+    auto e1 = cons(lisp, mkatom(lisp, "plus"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
     auto out0 = std::make_unique<file_t>(std::make_unique<io::string_sink>());
     prin0(lisp, e1, *out0.get());
-    CHECK(to_string(out0->sink()) == std::string("(+ 123 1)"));
+    CHECK(to_string(out0->sink()) == std::string("(plus 123 1)"));
     auto r1 = eval(lisp, e1);
     CHECK(r1->intval() == 124);
   }

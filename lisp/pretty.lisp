@@ -96,8 +96,8 @@
      (and (cdr exp)
           (prin1 " "))
      (pptail (cdr exp)
-             (+ indent (symlen (car exp))
-                2)
+             (plus indent (symlen (car exp))
+                   2)
              super)))
 
   (pptail
@@ -109,8 +109,8 @@
                    3)
             (lessp (length exp)
                    3))
-       (setq indent (+ indent (symlen (car exp))
-                       1))
+       (setq indent (plus indent (symlen (car exp))
+                          1))
        (prin2 (car exp))
        (and (setq exp (cdr exp))
             (prin1 " "))))
@@ -127,12 +127,12 @@
             (cond
              ((and (litatom (car exp))
                    (setq indent2
-                         (+ indent2 (symlen (car exp)) 1))
+                         (plus indent2 (symlen (car exp)) 1))
                    (if (greaterp indent2 60)
-                       (lessp (+ indent2
-                                 (if (litatom (cadr exp))
-                                     (symlen (cadr exp))
-                                   0)) 79)
+                       (lessp (plus indent2
+                                    (if (litatom (cadr exp))
+                                        (symlen (cadr exp))
+                                      0)) 79)
                      t))
               (prin1 " "))
              (t (ppnl indent)

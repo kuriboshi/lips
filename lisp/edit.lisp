@@ -44,7 +44,7 @@
           (setq com))
          ((minusp tmp)
           (setq clist (attach cexp clist))
-          (setq cexp (nth cexp (+ (length cexp) tmp 1))))
+          (setq cexp (nth cexp (plus (length cexp) tmp 1))))
          (t (setq clist (attach cexp clist))
             (setq cexp (nth cexp tmp)))))
        ((listp tmp)

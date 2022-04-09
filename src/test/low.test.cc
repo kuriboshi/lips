@@ -51,14 +51,14 @@ TEST_CASE("Low level functions")
     set("i"_l, 3_l);
     xwhile(mklist("greaterp"_a, "i"_a, 0_l),
       mklist(
-        mklist("setq"_a, "a"_a, mklist("+"_a, "a"_a, "i"_a)),
-        mklist("setq"_a, "i"_a, mklist("-"_a, "i"_a, 1_l))));
+        mklist("setq"_a, "a"_a, mklist("plus"_a, "a"_a, "i"_a)),
+        mklist("setq"_a, "i"_a, mklist("difference"_a, "i"_a, 1_l))));
     CHECK("a"_a->value()->intval() == 6);
     set("i"_a, 3_l);
     xwhile(l, mklist(l, "greaterp"_a, "i"_a, 0_l),
       mklist(l, 
-        mklist(l, "setq"_a, "a"_a, mklist(l, "+"_a, "a"_a, "i"_a)),
-        mklist(l, "setq"_a, "i"_a, mklist(l, "-"_a, "i"_a, 1_l))));
+        mklist(l, "setq"_a, "a"_a, mklist(l, "plus"_a, "a"_a, "i"_a)),
+        mklist(l, "setq"_a, "i"_a, mklist(l, "difference"_a, "i"_a, 1_l))));
   }
 
   SECTION("low: cond")
@@ -119,7 +119,7 @@ TEST_CASE("Low level functions")
   (setq r 0)
   ((lambda (i)
     (while (leq i 9)
-           (setq i (+ i 1)))
+           (setq i (plus i 1)))
     (setq r i))
    0)
   r)

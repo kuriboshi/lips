@@ -64,9 +64,9 @@
 (de ppfun (exp indent)
   (prin2 (car exp))
   (and (cdr exp) (prin1 " "))
-  (pptail (cdr exp) (+ indent
-                       (symlen (car exp))
-                       2)))
+  (pptail (cdr exp) (plus indent
+                          (symlen (car exp))
+                          2)))
 
 (de symlen (s)
   (strlen (symstr s)))
@@ -79,9 +79,9 @@
          (lessp (length exp) 3))
     (prin2 (car exp))
     (setq indent
-          (+ indent
-             (symlen (car exp))
-             1))
+          (plus indent
+                (symlen (car exp))
+                1))
     (and (setq exp (cdr exp))
          (prin1 " "))))
   (while exp

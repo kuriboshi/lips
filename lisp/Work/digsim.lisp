@@ -89,7 +89,7 @@
  ((wire 'add-action!) action-procedure))
 
 (de after-delay (delay action)
- (add-to-agenda! (+ delay (current-time the-agenda))
+ (add-to-agenda! (plus delay (current-time the-agenda))
                  action
                  the-agenda))
 

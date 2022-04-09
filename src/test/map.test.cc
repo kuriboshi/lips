@@ -26,7 +26,7 @@ TEST_CASE("Map functions")
     CHECK(caddr(cvar)->intval() == 1);
 
     cvar = 0_l;
-    auto f = eval(l, "(lambda (a) (setq cvar (+ (apply + a) cvar)))");
+    auto f = eval(l, "(lambda (a) (setq cvar (plus (apply plus a) cvar)))");
     map(mklist(1_l, 1_l, 1_l), f, NIL);
     CHECK(cvar->intval() == 6);
 
@@ -52,7 +52,7 @@ TEST_CASE("Map functions")
     CHECK(caddr(cvar)->intval() == 1);
 
     cvar = 0_l;
-    auto f = lambda(l, "(a)"_l, "((setq cvar (+ a cvar)))"_l);
+    auto f = lambda(l, "(a)"_l, "((setq cvar (plus a cvar)))"_l);
     mapc(mklist(1_l, 1_l, 1_l), f, NIL);
     REQUIRE(type_of(cvar) == type::INTEGER);
     CHECK(cvar->intval() == 3);
@@ -90,7 +90,7 @@ TEST_CASE("Map functions")
   SECTION("mapcar")
   {
     auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
-    auto f = lambda(l, "(a)"_l, "((+ a 1))"_l);
+    auto f = lambda(l, "(a)"_l, "((plus a 1))"_l);
 
     auto r0 = mapcar(l, ls, f, NIL);
     REQUIRE(type_of(r0) == type::CONS);

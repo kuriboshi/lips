@@ -69,7 +69,7 @@
                        (cond
                         ((substr x 1 (strlen home)))
                         (t "")))
-                (concat "~" (substr x (+ (strlen home) 1) (strlen x))))
+                (concat "~" (substr x (plus (strlen home) 1) (strlen x))))
                (t x)))))
 
 (de dirsprint (ds save)

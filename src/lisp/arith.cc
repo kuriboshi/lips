@@ -366,33 +366,33 @@ LISPT minusp(lisp& l, LISPT x)
 
 namespace pn
 {
-inline constexpr auto PLUS = "+";            // add
-inline constexpr auto DIFFERENCE = "-";      // subtract
-inline constexpr auto TIMES = "*";           // multiply
-inline constexpr auto DIVIDE = "/";          // divide
-inline constexpr auto IPLUS = "i+";          // integer add
-inline constexpr auto IDIFFERENCE = "i-";    // integer subtract
-inline constexpr auto ITIMES = "i*";         // integer multiply
-inline constexpr auto IQUOTIENT = "i/";      // integer divide
-inline constexpr auto IREMAINDER = "i%";     // integer mod
-inline constexpr auto IMINUS = "iminus";     // integer change sign
-inline constexpr auto MINUS = "minus";       // change sign generic
-inline constexpr auto ADD1 = "add1";         // add one
-inline constexpr auto SUB1 = "sub1";         // subtract one
-inline constexpr auto ABS = "abs";           // absolute value
-inline constexpr auto FPLUS = "f+";          // float add
-inline constexpr auto FDIFFERENCE = "f-";    // float subtract
-inline constexpr auto FTIMES = "f*";         // float multiply
-inline constexpr auto FDIVIDE = "f/";        // float divide
-inline constexpr auto ITOF = "itof";         // integer to float
-inline constexpr auto GREATERP = "greaterp"; // t if greater than
-inline constexpr auto GEQ = "geq";           // t if greater or eq
-inline constexpr auto LESSP = "lessp";       // less than
-inline constexpr auto LEQ = "leq";           // less or eq
-inline constexpr auto ZEROP = "zerop";       // t if eq to 0
-inline constexpr auto EQP = "eqp";           // number eq
-inline constexpr auto NEQP = "neqp";         // not eqp
-inline constexpr auto MINUSP = "minusp";     // t if negative
+inline constexpr auto PLUS = "plus";               // addition
+inline constexpr auto DIFFERENCE = "difference";   // subtraction
+inline constexpr auto TIMES = "times";             // multiplication
+inline constexpr auto DIVIDE = "divide";           // division
+inline constexpr auto IPLUS = "iplus";             // integer addition
+inline constexpr auto IDIFFERENCE = "idifference"; // integer subtraction
+inline constexpr auto ITIMES = "itimes";           // integer multiplication
+inline constexpr auto IQUOTIENT = "iquotient";     // integer division
+inline constexpr auto IREMAINDER = "iremainder";   // integer mod
+inline constexpr auto IMINUS = "iminus";           // integer change sign
+inline constexpr auto MINUS = "minus";             // change sign mixed
+inline constexpr auto ADD1 = "add1";               // add one
+inline constexpr auto SUB1 = "sub1";               // subtract one
+inline constexpr auto ABS = "abs";                 // absolute value
+inline constexpr auto FPLUS = "fplus";             // float addition
+inline constexpr auto FDIFFERENCE = "fdifference"; // float subtraction
+inline constexpr auto FTIMES = "ftimes";           // float multiplication
+inline constexpr auto FDIVIDE = "fdivide";         // float division
+inline constexpr auto ITOF = "itof";               // integer to float
+inline constexpr auto GREATERP = "greaterp";       // t if greater than
+inline constexpr auto GEQ = "geq";                 // t if greater or eq
+inline constexpr auto LESSP = "lessp";             // t if less than
+inline constexpr auto LEQ = "leq";                 // t if less or eq
+inline constexpr auto ZEROP = "zerop";             // t if eq to 0
+inline constexpr auto EQP = "eqp";                 // t if eq or numerically equal
+inline constexpr auto NEQP = "neqp";               // not eqp
+inline constexpr auto MINUSP = "minusp";           // t if negative
 } // namespace pn
 
 void init()

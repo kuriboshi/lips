@@ -14,12 +14,12 @@
       (setq withdraw
             (closure
              (lambda (amount)
-              (setq balance (- balance amount)))
+              (setq balance (difference balance amount)))
              '(balance)))
       (setq deposit
             (closure
              (lambda (amount)
-              (setq balance (+ balance amount)))
+              (setq balance (plus balance amount)))
              '(balance)))
       (lambda ()
        (closure

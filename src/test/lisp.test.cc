@@ -107,7 +107,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-      "+", [](lisp& l) -> LISPT { return NIL; },
+      "plus", [](lisp& l) -> LISPT { return NIL; },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "redefinition of subr not allowed");
   }
@@ -173,7 +173,7 @@ TEST_CASE("lisp: literals")
 
   SECTION("eval")
   {
-    auto e = "(+ 1 2)"_e;
+    auto e = "(plus 1 2)"_e;
     REQUIRE(type_of(e) == type::INTEGER);
     CHECK(e->intval() == 3);
   }
