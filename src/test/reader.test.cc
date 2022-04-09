@@ -194,9 +194,55 @@ TEST_CASE("reader: unread")
 
 TEST_CASE("reader: comments")
 {
+  SECTION("# at start of line")
+  {
+    std::string s{"# comment\nhello\n# another comment\nworld"};
+    string_reader reader{s};
+    auto token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "hello");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "world");
+  }
+
+  SECTION("# not at start of line")
+  {
+    std::string s{" # comment\nhello\n"};
+    string_reader reader{s};
+    auto token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "#");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "comment");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "hello");
+  }
+
+  SECTION("#' token")
+  {
+    std::string s{" #'plus\n"};
+    string_reader reader{s};
+    auto token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "#'");
+    token = reader.read();
+    REQUIRE(token);
+    CHECK(token.type == token_t::type::SYMBOL);
+    CHECK(token.token == "plus");
+  }
+
   SECTION("inside s-expr")
   {
-    std::string s{"(#comment\n)"};
+    std::string s{"(;comment\n)"};
     string_reader reader{s};
     auto token = reader.read();
     REQUIRE(token);
@@ -208,7 +254,7 @@ TEST_CASE("reader: comments")
 
   SECTION("inside s-expr with int")
   {
-    std::string s{"(100#comment\n200)"};
+    std::string s{"(100;comment\n200)"};
     string_reader reader{s};
     auto token = reader.read();
     REQUIRE(token);
@@ -226,7 +272,7 @@ TEST_CASE("reader: comments")
 
   SECTION("inside s-expr with int")
   {
-    std::string s{"(symbol#comment\n100)"};
+    std::string s{"(symbol;comment\n100)"};
     string_reader reader{s};
     auto token = reader.read();
     REQUIRE(token);
@@ -245,7 +291,7 @@ TEST_CASE("reader: comments")
 
   SECTION("inside s-expr with float")
   {
-    std::string s{"(1.23#comment\n100)"};
+    std::string s{"(1.23;comment\n100)"};
     string_reader reader{s};
     auto token = reader.read();
     REQUIRE(token);
@@ -264,7 +310,7 @@ TEST_CASE("reader: comments")
 
   SECTION("inside s-expr with exponent")
   {
-    std::string s{"(1.23e1#comment\n100)"};
+    std::string s{"(1.23e1;comment\n100)"};
     string_reader reader{s};
     auto token = reader.read();
     REQUIRE(token);

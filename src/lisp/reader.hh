@@ -143,12 +143,18 @@ public:
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
-  token_t ratom();
 
 private:
   Input& _input;
   typename Input::iterator _pos;
   token_t _token;
+  bool _start_of_line{true};
+
+  void next()
+  {
+    _start_of_line = *_pos == '\n';
+    ++_pos;
+  }
 
   enum class state_t
   {
@@ -158,6 +164,7 @@ private:
     IN_SYMBOL,                 // A symbol
     IN_QUOTE,                  // Next character is treated as literal
     IN_COMMENT,                // Inside comment
+    IN_HASH,                   // Encountered #, wait for ', otherwise it's symbol
     // If we fail to parse an integer or floating point number the token will
     // turn into a symbol.
     IN_DOT,                    // A dot may be the start of a float or a symbol
@@ -226,6 +233,8 @@ token_t reader<Input>::read()
     return std::move(_token);
   token_t token;
   state_t state{state_t::START};
+  if(_start_of_line && *_pos == '#')
+    state = state_t::IN_COMMENT;
   while(_pos != _input.end())
   {
     switch(state)
@@ -234,15 +243,28 @@ token_t reader<Input>::read()
         switch(*_pos)
         {
           case '#':
+            if(_start_of_line)
+              state = state_t::IN_COMMENT;
+            else
+            {
+              state = state_t::IN_HASH;
+              token.type = token_t::type::SYMBOL;
+              token.token.push_back(*_pos);
+            }
+            break;
+          case ';':
             state = state_t::IN_COMMENT;
             break;
-          case ' ': case '\n': case '\t':
+          case ' ': case '\t':
+            break;
+          case '\n':
+            _start_of_line = true;
             break;
           case '(': case ')': case '[': case ']':
           case '\'':
             token.type = token_t::type::MACRO;
             token.token.push_back(*_pos);
-            ++_pos;
+            next();
             return token;
           case '.':
             // A symbol may start with a dot so we assume it's a macro
@@ -278,14 +300,14 @@ token_t reader<Input>::read()
         // included in the symbol. This includes double quotes.
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case '(': case ')': case '[': case ']':
-          case ' ': case '\n': case '\t':
+          case ' ': case '\t': case '\n':
             return token;
           case '\\':
-            ++_pos;
+            next();
             if(_pos == _input.end())
               return token;
             token.token.push_back(*_pos);
@@ -306,7 +328,7 @@ token_t reader<Input>::read()
             state = state_t::IN_QUOTE;
             break;
           case '"':
-            ++_pos;
+            next();
             return token;
           default:
             token.token.push_back(*_pos);
@@ -316,6 +338,21 @@ token_t reader<Input>::read()
       case state_t::IN_COMMENT:
         if(*_pos == '\n')
           state = state_t::START;
+        break;
+      case state_t::IN_HASH:
+        switch(*_pos)
+        {
+          case '(': case ')': case '[': case ']':
+          case ' ': case '\t': case '\n':
+            return token;
+          case '\'':
+            token.token.push_back(*_pos);
+            next();
+            return token;
+          default:
+            token.token.push_back(*_pos);
+            break;
+        }
         break;
       case state_t::IN_SIGN:
         switch(*_pos)
@@ -335,7 +372,7 @@ token_t reader<Input>::read()
       case state_t::IN_INT:
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case '.':
@@ -362,7 +399,7 @@ token_t reader<Input>::read()
       case state_t::IN_FLOAT:
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case 'e': case 'E':
@@ -371,7 +408,7 @@ token_t reader<Input>::read()
           case '0': case '1': case '2': case '3': case '4':
           case '5': case '6': case '7': case '8': case '9':
             break;
-          case ' ': case '\n': case '\t':
+          case ' ': case '\t': case '\n':
           case '(': case ')': case '[': case ']':
             return token;
           default:
@@ -384,7 +421,7 @@ token_t reader<Input>::read()
       case state_t::IN_EXP1:
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case '-': case '+':
@@ -402,7 +439,7 @@ token_t reader<Input>::read()
       case state_t::IN_EXP2:
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case '0': case '1': case '2': case '3': case '4':
@@ -418,7 +455,7 @@ token_t reader<Input>::read()
       case state_t::IN_DOT:
         switch(*_pos)
         {
-          case '#':
+          case ';':
             state = state_t::IN_COMMENT;
             return token;
           case '0': case '1': case '2': case '3': case '4':
@@ -426,7 +463,7 @@ token_t reader<Input>::read()
             state = state_t::IN_FLOAT;
             continue;
           case '(': case ')': case '[': case ']':
-          case '\n': case '\t': case ' ':
+          case ' ': case '\t': case '\n':
             return token;
           default:
             state = state_t::IN_SYMBOL;
@@ -437,7 +474,7 @@ token_t reader<Input>::read()
       default:
         break;
     }
-    ++_pos;
+    next();
   }
   return token;
 }
