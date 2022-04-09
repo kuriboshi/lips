@@ -323,7 +323,7 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
       return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
       return illegalreturn(l, x);
-    case num_type::ILLEGAL2:
+    default:
       return illegalreturn(l, y);
   }
 }
