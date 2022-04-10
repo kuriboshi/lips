@@ -110,14 +110,14 @@ TEST_CASE("obarray")
   auto obs = obarray();
   // The reason this is not 1 is that there are already two symbols in the
   // local symbol table: base and verbose.
-  CHECK(length(obs)->intval() == 3);
+  CHECK(length(obs)->intval() == 4);
   auto a1 = mkatom("bar");
   obs = obarray();
-  CHECK(length(obs)->intval() == 4);
+  CHECK(length(obs)->intval() == 5);
 
   // Test calling from lisp
   obs = eval(l, "(obarray)");
-  CHECK(length(obs)->intval() == 4);
+  CHECK(length(obs)->intval() == 5);
 }
 
 TEST_CASE("reclaim + freecount")

@@ -243,7 +243,8 @@ LISPT lisp::break0(LISPT exp)
 }
 
 lisp::cvariables::cvariables(alloc& a)
-  : _currentbase(a.initcvar("base", a.mknumber(10L))), _verbose(a.initcvar("verbose", NIL))
+  : _currentbase(a.initcvar("base", 10_l)), _verbose(a.initcvar("verbose", NIL)),
+    _loadpath(a.initcvar("loadpath", "(.)"_l))
 {}
 
 lisp* lisp::_current = nullptr;

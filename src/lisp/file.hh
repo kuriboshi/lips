@@ -7,9 +7,7 @@
 
 #include "lisp.hh"
 
-namespace lisp
-{
-namespace file
+namespace lisp::file
 {
 void init();
 
@@ -29,6 +27,9 @@ LISPT readline(lisp&, LISPT);
 
 bool loadfile(lisp&, const std::string&);
 }
+
+namespace lisp
+{
 
 inline LISPT open(lisp& l, LISPT a, LISPT b) { return file::open(l, a, b); }
 inline LISPT open(LISPT a, LISPT b) { return file::open(lisp::current(), a, b); }

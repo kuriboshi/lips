@@ -21,6 +21,8 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     ccov-preprocessing
     COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
             $<TARGET_FILE:${TARGET_NAME}>
+            --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
+            --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND ${LLVM_PROFDATA} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
             -o ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
     DEPENDS ${TARGET_NAME})

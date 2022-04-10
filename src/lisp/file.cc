@@ -3,9 +3,11 @@
 // Copyright 1988, 2020-2022 Krister Joas
 //
 
+#include <filesystem>
 #include "file.hh"
 #include "alloc.hh"
 #include "eval.hh"
+#include "iter.hh"
 
 namespace lisp::file
 {
@@ -95,16 +97,25 @@ bool loadfile(lisp& l, const std::string& lf)
 {
   try
   {
-    auto foo = std::make_unique<file_t>(std::make_unique<io::file_source>(lf));
-    for(auto rval = lispread(l, *foo.get()); type_of(rval) != type::EMPTY;
-        rval = lispread(l, *foo.get()))
-      rval = l.e().eval(rval);
+    for(auto i: *l.loadpath())
+    {
+      std::filesystem::path base{i->getstr()};
+      base /= lf;
+      if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
+      {
+        auto foo = std::make_unique<file_t>(std::make_unique<io::file_source>(base));
+        for(auto rval = lispread(l, *foo.get()); type_of(rval) != type::EMPTY;
+            rval = lispread(l, *foo.get()))
+          rval = l.e().eval(rval);
+        return true;
+      }
+    }
   }
   catch(const lisp_error&)
   {
     return false;
   }
-  return true;
+  return false;
 }
 
 LISPT load(lisp& l, LISPT f)

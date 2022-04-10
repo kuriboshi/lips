@@ -245,6 +245,8 @@ public:
   /// @brief Automatically convert to the LISPT value in a LISPT context.
   operator LISPT () const noexcept { return _value; }
   /// @brief Dereference the wrapped LISPT value.
+  LISPT operator*() const noexcept { return _value; }
+  /// @brief Dereference the wrapped LISPT value.
   LISPT operator->() const noexcept { return _value; }
 
 private:
@@ -435,6 +437,8 @@ public:
 
   cvariable_t& currentbase() const { return _variables->_currentbase; }
   cvariable_t& verbose() const { return _variables->_verbose; }
+  cvariable_t& loadpath() const { return _variables->_loadpath; }
+  void loadpath(LISPT newpath) { _variables->_loadpath = newpath; }
   const cvariable_t& version() const { return _version; }
 
   // clang-format off
@@ -549,6 +553,7 @@ private:
     cvariables(alloc&);
     cvariable_t& _currentbase;
     cvariable_t& _verbose;
+    cvariable_t& _loadpath;
   };
   cvariable_t _version;
   std::unique_ptr<cvariables> _variables;
