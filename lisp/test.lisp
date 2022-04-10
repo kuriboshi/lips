@@ -18,16 +18,38 @@
 (setq *verbose* nil)
 
 (defineq
+  ;; Define a test with the name NAME and a description DESC. The
+  ;; expressions in the BODY is evaluated in sequence.
   (deftest
     (nlambda (name desc . body)
              (tconc *tests* (list name desc body))))
 
+  ;; Define a section within a test with the description DESC. The
+  ;; expressions in BODY are evaluated in sequence.
+  (section
+   (nlambda (desc . body)
+            (mapc body eval)))
+
+  ;; Compare the result to the expected result using the function
+  ;; FN. Record the result in *testresult*. Each result is a list of
+  ;; five elements: the name of the test, the current check number
+  ;; within a test, the symbol passed or failed, the result, and the
+  ;; expected result.
+  (check
+   (lambda (fn result expected)
+     (setq *numcheck* (add1 *numcheck*))
+     (tconc *testresult*
+            (list *currenttest* *numcheck*
+                  (cond ((fn result expected) 'passed)
+                        (t 'failed))
+                  result expected))))
+
   ;; Runs the tests.
   (runtest
    (lambda (which)
-     (let ((*numcheck* 0))
-       (mapc (car *tests*)
-             (lambda (test)
+     (mapc (car *tests*)
+           (lambda (test)
+             (let ((*numcheck* 0))
                (cond ((or (null which)
                           (eq which (car test)))
                       (if *verbose*
@@ -35,19 +57,18 @@
                             (prin1 (list "Running" (car test)))
                             (terpri)))
                       (let ((*currenttest* (car test)))
-                        (mapc (caddr test) null)))))))
+                        (mapc (caddr test) eval)))))))
      (car *testresult*)))
 
+  ;; Print each element in the list L using prin1 followed by a
+  ;; newline using terpri.
   (printlist1
    (lambda l
-     (mapc l (lambda (a) (prin1 a)))
+     (mapc l prin1)
      (terpri)))
-;     (print l)
-;     (cond ((null l) (terpri))
-;           (t (printlist1 (cdr l))))))
-;           (t (prin1 (car l))
-;              (printlist1 (cdr l))))))
 
+  ;; Print the result of each test (if *verbose* is t) and collect the
+  ;; number of passed and failed tests for the summary.
   (printresult
    (lambda (result)
      (cond ((eq (caddr result) 'passed)
@@ -60,35 +81,19 @@
             (setq passed (add1 passed)))
            (t (setq failed (add1 failed))))))
 
+  ;; Print a summary of the test run.
   (printsummary
    (lambda ()
-     (prin1 "Passed: ")
-     (prin1 passed)
-     (terpri)
-     (prin1 "Failed: ")
-     (prin1 failed)
-     (terpri)))
+     (printlist1 "Passed: " passed)
+     (printlist1 "Failed: " failed)))
 
-  ;; Prints a report of the tests
+  ;; Prints a report of the test result.
   (reporttest
    (lambda ()
-     ((lambda (passed failed)
-        (mapc (car *testresult*) printresult)
-        (printsummary))
-      0 0)))
-
-  (section
-   (nlambda (desc . p)
-     (mapc p null)))
-
-  (check
-   (lambda (fn result expected)
-     (setq *numcheck* (add1 *numcheck*))
-     (tconc *testresult*
-            (list *currenttest* *numcheck*
-                  (cond ((fn result expected) 'passed)
-                        (t 'failed))
-                  result expected))))
+     (let ((passed 0)
+           (failed 0))
+       (mapc (car *testresult*) printresult)
+       (printsummary))))
   )
 
 (deftest test-null "Test null"
@@ -104,6 +109,16 @@
            (check equal
                   (mapcar '(1 2 3) add1)
                   '(2 3 4))))
+
+(deftest test-apply "Test apply"
+  (section "(apply car '((1 2 3)))"
+           (check eq
+                  (apply car '((1 2 3)))
+                  1))
+  (section "(apply* car '(1 2 3))"
+           (check eq
+                  (apply* car '(1 2 3))
+                  1)))
 
 (runtest)
 (reporttest)
