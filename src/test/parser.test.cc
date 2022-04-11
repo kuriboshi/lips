@@ -192,4 +192,15 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
   CHECK(caddr(res)->string() == "b");
 }
 
+TEST_CASE("parser: nil")
+{
+  std::string s1{"()"};
+  std::string s2{"nil"};
+  string_reader r1{s1};
+  string_reader r2{s2};
+  auto res1 = parser(r1).parse();
+  auto res2 = parser(r2).parse();
+  CHECK(res1 == res2);
+}
+
 }

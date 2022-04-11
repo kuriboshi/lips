@@ -55,6 +55,9 @@ public:
       case token_t::type::MACRO:
         return mkatom(token.token);
       case token_t::type::SYMBOL:
+        // Consider the token 'nil' to be NIL even in unevaluated contexts.
+        if(token.token == "nil")
+          return NIL;
         return mkatom(token.token);
       case token_t::type::STRING:
         return mkstring(token.token);

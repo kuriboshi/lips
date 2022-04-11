@@ -54,11 +54,9 @@ TEST_CASE("user: User defined functions")
   {
     auto nil0 = getrep(NIL);
     CHECK(is_NIL(nil0));
-    auto f0 = lambda("(a)"_l, "((cons a ()))"_l);
+    auto f0 = lambda("(a)"_l, "((cons a nil))"_l);
     auto rep0 = getrep(l, f0);
-    // TODO: There is a problem here that the symbol 'nil' is not considered
-    // equal to the empty list '()'.
-    std::string s("(lambda (a) (cons a ()))\n");
+    std::string s("(lambda (a) (cons a nil))\n");
     auto expected = lispread(s);
     CHECK(!is_NIL(equal(rep0, expected)));
     auto rep1 = getrep(l, f0);
