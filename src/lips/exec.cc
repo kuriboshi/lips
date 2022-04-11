@@ -345,9 +345,9 @@ TEST_CASE("exec.cc: make_exec")
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
-  SECTION("(make_exec (+ 1 2)) -> 3")
+  SECTION("(make_exec (plus 1 2)) -> 3")
   {
-    auto expr = lispread("((+ 1 2))");
+    auto expr = lispread("((plus 1 2))");
     auto result = make_exec(expr);
     REQUIRE(result);
     CHECK(result->at(0) == "3"s);
