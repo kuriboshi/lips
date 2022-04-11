@@ -1,0 +1,15 @@
+\subsection{Properties}
+This section describes some properties that are used internally by the
+shell.
+
+\begin{description}
+\item[alias] this is used during alias expansion.  Let's say we want
+  to define an alias for ls that uses the -F option of ls: \lisp{(putprop 'l
+  'alias '(ls -F))}.  To simplify defining aliases the lisp function
+  alias is provided (see below).
+\item[autoload] If during evaluation of a form, an undefined function
+  is found the offending atom may have a file stored under this
+  property. If this is the case the file is loaded and evaluation is
+  allowed to continue.  If the function is still undefined error
+  processing takes over.
+\end{description}

@@ -1,0 +1,104 @@
+\section{Lips Input Syntax}
+The types of objects recognized by the lisp reader are integers,
+floats, literal atoms, lists, and strings.  All objects except lists
+and dotted pairs are called atoms.
+
+Strings start and end with a double quote, `\lisp{"}'.  To enter a
+double quote in a string preceed it by a backslash, `\lisp{\char`\\}'.
+For instance, \lisp{"Foo bar"} is a string and so is \lisp{"I like
+  \char`\\"lips\char`\\""} which contains two double quotes.  Newlines
+may be embedded inside strings without escaping them.
+
+Lists start with a left parenthesis followed by zero or more lisp
+expressions separated by separators (see below).  The list ends with a
+matching right parenthesis.  Separators breaks the atoms, and by
+default these are blanks, tabs, and newlines.  There is also a class
+of characters called break characters.  These characters breaks
+literal atoms and there is no need to add separators around them.
+Break characters are also literal atoms.  The default break characters
+are: `\lisp{(}', `\lisp{)}', `\lisp{\&}', `\lisp{<}', `\lisp{>}' and
+`\lisp{|}'.  Thus,
+
+\begin{quote}
+  \lisp{foo\\
+    (foo)\\
+    (foo fie fum)\\
+    (foo (fie (x y (z))) (fum))}
+\end{quote}
+
+are all valid lisp expressions.  The nesting of parenthesis may have
+arbitrary depth.
+
+\lips\ supports super parenthesis. Super parenthesis are square
+brackets and when an opening square bracket is closed by a matching
+closing square bracket any missing round parenthesis is added. A final
+closing square bracket closes any open round parenthesis and finishes
+the expression. Here are some examples:
+
+\begin{examples}
+  \ex{(cond [(null nil) "hello"] (t "world"))}{"hello"}
+  \ex{(cons 'a (cons 'b (cons 'c]}{(a b c)}
+\end{examples}
+
+The elements of lists are stored in the car part of the cons cells,
+and are then linked together by the cdr's.  The last cdr is always
+\NIL.  It's possible to enter so called dotted pairs in \lips.  A
+dotted pair is a cons cell with two expressions with no restrictions
+in the car and cdr of the cell.  Dotted pairs are entered starting
+with a left parenthesis, a \lips\ expression, followed by a dot, `.',
+another expression, and terminated with a right parenthesis.
+\lisp{(a\ .\ b)} is an example of a dotted pair. Note that the blanks
+around the dot are necessary, the dot is not a break character.  The
+dot is recognized in this special way only if it occurs as the second
+element from the end of a list.  In other cases it is treated as an
+ordinary atom.  The list \lisp{(.\ .\ .\ .)} is a list with three
+elements ending in a dotted pair.
+
+A list is just a special case of dotted pairs.  \lisp{(a .\ (b
+  .\ nil))} is equivalent to \lisp{(a b)}.  The second format is just
+a convenience since lists are so common.
+
+Integers consist of a sequence of digits.  No check for overflow is
+made.  Floats are a bit complicated, but in most cases an atom that
+looks like float is a float.  A float is a sequence of digits that
+have either a decimal point or a exponentiation character, `e',
+inside.  At most one decimal point is allowed.  If the exponentiation
+character is given it must be followed by at least one digit.  If
+these rules are not followed the atom will be interpreted as a literal
+atom.
+
+Examples:
+\begin{tabbing}
+\lisp{foo}\hspace*{1cm}\=literal atom\\
+\lisp{"fie"}      \>string\\
+\lisp{123}        \>integer\\
+\lisp{12a}        \>literal atom\\
+\lisp{1.0}        \>float\\
+\lisp{1e5}        \>float\\
+\lisp{1e}         \>literal atom\\
+\lisp{.e4}        \>literal atom\\
+\lisp{1.4.}       \>literal atom
+\end{tabbing}
+
+All expressions typed at the top level prompt are treated as lists.
+This means that \lips\ supplies an extra pair of matching parenthesis
+around all expressions.  If the first expression of a line is an atom,
+and not a list, input terminates with either a return (providing that
+parenthesis in subexpressions match), or an extra right parenthesis.
+In the first case, a matching pair of parenthesis are added
+surrounding the line, in the second case an extra left parenthesis is
+added as the first character.  Again, if a left parenthesis is missing
+a matching parenthesis is inserted.
+
+Typing the outermost parenthesis explicitly will make \lips\ print out
+the return value of the expression.  This is the way normal lisp
+systems behave, but when used only as a command shell the return value
+is most often uninteresting.  The return value is also stored in the
+variable $value$.
+
+Comments are allowed in \lips\ files.  In order to allow for the
+\textsc{Unix} ``shebang'' interpreter directive a `\lisp{\#}'
+character in the first column of a line is recognized as a comment
+that ends with a newline. A \lisp{\#} in any other colmn is treated as
+a regular character.  Comments may also start with the semicolon
+character and the comment again continues until the end of the line.

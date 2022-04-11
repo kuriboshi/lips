@@ -1,0 +1,51 @@
+\documentclass[a4paper]{article}
+\usepackage{slantsc}
+\usepackage{lmodern}
+\usepackage{changepage}
+\usepackage{enumitem}
+\usepackage{listings}
+\lstset{language=Lisp,
+  basicstyle={\ttfamily},
+  escapeinside={<>},
+  mathescape=true,
+  breaklines=true,
+  breakatwhitespace=true
+}
+\newcommand{\lips}{\textsc{Lips}}
+\newcommand{\lisp}[1]{\texttt{#1}}
+\newcommand{\T}{\lisp{t}}
+\newcommand{\NIL}{\lisp{nil}}
+\newcommand{\cpp}[1]{\texttt{#1}}
+\newcommand{\xargs}{$x_{1}$ $x_{2}$ $\cdots$}
+\newcommand{\largs}{$x_{1}$, $x_{2}$, $\ldots$}
+\newenvironment{examples}{
+  \newcommand{\ex}[2]{
+    \lisp{##1} $\Rightarrow$ \lisp{##2}\\
+  }
+  \begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{defun}[3]{\begin{adjustwidth}{0.5cm}{}
+    {\hspace*{-0.5cm}\lisp{#2}\hfill[\textit{#1}]\\}}
+               {\end{adjustwidth}}
+\newcommand{\example}[2]{
+  \begin{adjustwidth}{0.2cm}{}
+    \lisp{#1} $\Rightarrow$ \lisp{#2}
+  \end{adjustwidth}
+}
+\setlist[description]{font=\normalfont\ttfamily}
+\setlength\parskip{1em plus 0.1em minus 0.1em}
+\setlength\parindent{0pt}
+
+\title{\textsc{Lips} Reference Manual}
+\author{Krister Joas}
+\date{April, 2022}
+\begin{document}
+\maketitle
+\include{copyright}
+\include{intro}
+\include{syntax}
+\include{evaluation}
+\include{variables}
+\include{shell}
+\include{embedded}
+\include{functions}
+\end{document}

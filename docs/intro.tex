@@ -1,0 +1,36 @@
+\section{Introduction}
+\lips\ is a embeddable lisp interpreter written in \textsf{C++-20}.
+In addition to a set of typical lisp functions, \lips\ offers
+functionality to make it work as a command shell.  It includes
+functions for program composition with pipes and input/output
+redirection.  \lips\ makes use of read macros and transformation of
+the input to make the input syntax resemble the standard shells.
+
+\lips\ can be used as a lisp interpreter which can be linked with
+other applications.  The \lips\ shell is an example of such an
+application.
+
+\lips\ is inspired by \textsc{Interlisp} and functions are usually
+named as they are named in \textsc{Interlisp}.  Functions tend to
+behave in the same way as they do in \textsc{Interlisp}.  There are
+exceptions and \lips\ is not a faithful implementation of
+\textsc{Interlisp} by any stretch.
+
+This document is a reference manual for \lips\ and should be adequate
+for getting started.  See section \ref{functions} page
+\pageref{functions} for a complete list of lisp functions provided.
+
+When \lips\ is started it reads and evaluates expressions in a central
+initialization file.  This file is called \texttt{lipsrc}, and is
+located in some public directory, typically
+\texttt{/usr/local/share/lips}.  After reading this file \lips\ looks
+for the file \texttt{.lipsrc} in the users home directory.  If it is
+found, the expressions in it are read and evaluated. \lips\ then reads
+expressions from any file given on the command line.
+
+When the startup process is done, \lips\ prompts with the current
+history number followed by an underscore.  All commands are saved on a
+history list, and may be recalled at any time.  However, a maximum
+number of events saved on the history list is limited to the value of
+the variable \lisp{histmax}.  This variable may be set by the user to
+any value.

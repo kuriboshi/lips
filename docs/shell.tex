@@ -1,0 +1,17 @@
+\section{\lips\ as a Shell}
+If a function is \lisp{unbound} the \lips\ shell tries to run the
+function as an executable.  When \lips\ reads an expression some
+characters are treated as read-macros.  A read-macro can expand or
+transform the input in different ways.  The current version of the
+reader in \lips\ isn't fully developed yet and it's likely to be
+improved in later versions.
+
+In addition to read-macros the input is also transformed using a hook
+which is evaluated after an expression is read and before it's
+evaluated.  For example, the input \lisp{ls | wc -l} is rewritten by
+the transform hook into \lisp{(pipe-cmd (ls) (wc -l))}.  The
+\lisp{pipe-cmd} function evaluates each expression in a separate
+process, connecting the stdout from the \lisp{ls} function (i.e. the
+\lisp{ls} command) to the stdin of the \lisp{wc} function (command).
+
+Redirection of stdout and stdin is also handled by the transform hook.

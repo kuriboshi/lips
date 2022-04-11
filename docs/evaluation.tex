@@ -1,0 +1,52 @@
+\section{The Evaluation Process}
+The \lips\ interpreter has ``dynamic scope'' and ``shallow'' binding.
+``Dynamic scope'' means that free variables are looked up in the call
+stack. For example:
+
+\example{((lambda (a) ((lambda (b) (plus a b)) 1)) 2)}{3}
+
+``Lexical scope'' can be simulated using the \lisp{closure} function
+(see section \ref{closure} on page \pageref{closure}) which creates a
+lexical scope for variables.
+
+``Shallow'' binding means that every time a symbol is bound to a value
+the previous value is pushed onto a stack.  The current value of an
+atom is stored in the ``value cell'' and can be retrieved immediately.
+The opposite of ``shallow'' binding, ``deep'' binding, in contrast has
+to traverse the stack to find the current value of an atom.
+
+In \lips\ there is no top level value.  There is also no ``function
+definition cell'', only a ``value cell''.  Defining a function and
+binding it to a symbol simply sets the value cell for that symbol.
+Symbols are case sensitive and all system symbols are in lower case.
+\lips\ does not use a stop and sweep garbage collector.  Instead
+objects are reference counted and freed when the reference count goes
+down to zero.
+
+On the top level \lips\ reads expressions from standard in and
+evaluates the expressions.  Commands entered on the top level are
+always treated as functions, even if no parameters are given or if the
+expression is a single atom.  In order to print the value of a
+variable the function print must be used.
+
+If the expression to be evaluated is a list the first element (the
+car) in the list is evaluated and then applied to the arguments.  The
+car of the expression is reevalutated until either a proper functional
+form is recognized or if it's evaluated to an illegal functional form,
+in which case an error is signalled.
+
+If the functional form is an unbound atom, \lips\ looks for the
+property \lips{autoload} on the property list of the atom.  If it is
+found, and the value is a symbol or a string, the file with that name
+is loaded (if possible).  The interpreter then checks if the atom is
+no longer unbound, in wich case evaluation continues.  If the atom
+doesn't have the \lips{autoload} property, or loading the file didn't
+define the symbol, \lips\ looks under the property \lisp{alias}.  The
+atom is replaced with the expression stored under that property, if
+any, and the rest of the expression is appended at the end and the
+evaluation process continues.  When all else fails it is assumed the
+atom stands for an executable command.  The return value of an
+executable command is, at present, always \T.
+
+Note that the arguments for the command are never evaluated.  If you
+want them evaluated you must use the function \lisp{apply}.

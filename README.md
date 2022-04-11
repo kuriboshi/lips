@@ -20,6 +20,10 @@ However, that goal was never fully realised.  That goal is now a
 priority and I view the shell extension as an example of how the
 embeddable lisp interpreter can be used.
 
+Don't expect a solid, or even useful, program or library.  I wrote
+this as a learning exercise and to scratch an itch.  The shell
+functionality is minimal and serves more as a proof of concept.
+
 ## Requirements
 
 The code requires C++20 and CMake 3.18 or newer. The CMakePresets.json
