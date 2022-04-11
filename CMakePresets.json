@@ -23,12 +23,23 @@
             "displayName": "XCode preset",
             "generator": "Xcode",
             "binaryDir": "${sourceDir}/build/xcode"
+        },
+        {
+            "name": "make",
+            "inherits": "default",
+            "displayName": "Makefile preset",
+            "description": "Default build using make",
+            "generator": "Unix Makefiles"
         }
     ],
     "buildPresets": [
         {
             "name": "default",
             "configurePreset": "default"
+        },
+        {
+            "name": "make",
+            "configurePreset": "make"
         },
         {
             "name": "xcode",
@@ -39,6 +50,10 @@
         {
             "name": "default",
             "configurePreset": "default"
+        },
+        {
+            "name": "make",
+            "configurePreset": "make"
         },
         {
             "name": "xcode",
