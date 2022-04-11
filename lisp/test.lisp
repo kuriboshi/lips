@@ -24,11 +24,9 @@
     (nlambda (name desc . body)
              (tconc *tests* (list name desc body))))
 
-  ;; Define a section within a test with the description DESC. The
-  ;; expressions in BODY are evaluated in sequence.
-  (section
-   (nlambda (desc . body)
-            (mapc body eval)))
+  ;; Define a section within a test with a description DESC. TODO: Add
+  ;; description to result output.
+  (section (lambda (desc . body)))
 
   ;; Compare the result to the expected result using the function
   ;; FN. Record the result in *testresult*. Each result is a list of
@@ -36,13 +34,14 @@
   ;; within a test, the symbol passed or failed, the result, and the
   ;; expected result.
   (check
-   (lambda (fn result expected)
-     (setq *numcheck* (add1 *numcheck*))
-     (tconc *testresult*
-            (list *currenttest* *numcheck*
-                  (cond ((fn result expected) 'passed)
-                        (t 'failed))
-                  result expected))))
+   (nlambda (fn result expected)
+            (setq *numcheck* (add1 *numcheck*))
+            (let ((r (eval result)))
+              (tconc *testresult*
+                     (list *currenttest* *numcheck*
+                           (cond ((fn r expected) 'passed)
+                                 (t 'failed))
+                           r expected result)))))
 
   ;; Runs the tests.
   (runtest
@@ -74,7 +73,7 @@
      (cond ((eq (caddr result) 'passed)
             (if *verbose*
                 (printlist1 (car result) " " (cadr result) " passed")))
-           (t (printlist1 (car result) " " (cadr result) " failed")
+           (t (printlist1 (car result) " #" (cadr result) " failed " (nth result 6))
               (printlist1 "  result:   " (nth result 4))
               (printlist1 "  expected: " (nth result 5))))
      (cond ((eq (caddr result) 'passed)
@@ -93,32 +92,31 @@
      (let ((passed 0)
            (failed 0))
        (mapc (car *testresult*) printresult)
-       (printsummary))))
+       (printsummary)
+       (if (greaterp failed 0)
+           (exit 1)))))
   )
 
+
 (deftest test-null "Test null"
-  (section "(null nil) == t"
-           (check eq (null nil) t))
-  (section "(null t) == nil"
-           (check eq (null t) nil))
-  (section "(null 100) == nil"
-           (check eq (null 100) nil)))
+  (check eq (null nil) t)
+  (check eq (null t) nil)
+  (check eq (null 100) nil))
 
 (deftest test-mapcar "Test mapcar"
-  (section "(mapcar '(1 2 3) add1)"
-           (check equal
-                  (mapcar '(1 2 3) add1)
-                  '(2 3 4))))
+  (check equal
+         (mapcar '(1 2 3) add1)
+         (2 3 4)))
 
 (deftest test-apply "Test apply"
-  (section "(apply car '((1 2 3)))"
-           (check eq
-                  (apply car '((1 2 3)))
-                  1))
-  (section "(apply* car '(1 2 3))"
-           (check eq
-                  (apply* car '(1 2 3))
-                  1)))
+  (section "apply"
+   (check eq
+          (apply car '((1 2 3)))
+          1))
+  (section "apply*"
+   (check eq
+          (apply* car '(1 2 3))
+          1)))
 
 (runtest)
 (reporttest)
