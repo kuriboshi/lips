@@ -9,38 +9,6 @@
 
 namespace lisp::low
 {
-LISPT set(lisp& l, LISPT var, LISPT val)
-{
-  check(var, type::SYMBOL);
-  if(var->symbol().constant)
-    return l.error(ATTEMPT_TO_CLOBBER, var);
-  if(type_of(var->value()) == type::INDIRECT)
-    var->value()->set(indirect_t{val});
-  else if(type_of(var->value()) == type::CVARIABLE)
-  {
-    auto symval = var->value();
-    auto& cvar = symval->cvarval();
-    cvar = val;
-  }
-  else
-    var->value(val);
-  return val;
-}
-
-LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(l, val)); }
-
-LISPT progn(lisp& l, LISPT lexp)
-{
-  if(is_NIL(lexp))
-    return NIL;
-  while(!is_NIL(lexp->cdr()))
-  {
-    eval(l, lexp->car());
-    lexp = lexp->cdr();
-  }
-  return eval(l, lexp->car());
-}
-
 /// @brief The cond special form.
 ///
 /// @details The generalized conditional special form. The function takes zero
@@ -88,6 +56,40 @@ LISPT cond(lisp& l, LISPT args)
   return NIL;
 }
 
+LISPT prog1(lisp& l, LISPT a1, LISPT) { return a1; }
+
+LISPT progn(lisp& l, LISPT lexp)
+{
+  if(is_NIL(lexp))
+    return NIL;
+  while(!is_NIL(lexp->cdr()))
+  {
+    eval(l, lexp->car());
+    lexp = lexp->cdr();
+  }
+  return eval(l, lexp->car());
+}
+
+LISPT set(lisp& l, LISPT var, LISPT val)
+{
+  check(var, type::SYMBOL);
+  if(var->symbol().constant)
+    return l.error(ATTEMPT_TO_CLOBBER, var);
+  if(type_of(var->value()) == type::INDIRECT)
+    var->value()->set(indirect_t{val});
+  else if(type_of(var->value()) == type::CVARIABLE)
+  {
+    auto symval = var->value();
+    auto& cvar = symval->cvarval();
+    cvar = val;
+  }
+  else
+    var->value(val);
+  return val;
+}
+
+LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(l, val)); }
+
 LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
 {
   LISPT res = eval(l, pred);
@@ -99,17 +101,15 @@ LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
   return NIL;
 }
 
-LISPT prog1(lisp& l, LISPT a1, LISPT) { return a1; }
-
 namespace pn
 {
+inline constexpr auto COND = "cond";   // cond
+inline constexpr auto PROG1 = "prog1"; // return first expression
+inline constexpr auto PROGN = "progn"; // return last expression
 inline constexpr auto SET = "set";     // set variable
 inline constexpr auto SETQ = "setq";   // set quoted variable
 inline constexpr auto SETQQ = "setqq"; // noeval set
-inline constexpr auto COND = "cond";   // cond
 inline constexpr auto WHILE = "while"; // while t
-inline constexpr auto PROGN = "progn"; // return last expression
-inline constexpr auto PROG1 = "prog1"; // return first expression
 } // namespace pn
 
 void init()
