@@ -27,8 +27,7 @@ LISPT listp(lisp& l, LISPT a)
 {
   if(type_of(a) == type::CONS)
     return a;
-  else
-    return NIL;
+  return NIL;
 }
 
 LISPT memb(lisp& l, LISPT x, LISPT ls)
@@ -72,10 +71,11 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
 
 LISPT nlistp(lisp& l, LISPT a)
 {
+  if(a == NIL)
+    return T;
   if(type_of(a) != type::CONS)
     return a;
-  else
-    return NIL;
+  return NIL;
 }
 
 LISPT neq(lisp& l, LISPT a, LISPT b)

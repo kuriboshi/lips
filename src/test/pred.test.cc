@@ -29,6 +29,8 @@ TEST_CASE("Predicate functions")
     CHECK(listp(cons(l, mknumber(1), NIL)) != NIL);
     CHECK(listp(l, mkstring("hello")) == NIL);
     CHECK(listp(mkstring("hello")) == NIL);
+    CHECK(listp(l, NIL) == NIL);
+    CHECK(listp(NIL) == NIL);
   }
 
   SECTION("nlistp")
@@ -37,6 +39,8 @@ TEST_CASE("Predicate functions")
     CHECK(nlistp(cons(l, mknumber(1), NIL)) == NIL);
     CHECK(nlistp(l, mkstring("hello")) != NIL);
     CHECK(nlistp(mkstring("hello")) != NIL);
+    CHECK(nlistp(l, NIL) == T);
+    CHECK(nlistp(NIL) == T);
   }
 
   SECTION("boundp")
