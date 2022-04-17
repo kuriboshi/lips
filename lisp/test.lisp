@@ -118,5 +118,37 @@
           (apply* car '(1 2 3))
           1)))
 
+(load "lisp/list")
+
+(deftest test-reverse "Test reverse"
+  (check equal
+         (reverse '(a b c d))
+         (d c b a)))
+
+(deftest test-intersection "Test intersection"
+  (check equal
+         (intersection '(0 1 2 3) '(2 3 4 5))
+         (2 3)))
+
+(deftest test-subst "Test subst"
+  (check equal
+         (subst 'a 2 '(0 1 2 3 4))
+         (0 1 a 3 4)))
+
+(deftest test-sublis "Test sublis"
+  (check equal
+         (sublis '((0 . a) (1 . b) (2 . c)) '(0 1 2))
+         (a b c)))
+
+(deftest test-assoc "Test assoc"
+  (check equal
+         (assoc 'b '((a . 0) (b . 1) (c . 2)))
+         (b . 1)))
+
+(deftest test-flatten "Test flatten"
+  (check equal
+         (flatten '(a (b (c))))
+         (a b c)))
+
 (runtest)
 (reporttest)

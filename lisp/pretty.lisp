@@ -13,12 +13,12 @@
 (defineq
   (pp
    (nlambda funs
-            (mapc funs (lambda (name)
-                         (terpri)
-                         (if (memb (typeof (eval name)) '(subr fsubr))
-                             (cpprint name)
-                           (pprint (list name (getrep (eval name)))))))
-            funs))
+     (mapc funs (lambda (name)
+                  (terpri)
+                  (if (memb (typeof (eval name)) '(subr fsubr))
+                      (cpprint name)
+                      (pprint (list name (getrep (eval name)))))))
+     funs))
 
   (pprint
    (lambda (exp)

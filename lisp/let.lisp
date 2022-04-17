@@ -6,9 +6,9 @@
 #
 (defineq
   (let (nlambda (init . seq)
-                (eval (cons (cons 'lambda
-                                  (cons (vlis init) seq))
-                            (alis init)))))
+         (eval (cons (cons 'lambda
+                           (cons (vlis init) seq))
+                     (alis init)))))
 
   (vlis (lambda (u)
           (cond

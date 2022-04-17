@@ -4,7 +4,10 @@
 # $Id$
 #
 
-(df foreach (v x . f)
-    (mapc (expand x t)
-          (cons 'lambda
-                (cons (cons v) f))))
+(defineq
+  (foreach
+   (nlambda (v x . f)
+     (mapc (expand x t)
+           (cons 'lambda
+                 (cons (cons v) f)))))
+    )

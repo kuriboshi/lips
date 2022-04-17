@@ -14,28 +14,6 @@ TEST_CASE("user: User defined functions")
   lisp l;
   current c(l);
 
-  SECTION("de/df")
-  {
-    auto a = mkatom("a");
-    auto b = mkatom("b");
-    {
-      auto nlam = df(l, mkatom("f0"), mklist(mkatom("a")), mklist(mkatom("a")));
-      auto lam = de(l, mkatom("f1"), mklist(mkatom("a")), mklist(mkatom("a")));
-      set(l, a, b);
-      auto r0 = eval(l, "(cons (f0 a) (f1 a))");
-      CHECK(car(r0) == a);
-      CHECK(cdr(r0) == b);
-    }
-    {
-      auto nlam = df(mkatom("f0"), mklist(mkatom("a")), mklist(mkatom("a")));
-      auto lam = de(mkatom("f1"), mklist(mkatom("a")), mklist(mkatom("a")));
-      set(l, a, b);
-      auto r0 = eval(l, "(cons (f0 a) (f1 a))");
-      CHECK(car(r0) == a);
-      CHECK(cdr(r0) == b);
-    }
-  }
-
   SECTION("defineq")
   {
     auto f0 = mklist(mklist(mkatom("f0"), lambda(mklist(mkatom("a")), mklist(mkatom("a")))),

@@ -104,28 +104,11 @@ LISPT defineq(lisp& l, LISPT defs)
   return result->cdr();
 }
 
-LISPT def(lisp& l, LISPT name, LISPT pars, LISPT body, type type)
-{
-  check(name, type::SYMBOL);
-  if(!is_NIL(pars) && type_of(pars) != type::SYMBOL)
-    check(pars, type::CONS);
-  LISPT foo = l.a().mklambda(pars, body, type);
-  checkfn(l, name, foo);
-  name->value(foo);
-  return cons(l, name, NIL);
-}
-
-LISPT de(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::LAMBDA); }
-
-LISPT df(lisp& l, LISPT name, LISPT pars, LISPT body) { return def(l, name, pars, body, type::NLAMBDA); }
-
 namespace pn
 {
 inline constexpr auto DEFINE = "define";   // define function
 inline constexpr auto DEFINEQ = "defineq"; // defineq function
 inline constexpr auto GETREP = "getrep";   // get function representation
-inline constexpr auto DE = "de";           // defile lambda function
-inline constexpr auto DF = "df";           // define nlambda function
 } // namespace pn
 
 void init()
@@ -134,8 +117,6 @@ void init()
   mkprim(pn::DEFINE,  define,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::DEFINEQ, defineq, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::GETREP,  getrep,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::DE,      de,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::DF,      df,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 
