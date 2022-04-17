@@ -242,7 +242,7 @@ LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
   LISPT at;
 
   int c = file.getch();
-  if(issepr(l, c))
+  if(is_sepr(l, c))
     return C_EXCL;
   l.echoline = true;
   LISPT tmp = histget(0L, variables->history);

@@ -163,7 +163,7 @@ void term_source::ungetch(int)
 bool term_source::firstnotlp()
 {
   int i = 0;
-  for(; i < position && issepr((int)linebuffer[i]); i++)
+  for(; i < position && is_sepr((int)linebuffer[i]); i++)
     ;
   return linebuffer[i] != '(';
 }
@@ -193,7 +193,7 @@ bool term_source::onlyblanks()
 {
   for(int i = linepos; i > 0; --i)
   {
-    if(!issepr((int)linebuffer[i]))
+    if(!is_sepr((int)linebuffer[i]))
       return false;
   }
   return true;
@@ -295,7 +295,7 @@ char* term_source::mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!issepr((int)linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
+  while(!is_sepr((int)linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
   return ++last;
 }
 

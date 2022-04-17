@@ -336,7 +336,7 @@ LISPT rmdquote(lisp& l, file_t& file, LISPT, char)
 LISPT rmsquote(lisp& l, file_t& file, LISPT, char)
 {
   int c;
-  if((c = file.getch()) == ')' || issepr(l, c))
+  if((c = file.getch()) == ')' || is_sepr(l, c))
   {
     file.ungetch(c);
     return C_QUOTE;

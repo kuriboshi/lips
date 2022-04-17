@@ -307,24 +307,24 @@ private:
   }
 };
 
-inline bool isascii(int c) { return c >= 0 && c <= 127; }
+inline bool is_ascii(int c) { return c >= 0 && c <= 127; }
 inline bool is_charclass(lisp& l, int c, char_class cc)
 {
-  return isascii(c) && l.currentrt.chclass[c] == cc;
+  return is_ascii(c) && l.currentrt.chclass[c] == cc;
 }
 
-inline bool issepr(lisp& l, int c) { return is_charclass(l, c, char_class::SEPR); }
-inline bool issepr(int c) { return issepr(lisp::current(), c); }
-inline bool isbrk(lisp& l, int c) { return is_charclass(l, c, char_class::BRK); }
-inline bool isbrk(int c) { return isbrk(lisp::current(), c); }
-inline bool isctrl(lisp& l, int c) { return is_charclass(l, c, char_class::CTRL); }
-inline bool isctrl(int c) { return isctrl(lisp::current(), c); }
-inline bool isinsert(lisp& l, int c) { return is_charclass(l, c, char_class::INSERT); }
-inline bool isinsert(int c) { return isinsert(lisp::current(), c); }
-inline bool issplice(lisp& l, int c) { return is_charclass(l, c, char_class::SPLICE); }
-inline bool issplice(int c) { return issplice(lisp::current(), c); }
-inline bool isinfix(lisp& l, int c) { return is_charclass(l, c, char_class::INFIX); }
-inline bool isinfix(int c) { return isinfix(lisp::current(), c); }
+inline bool is_sepr(lisp& l, int c) { return is_charclass(l, c, char_class::SEPR); }
+inline bool is_sepr(int c) { return is_sepr(lisp::current(), c); }
+inline bool is_brk(lisp& l, int c) { return is_charclass(l, c, char_class::BRK); }
+inline bool is_brk(int c) { return is_brk(lisp::current(), c); }
+inline bool is_ctrl(lisp& l, int c) { return is_charclass(l, c, char_class::CTRL); }
+inline bool is_ctrl(int c) { return is_ctrl(lisp::current(), c); }
+inline bool is_insert(lisp& l, int c) { return is_charclass(l, c, char_class::INSERT); }
+inline bool is_insert(int c) { return is_insert(lisp::current(), c); }
+inline bool is_splice(lisp& l, int c) { return is_charclass(l, c, char_class::SPLICE); }
+inline bool is_splice(int c) { return is_splice(lisp::current(), c); }
+inline bool is_infix(lisp& l, int c) { return is_charclass(l, c, char_class::INFIX); }
+inline bool is_infix(int c) { return is_infix(lisp::current(), c); }
 
 inline LISPT ratom(lisp& l, file_t& f) { return io::ratom(l, f); }
 inline LISPT ratom(file_t& f) { return io::ratom(lisp::current(), f); }
