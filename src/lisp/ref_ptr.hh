@@ -11,6 +11,11 @@ namespace lisp
 // Very simple reference smart pointer with the reference counter built into
 // the object pointed to.
 
+/// @brief Use this type as the counter type for non-threaded applications.
+using unsafe_counter = unsigned;
+/// @brief Use this type for multithreaded applications.
+using safe_counter = std::atomic<unsigned>;
+
 ///
 /// @brief Default deleter simply deletes the object.
 ///
@@ -25,15 +30,21 @@ inline void ref_deleter(T* p)
 ///
 /// @brief Derive from this in order to use the ref_ptr class.
 ///
-/// @details This is the simplest type of reference counter. There is no mutex
-/// locking access to the counter so it is not suitable for a multi threaded
-/// environment.
+/// @details This reference counter can be used with or without a mutex
+///   depending on the Counter template argument. If Counter is the
+///   unsafe_counter type then it's not thread safe. If, on the other hand, the
+///   type is safe_counter then the reference counter is thread safe.
 ///
-template<typename T>
+/// @tparam T This is the type to be reference counted. T should derive from
+///   ref_count<T>.
+/// @tparam Counter The counter type used for reference counting. It can either
+///   be one of the predefined unsafe_counter or safe_counter types or any type
+///   for which the pre-increment and pre-decrement operators are defined.
+///
+template<typename T, typename Counter = safe_counter>
 class ref_count
 {
 public:
-  ref_count() = default;
   /// @brief Increase the reference counter.
   void retain()
   {
@@ -45,16 +56,21 @@ public:
   /// deleted.
   void release()
   {
-    if(!--_counter)
+    if(--_counter == 0)
       ref_deleter(static_cast<T*>(this));
   }
 
 protected:
+  /// @brief Default constructor protected to not allow creating on the stack.
+  ref_count() = default;
   ~ref_count() = default;
 
 private:
   /// @brief The reference counter.
-  int _counter = 0;
+  mutable Counter _counter = 0;
+  /// @brief Only the ref_ptr class is allowed to create objects of type
+  /// ref_count.
+  template<typename U> friend class ref_ptr;
 };
 
 ///
@@ -64,10 +80,14 @@ private:
 /// @c release by, for example, deriving from @c ref_count.
 ///
 template<typename T>
-class ref_ptr
+class ref_ptr final
 {
 public:
+  /// @brief Default constructor initializes to nullptr.
   ref_ptr() = default;
+  /// @brief Creates an object of type T and takes ownership of it.
+  //template<typename... Ts>
+  //explicit ref_ptr(Ts... ts): _ptr(new T(std::forward<Ts>(ts)...)) { _ptr->retain(); }
   ref_ptr(T* p): _ptr(p)
   {
     if(_ptr)
@@ -117,6 +137,8 @@ public:
   T& operator*() const { return *_ptr; }
   /// @brief Smart pointer access operator.
   T* operator->() const { return _ptr; }
+  /// @brief Smart pointer comparor for sorting purposes.
+  bool operator<(const ref_ptr<T>& x) const { return _ptr < x._ptr; }
   explicit operator bool() const noexcept
   {
     return _ptr != nullptr;

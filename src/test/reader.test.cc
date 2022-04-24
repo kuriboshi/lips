@@ -9,8 +9,6 @@
 #include <sstream>
 #include <lisp/reader.hh>
 
-using namespace std::literals;
-
 namespace
 {
 using string_reader = lisp::reader<std::string>;

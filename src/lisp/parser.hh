@@ -85,7 +85,7 @@ private:
   LISPT parse_list(char);
   /// @brief Parse the tail of a list.
   LISPT parse_tail();
-
+  /// @brief Make a symbol from a string.
   LISPT make_symbol(const std::string& symbol) const
   {
     return mkatom(symbol);

@@ -126,9 +126,9 @@ private:
   alloc& a;
   undefhook_t _undefhook;        // Called in case of undefined function.
   breakhook_t _breakhook;        // Called before going into break.
-  LISPT fun = nullptr;           // Store current function being evaluated.
-  LISPT expression = nullptr;    // Current expression.
-  LISPT args = nullptr;          // Current arguments.
+  LISPT fun;                     // Store current function being evaluated.
+  LISPT expression;              // Current expression.
+  LISPT args;                    // Current arguments.
   bool noeval = false;           // Don't evaluate arguments.
   continuation_t cont = nullptr; // Current continuation.
   destblock_t* env = nullptr;    // Current environment.
