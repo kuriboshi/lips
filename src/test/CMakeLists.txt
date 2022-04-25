@@ -16,6 +16,7 @@ target_sources(
           map.test.cc
           main.test.cc
           parser.test.cc
+          pool.test.cc
           pred.test.cc
           prim.test.cc
           prop.test.cc

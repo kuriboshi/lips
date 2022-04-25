@@ -40,6 +40,7 @@ target_sources(
           lisp/map.hh
           lisp/debug.hh
           lisp/parser.hh
+          lisp/pool.hh
           lisp/pred.hh
           lisp/prim.hh
           lisp/prop.hh
