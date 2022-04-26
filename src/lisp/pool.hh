@@ -1,9 +1,8 @@
 #ifndef LISP_POOL_HH
 #define LISP_POOL_HH
 
-#include <cstdlib>
 #include <new>
-#include <deque>
+#include <list>
 
 namespace lisp
 {
@@ -22,19 +21,32 @@ public:
     {
       _block = std::malloc(N * sizeof(T));
     }
+    /// @brief Disallow copying.
+    data(const data&) = delete;
+    /// @brief Disallow assignment.
+    data& operator=(const data&) = delete;
+    /// @brief Move constuctor.
+    data(data&& d)
+    {
+      _block = d._block;
+      _free_items = d._free_items;
+      d._block = nullptr;
+      d._free_items = 0;
+    }
+    /// @brief Disallow move assignment.
+    data& operator=(data&&) = delete;
+    /// @brief Destructor.
     ~data()
     {
       std::free(_block);
     }
     void* _block;
-    data* _next = nullptr;
-    data* _prev = nullptr;
     std::size_t _free_items = N;
   };
   std::size_t size() const
   {
-    if(_data != nullptr)
-      return _free_count + _data->_free_items;
+    if(!_storage.empty())
+      return _free_count + _storage.front()._free_items;
     return _free_count;
   }
   /// @brief Allocate memory for an object of type T.
@@ -49,24 +61,23 @@ public:
       return object;
     }
     // If we have no blocks of memory already allocated we allocate one block.
-    if(_data == nullptr)
+    if(_storage.empty())
     {
-      _data = new data;
-      _current = _data->_block;
+      data d;
+      _storage.push_front(std::move(d));
+      _current = _storage.front()._block;
     }
     // If the block we have has no more data we need to allocate a new one and
     // link it up to a double linked list.
-    if(_data->_free_items == 0)
+    if(_storage.front()._free_items == 0)
     {
-      _data->_prev = new data;
-      _data->_prev->_next = _data;
-      _data = _data->_prev;
-      _current = _data->_block;
+      _storage.push_front(data());
+      _current = _storage.front()._block;
     }
     // Placement new of the new object from our storage. The _current member
     // points to the first available memory in the data block.
     T* object = ::new (_current) T;
-    --_data->_free_items;
+    --_storage.front()._free_items;
     _current = static_cast<char*>(_current) + sizeof(T);
     return object;
   }
@@ -94,7 +105,7 @@ private:
   unsigned _free_count = 0;
   /// @brief Pointer to the storage block from where new objects are allocated
   /// if there are no objects available in the free list.
-  data* _data = nullptr;
+  std::list<data> _storage;
   /// @brief Pointer to the next available memory in the data block.
   void* _current = nullptr;
 };
