@@ -120,19 +120,10 @@ TEST_CASE("obarray")
   CHECK(length(obs)->intval() == 5);
 }
 
-TEST_CASE("reclaim + freecount")
-{
-  auto f0 = freecount();
-  CHECK(is_NIL(reclaim(mknumber(1))));
-  auto f1 = freecount();
-  CHECK(f1->intval() > f0->intval());
-}
-
 #ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {
   std::cout << "==========\n";
-  std::cout << "sizeof conscells_t: " << sizeof(alloc::conscells_t) << std::endl;
   std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;

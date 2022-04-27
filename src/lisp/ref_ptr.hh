@@ -85,9 +85,12 @@ class ref_ptr final
 public:
   /// @brief Default constructor initializes to nullptr.
   ref_ptr() = default;
+  /// @brief Create an empty ref_ptr.
+  ref_ptr(const std::nullptr_t): _ptr(nullptr) {}
   /// @brief Creates an object of type T and takes ownership of it.
-  //template<typename... Ts>
-  //explicit ref_ptr(Ts... ts): _ptr(new T(std::forward<Ts>(ts)...)) { _ptr->retain(); }
+  template<typename... Ts>
+  explicit ref_ptr(Ts... ts): _ptr(new T(std::forward<Ts>(ts)...)) { _ptr->retain(); }
+  /// @brief
   ref_ptr(T* p): _ptr(p)
   {
     if(_ptr)
@@ -114,6 +117,13 @@ public:
         _ptr->release();
       _ptr = x._ptr;
     }
+    return *this;
+  }
+  ref_ptr& operator=(std::nullptr_t)
+  {
+    if(_ptr)
+      _ptr->release();
+    _ptr = nullptr;
     return *this;
   }
   ref_ptr& operator=(T* p)

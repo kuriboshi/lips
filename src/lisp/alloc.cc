@@ -7,72 +7,16 @@
 
 namespace lisp
 {
-/// @brief Returns the lisp_t object to the list of free objects.
-///
-/// @details Instead of new/delete lisp_t objects are allocated from the list
-/// of free objects. When an object is deleted it's returned to the list of
-/// free lisp_t objects.
-///
-/// @param object A pointer to the lisp_t object to "delete".
-void ref_deleter(lisp_t* object)
-{
-  object->settype(type::FREE);
-  object->set();
-  alloc::freelist.push_back(object);
-}
-
 /// @brief Class handling allocation of objects.
 alloc::alloc(): local_symbols(lisp_t::symbol_collection().create())
 {
   destblockused = 0;
-  newpage(); // Allocate one page of storage
 }
 
 /// @brief Default destructor.
 ///
 // TODO: Free all memory
 alloc::~alloc() = default;
-
-/// @brief Allocates a new page of lisp_t objects.
-///
-/// @details lisp_t objects are managed like a memory pool. A number of blocks
-/// are used to store lisp_t objects. Free objects are kept on a list of
-/// available objects. If there are no available blocks on the list of free
-/// objects a new page is allocated and new objects are added to the list of
-/// free objects. The new objects are marked with the type "FREE".
-alloc::conscells_t* alloc::newpage()
-{
-  auto* newp = new conscells_t;
-  for(auto& i: newp->cells)
-  {
-    i.settype(type::FREE);
-    i.set();
-    freelist.push_back(&i);;
-  }
-  conscells.push_front(newp);
-  return newp;
-}
-
-/// @brief Allocate a number of pages of lisp_t objects.
-///
-/// @details As there is no garbage collection this function simply adds more
-/// pages and increases the number of available free objects with the number
-/// that fits in the number of pages allocated.
-///
-/// @param incr The number of pages to allocate.
-/// @returns Always returns NIL.
-LISPT alloc::reclaim(LISPT incr)
-{
-  int i = 0;
-  if(!is_NIL(incr))
-  {
-    check(incr, type::INTEGER);
-    i = incr->intval();
-  }
-  for(; i > 0; --i)
-    newpage();
-  return NIL;
-}
 
 /// @brief Allocates an object from the list of free objects.
 ///
@@ -81,13 +25,7 @@ LISPT alloc::reclaim(LISPT incr)
 /// @returns A new lisp_t object.
 LISPT alloc::getobject()
 {
-  if(freelist.empty())
-    newpage();
-
-  auto f = freelist.front();
-  freelist.pop_front();
-  auto r = LISPT(f);
-  return r;
+  return LISPT(new lisp_t);
 }
 
 /// @brief Creates a cons pair.
@@ -112,12 +50,12 @@ LISPT alloc::obarray()
 
 LISPT alloc::freecount()
 {
-  return mknumber(freelist.size());
+  return mknumber(lisp_t::freecount());
 }
 
 LISPT alloc::mkstring(const std::string& str)
 {
-  LISPT s = getobject();
+  auto s = getobject();
   s->set(str);
   return s;
 }
@@ -128,7 +66,7 @@ LISPT alloc::mkstring(const std::string& str)
 /// @returns An integer number as a LISP object.
 LISPT alloc::mknumber(int number)
 {
-  LISPT c = getobject();
+  auto c = getobject();;
   c->set(number);
   return c;
 }
@@ -139,7 +77,7 @@ LISPT alloc::mknumber(int number)
 /// @returns A floating point number as a LISP object.
 LISPT alloc::mkfloat(double number)
 {
-  LISPT c = getobject();
+  auto c = getobject();
   c->set(number);
   return c;
 }
@@ -180,7 +118,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
   std::int8_t count = 0;
   lambda.args = mkarglist(args, count);
   lambda.count = count;
-  LISPT s = getobject();
+  auto s = getobject();
   s->set(lambda, type == type::LAMBDA);
   return s;
 }
@@ -197,7 +135,7 @@ LISPT alloc::intern(const std::string& str)
   auto& sym = glob.get(str);
   if(sym.self == NIL)
   {
-    sym.self = LISPT(new lisp_t);
+    sym.self = new lisp_t;
     sym.self->set(sym);
   }
   return sym.self;
@@ -250,8 +188,5 @@ void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
 
 /// @brief Frees all destination blocks.
 void alloc::dzero() { destblockused = 0; }
-
-/// @brief The list of available lisp_t objects.
-std::deque<lisp_t*> alloc::freelist;
 
 } // namespace lisp

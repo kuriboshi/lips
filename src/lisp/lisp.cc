@@ -12,6 +12,23 @@
 
 namespace lisp
 {
+/// @brief Returns the lisp_t object to the list of free objects.
+///
+/// @details Instead of new/delete lisp_t objects are allocated from the list
+/// of free objects. When an object is deleted it's returned to the list of
+/// free lisp_t objects.
+///
+/// @param object A pointer to the lisp_t object to "delete".
+void ref_deleter(lisp_t* object)
+{
+  // Set the type to FREE to make it possible to detect use of objects already
+  // freed.
+  object->set();
+  object->settype(type::FREE);
+  // This will return the object to the memory pool.
+  delete object;
+}
+
 namespace pn
 {
 inline constexpr auto E = "e";                   // noeval version of eval
@@ -22,7 +39,6 @@ inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
 inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 
-inline constexpr auto RECLAIM = "reclaim";       // Initiate garbage collection
 inline constexpr auto CONS = "cons";             // Make a new cons cell
 inline constexpr auto FREECOUNT = "freecount";   // Number of free cells
 inline constexpr auto OBARRAY = "obarray";       // Return list of all atoms
@@ -150,7 +166,6 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
 
-    mkprim(pn::RECLAIM,   reclaim,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
     mkprim(pn::CONS,      cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
     mkprim(pn::FREECOUNT, freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
     mkprim(pn::OBARRAY,   obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
@@ -174,6 +189,8 @@ lisp::~lisp()
     _current = nullptr;
 }
 
+lisp_t::pool_t lisp_t::_pool;
+
 LISPT lisp::eval(lisp& l, LISPT expr) { return l._eval.eval(expr); }
 LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l._eval.apply(fun, args); }
 LISPT lisp::baktrace(lisp& l) { return l._eval.baktrace(); }
@@ -181,7 +198,6 @@ LISPT lisp::topofstack(lisp& l) { return l._eval.topofstack(); }
 LISPT lisp::destblock(lisp& l, LISPT a) { return l._eval.destblock(a); }
 
 LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
-LISPT lisp::reclaim(lisp& l, LISPT a) { return l._alloc.reclaim(a); }
 LISPT lisp::obarray(lisp& l) { return l._alloc.obarray(); }
 LISPT lisp::freecount(lisp& l) { return l._alloc.freecount(); }
 

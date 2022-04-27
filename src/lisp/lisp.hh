@@ -23,6 +23,7 @@
 #include "error.hh"
 #include "except.hh"
 #include "symbol.hh"
+#include "pool.hh"
 
 namespace lisp
 {
@@ -223,7 +224,7 @@ class cvariable_t
 {
 public:
   explicit cvariable_t(LISPT value): _value(value) {}
-  cvariable_t(): _value(NIL) {}
+  cvariable_t() {}
   ~cvariable_t() = default;
   cvariable_t(const cvariable_t& other) = delete;
   cvariable_t(cvariable_t&& other) noexcept
@@ -329,7 +330,25 @@ public:
     return all_symbols;
   }
 
+  // The new and delete operators uses the global pool to create objects.
+  void* operator new(std::size_t)
+  {
+    return _pool.allocate();
+  }
+  void operator delete(lisp_t* x, std::destroying_delete_t)
+  {
+    _pool.deallocate(x);
+  }
+
+  static std::size_t freecount()
+  {
+    return _pool.size();
+  }
+
 private:
+  using pool_t = pool<lisp_t, 256>;
+  static pool_t _pool;
+
   type _type = type::NIL;
 
   // One entry for each type.  Types that has no, or just one, value are
@@ -394,7 +413,6 @@ public:
   static LISPT destblock(lisp& l, LISPT a);
 
   static LISPT cons(lisp& l, LISPT a, LISPT b);
-  static LISPT reclaim(lisp& l, LISPT a);
   static LISPT obarray(lisp& l);
   static LISPT freecount(lisp& l);
 
@@ -627,8 +645,6 @@ inline LISPT destblock(LISPT a) { return lisp::destblock(lisp::current(), a); }
 
 inline LISPT cons(lisp& l, LISPT a, LISPT b) { return lisp::cons(l, a, b); }
 inline LISPT cons(LISPT a, LISPT b) { return lisp::cons(lisp::current(), a, b); }
-inline LISPT reclaim(lisp& l, LISPT a) { return lisp::reclaim(l, a); }
-inline LISPT reclaim(LISPT a) { return lisp::reclaim(lisp::current(), a); }
 inline LISPT obarray(lisp& l) { return lisp::obarray(l); }
 inline LISPT obarray() { return lisp::obarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return lisp::freecount(l); }

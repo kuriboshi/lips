@@ -66,7 +66,7 @@ public:
   alloc();
   ~alloc();
 
-  /// @brief Return a cons cell from storage.
+  /// @brief Return a cons cell from local storage.
   ///
   /// @details If the free cell list is empty a new block of cons cells is
   /// allocated.  The LISPT ref_ptr created by this function will have its
@@ -94,7 +94,7 @@ public:
   cvariable_t& initcvar(const std::string& name, LISPT val)
   {
     auto t = mkatom(name);
-    t->symbol().value = LISPT(new lisp_t);
+    t->symbol().value = new lisp_t;
     t->value()->set(cvariable_t(val));
     return t->value()->cvarval();
   }
@@ -118,7 +118,7 @@ public:
   ///
   static void mkprim(subr_t subr)
   {
-    auto s = LISPT(new lisp_t);
+    auto s = new lisp_t;
     s->set(subr_index{subr_t::put(subr)});
     LISPT f = intern(subr.name);
     f->value(s);
@@ -166,14 +166,6 @@ public:
   ///
   void dzero();
 
-  /// @brief Allocate a number of blocks of cons cells.
-  ///
-  /// @details The name is historical from when there was garbage collection.
-  ///
-  /// @param incr [in] Number of blocks of cons cells to allocate.
-  ///
-  LISPT reclaim(LISPT incr); // Number of blocks to increase with
-
   /// @brief Builds a cons cell out of the arguments.
   ///
   /// @details The most basic of lisp functions.  Allocate a cons cell and fill in
@@ -198,18 +190,7 @@ public:
   ///
   LISPT freecount();
   
-  struct conscells_t
-  {
-    static constexpr int CONSCELLS = 10240; // Number of cells in each block
-    std::array<lisp_t, CONSCELLS> cells;
-  };
-
 private:
-  /// @brief Allocates a new block of cons cells.
-  ///
-  /// @details The new block is linked into the current list of blocks.
-  ///
-  conscells_t* newpage();
 
   /// @brief Returns the global symbol table.
   static symbol::symbol_store_t& global_symbols()
@@ -218,8 +199,6 @@ private:
   }
   /// @brief The local symbol table, local for each lisp instance.
   symbol::symbol_store_t& local_symbols;
-  /// @brief List of free objects.
-  static std::deque<lisp_t*> freelist;
 
   /// @brief Builds an argument list.
   ///
@@ -235,16 +214,12 @@ private:
   /// @return A straight list of arguments.
   LISPT mkarglist(LISPT alist, std::int8_t& count);
 
-  /// @brief Cons cell storage.
-  std::list<conscells_t*> conscells;
   /// @brief Size of destination block area
   static constexpr int DESTBLOCKSIZE = 3000;
   /// @brief Destination block area.
   std::array<destblock_t, DESTBLOCKSIZE> destblock;
   /// @brief Index to last slot in destblock.
   int destblockused = 0;
-
-  friend void ref_deleter(lisp_t*);
 };
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
