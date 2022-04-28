@@ -272,10 +272,10 @@ public:
   void set() { _type = type::NIL; _u = {}; }
   void set(std::nullptr_t) { _type = type::EMPTY; _u = nullptr; }
   bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
-  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::print_name>(_u)); }
-  void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.pname; }
-  auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::print_name>(_u)).value; }
-  void value(LISPT x) { symbol_collection().get(std::get<symbol::print_name>(_u)).value = x; }
+  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
+  void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.id; }
+  auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
+  void value(LISPT x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
   auto intval() const -> int { return std::get<int>(_u); }
   void set(int x)
   {
@@ -319,7 +319,10 @@ public:
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
   void set(cvariable_t&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
-  const std::string& getstr() const { return _type == type::STRING ? string() : std::get<symbol::print_name>(_u).name; }
+  const std::string& getstr() const
+  {
+    return _type == type::STRING ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
+  }
 
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
@@ -356,7 +359,7 @@ private:
   std::variant<
     std::monostate,             // NIL
     std::nullptr_t,             // EMPTY
-    symbol::print_name,         // SYMBOL
+    symbol::symbol_id,          // SYMBOL
     int,                        // INTEGER
     double,                     // FLOAT
     indirect_t,                 // INDIRECT

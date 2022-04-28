@@ -27,7 +27,7 @@ namespace lisp
 
 const std::string& pname(LISPT sym)
 {
-  return sym->symbol().pname.name;
+  return sym->symbol().pname;
 }
 
 TEST_CASE("parser (a b . c)")

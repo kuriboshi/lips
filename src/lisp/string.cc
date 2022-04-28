@@ -16,7 +16,7 @@ LISPT symstr(lisp& l, LISPT sym)
   check(sym, type::SYMBOL, type::T, type::NIL);
   if(type_of(sym) == type::NIL)
     return mkstring("nil");
-  return mkstring(l, sym->symbol().pname.name);
+  return mkstring(l, sym->symbol().pname);
 }
 
 /// @brief T if s is a string, NIL otherwise.

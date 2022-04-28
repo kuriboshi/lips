@@ -34,21 +34,21 @@ struct symbol_index
 
 // The print_name class contains the symbol store identifier and the name of
 // the symbol.
-struct print_name
+struct symbol_id
 {
   symbol_collection_id ident = 0;
   symbol_index_t index = 0;
-  std::string name;
 };
 
 struct symbol_t
 {
-  print_name pname;      // The printname of the atom
-  LISPT self{};          // The LISPT object for this symbol
-  LISPT value{};         // Value
-  LISPT plist{};         // The property list
-  LISPT topval{};        // Holds top value (not used yet)
-  bool constant = false; // If true this is a constant which can't be set
+  symbol_id id;                // The id of the atom
+  std::string pname;
+  LISPT self{};                // The LISPT object for this symbol
+  LISPT value{};               // Value
+  LISPT plist{};               // The property list
+  LISPT topval{};              // Holds top value (not used yet)
+  bool constant = false;       // If true this is a constant which can't be set
 };
 
 class symbol_store_t
@@ -75,11 +75,12 @@ public:
     if(p != _map.end())
       return _store[p->second];
     symbol_t symbol;
-    symbol.pname = {_id, _store.size(), name};
+    symbol.pname = name;
+    symbol.id = {_id, _store.size()};
     symbol.value = C_UNBOUND;
     _store.push_back(symbol);
-    _map.emplace(name, symbol.pname.index);
-    return _store[symbol.pname.index];
+    _map.emplace(name, symbol.id.index);
+    return _store[symbol.id.index];
   }
   symbol_t& get(symbol_index_t index) { return _store.at(index); }
   store_t::iterator begin() { return _store.begin(); }
@@ -129,12 +130,12 @@ public:
     return p->second.exists(name);
   }
 
-  symbol_t& get(const print_name& pname)
+  symbol_t& get(const symbol_id& id)
   {
-    auto p = collection.find(pname.ident);
+    auto p = collection.find(id.ident);
     if(p == collection.end())
       throw std::runtime_error("no such symbol store");
-    return p->second.get(pname.name);
+    return p->second.get(id.index);
   }
 
   symbol_t& get(symbol_collection_id id, const std::string& name)

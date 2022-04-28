@@ -50,7 +50,7 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
     auto a = eval(l, "(setq f (nlambda (a) a))");
     auto b = eval(l, "(f x)");
     CHECK(type_of(b) == type::SYMBOL);
-    CHECK(b->symbol().pname.name == "x");
+    CHECK(b->symbol().pname == "x");
   }
 }
 

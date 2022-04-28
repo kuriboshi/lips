@@ -136,7 +136,7 @@ inline void pp(const char* s, file_t& file, LISPT x)
 
 LISPT patom(lisp&, LISPT x, file_t& file, bool esc)
 {
-  ps(x->symbol().pname.name, file, esc);
+  ps(x->symbol().pname, file, esc);
   return x;
 }
 

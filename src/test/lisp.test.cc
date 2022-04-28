@@ -159,7 +159,7 @@ TEST_CASE("lisp: literals")
     REQUIRE(type_of(sexpr) == type::CONS);
     auto a = caar(sexpr);
     CHECK(type_of(a) == type::SYMBOL);
-    CHECK(a->symbol().pname.name == "a");
+    CHECK(a->symbol().pname == "a");
     file_t out(std::make_unique<io::string_sink>());
     prin0(sexpr, out);
     CHECK(to_string(out.sink()) == "((a b) c)");
