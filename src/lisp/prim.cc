@@ -279,15 +279,15 @@ LISPT length(lisp& l, LISPT x)
 
 LISPT closure(lisp& l, LISPT fun, LISPT vars)
 {
-  closure_t c;
-  c.cfunction = fun;
-  c.closed = vars;
+  ref_closure_t c(new closure_t);
+  c->cfunction = fun;
+  c->closed = vars;
   auto f = prim::length(l, vars);
-  c.count = f->intval();
+  c->count = f->intval();
   f = closobj(l, vars);
   if(type_of(f) == type::ERROR)
     return f;
-  c.cvalues = f;
+  c->cvalues = f;
   auto clos = l.a().getobject();
   clos->set(c);
   return clos;

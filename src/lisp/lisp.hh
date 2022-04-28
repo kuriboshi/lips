@@ -201,13 +201,29 @@ struct lambda_t
 
 /// @brief A closure (static binding).
 ///
-struct closure_t
+class closure_t : public ref_count<closure_t>
 {
+public:
   LISPT cfunction = NIL;
   LISPT closed = NIL;
   LISPT cvalues = NIL;
   std::uint8_t count = 0;
+
+  void* operator new(std::size_t)
+  {
+    return _pool.allocate();
+  }
+  void operator delete(closure_t* x, std::destroying_delete_t)
+  {
+    _pool.deallocate(x);
+  }
+
+private:
+  using pool_t = pool<closure_t, 256>;
+  static pool_t _pool;
 };
+
+using ref_closure_t = ref_ptr<closure_t>;
 
 struct subr_index
 {
@@ -310,8 +326,8 @@ public:
   }
   auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
   void set(lambda_t x, bool lambda) { _type = lambda ? type::LAMBDA : type::NLAMBDA; _u = x; }
-  auto closure() -> closure_t& { return std::get<closure_t>(_u); }
-  void set(closure_t x) { _type = type::CLOSURE; _u = x; }
+  auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
+  void set(ref_closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
   auto file() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
@@ -367,7 +383,7 @@ private:
     std::string,                // STRING
     subr_index,                 // SUBR
     lambda_t,                   // LAMBDA
-    closure_t,                  // CLOSURE
+    ref_closure_t,              // CLOSURE
     destblock_t*,               // ENVIRON
     std::shared_ptr<file_t>,    // FILE
     cvariable_t                 // CVARIABLE

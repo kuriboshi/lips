@@ -189,6 +189,7 @@ lisp::~lisp()
     _current = nullptr;
 }
 
+closure_t::pool_t closure_t::_pool;
 lisp_t::pool_t lisp_t::_pool;
 
 LISPT lisp::eval(lisp& l, LISPT expr) { return l._eval.eval(expr); }

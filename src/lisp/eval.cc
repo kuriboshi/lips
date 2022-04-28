@@ -795,14 +795,14 @@ bool evaluator::evclosure()
 
   push(env);
   push(dest);
-  dest = mkdestblock(fun->closure().count);
-  for(foo = fun->closure().closed, i = fun->closure().count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
-  for(foo = fun->closure().cvalues; !is_NIL(foo); foo = foo->cdr())
+  dest = mkdestblock(fun->closure()->count);
+  for(foo = fun->closure()->closed, i = fun->closure()->count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(foo = fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
   }
-  fun = fun->closure().cfunction;
+  fun = fun->closure()->cfunction;
   link();
   dest = pop<destblock_t*>();
   auto envir = pop<destblock_t*>();
