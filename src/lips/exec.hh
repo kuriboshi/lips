@@ -79,3 +79,5 @@ extern bool insidefork;
 
 extern void printdone();
 extern void checkfork();
+
+#endif
