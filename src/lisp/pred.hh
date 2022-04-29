@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_PRED_HH
+#define LISP_PRED_HH
 
 #include "lisp.hh"
 
@@ -43,3 +44,5 @@ inline LISPT litatom(LISPT a) { return pred::litatom(lisp::current(), a); }
 inline LISPT xtypeof(lisp& l, LISPT a) { return pred::xtypeof(l, a); }
 inline LISPT xtypeof(LISPT a) { return pred::xtypeof(lisp::current(), a); }
 } // namespace lisp
+
+#endif

@@ -7,7 +7,7 @@
 
 #include <fmt/format.h>
 #include <iostream>
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 #include <lisp/except.hh>
 #include "main.hh"
 #include "top.hh"

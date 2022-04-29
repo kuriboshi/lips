@@ -1,16 +1,10 @@
 //
 // Lips, lisp shell.
-//
 // Copyright 2021-2022 Krister Joas
 //
-
 #include <iostream>
 #include <catch2/catch.hpp>
-
-#include <lisp/alloc.hh>
-#include <lisp/lisp.hh>
-#include <lisp/io.hh>
-#include <lisp/symbol.hh>
+#include <lisp/liblisp.hh>
 
 namespace lisp::symbol
 {

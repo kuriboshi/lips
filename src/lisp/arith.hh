@@ -3,7 +3,8 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_ARITH_HH
+#define LISP_ARITH_HH
 
 #include "lisp.hh"
 
@@ -101,3 +102,5 @@ inline LISPT minusp(lisp& l, LISPT x) { return arith::minusp(l, x); }
 inline LISPT minusp(LISPT x) { return arith::minusp(lisp::current(), x); }
 
 } // namespace lisp
+
+#endif

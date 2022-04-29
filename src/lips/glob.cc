@@ -11,7 +11,7 @@
 
 #include <pwd.h>
 
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 #include "main.hh"
 #include "exec.hh"
 #include "glob.hh"

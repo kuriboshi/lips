@@ -1,6 +1,6 @@
 #
 # let -- the let function
-# Copyright 1992, 2020 Krister Joas.
+# Copyright 1992, 2020, 2022 Krister Joas.
 #
 # $Id$
 #

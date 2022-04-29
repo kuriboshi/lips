@@ -1,17 +1,15 @@
-/*
- * Lips, lisp shell.
- * Copyright 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 2020-2021 Krister Joas
+//
 
-#pragma once
+#ifndef LIPS_EXEC_HH
+#define LIPS_EXEC_HH
 
 #include <unordered_map>
 #include <lisp/lisp.hh>
 
-namespace lisp
-{
-namespace pn
+namespace lisp::pn
 {
 inline constexpr auto CD = "cd";                  // change directory
 inline constexpr auto EXPAND = "expand";          // expand wildcards
@@ -28,8 +26,10 @@ inline constexpr auto BG = "bg";                  // run job in background
 inline constexpr auto SETENV = "setenv";          // set environment variable
 inline constexpr auto GETENV = "getenv";          // get value of variable
 inline constexpr auto EXEC = "exec";              // overlay lips with command
-}
+} // namespace lisp::pn
 
+namespace lisp
+{
 class exec
 {
 public:

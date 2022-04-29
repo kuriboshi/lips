@@ -3,10 +3,12 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_VERSION_HH
+#define LISP_VERSION_HH
 
 namespace lisp
 {
 extern const char* VERSION;
-
 }
+
+#endif

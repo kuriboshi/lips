@@ -4,7 +4,8 @@
 // Copyright 2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_PARSER_HH
+#define LISP_PARSER_HH
 
 #include <deque>
 #include <memory>
@@ -180,4 +181,6 @@ LISPT parser<Input>::parse_tail()
   return cons(object, NIL);
 }
 
-}
+} // namespace lisp
+
+#endif

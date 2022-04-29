@@ -16,7 +16,7 @@
 #include <cerrno>
 #include <cctype>
 
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 #include <lisp/except.hh>
 #include "main.hh"
 #include "env.hh"

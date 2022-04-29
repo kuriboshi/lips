@@ -1,9 +1,10 @@
 //
 // Lips, lisp shell.
-// Copyright 2020-2021 Krister Joas
+// Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_MAP_HH
+#define LISP_MAP_HH
 
 #include "lisp.hh"
 
@@ -28,3 +29,5 @@ inline LISPT maplist(LISPT a, LISPT b, LISPT c) { return Map::maplist(lisp::curr
 inline LISPT mapcar(lisp& l, LISPT a, LISPT b, LISPT c) { return Map::mapcar(l, a, b, c); }
 inline LISPT mapcar(LISPT a, LISPT b, LISPT c) { return Map::mapcar(lisp::current(), a, b, c); }
 } // namespace lisp
+
+#endif

@@ -1,10 +1,10 @@
-/*
- * Lips, lisp shell.
- * Copyright 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 2020-2022 Krister Joas
+//
 
-#pragma once
+#ifndef LIPS_TOP_HH
+#define LIPS_TOP_HH
 
 #include <functional>
 #include <lisp/lisp.hh>
@@ -75,3 +75,5 @@ private:
 } // namespace lisp
 
 extern std::string current_prompt;
+
+#endif

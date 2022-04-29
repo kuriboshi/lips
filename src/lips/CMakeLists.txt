@@ -1,4 +1,5 @@
 #
+# Lips, lisp shell.
 # Copyright 2020-2022 Krister Joas
 #
 add_executable(lips)

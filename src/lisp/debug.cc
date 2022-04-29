@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2021 Krister Joas
+//
 
 #include "debug.hh"
 #include "alloc.hh"

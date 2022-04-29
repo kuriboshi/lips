@@ -1,14 +1,14 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2021 Krister Joas
- */
+//
+// Lips, lisp shell.
+// Copyright 1988-1989, 1992, 2020-2022 Krister Joas
+//
 
-/*
- * version.c -- defines the current lips version
- */
+//
+// version.cc -- defines the current lips version
+//
 
 namespace lisp
 {
-const char* VERSION = "libisp 0.3(130), 2020-04-06";
-
+const char* VERSION = "lips 1.0"
+  "Copyright 1988-1989, 1992, 2020-2022 Krister Joas";
 }

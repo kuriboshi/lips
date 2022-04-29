@@ -1,10 +1,10 @@
 //
 // Lips, lisp shell.
-//
 // Copyright 2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_READER_HH
+#define LISP_READER_HH
 
 #include <iostream>
 #include <string>
@@ -486,3 +486,5 @@ void reader<Input>::unread(token_t token)
 }
 
 }
+
+#endif

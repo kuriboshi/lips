@@ -1,10 +1,13 @@
-#include <iostream>
-#include <catch2/catch.hpp>
-#include <lisp/pool.hh>
-
-#include <string>
+//
+// Lips, lisp shell
+// Copyright 2022 Krister Joas
+//
 #include <array>
 #include <chrono>
+#include <iostream>
+#include <string>
+#include <catch2/catch.hpp>
+#include <lisp/pool.hh>
 
 namespace lisp
 {

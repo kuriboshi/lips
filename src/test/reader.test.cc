@@ -1,12 +1,10 @@
 //
 // Lips, lisp shell.
-//
 // Copyright 2022 Krister Joas
 //
-
-#include <catch2/catch.hpp>
 #include <string>
 #include <sstream>
+#include <catch2/catch.hpp>
 #include <lisp/reader.hh>
 
 namespace

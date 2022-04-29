@@ -10,8 +10,6 @@
 #include "prim.hh"
 #include "prop.hh"
 
-// extern lisp::LISPT findalias(lisp::LISPT);
-
 using namespace std::literals;
 
 namespace lisp
@@ -315,10 +313,6 @@ void evaluator::do_unbound(continuation_t continuation)
   }
   else
   {
-#if 0
-    // TODO:
-    expression = findalias(expression);
-#endif
     if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
       && type_of(expression->car()->value()) == type::UNBOUND)
     {
@@ -336,10 +330,6 @@ void evaluator::do_unbound(continuation_t continuation)
 
 bool evaluator::do_default(continuation_t continuation)
 {
-#if 0
-  // TODO:
-  expression = findalias(expression);
-#endif
   if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
     && type_of(expression->car()->value()) == type::UNBOUND)
   {

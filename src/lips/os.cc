@@ -1,12 +1,10 @@
-/*
- * Lips, lisp shell.
- * Copyright 1989, 2020-2021 Krister Joas
- *
- */
-
-#include <unistd.h>
+//
+// Lips, lisp shell.
+// Copyright 1989, 2020-2021 Krister Joas
+//
 
 #include <cstdio>
+#include <unistd.h>
 
 namespace lisp
 {

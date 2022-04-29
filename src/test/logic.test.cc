@@ -2,10 +2,9 @@
 // Lips, lisp shell.
 // Copyright 2021-2022 Krister Joas
 //
-#include <catch2/catch.hpp>
-
 #include <iostream>
-#include <lisp/libisp.hh>
+#include <catch2/catch.hpp>
+#include <lisp/liblisp.hh>
 
 template<typename Enumeration>
 typename std::underlying_type<Enumeration>::type as_integer(Enumeration const value)

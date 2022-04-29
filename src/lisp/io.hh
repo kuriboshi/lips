@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_IO_HH
+#define LISP_IO_HH
 
 #include <optional>
 #include <sstream>
@@ -400,3 +401,5 @@ inline std::ostream& operator<<(std::ostream& os, const lisp::LISPT& obj)
   prin0(obj, out, true);
   return os;
 }
+
+#endif

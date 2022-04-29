@@ -1,8 +1,7 @@
-/*
- * Lips, lisp shell.
- * Copyright 1988, 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1988, 2020-2022 Krister Joas
+//
 
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -21,7 +20,7 @@
 #include <csignal>
 #include <cstring>
 
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 #include <lisp/except.hh>
 #include <lisp/iter.hh>
 #include "glob.hh"

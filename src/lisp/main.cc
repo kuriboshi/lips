@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <string>
-#include "libisp.hh"
+#include "liblisp.hh"
 #include "except.hh"
 #include "repl.hh"
 #include "main.hh"

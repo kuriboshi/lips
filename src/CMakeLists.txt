@@ -33,7 +33,7 @@ target_sources(
           lisp/file.hh
           lisp/io.hh
           lisp/iter.hh
-          lisp/libisp.hh
+          lisp/liblisp.hh
           lisp/lisp.hh
           lisp/logic.hh
           lisp/low.hh

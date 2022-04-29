@@ -2,13 +2,11 @@
 // Lips, lisp shell.
 // Copyright 2020-2022 Krister Joas
 //
-
 #define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
-
 #include <vector>
 #include <string>
-#include <lisp/libisp.hh>
+#include <catch2/catch.hpp>
+#include <lisp/liblisp.hh>
 
 namespace
 {

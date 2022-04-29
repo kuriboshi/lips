@@ -3,7 +3,8 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#pragma once
+#ifndef LIPS_MAIN_HH
+#define LIPS_MAIN_HH
 
 #include <memory>
 #include <lisp/lisp.hh>
@@ -42,3 +43,5 @@ extern lisp::LISPT C_REDIR_APPEND;
 extern lisp::LISPT C_REDIR_FROM;
 extern lisp::LISPT C_REDIR_TO;
 extern lisp::LISPT C_SEMI;
+
+#endif

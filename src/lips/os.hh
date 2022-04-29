@@ -3,10 +3,12 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#pragma once
+#ifndef LIPS_OS_HH
+#define LIPS_OS_HH
 
 namespace lisp
 {
 extern int readchar(FILE*, char*);
+} // namespace lisp
 
-}
+#endif

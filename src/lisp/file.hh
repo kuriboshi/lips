@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_FILE_HH
+#define LISP_FILE_HH
 
 #include "lisp.hh"
 
@@ -62,3 +63,5 @@ inline bool loadfile(lisp& l, const std::string& filename) { return file::loadfi
 inline bool loadfile(const std::string& filename) { return file::loadfile(lisp::current(), filename); }
 
 } // namespace lisp
+
+#endif

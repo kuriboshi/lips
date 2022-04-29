@@ -1,9 +1,7 @@
 //
 // Lips, lisp shell.
-//
 // Copyright 2022 Krister Joas
 //
-
 #include <sstream>
 #include <catch2/catch.hpp>
 #include <lisp/parser.hh>

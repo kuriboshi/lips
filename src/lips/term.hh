@@ -3,10 +3,10 @@
 // Copyright 1988, 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LIPS_TERM_HH
+#define LIPS_TERM_HH
 
 #include <termios.h>
-
 #include <lisp/io.hh>
 
 class term_source: public lisp::io::source
@@ -117,3 +117,5 @@ private:
   const char* clear = nullptr;
   bool nocap = false;           // true if insufficient term cap.
 };
+
+#endif

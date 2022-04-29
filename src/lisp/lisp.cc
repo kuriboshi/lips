@@ -6,7 +6,7 @@
 #include <cstring>              // For strerror
 #include <cerrno>               // For errno
 #include <iostream>
-#include "libisp.hh"
+#include "liblisp.hh"
 #include "except.hh"
 #include "error.hh"
 

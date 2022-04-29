@@ -1,9 +1,10 @@
 //
 // Lips, lisp shell.
-// Copyright 2020-2021 Krister Joas
+// Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_PRIM_HH
+#define LISP_PRIM_HH
 
 #include "lisp.hh"
 
@@ -124,3 +125,5 @@ inline LISPT append(LISPT a) { return prim::append(lisp::current(), a); }
 inline LISPT tconc(lisp& l, LISPT a, LISPT b) { return prim::tconc(l, a, b); }
 inline LISPT tconc(LISPT a, LISPT b) { return prim::tconc(lisp::current(), a, b); }
 } // namespace lisp
+
+#endif

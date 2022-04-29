@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 #include "main.hh"
 #include "top.hh"
 #include "glob.hh"

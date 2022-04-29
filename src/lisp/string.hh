@@ -1,9 +1,10 @@
 //
 // Lips, lisp shell.
-// Copyright 2020-2021 Krister Joas
+// Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_STRING_HH
+#define LISP_STRING_HH
 
 #include "lisp.hh"
 
@@ -37,3 +38,5 @@ inline LISPT strlen(LISPT x) { return string::strlen(lisp::current(), x); }
 inline LISPT substring(lisp& l, LISPT x, LISPT y, LISPT z) { return string::substring(l, x, y, z); }
 inline LISPT substring(LISPT x, LISPT y, LISPT z) { return string::substring(lisp::current(), x, y, z); }
 } // namespace lisp
+
+#endif

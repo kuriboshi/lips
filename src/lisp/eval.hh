@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_EVAL_HH
+#define LISP_EVAL_HH
 
 #include <array>
 #include <functional>
@@ -144,3 +145,5 @@ inline void unwind(lisp& l) { l.e().unwind(); }
 inline void unwind() { lisp::current().e().unwind(); }
 
 } // namespace lisp
+
+#endif

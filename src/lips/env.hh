@@ -7,7 +7,7 @@
 #define LIPS_ENV_HH
 
 #include <string>
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 
 namespace lisp
 {

@@ -2,9 +2,8 @@
 // Lips, lisp shell.
 // Copyright 2021-2022 Krister Joas
 //
-
 #include <catch2/catch.hpp>
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 
 namespace lisp
 {

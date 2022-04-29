@@ -1,9 +1,10 @@
 //
 // Lips, lisp shell.
-// Copyright 2020-2021 Krister Joas
+// Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_PROP_HH
+#define LISP_PROP_HH
 
 #include "lisp.hh"
 
@@ -31,3 +32,5 @@ inline LISPT getprop(LISPT a, LISPT b) { return prop::getprop(lisp::current(), a
 inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return prop::remprop(l, a, b); }
 inline LISPT remprop(LISPT a, LISPT b) { return prop::remprop(lisp::current(), a, b); }
 } // namespace lisp
+
+#endif

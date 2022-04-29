@@ -3,7 +3,8 @@
 // Copyright 2020-2021 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_EXCEPT_HH
+#define LISP_EXCEPT_HH
 
 #include <stdexcept>
 #include <string>
@@ -30,3 +31,5 @@ public:
 };
 
 } // namespace lisp
+
+#endif

@@ -1,10 +1,10 @@
-/*
- * Lips, lisp shell.
- * Copyright 1989, 2020-2021 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1989, 2020-2021 Krister Joas
+//
 
-#pragma once
+#ifndef LISP_ERROR_HH
+#define LISP_ERROR_HH
 
 namespace lisp
 {
@@ -45,3 +45,5 @@ inline constexpr int MAXMESSAGE = 30;
 inline constexpr int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
 
 } // namespace lisp
+
+#endif

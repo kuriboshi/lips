@@ -3,10 +3,10 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_ITER_HH
+#define LISP_ITER_HH
 
 #include <iterator>
-
 #include "lisp.hh"
 
 namespace lisp
@@ -47,3 +47,5 @@ inline iterator begin(LISPT l) { return iterator(l); }
 inline iterator end(LISPT l) { return iterator(nullptr); }
 
 } // namespace lisp
+
+#endif

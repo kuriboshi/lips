@@ -1,6 +1,6 @@
 #
 # dirstack -- directory stack functions
-# Copyright 1989, 2020 Krister Joas.
+# Copyright 1989, 2020, 2022 Krister Joas.
 #
 # $Id$
 #

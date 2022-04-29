@@ -1,3 +1,8 @@
+//
+// Lips, lisp shell.
+// Copyright 2022 Krister Joas
+//
+
 #ifndef LISP_POOL_HH
 #define LISP_POOL_HH
 

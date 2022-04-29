@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_USER_HH
+#define LISP_USER_HH
 
 #include "lisp.hh"
 
@@ -26,3 +27,5 @@ inline LISPT define(LISPT a, LISPT b) { return user::define(lisp::current(), a, 
 inline LISPT defineq(lisp& l, LISPT a) { return user::defineq(l, a); }
 inline LISPT defineq(LISPT a) { return user::defineq(lisp::current(), a); }
 } // namespace lisp
+
+#endif

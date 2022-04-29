@@ -4,7 +4,7 @@
 //
 #include <iostream>
 #include <catch2/catch.hpp>
-#include <lisp/libisp.hh>
+#include <lisp/liblisp.hh>
 
 namespace lisp
 {

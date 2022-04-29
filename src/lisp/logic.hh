@@ -3,7 +3,8 @@
 // Copyright 2020-2022 Krister Joas
 //
 
-#pragma once
+#ifndef LISP_LOGIC_HH
+#define LISP_LOGIC_HH
 
 #include "lisp.hh"
 
@@ -26,3 +27,5 @@ inline LISPT p_not(lisp& l, LISPT x) { return logic::p_not(l, x); }
 inline LISPT p_not(LISPT x) { return logic::p_not(lisp::current(), x); }
 
 } // namespace lisp
+
+#endif

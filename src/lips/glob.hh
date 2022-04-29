@@ -1,16 +1,16 @@
-/*
- * Lips, lisp shell.
- * Copyright 2020-2022 Krister Joas
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 2020-2022 Krister Joas
+//
 
-#pragma once
+#ifndef LIPS_GLOB_HH
+#define LIPS_GLOB_HH
 
-#include <catch2/catch.hpp>
-#include <lisp/libisp.hh>
 #include <optional>
 #include <string>
 #include <filesystem>
+#include <catch2/catch.hpp>
+#include <lisp/liblisp.hh>
 
 namespace glob
 {
@@ -30,3 +30,5 @@ inline lisp::LISPT expand(lisp::LISPT wild)
 {
   return glob::expand(wild);
 }
+
+#endif

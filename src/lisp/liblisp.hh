@@ -1,10 +1,10 @@
-/*
- * Lips, lisp shell.
- * Copyright 1992, 2020-2021 Krister Joas.
- *
- */
+//
+// Lips, lisp shell.
+// Copyright 1992, 2020-2021 Krister Joas.
+//
 
-#pragma once
+#ifndef LISP_LIBLISP_HH
+#define LISP_LIBLISP_HH
 
 #include "lisp.hh"
 #include "alloc.hh"
@@ -24,3 +24,5 @@
 #include "string.hh"
 #include "user.hh"
 #include "version.hh"
+
+#endif
