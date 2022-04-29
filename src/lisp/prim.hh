@@ -45,7 +45,6 @@ LISPT closure(lisp&, LISPT, LISPT);
 /// the length of LIST, return NIL.
 ///
 LISPT nth(lisp&, LISPT, LISPT);
-LISPT nthd(lisp&, LISPT, LISPT);
 LISPT error(lisp&, LISPT);
 LISPT uxexit(lisp&, LISPT);
 
@@ -111,8 +110,6 @@ inline LISPT closure(lisp& l, LISPT a, LISPT b) { return prim::closure(l, a, b);
 inline LISPT closure(LISPT a, LISPT b) { return prim::closure(lisp::current(), a, b); }
 inline LISPT nth(lisp& l, LISPT a, LISPT b) { return prim::nth(l, a, b); }
 inline LISPT nth(LISPT a, LISPT b) { return prim::nth(lisp::current(), a, b); }
-inline LISPT nthd(lisp& l, LISPT a, LISPT b) { return prim::nthd(l, a, b); }
-inline LISPT nthd(LISPT a, LISPT b) { return prim::nthd(lisp::current(), a, b); }
 inline LISPT error(lisp& l, LISPT a) { return prim::error(l, a); }
 inline LISPT error(LISPT a) { return prim::error(lisp::current(), a); }
 inline LISPT uxexit(lisp& l, LISPT a) { return prim::uxexit(l, a); }

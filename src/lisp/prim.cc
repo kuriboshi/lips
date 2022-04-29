@@ -296,11 +296,10 @@ LISPT closure(lisp& l, LISPT fun, LISPT vars)
 inline LISPT _nth(lisp& l, LISPT list, int n)
 {
   LISPT ls;
-
   for(ls = list; n > 1 && !is_NIL(ls); n--, ls = ls->cdr())
     ;
   if(!is_NIL(ls))
-    return ls->car();
+    return ls;
   return NIL;
 }
 
@@ -311,21 +310,6 @@ LISPT nth(lisp& l, LISPT x, LISPT p)
     return NIL;
   check(x, type::CONS);
   return _nth(l, x, p->intval());
-}
-
-LISPT nthd(lisp& l, LISPT list, LISPT pos)
-{
-  check(pos, type::INTEGER);
-  int p = pos->intval();
-  if(is_NIL(list))
-    return NIL;
-  check(list, type::CONS);
-  LISPT ls;
-  for(ls = list; type_of(ls) == type::CONS && p > 1; ls = ls->cdr())
-  {
-    --p;
-  }
-  return ls;
 }
 
 LISPT error(lisp& l, LISPT mess)
@@ -373,7 +357,6 @@ inline constexpr auto QUOTE = "quote";     // don't eval arg
 inline constexpr auto RPLACA = "rplaca";   // replace car
 inline constexpr auto RPLACD = "rplacd";   // replace cdr
 inline constexpr auto TCONC = "tconc";     // add to end of list
-inline constexpr auto NTHD = "nthd";       // return nth cdr of list
 inline constexpr auto ATTACH = "attach";   // attach object at front of list
 inline constexpr auto APPEND = "append";   // append lists
 inline constexpr auto EXIT = "exit";       // exit lips
@@ -420,7 +403,6 @@ void init()
   mkprim(pn::RPLACA,  rplaca,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::RPLACD,  rplacd,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::TCONC,   tconc,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-  mkprim(pn::NTHD,    nthd,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
 }
 

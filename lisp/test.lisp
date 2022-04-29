@@ -73,9 +73,9 @@
      (cond ((eq (caddr result) 'passed)
             (if *verbose*
                 (printlist1 (car result) " " (cadr result) " passed")))
-           (t (printlist1 (car result) " #" (cadr result) " failed " (nth result 6))
-              (printlist1 "  result:   " (nth result 4))
-              (printlist1 "  expected: " (nth result 5))))
+           (t (printlist1 (car result) " #" (cadr result) " failed " (car (nth result 6)))
+              (printlist1 "  result:   " (car (nth result 4)))
+              (printlist1 "  expected: " (car (nth result 5)))))
      (cond ((eq (caddr result) 'passed)
             (setq passed (add1 passed)))
            (t (setq failed (add1 failed))))))

@@ -48,9 +48,9 @@
              (setq com))
             ((minusp tmp)
              (setq clist (attach cexp clist))
-             (setq cexp (nth cexp (plus (length cexp) tmp 1))))
+             (setq cexp (car (nth cexp (plus (length cexp) tmp 1)))))
             (t (setq clist (attach cexp clist))
-               (setq cexp (nth cexp tmp)))))
+               (setq cexp (car (nth cexp tmp))))))
          ((listp tmp)
           (cond
             ((numberp (car tmp))
@@ -161,8 +161,8 @@
              (rplaca cexp (cdr cexp))
              (rplacd cexp))
             ((numberp arg)
-             (rplacd (nthd cexp (sub1 arg))
-                     (cons (nthd cexp arg)))))))
+             (rplacd (nth cexp (sub1 arg))
+                     (cons (nth cexp arg)))))))
 
 (putprop 'bo 'editcom2
          (lambda (arg)
@@ -174,8 +174,8 @@
              (rplacd cexp))
             ((numberp arg)
              (cond
-              ((nlistp (nth cexp arg)))
-              (t (nconc (nth cexp arg)
-                        (nthd cexp (add1 arg)))
-                 (rplacd (nthd cexp (sub1 arg))
-                         (nth cexp arg))))))))
+              ((nlistp (car (nth cexp arg))))
+              (t (nconc (car (nth cexp arg))
+                        (nth cexp (add1 arg)))
+                 (rplacd (nth cexp (sub1 arg))
+                         (car (nth cexp arg)))))))))

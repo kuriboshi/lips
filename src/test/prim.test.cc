@@ -179,23 +179,14 @@ TEST_CASE("Primary functions")
     CHECK(length(l, list)->intval() == 4);
   }
 
-  SECTION("nth and nthd")
+  SECTION("nth")
   {
     {
       auto foo = mklist(1_l, 2_l, 3_l, 4_l, 5_l);
-      CHECK(eq(nth(foo, 2_l), 2_l));
-      CHECK(eq(nth(foo, 3_l), 3_l));
-      CHECK(eq(nth(foo, 4_l), 4_l));
-      CHECK(eq(nth(foo, 5_l), 5_l));
-    }
-    {
-      // In Interlisp nth behaves like nthd and there appears to be no
-      // equivalent to our nth.
-      auto foo = mklist(1_l, 2_l, 3_l, 4_l, 5_l);
-      CHECK(equal(nthd(foo, 2_l), mklist(2_l, 3_l, 4_l, 5_l)));
-      CHECK(equal(nthd(foo, 3_l), mklist(3_l, 4_l, 5_l)));
-      CHECK(equal(nthd(foo, 4_l), mklist(4_l, 5_l)));
-      CHECK(equal(nthd(foo, 5_l), mklist(5_l)));
+      CHECK(equal(nth(foo, 2_l), mklist(2_l, 3_l, 4_l, 5_l)));
+      CHECK(equal(nth(foo, 3_l), mklist(3_l, 4_l, 5_l)));
+      CHECK(equal(nth(foo, 4_l), mklist(4_l, 5_l)));
+      CHECK(equal(nth(foo, 5_l), mklist(5_l)));
     }
   }
 
