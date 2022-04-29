@@ -13,7 +13,7 @@ TEST_CASE("String functions")
   lisp l;
   current c(l);
 
-  SECTION("stringp")
+  SECTION("string: stringp")
   {
     auto s = mkstring("hello");
     auto r0 = stringp(s);
@@ -23,17 +23,19 @@ TEST_CASE("String functions")
     auto r1 = stringp(l, i);
     CHECK(r1 == NIL);
   }
-  SECTION("streq")
+
+  SECTION("string: strequal")
   {
     auto s0 = mkstring("lorem");
     auto s1 = mkstring("lorem");
     auto s2 = mkstring("ipsem");
-    auto r0 = streq(s0, s1);
+    auto r0 = strequal(s0, s1);
     CHECK(r0 == T);
-    auto r1 = streq(l, s0, s2);
+    auto r1 = strequal(l, s0, s2);
     CHECK(r1 == NIL);
   }
-  SECTION("concat")
+
+  SECTION("string: concat")
   {
     auto s0 = mkstring("hello ");
     auto s1 = mkstring("world");
@@ -42,7 +44,8 @@ TEST_CASE("String functions")
     auto s3 = concat(l, cons(s0, cons(s1, NIL)));
     CHECK(s3->string() == mkstring("hello world")->string());
   }
-  SECTION("strlen")
+
+  SECTION("string: strlen")
   {
     auto s0 = mkstring("lorem");
     auto l0 = strlen(s0);
@@ -50,23 +53,26 @@ TEST_CASE("String functions")
     auto l1 = strlen(l, s0);
     CHECK(l1->intval() == 5);
   }
-  SECTION("substr")
+
+  SECTION("string: substring")
   {
     auto s0 = mkstring("hello world");
-    auto s1 = substr(s0, mknumber(0), mknumber(5));
+    auto s1 = substring(s0, mknumber(1), mknumber(5));
     REQUIRE(s1 != NIL);
     CHECK(s1->string() == "hello");
-    auto s2 = substr(s0, mknumber(6), mknumber(10));
+    auto s2 = substring(s0, mknumber(7), mknumber(11));
     REQUIRE(s2 != NIL);
     CHECK(s2->string() == "world");
-    auto s3 = substr(s0, mknumber(-1), mknumber(5));
-    CHECK(s3 == NIL);
-    auto s4 = substr(s0, mknumber(0), mknumber(15));
+    auto s3 = substring(s0, mknumber(-1), mknumber(5));
+    REQUIRE(s3 != NIL);
+    CHECK(s3->string() == "d");
+    auto s4 = substring(s0, mknumber(0), mknumber(15));
     CHECK(s4 == NIL);
-    auto s5 = substr(l, s0, mknumber(0), mknumber(-1));
+    auto s5 = substring(l, s0, mknumber(0), mknumber(-1));
     CHECK(s5 == NIL);
   }
-  SECTION("symstr")
+
+  SECTION("string: symstr")
   {
     auto p0 = intern("symbol");
     auto r0 = symstr(p0);
@@ -76,7 +82,8 @@ TEST_CASE("String functions")
     CHECK(type_of(r1) == type::STRING);
     CHECK(r1->string() == p0->getstr());
   }
-  SECTION("strcmp")
+
+  SECTION("string: strcmp")
   {
     auto s0 = mkstring("alpha");
     auto s1 = mkstring("zeta");

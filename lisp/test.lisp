@@ -150,5 +150,39 @@
          (flatten '(a (b (c))))
          (a b c)))
 
+(deftest test-substring "Test substring"
+  (check equal
+         (substring "hello" 1 1)
+         "h")
+  (check equal
+         (substring "hello" 2 222)
+         "ello")
+  (check equal
+         (substring "hello" 1)
+         "hello")
+  (check equal
+         (substring "hello" 2)
+         "ello")
+  (check equal
+         (substring "hello" -2 -1)
+         "lo")
+  (check equal
+         (substring "hello world" 7 11)
+         "world")
+  (check equal
+         (substring "hello" -3 -1)
+         "llo")
+  (check equal
+         (substring "hello" -1 -3)
+         nil)
+  (check eq
+         (substring "hello" 2 1)
+         nil)
+  (check eq
+         (substring "hello" 2 0)
+         nil)
+  )
+
 (runtest)
 (reporttest)
+(exit 0)
