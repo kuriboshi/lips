@@ -20,6 +20,10 @@ int main(int argc, const char** argv)
     {
       lisp::load(lisp::mkstring(f));
     }
+    catch(const lisp::lisp_finish& ex)
+    {
+      return ex.exit_code;
+    }
     catch(const std::exception& ex)
     {
       std::cout << f << ": " << ex.what() << std::endl;
