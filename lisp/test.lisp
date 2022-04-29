@@ -185,4 +185,3 @@
 
 (runtest)
 (reporttest)
-(exit 0)

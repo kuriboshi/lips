@@ -33,6 +33,12 @@ find_package(Catch2 REQUIRED)
 
 add_subdirectory(src)
 
+if(LIPS_ENABLE_TESTS)
+  add_test(NAME lisp_test
+    COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
+                      --loadpath ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+
 if(LIPS_ENABLE_TRACE)
   # Enable ability to trace calls to peval.
   target_compile_definitions(lisp PRIVATE TRACE)
