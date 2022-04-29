@@ -88,7 +88,7 @@ LISPT difference(lisp& l, LISPT x, LISPT y)
       return mknumber(l, x->intval() - y->intval());
     return mkfloat(l, static_cast<double>(x->intval()) - y->floatval());
   }
-  else if(type_of(y) == type::INTEGER)
+  if(type_of(y) == type::INTEGER)
     return mkfloat(l, x->floatval() - static_cast<double>(y->intval()));
   return mkfloat(l, x->floatval() - y->floatval());
 }
@@ -428,4 +428,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::arith

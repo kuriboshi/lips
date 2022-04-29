@@ -7,9 +7,7 @@
 
 #include "lisp.hh"
 
-namespace lisp
-{
-namespace prim
+namespace lisp::prim
 {
 void init();
 
@@ -52,8 +50,10 @@ LISPT error(lisp&, LISPT);
 LISPT uxexit(lisp&, LISPT);
 
 LISPT closobj(lisp&, LISPT);
-} // namespace prim
+} // namespace lisp::prim
 
+namespace lisp
+{
 extern LISPT C_ERROR;
 extern LISPT C_LAMBDA;
 extern LISPT C_NLAMBDA;
@@ -126,5 +126,4 @@ inline LISPT append(lisp& l, LISPT a) { return prim::append(l, a); }
 inline LISPT append(LISPT a) { return prim::append(lisp::current(), a); }
 inline LISPT tconc(lisp& l, LISPT a, LISPT b) { return prim::tconc(l, a, b); }
 inline LISPT tconc(LISPT a, LISPT b) { return prim::tconc(lisp::current(), a, b); }
-
 } // namespace lisp

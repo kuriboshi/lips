@@ -138,10 +138,10 @@ public:
   ///
   LISPT mkfloat(double);
 
-  /// @brief  Make a lambda object.
+  /// @brief Make a lambda object.
   ///
-  /// @details with the argument ARGS and definition DEF and the type TYPE, wich
-  /// is LAMBDA or NLAMBDA.
+  /// @details Make a lambda object with the argument ARGS and definition DEF
+  /// and the type TYPE, which is either LAMBDA or NLAMBDA.
   ///
   /// @return The lambda object.
   ///

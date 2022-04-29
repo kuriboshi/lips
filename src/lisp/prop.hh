@@ -7,9 +7,7 @@
 
 #include "lisp.hh"
 
-namespace lisp
-{
-namespace prop
+namespace lisp::prop
 {
 void init();
 
@@ -18,8 +16,10 @@ LISPT getplist(lisp&, LISPT);
 LISPT putprop(lisp&, LISPT, LISPT, LISPT);
 LISPT getprop(lisp&, LISPT, LISPT);
 LISPT remprop(lisp&, LISPT, LISPT);
-} // namespace prop
+} // namespace lisp::prop
 
+namespace lisp
+{
 inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return prop::setplist(l, a, b); }
 inline LISPT setplist(LISPT a, LISPT b) { return prop::setplist(lisp::current(), a, b); }
 inline LISPT getplist(lisp& l, LISPT a) { return prop::getplist(l, a); }
@@ -30,5 +30,4 @@ inline LISPT getprop(lisp& l, LISPT a, LISPT b) { return prop::getprop(l, a, b);
 inline LISPT getprop(LISPT a, LISPT b) { return prop::getprop(lisp::current(), a, b); }
 inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return prop::remprop(l, a, b); }
 inline LISPT remprop(LISPT a, LISPT b) { return prop::remprop(lisp::current(), a, b); }
-
 } // namespace lisp

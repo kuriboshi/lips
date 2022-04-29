@@ -82,8 +82,7 @@ LISPT neq(lisp& l, LISPT a, LISPT b)
 {
   if(a != b)
     return T;
-  else
-    return NIL;
+  return NIL;
 }
 
 LISPT boundp(lisp& l, LISPT a)
@@ -92,16 +91,14 @@ LISPT boundp(lisp& l, LISPT a)
     return NIL;
   else if(type_of(a->value()) != type::UNBOUND)
     return T;
-  else
-    return NIL;
+  return NIL;
 }
 
 LISPT litatom(lisp& l, LISPT a)
 {
   if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
     return T;
-  else
-    return NIL;
+  return NIL;
 }
 
 LISPT xtypeof(lisp& l, LISPT a)

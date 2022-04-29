@@ -7,9 +7,7 @@
 
 #include "lisp.hh"
 
-namespace lisp
-{
-namespace pred
+namespace lisp::pred
 {
 void init();
 
@@ -22,8 +20,10 @@ LISPT neq(lisp&, LISPT, LISPT);
 LISPT boundp(lisp&, LISPT);
 LISPT litatom(lisp&, LISPT);
 LISPT xtypeof(lisp&, LISPT);
-}
+} // namespace lisp::pred
 
+namespace lisp
+{
 inline LISPT numberp(lisp& l, LISPT a) { return pred::numberp(l, a); }
 inline LISPT numberp(LISPT a) { return pred::numberp(lisp::current(), a); }
 inline LISPT listp(lisp& l, LISPT a) { return pred::listp(l, a); }
@@ -42,5 +42,4 @@ inline LISPT litatom(lisp& l, LISPT a) { return pred::litatom(l, a); }
 inline LISPT litatom(LISPT a) { return pred::litatom(lisp::current(), a); }
 inline LISPT xtypeof(lisp& l, LISPT a) { return pred::xtypeof(l, a); }
 inline LISPT xtypeof(LISPT a) { return pred::xtypeof(lisp::current(), a); }
-
 } // namespace lisp

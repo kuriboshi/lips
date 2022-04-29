@@ -89,13 +89,10 @@ inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
     ++count;
     return cons(alist->car(), mkarglist(alist->cdr(), count));
   }
-  else if(is_NIL(alist))
+  if(is_NIL(alist))
     return NIL;
-  else
-  {
-    count = -(count + 1);
-    return cons(alist, NIL);
-  }
+  count = -(count + 1);
+  return cons(alist, NIL);
 }
 
 /// @brief Creates a lambda function.

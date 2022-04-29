@@ -166,11 +166,11 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
 
-    mkprim(pn::CONS,      cons,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-    mkprim(pn::FREECOUNT, freecount, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-    mkprim(pn::OBARRAY,   obarray,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
+    mkprim(pn::CONS,       cons,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::FREECOUNT,  freecount,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::OBARRAY,    obarray,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     // clang-format on
- }
+  }
 
   if(_current == this)
   {

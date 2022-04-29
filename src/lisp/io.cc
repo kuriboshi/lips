@@ -17,8 +17,9 @@ static char digits[] = {
   'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
   'u', 'v', 'w', 'x', 'y', 'z'};
 // clang-format on
+}
 
-namespace io
+namespace lisp::io
 {
 ///
 /// @brief Read an atom from FILE.
@@ -371,5 +372,4 @@ file_sink::file_sink(const std::string& name, bool append)
     throw lisp_error("Can't open file " + name);
 }
 
-} // namespace io
-} // namespace lisp
+} // namespace io::lisp

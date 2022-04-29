@@ -837,9 +837,7 @@ bool evaluator::evsequence()
 bool evaluator::evseq1()
 {
   if(is_NIL(args->cdr()))
-  {
     cont = &evaluator::peval;
-  }
   else
   {
     push(&evaluator::evseq3);
