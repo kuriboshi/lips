@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <catch2/catch.hpp>
 #include <lisp/pool.hh>
 
@@ -105,7 +106,7 @@ private:
 };
 
 template<typename T, std::size_t N>
-auto pool_test(const std::string& title) -> decltype(std::chrono::microseconds(0).count())
+auto pool_test() -> decltype(std::chrono::microseconds(0).count())
 {
   std::array<const T*, N * 2> a;
   auto t0 = std::chrono::high_resolution_clock::now();
@@ -127,21 +128,30 @@ auto pool_test(const std::string& title) -> decltype(std::chrono::microseconds(0
   }
   auto t1 = std::chrono::high_resolution_clock::now();
   auto t = timing(t0, t1);
-  std::cout << title << ' ' << t << '\n';
   return t;
+}
+
+template<std::size_t N, std::size_t M = 10>
+std::pair<std::uint64_t, std::uint64_t> do_test()
+{
+  std::uint64_t f{0};
+  std::uint64_t b{0};
+  for(auto i = 0; i != M; ++i) {
+    f += pool_test<Foo, N>();
+    b += pool_test<Bar, N>();
+  }
+  std::cout << N << ": " << f << " : " << b << '\n';
+  return {f, b};
 }
 
 TEST_CASE("pool: speed")
 {
-  auto f100 = pool_test<Foo, 100>("with    pool");
-  auto f500 = pool_test<Foo, 500>("with    pool");
-  auto f1000 = pool_test<Foo, 1000>("with    pool");
-  auto b100 = pool_test<Bar, 100>("without pool");
-  auto b500 = pool_test<Bar, 500>("without pool");
-  auto b1000 = pool_test<Bar, 1000>("without pool");
-  CHECK(f100 < b100);
-  CHECK(f500 < b500);
-  CHECK(f1000 < b1000);
+  auto p0 = do_test<100>();
+  CHECK(p0.first < p0.second);
+  auto p1 = do_test<500>();
+  CHECK(p1.first < p1.second);
+  auto p2 = do_test<1000>();
+  CHECK(p2.first < p2.second);
 }
 
 }
