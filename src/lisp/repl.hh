@@ -41,23 +41,33 @@ public:
     {
       while(true)
       {
-        prin0(l, _prompt, l.primout());
+        prin0(l, _prompt);
         auto expr = lispread(l, l.primin());
         if(expr == C_EMPTY)
           break;
-        print(l, eval(l, expr), l.primout());
+        print(l, eval(l, expr));
       }
       return NIL;
     }
     while(true)
     {
-      prin0(l, _break_prompt, l.primout());
+      prin0(l, _break_prompt);
       auto com = lispread(l, l.primin());
       if(com == C_EMPTY)
         return C_EOF;
       /* OK, EVAL, ^, ... */
       if(type_of(com) != type::CONS)
+      {
+        prin0(l, "(go) continue"_s);
+        terpri(l);
+        prin0(l, "(reset) back to top loop"_s);
+        terpri(l);
+        prin0(l, "(bt) print backtrace"_s);
+        terpri(l);
+        prin0(l, "(return exp) return expression"_s);
+        terpri(l);
         continue;
+      }
       else if(com->car() == C_GO)
         return print(l, eval(l, exp), false);
       else if(com->car() == C_RESET)
