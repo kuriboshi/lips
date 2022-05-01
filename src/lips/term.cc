@@ -16,6 +16,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
+#include <cctype>
 
 #include <lisp/liblisp.hh>
 #include "main.hh"
@@ -47,11 +48,11 @@ void term_source::init_keymap()
   key_tab[CKILL] = term_fun::T_KILL;
   key_tab[CEOF] = term_fun::T_EOF;
   key_tab[CTRL('I')] = term_fun::T_TAB;
-  key_tab[(int)'('] = term_fun::T_LEFTPAR;
-  key_tab[(int)')'] = term_fun::T_RIGHTPAR;
-  key_tab[(int)'\n'] = term_fun::T_NEWLINE;
-  key_tab[(int)'\\'] = term_fun::T_ESCAPE;
-  key_tab[(int)'"'] = term_fun::T_STRING;
+  key_tab[static_cast<int>('(')] = term_fun::T_LEFTPAR;
+  key_tab[static_cast<int>(')')] = term_fun::T_RIGHTPAR;
+  key_tab[static_cast<int>('\n')] = term_fun::T_NEWLINE;
+  key_tab[static_cast<int>('\\')] = term_fun::T_ESCAPE;
+  key_tab[static_cast<int>('"')] = term_fun::T_STRING;
 }
 
 struct termios term_source::oldterm;
@@ -163,7 +164,7 @@ void term_source::ungetch(int)
 bool term_source::firstnotlp()
 {
   int i = 0;
-  for(; i < position && is_sepr((int)linebuffer[i]); i++)
+  for(; i < position && std::isspace(linebuffer[i]); i++)
     ;
   return linebuffer[i] != '(';
 }
@@ -193,7 +194,7 @@ bool term_source::onlyblanks()
 {
   for(int i = linepos; i > 0; --i)
   {
-    if(!is_sepr((int)linebuffer[i]))
+    if(!isspace(linebuffer[i]))
       return false;
   }
   return true;
@@ -295,7 +296,7 @@ char* term_source::mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!is_sepr((int)linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
+  while(!isspace(linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
   return ++last;
 }
 

@@ -429,29 +429,6 @@ TEST_CASE("io: prin0")
   }
 }
 
-TEST_CASE("io: Read tables")
-{
-  lisp l;
-  current c(l);
-
-  CHECK(is_ascii(0));
-  CHECK(is_ascii(127));
-  CHECK(!is_ascii(128));
-
-  CHECK(is_sepr(l, ' '));
-  CHECK(is_sepr(' '));
-  CHECK(is_brk(l, '('));
-  CHECK(is_brk('('));
-  CHECK(is_ctrl(l, '\b'));
-  CHECK(is_ctrl('\a'));
-  CHECK(is_insert(l, '"'));
-  CHECK(is_insert('"'));
-  CHECK(is_splice(l, '!'));
-  CHECK(is_splice('!'));
-  CHECK(!is_infix(l, '$'));
-  CHECK(!is_infix('$'));
-}
-
 TEST_CASE("io: splice")
 {
   lisp l;

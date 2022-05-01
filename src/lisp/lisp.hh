@@ -395,24 +395,6 @@ inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
-enum class char_class
-{
-  NONE = 0,
-  SEPR,                         // seperator
-  BRK,                          // break character
-  CTRL,                         // control character - escaped when printed
-  INSERT,                       // insert read macro
-  SPLICE,                       // splice read macro
-  INFIX                         // infix read macro
-};
-
-struct rtinfo
-{
-  enum char_class chclass[128];
-  using rmacro_t = LISPT (*)(lisp&, file_t&, LISPT, char);
-  rmacro_t rmacros[128];
-};
-
 /// @brief The lisp interpreter.
 ///
 class lisp
@@ -477,101 +459,6 @@ public:
   cvariable_t& loadpath() const { return _variables->_loadpath; }
   void loadpath(LISPT newpath) { _variables->_loadpath = newpath; }
   const cvariable_t& version() const { return _version; }
-
-  // clang-format off
-  rtinfo currentrt =
-  {
-    {
-      // NUL SOH STX ETX
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // EOT ENQ ACK BEL
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // BS  HT  NL  VT
-      char_class::CTRL, char_class::SEPR, char_class::SEPR, char_class::CTRL,
-      // NP  CR  SO  SI
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // DLE DC1 DC2 DC3
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // DC4 NAK SYN ETB
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // CAN EM SUB ESC
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // FS GS RS US
-      char_class::CTRL, char_class::CTRL, char_class::CTRL, char_class::CTRL,
-      // SP  !   "   #
-      char_class::SEPR, char_class::SPLICE, char_class::INSERT, char_class::NONE,
-      // $   %   &   '
-      char_class::NONE, char_class::NONE, char_class::BRK, char_class::INSERT,
-      // (   )   *   +
-      char_class::BRK, char_class::BRK, char_class::NONE, char_class::NONE,
-      // ,   -   .   /
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // 0   1   2   3
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // 4   5   6   7
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // 8   9   :   ;
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // <   =   >   ?
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // @   A   B   C
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // D   E   F   G
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // H   I   J   K
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // L   M   N   O
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // P   Q   R   S
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // T   U   V   W
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // X   Y   Z   [
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // \   ]   ^   _
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // `   a   b   c
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // d   e   f   g
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // h   i   j   k
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // l   m   n   o
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // p   q   r   s
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // t   u   v   w
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // x   y   z   {
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::NONE,
-      // |   }   ~   DEL
-      char_class::NONE, char_class::NONE, char_class::NONE, char_class::CTRL
-    },
-    {
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, /*io::rmexcl*/0, /*io::rmdquote*/0, 0, 0, 0, 0, /*io::rmsquote*/0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0
-    }
-  };
-  // clang-format on
-  void set_read_table(unsigned char c, enum char_class chcls, rtinfo::rmacro_t macro)
-  {
-    currentrt.chclass[static_cast<int>(c)] = chcls;
-    currentrt.rmacros[static_cast<int>(c)] = macro;
-  }
 
 private:
   alloc& _alloc;

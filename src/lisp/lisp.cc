@@ -179,8 +179,6 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     _version = std::move(_alloc.initcvar("version", _alloc.mkstring(VERSION)));
   }
   _variables = std::make_unique<cvariables>(_alloc);
-
-  io::set_read_table(*this);
 }
 
 lisp::~lisp()

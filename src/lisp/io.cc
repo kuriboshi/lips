@@ -318,41 +318,6 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
   return rplacd(l, t2, t);
 }
 
-//
-// Read macros.
-//
-LISPT rmdquote(lisp& l, file_t& file, LISPT, char)
-{
-  std::string buffer;
-  auto c = file.getch();
-  while(c != '"')
-  {
-    if(c == '\\')
-      c = file.getch();
-    buffer.push_back(c);
-    c = file.getch();
-  }
-  return mkstring(l, buffer);
-}
-
-LISPT rmsquote(lisp& l, file_t& file, LISPT, char)
-{
-  int c;
-  if((c = file.getch()) == ')' || is_sepr(l, c))
-  {
-    file.ungetch(c);
-    return C_QUOTE;
-  }
-  file.ungetch(c);
-  return cons(l, C_QUOTE, cons(l, io::lispread(l, file), NIL));
-}
-
-void set_read_table(lisp& l)
-{
-  l.set_read_table('"', char_class::INSERT, io::rmdquote);
-  l.set_read_table('\'', char_class::INSERT, io::rmsquote);
-}
-
 file_source::file_source(const std::string& name)
 {
   _file = std::make_unique<std::ifstream>();

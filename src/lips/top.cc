@@ -227,77 +227,10 @@ LISPT top::operator()(LISPT exp)
   return NIL;
 }
 
-/*
- * Redo read macro:
- *   !!      - last command
- *   !-n     - the n'th previous command
- *   !n      - command n
- *   !s      - command with prefix s
- *   !$      - last argument
- *   !*      - all arguments
- * others could be added easily.
- */
-LISPT top::rmexcl(lisp& l, file_t& file, LISPT, char)
-{
-  LISPT at;
-
-  int c = file.getch();
-  if(is_sepr(l, c))
-    return C_EXCL;
-  l.echoline = true;
-  LISPT tmp = histget(0L, variables->history);
-  if(type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
-    tmp = tmp->car();
-  switch(c)
-  {
-    case '!':
-      return histget(0L, variables->history);
-      break;
-    case '$':
-      while(type_of(tmp->cdr()) == type::CONS) tmp = tmp->cdr();
-      return tmp;
-      break;
-    case '*':
-      return tmp->cdr();
-      break;
-    case '\n':
-      l.echoline = false;
-      return C_EXCL;
-      break;
-    default:
-      file.ungetch(c);
-      at = io::ratom(l, file);
-      if(type_of(at) == type::INTEGER)
-      {
-        tmp = histget(at->intval(), variables->history);
-        return tmp;
-      }
-      if(type_of(at) == type::SYMBOL)
-      {
-        for(auto h: variables->history)
-        {
-          tmp = histget(0L, h);
-          if(!is_NIL(tmp) && type_of(tmp->car()) == type::CONS && is_NIL(tmp->cdr()))
-            tmp = tmp->car();
-          if(!strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())))
-            return histget(0L, h);
-        }
-        return NIL;
-      }
-      else
-      {
-        l.error(EVENT_NOT_FOUND, at);
-        return NIL;
-      }
-  }
-  return NIL;
-}
-
 void top::init(alloc& a)
 {
   variables = std::make_unique<cvariables>(a);
   mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  lisp::current().set_read_table('!', char_class::SPLICE, top::rmexcl);
 }
 
 LISPT top::input_exp;           // The input expression.
