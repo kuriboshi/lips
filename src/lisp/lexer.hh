@@ -3,8 +3,8 @@
 // Copyright 2022 Krister Joas
 //
 
-#ifndef LISP_READER_HH
-#define LISP_READER_HH
+#ifndef LISP_LEXER_HH
+#define LISP_LEXER_HH
 
 #include <iostream>
 #include <string>
@@ -134,12 +134,12 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
   return os;
 }
 
-/// @brief A reader/lexer of a string input.
+/// @brief A lexer of a string input.
 template<typename Input>
-class reader
+class lexer
 {
 public:
-  reader(Input& input) : _input(input), _pos(_input.begin()) {}
+  lexer(Input& input) : _input(input), _pos(_input.begin()) {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
@@ -227,7 +227,7 @@ private:
 /// @returns Returns either the token as a string or the empty token when the
 ///   input stream reaches the end.
 template<typename Input>
-token_t reader<Input>::read()
+token_t lexer<Input>::read()
 {
   if(_token)
     return std::move(_token);
@@ -480,7 +480,7 @@ token_t reader<Input>::read()
 }
 
 template<typename Input>
-void reader<Input>::unread(token_t token)
+void lexer<Input>::unread(token_t token)
 {
   _token = token;
 }

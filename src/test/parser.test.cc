@@ -8,12 +8,12 @@
 
 namespace
 {
-using string_reader = lisp::reader<std::string>;
+using string_lexer = lisp::lexer<std::string>;
 
 void lisp_compare(std::string input, const std::string& result)
 {
-  string_reader reader{input};
-  auto res = lisp::parser(reader).parse();
+  string_lexer lexer{input};
+  auto res = lisp::parser(lexer).parse();
   std::ostringstream os;
   os << res;
   CHECK(os.str() == result);
@@ -31,8 +31,8 @@ const std::string& pname(LISPT sym)
 TEST_CASE("parser (a b . c)")
 {
   std::string s{"(a b . c)"};
-  string_reader reader{s};
-  auto res = parser(reader).parse();
+  string_lexer lexer{s};
+  auto res = parser(lexer).parse();
   CHECK(pname(cdr(cdr(res))) == "c");
 }
 
@@ -60,8 +60,8 @@ LISPT nth(LISPT o, int n)
 TEST_CASE("parser (a b . c d)")
 {
   std::string s{"(a b . c d)"};
-  string_reader reader{s}; // -> (a b . c d)
-  auto res = parser(reader).parse();
+  string_lexer lexer{s}; // -> (a b . c d)
+  auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 0)) == "a");
   CHECK(pname(nth(res, 1)) == "b");
   CHECK(pname(nth(res, 2)) == ".");
@@ -72,8 +72,8 @@ TEST_CASE("parser (a b . c d)")
 TEST_CASE("parser (a b . (c d))")
 {
   std::string s{"(a b . (c d))"};
-  string_reader reader{s}; // -> (a b c d)
-  auto res = parser(reader).parse();
+  string_lexer lexer{s}; // -> (a b c d)
+  auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
 }
@@ -81,8 +81,8 @@ TEST_CASE("parser (a b . (c d))")
 TEST_CASE("parser (a b . (c d]")
 {
   std::string s{"(a b . (c d]"};
-  string_reader reader{s}; // -> (a b c d)
-  auto res = parser(reader).parse();
+  string_lexer lexer{s}; // -> (a b c d)
+  auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
 }
@@ -182,8 +182,8 @@ TEST_CASE("parser dot")
 TEST_CASE("parser: (greaterp 1.0 \"b\")")
 {
   std::string s{"(greaterp 1.0 \"b\")"};
-  string_reader reader{s};
-  auto res = parser(reader).parse();
+  string_lexer lexer{s};
+  auto res = parser(lexer).parse();
   REQUIRE(type_of(res) == type::CONS);
   CHECK(car(res) == "greaterp"_a);
   CHECK(cadr(res)->floatval() == 1.0);
@@ -194,8 +194,8 @@ TEST_CASE("parser: nil")
 {
   std::string s1{"()"};
   std::string s2{"nil"};
-  string_reader r1{s1};
-  string_reader r2{s2};
+  string_lexer r1{s1};
+  string_lexer r2{s2};
   auto res1 = parser(r1).parse();
   auto res2 = parser(r2).parse();
   CHECK(res1 == res2);

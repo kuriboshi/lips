@@ -11,6 +11,7 @@ target_sources(
           eval.test.cc
           file.test.cc
           io.test.cc
+          lexer.test.cc
           lisp.test.cc
           logic.test.cc
           low.test.cc
@@ -21,7 +22,6 @@ target_sources(
           pred.test.cc
           prim.test.cc
           prop.test.cc
-          reader.test.cc
           repl.test.cc
           string.test.cc
           symbol.test.cc

@@ -13,7 +13,7 @@
 #include "alloc.hh"
 #include "lisp.hh"
 #include "pred.hh"
-#include "reader.hh"
+#include "lexer.hh"
 #include "ref_ptr.hh"
 #include "io.hh"
 #include "prim.hh"
@@ -28,7 +28,7 @@ inline bool empty(T& t)
 }
 
 template<typename Input>
-class reader;
+class lexer;
 
 /// @brief The LISP input parser.
 ///
@@ -39,11 +39,11 @@ class parser
 {
 public:
   /// @brief Constructor.
-  /// @details The parser takes a reader as the only parameter.  The parser
-  ///   calls the reader every time it needs the next token.
-  /// @param reader A reader object which returns the next token.
-  explicit parser(reader<Input>& reader) : _reader(reader) {}
-  /// @brief Parse the sequence of tokens supplied by the reader.
+  /// @details The parser takes a lexer as the only parameter.  The parser
+  ///   calls the lexer every time it needs the next token.
+  /// @param lexer A lexer object which returns the next token.
+  explicit parser(lexer<Input>& lexer) : _lexer(lexer) {}
+  /// @brief Parse the sequence of tokens supplied by the lexer.
   /// @return The return value is the SEXPR.
   LISPT parse();
 
@@ -92,8 +92,8 @@ private:
     return mkatom(symbol);
   }
 
-  /// @brief Holds the reader object.
-  reader<Input>& _reader;
+  /// @brief Holds the lexer object.
+  lexer<Input>& _lexer;
   /// @brief The current input token.
   token_t _token;
 };
@@ -107,7 +107,7 @@ LISPT parser<Input>::parse()
 template<typename Input>
 bool parser<Input>::next()
 {
-  _token = _reader.read();
+  _token = _lexer.read();
   return !!_token;
 }
 
@@ -149,7 +149,7 @@ LISPT parser<Input>::parse_list(char c)
       return head;
     else if(c == '(' && _token.is_macro(']'))
     {
-      _reader.unread(_token);
+      _lexer.unread(_token);
       return head;
     }
     else if(c == '[' && _token.is_macro(']'))
@@ -171,12 +171,12 @@ LISPT parser<Input>::parse_tail()
   if(_token.is_macro('.'))
   {
     auto object = parse_list('(');
-    _reader.unread(_token);
+    _lexer.unread(_token);
     if(listp(object) && cdr(object) == NIL)
       return car(object);
     return cons(make_symbol("."), object);
   }
-  _reader.unread(_token);
+  _lexer.unread(_token);
   auto object = parse_object();
   return cons(object, NIL);
 }

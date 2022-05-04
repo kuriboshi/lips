@@ -5,24 +5,24 @@
 #include <string>
 #include <sstream>
 #include <catch2/catch.hpp>
-#include <lisp/reader.hh>
+#include <lisp/lexer.hh>
 
 namespace
 {
-using string_reader = lisp::reader<std::string>;
+using string_lexer = lisp::lexer<std::string>;
 
-void reader_check(string_reader& reader, enum lisp::token_t::type type, const std::string& token)
+void lexer_check(string_lexer& lexer, enum lisp::token_t::type type, const std::string& token)
 {
-  auto b = reader.read();
+  auto b = lexer.read();
   REQUIRE(b);
   CHECK(b.type == type);
   CHECK(b.token == token);
 }
 
-void reader_check(std::string string, enum lisp::token_t::type type, const std::string& token)
+void lexer_check(std::string string, enum lisp::token_t::type type, const std::string& token)
 {
-  string_reader reader{string};
-  auto b = reader.read();
+  string_lexer lexer{string};
+  auto b = lexer.read();
   REQUIRE(b);
   CHECK(b.type == type);
   CHECK(b.token == token);
@@ -32,173 +32,173 @@ void reader_check(std::string string, enum lisp::token_t::type type, const std::
 namespace lisp
 {
 
-TEST_CASE("reader: symbols")
+TEST_CASE("lexer: symbols")
 {
   SECTION("Symbol a.")
   {
-    reader_check("a.", token_t::type::SYMBOL, "a.");
+    lexer_check("a.", token_t::type::SYMBOL, "a.");
   }
 
   SECTION("Symbol .a")
   {
-    reader_check(".a", token_t::type::SYMBOL, ".a");
+    lexer_check(".a", token_t::type::SYMBOL, ".a");
   }
 
   SECTION("Symbol a01")
   {
-    reader_check("a01", token_t::type::SYMBOL, "a01");
+    lexer_check("a01", token_t::type::SYMBOL, "a01");
   }
 
   SECTION("Symbol sym\\(bol")
   {
-    reader_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol");
+    lexer_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol");
   }
 }
 
-TEST_CASE("reader: (a b c)")
+TEST_CASE("lexer: (a b c)")
 {
   std::string s{"(a b c)"};
-  string_reader reader{s};
-  reader_check(reader, token_t::type::MACRO, "(");
-  reader_check(reader, token_t::type::SYMBOL, "a");
-  reader_check(reader, token_t::type::SYMBOL, "b");
-  reader_check(reader, token_t::type::SYMBOL, "c");
-  reader_check(reader, token_t::type::MACRO, ")");
-  CHECK(!reader.read());
+  string_lexer lexer{s};
+  lexer_check(lexer, token_t::type::MACRO, "(");
+  lexer_check(lexer, token_t::type::SYMBOL, "a");
+  lexer_check(lexer, token_t::type::SYMBOL, "b");
+  lexer_check(lexer, token_t::type::SYMBOL, "c");
+  lexer_check(lexer, token_t::type::MACRO, ")");
+  CHECK(!lexer.read());
 }
 
-TEST_CASE("reader: ( a b c )")
+TEST_CASE("lexer: ( a b c )")
 {
   std::string s{"( a b c )"};
-  string_reader reader{s};
-  reader_check(reader, token_t::type::MACRO, "(");
-  reader_check(reader, token_t::type::SYMBOL, "a");
-  reader_check(reader, token_t::type::SYMBOL, "b");
-  reader_check(reader, token_t::type::SYMBOL, "c");
-  reader_check(reader, token_t::type::MACRO, ")");
-  CHECK(!reader.read());
+  string_lexer lexer{s};
+  lexer_check(lexer, token_t::type::MACRO, "(");
+  lexer_check(lexer, token_t::type::SYMBOL, "a");
+  lexer_check(lexer, token_t::type::SYMBOL, "b");
+  lexer_check(lexer, token_t::type::SYMBOL, "c");
+  lexer_check(lexer, token_t::type::MACRO, ")");
+  CHECK(!lexer.read());
 }
 
-TEST_CASE("reader: +")
+TEST_CASE("lexer: +")
 {
   SECTION("+")
   {
     std::string s{"+"};
-    string_reader reader{s};
-    reader_check(reader, token_t::type::SYMBOL, "+");
+    string_lexer lexer{s};
+    lexer_check(lexer, token_t::type::SYMBOL, "+");
   }
 
   SECTION("(+)")
   {
     std::string s{"(+)"};
-    string_reader reader{s};
-    reader_check(reader, token_t::type::MACRO, "(");
-    reader_check(reader, token_t::type::SYMBOL, "+");
-    reader_check(reader, token_t::type::MACRO, ")");
+    string_lexer lexer{s};
+    lexer_check(lexer, token_t::type::MACRO, "(");
+    lexer_check(lexer, token_t::type::SYMBOL, "+");
+    lexer_check(lexer, token_t::type::MACRO, ")");
   }
 
   SECTION("(+ 1 2)")
   {
     std::string s{"(+ 1 2)"};
-    string_reader reader{s};
-    reader_check(reader, token_t::type::MACRO, "(");
-    reader_check(reader, token_t::type::SYMBOL, "+");
-    reader_check(reader, token_t::type::INT, "1");
-    reader_check(reader, token_t::type::INT, "2");
-    reader_check(reader, token_t::type::MACRO, ")");
+    string_lexer lexer{s};
+    lexer_check(lexer, token_t::type::MACRO, "(");
+    lexer_check(lexer, token_t::type::SYMBOL, "+");
+    lexer_check(lexer, token_t::type::INT, "1");
+    lexer_check(lexer, token_t::type::INT, "2");
+    lexer_check(lexer, token_t::type::MACRO, ")");
   }
 }
 
-TEST_CASE("reader: strings")
+TEST_CASE("lexer: strings")
 {
   SECTION("\"string\"")
   {
-    reader_check("\"string\"", token_t::type::STRING, "string");
+    lexer_check("\"string\"", token_t::type::STRING, "string");
   }
 
   SECTION("\"string\" hello")
   {
     std::string s{"\"string\" hello"};
-    string_reader reader{s};
-    reader_check(reader, token_t::type::STRING, "string");
-    reader_check(reader, token_t::type::SYMBOL, "hello");
+    string_lexer lexer{s};
+    lexer_check(lexer, token_t::type::STRING, "string");
+    lexer_check(lexer, token_t::type::SYMBOL, "hello");
   }
 
   SECTION("\"st\\\"ring\"")
   {
-    reader_check("\"st\\\"ring\"", token_t::type::STRING, "st\"ring");
+    lexer_check("\"st\\\"ring\"", token_t::type::STRING, "st\"ring");
   }
 
   SECTION("\"st\\\\ring\"")
   {
-    reader_check("\"st\\\\ring\"", token_t::type::STRING, "st\\ring");
+    lexer_check("\"st\\\\ring\"", token_t::type::STRING, "st\\ring");
   }
 
   SECTION("\"st\\\\\\\"ring\"")
   {
-    reader_check("\"st\\\\\\\"ring\"", token_t::type::STRING, "st\\\"ring");
+    lexer_check("\"st\\\\\\\"ring\"", token_t::type::STRING, "st\\\"ring");
   }
 
   SECTION("\"(hello)\"")
   {
-    reader_check("\"(hello)\"", token_t::type::STRING, "(hello)");
+    lexer_check("\"(hello)\"", token_t::type::STRING, "(hello)");
   }
 }
 
-TEST_CASE("reader: integers")
+TEST_CASE("lexer: integers")
 {
-  reader_check("123", token_t::type::INT, "123");
-  reader_check("123abc", token_t::type::SYMBOL, "123abc");
-  reader_check("0123456789", token_t::type::INT, "0123456789");
-  reader_check("+0123456789", token_t::type::INT, "+0123456789");
-  reader_check("-0123456789", token_t::type::INT, "-0123456789");
+  lexer_check("123", token_t::type::INT, "123");
+  lexer_check("123abc", token_t::type::SYMBOL, "123abc");
+  lexer_check("0123456789", token_t::type::INT, "0123456789");
+  lexer_check("+0123456789", token_t::type::INT, "+0123456789");
+  lexer_check("-0123456789", token_t::type::INT, "-0123456789");
 }
 
-TEST_CASE("reader: floats")
+TEST_CASE("lexer: floats")
 {
-  reader_check("1.0 ", token_t::type::FLOAT, "1.0");
-  reader_check("1.0)", token_t::type::FLOAT, "1.0");
-  reader_check("1.0(", token_t::type::FLOAT, "1.0");
-  reader_check("1.234", token_t::type::FLOAT, "1.234");
-  reader_check("-1.234", token_t::type::FLOAT, "-1.234");
-  reader_check("1.23e-2", token_t::type::FLOAT, "1.23e-2");
-  reader_check("1.23e+2", token_t::type::FLOAT, "1.23e+2");
-  reader_check("1.23E-2", token_t::type::FLOAT, "1.23E-2");
-  reader_check("+1.234", token_t::type::FLOAT, "+1.234");
-  reader_check("123e-2", token_t::type::FLOAT, "123e-2");
-  reader_check(".1.234", token_t::type::SYMBOL, ".1.234");
-  reader_check(".1,234", token_t::type::SYMBOL, ".1,234");
-  reader_check("1.23e--2", token_t::type::SYMBOL, "1.23e--2");
-  reader_check("12e2abc", token_t::type::SYMBOL, "12e2abc");
+  lexer_check("1.0 ", token_t::type::FLOAT, "1.0");
+  lexer_check("1.0)", token_t::type::FLOAT, "1.0");
+  lexer_check("1.0(", token_t::type::FLOAT, "1.0");
+  lexer_check("1.234", token_t::type::FLOAT, "1.234");
+  lexer_check("-1.234", token_t::type::FLOAT, "-1.234");
+  lexer_check("1.23e-2", token_t::type::FLOAT, "1.23e-2");
+  lexer_check("1.23e+2", token_t::type::FLOAT, "1.23e+2");
+  lexer_check("1.23E-2", token_t::type::FLOAT, "1.23E-2");
+  lexer_check("+1.234", token_t::type::FLOAT, "+1.234");
+  lexer_check("123e-2", token_t::type::FLOAT, "123e-2");
+  lexer_check(".1.234", token_t::type::SYMBOL, ".1.234");
+  lexer_check(".1,234", token_t::type::SYMBOL, ".1,234");
+  lexer_check("1.23e--2", token_t::type::SYMBOL, "1.23e--2");
+  lexer_check("12e2abc", token_t::type::SYMBOL, "12e2abc");
 }
 
-TEST_CASE("reader: unread")
+TEST_CASE("lexer: unread")
 {
   std::string s{"()"};
-  string_reader reader{s};
-  auto token = reader.read();
+  string_lexer lexer{s};
+  auto token = lexer.read();
   REQUIRE(token);
   CHECK(token.token == "(");
-  reader.unread(token);
-  token = reader.read();
+  lexer.unread(token);
+  token = lexer.read();
   REQUIRE(token);
   CHECK(token.token == "(");
-  token = reader.read();
+  token = lexer.read();
   REQUIRE(token);
   CHECK(token.token == ")");
 }
 
-TEST_CASE("reader: comments")
+TEST_CASE("lexer: comments")
 {
   SECTION("# at start of line")
   {
     std::string s{"# comment\nhello\n# another comment\nworld"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "hello");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "world");
@@ -207,16 +207,16 @@ TEST_CASE("reader: comments")
   SECTION("# not at start of line")
   {
     std::string s{" # comment\nhello\n"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "#");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "comment");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "hello");
@@ -225,12 +225,12 @@ TEST_CASE("reader: comments")
   SECTION("#' token")
   {
     std::string s{" #'plus\n"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "#'");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
     CHECK(token.token == "plus");
@@ -239,11 +239,11 @@ TEST_CASE("reader: comments")
   SECTION("inside s-expr")
   {
     std::string s{"(;comment\n)"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro('('));
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro(')'));
   }
@@ -251,17 +251,17 @@ TEST_CASE("reader: comments")
   SECTION("inside s-expr with int")
   {
     std::string s{"(100;comment\n200)"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro('('));
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "100");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "200");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro(')'));
   }
@@ -269,18 +269,18 @@ TEST_CASE("reader: comments")
   SECTION("inside s-expr with int")
   {
     std::string s{"(symbol;comment\n100)"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro('('));
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     token_t symbol{token_t::type::SYMBOL, "symbol"};
     CHECK(token == symbol);
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "100");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro(')'));
   }
@@ -288,18 +288,18 @@ TEST_CASE("reader: comments")
   SECTION("inside s-expr with float")
   {
     std::string s{"(1.23;comment\n100)"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro('('));
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     token_t f0{token_t::type::FLOAT, "1.23"};
     CHECK(token == f0);
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "100");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro(')'));
   }
@@ -307,24 +307,24 @@ TEST_CASE("reader: comments")
   SECTION("inside s-expr with exponent")
   {
     std::string s{"(1.23e1;comment\n100)"};
-    string_reader reader{s};
-    auto token = reader.read();
+    string_lexer lexer{s};
+    auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro('('));
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     token_t f0{token_t::type::FLOAT, "1.23e1"};
     CHECK(token == f0);
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "100");
-    token = reader.read();
+    token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_macro(')'));
   }
 }
 
-TEST_CASE("reader: operator<<")
+TEST_CASE("lexer: operator<<")
 {
   SECTION("EMPTY")
   {
@@ -375,7 +375,7 @@ TEST_CASE("reader: operator<<")
   }
 }
 
-TEST_CASE("reader: operator==")
+TEST_CASE("lexer: operator==")
 {
   SECTION("EMPTY")
   {

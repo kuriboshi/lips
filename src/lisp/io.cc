@@ -6,7 +6,7 @@
 #include "io.hh"
 #include "alloc.hh"
 #include "prim.hh"
-#include "reader.hh"
+#include "lexer.hh"
 #include "parser.hh"
 
 namespace lisp
@@ -37,9 +37,9 @@ namespace lisp::io
 ///
 LISPT ratom(lisp& l, file_t& file)
 {
-  reader reader{file.source()};
-  auto token = reader.read();
-  parser parser{reader};
+  lexer lexer{file.source()};
+  auto token = lexer.read();
+  parser parser{lexer};
   return parser.create(token);
 }
 
@@ -48,8 +48,8 @@ LISPT ratom(lisp& l, file_t& file)
 //
 LISPT lispread(lisp& l, file_t& file)
 {
-  reader reader(file.source());
-  return parser(reader).parse();
+  lexer lexer(file.source());
+  return parser(lexer).parse();
 }
 
 LISPT readline(lisp& l, file_t& file)
@@ -57,8 +57,8 @@ LISPT readline(lisp& l, file_t& file)
   auto line = file.getline();
   if(line)
   {
-    reader reader(*line);
-    parser parser(reader);
+    lexer lexer(*line);
+    parser parser(lexer);
     auto head = parser.parse();
     if(head && head->empty())
       return head;
