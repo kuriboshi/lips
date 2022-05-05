@@ -57,7 +57,8 @@ LISPT readline(lisp& l, file_t& file)
   auto line = file.getline();
   if(line)
   {
-    lexer lexer(*line);
+    string_source ss(*line);
+    lexer lexer(ss);
     parser parser(lexer);
     auto head = parser.parse();
     if(head && head->empty())
