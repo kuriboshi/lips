@@ -59,11 +59,11 @@ TEST_CASE("lexer: (a b c)")
 {
   std::string s{"(a b c)"};
   string_lexer lexer{s};
-  lexer_check(lexer, token_t::type::MACRO, "(");
+  lexer_check(lexer, token_t::type::SPECIAL, "(");
   lexer_check(lexer, token_t::type::SYMBOL, "a");
   lexer_check(lexer, token_t::type::SYMBOL, "b");
   lexer_check(lexer, token_t::type::SYMBOL, "c");
-  lexer_check(lexer, token_t::type::MACRO, ")");
+  lexer_check(lexer, token_t::type::SPECIAL, ")");
   CHECK(!lexer.read());
 }
 
@@ -71,11 +71,11 @@ TEST_CASE("lexer: ( a b c )")
 {
   std::string s{"( a b c )"};
   string_lexer lexer{s};
-  lexer_check(lexer, token_t::type::MACRO, "(");
+  lexer_check(lexer, token_t::type::SPECIAL, "(");
   lexer_check(lexer, token_t::type::SYMBOL, "a");
   lexer_check(lexer, token_t::type::SYMBOL, "b");
   lexer_check(lexer, token_t::type::SYMBOL, "c");
-  lexer_check(lexer, token_t::type::MACRO, ")");
+  lexer_check(lexer, token_t::type::SPECIAL, ")");
   CHECK(!lexer.read());
 }
 
@@ -92,20 +92,20 @@ TEST_CASE("lexer: +")
   {
     std::string s{"(+)"};
     string_lexer lexer{s};
-    lexer_check(lexer, token_t::type::MACRO, "(");
+    lexer_check(lexer, token_t::type::SPECIAL, "(");
     lexer_check(lexer, token_t::type::SYMBOL, "+");
-    lexer_check(lexer, token_t::type::MACRO, ")");
+    lexer_check(lexer, token_t::type::SPECIAL, ")");
   }
 
   SECTION("(+ 1 2)")
   {
     std::string s{"(+ 1 2)"};
     string_lexer lexer{s};
-    lexer_check(lexer, token_t::type::MACRO, "(");
+    lexer_check(lexer, token_t::type::SPECIAL, "(");
     lexer_check(lexer, token_t::type::SYMBOL, "+");
     lexer_check(lexer, token_t::type::INT, "1");
     lexer_check(lexer, token_t::type::INT, "2");
-    lexer_check(lexer, token_t::type::MACRO, ")");
+    lexer_check(lexer, token_t::type::SPECIAL, ")");
   }
 }
 
@@ -242,10 +242,10 @@ TEST_CASE("lexer: comments")
     string_lexer lexer{s};
     auto token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro('('));
+    CHECK(token.is_special('('));
     token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro(')'));
+    CHECK(token.is_special(')'));
   }
 
   SECTION("inside s-expr with int")
@@ -254,7 +254,7 @@ TEST_CASE("lexer: comments")
     string_lexer lexer{s};
     auto token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro('('));
+    CHECK(token.is_special('('));
     token = lexer.read();
     REQUIRE(token);
     CHECK(token.token == "100");
@@ -263,7 +263,7 @@ TEST_CASE("lexer: comments")
     CHECK(token.token == "200");
     token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro(')'));
+    CHECK(token.is_special(')'));
   }
 
   SECTION("inside s-expr with int")
@@ -272,7 +272,7 @@ TEST_CASE("lexer: comments")
     string_lexer lexer{s};
     auto token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro('('));
+    CHECK(token.is_special('('));
     token = lexer.read();
     REQUIRE(token);
     token_t symbol{token_t::type::SYMBOL, "symbol"};
@@ -282,7 +282,7 @@ TEST_CASE("lexer: comments")
     CHECK(token.token == "100");
     token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro(')'));
+    CHECK(token.is_special(')'));
   }
 
   SECTION("inside s-expr with float")
@@ -291,7 +291,7 @@ TEST_CASE("lexer: comments")
     string_lexer lexer{s};
     auto token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro('('));
+    CHECK(token.is_special('('));
     token = lexer.read();
     REQUIRE(token);
     token_t f0{token_t::type::FLOAT, "1.23"};
@@ -301,7 +301,7 @@ TEST_CASE("lexer: comments")
     CHECK(token.token == "100");
     token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro(')'));
+    CHECK(token.is_special(')'));
   }
 
   SECTION("inside s-expr with exponent")
@@ -310,7 +310,7 @@ TEST_CASE("lexer: comments")
     string_lexer lexer{s};
     auto token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro('('));
+    CHECK(token.is_special('('));
     token = lexer.read();
     REQUIRE(token);
     token_t f0{token_t::type::FLOAT, "1.23e1"};
@@ -320,7 +320,7 @@ TEST_CASE("lexer: comments")
     CHECK(token.token == "100");
     token = lexer.read();
     REQUIRE(token);
-    CHECK(token.is_macro(')'));
+    CHECK(token.is_special(')'));
   }
 }
 
@@ -334,12 +334,12 @@ TEST_CASE("lexer: operator<<")
     CHECK(os.str() == "?:");
   }
 
-  SECTION("MACRO")
+  SECTION("SPECIAL")
   {
     std::ostringstream os;
-    token_t token{token_t::type::MACRO, ")"};
+    token_t token{token_t::type::SPECIAL, ")"};
     os << token;
-    CHECK(os.str() == "MACRO:)");
+    CHECK(os.str() == "SPECIAL:)");
   }
 
   SECTION("STRING")
@@ -384,10 +384,10 @@ TEST_CASE("lexer: operator==")
     CHECK(token0 == token1);
   }
 
-  SECTION("MACRO")
+  SECTION("SPECIAL")
   {
-    token_t token0{token_t::type::MACRO, ")"};
-    token_t token1{token_t::type::MACRO, ")"};
+    token_t token0{token_t::type::SPECIAL, ")"};
+    token_t token1{token_t::type::SPECIAL, ")"};
     CHECK(token0 == token1);
   }
 

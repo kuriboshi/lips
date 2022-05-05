@@ -53,7 +53,7 @@ public:
   {
     switch(token.type)
     {
-      case token_t::type::MACRO:
+      case token_t::type::SPECIAL:
         return mkatom(token.token);
       case token_t::type::SYMBOL:
         // Consider the token 'nil' to be NIL even in unevaluated contexts.
@@ -116,16 +116,18 @@ LISPT parser<Input>::parse_object()
 {
   if(!next())
     return C_EMPTY;
-  if(_token.is_macro('\''))
+  if(_token.is_special('\''))
     return cons(mkatom("quote"), cons(parse_object(), NIL));
-  if(_token.is_macro('('))
+  if(_token.is_special('('))
     return parse_list('(');
-  if(_token.is_macro('['))
+  if(_token.is_special('['))
     return parse_list('[');
-  if(_token.is_macro(')'))
+  if(_token.is_special(')'))
     return NIL;
-  if(_token.is_macro(']'))
+  if(_token.is_special(']'))
     return NIL;
+  if(_token.type == token_t::type::MACRO)
+    return _lexer.macro(_token);
   return create(_token);
 }
 
@@ -139,20 +141,20 @@ LISPT parser<Input>::parse_list(char c)
     if(!next())
       return head;
 
-    if(c == '[' && _token.is_macro(')'))
+    if(c == '[' && _token.is_special(')'))
     {
       head = cons(head, NIL);
       tail = head;
       continue;
     }
-    if(c == '(' && _token.is_macro(')'))
+    if(c == '(' && _token.is_special(')'))
       return head;
-    else if(c == '(' && _token.is_macro(']'))
+    else if(c == '(' && _token.is_special(']'))
     {
       _lexer.unread(_token);
       return head;
     }
-    else if(c == '[' && _token.is_macro(']'))
+    else if(c == '[' && _token.is_special(']'))
       return head;
 
     auto object = parse_tail();
@@ -168,7 +170,7 @@ LISPT parser<Input>::parse_list(char c)
 template<typename Input>
 LISPT parser<Input>::parse_tail()
 {
-  if(_token.is_macro('.'))
+  if(_token.is_special('.'))
   {
     auto object = parse_list('(');
     _lexer.unread(_token);

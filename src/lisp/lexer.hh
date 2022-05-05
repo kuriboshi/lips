@@ -10,6 +10,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include "lisp.hh"
 
 namespace lisp
 {
@@ -36,12 +37,15 @@ struct token_t final
   /// @brief The type of token.
   enum class type
   {
-    EMPTY,
-    MACRO,
-    STRING,
-    SYMBOL,
-    INT,
-    FLOAT
+    EMPTY,                      // No type
+    SPECIAL,                    // Special characters like '(', ')', '[', etc.
+    STRING,                     // Literal string
+    SYMBOL,                     // Atom or symbol
+    INT,                        // Integer
+    FLOAT,                      // Floating point number
+    MACRO,                      // Read-macro
+    SPLICE,                     // Splice read-macro
+    INFIX                       // Infix read-macro
   };
 
   /// @brief Token type.
@@ -85,14 +89,14 @@ struct token_t final
     t.type = type::EMPTY;
   }
 
-  /// @brief Checks that the token is of type MACRO and the value matches the
+  /// @brief Checks that the token is of type SPECIAL and the value matches the
   /// character in the argument.
   ///
   /// @param c The macro character.
-  /// @returns True if the MACRO character matches the @c c.
-  bool is_macro(char c) const
+  /// @returns True if the SPECIAL character matches the @c c.
+  bool is_special(char c) const
   {
-    return type == type::MACRO && !token.empty() && token[0] == c;
+    return type == type::SPECIAL && !token.empty() && token[0] == c;
   }
 
   /// @brief The swap function for use in the assignment operators.
@@ -113,8 +117,8 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
 {
   switch(t.type)
   {
-    case token_t::type::MACRO:
-      os << "MACRO:";
+    case token_t::type::SPECIAL:
+      os << "SPECIAL:";
       break;
     case token_t::type::STRING:
       os << "STRING:";
@@ -127,6 +131,15 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
       break;
     case token_t::type::FLOAT:
       os << "FLOAT:";
+      break;
+    case token_t::type::MACRO:
+      os << "MACRO:";
+      break;
+    case token_t::type::SPLICE:
+      os << "SPLICE:";
+      break;
+    case token_t::type::INFIX:
+      os << "INFIX:";
       break;
     default:
       os << "?:";
@@ -180,7 +193,11 @@ public:
     // Comments
     COMMENT,
     SHELL_COMMENT,
-    NEWLINE
+    NEWLINE,
+    // Macros
+    MACRO,
+    SPLICE,
+    INFIX
   };
   type get(std::uint8_t index) const
   {
@@ -190,6 +207,7 @@ public:
   {
     _table[index] = value;
   }
+  /// @brief Reset read table to the defaults.
   void reset() {
     set('(', type::LEFT_PAREN);
     set(')', type::RIGHT_PAREN);
@@ -222,7 +240,6 @@ public:
   std::array<type, 256> _table = {type::OTHER};
 };
 
-template<typename T>
 class read_macros
 {
 public:
@@ -234,7 +251,7 @@ public:
     INFIX
   };
 private:
-  using macro_t = std::pair<type, std::function<T(T, T)>>;
+  using macro_t = std::pair<type, std::function<LISPT(LISPT, LISPT)>>;
   std::array<macro_t, 256> matrix;
 };
 
@@ -247,6 +264,8 @@ public:
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
+  Input& input() const { return _input; }
+  LISPT macro(token_t) { return NIL; }
 
 private:
   Input& _input;
@@ -369,7 +388,7 @@ token_t lexer<Input>::read()
           case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
           case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
           case syntax::type::QUOTE:
-            token.type = token_t::type::MACRO;
+            token.type = token_t::type::SPECIAL;
             token.token.push_back(*_pos);
             next();
             return token;
@@ -377,7 +396,7 @@ token_t lexer<Input>::read()
             // A symbol may start with a dot so we assume it's a macro
             // character but look ahead one character.
             state = state_t::IN_DOT;
-            token.type = token_t::type::MACRO;
+            token.type = token_t::type::SPECIAL;
             token.token.push_back(*_pos);
             break;
           case syntax::type::STRING_DELIM:
@@ -394,6 +413,21 @@ token_t lexer<Input>::read()
             token.type = token_t::type::INT;
             token.token.push_back(*_pos);
             break;
+          case syntax::type::MACRO:
+            token.type = token_t::type::MACRO;
+            token.token.push_back(*_pos);
+            next();
+            return token;
+          case syntax::type::SPLICE:
+            token.type = token_t::type::SPLICE;
+            token.token.push_back(*_pos);
+            next();
+            return token;
+          case syntax::type::INFIX:
+            token.type = token_t::type::INFIX;
+            token.token.push_back(*_pos);
+            next();
+            return token;
           default:
             state = state_t::IN_SYMBOL;
             token.type = token_t::type::SYMBOL;
