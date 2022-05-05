@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <string>
+#include <array>
+#include <vector>
 
 namespace lisp
 {
@@ -134,6 +136,108 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
   return os;
 }
 
+// ^# start of line comment
+// #' Function quote
+// ' Quote
+// " String
+// ! Repeat
+// ?? History
+// >
+// >>
+// <
+// |
+// &
+// *
+// `
+// ,@
+// ;
+
+class syntax
+{
+public:
+  syntax()
+  {
+    reset();
+  }
+  enum class type
+  {
+    OTHER = 0,
+    LEFT_PAREN,
+    RIGHT_PAREN,
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
+    STRING_DELIM,
+    ESCAPE,
+    BREAKCHAR,
+    SEPARATOR,
+    //
+    QUOTE,
+    // Integers and floating point numbers
+    EXPONENT,
+    SIGN,
+    DIGIT,
+    DECIMAL_POINT,
+    // Comments
+    COMMENT,
+    SHELL_COMMENT,
+    NEWLINE
+  };
+  type get(std::uint8_t index) const
+  {
+    return _table[index];
+  }
+  void set(std::uint8_t index, type value)
+  {
+    _table[index] = value;
+  }
+  void reset() {
+    set('(', type::LEFT_PAREN);
+    set(')', type::RIGHT_PAREN);
+    set('[', type::LEFT_BRACKET);
+    set(']', type::RIGHT_BRACKET);
+    set('"', type::STRING_DELIM);
+    set('\\', type::ESCAPE);
+    set(' ', type::SEPARATOR);
+    set('\t', type::SEPARATOR);
+    set('\n', type::NEWLINE);
+    set('0', type::DIGIT);
+    set('1', type::DIGIT);
+    set('2', type::DIGIT);
+    set('3', type::DIGIT);
+    set('4', type::DIGIT);
+    set('5', type::DIGIT);
+    set('6', type::DIGIT);
+    set('7', type::DIGIT);
+    set('8', type::DIGIT);
+    set('9', type::DIGIT);
+    set('+', type::SIGN);
+    set('-', type::SIGN);
+    set('.', type::DECIMAL_POINT);
+    set('e', type::EXPONENT);
+    set('E', type::EXPONENT);
+    set(';', type::COMMENT);
+    set('#', type::SHELL_COMMENT);
+    set('\'', type::QUOTE);
+  }
+  std::array<type, 256> _table = {type::OTHER};
+};
+
+template<typename T>
+class read_macros
+{
+public:
+  read_macros() = default;
+  enum class type
+  {
+    MACRO,
+    SPLICE,
+    INFIX
+  };
+private:
+  using macro_t = std::pair<type, std::function<T(T, T)>>;
+  std::array<macro_t, 256> matrix;
+};
+
 /// @brief A lexer of a string input.
 template<typename Input>
 class lexer
@@ -152,7 +256,7 @@ private:
 
   void next()
   {
-    _start_of_line = *_pos == '\n';
+    _start_of_line = _syntax.get(*_pos) == syntax::type::NEWLINE;
     ++_pos;
   }
 
@@ -221,6 +325,8 @@ private:
     }
     return os;
   }
+
+  syntax _syntax;
 };
 
 /// @brief Read the next token from the input stream.
@@ -240,9 +346,9 @@ token_t lexer<Input>::read()
     switch(state)
     {
       case state_t::START:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case '#':
+          case syntax::type::SHELL_COMMENT:
             if(_start_of_line)
               state = state_t::IN_COMMENT;
             else
@@ -252,38 +358,38 @@ token_t lexer<Input>::read()
               token.token.push_back(*_pos);
             }
             break;
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             break;
-          case ' ': case '\t':
+          case syntax::type::SEPARATOR:
             break;
-          case '\n':
+          case syntax::type::NEWLINE:
             _start_of_line = true;
             break;
-          case '(': case ')': case '[': case ']':
-          case '\'':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::QUOTE:
             token.type = token_t::type::MACRO;
             token.token.push_back(*_pos);
             next();
             return token;
-          case '.':
+          case syntax::type::DECIMAL_POINT:
             // A symbol may start with a dot so we assume it's a macro
             // character but look ahead one character.
             state = state_t::IN_DOT;
             token.type = token_t::type::MACRO;
             token.token.push_back(*_pos);
             break;
-          case '"':
+          case syntax::type::STRING_DELIM:
             state = state_t::IN_STRING;
             token.type = token_t::type::STRING;
             break;
-          case '-': case '+':
+          case syntax::type::SIGN:
             state = state_t::IN_SIGN;
             token.type = token_t::type::SYMBOL; // Assume symbol
             token.token.push_back(*_pos);
             break;
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             state = state_t::IN_INT;
             token.type = token_t::type::INT;
             token.token.push_back(*_pos);
@@ -298,15 +404,16 @@ token_t lexer<Input>::read()
       case state_t::IN_SYMBOL:
         // Any character except unquoted terminating macro characters are
         // included in the symbol. This includes double quotes.
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case '(': case ')': case '[': case ']':
-          case ' ': case '\t': case '\n':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR: case syntax::type::NEWLINE:
             return token;
-          case '\\':
+          case syntax::type::ESCAPE:
             next();
             if(_pos == _input.end())
               return token;
@@ -322,12 +429,12 @@ token_t lexer<Input>::read()
         state = state_t::IN_STRING;
         break;
       case state_t::IN_STRING:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case '\\':
+          case syntax::type::ESCAPE:
             state = state_t::IN_QUOTE;
             break;
-          case '"':
+          case syntax::type::STRING_DELIM:
             next();
             return token;
           default:
@@ -336,16 +443,19 @@ token_t lexer<Input>::read()
         }
         break;
       case state_t::IN_COMMENT:
-        if(*_pos == '\n')
+        if(_syntax.get(*_pos) == syntax::type::NEWLINE)
           state = state_t::START;
         break;
       case state_t::IN_HASH:
-        switch(*_pos)
+        std::cout << "IN_HASH: " << *_pos << std::endl;
+        switch(_syntax.get(*_pos))
         {
-          case '(': case ')': case '[': case ']':
-          case ' ': case '\t': case '\n':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR:
+          case syntax::type::NEWLINE:
             return token;
-          case '\'':
+          case syntax::type::QUOTE:
             token.token.push_back(*_pos);
             next();
             return token;
@@ -355,10 +465,9 @@ token_t lexer<Input>::read()
         }
         break;
       case state_t::IN_SIGN:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             state = state_t::IN_INT;
             token.type = token_t::type::INT;
             token.token.push_back(*_pos);
@@ -370,24 +479,25 @@ token_t lexer<Input>::read()
         }
         break;
       case state_t::IN_INT:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case '.':
+          case syntax::type::DECIMAL_POINT:
             state = state_t::IN_FLOAT;
             token.type = token_t::type::FLOAT;
             break;
-          case 'e': case 'E':
+          case syntax::type::EXPONENT:
             state = state_t::IN_EXP1;
             token.type = token_t::type::FLOAT;
             break;
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             break;
-          case ' ': case '\t': case '\n':
-          case '(': case ')': case '[': case ']':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR:
+          case syntax::type::NEWLINE:
             return token;
           default:
             token.type = token_t::type::SYMBOL;
@@ -397,19 +507,20 @@ token_t lexer<Input>::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_FLOAT:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case 'e': case 'E':
+          case syntax::type::EXPONENT:
             state = state_t::IN_EXP1;
             break;
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             break;
-          case ' ': case '\t': case '\n':
-          case '(': case ')': case '[': case ']':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR:
+          case syntax::type::NEWLINE:
             return token;
           default:
             state = state_t::IN_SYMBOL;
@@ -419,14 +530,13 @@ token_t lexer<Input>::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_EXP1:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case '-': case '+':
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::SIGN:
+          case syntax::type::DIGIT:
             state = state_t::IN_EXP2;
             break;
           default:
@@ -437,13 +547,12 @@ token_t lexer<Input>::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_EXP2:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             break;
           default:
             state = state_t::IN_SYMBOL;
@@ -453,17 +562,18 @@ token_t lexer<Input>::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_DOT:
-        switch(*_pos)
+        switch(_syntax.get(*_pos))
         {
-          case ';':
+          case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
             return token;
-          case '0': case '1': case '2': case '3': case '4':
-          case '5': case '6': case '7': case '8': case '9':
+          case syntax::type::DIGIT:
             state = state_t::IN_FLOAT;
             continue;
-          case '(': case ')': case '[': case ']':
-          case ' ': case '\t': case '\n':
+          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR:
+          case syntax::type::NEWLINE:
             return token;
           default:
             state = state_t::IN_SYMBOL;
