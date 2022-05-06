@@ -23,30 +23,34 @@ namespace lisp
 ///
 /// @li @c EMPTY An empty token signalling the end of a stream or an error
 ///   tokenizing the stream.
-/// @li @c MACRO A macro token. This includes the left and right parenthesis,
-///   the left and right super parenthesis, a single quote, and a dot used to
-///   create dotted pairs.
+/// @li @c SPECIAL A token for special characters. This includes the left and
+///   right parenthesis, the left and right super parenthesis, a single quote,
+///   and a dot used to create dotted pairs.
 /// @li @c STRING A string. Double quotes can be embedded by using the
 ///   backslash, common in other Unix tools. Note that this differs from
 ///   Interlisp which uses a percent sign for this purpose.
 /// @li @c SYMBOL A literal symbol.
 /// @li @c INT An integer.
 /// @li @c FLOAT A floating point value.
+/// @li @c MACRO A simple read-macro.
+/// @li @c SPLICE A read-macro which splices the result into the current
+///   expression.
+/// @li @c INFIX A read-macro which handles infix notation.
 ///
 struct token_t final
 {
   /// @brief The type of token.
   enum class type
   {
-    EMPTY,                      // No type
-    SPECIAL,                    // Special characters like '(', ')', '[', etc.
-    STRING,                     // Literal string
-    SYMBOL,                     // Atom or symbol
-    INT,                        // Integer
-    FLOAT,                      // Floating point number
-    MACRO,                      // Read-macro
-    SPLICE,                     // Splice read-macro
-    INFIX                       // Infix read-macro
+    EMPTY,   // No type
+    SPECIAL, // Special characters like '(', ')', '[', etc.
+    STRING,  // Literal string
+    SYMBOL,  // Atom or symbol
+    INT,     // Integer
+    FLOAT,   // Floating point number
+    MACRO,   // Read-macro
+    SPLICE,  // Splice read-macro
+    INFIX    // Infix read-macro
   };
 
   /// @brief Token type.
@@ -55,18 +59,18 @@ struct token_t final
   std::string token;
 
   /// @brief Default constructor is the empty token.
-  token_t() : type(type::EMPTY) {}
+  token_t(): type(type::EMPTY) {}
   /// @brief Construct a token of a certain type but with an empty token
   /// string.
   ///
   /// @param t The type of token.
-  token_t(enum type t) : type(t) {}
+  token_t(enum type t): type(t) {}
   /// @brief Construct a token of a certain type with the token string
   /// representation given.
   ///
   /// @param t The type of token.
   /// @param s The token string.
-  token_t(enum type t, const std::string& s) : type(t), token(s) {}
+  token_t(enum type t, const std::string& s): type(t), token(s) {}
   /// @brief Default destructor.
   ~token_t() = default;
   /// @brief The operator bool for use in bool contexts.
@@ -85,20 +89,14 @@ struct token_t final
   /// @brief The move constructor.
   ///
   /// @details The moved from token becomes an empty token.
-  token_t(token_t&& t) : type(t.type), token(std::move(t.token))
-  {
-    t.type = type::EMPTY;
-  }
+  token_t(token_t&& t): type(t.type), token(std::move(t.token)) { t.type = type::EMPTY; }
 
   /// @brief Checks that the token is of type SPECIAL and the value matches the
   /// character in the argument.
   ///
   /// @param c The macro character.
   /// @returns True if the SPECIAL character matches the @c c.
-  bool is_special(char c) const
-  {
-    return type == type::SPECIAL && !token.empty() && token[0] == c;
-  }
+  bool is_special(char c) const { return type == type::SPECIAL && !token.empty() && token[0] == c; }
 
   /// @brief The swap function for use in the assignment operators.
   friend void swap(token_t& left, token_t& right) noexcept
@@ -109,10 +107,7 @@ struct token_t final
   }
 };
 
-inline bool operator==(const token_t& l, const token_t& r)
-{
-  return l.type == r.type && l.token == r.token;
-}
+inline bool operator==(const token_t& l, const token_t& r) { return l.type == r.type && l.token == r.token; }
 
 inline std::ostream& operator<<(std::ostream& os, const token_t& t)
 {
@@ -169,10 +164,7 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
 class syntax
 {
 public:
-  syntax()
-  {
-    reset();
-  }
+  syntax() { reset(); }
   enum class type
   {
     OTHER = 0,
@@ -200,16 +192,11 @@ public:
     SPLICE,
     INFIX
   };
-  type get(std::uint8_t index) const
-  {
-    return _table[index];
-  }
-  void set(std::uint8_t index, type value)
-  {
-    _table[index] = value;
-  }
+  type get(std::uint8_t index) const { return _table[index]; }
+  void set(std::uint8_t index, type value) { _table[index] = value; }
   /// @brief Reset read table to the defaults.
-  void reset() {
+  void reset()
+  {
     set('(', type::LEFT_PAREN);
     set(')', type::RIGHT_PAREN);
     set('[', type::LEFT_BRACKET);
@@ -251,6 +238,7 @@ public:
     SPLICE,
     INFIX
   };
+
 private:
   using macro_t = std::pair<type, std::function<LISPT(LISPT, LISPT)>>;
   std::array<macro_t, 256> matrix;
@@ -260,7 +248,7 @@ private:
 class lexer
 {
 public:
-  lexer(io::source& input) : _input(input), _pos(_input.begin()) {}
+  lexer(io::source& input): _input(input), _pos(_input.begin()) {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
@@ -281,28 +269,28 @@ private:
 
   enum class state_t
   {
-    START,                     // Starting state
-    IN_STRING,                 // Inside a string until the next unescaped
-                               // double quote
-    IN_SYMBOL,                 // A symbol
-    IN_QUOTE,                  // Next character is treated as literal
-    IN_COMMENT,                // Inside comment
-    IN_HASH,                   // Encountered #, wait for ', otherwise it's symbol
+    START,      // Starting state
+    IN_STRING,  // Inside a string until the next unescaped
+                // double quote
+    IN_SYMBOL,  // A symbol
+    IN_QUOTE,   // Next character is treated as literal
+    IN_COMMENT, // Inside comment
+    IN_HASH,    // Encountered #, wait for ', otherwise it's symbol
     // If we fail to parse an integer or floating point number the token will
     // turn into a symbol.
-    IN_DOT,                    // A dot may be the start of a float or a symbol
-                               // unless it's followed by a terminating
-                               // character, like '(', ')', or a white space.
-    IN_SIGN,                   // A lone '+' or '-' is an atom, not an integer.
-    IN_INT,                    // An integer which may turn into a float if an
-                               // 'e' or a decimal point is found. It may also
-                               // turn into a symbol if there are any
-                               // non-number, non-break characters in the
-                               // sequence, e.g. '123abc'.
-    IN_FLOAT,                  // Try to parse a floating point number.
-    IN_EXP1,                   // The state after finding an 'e'.
-    IN_EXP2,                   // Next state after finding a '+', '-', or a
-                               // digit.
+    IN_DOT,   // A dot may be the start of a float or a symbol
+              // unless it's followed by a terminating
+              // character, like '(', ')', or a white space.
+    IN_SIGN,  // A lone '+' or '-' is an atom, not an integer.
+    IN_INT,   // An integer which may turn into a float if an
+              // 'e' or a decimal point is found. It may also
+              // turn into a symbol if there are any
+              // non-number, non-break characters in the
+              // sequence, e.g. '123abc'.
+    IN_FLOAT, // Try to parse a floating point number.
+    IN_EXP1,  // The state after finding an 'e'.
+    IN_EXP2,  // Next state after finding a '+', '-', or a
+              // digit.
   };
   friend std::ostream& operator<<(std::ostream& os, enum state_t state)
   {
@@ -351,6 +339,6 @@ private:
   syntax _syntax;
 };
 
-}
+} // namespace lisp
 
 #endif
