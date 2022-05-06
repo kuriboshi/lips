@@ -54,6 +54,7 @@ target_include_directories(
   liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                  $<INSTALL_INTERFACE:include/lisp>)
 target_link_libraries(liblisp PUBLIC fmt::fmt)
+set_target_properties(liblisp PROPERTIES OUTPUT_NAME lisp)
 
 add_executable(lisp lisp/main.cc)
 target_sources(
