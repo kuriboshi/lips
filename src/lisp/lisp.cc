@@ -10,6 +10,7 @@
 #include "except.hh"
 #include "error.hh"
 #include "rtable.hh"
+#include "lexer.hh"
 
 namespace lisp
 {
@@ -49,6 +50,8 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
 {
   if(_current == nullptr)
     _current = this;
+
+  _syntax.reset(new syntax);
 
   _primout = new file_t(std::cout);
   _primerr = new file_t(std::cerr);
@@ -155,7 +158,7 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     pred::init();
     prim::init();
     prop::init();
-    rm::init();
+    rtable::init();
     string::init();
     user::init();
 
@@ -187,6 +190,19 @@ lisp::~lisp()
 {
   if(_current == this)
     _current = nullptr;
+}
+
+syntax& lisp::read_table() { return *_syntax; }
+void lisp::read_table(std::unique_ptr<syntax> syntax) { _syntax = std::move(syntax); }
+
+LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
+{
+  auto fn = _macro[index];
+  LISPT f{new lisp_t};
+  f->set(source);
+  if(fn != NIL)
+    return apply(lisp, fn, cons(f, NIL));
+  return NIL;
 }
 
 closure_t::pool_t closure_t::_pool;

@@ -37,7 +37,7 @@ namespace lisp::io
 ///
 LISPT ratom(lisp& l, ref_file_t file)
 {
-  lexer lexer{file};
+  lexer lexer{l, file};
   auto token = lexer.read();
   parser parser{lexer};
   return parser.create(token);

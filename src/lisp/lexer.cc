@@ -23,7 +23,7 @@ token_t lexer::read()
     switch(state)
     {
       case state_t::START:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::SHELL_COMMENT:
             if(_start_of_line)
@@ -96,7 +96,7 @@ token_t lexer::read()
       case state_t::IN_SYMBOL:
         // Any character except unquoted terminating macro characters are
         // included in the symbol. This includes double quotes.
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
@@ -121,7 +121,7 @@ token_t lexer::read()
         state = state_t::IN_STRING;
         break;
       case state_t::IN_STRING:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::ESCAPE:
             state = state_t::IN_QUOTE;
@@ -135,11 +135,11 @@ token_t lexer::read()
         }
         break;
       case state_t::IN_COMMENT:
-        if(_syntax.get(*_pos) == syntax::type::NEWLINE)
+        if(get(*_pos) == syntax::type::NEWLINE)
           state = state_t::START;
         break;
       case state_t::IN_HASH:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
           case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
@@ -156,7 +156,7 @@ token_t lexer::read()
         }
         break;
       case state_t::IN_SIGN:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::DIGIT:
             state = state_t::IN_INT;
@@ -170,7 +170,7 @@ token_t lexer::read()
         }
         break;
       case state_t::IN_INT:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
@@ -198,7 +198,7 @@ token_t lexer::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_FLOAT:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
@@ -221,7 +221,7 @@ token_t lexer::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_EXP1:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
@@ -238,7 +238,7 @@ token_t lexer::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_EXP2:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;
@@ -253,7 +253,7 @@ token_t lexer::read()
         token.token.push_back(*_pos);
         break;
       case state_t::IN_DOT:
-        switch(_syntax.get(*_pos))
+        switch(get(*_pos))
         {
           case syntax::type::COMMENT:
             state = state_t::IN_COMMENT;

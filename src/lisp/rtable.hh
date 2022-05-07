@@ -3,18 +3,29 @@
 // Copyright 1988-1989,2022 Krister Joas
 //
 
+#ifndef LISP_RTABLE_HH
+#define LISP_RTABLE_HH
+
+#include <array>
+#include <vector>
 #include "lisp.hh"
 
-namespace lisp::rm
+namespace lisp
+{
+class lisp_t;
+using LISPT = ref_ptr<lisp_t>;
+class file_t;
+using ref_file_t = ref_ptr<file_t>;
+class lisp;
+}
+
+namespace lisp::rtable
 {
 void init();
 
 LISPT dquote(lisp&, LISPT);
 LISPT squote(lisp&, LISPT);
 LISPT getenv(lisp&, LISPT);
-} // namespace lisp::rm
+} // namespace lisp::rtable
 
-namespace lisp
-{
-inline LISPT getenv(lisp& l, LISPT stream) { return rm::getenv(l, stream); }
-} // namespace lisp
+#endif

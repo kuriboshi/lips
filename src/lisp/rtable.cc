@@ -7,7 +7,7 @@
 #include "io.hh"
 #include "rtable.hh"
 
-namespace lisp::rm
+namespace lisp::rtable
 {
 //
 // Read macros.
@@ -58,4 +58,4 @@ void init()
 {
   mkprim(pn::GETENV, getenv, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
-} // namespace lisp::rm
+} // namespace lisp::rtable

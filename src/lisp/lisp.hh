@@ -19,11 +19,12 @@
 #include <variant>
 #include <vector>
 
-#include "ref_ptr.hh"
 #include "error.hh"
 #include "except.hh"
-#include "symbol.hh"
 #include "pool.hh"
+#include "ref_ptr.hh"
+#include "rtable.hh"
+#include "symbol.hh"
 
 namespace lisp
 {
@@ -31,6 +32,7 @@ class lisp;
 class evaluator;
 class alloc;
 class file_t;
+class lexer;
 
 ///
 /// @brief Puts the lisp_t object back on the freelist.
@@ -279,6 +281,97 @@ struct indirect_t
 
 class destblock_t;
 
+// ^# start of line comment
+// #' Function quote
+// ' Quote
+// " String
+// ! Repeat
+// ?? History
+// >
+// >>
+// <
+// |
+// &
+// *
+// `
+// ,@
+// ;
+
+class syntax
+{
+public:
+  syntax() { reset(); }
+  enum class type
+  {
+    OTHER = 0,
+    LEFT_PAREN,
+    RIGHT_PAREN,
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
+    STRING_DELIM,
+    ESCAPE,
+    BREAKCHAR,
+    SEPARATOR,
+    //
+    QUOTE,
+    // Integers and floating point numbers
+    EXPONENT,
+    SIGN,
+    DIGIT,
+    DECIMAL_POINT,
+    // Comments
+    COMMENT,
+    SHELL_COMMENT,
+    NEWLINE,
+    // Macros
+    MACRO,
+    SPLICE,
+    INFIX
+  };
+  type get(std::uint8_t index) const { return _table[index]; }
+  void set(std::uint8_t index, type value) { _table[index] = value; }
+  void set(std::uint8_t index, LISPT value)
+  {
+    set(index, type::MACRO);
+    _macro[index] = value;
+  }
+  LISPT macro(lisp& lisp, ref_file_t source, std::uint8_t index);
+  /// @brief Reset read table to the defaults.
+  void reset()
+  {
+    set('(', type::LEFT_PAREN);
+    set(')', type::RIGHT_PAREN);
+    set('[', type::LEFT_BRACKET);
+    set(']', type::RIGHT_BRACKET);
+    set('"', type::STRING_DELIM);
+    set('\\', type::ESCAPE);
+    set(' ', type::SEPARATOR);
+    set('\t', type::SEPARATOR);
+    set('\n', type::NEWLINE);
+    set('0', type::DIGIT);
+    set('1', type::DIGIT);
+    set('2', type::DIGIT);
+    set('3', type::DIGIT);
+    set('4', type::DIGIT);
+    set('5', type::DIGIT);
+    set('6', type::DIGIT);
+    set('7', type::DIGIT);
+    set('8', type::DIGIT);
+    set('9', type::DIGIT);
+    set('+', type::SIGN);
+    set('-', type::SIGN);
+    set('.', type::DECIMAL_POINT);
+    set('e', type::EXPONENT);
+    set('E', type::EXPONENT);
+    set(';', type::COMMENT);
+    set('#', type::SHELL_COMMENT);
+    set('\'', type::QUOTE);
+  }
+private:
+  std::array<type, 256> _table = {type::OTHER};
+  std::array<LISPT, 256> _macro = {NIL};
+};
+
 class lisp_t final : public ref_count<lisp_t>
 {
 public:
@@ -418,6 +511,9 @@ public:
   static LISPT obarray(lisp& l);
   static LISPT freecount(lisp& l);
 
+  syntax& read_table();
+  void read_table(std::unique_ptr<syntax>);
+
   ref_file_t primout() const { return _primout; }
   ref_file_t primerr() const { return _primerr; }
   ref_file_t primin() const { return _primin; }
@@ -464,6 +560,8 @@ public:
 private:
   alloc& _alloc;
   evaluator& _eval;
+  std::unique_ptr<syntax> _syntax;
+
   ref_file_t _primout;
   ref_file_t _primerr;
   ref_file_t _primin;

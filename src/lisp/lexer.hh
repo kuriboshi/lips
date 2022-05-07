@@ -8,10 +8,9 @@
 
 #include <iostream>
 #include <string>
-#include <array>
-#include <vector>
 #include "lisp.hh"
 #include "io.hh"
+#include "rtable.hh"
 
 namespace lisp
 {
@@ -145,140 +144,28 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
   return os;
 }
 
-// ^# start of line comment
-// #' Function quote
-// ' Quote
-// " String
-// ! Repeat
-// ?? History
-// >
-// >>
-// <
-// |
-// &
-// *
-// `
-// ,@
-// ;
-
-class syntax
-{
-public:
-  syntax() { reset(); }
-  enum class type
-  {
-    OTHER = 0,
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACKET,
-    RIGHT_BRACKET,
-    STRING_DELIM,
-    ESCAPE,
-    BREAKCHAR,
-    SEPARATOR,
-    //
-    QUOTE,
-    // Integers and floating point numbers
-    EXPONENT,
-    SIGN,
-    DIGIT,
-    DECIMAL_POINT,
-    // Comments
-    COMMENT,
-    SHELL_COMMENT,
-    NEWLINE,
-    // Macros
-    MACRO,
-    SPLICE,
-    INFIX
-  };
-  type get(std::uint8_t index) const { return _table[index]; }
-  void set(std::uint8_t index, type value) { _table[index] = value; }
-  void set(std::uint8_t index, LISPT value)
-  {
-    set(index, type::MACRO);
-    _macro[index] = value;
-  }
-  LISPT macro(ref_file_t source, std::uint8_t index)
-  {
-    auto fn = _macro[index];
-    LISPT f{new lisp_t};
-    f->set(source);
-    if(fn != NIL)
-      return apply(fn, cons(f, NIL));
-    return NIL;
-  }
-  /// @brief Reset read table to the defaults.
-  void reset()
-  {
-    set('(', type::LEFT_PAREN);
-    set(')', type::RIGHT_PAREN);
-    set('[', type::LEFT_BRACKET);
-    set(']', type::RIGHT_BRACKET);
-    set('"', type::STRING_DELIM);
-    set('\\', type::ESCAPE);
-    set(' ', type::SEPARATOR);
-    set('\t', type::SEPARATOR);
-    set('\n', type::NEWLINE);
-    set('0', type::DIGIT);
-    set('1', type::DIGIT);
-    set('2', type::DIGIT);
-    set('3', type::DIGIT);
-    set('4', type::DIGIT);
-    set('5', type::DIGIT);
-    set('6', type::DIGIT);
-    set('7', type::DIGIT);
-    set('8', type::DIGIT);
-    set('9', type::DIGIT);
-    set('+', type::SIGN);
-    set('-', type::SIGN);
-    set('.', type::DECIMAL_POINT);
-    set('e', type::EXPONENT);
-    set('E', type::EXPONENT);
-    set(';', type::COMMENT);
-    set('#', type::SHELL_COMMENT);
-    set('\'', type::QUOTE);
-  }
-private:
-  std::array<type, 256> _table = {type::OTHER};
-  std::array<LISPT, 256> _macro = {NIL};
-};
-
-class read_macros
-{
-public:
-  read_macros() = default;
-  enum class type
-  {
-    MACRO,
-    SPLICE,
-    INFIX
-  };
-
-private:
-  using macro_t = std::pair<type, std::function<LISPT(LISPT, LISPT)>>;
-  std::array<macro_t, 256> matrix;
-};
-
 /// @brief A lexer of a string input.
 class lexer
 {
 public:
-  lexer(ref_file_t input): _input(input), _pos(_input->source().begin()) {}
-  lexer(std::string s): _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
+  lexer(ref_file_t input): _lisp(lisp::current()), _input(input), _pos(_input->source().begin()) {}
+  lexer(std::string s): _lisp(lisp::current()), _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
+  lexer(lisp& lisp, ref_file_t input): _lisp(lisp), _input(input), _pos(_input->source().begin()) {}
+  lexer(lisp& lisp, std::string s): _lisp(lisp), _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
-  // io::source& input() const { return _input; }
-  syntax::type get(std::uint8_t index) const { return _syntax.get(index); }
-  void set(std::uint8_t index, syntax::type value) { _syntax.set(index, value); }
-  void set(std::uint8_t index, LISPT value) { _syntax.set(index, value); }
+  // Syntax table member functions.
+  syntax::type get(std::uint8_t index) const { return _lisp.read_table().get(index); }
+  void set(std::uint8_t index, syntax::type value) { _lisp.read_table().set(index, value); }
+  void set(std::uint8_t index, LISPT value) { _lisp.read_table().set(index, value); }
   LISPT macro(token_t token)
   {
-    return _syntax.macro(_input, token.token[0]);
+    return _lisp.read_table().macro(_lisp, _input, token.token[0]);
   }
 
 private:
+  lisp& _lisp;
   ref_file_t _input;
   typename io::source::iterator _pos;
   token_t _token;
@@ -286,7 +173,7 @@ private:
 
   void next()
   {
-    _start_of_line = _syntax.get(*_pos) == syntax::type::NEWLINE;
+    _start_of_line = _lisp.read_table().get(*_pos) == syntax::type::NEWLINE;
     ++_pos;
   }
 
@@ -358,8 +245,6 @@ private:
     }
     return os;
   }
-
-  syntax _syntax;
 };
 
 } // namespace lisp
