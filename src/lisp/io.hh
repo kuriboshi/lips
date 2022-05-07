@@ -76,17 +76,17 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch() override
+  int getch() override
   {
     return getch(*_file);
   }
-  virtual void ungetch(int c) override { _file->putback(c); }
-  virtual bool close() override
+  void ungetch(int c) override { _file->putback(c); }
+  bool close() override
   {
     _file->close();
     return !_file->is_open();
   }
-  virtual std::optional<std::string> getline() override
+  std::optional<std::string> getline() override
   {
     return getline(*_file);
   }
@@ -106,13 +106,13 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch() override
+  int getch() override
   {
     return getch(_stream);
   }
-  virtual void ungetch(int c) override { _stream.putback(c); }
-  virtual bool close() override { return true; }
-  virtual std::optional<std::string> getline() override
+  void ungetch(int c) override { _stream.putback(c); }
+  bool close() override { return true; }
+  std::optional<std::string> getline() override
   {
     return getline(_stream);
   }
@@ -131,13 +131,13 @@ public:
   using source::getch;
   using source::getline;
 
-  virtual int getch() override
+  int getch() override
   {
     return getch(_string);
   }
-  virtual void ungetch(int c) override { _string.putback(c); }
-  virtual bool close() override { return true; }
-  virtual std::optional<std::string> getline() override { return getline(_string); }
+  void ungetch(int c) override { _string.putback(c); }
+  bool close() override { return true; }
+  std::optional<std::string> getline() override { return getline(_string); }
 
   iterator begin() override { return iterator(_string); }
 
@@ -189,11 +189,11 @@ public:
 
   using sink::putch;
 
-  virtual void putch(int c, bool esc) override { putch(c, *_file, esc); }
-  virtual void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
-  virtual void terpri() override { _file->put('\n'); }
-  virtual void flush() override { _file->flush(); }
-  virtual bool close() override
+  void putch(int c, bool esc) override { putch(c, *_file, esc); }
+  void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
+  void terpri() override { _file->put('\n'); }
+  void flush() override { _file->flush(); }
+  bool close() override
   {
     _file->close();
     return !_file->is_open();
@@ -211,11 +211,11 @@ public:
 
   using sink::putch;
 
-  virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
-  virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
-  virtual void terpri() override { _stream.put('\n'); }
-  virtual void flush() override { _stream.flush(); }
-  virtual bool close() override
+  void putch(int c, bool esc) override { putch(c, _stream, esc); }
+  void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  void terpri() override { _stream.put('\n'); }
+  void flush() override { _stream.flush(); }
+  bool close() override
   {
     _stream.flush();
     return true;
@@ -234,11 +234,11 @@ public:
 
   std::string string() const { return _stream.str(); }
 
-  virtual void putch(int c, bool esc) override { putch(c, _stream, esc); }
-  virtual void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
-  virtual void terpri() override { _stream.put('\n'); }
-  virtual void flush() override { _stream.flush(); }
-  virtual bool close() override { return true; }
+  void putch(int c, bool esc) override { putch(c, _stream, esc); }
+  void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  void terpri() override { _stream.put('\n'); }
+  void flush() override { _stream.flush(); }
+  bool close() override { return true; }
 
 private:
   std::ostringstream _stream;

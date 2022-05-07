@@ -13,13 +13,13 @@ class term_source: public lisp::io::source
 {
 public:
   term_source(const options_t& options) : is(linebuffer), options(options) {}
-  virtual ~term_source();
+  ~term_source() override;
 
   // io::source
-  virtual int getch() override;
-  virtual void ungetch(int) override;
-  virtual bool close() override { return true; }
-  virtual std::optional<std::string> getline() override;
+  int getch() override;
+  void ungetch(int) override;
+  bool close() override { return true; }
+  std::optional<std::string> getline() override;
 
   static void end_term();
   void clearlbuf();
