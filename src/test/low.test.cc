@@ -28,7 +28,7 @@ TEST_CASE("Low level functions")
   SECTION("low: prohibit set on constants")
   {
     std::ostringstream os;
-    auto of = std::make_unique<file_t>(os);
+    auto of = ref_file_t::create(os);
     l.primerr(std::move(of));
     CHECK_THROWS(set(l, T, NIL));
     CHECK_THROWS(set(l, mkatom("nil"), NIL));

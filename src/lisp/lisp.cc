@@ -9,6 +9,7 @@
 #include "liblisp.hh"
 #include "except.hh"
 #include "error.hh"
+#include "rtable.hh"
 
 namespace lisp
 {
@@ -49,12 +50,12 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
   if(_current == nullptr)
     _current = this;
 
-  _primout = std::make_unique<file_t>(std::cout);
-  _primerr = std::make_unique<file_t>(std::cerr);
-  _primin = std::make_unique<file_t>(std::cin);
-  _stdout = std::make_unique<file_t>(std::cout);
-  _stderr = std::make_unique<file_t>(std::cerr);
-  _stdin = std::make_unique<file_t>(std::cin);
+  _primout = new file_t(std::cout);
+  _primerr = new file_t(std::cerr);
+  _primin = new file_t(std::cin);
+  _stdout = new file_t(std::cout);
+  _stderr = new file_t(std::cerr);
+  _stdin = new file_t(std::cin);
 
   static auto global_set = false;
   if(!global_set)
@@ -154,6 +155,7 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     pred::init();
     prim::init();
     prop::init();
+    rm::init();
     string::init();
     user::init();
 
@@ -200,17 +202,17 @@ LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
 LISPT lisp::obarray(lisp& l) { return l._alloc.obarray(); }
 LISPT lisp::freecount(lisp& l) { return l._alloc.freecount(); }
 
-void lisp::primout(std::unique_ptr<file_t> f)
+void lisp::primout(ref_file_t f)
 {
   _primout = std::move(f);
 }
 
-void lisp::primerr(std::unique_ptr<file_t> f)
+void lisp::primerr(ref_file_t f)
 {
   _primerr = std::move(f);
 }
 
-void lisp::primin(std::unique_ptr<file_t> f)
+void lisp::primin(ref_file_t f)
 {
   _primin = std::move(f);
 }
@@ -224,7 +226,7 @@ inline std::string lisp::geterror(int messnr)
 
 LISPT lisp::perror(int messnr, LISPT arg)
 {
-  primerr().format("{} ", geterror(messnr));
+  primerr()->format("{} ", geterror(messnr));
   if(messnr & (PRINT_ARG | NOT_A))
     prin2(*this, arg, T);
   return C_ERROR;
@@ -246,9 +248,9 @@ LISPT lisp::syserr(LISPT fault)
   if(!is_NIL(fault))
   {
     prin2(*this, fault, T);
-    primerr().format(": ");
+    primerr()->format(": ");
   }
-  primerr().format("{}", strerror(errno));
+  primerr()->format("{}", strerror(errno));
   return C_ERROR;
 }
 
@@ -269,7 +271,7 @@ subr_t::subr_vector subr_t::subr_store;
 
 LISPT eval(lisp& l, const std::string& expr)
 {
-  file_t in(expr);
+  auto in = ref_file_t::create(expr);
   auto e = lispread(l, in);
   return lisp::eval(l, e);
 }

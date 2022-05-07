@@ -172,9 +172,8 @@ TEST_CASE("file: functions")
 
   SECTION("readc")
   {
-    std::string is = R"(test)";
     LISPT f = l.a().getobject();
-    f->set(std::make_shared<file_t>(is));
+    f->set(ref_file_t::create(R"(test)"));
     auto ch0 = readc(l, f);
     CHECK(ch0->intval() == 't');
     auto ch1 = readc(f);
@@ -187,9 +186,8 @@ TEST_CASE("file: functions")
 
   SECTION("read")
   {
-    std::string is = R"((a b c))";
     LISPT f = l.a().getobject();
-    f->set(std::make_shared<file_t>(is));
+    f->set(ref_file_t::create(R"((a b c))"));
     auto sexpr = read(l, f);
     CHECK(!is_NIL(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
   }
@@ -198,14 +196,14 @@ TEST_CASE("file: functions")
   {
     {
       std::ostringstream cout;
-      auto out = std::make_unique<file_t>(cout);
+      auto out = ref_file_t::create(cout);
       l.primout(std::move(out));
       spaces(l, 8_l, NIL);
       CHECK(cout.str() == "        ");
     }
     {
       std::ostringstream cout;
-      auto out = std::make_unique<file_t>(cout);
+      auto out = ref_file_t::create(cout);
       l.primout(std::move(out));
       spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
@@ -216,9 +214,8 @@ TEST_CASE("file: functions")
   {
     SECTION("One atom")
     {
-      std::string is = R"(test)";
       LISPT f = l.a().getobject();
-      f->set(std::make_shared<file_t>(is));
+      f->set(ref_file_t::create(R"(test)"));
       auto r = readline(l, f);
       CHECK(type_of(r) == type::CONS);
       auto expected = mklist("test"_a);
@@ -226,9 +223,8 @@ TEST_CASE("file: functions")
     }
     SECTION("Two atoms")
     {
-      std::string is = R"(test test)";
       LISPT f = l.a().getobject();
-      f->set(std::make_shared<file_t>(is));
+      f->set(ref_file_t::create(R"(test test)"));
       auto r = readline(f);
       CHECK(type_of(r) == type::CONS);
       auto expected = mklist("test"_a, "test"_a);

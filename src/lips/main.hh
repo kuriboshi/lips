@@ -10,9 +10,9 @@
 #include <lisp/lisp.hh>
 #include "env.hh"
 
-inline lisp::file_t& primout() { return lisp::lisp::current().primout(); }
-inline lisp::file_t& primin() { return lisp::lisp::current().primin(); }
-inline lisp::file_t& primerr() { return lisp::lisp::current().primerr(); }
+inline lisp::ref_file_t primout() { return lisp::lisp::current().primout(); }
+inline lisp::ref_file_t primin() { return lisp::lisp::current().primin(); }
+inline lisp::ref_file_t primerr() { return lisp::lisp::current().primerr(); }
 
 struct options_t
 {

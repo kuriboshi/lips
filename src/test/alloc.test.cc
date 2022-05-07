@@ -55,7 +55,7 @@ TEST_CASE("Create lisp objects")
     CHECK(to_string(out1.sink()) == std::string(j->getstr()));
 
     std::string s_hello{"(hello)"};
-    file_t in(s_hello);
+    auto in = ref_file_t::create(s_hello);
     auto hello = lispread(lisp, in);
     file_t out2(std::make_unique<io::string_sink>());
     prin0(lisp, hello, out2);
@@ -137,7 +137,7 @@ TEST_CASE("Object sizes")
   std::cout << "lambda_t: " << sizeof(lambda_t) << std::endl;
   std::cout << "ref_closure_t: " << sizeof(ref_closure_t) << std::endl;
   std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
-  std::cout << "std::shared_ptr<file_t>: " << sizeof(std::shared_ptr<file_t>) << std::endl;
+  std::cout << "ref_file_t: " << sizeof(ref_file_t) << std::endl;
   std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
   std::cout << "==========\n";
   std::cout << "subr_t: " << sizeof(subr_t) << std::endl;

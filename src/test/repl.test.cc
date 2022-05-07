@@ -16,17 +16,16 @@ TEST_CASE("Interactive tests")
   current c(l);
 
   std::ostringstream cout;
-  auto out = std::make_unique<file_t>(cout);
+  auto out = ref_file_t::create(cout);
   l.primout(std::move(out));
 
   std::ostringstream cerr;
-  auto err = std::make_unique<file_t>(cerr);
+  auto err = ref_file_t::create(cerr);
   l.primerr(std::move(err));
 
   SECTION("Simple repl")
   {
-    std::string is = R"((print "hello"))";
-    l.primin(std::move(std::make_unique<file_t>(is)));
+    l.primin(ref_file_t::create(R"((print "hello"))"));
     repl repl(l);
     repl(NIL);
     std::string expected = R"(> "hello"
@@ -42,7 +41,7 @@ TEST_CASE("Interactive tests")
 (setq a 100)
 a
 )";
-    l.primin(std::move(std::make_unique<file_t>(is)));
+    l.primin(ref_file_t::create(is));
     repl repl(l);
     repl(NIL);
     std::string expected = R"(> nil
@@ -57,7 +56,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
 )";
-    l.primin(std::move(std::make_unique<file_t>(is)));
+    l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
@@ -75,7 +74,7 @@ a
 (bt)
 (reset)
 )";
-    l.primin(std::move(std::make_unique<file_t>(is)));
+    l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
@@ -96,7 +95,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (return "hello")
 )";
-    l.primin(std::move(std::make_unique<file_t>(is)));
+    l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     repl(NIL);

@@ -33,22 +33,22 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
   }
   auto f = [&]() {
     if(readmode)
-      return std::make_unique<file_t>(std::make_unique<io::file_source>(filename->getstr()));
-    return std::make_unique<file_t>(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
+      return new file_t(std::make_unique<io::file_source>(filename->getstr()));
+    return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
   if(!f)
     return l.error(CANT_OPEN, filename);
   auto newfile = l.a().getobject();
-  newfile->set(std::move(f));
+  newfile->set(ref_file_t(f));
   return newfile;
 }
 
 LISPT close(lisp& l, LISPT fildes)
 {
   check(fildes, type::FILET);
-  if(fildes->file().has_sink())
-    fildes->file().flush();
-  if(fildes->file().close())
+  if(fildes->file()->has_sink())
+    fildes->file()->flush();
+  if(fildes->file()->close())
     return T;
   return NIL;
 }
@@ -66,11 +66,11 @@ LISPT ratom(lisp& l, LISPT file)
 LISPT readc(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return l.a().mknumber(l.primin().getch());
+    return l.a().mknumber(l.primin()->getch());
   if(is_T(file))
-    return l.a().mknumber(l.stdin().getch());
+    return l.a().mknumber(l.stdin()->getch());
   check(file, type::FILET);
-  return l.a().mknumber(file->file().getch());
+  return l.a().mknumber(file->file()->getch());
 }
 
 LISPT read(lisp& l, LISPT file)
@@ -86,11 +86,11 @@ LISPT read(lisp& l, LISPT file)
 LISPT print(lisp& l, LISPT x, LISPT file)
 {
   if(is_NIL(file))
-    return io::print(l, x, l.primout());
+    return io::print(l, x, *l.primout());
   if(is_T(file))
-    return io::print(l, x, l.primerr());
+    return io::print(l, x, *l.primerr());
   check(file, type::FILET);
-  return io::print(l, x, file->file());
+  return io::print(l, x, *file->file());
 }
 
 bool loadfile(lisp& l, const std::string& lf)
@@ -103,9 +103,9 @@ bool loadfile(lisp& l, const std::string& lf)
       base /= lf;
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
-        auto foo = std::make_unique<file_t>(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(l, *foo.get()); type_of(rval) != type::EMPTY;
-            rval = lispread(l, *foo.get()))
+        auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
+        for(auto rval = lispread(l, foo); type_of(rval) != type::EMPTY;
+            rval = lispread(l, foo))
           rval = l.e().eval(rval);
         return true;
       }
@@ -129,33 +129,33 @@ LISPT load(lisp& l, LISPT f)
 LISPT terpri(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return io::terpri(l, l.primout());
+    return io::terpri(l, *l.primout());
   if(is_T(file))
-    return io::terpri(l, l.primerr());
+    return io::terpri(l, *l.primerr());
   check(file, type::FILET);
-  return io::terpri(l, file->file());
+  return io::terpri(l, *file->file());
 }
 
 LISPT prin1(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
-    return prin0(l, x, l.primout(), false);
+    return prin0(l, x, *l.primout(), false);
   if(is_T(file))
-    return prin0(l, x, l.primerr(), false);
+    return prin0(l, x, *l.primerr(), false);
   check(file, type::FILET);
-  return prin0(l, x, file->file(), false);
+  return prin0(l, x, *file->file(), false);
 }
 
 LISPT prin2(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
-    return prin0(l, x, l.primout(), true);
+    return prin0(l, x, *l.primout(), true);
   if(is_T(file))
-    return prin0(l, x, l.primerr(), true);
+    return prin0(l, x, *l.primerr(), true);
   check(file, type::FILET);
-  return prin0(l, x, file->file(), true);
+  return prin0(l, x, *file->file(), true);
 }
 
 LISPT printlevel(lisp& l, LISPT newl)
@@ -172,17 +172,17 @@ LISPT printlevel(lisp& l, LISPT newl)
 LISPT spaces(lisp& l, LISPT n, LISPT file)
 {
   int i;
-  file_t* f;
+  ref_file_t f;
 
   check(n, type::INTEGER);
   if(is_NIL(file))
-    f = &l.primout();
+    f = l.primout();
   else if(is_T(file))
-    f = &l.primerr();
+    f = l.primerr();
   else
   {
     check(file, type::FILET);
-    f = &file->file();
+    f = file->file();
   }
   for(i = n->intval(); i > 0; i--) f->putch(' ');
   return NIL;

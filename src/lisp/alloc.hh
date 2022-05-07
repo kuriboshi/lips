@@ -260,7 +260,7 @@ inline LISPT operator"" _l(long double d)
 /// @brief Creates a lisp expression.
 inline LISPT operator"" _l(const char* s, std::size_t)
 {
-  file_t in(s);
+  auto in = ref_file_t::create(s);
   auto e = lispread(lisp::current(), in);
   return e;
 }

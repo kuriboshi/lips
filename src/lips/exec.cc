@@ -101,7 +101,7 @@ static void printjob(const job_t& job)
       buffer += " (core dumped)";
   }
   buffer += "\t";
-  primout().format(buffer);
+  primout()->format(buffer);
   print(job.exp, false);
 }
 
@@ -541,7 +541,7 @@ LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr().format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmd);
@@ -575,7 +575,7 @@ LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr().format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
     eval(cmd);
@@ -609,7 +609,7 @@ LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr().format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmd);
@@ -636,7 +636,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
   {
     if(pipe(pd) == -1)
     {
-      l.stderr().format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
     if((pid = mfork()) == 0)
@@ -644,7 +644,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        l.stderr().format("{}\n", strerror(errno));
+        l.stderr()->format("{}\n", strerror(errno));
         exit(1);
       }
       eval(l, cmds->car());
@@ -656,7 +656,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      l.stderr().format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
     eval(l, cmds->car());

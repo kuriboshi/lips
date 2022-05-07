@@ -35,9 +35,9 @@ namespace lisp::io
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
 ///
-LISPT ratom(lisp& l, file_t& file)
+LISPT ratom(lisp& l, ref_file_t file)
 {
-  lexer lexer{file.source()};
+  lexer lexer{file};
   auto token = lexer.read();
   parser parser{lexer};
   return parser.create(token);
@@ -46,19 +46,18 @@ LISPT ratom(lisp& l, file_t& file)
 //
 // LISPREAD reads a lisp expression from file FILE.
 //
-LISPT lispread(lisp& l, file_t& file)
+LISPT lispread(lisp& l, ref_file_t file)
 {
-  lexer lexer(file.source());
+  lexer lexer(file);
   return parser(lexer).parse();
 }
 
-LISPT readline(lisp& l, file_t& file)
+LISPT readline(lisp& l, ref_file_t file)
 {
-  auto line = file.getline();
+  auto line = file->getline();
   if(line)
   {
-    string_source ss(*line);
-    lexer lexer(ss);
+    lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
     if(head && head->empty())
@@ -86,7 +85,7 @@ LISPT readline(lisp& l, file_t& file)
 LISPT getline(lisp& l, LISPT file)
 {
   check(file, type::FILET);
-  auto line = file->file().getline();
+  auto line = file->file()->getline();
   if(line)
     return mkstring(l, *line);
   return NIL;

@@ -113,7 +113,7 @@ TEST_CASE("eval: control limits")
   lisp l;
   current c(l);
   std::ostringstream err;
-  l.primerr(std::make_unique<file_t>(err));
+  l.primerr(ref_file_t::create(err));
   "(defineq (f (lambda () (f))))"_e;
   CHECK_THROWS_WITH("(f)"_e, "abort");
   CHECK(err.str() == "Stack overflow [in f]\n");

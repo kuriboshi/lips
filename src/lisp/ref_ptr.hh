@@ -87,9 +87,6 @@ public:
   ref_ptr() = default;
   /// @brief Create an empty ref_ptr.
   ref_ptr(const std::nullptr_t): _ptr(nullptr) {}
-  /// @brief Creates an object of type T and takes ownership of it.
-  template<typename... Ts>
-  explicit ref_ptr(Ts... ts): _ptr(new T(std::forward<Ts>(ts)...)) { _ptr->retain(); }
   /// @brief
   ref_ptr(T* p): _ptr(p)
   {
@@ -102,6 +99,10 @@ public:
     if(_ptr)
       _ptr->retain();
   }
+  /// @brief Create a ref_ptr<T> with a pointer to an object of type T.
+  /// @brief Creates an object of type T and takes ownership of it.
+  template<typename... Ts>
+  static ref_ptr<T> create(Ts&&... ts) { return ref_ptr<T>(new T(std::forward<Ts>(ts)...)); }
   /// @brief Assignment operator.
   ///
   /// @details The reference counter of the assigned object is incremented. If

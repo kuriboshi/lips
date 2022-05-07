@@ -140,7 +140,6 @@ std::pair<std::uint64_t, std::uint64_t> do_test()
     f += pool_test<Foo, N>();
     b += pool_test<Bar, N>();
   }
-  std::cout << N << ": " << f << " : " << b << '\n';
   return {f, b};
 }
 

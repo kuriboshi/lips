@@ -18,7 +18,7 @@ token_t lexer::read()
   state_t state{state_t::START};
   if(_start_of_line && *_pos == '#')
     state = state_t::IN_COMMENT;
-  while(_pos != _input.end())
+  while(_pos != _input->source().end())
   {
     switch(state)
     {
@@ -107,7 +107,7 @@ token_t lexer::read()
             return token;
           case syntax::type::ESCAPE:
             next();
-            if(_pos == _input.end())
+            if(_pos == _input->source().end())
               return token;
             token.token.push_back(*_pos);
             break;
@@ -139,7 +139,6 @@ token_t lexer::read()
           state = state_t::START;
         break;
       case state_t::IN_HASH:
-        std::cout << "IN_HASH: " << *_pos << std::endl;
         switch(_syntax.get(*_pos))
         {
           case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:

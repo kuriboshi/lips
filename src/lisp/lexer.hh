@@ -194,6 +194,20 @@ public:
   };
   type get(std::uint8_t index) const { return _table[index]; }
   void set(std::uint8_t index, type value) { _table[index] = value; }
+  void set(std::uint8_t index, LISPT value)
+  {
+    set(index, type::MACRO);
+    _macro[index] = value;
+  }
+  LISPT macro(ref_file_t source, std::uint8_t index)
+  {
+    auto fn = _macro[index];
+    LISPT f{new lisp_t};
+    f->set(source);
+    if(fn != NIL)
+      return apply(fn, cons(f, NIL));
+    return NIL;
+  }
   /// @brief Reset read table to the defaults.
   void reset()
   {
@@ -225,7 +239,9 @@ public:
     set('#', type::SHELL_COMMENT);
     set('\'', type::QUOTE);
   }
+private:
   std::array<type, 256> _table = {type::OTHER};
+  std::array<LISPT, 256> _macro = {NIL};
 };
 
 class read_macros
@@ -248,15 +264,22 @@ private:
 class lexer
 {
 public:
-  lexer(io::source& input): _input(input), _pos(_input.begin()) {}
+  lexer(ref_file_t input): _input(input), _pos(_input->source().begin()) {}
+  lexer(std::string s): _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
-  io::source& input() const { return _input; }
-  LISPT macro(token_t) { return NIL; }
+  // io::source& input() const { return _input; }
+  syntax::type get(std::uint8_t index) const { return _syntax.get(index); }
+  void set(std::uint8_t index, syntax::type value) { _syntax.set(index, value); }
+  void set(std::uint8_t index, LISPT value) { _syntax.set(index, value); }
+  LISPT macro(token_t token)
+  {
+    return _syntax.macro(_input, token.token[0]);
+  }
 
 private:
-  io::source& _input;
+  ref_file_t _input;
   typename io::source::iterator _pos;
   token_t _token;
   bool _start_of_line{true};

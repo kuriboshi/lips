@@ -3,16 +3,17 @@
 // Copyright 2022 Krister Joas
 //
 #include <sstream>
+#include <cstdlib>
 #include <catch2/catch.hpp>
 #include <lisp/parser.hh>
 #include <lisp/io.hh>
+#include <lisp/rtable.hh>
 
 namespace
 {
 void lisp_compare(std::string input, const std::string& result)
 {
-  lisp::io::string_source ss{input};
-  lisp::lexer lexer{ss};
+  lisp::lexer lexer{input};
   auto res = lisp::parser(lexer).parse();
   std::ostringstream os;
   os << res;
@@ -30,8 +31,7 @@ const std::string& pname(LISPT sym)
 
 TEST_CASE("parser (a b . c)")
 {
-  io::string_source s{"(a b . c)"};
-  lexer lexer{s};
+  lexer lexer{"(a b . c)"};
   auto res = parser(lexer).parse();
   CHECK(pname(cdr(cdr(res))) == "c");
 }
@@ -59,8 +59,7 @@ LISPT nth(LISPT o, int n)
 //
 TEST_CASE("parser (a b . c d)")
 {
-  io::string_source s{"(a b . c d)"};
-  lexer lexer{s}; // -> (a b . c d)
+  lexer lexer{"(a b . c d)"}; // -> (a b . c d)
   auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 0)) == "a");
   CHECK(pname(nth(res, 1)) == "b");
@@ -71,8 +70,7 @@ TEST_CASE("parser (a b . c d)")
 
 TEST_CASE("parser (a b . (c d))")
 {
-  io::string_source s{"(a b . (c d))"};
-  lexer lexer{s}; // -> (a b c d)
+  lexer lexer{"(a b . (c d))"}; // -> (a b c d)
   auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
@@ -80,8 +78,7 @@ TEST_CASE("parser (a b . (c d))")
 
 TEST_CASE("parser (a b . (c d]")
 {
-  io::string_source s{"(a b . (c d]"};
-  lexer lexer{s}; // -> (a b c d)
+  lexer lexer{"(a b . (c d]"}; // -> (a b c d)
   auto res = parser(lexer).parse();
   CHECK(pname(nth(res, 2)) == "c");
   CHECK(pname(nth(res, 3)) == "d");
@@ -181,8 +178,7 @@ TEST_CASE("parser dot")
 
 TEST_CASE("parser: (greaterp 1.0 \"b\")")
 {
-  io::string_source s{"(greaterp 1.0 \"b\")"};
-  lexer lexer{s};
+  lexer lexer{"(greaterp 1.0 \"b\")"};
   auto res = parser(lexer).parse();
   REQUIRE(type_of(res) == type::CONS);
   CHECK(car(res) == "greaterp"_a);
@@ -192,13 +188,21 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
 
 TEST_CASE("parser: nil")
 {
-  io::string_source s1{"()"};
-  io::string_source s2{"nil"};
-  lexer r1{s1};
-  lexer r2{s2};
+  lexer r1{"()"};
+  lexer r2{"nil"};
   auto res1 = parser(r1).parse();
   auto res2 = parser(r2).parse();
   CHECK(res1 == res2);
+}
+
+TEST_CASE("parser: macro")
+{
+  lexer lexer{"$HOME"};
+  lexer.set('$', "rmgetenv"_l);
+  auto r = parser(lexer).parse();
+  REQUIRE(r);
+  REQUIRE(type_of(r) == type::STRING);
+  CHECK(r->string().starts_with("/"));
 }
 
 }

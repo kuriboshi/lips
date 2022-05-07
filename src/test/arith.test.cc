@@ -13,7 +13,7 @@ TEST_CASE("Arithmetic functions")
   lisp l;
   current c(l);
   std::ostringstream os;
-  auto of = std::make_unique<file_t>(os);
+  auto of = ref_file_t::create(os);
   l.primerr(std::move(of));
 
   SECTION("+")

@@ -61,7 +61,7 @@ TEST_CASE("user: User defined functions")
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(is_NIL(redef0));
     std::ostringstream cout;
-    auto out = std::make_unique<file_t>(cout);
+    auto out = ref_file_t::create(cout);
     l.primout(std::move(out));
     eval(l, "(setq verbose t)");
     auto f1 = define(mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));

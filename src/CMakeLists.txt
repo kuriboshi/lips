@@ -20,6 +20,7 @@ target_sources(
           lisp/pred.cc
           lisp/prim.cc
           lisp/prop.cc
+          lisp/rtable.cc
           lisp/string.cc
           lisp/user.cc
           lisp/version.cc)
@@ -47,6 +48,7 @@ target_sources(
           lisp/prop.hh
           lisp/ref_ptr.hh
           lisp/repl.hh
+          lisp/rtable.hh
           lisp/string.hh
           lisp/user.hh
           lisp/version.hh)

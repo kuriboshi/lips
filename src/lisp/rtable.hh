@@ -7,6 +7,14 @@
 
 namespace lisp::rm
 {
-LISPT dquote(lisp&, file_t&, LISPT, char);
-LISPT squote(lisp&, file_t&, LISPT, char);
+void init();
+
+LISPT dquote(lisp&, LISPT);
+LISPT squote(lisp&, LISPT);
+LISPT getenv(lisp&, LISPT);
 } // namespace lisp::rm
+
+namespace lisp
+{
+inline LISPT getenv(lisp& l, LISPT stream) { return rm::getenv(l, stream); }
+} // namespace lisp

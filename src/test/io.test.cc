@@ -31,9 +31,9 @@ TEST_CASE("io: Basic I/O")
   lisp lisp;
   current c(lisp);
 
-  lisp.primout(std::make_unique<file_t>(std::make_unique<io::string_sink>()));
-  lisp.primout().format("hello world {}", 123);
-  CHECK(to_string(lisp.primout().sink()) == std::string("hello world 123"));
+  lisp.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
+  lisp.primout()->format("hello world {}", 123);
+  CHECK(to_string(lisp.primout()->sink()) == std::string("hello world 123"));
 }
 
 TEST_CASE("io: ratom")
@@ -43,22 +43,19 @@ TEST_CASE("io: ratom")
 
   SECTION("integer")
   {
-    std::string s{"124"};
-    file_t in{s};
+    auto in = ref_file_t::create("124");
     auto r = ratom(in);
     CHECK(type_of(r) == type::INTEGER);
   }
   SECTION("symbol")
   {
     {
-      std::string s{"124abc"};
-      file_t in{s};
+      auto in = ref_file_t::create("124abc");
       auto r = ratom(in);
       CHECK(type_of(r) == type::SYMBOL);
     }
     {
-      std::string s{"124abc"};
-      file_t in{s};
+      auto in = ref_file_t::create("124abc");
       auto r = ratom(l, in);
       CHECK(type_of(r) == type::SYMBOL);
     }
@@ -67,8 +64,7 @@ TEST_CASE("io: ratom")
   {
     // This does not match the behaviour of Interlisp which would return the
     // symbol \".
-    std::string s{"\"hello\""};
-    file_t in{s};
+    auto in = ref_file_t::create(R"("hello")");
     auto r = ratom(in);
     CHECK(type_of(r) == type::STRING);
   }
@@ -82,7 +78,7 @@ TEST_CASE("io: lispread/readline")
   SECTION("Read from utf-8")
   {
     std::string s_nihongo{"\"日本語\"\n"};
-    file_t in{s_nihongo};
+    auto in = ref_file_t::create(s_nihongo);
     auto nihongo = lispread(l, in);
     file_t out(std::make_unique<io::string_sink>());
     print(l, nihongo, out);
@@ -93,7 +89,7 @@ TEST_CASE("io: lispread/readline")
   {
     std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
-    file_t in{s_nihongo};
+    auto in = ref_file_t::create(s_nihongo);
     auto nihongo = lispread(l, in);
     file_t out(std::make_unique<io::string_sink>());
     print(l, nihongo, out);
@@ -109,7 +105,7 @@ TEST_CASE("io: lispread/readline")
       std::ofstream o{test_file};
       o << s_nihongo;
     }
-    auto f = file_t(std::make_unique<io::file_source>(test_file));
+    auto f = ref_file_t::create(std::make_unique<io::file_source>(test_file));
     auto nihongo = lispread(l, f);
     file_t out(std::make_unique<io::string_sink>());
     print(l, nihongo, out);
@@ -119,11 +115,9 @@ TEST_CASE("io: lispread/readline")
 
   SECTION("lispread vs. readline")
   {
-    std::string s0{R"((hello world))"};
-    auto f0 = file_t(s0);
+    auto f0 = ref_file_t::create(R"((hello world))");
     auto result0 = lispread(l, f0);
-    std::string s1{R"(hello world)"};
-    auto f1 = file_t(s1);
+    auto f1 = ref_file_t::create(R"(hello world)");
     auto result1 = readline(l, f1);
     CHECK(equal(l, result0, result1) != NIL);
   }
@@ -137,10 +131,10 @@ TEST_CASE("io: lispread/readline")
   SECTION("lispread & readline")
   {
     std::string s0{"hello"};
-    auto f0 = file_t(s0);
+    auto f0 = ref_file_t::create(s0);
     auto r0 = lispread(f0);
     CHECK(r0 == "hello"_a);
-    auto f1 = file_t(s0);
+    auto f1 = ref_file_t::create(s0);
     auto r1 = readline(f1);
     CHECK(r0 == "hello"_a);
   }
@@ -281,28 +275,28 @@ TEST_CASE("io: patom primout/primerr")
 
   {
     std::ostringstream out;
-    l.primout(std::make_unique<file_t>(out));
+    l.primout(ref_file_t::create(out));
     patom(l, "foo"_a, false);
     terpri(l, false);
     CHECK(out.str() == "foo\n");
   }
   {
     std::ostringstream err;
-    l.primerr(std::make_unique<file_t>(err));
+    l.primerr(ref_file_t::create(err));
     patom(l, "bar"_a, true);
     terpri(l, true);
     CHECK(err.str() == "bar\n");
   }
   {
     std::ostringstream out;
-    l.primout(std::make_unique<file_t>(out));
+    l.primout(ref_file_t::create(out));
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
   }
   {
     std::ostringstream err;
-    l.primerr(std::make_unique<file_t>(err));
+    l.primerr(ref_file_t::create(err));
     patom("bar"_a, true);
     terpri(true);
     CHECK(err.str() == "bar\n");
@@ -329,25 +323,25 @@ TEST_CASE("io: prinbody")
   }
   {
     std::ostringstream os;
-    l.primout(std::make_unique<file_t>(os));
+    l.primout(ref_file_t::create(os));
     prinbody(l, list, false);
     CHECK(os.str() == "a b c . d");
   }
   {
     std::ostringstream os;
-    l.primerr(std::make_unique<file_t>(os));
+    l.primerr(ref_file_t::create(os));
     prinbody(l, list, true);
     CHECK(os.str() == "a b c . d");
   }
   {
     std::ostringstream os;
-    l.primout(std::make_unique<file_t>(os));
+    l.primout(ref_file_t::create(os));
     prinbody(list, false);
     CHECK(os.str() == "a b c . d");
   }
   {
     std::ostringstream os;
-    l.primerr(std::make_unique<file_t>(os));
+    l.primerr(ref_file_t::create(os));
     prinbody(list, true);
     CHECK(os.str() == "a b c . d");
   }
@@ -470,4 +464,4 @@ TEST_CASE("io: splice")
   }
 }
 
-}
+} // namespace lisp

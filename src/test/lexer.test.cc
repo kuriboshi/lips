@@ -6,6 +6,7 @@
 #include <sstream>
 #include <catch2/catch.hpp>
 #include <lisp/lexer.hh>
+#include <lisp/alloc.hh>
 
 namespace
 {
@@ -19,14 +20,13 @@ void lexer_check(lisp::lexer& lexer, enum lisp::token_t::type type, const std::s
 
 void lexer_check(std::string string, enum lisp::token_t::type type, const std::string& token)
 {
-  lisp::io::string_source ss{string};
-  lisp::lexer lexer{ss};
+  lisp::lexer lexer{string};
   auto b = lexer.read();
   REQUIRE(b);
   CHECK(b.type == type);
   CHECK(b.token == token);
 }
-}
+} // namespace
 
 namespace lisp
 {
@@ -56,8 +56,7 @@ TEST_CASE("lexer: symbols")
 
 TEST_CASE("lexer: (a b c)")
 {
-  io::string_source s{"(a b c)"};
-  lexer lexer{s};
+  lexer lexer{"(a b c)"};
   lexer_check(lexer, token_t::type::SPECIAL, "(");
   lexer_check(lexer, token_t::type::SYMBOL, "a");
   lexer_check(lexer, token_t::type::SYMBOL, "b");
@@ -68,8 +67,7 @@ TEST_CASE("lexer: (a b c)")
 
 TEST_CASE("lexer: ( a b c )")
 {
-  io::string_source s{"( a b c )"};
-  lexer lexer{s};
+  lexer lexer{"( a b c )"};
   lexer_check(lexer, token_t::type::SPECIAL, "(");
   lexer_check(lexer, token_t::type::SYMBOL, "a");
   lexer_check(lexer, token_t::type::SYMBOL, "b");
@@ -82,15 +80,13 @@ TEST_CASE("lexer: +")
 {
   SECTION("+")
   {
-    io::string_source s{"+"};
-    lexer lexer{s};
+    lexer lexer{"+"};
     lexer_check(lexer, token_t::type::SYMBOL, "+");
   }
 
   SECTION("(+)")
   {
-    io::string_source s{"(+)"};
-    lexer lexer{s};
+    lexer lexer{"(+)"};
     lexer_check(lexer, token_t::type::SPECIAL, "(");
     lexer_check(lexer, token_t::type::SYMBOL, "+");
     lexer_check(lexer, token_t::type::SPECIAL, ")");
@@ -98,8 +94,7 @@ TEST_CASE("lexer: +")
 
   SECTION("(+ 1 2)")
   {
-    io::string_source s{"(+ 1 2)"};
-    lexer lexer{s};
+    lexer lexer{"(+ 1 2)"};
     lexer_check(lexer, token_t::type::SPECIAL, "(");
     lexer_check(lexer, token_t::type::SYMBOL, "+");
     lexer_check(lexer, token_t::type::INT, "1");
@@ -117,8 +112,7 @@ TEST_CASE("lexer: strings")
 
   SECTION("\"string\" hello")
   {
-    io::string_source s{"\"string\" hello"};
-    lexer lexer{s};
+    lexer lexer{"\"string\" hello"};
     lexer_check(lexer, token_t::type::STRING, "string");
     lexer_check(lexer, token_t::type::SYMBOL, "hello");
   }
@@ -173,8 +167,7 @@ TEST_CASE("lexer: floats")
 
 TEST_CASE("lexer: unread")
 {
-  io::string_source s{"()"};
-  lexer lexer{s};
+  lexer lexer{"()"};
   auto token = lexer.read();
   REQUIRE(token);
   CHECK(token.token == "(");
@@ -191,8 +184,7 @@ TEST_CASE("lexer: comments")
 {
   SECTION("# at start of line")
   {
-    io::string_source s{"# comment\nhello\n# another comment\nworld"};
-    lexer lexer{s};
+    lexer lexer{"# comment\nhello\n# another comment\nworld"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
@@ -205,8 +197,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("# not at start of line")
   {
-    io::string_source s{" # comment\nhello\n"};
-    lexer lexer{s};
+    lexer lexer{" # comment\nhello\n"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
@@ -223,8 +214,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("#' token")
   {
-    io::string_source s{" #'plus\n"};
-    lexer lexer{s};
+    lexer lexer{" #'plus\n"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.type == token_t::type::SYMBOL);
@@ -237,8 +227,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr")
   {
-    io::string_source s{"(;comment\n)"};
-    lexer lexer{s};
+    lexer lexer{"(;comment\n)"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_special('('));
@@ -249,8 +238,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr with int")
   {
-    io::string_source s{"(100;comment\n200)"};
-    lexer lexer{s};
+    lexer lexer{"(100;comment\n200)"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_special('('));
@@ -267,8 +255,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr with int")
   {
-    io::string_source s{"(symbol;comment\n100)"};
-    lexer lexer{s};
+    lexer lexer{"(symbol;comment\n100)"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_special('('));
@@ -286,8 +273,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr with float")
   {
-    io::string_source s{"(1.23;comment\n100)"};
-    lexer lexer{s};
+    lexer lexer{"(1.23;comment\n100)"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_special('('));
@@ -305,8 +291,7 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr with exponent")
   {
-    io::string_source s{"(1.23e1;comment\n100)"};
-    lexer lexer{s};
+    lexer lexer{"(1.23e1;comment\n100)"};
     auto token = lexer.read();
     REQUIRE(token);
     CHECK(token.is_special('('));
@@ -417,6 +402,15 @@ TEST_CASE("lexer: operator==")
     token_t token1{token_t::type::FLOAT, "1.234"};
     CHECK(token0 == token1);
   }
+}
+
+TEST_CASE("lexer: macro")
+{
+  lexer lexer{"$HOME"};
+  lexer.set('$', "rmgetenv"_l);
+  auto t = lexer.read();
+  REQUIRE(t);
+  CHECK(t.token == "$");
 }
 
 }

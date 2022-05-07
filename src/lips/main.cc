@@ -310,7 +310,7 @@ int main(int argc, char* const* argv)
       std::cout << "Error loading rc file: " << error.what() << '\n';
     }
   }
-  file_t terminal(std::make_unique<term_source>(options));
+  ref_file_t terminal{new file_t(std::make_unique<term_source>(options))};
   top toploop(*lisp, options, terminal);
   while(true)
   {
@@ -329,12 +329,12 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_error& error)
     {
-      static_cast<term_source&>(terminal.source()).clearlbuf();
+      static_cast<term_source&>(terminal->source()).clearlbuf();
       std::cerr << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)
     {
-      lisp->primerr().format("finish: {}\n", fin.what());
+      lisp->primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

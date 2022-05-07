@@ -27,8 +27,8 @@ void top::phist()
   for(auto hl: variables->history)
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
-    prinbody(hl->cdr(), lisp::current().stdout(), true);
-    primout().terpri();
+    prinbody(hl->cdr(), *lisp::current().stdout(), true);
+    primout()->terpri();
   }
 }
 
@@ -170,7 +170,7 @@ LISPT top::operator()(LISPT exp)
     //
     // Evaluate promptform and print prompt.
     //
-    if(options.interactive)
+    if(_options.interactive)
     {
       if(type_of(eval(l, variables->promptform)) == type::ERROR)
       {
@@ -182,7 +182,7 @@ LISPT top::operator()(LISPT exp)
       else
         promptprint(variables->topprompt);
     }
-    input_exp = readline(file);
+    input_exp = readline(_file);
     if(type_of(input_exp) == type::ENDOFFILE)
       return NIL;
     if(is_NIL(input_exp))
@@ -206,8 +206,8 @@ LISPT top::operator()(LISPT exp)
     top::addhist(input_exp);
     if(lisp::current().echoline)
     {
-      prinbody(input_exp, primout(), 1);
-      primout().terpri();
+      prinbody(input_exp, *primout(), 1);
+      primout()->terpri();
     }
     bool printit = false; // If the result will be printed.
     LISPT topexp = transform(input_exp);
@@ -220,7 +220,7 @@ LISPT top::operator()(LISPT exp)
     topexp = eval(topexp);
     if(printit)
       print(topexp, T);
-    if(!options.interactive && options.command)
+    if(!_options.interactive && _options.command)
       return NIL;
     top::trimhist();
   }

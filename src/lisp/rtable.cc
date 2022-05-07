@@ -2,6 +2,9 @@
 // Lips, lisp shell.
 // Copyright 1988-1989, 2022.
 //
+#include <cstdlib>
+#include "alloc.hh"
+#include "io.hh"
 #include "rtable.hh"
 
 namespace lisp::rm
@@ -9,29 +12,50 @@ namespace lisp::rm
 //
 // Read macros.
 //
-LISPT dquote(lisp& l, file_t& file, LISPT, char)
+LISPT dquote(lisp& l, LISPT stream)
 {
+  check(stream, type::FILET);
   std::string buffer;
-  auto c = file.getch();
+  auto c = stream->file()->getch();
   while(c != '"')
   {
     if(c == '\\')
-      c = file.getch();
+      c = stream->file()->getch();
     buffer.push_back(c);
-    c = file.getch();
+    c = stream->file()->getch();
   }
   return mkstring(l, buffer);
 }
 
-LISPT squote(lisp& l, file_t& file, LISPT, char)
+LISPT squote(lisp& l, LISPT stream)
 {
+  check(stream, type::FILET);
   int c;
-  if((c = file.getch()) == ')' || is_sepr(l, c))
+  if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
   {
-    file.ungetch(c);
+    stream->file()->ungetch(c);
     return C_QUOTE;
   }
-  file.ungetch(c);
-  return cons(l, C_QUOTE, cons(l, io::lispread(l, file), NIL));
+  stream->file()->ungetch(c);
+  return cons(l, C_QUOTE, cons(l, io::lispread(l, stream->file()), NIL));
+}
+
+LISPT getenv(lisp&, LISPT stream)
+{
+  check(stream, type::FILET);
+  auto sym = ratom(stream->file());
+  check(sym, type::SYMBOL, type::STRING);
+  auto val = std::getenv(sym->getstr().c_str());
+  return mkstring(val);
+}
+
+namespace pn
+{
+inline constexpr auto GETENV = "rmgetenv";
+}
+
+void init()
+{
+  mkprim(pn::GETENV, getenv, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 } // namespace lisp::rm

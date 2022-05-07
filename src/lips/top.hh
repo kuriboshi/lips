@@ -16,7 +16,7 @@ inline constexpr auto PN_PRINTHIST = "??"; // print history
 class top
 {
 public:
-  top(lisp& lisp, const options_t& options, file_t& file) : l(lisp), options(options), file(file) {}
+  top(lisp& lisp, const options_t& options, ref_file_t file) : l(lisp), _options(options), _file(file) {}
   ~top() = default;
 
   static void init(alloc&);
@@ -36,7 +36,7 @@ public:
   static void trimhist();
 
   // Read table functions
-  static LISPT rmexcl(lisp&, file_t&, LISPT, char);
+  static LISPT rmexcl(lisp&, ref_file_t, LISPT, char);
 
   static LISPT input_exp;
   static std::function<LISPT(LISPT)> transform_hook; // Applied on input if non-nullptr.
@@ -67,8 +67,8 @@ private:
   static std::unique_ptr<cvariables> variables;
 
   lisp& l;
-  const options_t& options;
-  file_t& file;
+  const options_t& _options;
+  ref_file_t _file;
   int _level = 0;
 };
 

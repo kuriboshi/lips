@@ -224,6 +224,7 @@ private:
 };
 
 using ref_closure_t = ref_ptr<closure_t>;
+using ref_file_t = ref_ptr<file_t>;
 
 struct subr_index
 {
@@ -330,8 +331,8 @@ public:
   void set(ref_closure_t x) { _type = type::CLOSURE; _u = x; }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
-  auto file() -> file_t& { return *std::get<std::shared_ptr<file_t>>(_u); }
-  void set(std::shared_ptr<file_t> f) { _type = type::FILET; _u = f; }
+  auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
+  void set(ref_file_t f) { _type = type::FILET; _u = f; }
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
   void set(cvariable_t&& x) { _type = type::CVARIABLE; _u = std::move(x); }
 
@@ -385,7 +386,7 @@ private:
     lambda_t,                   // LAMBDA
     ref_closure_t,              // CLOSURE
     destblock_t*,               // ENVIRON
-    std::shared_ptr<file_t>,    // FILE
+    ref_file_t,                 // FILE
     cvariable_t                 // CVARIABLE
     > _u;
 };
@@ -417,15 +418,15 @@ public:
   static LISPT obarray(lisp& l);
   static LISPT freecount(lisp& l);
 
-  file_t& primout() const { return *_primout; }
-  file_t& primerr() const { return *_primerr; }
-  file_t& primin() const { return *_primin; }
-  void primout(std::unique_ptr<file_t>);
-  void primerr(std::unique_ptr<file_t>);
-  void primin(std::unique_ptr<file_t>);
-  file_t& stdout() const { return *_stdout; }
-  file_t& stderr() const { return *_stderr; }
-  file_t& stdin() const { return *_stdin; }
+  ref_file_t primout() const { return _primout; }
+  ref_file_t primerr() const { return _primerr; }
+  ref_file_t primin() const { return _primin; }
+  void primout(ref_file_t);
+  void primerr(ref_file_t);
+  void primin(ref_file_t);
+  ref_file_t stdout() const { return _stdout; }
+  ref_file_t stderr() const { return _stderr; }
+  ref_file_t stdin() const { return _stdin; }
 
   std::string geterror(int);
   LISPT perror(int, LISPT);
@@ -463,12 +464,12 @@ public:
 private:
   alloc& _alloc;
   evaluator& _eval;
-  std::unique_ptr<file_t> _primout;
-  std::unique_ptr<file_t> _primerr;
-  std::unique_ptr<file_t> _primin;
-  std::unique_ptr<file_t> _stdout;
-  std::unique_ptr<file_t> _stderr;
-  std::unique_ptr<file_t> _stdin;
+  ref_file_t _primout;
+  ref_file_t _primerr;
+  ref_file_t _primin;
+  ref_file_t _stdout;
+  ref_file_t _stderr;
+  ref_file_t _stdin;
   static lisp* _current;
 
   class cvariables
