@@ -624,16 +624,17 @@ LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
 LISPT exec::pipecmd(lisp& l, LISPT cmds)
 {
-  int pd[2];
-  int pid;
-  UNION_WAIT status;
+  print(cmds);
 
   if(is_NIL(cmds))
     return NIL;
   if(is_NIL(cmds->cdr()))
     return eval(l, cmds->car());
+
+  int pid;
   if((pid = mfork()) == 0)
   {
+    int pd[2];
     if(pipe(pd) == -1)
     {
       l.stderr()->format("{}\n", strerror(errno));
@@ -660,12 +661,12 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
       exit(1);
     }
     eval(l, cmds->car());
-    status = waitfork(pid);
-    exit(0);
+    auto status = waitfork(pid);
+    exit(WEXITSTATUS(status));
   }
   else if(pid < 0)
     return C_ERROR;
-  status = waitfork(pid);
+  auto status = waitfork(pid);
   return mknumber(l, WEXITSTATUS(status));
 }
 
@@ -883,7 +884,7 @@ void exec::init()
   mkprim(pn::REDIR_TO,     redir_to,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::REDIR_FROM,   redir_from,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::REDIR_APPEND, redir_append, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::PIPECMD,      pipecmd,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::PIPECMD,      pipecmd,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::BACK,         back,         subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::STOP,         stop,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::CD,           cd,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);

@@ -67,15 +67,15 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
   return list;
 }
 
-LISPT transform(LISPT list)
+LISPT transform(::lisp::lisp& l, LISPT list)
 {
   LISPT tl = NIL;
   LISPT res = NIL;
   bool conc = false;
-  for(LISPT ll = list; type_of(ll) == type::CONS; ll = ll->cdr())
+  for(auto ll = list; type_of(ll) == type::CONS; ll = ll->cdr())
   {
     if(type_of(ll->car()) == type::CONS)
-      tl = put_end(tl, transform(ll->car()), conc);
+      tl = put_end(tl, transform(l, ll->car()), conc);
     else if(ll->car() == C_BAR)
     {
       if(is_NIL(res))
@@ -87,6 +87,8 @@ LISPT transform(LISPT list)
     }
     else if(ll->car() == C_SEMI)
     {
+      // Semicolon is considered a comment character. If progn transformation
+      // is to be effective ';' cannot be a comment character.
       if(is_NIL(res))
         res = cons(C_PROGN, cons(tl, NIL));
       else
@@ -192,6 +194,8 @@ std::unique_ptr<::lisp::lisp> init()
   breakhook(onbreak);
 
   exec::init();
+
+  l->read_table().set('!', "rmexcl"_l);
 
   return l;
 }

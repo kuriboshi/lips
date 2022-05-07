@@ -9,25 +9,6 @@
 #include <unordered_map>
 #include <lisp/lisp.hh>
 
-namespace lisp::pn
-{
-inline constexpr auto CD = "cd";                  // change directory
-inline constexpr auto EXPAND = "expand";          // expand wildcards
-inline constexpr auto REDIR_TO = "redir-to";      // redirect to file
-inline constexpr auto REDIR_FROM = "redir-from";  // redirect from file
-inline constexpr auto REDIR_APPEND = "append-to"; // redirect appending to file
-inline constexpr auto PIPECMD = "pipe-cmd";       // pipe commands
-inline constexpr auto BACK = "back";              // run command in background
-inline constexpr auto STOP = "stop-lips";         // stop lips, return to superior
-inline constexpr auto REHASH = "rehash";          // recalculate hash table
-inline constexpr auto JOBS = "jobs";              // list jobs
-inline constexpr auto FG = "fg";                  // run job in foreground
-inline constexpr auto BG = "bg";                  // run job in background
-inline constexpr auto SETENV = "setenv";          // set environment variable
-inline constexpr auto GETENV = "getenv";          // get value of variable
-inline constexpr auto EXEC = "exec";              // overlay lips with command
-} // namespace lisp::pn
-
 namespace lisp
 {
 class exec
@@ -74,6 +55,25 @@ inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess
 inline LISPT doexec(lisp& l, LISPT cmd) { return exec::doexec(l, cmd); }
 
 } // namespace lisp
+
+namespace pn
+{
+inline constexpr auto CD = "cd";                  // change directory
+inline constexpr auto EXPAND = "expand";          // expand wildcards
+inline constexpr auto REDIR_TO = "redir-to";      // redirect to file
+inline constexpr auto REDIR_FROM = "redir-from";  // redirect from file
+inline constexpr auto REDIR_APPEND = "append-to"; // redirect appending to file
+inline constexpr auto PIPECMD = "pipe-cmd";       // pipe commands
+inline constexpr auto BACK = "back";              // run command in background
+inline constexpr auto STOP = "stop-lips";         // stop lips, return to superior
+inline constexpr auto REHASH = "rehash";          // recalculate hash table
+inline constexpr auto JOBS = "jobs";              // list jobs
+inline constexpr auto FG = "fg";                  // run job in foreground
+inline constexpr auto BG = "bg";                  // run job in background
+inline constexpr auto SETENV = "setenv";          // set environment variable
+inline constexpr auto GETENV = "getenv";          // get value of variable
+inline constexpr auto EXEC = "exec";              // overlay lips with command
+} // namespace pn
 
 extern bool insidefork;
 

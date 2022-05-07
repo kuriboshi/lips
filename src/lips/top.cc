@@ -99,7 +99,7 @@ LISPT top::printhist()
 LISPT top::transform(LISPT list)
 {
   if(transform_hook)
-    return transform_hook(list);
+    return transform_hook(l, list);
   return list;
 }
 
@@ -189,20 +189,6 @@ LISPT top::operator()(LISPT exp)
       continue;
     if(is_NIL(input_exp->car()))
       continue;
-#if 0
-    if(transform_hook)
-    {
-      switch(transform_hook(lisp, &input_exp))
-      {
-        case break_return::RETURN:
-          return;
-        case break_return::PROCEED:
-          break;
-        case break_return::SKIP:
-          continue;
-      }
-    }
-#endif
     top::addhist(input_exp);
     if(lisp::current().echoline)
     {
@@ -227,14 +213,81 @@ LISPT top::operator()(LISPT exp)
   return NIL;
 }
 
+/// @brief Redo read macro.
+///
+/// @details
+///  !!      - last command
+///  !-n     - the n'th previous command
+///  !n      - command n
+///  !s      - command with prefix s
+///  !$      - last argument
+///  !*      - all arguments
+/// others could be added easily.
+LISPT top::rmexcl(lisp& l, LISPT stream)
+{
+  int c = stream->file()->getch();
+  if(std::isspace(c))
+    return C_EXCL;
+  l.echoline = true;
+  LISPT tmp = histget(0L, variables->history);
+  switch(c)
+  {
+    case '!':
+      return tmp;
+      break;
+    case '$':
+      while(type_of(tmp->cdr()) == type::CONS) tmp = tmp->cdr();
+      return tmp;
+      break;
+    case '*':
+      return tmp->cdr();
+      break;
+    case '\n':
+      l.echoline = false;
+      return C_EXCL;
+      break;
+    default:
+      stream->file()->ungetch(c);
+      auto at = io::ratom(l, stream->file());
+      if(type_of(at) == type::INTEGER)
+      {
+        tmp = histget(at->intval(), variables->history);
+        return tmp;
+      }
+      if(type_of(at) == type::SYMBOL)
+      {
+        for(auto h: variables->history)
+        {
+          tmp = h->cdr();
+          if(!strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())))
+            return tmp;
+        }
+        return NIL;
+      }
+      else
+      {
+        l.error(EVENT_NOT_FOUND, at);
+        return NIL;
+      }
+  }
+  return NIL;
+}
+
+namespace lisp::pn
+{
+inline constexpr auto PRINTHIST = "??"; // print history
+inline constexpr auto RMEXCL = "rmexcl"; // History read-macro
+}
+
 void top::init(alloc& a)
 {
   variables = std::make_unique<cvariables>(a);
-  mkprim(PN_PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
 LISPT top::input_exp;           // The input expression.
-std::function<LISPT(LISPT)> top::transform_hook;;
+std::function<LISPT(::lisp::lisp&, LISPT)> top::transform_hook;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;

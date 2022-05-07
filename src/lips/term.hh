@@ -48,7 +48,6 @@ private:
   void clearscr();
 
   static inline constexpr int NUM_KEYS = 256;
-  static inline constexpr char COMMENTCHAR = '#';
   static inline constexpr char BELL = '\007';
 
   //

@@ -11,8 +11,6 @@
 
 namespace lisp
 {
-inline constexpr auto PN_PRINTHIST = "??"; // print history
-
 class top
 {
 public:
@@ -23,8 +21,8 @@ public:
 
   LISPT operator()(LISPT);
 
-  static LISPT transform(LISPT list);
-  static LISPT findalias(LISPT exp);
+  LISPT transform(LISPT list);
+  LISPT findalias(LISPT exp);
   static void promptprint(LISPT prompt);
 
   // History functions
@@ -36,10 +34,10 @@ public:
   static void trimhist();
 
   // Read table functions
-  static LISPT rmexcl(lisp&, ref_file_t, LISPT, char);
+  static LISPT rmexcl(lisp&, LISPT);
 
   static LISPT input_exp;
-  static std::function<LISPT(LISPT)> transform_hook; // Applied on input if non-nullptr.
+  static std::function<LISPT(lisp&, LISPT)> transform_hook; // Applied on input if non-nullptr.
   static std::function<void()> prompt_hook;          // Called before the prompt is printed.
 
 private:

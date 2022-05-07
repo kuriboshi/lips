@@ -194,7 +194,7 @@ bool term_source::onlyblanks()
 {
   for(int i = linepos; i > 0; --i)
   {
-    if(!isspace(linebuffer[i]))
+    if(!std::isspace(linebuffer[i]))
       return false;
   }
   return true;
@@ -296,7 +296,7 @@ char* term_source::mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!isspace(linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
+  while(!std::isspace(linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
   return ++last;
 }
 
