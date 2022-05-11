@@ -4,10 +4,7 @@
 //
 
 #include <filesystem>
-#include "file.hh"
-#include "alloc.hh"
-#include "eval.hh"
-#include "iter.hh"
+#include "lisp.hh"
 
 namespace lisp::file
 {

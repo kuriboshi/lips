@@ -13,13 +13,8 @@
 #include <string_view>
 #include <fmt/format.h>
 #include "lisp.hh"
-#include "except.hh"
 
-namespace lisp
-{
-// class lisp;
-
-namespace io
+namespace lisp::io
 {
 LISPT ratom(lisp& l, ref_file_t);
 LISPT lispread(lisp& l, ref_file_t);
@@ -243,9 +238,10 @@ public:
 private:
   std::ostringstream _stream;
 };
+} // namespace lisp::io
 
-}
-
+namespace lisp
+{
 class file_t final: public ref_count<file_t>
 {
 public:
@@ -375,6 +371,13 @@ std::string to_string(T& sink)
   return dynamic_cast<io::string_sink&>(sink).string();
 }
 
+/// @brief Creates a lisp expression.
+inline LISPT operator"" _l(const char* s, std::size_t)
+{
+  auto in = ref_file_t::create(s);
+  auto e = lispread(lisp::current(), in);
+  return e;
+}
 } // namespace lisp
 
 inline std::ostream& operator<<(std::ostream& os, const lisp::LISPT& obj)

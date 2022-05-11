@@ -18,7 +18,7 @@
 #include <cstring>
 #include <cctype>
 
-#include <lisp/liblisp.hh>
+#include <lisp/lisp.hh>
 #include "main.hh"
 #include "top.hh"
 #include "glob.hh"

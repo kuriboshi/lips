@@ -6,11 +6,7 @@
 #include <cstring>              // For strerror
 #include <cerrno>               // For errno
 #include <iostream>
-#include "liblisp.hh"
-#include "except.hh"
-#include "error.hh"
-#include "rtable.hh"
-#include "lexer.hh"
+#include "lisp.hh"
 
 namespace lisp
 {

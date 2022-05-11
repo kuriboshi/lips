@@ -4,11 +4,6 @@
 //
 
 #include "eval.hh"
-#include "alloc.hh"
-#include "except.hh"
-#include "file.hh"
-#include "prim.hh"
-#include "prop.hh"
 
 using namespace std::literals;
 

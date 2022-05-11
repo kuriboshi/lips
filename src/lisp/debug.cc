@@ -4,9 +4,6 @@
 //
 
 #include "debug.hh"
-#include "alloc.hh"
-#include "io.hh"
-#include "eval.hh"
 
 namespace lisp::debug
 {

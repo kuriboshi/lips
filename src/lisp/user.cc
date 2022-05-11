@@ -4,14 +4,6 @@
 //
 
 #include "user.hh"
-#include "alloc.hh"
-#include "eval.hh"
-#include "file.hh"
-#include "io.hh"
-#include "iter.hh"
-#include "pred.hh"
-#include "prop.hh"
-#include "prim.hh"
 
 namespace lisp::user
 {

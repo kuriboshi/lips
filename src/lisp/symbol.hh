@@ -11,7 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ref_ptr.hh"
 #include "lisp.hh"
 
 namespace lisp

@@ -4,9 +4,6 @@
 //
 
 #include "prop.hh"
-#include "alloc.hh"
-#include "io.hh"
-#include "prim.hh"
 
 namespace lisp::prop
 {

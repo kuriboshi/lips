@@ -4,8 +4,6 @@
 //
 
 #include "low.hh"
-#include "alloc.hh"
-#include "eval.hh"
 
 namespace lisp::low
 {

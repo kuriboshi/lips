@@ -3,8 +3,6 @@
 // Copyright 1988-1989, 2022.
 //
 #include <cstdlib>
-#include "alloc.hh"
-#include "io.hh"
 #include "rtable.hh"
 
 namespace lisp::rtable

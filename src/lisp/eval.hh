@@ -11,7 +11,6 @@
 #include <variant>
 
 #include "lisp.hh"
-#include "io.hh"
 
 namespace lisp
 {

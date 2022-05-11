@@ -9,8 +9,6 @@
 #include <iostream>
 #include <string>
 #include "lisp.hh"
-#include "io.hh"
-#include "rtable.hh"
 
 namespace lisp
 {

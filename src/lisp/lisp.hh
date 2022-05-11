@@ -6,11 +6,7 @@
 #ifndef LISP_LISP_HH
 #define LISP_LISP_HH
 
-//
-// This header file is private to the libisp libray.  Applications using
-// libisp should only include libisp.hh.
-//
-
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -23,7 +19,6 @@
 #include "except.hh"
 #include "pool.hh"
 #include "ref_ptr.hh"
-#include "rtable.hh"
 #include "symbol.hh"
 
 namespace lisp
@@ -32,7 +27,8 @@ class lisp;
 class evaluator;
 class alloc;
 class file_t;
-class lexer;
+class lisp_t;
+using LISPT = ref_ptr<lisp_t>;
 
 ///
 /// @brief Puts the lisp_t object back on the freelist.
@@ -42,42 +38,6 @@ class lexer;
 /// @param obj The object to be returned to the freelist.
 ///
 void ref_deleter(lisp_t* obj);
-
-//
-// All lisp constants used internally.
-//
-extern LISPT T;
-extern LISPT C_EMPTY;
-extern LISPT C_AUTOLOAD;
-extern LISPT C_BROKEN;
-extern LISPT C_BT;
-extern LISPT C_CLOSURE;
-extern LISPT C_CONS;
-extern LISPT C_DOT;
-extern LISPT C_ENDOFFILE;
-extern LISPT C_ENVIRON;
-extern LISPT C_EOF;
-extern LISPT C_ERROR;
-extern LISPT C_FILE;
-extern LISPT C_FLOAT;
-extern LISPT C_FREE;
-extern LISPT C_FSUBR;
-extern LISPT C_GO;
-extern LISPT C_INDIRECT;
-extern LISPT C_INTEGER;
-extern LISPT C_LAMBDA;
-extern LISPT C_NLAMBDA;
-extern LISPT C_OLDDEF;
-extern LISPT C_QUOTE;
-extern LISPT C_REDEFINED;
-extern LISPT C_RESET;
-extern LISPT C_RETURN;
-extern LISPT C_STRING;
-extern LISPT C_SUBR;
-extern LISPT C_SYMBOL;
-extern LISPT C_READ;
-extern LISPT C_WRITE;
-extern LISPT C_APPEND;
 
 template<typename Enum>
 constexpr auto to_underlying(Enum e) noexcept
@@ -609,23 +569,6 @@ private:
   // clang-format on
 };
 
-class current
-{
-public:
-  current(lisp& c)
-  {
-    previous = &lisp::current();
-    lisp::current(c);
-  }
-  ~current()
-  {
-    lisp::current(*previous);
-  }
-  current(const current&) = delete;
-private:
-  lisp* previous = nullptr;
-};
-
 inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }
 inline LISPT perror(int i, LISPT a) { return perror(lisp::current(), i, a); }
 inline LISPT error(lisp& l, int i, LISPT a) { return l.error(i, a); }
@@ -654,6 +597,81 @@ inline LISPT obarray(lisp& l) { return lisp::obarray(l); }
 inline LISPT obarray() { return lisp::obarray(lisp::current()); }
 inline LISPT freecount(lisp& l) { return lisp::freecount(l); }
 inline LISPT freecount() { return lisp::freecount(lisp::current()); }
+
+//
+// All lisp constants used internally.
+//
+extern LISPT T;
+extern LISPT C_EMPTY;
+extern LISPT C_AUTOLOAD;
+extern LISPT C_BROKEN;
+extern LISPT C_BT;
+extern LISPT C_CLOSURE;
+extern LISPT C_CONS;
+extern LISPT C_DOT;
+extern LISPT C_ENDOFFILE;
+extern LISPT C_ENVIRON;
+extern LISPT C_EOF;
+extern LISPT C_ERROR;
+extern LISPT C_FILE;
+extern LISPT C_FLOAT;
+extern LISPT C_FREE;
+extern LISPT C_FSUBR;
+extern LISPT C_GO;
+extern LISPT C_INDIRECT;
+extern LISPT C_INTEGER;
+extern LISPT C_LAMBDA;
+extern LISPT C_NLAMBDA;
+extern LISPT C_OLDDEF;
+extern LISPT C_QUOTE;
+extern LISPT C_REDEFINED;
+extern LISPT C_RESET;
+extern LISPT C_RETURN;
+extern LISPT C_STRING;
+extern LISPT C_SUBR;
+extern LISPT C_SYMBOL;
+extern LISPT C_READ;
+extern LISPT C_WRITE;
+extern LISPT C_APPEND;
+} // namespace lisp
+
+#include "alloc.hh"
+#include "arith.hh"
+#include "debug.hh"
+#include "eval.hh"
+#include "file.hh"
+#include "iter.hh"
+#include "io.hh"
+#include "logic.hh"
+#include "low.hh"
+#include "map.hh"
+#include "pred.hh"
+#include "prim.hh"
+#include "prop.hh"
+#include "repl.hh"
+#include "rtable.hh"
+#include "string.hh"
+#include "user.hh"
+#include "version.hh"
+
+namespace lisp
+{
+class current
+{
+public:
+  current(lisp& c)
+  {
+    previous = &lisp::current();
+    lisp::current(c);
+  }
+  ~current()
+  {
+    lisp::current(*previous);
+  }
+  current(const current&) = delete;
+private:
+  lisp* previous = nullptr;
+};
 
 template<typename T>
 void check(LISPT arg, T type)

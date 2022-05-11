@@ -10,7 +10,7 @@
 #include <string>
 #include <filesystem>
 #include <catch2/catch.hpp>
-#include <lisp/liblisp.hh>
+#include <lisp/lisp.hh>
 
 namespace glob
 {

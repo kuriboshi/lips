@@ -5,9 +5,6 @@
 
 #include <vector>
 #include <string>
-#include "liblisp.hh"
-#include "except.hh"
-#include "repl.hh"
 #include "main.hh"
 
 int main(int argc, const char** argv)

@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "lisp.hh"
-#include "io.hh"
 
 namespace lisp
 {
@@ -255,14 +254,6 @@ inline LISPT operator"" _l(unsigned long long i)
 inline LISPT operator"" _l(long double d)
 {
   return mkfloat(d);
-}
-
-/// @brief Creates a lisp expression.
-inline LISPT operator"" _l(const char* s, std::size_t)
-{
-  auto in = ref_file_t::create(s);
-  auto e = lispread(lisp::current(), in);
-  return e;
 }
 
 /// @brief Evaluates a lisp expression in a string.

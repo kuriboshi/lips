@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include "lisp.hh"
-#include "except.hh"
 #include "repl.hh"
 
 namespace lisp

@@ -10,13 +10,8 @@
 #include <deque>
 #include <memory>
 #include <utility>
-#include "alloc.hh"
 #include "lisp.hh"
-#include "pred.hh"
 #include "lexer.hh"
-#include "ref_ptr.hh"
-#include "io.hh"
-#include "prim.hh"
 
 namespace lisp
 {

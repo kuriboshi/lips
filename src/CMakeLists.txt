@@ -20,6 +20,7 @@ target_sources(
           lisp/pred.cc
           lisp/prim.cc
           lisp/prop.cc
+          lisp/repl.cc
           lisp/rtable.cc
           lisp/string.cc
           lisp/user.cc
@@ -35,7 +36,6 @@ target_sources(
           lisp/io.hh
           lisp/iter.hh
           lisp/lexer.hh
-          lisp/liblisp.hh
           lisp/lisp.hh
           lisp/logic.hh
           lisp/low.hh

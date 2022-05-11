@@ -4,7 +4,7 @@
 //
 #include <iostream>
 #include <catch2/catch.hpp>
-#include <lisp/liblisp.hh>
+#include <lisp/lisp.hh>
 
 template<typename Enumeration>
 typename std::underlying_type<Enumeration>::type as_integer(Enumeration const value)

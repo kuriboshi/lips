@@ -4,8 +4,6 @@
 //
 
 #include "string.hh"
-#include "alloc.hh"
-#include "io.hh"
 
 namespace lisp::string
 {

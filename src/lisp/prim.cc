@@ -4,9 +4,6 @@
 //
 
 #include "prim.hh"
-#include "alloc.hh"
-#include "except.hh"
-#include "io.hh"
 
 namespace lisp
 {

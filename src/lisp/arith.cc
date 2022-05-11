@@ -4,9 +4,6 @@
 //
 
 #include "arith.hh"
-#include "alloc.hh"
-#include "iter.hh"
-#include "io.hh"
 
 namespace lisp::arith
 {

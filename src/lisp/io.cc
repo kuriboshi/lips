@@ -4,9 +4,6 @@
 //
 
 #include "io.hh"
-#include "alloc.hh"
-#include "prim.hh"
-#include "lexer.hh"
 #include "parser.hh"
 
 namespace lisp

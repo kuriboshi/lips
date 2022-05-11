@@ -4,10 +4,6 @@
 //
 
 #include "pred.hh"
-#include "alloc.hh"
-#include "user.hh"
-#include "io.hh"
-#include "prim.hh"
 
 namespace lisp::pred
 {
