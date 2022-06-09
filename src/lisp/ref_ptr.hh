@@ -6,6 +6,8 @@
 #ifndef LISP_REF_PTR_HH
 #define LISP_REF_PTR_HH
 
+#include <atomic>
+
 namespace lisp
 {
 // Very simple reference smart pointer with the reference counter built into
