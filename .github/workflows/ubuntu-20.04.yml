@@ -16,8 +16,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install compilers
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y g++11
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 90 --slave /usr/bin/c++ c++ /usr/bin/g++-11
+
     - name: Configure CMake
-      run: cmake --preset make
+      run: |
+        cmake --preset make
 
     - name: Build
       run: cmake --build --preset make

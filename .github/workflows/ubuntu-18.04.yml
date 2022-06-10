@@ -8,8 +8,6 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  CMAKE_C_COMPILER: "gcc-9"
-  CMAKE_CXX_COMPILER: "g++-9"
 
 jobs:
   build:
@@ -18,11 +16,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install compilers
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y g++11
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 90 --slave /usr/bin/c++ c++ /usr/bin/g++-11
+
     - name: Configure CMake
       run: |
-        cmake --preset make \
-              -DCMAKE_C_COMPILER=${{env.CMAKE_C_COMPILER}} \
-              -DCMAKE_CXX_COMPILER=${{env.CMAKE_CXX_COMPILER}}
+        cmake --preset make
 
     - name: Build
       run: cmake --build --preset make
