@@ -33,7 +33,7 @@ public:
   int t0 = 1;
   int t1 = 12;
   int t2 = 123;
-  using pool_t = pool<Test, 2>;
+  using pool_t = ::lisp::pool<Test, 2>;
   static pool_t& pool() { return _pool; };
 private:
   static pool_t _pool;
