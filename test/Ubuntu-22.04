@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+ARG USER_ID
+ARG GROUP_ID
+
+RUN apt-get -y update && apt-get install -y software-properties-common
+RUN apt-get -y update && apt-get install -y gpg wget
+RUN apt-get -y update && apt-get -y install cmake ninja-build g++-12 libncurses-dev
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-12 90 --slave /usr/bin/c++ c++ /usr/bin/g++-12
+
+ENV USER=root
+ENV HOME=/root
+USER ${USER_ID}:${GROUP_ID}
+WORKDIR /project
