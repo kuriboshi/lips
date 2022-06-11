@@ -1,4 +1,4 @@
-Lips — lisp shell
+# Lips — lisp shell
 
 Copyright 1988-1989, 1992, 2020-2022 Krister Joas
 
@@ -6,7 +6,7 @@ Copyright 1988-1989, 1992, 2020-2022 Krister Joas
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-# What is it?
+## What is it?
 
 `lips` is a lisp interpreter with some functions to make it work as a
 shell for a Unix system.  The project has been dormant since my
@@ -20,17 +20,75 @@ However, that goal was never fully realised.  That goal is now a
 priority and I view the shell extension as an example of how the
 embeddable lisp interpreter can be used.
 
-# Requirements
+## Requirements
 
 The code requires C++20 and CMake 3.18 or newer. The CMakePresets.json
 file requires CMake 3.21.0 or newer.
 
-# Platforms
+## Platforms
 
 The project is developed on macOS 12 (Monterey) using the Apple clang
-version 13.1.6 (clang-1316.0.21.2) compiler.
-It may work on older releases of macOS if you install a newer
-compiler.
-It's also regularly tested on FreeBSD 13 as well as Ubuntu 21.10,
-20.04, and 18.04.
-On Ubuntu 18.04 gcc 9.x or newer is required.
+version 13.1.6 (clang-1316.0.21.2) compiler.  It may work on older
+releases of macOS if you install a newer compiler.  It's also
+regularly tested on FreeBSD 13 as well as Ubuntu 22.04, 20.04, and
+18.04. On Ubuntu testing is done using gcc 11.x and clang 12.x.
+
+## Building
+
+Configure and build using `cmake`. The `default` preset uses `ninja` to build.
+
+```
+cmake --preset default
+cmake --build --preset default
+```
+
+There are a number of options available to customize the build.
+
+| Option                      | Description                  | Default value |
+| --------------------------- | ---------------------------- | ------------- |
+| `LIPS_ENABLE_TRACE`         | Enable tracing               | `ON`          |
+| `LIPS_ENABLE_CODE_COVERAGE` | Enable code coverage         | `ON`          |
+| `LIPS_ENABLE_TESTS`         | Enable building test code    | `ON`          |
+| `LIPS_ENABLE_OBJECT_SIZES`  | Enable printing object sizes | `OFF`         |
+| `LIPS_USE_SSHFS`            | Use sshfs on macOS podman    | `OFF`         |
+
+Turn them on by adding `-D` options to the `cmake` command.
+
+## Testing
+
+Native testing on the host is triggered by the `ctest` command. For example
+
+```
+ctest --preset default
+```
+
+### GitHub workflows
+
+Builds and tests using GitHub actions are included in the
+`.github/workflows` directory. There are workflows for both Ubuntu 18
+and 20.
+
+### Local testing
+
+For local testing there are some docker files in the `test` directory
+which can be used for testing on various platforms. Currently there
+are files for Ubuntu 18.04, 20.04, and 22.04. The latter also has a
+variant for clang. For 18.04 and 20.04 the version of gcc is 11 and
+for 22.04 it's gcc 12. For 22.04 and clang the version of clang is
+clang 12.
+
+Runing the following command builds and tests on all four operating
+systems and compiler combinations.
+
+```
+cmake --preset default --target test-linux
+```
+
+On macOS it's currently a little more involved. Instead of `docker` it
+uses `podman`. Building using this method works but there is a bug in
+`qemu` which prevents running the tests
+([see this `qemu` bug report](https://gitlab.com/qemu-project/qemu/-/issues/1010)).
+
+You can work around this by using `sshfs` instead by following the
+steps in [this
+post](https://dalethestirling.github.io/Macos-volumes-with-Podman/).
