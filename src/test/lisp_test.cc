@@ -15,7 +15,8 @@ lisp::LISPT buildpath(I i, I end)
 {
   if(i == end)
     return lisp::NIL;
-  return lisp::cons(lisp::mkstring(*i), buildpath(++i, end));
+  auto s = lisp::mkstring(*i);
+  return lisp::cons(s, buildpath(++i, end));
 }
 }
 
