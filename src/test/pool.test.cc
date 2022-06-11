@@ -150,11 +150,11 @@ std::pair<std::uint64_t, std::uint64_t> do_test()
 TEST_CASE("pool: speed")
 {
   auto p0 = do_test<100>();
-  CHECK(p0.first < (p0.second * 1.20));
+  CHECK(p0.first < (p0.second * 1.50));
   auto p1 = do_test<500>();
-  CHECK(p1.first < (p1.second * 1.20));
+  CHECK(p1.first < (p1.second * 1.50));
   auto p2 = do_test<1000>();
-  CHECK(p2.first < (p2.second * 1.20));
+  CHECK(p2.first < (p2.second * 1.50));
 }
 
 }
