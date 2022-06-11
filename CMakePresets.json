@@ -29,7 +29,19 @@
             "inherits": "default",
             "displayName": "Makefile preset",
             "description": "Default build using make",
-            "generator": "Unix Makefiles"
+            "generator": "Unix Makefiles",
+            "cacheVariables": {
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
+            }
+        },
+        {
+            "name": "docker",
+            "inherits": "default",
+            "displayName": "Docker preset",
+            "description": "Default preset for use in docker",
+            "cacheVariables": {
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
+            }
         }
     ],
     "buildPresets": [
