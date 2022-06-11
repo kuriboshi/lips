@@ -175,6 +175,10 @@ public:
   {
     return _pool.allocate();
   }
+  void operator delete(void* x)
+  {
+    _pool.deallocate(x);
+  }
   void operator delete(closure_t* x, std::destroying_delete_t)
   {
     _pool.deallocate(x);
@@ -407,6 +411,10 @@ public:
   void* operator new(std::size_t)
   {
     return _pool.allocate();
+  }
+  void operator delete(void* x)
+  {
+    _pool.deallocate(x);
   }
   void operator delete(lisp_t* x, std::destroying_delete_t)
   {
