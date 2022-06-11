@@ -99,7 +99,7 @@ private:
   struct termios newterm;
   static struct termios oldterm;
 
-  char linebuffer[BUFSIZ];         // Line buffer for terminal input.
+  char linebuffer[BUFSIZ] = {};    // Line buffer for terminal input.
   std::istringstream is;           // For input stream.
   int parcount = 0;                // Counts paranthesis.
   int linepos = 0;                 // End of line buffer.
