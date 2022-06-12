@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       actions: read
       contents: read
@@ -20,13 +20,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Install compilers
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y g++-11
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 90
+        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-11 90
+
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
