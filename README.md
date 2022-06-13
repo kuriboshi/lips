@@ -6,6 +6,8 @@ Copyright 1988-1989, 1992, 2020-2022 Krister Joas
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
+Version 1.0.0
+
 ## What is it?
 
 `lips` is a lisp interpreter with some functions to make it work as a
