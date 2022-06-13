@@ -42,7 +42,7 @@ public:
 
   using iterator = std::istreambuf_iterator<char>;
   virtual iterator begin() = 0;
-  virtual iterator end() { return iterator(); }  
+  iterator end() { return iterator(); }  
 
 protected:
   int getch(std::istream& stream)
