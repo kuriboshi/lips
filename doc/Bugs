@@ -1,5 +1,0 @@
-* Protecting variables during expansion is ignored.
-* !!! as the first command dumps core.
-* !!! as another command never terminates.
-
-
