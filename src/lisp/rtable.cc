@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 1988-1989, 2022.
+// Copyright 1988-1989, 2022 Krister Joas
 //
 #include <cstdlib>
 #include "rtable.hh"
