@@ -99,7 +99,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
           case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
@@ -173,7 +172,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::DECIMAL_POINT:
             state = state_t::IN_FLOAT;
@@ -201,7 +199,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::EXPONENT:
             state = state_t::IN_EXP1;
@@ -224,7 +221,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::SIGN:
           case syntax::type::DIGIT:
@@ -241,7 +237,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::DIGIT:
             break;
@@ -256,7 +251,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            state = state_t::IN_COMMENT;
             return token;
           case syntax::type::DIGIT:
             state = state_t::IN_FLOAT;

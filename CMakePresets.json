@@ -42,6 +42,16 @@
             "cacheVariables": {
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
+        },
+        {
+            "name": "clang-tidy",
+            "inherits": "default",
+            "displayName": "Run clang-tidy",
+            "description": "Run clang-tidy on the source code",
+            "binaryDir": "${sourceDir}/build/clang-tidy",
+            "cacheVariables": {
+                "LIPS_ENABLE_CLANG_TIDY": "ON"
+            }
         }
     ],
     "buildPresets": [
@@ -56,6 +66,10 @@
         {
             "name": "xcode",
             "configurePreset": "xcode"
+        },
+        {
+            "name": "clang-tidy",
+            "configurePreset": "clang-tidy"
         }
     ],
     "testPresets": [

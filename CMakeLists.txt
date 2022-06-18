@@ -13,6 +13,7 @@ endif()
 option(LIPS_ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
 option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
 option(LIPS_ENABLE_TESTS "Enable compiling test code" ON)
+option(LIPS_ENABLE_CLANG_TIDY "Enable checking with clang-tidy" OFF)
 option(LIPS_ENABLE_OBJECT_SIZES "Enable printing object sizes with" OFF)
 option(LIPS_USE_SSHFS "Turn this ON if using sshfs on macOS (see README.md)" OFF)
 
@@ -20,6 +21,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if(LIPS_ENABLE_CODE_COVERAGE AND NOT ${CMAKE_GENERATOR} STREQUAL "Xcode")
   include(coverage)
+endif()
+
+if(LIPS_ENABLE_CLANG_TIDY)
+  include(clang-tidy)
 endif()
 
 include(docker)

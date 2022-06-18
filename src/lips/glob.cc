@@ -171,6 +171,7 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
     if(w == "/")
       continue;
     auto process = std::move(collect);
+    collect.clear();
     for(const auto& p: process)
     {
       auto dir_path = p;

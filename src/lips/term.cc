@@ -11,6 +11,7 @@
 
 #include <unistd.h>
 #include <term.h>
+#include <poll.h>
 
 #include <iostream>
 #include <csignal>
@@ -490,12 +491,14 @@ void term_source::blink()
   else
     nput(curfwd, cdiff);
   fflush(stdout);
-  struct timeval timeout;
-  timeout.tv_sec = 1L;
-  timeout.tv_usec = 0L;
-  fd_set rfds;
-  FD_SET(1, &rfds);
-  select(1, &rfds, nullptr, nullptr, &timeout);
+
+  // Blink for 1s or until key pressed
+  struct pollfd pfd;
+  pfd.fd = 1;
+  pfd.events = POLLIN;
+  pfd.revents = 0;
+  poll(&pfd, 1, 1000);
+
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
   {

@@ -34,17 +34,15 @@ std::unordered_map<std::string, std::string> exec::exechash;
 extern char** environ;
 LISPT p_setenv(LISPT, LISPT);
 
-using UNION_WAIT = int;
-
 bool insidefork = false;        // Is nonzero in the child after a fork
 
-static int pgrp;                    /* Process group of current job */
+static int pgrp;                // Process group of current job
 
 struct job_t
 {
   int jobnum;        // Job number
   int procid;        // Process id
-  UNION_WAIT status; // Return value
+  int status;        // Return value
   std::string wdir;  // Working directory
   LISPT exp;         // Job expression
   bool background;   // Nonzero means job runs in bg
@@ -131,7 +129,7 @@ static bool recordjob(int pid, bool bg)
  * collectjob - updates job list with PID as process id, and STAT as exit 
  *              status.
  */
-static void collectjob(int pid, UNION_WAIT stat)
+static void collectjob(int pid, int stat)
 {
   for(auto job = joblist.begin(); job != joblist.end(); ++job)
   {
@@ -182,7 +180,7 @@ static int mfork()
     {
       setpgid(1, pgrp);
       tcsetpgrp(1, pgrp);
-      insidefork = 1;
+      insidefork = true;
     }
     preparefork();
     return pid;
@@ -371,39 +369,42 @@ TEST_CASE("exec.cc: make_exec")
  *            status. If PID is 0 it means to wait for the first process 
  *            to exit.
  */
-static UNION_WAIT waitfork(int pid)
+static int waitfork(pid_t pid)
 {
-  int wpid;
-  UNION_WAIT wstat;
-
-  do
+  int stat;
+  
+  while(true)
   {
-    UNION_WAIT stat;
-    wpid = wait3(&stat, WUNTRACED, nullptr);
+    auto wpid = waitpid(pid, &stat, WUNTRACED);
+    if(wpid == -1 && errno == EINTR)
+      continue;
+    if(wpid == pid)
+    {
+      if(WIFSIGNALED(stat))
+      {
+        unwind();
+        throw lisp_error("waitfork");
+      }
+      collectjob(wpid, stat);
+      break;
+    }
     if(wpid != -1 && !insidefork)
       collectjob(wpid, stat);
-    if(wpid == pid)
-      wstat = stat;
-  } while(errno == EINTR || (pid != 0 && pid != wpid && wpid != -1));
-  if(WIFSIGNALED(wstat))
-  {
-    unwind();
-    throw lisp_error("waitfork");
   }
-  return wstat;
+  return stat;
 }
 
 void checkfork()
 {
-  int wpid;
-  UNION_WAIT wstat;
-
-  do
+  while(true)
   {
-    wpid = wait3(&wstat, WUNTRACED | WNOHANG, nullptr);
+    int wstat;
+    auto wpid = waitpid(-1, &wstat, WUNTRACED | WNOHANG);
     if(wpid > 0)
       collectjob(wpid, wstat);
-  } while(wpid > 0);
+    else
+      break;
+  }
 }
 
 /* 
@@ -521,7 +522,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
 LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
-  UNION_WAIT status;
+  int status;
 
   if(is_NIL(cmd))
     return NIL;
@@ -555,7 +556,7 @@ LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
-  UNION_WAIT status;
+  int status;
 
   if(is_NIL(cmd))
     return NIL;
@@ -589,7 +590,7 @@ LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd, pid, oldfd;
-  UNION_WAIT status;
+  int status;
 
   if(is_NIL(cmd))
     return NIL;
@@ -675,7 +676,7 @@ LISPT exec::back(lisp& l, LISPT x)
   if((pid = fork()) == 0)
   {
     pgrp = getpid();
-    insidefork = 1;
+    insidefork = true;
     preparefork();
     eval(l, x);
     exit(0);
@@ -863,7 +864,7 @@ LISPT exec::doexec(lisp& l, LISPT cmd)
 {
   LISPT res;
 
-  insidefork = 1; /* Prevent exec from forking */
+  insidefork = true; /* Prevent exec from forking */
   switch(execcommand(cmd, &res))
   {
     case -1:

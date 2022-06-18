@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cctype>
+#include <string>
 
 #include <lisp/lisp.hh>
 #include "main.hh"
@@ -202,7 +203,7 @@ std::unique_ptr<::lisp::lisp> init()
 //
 // Loads the file INITFILE.
 //
-void loadinit(const char* initfile)
+void loadinit(const std::string& initfile)
 {
   loadfile(initfile);
 }
@@ -213,19 +214,19 @@ void loadinit(const char* initfile)
 //
 LISPT greet(LISPT who)
 {
-  const char* s;
+  std::string s;
   if(is_NIL(who))
     s = getenv("USER");
   else
-    s = who->string().c_str();
-  if(s == nullptr)
+    s = who->string();
+  if(s.empty())
     return NIL;
-  struct passwd* pws = getpwnam(s);
+  struct passwd* pws = getpwnam(s.c_str());
   if(pws == nullptr)
     return NIL;
-  char loadf[256];
-  strcpy(loadf, pws->pw_dir);
-  strcat(loadf, "/.lipsrc");
+  std::string loadf;
+  loadf = pws->pw_dir;
+  loadf.append("/.lipsrc");
   loadfile(loadf);
   return T;
 }
