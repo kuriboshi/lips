@@ -494,7 +494,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
   auto cmd = exechash.find(*command);
 
   std::string comdir;
-  for(auto cdir: env->path)
+  for(auto cdir: environment->path)
   {
     if(is_NIL(cdir) || cdir->getstr() == ".")
       comdir = ".";
@@ -704,7 +704,7 @@ void exec::do_rehash()
 {
   exechash.clear();
 
-  for(auto p: env->path)
+  for(auto p: environment->path)
   {
     if(is_NIL(p))
       continue;
@@ -832,7 +832,7 @@ LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
   LISPT ndir;
 
   if(is_NIL(dir))
-    ndir = env->home;
+    ndir = environment->home;
   else
   {
     ndir = expand(l, dir);

@@ -8,9 +8,9 @@
 namespace lisp
 {
 
-environment::environment()
-  : path(initcvar("path", mungepath(getenv("PATH")))),
-    home(initcvar("home", mkstring(getenv("HOME")))),
+env::env()
+  : path(initcvar("path", mungepath())),
+    home(initcvar("home", mkstring(get("HOME")))),
     globsort(initcvar("globsort", T))
 {}
 

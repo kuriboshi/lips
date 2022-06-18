@@ -15,6 +15,7 @@
 #include "main.hh"
 #include "exec.hh"
 #include "glob.hh"
+#include "env.hh"
 
 using namespace std::literals;
 using namespace lisp;
@@ -288,7 +289,7 @@ std::optional<std::string> extilde(const std::string& w)
   std::string s;
   if(p == w.end() || *p == '/')
   {
-    s = env->home->getstr();
+    s = environment->home->getstr();
     std::copy(p, w.end(), std::back_inserter(s));
   }
   else
@@ -311,7 +312,7 @@ std::optional<std::string> extilde(const std::string& w)
 
 TEST_CASE("extilde")
 {
-  std::string home = std::getenv("HOME");
+  std::string home = env::get("HOME");
   SECTION("~ == HOME")
   {
     auto dir = extilde("~");
@@ -334,7 +335,7 @@ TEST_CASE("extilde")
   }
   SECTION("~USER == HOME")
   {
-    std::string user = std::getenv("USER");
+    std::string user = env::get("USER");
     auto tilde_user = "~" + user;
     auto dir = extilde(tilde_user);
     REQUIRE(dir);
@@ -363,7 +364,7 @@ LISPT expandfiles(const std::string& wild, bool sort)
   {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }
   } reverse;
-  if(!is_NIL(env->globsort) || sort)
+  if(!is_NIL(environment->globsort) || sort)
     std::sort(files.begin(), files.end(), reverse);
   return buildlist(files);
 }

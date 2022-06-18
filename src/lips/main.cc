@@ -187,7 +187,7 @@ std::unique_ptr<::lisp::lisp> init()
 
   top::init(l->a());
 
-  env = std::make_unique<environment>();
+  environment = std::make_unique<env>();
 
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
@@ -249,7 +249,7 @@ LISPT C_REDIR_FROM;
 LISPT C_REDIR_TO;
 LISPT C_SEMI;
 
-std::unique_ptr<environment> env;
+std::unique_ptr<env> environment;
 
 int main(int argc, char* const* argv)
 {

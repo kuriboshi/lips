@@ -12,22 +12,32 @@
 namespace lisp
 {
 
-class environment
+class env
 {
 public:
-  environment();
+  env();
 
   cvariable_t& path;            // Search path for executables.
   cvariable_t& home;            // Home directory.
   cvariable_t& globsort;
+
+  static std::string get(const std::string& pstr)
+  {
+    auto e = getenv(pstr.c_str());
+    std::string result;
+    if(e != nullptr)
+      result = e;
+    return result;
+  }
 
 private:
   /*
    * Processes the environment variable PATH and returns a list
    * of all directories in PATH.
    */
-  LISPT mungepath(const std::string& pstr)
+  static LISPT mungepath()
   {
+    auto pstr = get("PATH");
     LISPT result = NIL;
     auto pos = pstr.size();
     for(;;)

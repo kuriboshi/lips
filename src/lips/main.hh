@@ -25,7 +25,7 @@ struct options_t
 };
 
 extern options_t options;
-extern std::unique_ptr<lisp::environment> env;
+extern std::unique_ptr<lisp::env> environment;
 
 extern lisp::LISPT C_ALIAS;
 extern lisp::LISPT C_AMPER;
