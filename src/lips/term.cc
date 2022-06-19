@@ -485,10 +485,7 @@ void term_source::blink()
   fflush(stdout);
 
   // Blink for 1s or until key pressed
-  struct pollfd pfd;
-  pfd.fd = 1;
-  pfd.events = POLLIN;
-  pfd.revents = 0;
+  struct pollfd pfd = {1, POLLIN, 0};
   poll(&pfd, 1, 1000);
 
   linebuffer[linepos] = '\0';
