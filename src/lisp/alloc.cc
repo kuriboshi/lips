@@ -125,12 +125,12 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 ///
 /// @details Create an interned symbol in the global symbol table.
 ///
-/// @param str Name of the symbol.
+/// @param pname Name of the symbol.
 /// @returns The symbol as a LISP object.
-LISPT alloc::intern(const std::string& str)
+LISPT alloc::intern(const std::string& pname)
 {
   auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
-  auto& sym = glob.get(str);
+  auto& sym = glob.get(pname);
   if(sym.self == NIL)
   {
     sym.self = new lisp_t; // NOLINT
@@ -182,7 +182,7 @@ destblock_t* alloc::dalloc(int size)
 /// @brief Free a destination block.
 ///
 /// @param ptr The destination block to free.
-void alloc::dfree(destblock_t* ptr) { destblockused -= ptr->size() + 1; }
+void alloc::dfree(destblock_t* block) { destblockused -= block->size() + 1; }
 
 /// @brief Frees all destination blocks.
 void alloc::dzero() { destblockused = 0; }
