@@ -231,7 +231,7 @@ void lisp::primin(ref_file_t f)
 
 inline std::string lisp::geterror(int messnr)
 {
-  if(NOT_A & messnr)
+  if((NOT_A & messnr) != 0)
     return errmess[error_code(messnr)];
   return messages[error_code(messnr)];
 }
@@ -239,7 +239,7 @@ inline std::string lisp::geterror(int messnr)
 LISPT lisp::perror(int messnr, LISPT arg)
 {
   primerr()->format("{} ", geterror(messnr));
-  if(messnr & (PRINT_ARG | NOT_A))
+  if((messnr & (PRINT_ARG | NOT_A)) != 0)
     prin2(*this, arg, T);
   return C_ERROR;
 }

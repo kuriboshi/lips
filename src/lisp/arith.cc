@@ -112,7 +112,7 @@ LISPT ltimes(lisp& l, LISPT x)
 
   while(type_of(x) == type::CONS)
   {
-    if(f)
+    if(f != 0)
     {
       if(type_of(x->car()) == type::INTEGER)
         fprod *= (double)x->car()->intval();
@@ -132,7 +132,7 @@ LISPT ltimes(lisp& l, LISPT x)
       return l.error(ILLEGAL_ARG, x->car());
     x = x->cdr();
   }
-  if(f)
+  if(f != 0)
     return mkfloat(l, fprod);
   return mknumber(l, prod);
 }

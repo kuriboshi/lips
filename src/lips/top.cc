@@ -188,7 +188,7 @@ LISPT top::operator()(LISPT exp)
     top::addhist(input_exp);
     if(lisp::current().echoline)
     {
-      prinbody(input_exp, *primout(), 1);
+      prinbody(input_exp, *primout(), true);
       primout()->terpri();
     }
     bool printit = false; // If the result will be printed.
@@ -222,7 +222,7 @@ LISPT top::operator()(LISPT exp)
 LISPT top::rmexcl(lisp& l, LISPT stream)
 {
   int c = stream->file()->getch();
-  if(std::isspace(c))
+  if(std::isspace(c) != 0)
     return C_EXCL;
   l.echoline = true;
   LISPT tmp = histget(0L, variables->history);
@@ -255,7 +255,7 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
         for(auto h: variables->history)
         {
           tmp = h->cdr();
-          if(!strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())))
+          if(strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())) == 0)
             return tmp;
         }
         return NIL;

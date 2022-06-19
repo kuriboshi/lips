@@ -33,7 +33,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
       return new file_t(std::make_unique<io::file_source>(filename->getstr()));
     return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
-  if(!f)
+  if(f == nullptr)
     return l.error(CANT_OPEN, filename);
   auto newfile = l.a().getobject();
   newfile->set(ref_file_t(f));

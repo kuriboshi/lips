@@ -31,7 +31,7 @@ private:
   void init_keymap();
   void init_term();
   void pputc(int c, FILE* file);
-  void putch(int c, FILE* file, int esc);
+  void putch(int c, FILE* file, bool esc);
   bool firstnotlp();
   void delonechar();
   bool onlyblanks();

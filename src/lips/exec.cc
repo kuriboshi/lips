@@ -193,7 +193,7 @@ static int mfork()
       syserr(NIL);
     return pid;
   }
-  recordjob(pid, 0);
+  recordjob(pid, false);
   return pid;
 }
 
@@ -685,7 +685,7 @@ LISPT exec::back(lisp& l, LISPT x)
   }
   else if(pid < 0)
     return C_ERROR;
-  recordjob(pid, 1);
+  recordjob(pid, true);
   std::cout << fmt::format("[{}] {}\n", joblist.front().jobnum, pid);
   return mknumber(l, pid);
 }
@@ -752,7 +752,7 @@ LISPT exec::fg(lisp& l, LISPT job)
       }
     }
   }
-  if(current)
+  if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
     current->running = true;
@@ -796,7 +796,7 @@ LISPT exec::bg(lisp& l, LISPT job)
       }
     }
   }
-  if(current)
+  if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
     current->status = 0;

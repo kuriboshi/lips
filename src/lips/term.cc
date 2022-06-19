@@ -118,7 +118,7 @@ void term_source::pputc(int c, FILE* file)
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-void term_source::putch(int c, FILE* file, int esc)
+void term_source::putch(int c, FILE* file, bool esc)
 {
   if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -160,7 +160,7 @@ void term_source::ungetch(int)
 bool term_source::firstnotlp()
 {
   int i = 0;
-  for(; i < position && std::isspace(linebuffer[i]); i++)
+  for(; i < position && std::isspace(linebuffer[i]) != 0; i++)
     ;
   return linebuffer[i] != '(';
 }
@@ -190,7 +190,7 @@ bool term_source::onlyblanks()
 {
   for(int i = linepos; i > 0; --i)
   {
-    if(!std::isspace(linebuffer[i]))
+    if(std::isspace(linebuffer[i]) == 0)
       return false;
   }
   return true;
@@ -225,7 +225,7 @@ void term_source::retype(int all)
         ++l;
       }
     }
-    for(l = (all ? l : 1); l; l--)
+    for(l = (all != 0 ? l : 1); l != 0; l--)
     {
       if(all == 2)
       {
@@ -235,7 +235,7 @@ void term_source::retype(int all)
       tputs(curup, 1, outc);
     }
     putc('\r', stdout);
-    if(all)
+    if(all != 0)
       nl = 0;
     if(nl == 0)
       std::cout << current_prompt;
@@ -292,13 +292,13 @@ char* term_source::mkexstr()
   last = word + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(!std::isspace(linebuffer[i - 1]) && i > 0) *last-- = linebuffer[--i];
+  while(std::isspace(linebuffer[i - 1]) == 0 && i > 0) *last-- = linebuffer[--i];
   return ++last;
 }
 
 void term_source::fillrest(const char* word)
 {
-  for(word += strlen(last) - 1; *word; word++)
+  for(word += strlen(last) - 1; *word != 0; word++)
   {
     pputc(*word, stdout);
     linebuffer[linepos++] = *word;
@@ -538,7 +538,7 @@ std::optional<std::string> term_source::getline()
   int origpar = parcount;
   while(true)
   {
-    if(escaped)
+    if(escaped != 0)
       escaped--;
     fflush(stdout);
     if(readchar(stdin, &c) == 0)
@@ -622,23 +622,23 @@ std::optional<std::string> term_source::getline()
       case term_fun::T_STRING:
         linebuffer[linepos++] = c;
         pputc(c, stdout);
-        if(!escaped)
+        if(escaped == 0)
           instring = !instring;
         break;
       case term_fun::T_ESCAPE:
         linebuffer[linepos++] = c;
         pputc(c, stdout);
-        if(!escaped)
+        if(escaped == 0)
           escaped = 2;
         break;
       case term_fun::T_LEFTPAR:
-        if(!instring && !escaped)
+        if(!instring && escaped == 0)
           parcount++;
         pputc(c, stdout);
         linebuffer[linepos++] = c;
         break;
       case term_fun::T_RIGHTPAR:
-        if(escaped || instring)
+        if((escaped != 0) || instring)
         {
           pputc(c, stdout);
           linebuffer[linepos++] = c;

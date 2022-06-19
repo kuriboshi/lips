@@ -289,7 +289,7 @@ int main(int argc, char* const* argv)
     }
   }
   if(!options.interactive && !options.command)
-    options.interactive = isatty(0);
+    options.interactive = isatty(0) != 0;
   if(options.version)
     std::cout << VERSION << '\n';
 

@@ -26,15 +26,15 @@ LISPT evaluator::printwhere()
   int i = toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
-    if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::evlam0)
+    if(auto* cont = std::get_if<continuation_t>(&control[i]); (cont != nullptr) && *cont == &evaluator::evlam0)
       break;
   }
   for(; i != 0; --i)
   {
-    if(auto* func = std::get_if<continuation_t>(&control[i]); func && *func == &evaluator::ev0)
+    if(auto* func = std::get_if<continuation_t>(&control[i]); (func != nullptr) && *func == &evaluator::ev0)
     {
       if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
-        lsp && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
+        lsp != nullptr && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
       {
         foo = *lsp;
         l.primerr()->format("[in ");
@@ -457,9 +457,9 @@ void evaluator::bt()
 {
   int op = l.printlevel;
   l.printlevel = 2;
-  for(int i = toctrl - 1; i; i--)
+  for(int i = toctrl - 1; i != 0; i--)
   {
-    if(auto* cont = std::get_if<continuation_t>(&control[i]); cont && *cont == &evaluator::ev0)
+    if(auto* cont = std::get_if<continuation_t>(&control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
       file::print(l, std::get<LISPT>(control[i - 1]), T);
   }
   l.printlevel = op;
@@ -611,7 +611,7 @@ bool evaluator::evlam()
   }
   dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = fun->lambda().args; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(auto foo = fun->lambda().args; i != 0; foo = foo->cdr(), i--) storevar(foo->car(), i);
   push(&evaluator::evlam1);
   if(spr)
   {
