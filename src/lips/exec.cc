@@ -185,7 +185,7 @@ static int mfork()
     preparefork();
     return pid;
   }
-  else if(pid < 0)
+  if(pid < 0)
   {
     if(insidefork)
       std::cerr << fmt::format("{}\n", strerror(errno));

@@ -139,20 +139,17 @@ void top::promptprint(LISPT prompt)
   current_prompt.clear();
   if(type_of(prompt) != type::STRING)
     return;
-  else
+  auto s = prompt->getstr();
+  for(auto c: s)
   {
-    auto s = prompt->getstr();
-    for(auto c: s)
+    if(c == '!')
     {
-      if(c == '!')
-      {
-        current_prompt += std::to_string(top::variables->histnum->intval());
-        continue;
-      }
-      else if(c == '\\')
-        continue;
-      current_prompt.push_back(c);
+      current_prompt += std::to_string(top::variables->histnum->intval());
+      continue;
     }
+    if(c == '\\')
+      continue;
+    current_prompt.push_back(c);
   }
   std::cout << "\r";
   std::cout << current_prompt;
