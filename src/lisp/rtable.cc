@@ -43,7 +43,9 @@ LISPT getenv(lisp&, LISPT stream)
   check(stream, type::FILET);
   auto sym = ratom(stream->file());
   check(sym, type::SYMBOL, type::STRING);
-  auto val = std::getenv(sym->getstr().c_str());
+  auto* val = std::getenv(sym->getstr().c_str());
+  if(val == nullptr)
+    return NIL;
   return mkstring(val);
 }
 
