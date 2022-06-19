@@ -213,7 +213,7 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
 TEST_CASE("walkfiles")
 {
   std::error_code ec;
-  for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y"})
+  for(const auto* s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y"})
   {
     std::filesystem::create_directories(s, ec);
     REQUIRE(!ec);
@@ -236,7 +236,7 @@ TEST_CASE("walkfiles")
     auto result = walkfiles("testdir/*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 4);
-    for(auto r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
+    for(const auto* r: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x"})
       CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SECTION("walkfiles: testdir/*/*")
@@ -244,14 +244,14 @@ TEST_CASE("walkfiles")
     auto result = walkfiles("testdir/*/*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
-    for(auto r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
+    for(const auto* r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SECTION("walkfiles: testdir/[b]*")
   {
     auto result = walkfiles("testdir/[b]*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
-    for(auto r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
+    for(const auto* r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SECTION("walkfiles: ./testd*")
   {
@@ -261,7 +261,7 @@ TEST_CASE("walkfiles")
     CHECK(*result.begin() == "./testdir");
   }
 
-  for(auto s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y", "testdir/x", "testdir"})
+  for(const auto* s: {"testdir/a", "testdir/bb", "testdir/ccc", "testdir/x/y", "testdir/x", "testdir"})
   {
     std::filesystem::remove(s, ec);
     REQUIRE(!ec);

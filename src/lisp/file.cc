@@ -28,7 +28,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
     else
       return l.error(UNKNOWN_REQUEST, mode);
   }
-  auto f = [&]() {
+  auto* f = [&]() {
     if(readmode)
       return new file_t(std::make_unique<io::file_source>(filename->getstr()));
     return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));

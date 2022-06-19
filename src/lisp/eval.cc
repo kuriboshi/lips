@@ -784,7 +784,7 @@ bool evaluator::evclosure()
   fun = fun->closure()->cfunction;
   link();
   dest = pop<destblock_t*>();
-  auto envir = pop<destblock_t*>();
+  auto* envir = pop<destblock_t*>();
   cont = pop<continuation_t>();
   push(envir);
   push(&evaluator::evclosure1);

@@ -712,7 +712,7 @@ void exec::do_rehash()
       continue;
     check(p, type::STRING, type::SYMBOL);
     std::error_code ec;
-    for(auto& odir:
+    for(const auto& odir:
       std::filesystem::directory_iterator(p->getstr(), std::filesystem::directory_options::skip_permission_denied, ec))
       exechash.try_emplace(odir.path().filename().string(), odir.path().parent_path().string());
   }

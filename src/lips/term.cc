@@ -573,7 +573,7 @@ std::optional<std::string> term_source::getline()
         break;
       case term_fun::T_TAB:
       {
-        auto s = mkexstr();
+        auto* s = mkexstr();
         auto t = glob::extilde(s);
         if(!t)
         {
