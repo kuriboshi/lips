@@ -222,7 +222,7 @@ static std::pair<bool, std::string> check_meta(const std::string& s)
     }
     result.push_back(c);
   }
-  return std::pair(meta, result);
+  return {meta, result};
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)

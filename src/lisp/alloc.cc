@@ -25,7 +25,7 @@ alloc::~alloc() = default;
 /// @returns A new lisp_t object.
 LISPT alloc::getobject()
 {
-  return LISPT(new lisp_t);
+  return {new lisp_t};
 }
 
 /// @brief Creates a cons pair.
