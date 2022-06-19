@@ -85,7 +85,7 @@ LISPT boundp(lisp& l, LISPT a)
 {
   if(type_of(a) != type::SYMBOL)
     return NIL;
-  else if(type_of(a->value()) != type::UNBOUND)
+  if(type_of(a->value()) != type::UNBOUND)
     return T;
   return NIL;
 }

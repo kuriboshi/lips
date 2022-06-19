@@ -75,7 +75,7 @@ LISPT top::histget(int num, LISPT hlist)
       return NIL;
     return hlist->car()->cdr();
   }
-  else if(num > 0)
+  if(num > 0)
   {
     for(; type_of(hlist) == type::CONS && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
       ;
@@ -83,7 +83,7 @@ LISPT top::histget(int num, LISPT hlist)
       return NIL;
     return hlist->car()->cdr();
   }
-  else if(!is_NIL(hlist))
+  if(!is_NIL(hlist))
     return hlist->car()->cdr();
   return NIL;
 }
@@ -263,11 +263,8 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
         }
         return NIL;
       }
-      else
-      {
-        l.error(EVENT_NOT_FOUND, at);
-        return NIL;
-      }
+      l.error(EVENT_NOT_FOUND, at);
+      return NIL;
   }
   return NIL;
 }

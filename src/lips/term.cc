@@ -137,14 +137,11 @@ int term_source::getch()
   {
     if(position < linepos)
       return linebuffer[position++];
-    else
-    {
-      auto line = getline();
-      end_term();
-      if(line)
-        return EOF;
-      end_term();
-    }
+    auto line = getline();
+    end_term();
+    if(line)
+      return EOF;
+    end_term();
   }
 }
 
@@ -668,8 +665,7 @@ std::optional<std::string> term_source::getline()
           linebuffer[linepos++] = '\0';
           return linebuffer;
         }
-        else
-          blink();
+        blink();
         break;
       case term_fun::T_NEWLINE:
         pputc('\n', stdout);

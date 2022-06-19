@@ -530,13 +530,10 @@ bool evaluator::noev9()
       cont = pop<continuation_t>();
       break;
     }
-    else
-    {
-      send(expression);
-      next();
-      args = args->cdr();
-      expression = args->car();
-    }
+    send(expression);
+    next();
+    args = args->cdr();
+    expression = args->car();
   }
   return false;
 }
@@ -640,18 +637,15 @@ bool evaluator::spread()
       cont = pop<continuation_t>();
       break;
     }
-    else if(dest[0].index() == 1)
+    if(dest[0].index() == 1)
     {
       send(args);
       cont = pop<continuation_t>();
       break;
     }
-    else
-    {
-      send(args->car());
-      next();
-      args = args->cdr();
-    }
+    send(args->car());
+    next();
+    args = args->cdr();
   }
   return false;
 }

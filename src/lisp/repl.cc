@@ -49,19 +49,19 @@ LISPT repl::operator()(LISPT exp)
       terpri(l);
       continue;
     }
-    else if(com->car() == C_GO)
+    if(com->car() == C_GO)
       return print(l, eval(l, exp), false);
-    else if(com->car() == C_RESET)
+    if(com->car() == C_RESET)
     {
       l.e().unwind();
       throw lisp_reset();
     }
-    else if(com->car() == C_BT)
+    if(com->car() == C_BT)
     {
       l.e().bt();
       continue;
     }
-    else if(com->car() == C_RETURN)
+    if(com->car() == C_RETURN)
       return is_NIL(com->cdr()) ? NIL : com->cdr()->car();
   }
 }

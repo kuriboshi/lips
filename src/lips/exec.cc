@@ -214,7 +214,7 @@ static std::pair<bool, std::string> check_meta(const std::string& s)
       quote = true;
       continue;
     }
-    else if(quote)
+    if(quote)
       quote = false;
     else if("*?[]"s.find_first_of(c) != std::string::npos)
     {
@@ -487,8 +487,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
   {
     if(execute(*command, exp) == C_ERROR)
       return -1;
-    else
-      return 1;
+    return 1;
   }
 
   auto cmd = exechash.find(*command);
@@ -508,11 +507,8 @@ int exec::execcommand(LISPT exp, LISPT* res)
       comdir += *command;
       if(execute(comdir, exp) == C_ERROR)
         return -1;
-      else
-        return 1;
+      return 1;
     }
-    else
-      continue;
   }
   return 0;
 }
@@ -851,13 +847,9 @@ LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
       return syserr(l, dir);
     return NIL;
   }
-  else
-  {
-    auto wd = std::filesystem::current_path();
-    setenv("PWD", wd.c_str(), 1);
-    return T;
-  }
-  return ndir; // TODO: Is this correct?
+  auto wd = std::filesystem::current_path();
+  setenv("PWD", wd.c_str(), 1);
+  return T;
 }
 
 LISPT exec::doexec(lisp& l, LISPT cmd)

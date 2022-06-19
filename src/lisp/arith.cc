@@ -280,15 +280,15 @@ inline num_type numtype(LISPT x, LISPT y)
   {
     if(type_of(y) == type::FLOAT)
       return num_type::FLOATFLOAT;
-    else if(type_of(y) == type::INTEGER)
+    if(type_of(y) == type::INTEGER)
       return num_type::FLOATINT;
     return num_type::ILLEGAL2;
   }
-  else if(type_of(x) == type::INTEGER)
+  if(type_of(x) == type::INTEGER)
   {
     if(type_of(y) == type::FLOAT)
       return num_type::INTFLOAT;
-    else if(type_of(y) == type::INTEGER)
+    if(type_of(y) == type::INTEGER)
       return num_type::INTINT;
     return num_type::ILLEGAL2;
   }
@@ -352,7 +352,7 @@ LISPT minusp(lisp& l, LISPT x)
       return T;
     return NIL;
   }
-  else if(type_of(x) == type::INTEGER)
+  if(type_of(x) == type::INTEGER)
   {
     if(x->intval() < 0)
       return T;

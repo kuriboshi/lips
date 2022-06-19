@@ -11,8 +11,7 @@ LISPT getargs(lisp& l, LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
-  else
-    return cons(l, al->car(), getargs(l, al->cdr()));
+  return cons(l, al->car(), getargs(l, al->cdr()));
 }
 
 LISPT getrep(lisp& l, LISPT fun)

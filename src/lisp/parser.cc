@@ -44,12 +44,12 @@ LISPT parser::parse_list(char c)
     }
     if(c == '(' && _token.is_special(')'))
       return head;
-    else if(c == '(' && _token.is_special(']'))
+    if(c == '(' && _token.is_special(']'))
     {
       _lexer.unread(_token);
       return head;
     }
-    else if(c == '[' && _token.is_special(']'))
+    if(c == '[' && _token.is_special(']'))
       return head;
 
     auto object = parse_tail();

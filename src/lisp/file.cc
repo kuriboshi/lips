@@ -189,7 +189,7 @@ LISPT readline(lisp& l, LISPT file)
 {
   if(is_NIL(file))
     return io::readline(l, l.primin());
-  else if(is_T(file))
+  if(is_T(file))
     return io::readline(l, l.stdin());
   check(file, type::FILET);
   return io::readline(l, file->file());
