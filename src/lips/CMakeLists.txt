@@ -29,6 +29,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
 endif()
 target_compile_options(lips PRIVATE -Wall -Werror)
 target_compile_definitions(lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/lipsrc\"")
+if(LIPS_ENABLE_CLANG_TIDY)
+  set_target_properties(lips PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
+endif()
 
 find_package(Curses REQUIRED)
 target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
