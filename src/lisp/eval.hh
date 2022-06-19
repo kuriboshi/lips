@@ -36,8 +36,6 @@ public:
   void trace(int t) { _trace = t; }
   void interactive(bool b) { _interactive = b; }
 
-  destblock_t* dest = nullptr; // Current destination being built.
-
   using undefhook_t = std::function<int(LISPT, LISPT*)>;
   void undefhook(undefhook_t fun) { _undefhook = fun; }
   using breakhook_t = std::function<void()>;
@@ -46,6 +44,8 @@ public:
   destblock_t* environment() const { return env; }
 
 private:
+  destblock_t* dest = nullptr; // Current destination being built.
+
   //
   // The control stack.
   //
