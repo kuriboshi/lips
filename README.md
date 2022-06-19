@@ -93,7 +93,7 @@ which can be used for testing on various platforms. Currently there
 are files for Ubuntu 18.04, 20.04, and 22.04. The latter also has a
 variant for clang. For 18.04 and 20.04 the version of gcc is 11 and
 for 22.04 it's gcc 12. For 22.04 and clang the version of clang is
-clang 12.
+clang 14.
 
 Runing the following command builds and tests on all four operating
 systems and compiler combinations.
