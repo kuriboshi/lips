@@ -465,12 +465,10 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
   auto status = std::filesystem::status(path, ec);
   if(ec)
     return false;
-  if(status.type() == std::filesystem::file_type::regular
+  return (status.type() == std::filesystem::file_type::regular
     && ((status.permissions() & std::filesystem::perms::others_exec) != std::filesystem::perms::none
       || (status.permissions() & std::filesystem::perms::group_exec) != std::filesystem::perms::none
-      || (status.permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none))
-    return true;
-  return false;
+      || (status.permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none));
 }
 
 /* 

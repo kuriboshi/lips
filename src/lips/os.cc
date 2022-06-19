@@ -15,10 +15,8 @@ namespace lisp
  */
 bool readchar(FILE* file, char* cp)
 {
-  int i = read(fileno(file), cp, 1);
-  if(i != 1)
-    return false;
-  return true;
+  auto i = read(fileno(file), cp, 1);
+  return i == 1;
 }
 
 } // namespace lisp

@@ -43,9 +43,7 @@ bool dircheck(const std::string& wild, const std::string& original)
   if(*wbegin == '/')
     return std::filesystem::is_directory(original);
   while(wbegin != wild.end() && *wbegin == '*') ++wbegin;
-  if(wbegin != wild.end())
-    return false;
-  return true;
+  return wbegin == wild.end();
 }
 
 TEST_CASE("dircheck") { CHECK(dircheck("/", "/")); }
