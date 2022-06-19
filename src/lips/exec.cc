@@ -246,7 +246,7 @@ TEST_CASE("exec.cc: check_meta")
   }
   SECTION("test 4")
   {
-    auto b = check_meta("hello\\*\\[\\]");
+    auto b = check_meta(R"(hello\*\[\])");
     CHECK(!b.first);
     CHECK(b.second == "hello*[]"s);
   }
