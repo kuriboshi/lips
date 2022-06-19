@@ -10,9 +10,10 @@ Checks:          "\
   -cppcoreguidelines-avoid-non-const-global-variables,\
   readability-*,\
   -readability-braces-around-statements,\
-  -readability-named-parameter,\
   -readability-convert-member-functions-to-static,\
+  -readability-identifier-length,\
   -readability-magic-numbers,\
+  -readability-named-parameter,\
   modernize-*,\
   -modernize-use-trailing-return-type,\
   -modernize-avoid-c-arrays,\
