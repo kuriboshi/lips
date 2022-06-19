@@ -769,14 +769,15 @@ bool evaluator::lookup()
 
 bool evaluator::evclosure()
 {
-  LISPT foo;
-  int i;
-
   push(env);
   push(dest);
   dest = mkdestblock(fun->closure()->count);
-  for(foo = fun->closure()->closed, i = fun->closure()->count; i; foo = foo->cdr(), i--) storevar(foo->car(), i);
-  for(foo = fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
+  {
+    auto foo = fun->closure()->closed;
+    auto i = fun->closure()->count;
+    for(; i != 0; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  }
+  for(auto foo = fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
