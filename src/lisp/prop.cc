@@ -48,12 +48,12 @@ LISPT getprop(lisp& l, LISPT x, LISPT p)
 
 LISPT remprop(lisp& l, LISPT x, LISPT p)
 {
-  LISPT pl, pl2;
-
   check(x, type::SYMBOL);
   check(p, type::SYMBOL);
   LISPT r = NIL;
-  for(pl = x->symbol().plist, pl2 = NIL; !is_NIL(pl); pl = pl->cdr()->cdr())
+  auto pl = x->symbol().plist;
+  LISPT pl2 = NIL;
+  for(; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
     {

@@ -39,9 +39,7 @@ void term_source::clearlbuf()
  */
 void term_source::init_keymap()
 {
-  int i;
-
-  for(i = NUM_KEYS - 1; i; i--) key_tab[i] = term_fun::T_INSERT;
+  for(int i = NUM_KEYS - 1; i != 0; i--) key_tab[i] = term_fun::T_INSERT;
   key_tab[CERASE] = term_fun::T_ERASE;
   key_tab[CTRL('H')] = term_fun::T_ERASE;
   key_tab[CRPRNT] = term_fun::T_RETYPE;
@@ -335,13 +333,12 @@ void term_source::complete(LISPT words)
 LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
 {
   LISPT stripped;
-  const char* s;
 
   if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;
   for(stripped = cons(NIL, NIL); !is_NIL(files); files = files->cdr())
   {
-    s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
+    const auto* s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
     tconc(stripped, mkstring(s));
   }
@@ -524,7 +521,7 @@ void term_source::clearscr() {
 //
 std::optional<std::string> term_source::getline()
 {
-  char c;
+  char c = 0;
   bool instring = false;
   int escaped = 0;
 

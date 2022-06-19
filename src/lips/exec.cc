@@ -40,13 +40,13 @@ static int pgrp;                // Process group of current job
 
 struct job_t
 {
-  int jobnum;        // Job number
-  int procid;        // Process id
-  int status;        // Return value
-  std::string wdir;  // Working directory
-  LISPT exp;         // Job expression
-  bool background;   // Nonzero means job runs in bg
-  bool running;      // Nonzero if running
+  int jobnum = 0;               // Job number
+  int procid = 0;               // Process id
+  int status = 0;               // Return value
+  std::string wdir;             // Working directory
+  LISPT exp;                    // Job expression
+  bool background = false;      // true means job runs in bg
+  bool running = false;         // true if running
 };
 
 static std::list<job_t> joblist;  // List of jobs
@@ -171,7 +171,7 @@ void printdone()
  */
 static int mfork()
 {
-  int pid;
+  int pid = 0;
 
   if((pid = fork()) == 0)
   {
@@ -371,7 +371,7 @@ TEST_CASE("exec.cc: make_exec")
  */
 static int waitfork(pid_t pid)
 {
-  int stat;
+  int stat = 0;
   
   while(true)
   {
@@ -398,7 +398,7 @@ void checkfork()
 {
   while(true)
   {
-    int wstat;
+    int wstat = 0;
     auto wpid = waitpid(-1, &wstat, WUNTRACED | WNOHANG);
     if(wpid > 0)
       collectjob(wpid, wstat);
@@ -517,8 +517,10 @@ int exec::execcommand(LISPT exp, LISPT* res)
 
 LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
-  int fd, pid, oldfd;
-  int status;
+  int fd = 0;
+  int pid = 0;
+  int oldfd = 0;
+  int status = 0;
 
   if(is_NIL(cmd))
     return NIL;
@@ -551,8 +553,10 @@ LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
 LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
-  int fd, pid, oldfd;
-  int status;
+  int fd = 0;
+  int pid = 0;
+  int oldfd = 0;
+  int status = 0;
 
   if(is_NIL(cmd))
     return NIL;
@@ -585,8 +589,10 @@ LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
 LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
-  int fd, pid, oldfd;
-  int status;
+  int fd = 0;
+  int pid = 0;
+  int oldfd = 0;
+  int status = 0;
 
   if(is_NIL(cmd))
     return NIL;
@@ -626,7 +632,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
   if(is_NIL(cmds->cdr()))
     return eval(l, cmds->car());
 
-  int pid;
+  int pid = 0;
   if((pid = mfork()) == 0)
   {
     int pd[2];
@@ -667,7 +673,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
 
 LISPT exec::back(lisp& l, LISPT x)
 {
-  int pid;
+  int pid = 0;
 
   if((pid = fork()) == 0)
   {

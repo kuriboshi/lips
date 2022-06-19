@@ -168,7 +168,7 @@ LISPT printlevel(lisp& l, LISPT newl)
 
 LISPT spaces(lisp& l, LISPT n, LISPT file)
 {
-  int i;
+  int i = 0;
   ref_file_t f;
 
   check(n, type::INTEGER);

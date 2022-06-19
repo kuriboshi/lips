@@ -28,7 +28,7 @@ LISPT dquote(lisp& l, LISPT stream)
 LISPT squote(lisp& l, LISPT stream)
 {
   check(stream, type::FILET);
-  int c;
+  int c = 0;
   if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
   {
     stream->file()->ungetch(c);

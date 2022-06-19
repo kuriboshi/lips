@@ -256,7 +256,7 @@ int main(int argc, char* const* argv)
   Catch::Session session;
 
   signal_flag = 0;
-  int option;
+  int option = 0;
   options_t options;
   while((option = getopt(argc, argv, "c:fvidT")) != EOF)
   {
