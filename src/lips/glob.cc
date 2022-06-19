@@ -164,9 +164,9 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
 {
   std::vector<std::filesystem::path> collect;
   if(wild.is_absolute())
-    collect.push_back("/");
+    collect.emplace_back("/");
   else
-    collect.push_back("");
+    collect.emplace_back("");
   for(const auto& w: wild)
   {
     // The iterating over an absolute path starts with a forward slash. We skip this one 
