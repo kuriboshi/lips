@@ -3,6 +3,9 @@
 // Copyright 1988, 2020-2022 Krister Joas
 //
 
+#include <charconv>
+#include <array>
+
 #include "io.hh"
 #include "parser.hh"
 
@@ -96,32 +99,19 @@ inline void ps(const std::string& s, file_t& file, bool esc)
 
 inline void pi(std::int64_t i, int base, file_t& file)
 {
-  char ss[33];
-  int sign;
-  int j = 31;
-
-  ss[32] = 0;
-  sign = (i < 0) ? -1 : 1;
-  i = sign * i;
-  if(!i)
-    ps("0", file, false);
-  else
+  std::array<char, 33> ss{};
+  if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, base);
+    ec == std::errc())
   {
-    while(i)
-    {
-      ss[j--] = digits[i % base];
-      i /= base;
-    }
+    *ptr = '\0';
+    ps(ss.data(), file, false);
   }
-  if(sign == -1)
-    ss[j--] = '-';
-  ps(ss + j + 1, file, false);
 }
 
 inline void pf(double d, file_t& file)
 {
   auto ss = fmt::format("{:#g}", d);
-  ps(ss.c_str(), file, false);
+  ps(ss, file, false);
 }
 
 // Print pointer type object
