@@ -31,7 +31,9 @@ using namespace lisp;
 using namespace std::literals;
 
 std::unordered_map<std::string, std::string> exec::exechash;
+#ifdef __APPLE__
 extern char** environ;
+#endif
 LISPT p_setenv(LISPT, LISPT);
 
 bool insidefork = false;        // Is nonzero in the child after a fork
@@ -427,9 +429,9 @@ static LISPT execute(const std::string& name, LISPT command)
   argv.push_back(nullptr);
   if(insidefork)
   {
-    execve(name.c_str(), &argv[0], environ);
+    execve(name.c_str(), argv.data(), environ);
     if(errno == ENOEXEC)
-      execvp(name.c_str(), &argv[0]);
+      execvp(name.c_str(), argv.data());
     std::cerr << strerror(errno) << '\n';
     exit(1);
     /* No return */
@@ -437,9 +439,9 @@ static LISPT execute(const std::string& name, LISPT command)
   auto pid = mfork();
   if(pid == 0)
   {
-    execve(name.c_str(), &argv[0], environ);
+    execve(name.c_str(), argv.data(), environ);
     if(errno == ENOEXEC)
-      execvp(name.c_str(), &argv[0]);
+      execvp(name.c_str(), argv.data());
     std::cerr << strerror(errno) << '\n';
     exit(1);
   }
