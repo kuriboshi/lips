@@ -497,7 +497,7 @@ public:
   LISPT error(int, LISPT);
   void fatal(int);
   LISPT syserr(LISPT);
-  LISPT break0(LISPT);
+  LISPT break0(LISPT) const;
 
   enum class break_return
   {

@@ -266,7 +266,7 @@ LISPT lisp::syserr(LISPT fault)
   return C_ERROR;
 }
 
-LISPT lisp::break0(LISPT exp)
+LISPT lisp::break0(LISPT exp) const
 {
   return repl(exp);
 }
