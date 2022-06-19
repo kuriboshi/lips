@@ -91,7 +91,7 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
     messages[error_code(USER_ERROR)] = "";
     messages[error_code(CANT_LOAD)] = "Can't load file";
 
-    auto intern = [this](const auto s) { return a().intern(s); };
+    auto intern = [this](const auto s) { return alloc::intern(s); };
 
     // Must be early since it's used by symbol_store_t to initialize new
     // symbols.
