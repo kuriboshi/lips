@@ -72,11 +72,11 @@ void term_source::init_term()
     newterm.c_cc[VTIME] = 0;
     curup = nullptr;
     curfwd = nullptr;
-    char* termc = tcap;
+    char* termc = static_cast<char*>(tcap);
     if(auto* term = getenv("TERM"); term != nullptr)
     {
       char bp[1024];
-      if(tgetent(bp, term) == 1)
+      if(tgetent(static_cast<char*>(bp), term) == 1)
       {
         clear = tgetstr(const_cast<char*>("cl"), &termc); // NOLINT
         curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
@@ -287,7 +287,7 @@ char* term_source::mkexstr()
 {
   int i = linepos;
 
-  last = word + BUFSIZ - 1;
+  last = static_cast<char*>(word) + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
   while(std::isspace(linebuffer[i - 1]) == 0 && i > 0) *last-- = linebuffer[--i];
@@ -303,7 +303,7 @@ void term_source::fillrest(const char* word)
   }
 }
 
-bool term_source::checkchar(LISPT words, int pos, int* c)
+bool term_source::checkchar(LISPT words, std::size_t pos, char* c)
 {
   LISPT w = words;
   *c = (w->car()->getstr())[pos];
@@ -317,10 +317,9 @@ bool term_source::checkchar(LISPT words, int pos, int* c)
 
 void term_source::complete(LISPT words)
 {
-  int pos;
-  int c = 1;
+  char c = 1;
 
-  pos = strlen(last) - 1;
+  auto pos = strlen(last) - 1;
   while(c != '\0' && checkchar(words, pos++, &c))
   {
     pputc(c, stdout);
@@ -439,8 +438,8 @@ void term_source::scan(int begin)
   currentpos.line = line;
   if(line == 0)
   {
-    currentpos.cpos += current_prompt.length();
-    currentpos.line_start = linebuffer;
+    currentpos.cpos += static_cast<int>(current_prompt.length());
+    currentpos.line_start = &linebuffer[0];
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)

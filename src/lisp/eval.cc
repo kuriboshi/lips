@@ -352,7 +352,7 @@ bool evaluator::peval1()
       case type::FSUBR:
         push(dest);
         push(&evaluator::ev2);
-        dest = mkdestblock(fun->subrval().argcount());
+        dest = mkdestblock(static_cast<int>(fun->subrval().argcount()));
         noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
         if(fun->subrval().spread == subr_t::spread::NOSPREAD)
         {
@@ -415,7 +415,7 @@ bool evaluator::peval2()
       case type::FSUBR:
         push(dest);
         push(&evaluator::ev2);
-        dest = mkdestblock(fun->subrval().argcount());
+        dest = mkdestblock(static_cast<int>(fun->subrval().argcount()));
         noeval = true;
         if(fun->subrval().spread == subr_t::spread::NOSPREAD)
           cont = &evaluator::spread;

@@ -19,7 +19,7 @@ LISPT dquote(lisp& l, LISPT stream)
   {
     if(c == '\\')
       c = stream->file()->getch();
-    buffer.push_back(c);
+    buffer.push_back(static_cast<char>(c));
     c = stream->file()->getch();
   }
   return mkstring(l, buffer);

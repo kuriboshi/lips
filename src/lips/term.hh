@@ -39,7 +39,7 @@ private:
   void retype(int);
   char* mkexstr();
   void fillrest(const char*);
-  bool checkchar(lisp::LISPT words, int pos, int* c);
+  bool checkchar(lisp::LISPT words, std::size_t pos, char* c);
   void complete(lisp::LISPT words);
   lisp::LISPT strip(lisp::LISPT files, const char* prefix, const char* suffix);
   void scan(int begin);

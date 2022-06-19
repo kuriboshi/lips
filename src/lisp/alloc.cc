@@ -50,7 +50,7 @@ LISPT alloc::obarray()
 
 LISPT alloc::freecount()
 {
-  return mknumber(lisp_t::freecount());
+  return mknumber(static_cast<int>(lisp_t::freecount()));
 }
 
 LISPT alloc::mkstring(const std::string& str)
@@ -91,7 +91,8 @@ inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
   }
   if(is_NIL(alist))
     return NIL;
-  count = -(count + 1);
+  ++count;
+  count = static_cast<std::int8_t>(-count);
   return cons(alist, NIL);
 }
 
@@ -170,7 +171,7 @@ destblock_t* alloc::dalloc(int size)
   {
     auto* dest = &destblock[destblockused];
     destblockused += size + 1;
-    dest->num(size);
+    dest->num(static_cast<std::int8_t>(size));
     for(int i = 1; i <= size; ++i)
       destblock[destblockused - i].reset();
     return dest;

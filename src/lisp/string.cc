@@ -58,7 +58,7 @@ LISPT concat(lisp& l, LISPT strlist)
 LISPT strlen(lisp& l, LISPT s)
 {
   check(s, type::STRING);
-  return mknumber(l, s->string().length());
+  return mknumber(l, static_cast<int>(s->string().length()));
 }
 
 /// @brief Extract a substring from start to end.
