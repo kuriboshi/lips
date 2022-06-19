@@ -8,10 +8,7 @@
 namespace lisp
 {
 /// @brief Class handling allocation of objects.
-alloc::alloc(): local_symbols(lisp_t::symbol_collection().create())
-{
-  destblockused = 0;
-}
+alloc::alloc(): local_symbols(lisp_t::symbol_collection().create()) {}
 
 /// @brief Default destructor.
 ///
