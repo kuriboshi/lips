@@ -132,7 +132,7 @@ LISPT alloc::intern(const std::string& str)
   auto& sym = glob.get(str);
   if(sym.self == NIL)
   {
-    sym.self = new lisp_t;
+    sym.self = new lisp_t; // NOLINT
     sym.self->set(sym);
   }
   return sym.self;

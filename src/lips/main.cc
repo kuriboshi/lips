@@ -67,6 +67,7 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
   return list;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 LISPT transform(::lisp::lisp& l, LISPT list)
 {
   LISPT tl = NIL;
@@ -161,8 +162,8 @@ void onbreak()
 
 std::unique_ptr<::lisp::lisp> init()
 {
-  signal(SIGTTIN, SIG_IGN);
-  signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back
+  signal(SIGTTIN, SIG_IGN); // NOLINT
+  signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back NOLINT
 
   fixpgrp();
 

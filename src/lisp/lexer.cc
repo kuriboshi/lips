@@ -10,6 +10,7 @@ namespace lisp
 /// @brief Read the next token from the input stream.
 /// @returns Returns either the token as a string or the empty token when the
 ///   input stream reaches the end.
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 token_t lexer::read()
 {
   if(_token)

@@ -129,7 +129,7 @@ inline void pp(const char* s, file_t& file, LISPT x)
 {
   ps(s, file, false);
   ps(" ", file, false);
-  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file);
+  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file); // NOLINT
   ps(">", file, false);
 }
 

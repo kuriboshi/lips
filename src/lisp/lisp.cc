@@ -24,7 +24,7 @@ void ref_deleter(lisp_t* object)
   object->set();
   object->settype(type::FREE);
   // This will return the object to the memory pool.
-  delete object;
+  delete object; // NOLINT
 }
 
 namespace pn
@@ -49,12 +49,12 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
 
   _syntax.reset(new syntax);
 
-  _primout = new file_t(std::cout);
-  _primerr = new file_t(std::cerr);
-  _primin = new file_t(std::cin);
-  _stdout = new file_t(std::cout);
-  _stderr = new file_t(std::cerr);
-  _stdin = new file_t(std::cin);
+  _primout = new file_t(std::cout); // NOLINT
+  _primerr = new file_t(std::cerr); // NOLINT
+  _primin = new file_t(std::cin); // NOLINT
+  _stdout = new file_t(std::cout); // NOLINT
+  _stderr = new file_t(std::cerr); // NOLINT
+  _stdin = new file_t(std::cin); // NOLINT
 
   static auto global_set = false;
   if(!global_set)

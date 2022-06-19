@@ -54,6 +54,7 @@ TEST_CASE("dircheck") { CHECK(dircheck("/", "/")); }
 // Returns true if s matches wildcard pattern in w, false otherwise. STR is a
 // simple string with no slashes.
 //
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 bool match(const std::string& str, const std::string& wild)
 {
   auto sbegin = str.begin();
@@ -100,6 +101,7 @@ bool match(const std::string& str, const std::string& wild)
   return sbegin == str.end() && dircheck(std::string(wbegin, wild.end()), str);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("match")
 {
   std::error_code ec;
@@ -159,6 +161,7 @@ TEST_CASE("match")
 ///
 /// @param wild The glob pattern to match. Standard patterns are supported (*, ?, [...]).
 /// 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::vector<std::string> walkfiles(const std::filesystem::path& wild)
 {
   std::vector<std::filesystem::path> collect;
@@ -208,6 +211,7 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
   return result;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("walkfiles")
 {
   std::error_code ec;
@@ -310,6 +314,7 @@ std::optional<std::string> extilde(const std::string& w)
   return s;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("extilde")
 {
   std::string home = env::get("HOME");
@@ -369,6 +374,7 @@ LISPT expandfiles(const std::string& wild, bool sort)
   return buildlist(files);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("expandfiles")
 {
   std::error_code ec;

@@ -78,15 +78,12 @@ void term_source::init_term()
       char bp[1024];
       if(tgetent(bp, term) == 1)
       {
-        clear = tgetstr(const_cast<char*>("cl"), &termc);
-        curup = tgetstr(const_cast<char*>("up"), &termc);
+        clear = tgetstr(const_cast<char*>("cl"), &termc); // NOLINT
+        curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
         curdn = "\n";
-        curfwd = tgetstr(const_cast<char*>("nd"), &termc);
-        cleol = tgetstr(const_cast<char*>("ce"), &termc);
-        if(!curup || !curdn || !curfwd || !cleol)
-          nocap = true;
-        else
-          nocap = false;
+        curfwd = tgetstr(const_cast<char*>("nd"), &termc); // NOLINT
+        cleol = tgetstr(const_cast<char*>("ce"), &termc); // NOLINT
+        nocap = (curup == nullptr || curdn == nullptr || curfwd == nullptr || cleol == nullptr);
       }
     }
     init_keymap();
@@ -210,6 +207,7 @@ int term_source::outc(int c)
  *          complete line, including prompt.  It ALL is 2 just delete all
  *          lines.  Used for ctrl-u kill.
  */
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::retype(int all)
 {
   int nl = 0;
@@ -351,6 +349,7 @@ LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
  * cursor is now in currentpos, so it can find its way back.  BEGIN is the
  * position in linebuffer from where to start searching.
  */
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::scan(int begin)
 {
   int line = 0;
@@ -445,7 +444,7 @@ void term_source::scan(int begin)
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)
-    parpos.cpos = cpos - parpos.cpos + current_prompt.length();
+    parpos.cpos = cpos - parpos.cpos + current_prompt.length(); // NOLINT
 }
 
 /*
@@ -467,7 +466,6 @@ void term_source::blink()
   if(nocap)
     return; // Requires termcap and enough capability
   scan(linepos - 1);
-  int i;
 
   int ldiff = currentpos.line - parpos.line;
   int cdiff = parpos.cpos - currentpos.cpos;
@@ -496,13 +494,13 @@ void term_source::blink()
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
   {
-    for(i = 0; parpos.line_start[i]; i++) pputc(parpos.line_start[i], stdout);
+    for(int i = 0; parpos.line_start[i]; i++) pputc(parpos.line_start[i], stdout); // NOLINT
   }
   else
   {
     if(currentpos.line == 0)
       std::cout << current_prompt;
-    for(i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout);
+    for(int i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout); // NOLINT
   }
   fflush(stdout);
 }
@@ -519,6 +517,7 @@ void term_source::clearscr() {
 // matching right paren.  Typing just a return puts a right paren in the buffer
 // as well as the newline.  Returns empty optional on EOF.
 //
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::optional<std::string> term_source::getline()
 {
   char c = 0;

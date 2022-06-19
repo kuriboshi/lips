@@ -86,14 +86,14 @@ static void printjob(const job_t& job)
   std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
   if(job.running)
     buffer += "Running";
-  else if(WIFEXITED(job.status))
+  else if(WIFEXITED(job.status)) // NOLINT
     buffer += "Done";
-  else if(WIFSTOPPED(job.status))
-    buffer += strsignal(WSTOPSIG(job.status));
+  else if(WIFSTOPPED(job.status)) // NOLINT
+    buffer += strsignal(WSTOPSIG(job.status)); // NOLINT
   else
   {
-    buffer += strsignal(WTERMSIG(job.status));
-    if(WCOREDUMP(job.status))
+    buffer += strsignal(WTERMSIG(job.status)); // NOLINT
+    if(WCOREDUMP(job.status)) // NOLINT
       buffer += " (core dumped)";
   }
   buffer += "\t";
@@ -225,6 +225,7 @@ static std::pair<bool, std::string> check_meta(const std::string& s)
   return std::pair(meta, result);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("exec.cc: check_meta")
 {
   SECTION("test 1")
@@ -322,6 +323,7 @@ static std::optional<std::vector<std::string>> make_exec(LISPT command)
   return args;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("exec.cc: make_exec")
 {
   SECTION("(make_exec (a b c)) -> a b c")
@@ -568,7 +570,7 @@ LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
     check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
-  if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+  if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
     return syserr(file);
   if((pid = mfork()) == 0)
   {
@@ -604,7 +606,7 @@ LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
     check(filed, type::INTEGER);
     oldfd = filed->intval();
   }
-  if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1)
+  if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
     return syserr(l, file);
   if((pid = mfork()) == 0)
   {
@@ -636,7 +638,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
   if((pid = mfork()) == 0)
   {
     int pd[2];
-    if(pipe(pd) == -1)
+    if(pipe(pd) == -1) // NOLINT
     {
       l.stderr()->format("{}\n", strerror(errno));
       exit(1);

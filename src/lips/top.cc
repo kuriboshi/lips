@@ -155,6 +155,7 @@ void top::promptprint(LISPT prompt)
   std::cout << current_prompt;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 LISPT top::operator()(LISPT exp)
 {
   ++_level;

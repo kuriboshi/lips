@@ -845,12 +845,14 @@ LISPT evaluator::destblock(lisp& l, const destblock_t* block)
   return car(l, foo);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 LISPT evaluator::baktrace()
 {
   for(int i = toctrl; i >= 0; i--)
   {
     l.primerr()->format("{}: ", i);
     std::visit(
+      // NOLINTNEXTLINE(readability-function-cognitive-complexity)
       [this](auto&& arg) {
         using ArgType = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<ArgType, LISPT>)
