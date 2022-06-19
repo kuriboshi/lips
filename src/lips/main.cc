@@ -334,7 +334,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_error& error)
     {
-      static_cast<term_source&>(terminal->source()).clearlbuf();
+      dynamic_cast<term_source&>(terminal->source()).clearlbuf();
       std::cerr << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)
