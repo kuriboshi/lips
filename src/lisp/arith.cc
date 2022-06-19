@@ -236,14 +236,10 @@ LISPT iminus(lisp& l, LISPT x)
 
 LISPT absval(lisp& l, LISPT x)
 {
-  int sign;
-
   check(x, type::INTEGER);
   if(x->intval() < 0)
-    sign = -1;
-  else
-    sign = 1;
-  return mknumber(l, x->intval() * sign);
+    return mknumber(l, -x->intval());
+  return mknumber(l, x->intval());
 }
 
 LISPT itof(lisp& l, LISPT x)
