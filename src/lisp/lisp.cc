@@ -47,7 +47,7 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
   if(_current == nullptr)
     _current = this;
 
-  _syntax.reset(new syntax);
+  _syntax = std::make_unique<syntax>();
 
   _primout = new file_t(std::cout); // NOLINT
   _primerr = new file_t(std::cerr); // NOLINT
