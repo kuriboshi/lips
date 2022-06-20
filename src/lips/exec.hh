@@ -25,7 +25,7 @@ public:
   static LISPT jobs(lisp&);
   static LISPT fg(lisp&, LISPT job);
   static LISPT bg(lisp&, LISPT job);
-  static LISPT p_setenv(lisp&, LISPT var, LISPT val);
+  static LISPT setenv(lisp&, LISPT var, LISPT val);
   static LISPT getenviron(lisp&, LISPT var);
   static LISPT cd(lisp&, LISPT dir, LISPT emess);
   static LISPT doexec(lisp&, LISPT cmd);
@@ -49,7 +49,7 @@ inline LISPT rehash() { exec::do_rehash(); return NIL; }
 inline LISPT jobs(lisp& l) { return exec::jobs(l); }
 inline LISPT fg(lisp& l, LISPT job) { return exec::fg(l, job); }
 inline LISPT bg(lisp& l, LISPT job) { return exec::bg(l, job); }
-inline LISPT p_setenv(lisp& l, LISPT var, LISPT val) { return exec::p_setenv(l, var, val); }
+inline LISPT setenv(lisp& l, LISPT var, LISPT val) { return exec::setenv(l, var, val); }
 inline LISPT getenviron(lisp& l, LISPT var) { return exec::getenviron(l, var); }
 inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess); }
 inline LISPT doexec(lisp& l, LISPT cmd) { return exec::doexec(l, cmd); }

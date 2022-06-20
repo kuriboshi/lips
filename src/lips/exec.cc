@@ -737,11 +737,11 @@ LISPT exec::bg(lisp& l, LISPT job)
   return l.error(NO_SUCH_JOB, job);
 }
 
-LISPT exec::p_setenv(lisp& l, LISPT var, LISPT val)
+LISPT exec::setenv(lisp& l, LISPT var, LISPT val)
 {
   check(var, type::STRING, type::SYMBOL);
   check(val, type::STRING, type::SYMBOL);
-  setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
+  ::setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
@@ -779,7 +779,7 @@ LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
     return NIL;
   }
   auto wd = std::filesystem::current_path();
-  setenv("PWD", wd.c_str(), 1);
+  ::setenv("PWD", wd.c_str(), 1);
   return T;
 }
 
@@ -814,7 +814,7 @@ void exec::init()
   mkprim(pn::JOBS,         jobs,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SETENV,       p_setenv,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::SETENV,       setenv,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::EXEC,         doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
