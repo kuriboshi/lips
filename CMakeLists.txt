@@ -41,6 +41,7 @@ endif()
 if(LIPS_ENABLE_CLANG_TIDY)
   include(clang-tidy)
 endif()
+include(clang-format)
 
 include(docker)
 

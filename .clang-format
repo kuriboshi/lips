@@ -14,7 +14,7 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
-AllowShortLoopsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: Yes
@@ -69,6 +69,7 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
+PackConstructorInitializers: Never
 PointerAlignment: Left
 ReflowComments: false
 SortIncludes: false
