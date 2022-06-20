@@ -9,35 +9,30 @@
 #include <unordered_map>
 #include <lisp/lisp.hh>
 
+namespace lisp::exec
+{
+void init();
+
+LISPT redir_to(lisp&, LISPT cmd, LISPT file, LISPT filed);
+LISPT redir_append(lisp&, LISPT cmd, LISPT file, LISPT filed);
+LISPT redir_from(lisp&, LISPT cmd, LISPT file, LISPT filed);
+LISPT pipecmd(lisp&, LISPT cmds);
+LISPT back(lisp&, LISPT x);
+LISPT stop(lisp&);
+LISPT jobs(lisp&);
+LISPT fg(lisp&, LISPT job);
+LISPT bg(lisp&, LISPT job);
+LISPT setenv(lisp&, LISPT var, LISPT val);
+LISPT getenviron(lisp&, LISPT var);
+LISPT cd(lisp&, LISPT dir, LISPT emess);
+LISPT doexec(lisp&, LISPT cmd);
+
+LISPT rehash(lisp&);
+void do_rehash();
+}
+
 namespace lisp
 {
-class exec
-{
-public:
-  static void init();
-
-  static LISPT redir_to(lisp&, LISPT cmd, LISPT file, LISPT filed);
-  static LISPT redir_append(lisp&, LISPT cmd, LISPT file, LISPT filed);
-  static LISPT redir_from(lisp&, LISPT cmd, LISPT file, LISPT filed);
-  static LISPT pipecmd(lisp&, LISPT cmds);
-  static LISPT back(lisp&, LISPT x);
-  static LISPT stop(lisp&);
-  static LISPT jobs(lisp&);
-  static LISPT fg(lisp&, LISPT job);
-  static LISPT bg(lisp&, LISPT job);
-  static LISPT setenv(lisp&, LISPT var, LISPT val);
-  static LISPT getenviron(lisp&, LISPT var);
-  static LISPT cd(lisp&, LISPT dir, LISPT emess);
-  static LISPT doexec(lisp&, LISPT cmd);
-
-  static LISPT rehash(lisp&);
-  static void do_rehash();
-
-private:
-  static int execcommand(LISPT, LISPT*);
-  static std::unordered_map<std::string, std::string> exechash;
-};
-
 inline LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(l, cmd, file, filed); }
 inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_append(l, cmd, file, filed); }
 inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(l, cmd, file, filed); }
@@ -53,8 +48,6 @@ inline LISPT setenv(lisp& l, LISPT var, LISPT val) { return exec::setenv(l, var,
 inline LISPT getenviron(lisp& l, LISPT var) { return exec::getenviron(l, var); }
 inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess); }
 inline LISPT doexec(lisp& l, LISPT cmd) { return exec::doexec(l, cmd); }
-
-} // namespace lisp
 
 namespace pn
 {
@@ -74,6 +67,8 @@ inline constexpr auto SETENV = "setenv";          // set environment variable
 inline constexpr auto GETENV = "getenv";          // get value of variable
 inline constexpr auto EXEC = "exec";              // overlay lips with command
 } // namespace pn
+
+} // namespace lisp
 
 extern bool insidefork;
 

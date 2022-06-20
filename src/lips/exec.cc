@@ -19,7 +19,6 @@
 #include <cstdlib>
 #include <cerrno>
 #include <csignal>
-#include <cstring>
 
 #include <lisp/lisp.hh>
 #include "glob.hh"
@@ -31,7 +30,6 @@
 using namespace lisp;
 using namespace std::literals;
 
-std::unordered_map<std::string, std::string> exec::exechash;
 #ifdef __APPLE__
 extern char** environ;
 #endif
@@ -54,6 +52,8 @@ struct job_t
 
 static std::list<job_t> joblist;  // List of jobs
 static std::list<job_t> cjoblist; // List of collected jobs
+
+static std::unordered_map<std::string, std::string> exechash;
 
 namespace
 {
@@ -396,13 +396,15 @@ void checkfork()
   }
 }
 
+namespace lisp::exec
+{
 /* 
  * execcommand - Tries to execute the lisp expression exp as a command. 
  *               execcomand returns 0 if there is no executable file in 
  *               the path, 1 if the command was successively run and -1 if 
  *               there was some error.
  */
-int exec::execcommand(LISPT exp, LISPT* res)
+int execcommand(LISPT exp, LISPT* res)
 {
   *res = T;
   auto command = glob::extilde(exp->car()->getstr());
@@ -440,7 +442,7 @@ int exec::execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -476,7 +478,7 @@ LISPT exec::redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -512,7 +514,7 @@ LISPT exec::redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -548,7 +550,7 @@ LISPT exec::redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::pipecmd(lisp& l, LISPT cmds)
+LISPT pipecmd(lisp& l, LISPT cmds)
 {
   print(cmds);
 
@@ -596,7 +598,7 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
   return mknumber(l, WEXITSTATUS(status));
 }
 
-LISPT exec::back(lisp& l, LISPT x)
+LISPT back(lisp& l, LISPT x)
 {
   int pid = 0;
 
@@ -615,19 +617,19 @@ LISPT exec::back(lisp& l, LISPT x)
   return mknumber(l, pid);
 }
 
-LISPT exec::stop(lisp& l)
+LISPT stop(lisp& l)
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-LISPT exec::rehash(lisp&)
+LISPT rehash(lisp&)
 {
   do_rehash();
   return NIL;
 }
 
-void exec::do_rehash()
+void do_rehash()
 {
   exechash.clear();
 
@@ -643,14 +645,14 @@ void exec::do_rehash()
   }
 }
 
-LISPT exec::jobs(lisp& l)
+LISPT jobs(lisp& l)
 {
   for(const auto& job: joblist)
     printjob(job);
   return NIL;
 }
 
-LISPT exec::fg(lisp& l, LISPT job)
+LISPT fg(lisp& l, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -694,7 +696,7 @@ LISPT exec::fg(lisp& l, LISPT job)
   return l.error(NO_SUCH_JOB, job);
 }
 
-LISPT exec::bg(lisp& l, LISPT job)
+LISPT bg(lisp& l, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -737,7 +739,7 @@ LISPT exec::bg(lisp& l, LISPT job)
   return l.error(NO_SUCH_JOB, job);
 }
 
-LISPT exec::setenv(lisp& l, LISPT var, LISPT val)
+LISPT setenv(lisp& l, LISPT var, LISPT val)
 {
   check(var, type::STRING, type::SYMBOL);
   check(val, type::STRING, type::SYMBOL);
@@ -745,7 +747,7 @@ LISPT exec::setenv(lisp& l, LISPT var, LISPT val)
   return var;
 }
 
-LISPT exec::getenviron(lisp& l, LISPT var)
+LISPT getenviron(lisp& l, LISPT var)
 {
   check(var, type::STRING, type::SYMBOL);
   char* s = getenv(var->getstr().c_str());
@@ -754,7 +756,7 @@ LISPT exec::getenviron(lisp& l, LISPT var)
   return mkstring(l, s);
 }
 
-LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
+LISPT cd(lisp& l, LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -783,7 +785,7 @@ LISPT exec::cd(lisp& l, LISPT dir, LISPT emess)
   return T;
 }
 
-LISPT exec::doexec(lisp& l, LISPT cmd)
+LISPT doexec(lisp& l, LISPT cmd)
 {
   LISPT res;
 
@@ -799,7 +801,7 @@ LISPT exec::doexec(lisp& l, LISPT cmd)
   return NIL;
 }
 
-void exec::init()
+void init()
 {
   // clang-format off
   // mkprim(pn::EXPAND, expand, subr_t::S_EVAL, subr_t::S_NOSPREAD);
@@ -820,6 +822,7 @@ void exec::init()
   // clang-format on
   do_rehash();
   undefhook(execcommand);
+}
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
