@@ -55,11 +55,13 @@ struct job_t
 static std::list<job_t> joblist;  // List of jobs
 static std::list<job_t> cjoblist; // List of collected jobs
 
+namespace
+{
 /* 
  * preparefork - Sets the processgroup to the group currently beeing built. 
  *               Resets signals to their default value.
  */
-static void preparefork()
+void preparefork()
 {
   signal(SIGHUP, SIG_DFL);
   signal(SIGINT, SIG_DFL);
@@ -84,7 +86,7 @@ static void preparefork()
  *            [n]   Status (other info)  (command line)
  *            Status is Done if job has exited.
  */
-static void printjob(const job_t& job)
+void printjob(const job_t& job)
 {
   std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
   if(job.running)
@@ -109,7 +111,7 @@ static void printjob(const job_t& job)
  *             BG is non-zero, job is registered as running in background.
  *             Returns true if all went well, false otherwise.
  */
-static bool recordjob(int pid, bool bg)
+bool recordjob(int pid, bool bg)
 {
   if(insidefork)
     return true; /* Skip this if in a fork. */
@@ -132,7 +134,7 @@ static bool recordjob(int pid, bool bg)
  * collectjob - updates job list with PID as process id, and STAT as exit 
  *              status.
  */
-static void collectjob(int pid, int stat)
+void collectjob(int pid, int stat)
 {
   for(auto job = joblist.begin(); job != joblist.end(); ++job)
   {
@@ -158,21 +160,13 @@ static void collectjob(int pid, int stat)
   }
 }
 
-/* printdone - Sweeps CJOBLIST and prints each job it frees. */
-void printdone()
-{
-  for(const auto& job: cjoblist)
-    printjob(job);
-  cjoblist.clear();
-}
-
 /* 
  * mfork - Forks and initializes the child. If the process hasn't 
  *         previously been forked, its pid is used as process group id. It 
  *         also grabs the tty for the new process group. Mfork returns the 
  *         pid returned by fork.
  */
-static int mfork()
+int mfork()
 {
   int pid = 0;
 
@@ -205,7 +199,7 @@ static int mfork()
  *              characters in which case it returns true.  It also strips off
  *              all quote-characters (backslash).
  */
-static std::pair<bool, std::string> check_meta(const std::string& s)
+std::pair<bool, std::string> check_meta(const std::string& s)
 {
   std::string result;
   bool meta = false;
@@ -228,40 +222,7 @@ static std::pair<bool, std::string> check_meta(const std::string& s)
   return {meta, result};
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-TEST_CASE("exec.cc: check_meta")
-{
-  SECTION("test 1")
-  {
-    auto b = check_meta("hello");
-    CHECK(!b.first);
-  }
-  SECTION("test 2")
-  {
-    auto b = check_meta("hello*");
-    CHECK(b.first);
-  }
-  SECTION("test 3")
-  {
-    auto b = check_meta("hello\\*");
-    CHECK(!b.first);
-    CHECK(b.second == "hello*"s);
-  }
-  SECTION("test 4")
-  {
-    auto b = check_meta(R"(hello\*\[\])");
-    CHECK(!b.first);
-    CHECK(b.second == "hello*[]"s);
-  }
-  SECTION("test 5")
-  {
-    auto b = check_meta("hello\\*[a]\\*");
-    CHECK(b.first);
-    CHECK(b.second == "hello*[a]*"s);
-  }
-}
-
-static std::optional<std::vector<std::string>> process_one(LISPT arg)
+std::optional<std::vector<std::string>> process_one(LISPT arg)
 {
   std::vector<std::string> args;
   if(type_of(arg) == type::SYMBOL)
@@ -312,7 +273,7 @@ static std::optional<std::vector<std::string>> process_one(LISPT arg)
  *             execve. Returns nullptr if some error occured, like a no match
  *             for wild cards. Returns pointers to globbed arguments.
  */
-static std::optional<std::vector<std::string>> make_exec(LISPT command)
+std::optional<std::vector<std::string>> make_exec(LISPT command)
 {
   std::vector<std::string> args;
 
@@ -326,55 +287,12 @@ static std::optional<std::vector<std::string>> make_exec(LISPT command)
   return args;
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-TEST_CASE("exec.cc: make_exec")
-{
-  SECTION("(make_exec (a b c)) -> a b c")
-  {
-    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), NIL))));
-    REQUIRE(result);
-    CHECK(result->size() == 3);
-    auto i = result->begin();
-    CHECK(*i++ == "a");
-    CHECK(*i++ == "b");
-    CHECK(*i++ == "c");
-  }
-  SECTION("(make_exec (100)) -> 100")
-  {
-    auto result = make_exec(cons(mknumber(100), NIL));
-    REQUIRE(result);
-    CHECK(result->at(0) == "100"s);
-  }
-  SECTION("(make_exec (plus 1 2)) -> 3")
-  {
-    auto expr = lispread("((plus 1 2))");
-    auto result = make_exec(expr);
-    REQUIRE(result);
-    CHECK(result->at(0) == "3"s);
-  }
-  SECTION("(make_exec (/b*)) -> /bin")
-  {
-    auto expr = lispread("(/b*)");
-    auto result = make_exec(expr);
-    REQUIRE(result);
-    REQUIRE(!result->empty());
-    CHECK(result->at(0) == "/bin"s);
-  }
-  SECTION("(make_exec (/a*)) -> <empty>")
-  {
-    auto expr = lispread("(/a*)");
-    auto result = make_exec(expr);
-    REQUIRE(result);
-    REQUIRE(result->empty());
-  }
-}
-
 /* 
  * waitfork - If there is a fork with pid PID, wait for it and return its 
  *            status. If PID is 0 it means to wait for the first process 
  *            to exit.
  */
-static int waitfork(pid_t pid)
+int waitfork(pid_t pid)
 {
   int stat = 0;
   
@@ -399,19 +317,6 @@ static int waitfork(pid_t pid)
   return stat;
 }
 
-void checkfork()
-{
-  while(true)
-  {
-    int wstat = 0;
-    auto wpid = waitpid(-1, &wstat, WUNTRACED | WNOHANG);
-    if(wpid > 0)
-      collectjob(wpid, wstat);
-    else
-      break;
-  }
-}
-
 /* 
  * execute - Forks (if not already in a fork, in which case it works as execve,
  *           overlaying the current process), and execs NAME with original
@@ -419,7 +324,7 @@ void checkfork()
  *           waitfork). Exec either returns T or ERROR depending success or
  *           failure for some reason.
  */
-static LISPT execute(const std::string& name, LISPT command)
+LISPT execute(const std::string& name, LISPT command)
 {
   auto args = make_exec(command);
   if(!args)
@@ -452,16 +357,10 @@ static LISPT execute(const std::string& name, LISPT command)
   return mknumber(WEXITSTATUS(status));
 }
 
-TEST_CASE("execute")
-{
-  auto result = execute("/bin/ls", cons(mkstring("ls"), NIL));
-  CHECK(result->intval() == 0);
-}
-
 /* 
  * ifexec - Returns true if directory DIR contains a NAME that is executable.
  */
-static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
+bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 {
   auto path = dir / name;
   std::error_code ec;
@@ -472,6 +371,29 @@ static bool ifexec(const std::filesystem::path& dir, const std::filesystem::path
     && ((status.permissions() & std::filesystem::perms::others_exec) != std::filesystem::perms::none
       || (status.permissions() & std::filesystem::perms::group_exec) != std::filesystem::perms::none
       || (status.permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none));
+}
+
+} // namespace
+
+/* printdone - Sweeps CJOBLIST and prints each job it frees. */
+void printdone()
+{
+  for(const auto& job: cjoblist)
+    printjob(job);
+  cjoblist.clear();
+}
+
+void checkfork()
+{
+  while(true)
+  {
+    int wstat = 0;
+    auto wpid = waitpid(-1, &wstat, WUNTRACED | WNOHANG);
+    if(wpid > 0)
+      collectjob(wpid, wstat);
+    else
+      break;
+  }
 }
 
 /* 
@@ -898,4 +820,86 @@ void exec::init()
   // clang-format on
   do_rehash();
   undefhook(execcommand);
+}
+
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+TEST_CASE("exec.cc: check_meta")
+{
+  SECTION("test 1")
+  {
+    auto b = check_meta("hello");
+    CHECK(!b.first);
+  }
+  SECTION("test 2")
+  {
+    auto b = check_meta("hello*");
+    CHECK(b.first);
+  }
+  SECTION("test 3")
+  {
+    auto b = check_meta("hello\\*");
+    CHECK(!b.first);
+    CHECK(b.second == "hello*"s);
+  }
+  SECTION("test 4")
+  {
+    auto b = check_meta(R"(hello\*\[\])");
+    CHECK(!b.first);
+    CHECK(b.second == "hello*[]"s);
+  }
+  SECTION("test 5")
+  {
+    auto b = check_meta("hello\\*[a]\\*");
+    CHECK(b.first);
+    CHECK(b.second == "hello*[a]*"s);
+  }
+}
+
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+TEST_CASE("exec.cc: make_exec")
+{
+  SECTION("(make_exec (a b c)) -> a b c")
+  {
+    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), NIL))));
+    REQUIRE(result);
+    CHECK(result->size() == 3);
+    auto i = result->begin();
+    CHECK(*i++ == "a");
+    CHECK(*i++ == "b");
+    CHECK(*i++ == "c");
+  }
+  SECTION("(make_exec (100)) -> 100")
+  {
+    auto result = make_exec(cons(mknumber(100), NIL));
+    REQUIRE(result);
+    CHECK(result->at(0) == "100"s);
+  }
+  SECTION("(make_exec (plus 1 2)) -> 3")
+  {
+    auto expr = lispread("((plus 1 2))");
+    auto result = make_exec(expr);
+    REQUIRE(result);
+    CHECK(result->at(0) == "3"s);
+  }
+  SECTION("(make_exec (/b*)) -> /bin")
+  {
+    auto expr = lispread("(/b*)");
+    auto result = make_exec(expr);
+    REQUIRE(result);
+    REQUIRE(!result->empty());
+    CHECK(result->at(0) == "/bin"s);
+  }
+  SECTION("(make_exec (/a*)) -> <empty>")
+  {
+    auto expr = lispread("(/a*)");
+    auto result = make_exec(expr);
+    REQUIRE(result);
+    REQUIRE(result->empty());
+  }
+}
+
+TEST_CASE("execute")
+{
+  auto result = execute("/bin/ls", cons(mkstring("ls"), NIL));
+  CHECK(result->intval() == 0);
 }
