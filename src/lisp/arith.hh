@@ -8,9 +8,7 @@
 
 #include "lisp.hh"
 
-namespace lisp
-{
-namespace arith
+namespace lisp::arith
 {
 void init();
 
@@ -46,6 +44,8 @@ LISPT zerop(lisp&, LISPT);
 LISPT minusp(lisp&, LISPT);
 }
 
+namespace lisp
+{
 inline LISPT plus(lisp& l, LISPT a) { return arith::plus(l, a); }
 inline LISPT plus(LISPT a) { return arith::plus(lisp::current(), a); }
 inline LISPT iplus(lisp& l, LISPT a) { return arith::iplus(l, a); }
@@ -100,7 +100,6 @@ inline LISPT zerop(lisp& l, LISPT x) { return arith::zerop(l, x); }
 inline LISPT zerop(LISPT x) { return arith::zerop(lisp::current(), x); }
 inline LISPT minusp(lisp& l, LISPT x) { return arith::minusp(l, x); }
 inline LISPT minusp(LISPT x) { return arith::minusp(lisp::current(), x); }
-
 } // namespace lisp
 
 #endif
