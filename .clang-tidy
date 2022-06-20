@@ -16,7 +16,6 @@ Checks:          "\
   -readability-named-parameter,\
   modernize-*,\
   -modernize-use-trailing-return-type,\
-  -modernize-avoid-c-arrays,\
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''

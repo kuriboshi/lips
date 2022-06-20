@@ -14,6 +14,7 @@
 #include <poll.h>
 
 #include <iostream>
+#include <array>
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
@@ -75,8 +76,8 @@ void term_source::init_term()
     char* termc = static_cast<char*>(tcap);
     if(auto* term = getenv("TERM"); term != nullptr)
     {
-      char bp[1024];
-      if(tgetent(static_cast<char*>(bp), term) == 1)
+      std::array<char, 1024> bp{};
+      if(tgetent(bp.data(), term) == 1)
       {
         clear = tgetstr(const_cast<char*>("cl"), &termc); // NOLINT
         curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
@@ -280,14 +281,14 @@ void term_source::retype(int all)
 /*
  * Stuff for file name completion.
  */
-static char word[BUFSIZ];
+static std::array<char, BUFSIZ> word{};
 static char* last;
 
 char* term_source::mkexstr()
 {
   int i = linepos;
 
-  last = static_cast<char*>(word) + BUFSIZ - 1;
+  last = word.data() + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
   while(std::isspace(linebuffer[i - 1]) == 0 && i > 0) *last-- = linebuffer[--i];

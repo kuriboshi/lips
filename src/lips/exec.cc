@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <string>
 #include <iostream>
+#include <array>
 #include <cstdlib>
 #include <cerrno>
 #include <csignal>
@@ -637,8 +638,8 @@ LISPT exec::pipecmd(lisp& l, LISPT cmds)
   int pid = 0;
   if((pid = mfork()) == 0)
   {
-    int pd[2];
-    if(pipe(pd) == -1) // NOLINT
+    std::array<int, 2> pd{};
+    if(pipe(pd.data()) == -1) // NOLINT
     {
       l.stderr()->format("{}\n", strerror(errno));
       exit(1);
