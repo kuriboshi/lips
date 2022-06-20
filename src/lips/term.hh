@@ -47,6 +47,9 @@ private:
   void blink();
   void clearscr();
 
+  std::array<char, BUFSIZ> word{};
+  char* last = nullptr;
+
   static inline constexpr int NUM_KEYS = 256;
   static inline constexpr char BELL = '\007';
 

@@ -281,9 +281,6 @@ void term_source::retype(int all)
 /*
  * Stuff for file name completion.
  */
-static std::array<char, BUFSIZ> word{};
-static char* last;
-
 char* term_source::mkexstr()
 {
   int i = linepos;
