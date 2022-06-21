@@ -62,9 +62,7 @@ if(LIPS_ENABLE_CLANG_TIDY)
 endif()
 
 add_executable(lisp lisp/main.cc)
-target_sources(
-  lisp
-  PRIVATE lisp/main.hh)
+target_sources(lisp PRIVATE lisp/main.hh)
 target_link_libraries(lisp PUBLIC liblisp Catch2::Catch2)
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")

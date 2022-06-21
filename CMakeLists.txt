@@ -15,7 +15,8 @@ option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
 option(LIPS_ENABLE_TESTS "Enable compiling test code" ON)
 option(LIPS_ENABLE_CLANG_TIDY "Enable checking with clang-tidy" OFF)
 option(LIPS_ENABLE_OBJECT_SIZES "Enable printing object sizes with" OFF)
-option(LIPS_USE_SSHFS "Turn this ON if using sshfs on macOS (see README.md)" OFF)
+option(LIPS_USE_SSHFS "Turn this ON if using sshfs on macOS (see README.md)"
+       OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -45,8 +46,8 @@ add_subdirectory(src)
 
 if(LIPS_ENABLE_TESTS)
   add_test(NAME lisp_test
-    COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
-                      --loadpath ${CMAKE_CURRENT_SOURCE_DIR})
+           COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
+                   --loadpath ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 if(LIPS_ENABLE_TRACE)
