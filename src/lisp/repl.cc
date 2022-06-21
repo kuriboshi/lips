@@ -20,7 +20,8 @@
 namespace lisp
 {
 
-repl::repl(lisp& lisp) : l(lisp)
+repl::repl(lisp& lisp)
+  : l(lisp)
 {
   _prompt = "> "_s;
   _break_prompt = ": "_s;

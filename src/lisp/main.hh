@@ -57,6 +57,6 @@ inline int run(lisp& lisp, std::ostream& out = std::cout)
   return 1;
 }
 
-}
+} // namespace lisp
 
 #endif

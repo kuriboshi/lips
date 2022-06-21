@@ -481,7 +481,6 @@ TEST_CASE("Arithmetic functions")
     CHECK(is_NIL(minusp(1.0_l)));
     CHECK_THROWS_WITH(minusp("string"_s), "Illegal argument");
   }
-
 }
 
-}
+} // namespace lisp

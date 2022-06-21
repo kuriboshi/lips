@@ -31,7 +31,7 @@ lisp::LISPT buildpath(I i, I end)
   auto s = lisp::mkstring(*i);
   return lisp::cons(s, buildpath(++i, end));
 }
-}
+} // namespace
 
 int main(int argc, const char** argv)
 {
@@ -41,8 +41,7 @@ int main(int argc, const char** argv)
     std::vector<std::string> load;
     std::vector<std::string> loadpath;
     using namespace Catch::clara;
-    auto cli = session.cli()
-      | Opt(load, "load")["--load"]("Load a LISP file")
+    auto cli = session.cli() | Opt(load, "load")["--load"]("Load a LISP file")
       | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
     session.cli(cli);
     session.applyCommandLine(argc, argv);

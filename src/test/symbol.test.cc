@@ -73,4 +73,4 @@ TEST_CASE("symbol: Print sizes")
 #endif
 }
 
-}
+} // namespace lisp::symbol

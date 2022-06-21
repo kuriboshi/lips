@@ -24,7 +24,10 @@
 class term_source: public lisp::io::source
 {
 public:
-  term_source(const options_t& options) : is(linebuffer), options(options) {}
+  term_source(const options_t& options)
+    : is(linebuffer),
+      options(options)
+  {}
   ~term_source() override;
 
   // io::source
@@ -36,7 +39,11 @@ public:
   static void end_term();
   void clearlbuf();
 
-  iterator begin() override { is.seekg(0); return iterator(is); }
+  iterator begin() override
+  {
+    is.seekg(0);
+    return iterator(is);
+  }
 
 private:
   bool getline(lisp::lisp&);
@@ -105,7 +112,7 @@ private:
     T_ESCAPE
   };
 
-  struct curpos parpos;         // Saves position of matching par.
+  struct curpos parpos;     // Saves position of matching par.
   struct curpos currentpos; // Current position.
 
   //
@@ -123,13 +130,13 @@ private:
 
   const options_t& options;
 
-  char tcap[128];               // Buffer for terminal capabilties.
+  char tcap[128]; // Buffer for terminal capabilties.
   const char* curup = nullptr;
   const char* curfwd = nullptr; // Various term cap strings.
   const char* cleol = nullptr;
   const char* curdn = nullptr;
   const char* clear = nullptr;
-  bool nocap = false;           // true if insufficient term cap.
+  bool nocap = false; // true if insufficient term cap.
 };
 
 #endif

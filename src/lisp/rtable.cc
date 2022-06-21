@@ -66,8 +66,5 @@ namespace pn
 inline constexpr auto GETENV = "rmgetenv";
 }
 
-void init()
-{
-  mkprim(pn::GETENV, getenv, subr_t::subr::EVAL, subr_t::spread::SPREAD);
-}
+void init() { mkprim(pn::GETENV, getenv, subr_t::subr::EVAL, subr_t::spread::SPREAD); }
 } // namespace lisp::rtable

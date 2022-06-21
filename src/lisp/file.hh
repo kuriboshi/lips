@@ -39,7 +39,7 @@ LISPT spaces(lisp&, LISPT, LISPT);
 LISPT readline(lisp&, LISPT);
 
 bool loadfile(lisp&, const std::string&);
-}
+} // namespace lisp::file
 
 namespace lisp
 {

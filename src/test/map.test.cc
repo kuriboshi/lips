@@ -44,8 +44,7 @@ TEST_CASE("Map functions")
     CHECK(cvar->intval() == 6);
 
     cvar = NIL;
-    map(l, "(1 2 3)"_l, lambda(l, "(a)"_l, "((setq cvar (cons (car a) cvar)))"_l),
-      lambda(l, "(a)"_l, "((cdr a))"_l));
+    map(l, "(1 2 3)"_l, lambda(l, "(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda(l, "(a)"_l, "((cdr a))"_l));
     CHECK(type_of(cvar) == type::CONS);
     CHECK(car(cvar)->intval() == 3);
     CHECK(cadr(cvar)->intval() == 2);
@@ -125,4 +124,4 @@ TEST_CASE("Map functions")
   }
 }
 
-}
+} // namespace lisp

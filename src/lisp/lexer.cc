@@ -56,8 +56,10 @@ token_t lexer::read()
           case syntax::type::NEWLINE:
             _start_of_line = true;
             break;
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
           case syntax::type::QUOTE:
             token.type = token_t::type::SPECIAL;
             token.token.push_back(*_pos);
@@ -113,9 +115,12 @@ token_t lexer::read()
         {
           case syntax::type::COMMENT:
             return token;
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
-          case syntax::type::SEPARATOR: case syntax::type::NEWLINE:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
+          case syntax::type::SEPARATOR:
+          case syntax::type::NEWLINE:
             return token;
           case syntax::type::ESCAPE:
             next();
@@ -153,8 +158,10 @@ token_t lexer::read()
       case state_t::IN_HASH:
         switch(get(*_pos))
         {
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
           case syntax::type::SEPARATOR:
           case syntax::type::NEWLINE:
             return token;
@@ -196,8 +203,10 @@ token_t lexer::read()
             break;
           case syntax::type::DIGIT:
             break;
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
           case syntax::type::SEPARATOR:
           case syntax::type::NEWLINE:
             return token;
@@ -218,8 +227,10 @@ token_t lexer::read()
             break;
           case syntax::type::DIGIT:
             break;
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
           case syntax::type::SEPARATOR:
           case syntax::type::NEWLINE:
             return token;
@@ -243,7 +254,7 @@ token_t lexer::read()
             state = state_t::IN_SYMBOL;
             token.type = token_t::type::SYMBOL;
             break;
-        }            
+        }
         token.token.push_back(*_pos);
         break;
       case state_t::IN_EXP2:
@@ -268,8 +279,10 @@ token_t lexer::read()
           case syntax::type::DIGIT:
             state = state_t::IN_FLOAT;
             continue;
-          case syntax::type::LEFT_PAREN: case syntax::type::RIGHT_PAREN:
-          case syntax::type::LEFT_BRACKET: case syntax::type::RIGHT_BRACKET:
+          case syntax::type::LEFT_PAREN:
+          case syntax::type::RIGHT_PAREN:
+          case syntax::type::LEFT_BRACKET:
+          case syntax::type::RIGHT_BRACKET:
           case syntax::type::SEPARATOR:
           case syntax::type::NEWLINE:
             return token;
@@ -287,8 +300,5 @@ token_t lexer::read()
   return token;
 }
 
-void lexer::unread(token_t token)
-{
-  _token = token;
-}
+void lexer::unread(token_t token) { _token = token; }
 } // namespace lisp

@@ -84,4 +84,4 @@ TEST_CASE("user: User defined functions")
   }
 }
 
-}
+} // namespace lisp

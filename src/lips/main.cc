@@ -41,12 +41,9 @@ using namespace lisp;
 namespace
 {
 volatile sig_atomic_t signal_flag;
-int mypgrp;     // lips process group
+int mypgrp; // lips process group
 
-void onsignal(int sig)
-{
-  signal_flag = sig;
-}
+void onsignal(int sig) { signal_flag = sig; }
 
 void fixpgrp()
 {
@@ -216,10 +213,7 @@ std::unique_ptr<::lisp::lisp> init()
 //
 // Loads the file INITFILE.
 //
-void loadinit(const std::string& initfile)
-{
-  loadfile(initfile);
-}
+void loadinit(const std::string& initfile) { loadfile(initfile); }
 
 //
 // Greet user who, or if who is nil, $USER. This means loading
@@ -243,7 +237,7 @@ LISPT greet(LISPT who)
   loadfile(loadf);
   return T;
 }
-}
+} // namespace
 
 LISPT C_ALIAS;
 LISPT C_AMPER;

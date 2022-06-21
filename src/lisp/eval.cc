@@ -21,7 +21,10 @@ using namespace std::literals;
 
 namespace lisp
 {
-evaluator::evaluator(lisp& lisp): l(lisp), a(lisp.a()) {}
+evaluator::evaluator(lisp& lisp)
+  : l(lisp),
+    a(lisp.a())
+{}
 
 void evaluator::reset()
 {
@@ -46,7 +49,7 @@ LISPT evaluator::printwhere()
     if(auto* func = std::get_if<continuation_t>(&control[i]); (func != nullptr) && *func == &evaluator::ev0)
     {
       if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
-        lsp != nullptr && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
+         lsp != nullptr && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
       {
         foo = *lsp;
         l.primerr()->format("[in ");
@@ -91,15 +94,9 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 }
 
 /// @brief Creates a new destination block of size 's' and initializes it.
-destblock_t* evaluator::mkdestblock(int s)
-{
-  return a.dalloc(s);
-}
+destblock_t* evaluator::mkdestblock(int s) { return a.dalloc(s); }
 
-void evaluator::storevar(LISPT v, int i)
-{
-  dest[i].var(v);
-}
+void evaluator::storevar(LISPT v, int i) { dest[i].var(v); }
 
 destblock_t* evaluator::pop_env()
 {
@@ -113,15 +110,9 @@ void evaluator::send(LISPT a)
     dest[dest[0].index()].val(a);
 }
 
-LISPT evaluator::receive()
-{
-  return dest[dest[0].index()].val();
-}
+LISPT evaluator::receive() { return dest[dest[0].index()].val(); }
 
-void evaluator::next()
-{
-  dest[0].decr();
-}
+void evaluator::next() { dest[0].decr(); }
 
 /// @brief Make a call to the function in parameter `fun'.
 ///
@@ -623,7 +614,8 @@ bool evaluator::evlam()
   }
   dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = fun->lambda().args; i != 0; foo = foo->cdr(), i--) storevar(foo->car(), i);
+  for(auto foo = fun->lambda().args; i != 0; foo = foo->cdr(), i--)
+    storevar(foo->car(), i);
   push(&evaluator::evlam1);
   if(spr)
   {
@@ -787,7 +779,8 @@ bool evaluator::evclosure()
   {
     auto foo = fun->closure()->closed;
     auto i = fun->closure()->count;
-    for(; i != 0; foo = foo->cdr(), i--) storevar(foo->car(), i);
+    for(; i != 0; foo = foo->cdr(), i--)
+      storevar(foo->car(), i);
   }
   for(auto foo = fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
   {

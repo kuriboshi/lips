@@ -53,21 +53,25 @@ struct symbol_id
 
 struct symbol_t
 {
-  symbol_id id;                // The id of the atom
+  symbol_id id; // The id of the atom
   std::string pname;
-  LISPT self{};                // The LISPT object for this symbol
-  LISPT value{};               // Value
-  LISPT plist{};               // The property list
-  LISPT topval{};              // Holds top value (not used yet)
-  bool constant = false;       // If true this is a constant which can't be set
+  LISPT self{};          // The LISPT object for this symbol
+  LISPT value{};         // Value
+  LISPT plist{};         // The property list
+  LISPT topval{};        // Holds top value (not used yet)
+  bool constant = false; // If true this is a constant which can't be set
 };
 
 class symbol_store_t
 {
 public:
-  symbol_store_t(symbol_collection_id id): _id(id) {}
+  symbol_store_t(symbol_collection_id id)
+    : _id(id)
+  {}
   symbol_store_t(symbol_store_t&& other) noexcept
-    : _id(other._id), _map(std::move(other._map)), _store(std::move(other._store))
+    : _id(other._id),
+      _map(std::move(other._map)),
+      _store(std::move(other._store))
   {}
   ~symbol_store_t() {}
 

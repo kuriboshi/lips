@@ -46,25 +46,13 @@ namespace lisp
 
 TEST_CASE("lexer: symbols")
 {
-  SECTION("Symbol a.")
-  {
-    lexer_check("a.", token_t::type::SYMBOL, "a.");
-  }
+  SECTION("Symbol a.") { lexer_check("a.", token_t::type::SYMBOL, "a."); }
 
-  SECTION("Symbol .a")
-  {
-    lexer_check(".a", token_t::type::SYMBOL, ".a");
-  }
+  SECTION("Symbol .a") { lexer_check(".a", token_t::type::SYMBOL, ".a"); }
 
-  SECTION("Symbol a01")
-  {
-    lexer_check("a01", token_t::type::SYMBOL, "a01");
-  }
+  SECTION("Symbol a01") { lexer_check("a01", token_t::type::SYMBOL, "a01"); }
 
-  SECTION("Symbol sym\\(bol")
-  {
-    lexer_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol");
-  }
+  SECTION("Symbol sym\\(bol") { lexer_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol"); }
 }
 
 TEST_CASE("lexer: (a b c)")
@@ -118,10 +106,7 @@ TEST_CASE("lexer: +")
 
 TEST_CASE("lexer: strings")
 {
-  SECTION("\"string\"")
-  {
-    lexer_check("\"string\"", token_t::type::STRING, "string");
-  }
+  SECTION("\"string\"") { lexer_check("\"string\"", token_t::type::STRING, "string"); }
 
   SECTION("\"string\" hello")
   {
@@ -130,25 +115,13 @@ TEST_CASE("lexer: strings")
     lexer_check(lexer, token_t::type::SYMBOL, "hello");
   }
 
-  SECTION("\"st\\\"ring\"")
-  {
-    lexer_check("\"st\\\"ring\"", token_t::type::STRING, "st\"ring");
-  }
+  SECTION("\"st\\\"ring\"") { lexer_check("\"st\\\"ring\"", token_t::type::STRING, "st\"ring"); }
 
-  SECTION("\"st\\\\ring\"")
-  {
-    lexer_check("\"st\\\\ring\"", token_t::type::STRING, "st\\ring");
-  }
+  SECTION("\"st\\\\ring\"") { lexer_check("\"st\\\\ring\"", token_t::type::STRING, "st\\ring"); }
 
-  SECTION("\"st\\\\\\\"ring\"")
-  {
-    lexer_check("\"st\\\\\\\"ring\"", token_t::type::STRING, "st\\\"ring");
-  }
+  SECTION("\"st\\\\\\\"ring\"") { lexer_check("\"st\\\\\\\"ring\"", token_t::type::STRING, "st\\\"ring"); }
 
-  SECTION("\"(hello)\"")
-  {
-    lexer_check("\"(hello)\"", token_t::type::STRING, "(hello)");
-  }
+  SECTION("\"(hello)\"") { lexer_check("\"(hello)\"", token_t::type::STRING, "(hello)"); }
 }
 
 TEST_CASE("lexer: integers")
@@ -426,4 +399,4 @@ TEST_CASE("lexer: macro")
   CHECK(t.token == "$");
 }
 
-}
+} // namespace lisp

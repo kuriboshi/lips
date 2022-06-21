@@ -47,19 +47,19 @@ extern char** environ;
 #endif
 LISPT p_setenv(LISPT, LISPT);
 
-bool insidefork = false;        // Is nonzero in the child after a fork
+bool insidefork = false; // Is nonzero in the child after a fork
 
-static int pgrp;                // Process group of current job
+static int pgrp; // Process group of current job
 
 struct job_t
 {
-  int jobnum = 0;               // Job number
-  int procid = 0;               // Process id
-  int status = 0;               // Return value
-  std::string wdir;             // Working directory
-  LISPT exp;                    // Job expression
-  bool background = false;      // true means job runs in bg
-  bool running = false;         // true if running
+  int jobnum = 0;          // Job number
+  int procid = 0;          // Process id
+  int status = 0;          // Return value
+  std::string wdir;        // Working directory
+  LISPT exp;               // Job expression
+  bool background = false; // true means job runs in bg
+  bool running = false;    // true if running
 };
 
 static std::list<job_t> joblist;  // List of jobs
@@ -105,12 +105,12 @@ void printjob(const job_t& job)
     buffer += "Running";
   else if(WIFEXITED(job.status)) // NOLINT
     buffer += "Done";
-  else if(WIFSTOPPED(job.status)) // NOLINT
+  else if(WIFSTOPPED(job.status))              // NOLINT
     buffer += strsignal(WSTOPSIG(job.status)); // NOLINT
   else
   {
     buffer += strsignal(WTERMSIG(job.status)); // NOLINT
-    if(WCOREDUMP(job.status)) // NOLINT
+    if(WCOREDUMP(job.status))                  // NOLINT
       buffer += " (core dumped)";
   }
   buffer += "\t";
@@ -157,9 +157,9 @@ void collectjob(int pid, int stat)
       if(!WIFSTOPPED(job->status))
       {
         if(!job->background && WIFSIGNALED(job->status) && WTERMSIG(job->status) != SIGINT)
-          printjob(*job);       // Print if not interrupted
+          printjob(*job);   // Print if not interrupted
         if(job->background) // When running in background, save on another list to be
-        {                     
+        {
           // Collected when signaled with SIGCHLD
           cjoblist.push_front(*job);
         }
@@ -307,7 +307,7 @@ std::optional<std::vector<std::string>> make_exec(LISPT command)
 int waitfork(pid_t pid)
 {
   int stat = 0;
-  
+
   while(true)
   {
     auto wpid = waitpid(pid, &stat, WUNTRACED);
@@ -835,7 +835,7 @@ void init()
   do_rehash();
   undefhook(execcommand);
 }
-}
+} // namespace lisp::exec
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 TEST_CASE("exec.cc: check_meta")

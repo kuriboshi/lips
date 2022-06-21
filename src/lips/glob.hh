@@ -32,15 +32,9 @@ using LISPT = lisp::LISPT;
 std::optional<std::string> extilde(const std::string& w);
 LISPT expandfiles(const std::string& wild, bool sort);
 LISPT expand(LISPT wild);
-}
+} // namespace glob
 
-inline lisp::LISPT expand(lisp::lisp&, lisp::LISPT wild)
-{
-  return glob::expand(wild);
-}
-inline lisp::LISPT expand(lisp::LISPT wild)
-{
-  return glob::expand(wild);
-}
+inline lisp::LISPT expand(lisp::lisp&, lisp::LISPT wild) { return glob::expand(wild); }
+inline lisp::LISPT expand(lisp::LISPT wild) { return glob::expand(wild); }
 
 #endif

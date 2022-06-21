@@ -113,8 +113,7 @@ bool loadfile(lisp& l, const std::string& lf)
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(l, foo); type_of(rval) != type::EMPTY;
-            rval = lispread(l, foo))
+        for(auto rval = lispread(l, foo); type_of(rval) != type::EMPTY; rval = lispread(l, foo))
           rval = l.e().eval(rval);
         return true;
       }
@@ -193,7 +192,8 @@ LISPT spaces(lisp& l, LISPT n, LISPT file)
     check(file, type::FILET);
     f = file->file();
   }
-  for(i = n->intval(); i > 0; i--) f->putch(' ');
+  for(i = n->intval(); i > 0; i--)
+    f->putch(' ');
   return NIL;
 }
 
@@ -209,19 +209,19 @@ LISPT readline(lisp& l, LISPT file)
 
 namespace pn
 {
-inline constexpr auto OPEN = "open";         // open file
-inline constexpr auto CLOSE = "close";       // close file
-inline constexpr auto LOAD = "load";         // load file
-inline constexpr auto PRIN1 = "prin1";       // print without escapes
-inline constexpr auto PRIN2 = "prin2";       // print without new-line
-inline constexpr auto PRINT = "print";       // print
+inline constexpr auto OPEN = "open";             // open file
+inline constexpr auto CLOSE = "close";           // close file
+inline constexpr auto LOAD = "load";             // load file
+inline constexpr auto PRIN1 = "prin1";           // print without escapes
+inline constexpr auto PRIN2 = "prin2";           // print without new-line
+inline constexpr auto PRINT = "print";           // print
 inline constexpr auto PRINTLEVEL = "printlevel"; // how deep to print
-inline constexpr auto RATOM = "ratom";       // read atom
-inline constexpr auto READ = "read";         // read expression
-inline constexpr auto READC = "readc";       // read characte
-inline constexpr auto READLINE = "readline"; // read a line
-inline constexpr auto SPACES = "spaces";     // print some spaces
-inline constexpr auto TERPRI = "terpri";     // print new-line
+inline constexpr auto RATOM = "ratom";           // read atom
+inline constexpr auto READ = "read";             // read expression
+inline constexpr auto READC = "readc";           // read characte
+inline constexpr auto READLINE = "readline";     // read a line
+inline constexpr auto SPACES = "spaces";         // print some spaces
+inline constexpr auto TERPRI = "terpri";         // print new-line
 } // namespace pn
 
 void init()
@@ -245,5 +245,4 @@ void init()
   // clang-format on
 }
 
-}
-
+} // namespace lisp::file

@@ -23,7 +23,7 @@ LISPT C_ERROR;
 LISPT C_LAMBDA;
 LISPT C_NLAMBDA;
 LISPT C_QUOTE;
-}
+} // namespace lisp
 
 namespace lisp::prim
 {
@@ -174,8 +174,7 @@ LISPT eq(lisp& l, LISPT a, LISPT b)
 {
   if(a == b)
     return T;
-  if(type_of(a) == type::INTEGER && type_of(b) == type::INTEGER
-    && a->intval() == b->intval())
+  if(type_of(a) == type::INTEGER && type_of(b) == type::INTEGER && a->intval() == b->intval())
     return T;
   return NIL;
 }
@@ -415,4 +414,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::prim

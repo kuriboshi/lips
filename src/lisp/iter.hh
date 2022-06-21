@@ -32,7 +32,9 @@ public:
   using pointer = LISPT*;
   using reference = LISPT&;
 
-  iterator(LISPT l): _car(l) {}
+  iterator(LISPT l)
+    : _car(l)
+  {}
   bool operator==(const iterator& x) const { return _car == x._car; }
   bool operator!=(const iterator& x) const { return _car != x._car; }
   iterator& operator++()
@@ -49,7 +51,13 @@ public:
     ++(*this);
     return tmp;
   }
-  LISPT operator*() const { if(type_of(_car) == type::CONS) return _car->car(); else return nullptr; }
+  LISPT operator*() const
+  {
+    if(type_of(_car) == type::CONS)
+      return _car->car();
+    else
+      return nullptr;
+  }
 
 private:
   LISPT _car;

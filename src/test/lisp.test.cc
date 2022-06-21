@@ -120,8 +120,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-      "plus", [](lisp& l) -> LISPT { return NIL; },
-      subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+                        "plus", [](lisp& l) -> LISPT { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "redefinition of subr not allowed");
   }
 }
@@ -226,4 +225,4 @@ TEST_CASE("lisp: iter")
   }
 }
 
-}
+} // namespace lisp

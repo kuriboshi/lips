@@ -76,4 +76,4 @@ TEST_CASE("Logic functions")
   }
 }
 
-}
+} // namespace lisp

@@ -15,8 +15,8 @@
 // limitations under the License.
 //
 
-#include <cstring>              // For strerror
-#include <cerrno>               // For errno
+#include <cstring> // For strerror
+#include <cerrno>  // For errno
 #include <iostream>
 #include "lisp.hh"
 
@@ -49,12 +49,14 @@ inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
 inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 
-inline constexpr auto CONS = "cons";             // Make a new cons cell
-inline constexpr auto FREECOUNT = "freecount";   // Number of free cells
-inline constexpr auto OBARRAY = "obarray";       // Return list of all atoms
+inline constexpr auto CONS = "cons";           // Make a new cons cell
+inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
+inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
 } // namespace pn
 
-lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
+lisp::lisp()
+  : _alloc(*new alloc()),
+    _eval(*new evaluator(*this))
 {
   if(_current == nullptr)
     _current = this;
@@ -63,10 +65,10 @@ lisp::lisp(): _alloc(*new alloc()), _eval(*new evaluator(*this))
 
   _primout = new file_t(std::cout); // NOLINT
   _primerr = new file_t(std::cerr); // NOLINT
-  _primin = new file_t(std::cin); // NOLINT
-  _stdout = new file_t(std::cout); // NOLINT
-  _stderr = new file_t(std::cerr); // NOLINT
-  _stdin = new file_t(std::cin); // NOLINT
+  _primin = new file_t(std::cin);   // NOLINT
+  _stdout = new file_t(std::cout);  // NOLINT
+  _stderr = new file_t(std::cerr);  // NOLINT
+  _stdin = new file_t(std::cin);    // NOLINT
 
   static auto global_set = false;
   if(!global_set)
@@ -226,20 +228,11 @@ LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
 LISPT lisp::obarray(lisp& l) { return l._alloc.obarray(); }
 LISPT lisp::freecount(lisp& l) { return l._alloc.freecount(); }
 
-void lisp::primout(ref_file_t f)
-{
-  _primout = std::move(f);
-}
+void lisp::primout(ref_file_t f) { _primout = std::move(f); }
 
-void lisp::primerr(ref_file_t f)
-{
-  _primerr = std::move(f);
-}
+void lisp::primerr(ref_file_t f) { _primerr = std::move(f); }
 
-void lisp::primin(ref_file_t f)
-{
-  _primin = std::move(f);
-}
+void lisp::primin(ref_file_t f) { _primin = std::move(f); }
 
 inline std::string lisp::geterror(int messnr)
 {
@@ -262,10 +255,7 @@ LISPT lisp::error(int messnr, LISPT arg)
   throw lisp_error(geterror(messnr));
 }
 
-void lisp::fatal(int messnr)
-{
-  throw lisp_error(geterror(messnr));
-}
+void lisp::fatal(int messnr) { throw lisp_error(geterror(messnr)); }
 
 LISPT lisp::syserr(LISPT fault)
 {
@@ -278,13 +268,11 @@ LISPT lisp::syserr(LISPT fault)
   return C_ERROR;
 }
 
-LISPT lisp::break0(LISPT exp) const
-{
-  return repl(exp);
-}
+LISPT lisp::break0(LISPT exp) const { return repl(exp); }
 
 lisp::cvariables::cvariables(alloc& a)
-  : _currentbase(a.initcvar("base", 10_l)), _verbose(a.initcvar("verbose", NIL)),
+  : _currentbase(a.initcvar("base", 10_l)),
+    _verbose(a.initcvar("verbose", NIL)),
     _loadpath(a.initcvar("loadpath", "(.)"_l))
 {}
 
@@ -300,10 +288,7 @@ LISPT eval(lisp& l, const std::string& expr)
   return lisp::eval(l, e);
 }
 
-LISPT eval(const std::string& expr)
-{
-  return eval(lisp::current(), expr);
-}
+LISPT eval(const std::string& expr) { return eval(lisp::current(), expr); }
 
 //
 // All lisp constants needed internally.

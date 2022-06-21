@@ -30,12 +30,9 @@ struct create_test_file final
     std::ofstream of(file);
     of << contents;
   }
-  ~create_test_file()
-  {
-    std::filesystem::remove(file);
-  }
+  ~create_test_file() { std::filesystem::remove(file); }
 };
-}
+} // namespace
 
 namespace lisp
 {
@@ -259,4 +256,4 @@ TEST_CASE("file: functions")
   }
 }
 
-}
+} // namespace lisp

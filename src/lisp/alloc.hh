@@ -53,7 +53,7 @@ private:
 
 public:
   void reset() { u = var_val_pair{NIL, NIL}; }
-  
+
   void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
   int size() const { return std::get<control_block>(u).size; }
   int index() const { return std::get<control_block>(u).index; }
@@ -200,9 +200,8 @@ public:
   /// @return The number of free cells.
   ///
   LISPT freecount();
-  
-private:
 
+private:
   /// @brief Returns the global symbol table.
   static symbol::symbol_store_t& global_symbols()
   {
@@ -245,53 +244,32 @@ inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
 inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
 
 /// @brief Creates a lisp string.
-inline LISPT operator"" _s(const char* s, std::size_t)
-{
-  return mkstring(s);
-}
+inline LISPT operator"" _s(const char* s, std::size_t) { return mkstring(s); }
 
 /// @brief Simpler way to create an atom.
-inline LISPT operator"" _a(const char* s, std::size_t)
-{
-  return mkatom(s);
-}
+inline LISPT operator"" _a(const char* s, std::size_t) { return mkatom(s); }
 
 /// @brief Creates a number.
-inline LISPT operator"" _l(unsigned long long i)
-{
-  return mknumber(i);
-}
+inline LISPT operator"" _l(unsigned long long i) { return mknumber(i); }
 
 /// @brief Creates a floating point value.
-inline LISPT operator"" _l(long double d)
-{
-  return mkfloat(d);
-}
+inline LISPT operator"" _l(long double d) { return mkfloat(d); }
 
 /// @brief Evaluates a lisp expression in a string.
-inline LISPT operator"" _e(const char* s, std::size_t)
-{
-  return eval(s);
-}
+inline LISPT operator"" _e(const char* s, std::size_t) { return eval(s); }
 
-inline LISPT mklist(lisp& l, LISPT t)
-{
-  return cons(l, t, NIL);
-}
+inline LISPT mklist(lisp& l, LISPT t) { return cons(l, t, NIL); }
 
 template<typename... Ts>
-LISPT mklist(lisp& l, LISPT t, Ts ...ts)
+LISPT mklist(lisp& l, LISPT t, Ts... ts)
 {
   return cons(l, t, mklist(l, ts...));
 }
 
-inline LISPT mklist(LISPT t)
-{
-  return cons(t, NIL);
-}
+inline LISPT mklist(LISPT t) { return cons(t, NIL); }
 
 template<typename... Ts>
-LISPT mklist(LISPT t, Ts ...ts)
+LISPT mklist(LISPT t, Ts... ts)
 {
   return cons(t, mklist(ts...));
 }

@@ -32,8 +32,13 @@ public:
   class level
   {
   public:
-    level(repl& repl) : _repl(repl) { ++_repl._level; }
+    level(repl& repl)
+      : _repl(repl)
+    {
+      ++_repl._level;
+    }
     ~level() { --_repl._level; }
+
   private:
     repl& _repl;
   };

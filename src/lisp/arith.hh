@@ -54,7 +54,7 @@ LISPT leq(lisp&, LISPT, LISPT);
 LISPT neqp(lisp&, LISPT, LISPT);
 LISPT zerop(lisp&, LISPT);
 LISPT minusp(lisp&, LISPT);
-}
+} // namespace lisp::arith
 
 namespace lisp
 {

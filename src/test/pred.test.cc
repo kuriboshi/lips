@@ -128,4 +128,4 @@ TEST_CASE("Predicate functions")
   }
 }
 
-}
+} // namespace lisp

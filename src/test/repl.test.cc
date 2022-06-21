@@ -45,7 +45,7 @@ TEST_CASE("Interactive tests")
 > )";
     CHECK(cout.str() == expected);
   }
-  
+
   SECTION("Example interaction")
   {
     std::string is = R"(
@@ -121,4 +121,4 @@ a
   }
 }
 
-}
+} // namespace lisp

@@ -63,14 +63,12 @@ TEST_CASE("Low level functions")
     set("a"_l, 0_l);
     set("i"_l, 3_l);
     xwhile(mklist("greaterp"_a, "i"_a, 0_l),
-      mklist(
-        mklist("setq"_a, "a"_a, mklist("plus"_a, "a"_a, "i"_a)),
+      mklist(mklist("setq"_a, "a"_a, mklist("plus"_a, "a"_a, "i"_a)),
         mklist("setq"_a, "i"_a, mklist("difference"_a, "i"_a, 1_l))));
     CHECK("a"_a->value()->intval() == 6);
     set("i"_a, 3_l);
     xwhile(l, mklist(l, "greaterp"_a, "i"_a, 0_l),
-      mklist(l, 
-        mklist(l, "setq"_a, "a"_a, mklist(l, "plus"_a, "a"_a, "i"_a)),
+      mklist(l, mklist(l, "setq"_a, "a"_a, mklist(l, "plus"_a, "a"_a, "i"_a)),
         mklist(l, "setq"_a, "i"_a, mklist(l, "difference"_a, "i"_a, 1_l))));
   }
 
@@ -142,4 +140,4 @@ TEST_CASE("Low level functions")
   }
 }
 
-}
+} // namespace lisp

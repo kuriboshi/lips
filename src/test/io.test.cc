@@ -29,12 +29,9 @@ struct create_test_file final
     std::ofstream of(file);
     of << contents;
   }
-  ~create_test_file()
-  {
-    std::filesystem::remove(file);
-  }
+  ~create_test_file() { std::filesystem::remove(file); }
 };
-}
+} // namespace
 
 namespace lisp
 {
@@ -100,7 +97,8 @@ TEST_CASE("io: lispread/readline")
 
   SECTION("Read from utf-8 2")
   {
-    std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
+    std::string s_nihongo{
+      R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     auto in = ref_file_t::create(s_nihongo);
     auto nihongo = lispread(l, in);
@@ -112,7 +110,8 @@ TEST_CASE("io: lispread/readline")
   SECTION("Read utf-8 from file")
   {
     constexpr const char* test_file{"test.lisp"};
-    std::string s_nihongo{R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
+    std::string s_nihongo{
+      R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     {
       std::ofstream o{test_file};

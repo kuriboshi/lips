@@ -36,4 +36,4 @@ TEST_CASE("Debug functions")
   CHECK(t == 0);
 }
 
-}
+} // namespace lisp

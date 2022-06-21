@@ -52,7 +52,8 @@ void term_source::clearlbuf()
  */
 void term_source::init_keymap()
 {
-  for(int i = NUM_KEYS - 1; i != 0; i--) key_tab[i] = term_fun::T_INSERT;
+  for(int i = NUM_KEYS - 1; i != 0; i--)
+    key_tab[i] = term_fun::T_INSERT;
   key_tab[CERASE] = term_fun::T_ERASE;
   key_tab[CTRL('H')] = term_fun::T_ERASE;
   key_tab[CRPRNT] = term_fun::T_RETYPE;
@@ -95,7 +96,7 @@ void term_source::init_term()
         curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
         curdn = "\n";
         curfwd = tgetstr(const_cast<char*>("nd"), &termc); // NOLINT
-        cleol = tgetstr(const_cast<char*>("ce"), &termc); // NOLINT
+        cleol = tgetstr(const_cast<char*>("ce"), &termc);  // NOLINT
         nocap = (curup == nullptr || curdn == nullptr || curfwd == nullptr || cleol == nullptr);
       }
     }
@@ -272,14 +273,16 @@ void term_source::retype(int all)
         ;
       if(i == 0)
         std::cout << current_prompt;
-      for(++i; i < linepos; i++) pputc(linebuffer[i], stdout);
+      for(++i; i < linepos; i++)
+        pputc(linebuffer[i], stdout);
     }
     else if(all == 1)
     {
       pputc(CRPRNT, stdout);
       pputc('\n', stdout);
       std::cout << current_prompt;
-      for(int i = 0; i < linepos; ++i) pputc(linebuffer[i], stdout);
+      for(int i = 0; i < linepos; ++i)
+        pputc(linebuffer[i], stdout);
     }
     else
     {
@@ -300,7 +303,8 @@ char* term_source::mkexstr()
   last = word.data() + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(std::isspace(linebuffer[i - 1]) == 0 && i > 0) *last-- = linebuffer[--i];
+  while(std::isspace(linebuffer[i - 1]) == 0 && i > 0)
+    *last-- = linebuffer[--i];
   return ++last;
 }
 
@@ -500,18 +504,21 @@ void term_source::blink()
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
   {
-    for(int i = 0; parpos.line_start[i]; i++) pputc(parpos.line_start[i], stdout); // NOLINT
+    for(int i = 0; parpos.line_start[i]; i++)
+      pputc(parpos.line_start[i], stdout); // NOLINT
   }
   else
   {
     if(currentpos.line == 0)
       std::cout << current_prompt;
-    for(int i = 0; currentpos.line_start[i]; i++) pputc(currentpos.line_start[i], stdout); // NOLINT
+    for(int i = 0; currentpos.line_start[i]; i++)
+      pputc(currentpos.line_start[i], stdout); // NOLINT
   }
   fflush(stdout);
 }
 
-void term_source::clearscr() {
+void term_source::clearscr()
+{
 #ifdef HAVE_CURSES
   tputs(clear, 1, outc);
 #endif

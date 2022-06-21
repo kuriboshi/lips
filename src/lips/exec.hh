@@ -41,18 +41,29 @@ LISPT doexec(lisp&, LISPT cmd);
 
 LISPT rehash(lisp&);
 void do_rehash();
-}
+} // namespace lisp::exec
 
 namespace lisp
 {
 inline LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(l, cmd, file, filed); }
-inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_append(l, cmd, file, filed); }
+inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+{
+  return exec::redir_append(l, cmd, file, filed);
+}
 inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(l, cmd, file, filed); }
 inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec::pipecmd(l, cmds); }
 inline LISPT back(lisp& l, LISPT x) { return exec::back(l, x); }
 inline LISPT stop(lisp& l) { return exec::stop(l); }
-inline LISPT rehash(lisp&) { exec::do_rehash(); return NIL; }
-inline LISPT rehash() { exec::do_rehash(); return NIL; }
+inline LISPT rehash(lisp&)
+{
+  exec::do_rehash();
+  return NIL;
+}
+inline LISPT rehash()
+{
+  exec::do_rehash();
+  return NIL;
+}
 inline LISPT jobs(lisp& l) { return exec::jobs(l); }
 inline LISPT fg(lisp& l, LISPT job) { return exec::fg(l, job); }
 inline LISPT bg(lisp& l, LISPT job) { return exec::bg(l, job); }

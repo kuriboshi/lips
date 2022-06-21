@@ -104,7 +104,7 @@ TEST_CASE("Primary functions")
     CHECK(cadr(sym) == NIL);
     CHECK(cdar(sym) == NIL);
     CHECK(cddr(sym) == NIL);
-    
+
     CHECK(caaar(sym) == NIL);
     CHECK(caadr(sym) == NIL);
     CHECK(cadar(sym) == NIL);
@@ -212,4 +212,4 @@ TEST_CASE("Primary functions")
   }
 }
 
-}
+} // namespace lisp

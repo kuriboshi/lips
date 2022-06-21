@@ -79,7 +79,10 @@ private:
   // @brief Pops continuations, destinations, or LISPT objects from the control
   // stack.
   template<typename T>
-  T pop() { return std::get<T>(control[--toctrl]); }
+  T pop()
+  {
+    return std::get<T>(control[--toctrl]);
+  }
   destblock_t* pop_env();
 
   void xbreak(int mess, LISPT fault, continuation_t next);

@@ -60,10 +60,7 @@ class ref_count
 {
 public:
   /// @brief Increase the reference counter.
-  void retain()
-  {
-    ++_counter;
-  }
+  void retain() { ++_counter; }
   /// @brief Decrease the reference counter.
   ///
   /// @details Once the counter reaches zero the object is automatically
@@ -84,7 +81,8 @@ private:
   mutable Counter _counter = 0;
   /// @brief Only the ref_ptr class is allowed to create objects of type
   /// ref_count.
-  template<typename U> friend class ref_ptr;
+  template<typename U>
+  friend class ref_ptr;
 };
 
 ///
@@ -100,15 +98,19 @@ public:
   /// @brief Default constructor initializes to nullptr.
   ref_ptr() = default;
   /// @brief Create an empty ref_ptr.
-  ref_ptr(const std::nullptr_t): _ptr(nullptr) {}
+  ref_ptr(const std::nullptr_t)
+    : _ptr(nullptr)
+  {}
   /// @brief
-  ref_ptr(T* p): _ptr(p)
+  ref_ptr(T* p)
+    : _ptr(p)
   {
     if(_ptr)
       _ptr->retain();
   }
   /// @brief Copy constructor will increase the reference count.
-  ref_ptr(const ref_ptr& x): _ptr(x._ptr)
+  ref_ptr(const ref_ptr& x)
+    : _ptr(x._ptr)
   {
     if(_ptr)
       _ptr->retain();
@@ -116,7 +118,10 @@ public:
   /// @brief Create a ref_ptr<T> with a pointer to an object of type T.
   /// @brief Creates an object of type T and takes ownership of it.
   template<typename... Ts>
-  static ref_ptr<T> create(Ts&&... ts) { return ref_ptr<T>(new T(std::forward<Ts>(ts)...)); }
+  static ref_ptr<T> create(Ts&&... ts)
+  {
+    return ref_ptr<T>(new T(std::forward<Ts>(ts)...));
+  }
   /// @brief Assignment operator.
   ///
   /// @details The reference counter of the assigned object is incremented. If
@@ -164,26 +169,18 @@ public:
   T* operator->() const { return _ptr; }
   /// @brief Smart pointer comparor for sorting purposes.
   bool operator<(const ref_ptr<T>& x) const { return _ptr < x._ptr; }
-  explicit operator bool() const noexcept
-  {
-    return _ptr != nullptr;
-  }
+  explicit operator bool() const noexcept { return _ptr != nullptr; }
+
 private:
   /// @brief The pointer to the object being controlled.
   T* _ptr = nullptr;
   /// @brief Smart pointer comparor for sorting purposes.
   friend bool operator<(const ref_ptr<T>& x, const ref_ptr<T>& y) { return x._ptr < y._ptr; }
   /// @brief Equality operator.
-  friend bool operator==(const ref_ptr<T>& l, const ref_ptr<T>& r)
-  {
-    return l._ptr == r._ptr;
-  }
+  friend bool operator==(const ref_ptr<T>& l, const ref_ptr<T>& r) { return l._ptr == r._ptr; }
   /// @brief Equality operator.
-  friend bool operator!=(const ref_ptr<T>& l, const ref_ptr<T>& r)
-  {
-    return l._ptr != r._ptr;
-  }
+  friend bool operator!=(const ref_ptr<T>& l, const ref_ptr<T>& r) { return l._ptr != r._ptr; }
 };
-}
+} // namespace lisp
 
 #endif

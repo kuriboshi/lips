@@ -26,7 +26,11 @@ namespace lisp
 class top
 {
 public:
-  top(lisp& lisp, const options_t& options, ref_file_t file) : l(lisp), _options(options), _file(file) {}
+  top(lisp& lisp, const options_t& options, ref_file_t file)
+    : l(lisp),
+      _options(options),
+      _file(file)
+  {}
   ~top() = default;
 
   static void init(alloc&);
@@ -50,7 +54,7 @@ public:
 
   static LISPT input_exp;
   static std::function<LISPT(lisp&, LISPT)> transform_hook; // Applied on input if non-nullptr.
-  static std::function<void()> prompt_hook;          // Called before the prompt is printed.
+  static std::function<void()> prompt_hook;                 // Called before the prompt is printed.
 
 private:
   static LISPT alias_expanded; //For checking alias loops.
@@ -67,12 +71,12 @@ private:
         promptform(initcvar("promptform", NIL))
     {}
 
-    cvariable_t& history;       // Holds the history list.
-    cvariable_t& histnum;       // Current event number.
-    cvariable_t& histmax;       // Maximum number of events to save.
+    cvariable_t& history; // Holds the history list.
+    cvariable_t& histnum; // Current event number.
+    cvariable_t& histmax; // Maximum number of events to save.
     cvariable_t& topprompt;
     cvariable_t& brkprompt;
-    cvariable_t& promptform;    // Evaluated before printing the prompt.
+    cvariable_t& promptform; // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables;
 

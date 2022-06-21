@@ -121,16 +121,28 @@ struct subr_t
   using func3_t = std::function<LISPT(lisp&, LISPT, LISPT, LISPT)>;
 
   subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
-    : name(pname), f(fun), subr(subr), spread(spread)
+    : name(pname),
+      f(fun),
+      subr(subr),
+      spread(spread)
   {}
   subr_t(const std::string& pname, func1_t fun, enum subr subr, enum spread spread)
-    : name(pname), f(fun), subr(subr), spread(spread)
+    : name(pname),
+      f(fun),
+      subr(subr),
+      spread(spread)
   {}
   subr_t(const std::string& pname, func2_t fun, enum subr subr, enum spread spread)
-    : name(pname), f(fun), subr(subr), spread(spread)
+    : name(pname),
+      f(fun),
+      subr(subr),
+      spread(spread)
   {}
   subr_t(const std::string& pname, func3_t fun, enum subr subr, enum spread spread)
-    : name(pname), f(fun), subr(subr), spread(spread)
+    : name(pname),
+      f(fun),
+      subr(subr),
+      spread(spread)
   {}
   constexpr std::size_t argcount() const noexcept { return f.index(); }
 
@@ -175,7 +187,7 @@ struct lambda_t
 
 /// @brief A closure (static binding).
 ///
-class closure_t : public ref_count<closure_t>
+class closure_t: public ref_count<closure_t>
 {
 public:
   LISPT cfunction = NIL;
@@ -183,18 +195,9 @@ public:
   LISPT cvalues = NIL;
   std::uint8_t count = 0;
 
-  void* operator new(std::size_t)
-  {
-    return _pool.allocate();
-  }
-  void operator delete(void* x)
-  {
-    _pool.deallocate(x);
-  }
-  void operator delete(closure_t* x, std::destroying_delete_t)
-  {
-    _pool.deallocate(x);
-  }
+  void* operator new(std::size_t) { return _pool.allocate(); }
+  void operator delete(void* x) { _pool.deallocate(x); }
+  void operator delete(closure_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
 private:
   using pool_t = pool<closure_t, 256>;
@@ -218,14 +221,13 @@ struct subr_index
 class cvariable_t
 {
 public:
-  explicit cvariable_t(LISPT value): _value(value) {}
+  explicit cvariable_t(LISPT value)
+    : _value(value)
+  {}
   cvariable_t() {}
   ~cvariable_t() = default;
   cvariable_t(const cvariable_t& other) = delete;
-  cvariable_t(cvariable_t&& other) noexcept
-  {
-    _value = std::move(other._value);
-  }
+  cvariable_t(cvariable_t&& other) noexcept { _value = std::move(other._value); }
   cvariable_t& operator=(cvariable_t&& other) noexcept
   {
     std::swap(_value, other._value);
@@ -239,7 +241,7 @@ public:
   }
 
   /// @brief Automatically convert to the LISPT value in a LISPT context.
-  operator LISPT () const noexcept { return _value; }
+  operator LISPT() const noexcept { return _value; }
   /// @brief Dereference the wrapped LISPT value.
   LISPT operator*() const noexcept { return _value; }
   /// @brief Dereference the wrapped LISPT value.
@@ -343,23 +345,36 @@ public:
     set('#', type::SHELL_COMMENT);
     set('\'', type::QUOTE);
   }
+
 private:
   std::array<type, 256> _table = {type::OTHER};
   std::array<LISPT, 256> _macro = {NIL};
 };
 
-class lisp_t final : public ref_count<lisp_t>
+class lisp_t final: public ref_count<lisp_t>
 {
 public:
   lisp_t() = default;
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
-  void set() { _type = type::NIL; _u = {}; }
-  void set(std::nullptr_t) { _type = type::EMPTY; _u = nullptr; }
+  void set()
+  {
+    _type = type::NIL;
+    _u = {};
+  }
+  void set(std::nullptr_t)
+  {
+    _type = type::EMPTY;
+    _u = nullptr;
+  }
   bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
-  void set(const symbol::symbol_t& sym) { _type = type::SYMBOL; _u = sym.id; }
+  void set(const symbol::symbol_t& sym)
+  {
+    _type = type::SYMBOL;
+    _u = sym.id;
+  }
   auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
   void value(LISPT x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
   auto intval() const -> int { return std::get<int>(_u); }
@@ -375,9 +390,17 @@ public:
     _u = f;
   }
   auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
-  void set(indirect_t x) { _type = type::INDIRECT; _u = x; }
+  void set(indirect_t x)
+  {
+    _type = type::INDIRECT;
+    _u = x;
+  }
   auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
-  void set(cons_t x) { _type = type::CONS; _u = x; }
+  void set(cons_t x)
+  {
+    _type = type::CONS;
+    _u = x;
+  }
   auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
   auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
   void car(LISPT x) { std::get<cons_t>(_u).car = x; }
@@ -395,15 +418,35 @@ public:
     _u = x;
   }
   auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
-  void set(lambda_t x, bool lambda) { _type = lambda ? type::LAMBDA : type::NLAMBDA; _u = x; }
+  void set(lambda_t x, bool lambda)
+  {
+    _type = lambda ? type::LAMBDA : type::NLAMBDA;
+    _u = x;
+  }
   auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
-  void set(ref_closure_t x) { _type = type::CLOSURE; _u = x; }
+  void set(ref_closure_t x)
+  {
+    _type = type::CLOSURE;
+    _u = x;
+  }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
-  void set(destblock_t* env) { _type = type::ENVIRON; _u = env; }
+  void set(destblock_t* env)
+  {
+    _type = type::ENVIRON;
+    _u = env;
+  }
   auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
-  void set(ref_file_t f) { _type = type::FILET; _u = f; }
+  void set(ref_file_t f)
+  {
+    _type = type::FILET;
+    _u = f;
+  }
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
-  void set(cvariable_t&& x) { _type = type::CVARIABLE; _u = std::move(x); }
+  void set(cvariable_t&& x)
+  {
+    _type = type::CVARIABLE;
+    _u = std::move(x);
+  }
 
   const std::string& getstr() const
   {
@@ -420,23 +463,11 @@ public:
   }
 
   // The new and delete operators uses the global pool to create objects.
-  void* operator new(std::size_t)
-  {
-    return _pool.allocate();
-  }
-  void operator delete(void* x)
-  {
-    _pool.deallocate(x);
-  }
-  void operator delete(lisp_t* x, std::destroying_delete_t)
-  {
-    _pool.deallocate(x);
-  }
+  void* operator new(std::size_t) { return _pool.allocate(); }
+  void operator delete(void* x) { _pool.deallocate(x); }
+  void operator delete(lisp_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
-  static std::size_t freecount()
-  {
-    return _pool.size();
-  }
+  static std::size_t freecount() { return _pool.size(); }
 
 private:
   using pool_t = pool<lisp_t, 256>;
@@ -446,22 +477,22 @@ private:
 
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
-  std::variant<
-    std::monostate,             // NIL
-    std::nullptr_t,             // EMPTY
-    symbol::symbol_id,          // SYMBOL
-    int,                        // INTEGER
-    double,                     // FLOAT
-    indirect_t,                 // INDIRECT
-    cons_t,                     // CONS
-    std::string,                // STRING
-    subr_index,                 // SUBR
-    lambda_t,                   // LAMBDA
-    ref_closure_t,              // CLOSURE
-    destblock_t*,               // ENVIRON
-    ref_file_t,                 // FILE
-    cvariable_t                 // CVARIABLE
-    > _u;
+  std::variant<std::monostate, // NIL
+    std::nullptr_t,            // EMPTY
+    symbol::symbol_id,         // SYMBOL
+    int,                       // INTEGER
+    double,                    // FLOAT
+    indirect_t,                // INDIRECT
+    cons_t,                    // CONS
+    std::string,               // STRING
+    subr_index,                // SUBR
+    lambda_t,                  // LAMBDA
+    ref_closure_t,             // CLOSURE
+    destblock_t*,              // ENVIRON
+    ref_file_t,                // FILE
+    cvariable_t                // CVARIABLE
+    >
+    _u;
 };
 
 inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
@@ -513,9 +544,9 @@ public:
 
   enum class break_return
   {
-    RETURN,                     // Return from recursive repl
-    PROCEED,                    // Proceed with repl
-    SKIP,                       // Skip eval
+    RETURN,  // Return from recursive repl
+    PROCEED, // Proceed with repl
+    SKIP,    // Skip eval
   };
   using repl_fun_t = std::function<LISPT(LISPT)>;
   repl_fun_t repl;
@@ -684,11 +715,9 @@ public:
     previous = &lisp::current();
     lisp::current(c);
   }
-  ~current()
-  {
-    lisp::current(*previous);
-  }
+  ~current() { lisp::current(*previous); }
   current(const current&) = delete;
+
 private:
   lisp* previous = nullptr;
 };
@@ -700,8 +729,8 @@ void check(LISPT arg, T type)
     error(ILLEGAL_ARG, arg);
 }
 
-template<typename T, typename ...Ts>
-void check(LISPT arg, T type, Ts ...types)
+template<typename T, typename... Ts>
+void check(LISPT arg, T type, Ts... types)
 {
   if(type_of(arg) == type)
     return;

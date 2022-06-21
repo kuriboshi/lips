@@ -47,4 +47,4 @@ TEST_CASE("Property functions")
   CHECK(getprop(sym, mkatom("prop2")) == NIL);
 }
 
-}
+} // namespace lisp

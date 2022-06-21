@@ -29,8 +29,8 @@ class env
 public:
   env();
 
-  cvariable_t& path;            // Search path for executables.
-  cvariable_t& home;            // Home directory.
+  cvariable_t& path; // Search path for executables.
+  cvariable_t& home; // Home directory.
   cvariable_t& globsort;
 
   static std::string get(const std::string& pstr)
@@ -73,6 +73,6 @@ private:
   }
 };
 
-}
+} // namespace lisp
 
 #endif

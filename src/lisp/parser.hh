@@ -39,7 +39,7 @@ class lexer;
 /// @brief The LISP input parser.
 ///
 /// @details The main attraction.
-///  
+///
 class parser
 {
 public:
@@ -47,7 +47,9 @@ public:
   /// @details The parser takes a lexer as the only parameter.  The parser
   ///   calls the lexer every time it needs the next token.
   /// @param lexer A lexer object which returns the next token.
-  explicit parser(lexer& lexer) : _lexer(lexer) {}
+  explicit parser(lexer& lexer)
+    : _lexer(lexer)
+  {}
   /// @brief Parse the sequence of tokens supplied by the lexer.
   /// @return The return value is the SEXPR.
   LISPT parse() { return parse_object(); }
@@ -97,10 +99,7 @@ private:
   /// @brief Parse the tail of a list.
   LISPT parse_tail();
   /// @brief Make a symbol from a string.
-  LISPT make_symbol(const std::string& symbol) const
-  {
-    return mkatom(symbol);
-  }
+  LISPT make_symbol(const std::string& symbol) const { return mkatom(symbol); }
 
   /// @brief Holds the lexer object.
   lexer& _lexer;

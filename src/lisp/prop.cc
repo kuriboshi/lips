@@ -100,4 +100,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp
+} // namespace lisp::prop

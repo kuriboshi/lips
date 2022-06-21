@@ -245,7 +245,8 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
       return tmp;
       break;
     case '$':
-      while(type_of(tmp->cdr()) == type::CONS) tmp = tmp->cdr();
+      while(type_of(tmp->cdr()) == type::CONS)
+        tmp = tmp->cdr();
       return tmp;
       break;
     case '*':
@@ -281,18 +282,19 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
 
 namespace lisp::pn
 {
-inline constexpr auto PRINTHIST = "??"; // print history
+inline constexpr auto PRINTHIST = "??";  // print history
 inline constexpr auto RMEXCL = "rmexcl"; // History read-macro
-}
+} // namespace lisp::pn
 
 void top::init(alloc& a)
 {
   variables = std::make_unique<cvariables>(a);
-  mkprim(pn::PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(
+    pn::PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
-LISPT top::input_exp;           // The input expression.
+LISPT top::input_exp; // The input expression.
 std::function<LISPT(::lisp::lisp&, LISPT)> top::transform_hook;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded;

@@ -68,18 +68,25 @@ struct token_t final
   std::string token;
 
   /// @brief Default constructor is the empty token.
-  token_t(): type(type::EMPTY) {}
+  token_t()
+    : type(type::EMPTY)
+  {}
   /// @brief Construct a token of a certain type but with an empty token
   /// string.
   ///
   /// @param t The type of token.
-  token_t(enum type t): type(t) {}
+  token_t(enum type t)
+    : type(t)
+  {}
   /// @brief Construct a token of a certain type with the token string
   /// representation given.
   ///
   /// @param t The type of token.
   /// @param s The token string.
-  token_t(enum type t, const std::string& s): type(t), token(s) {}
+  token_t(enum type t, const std::string& s)
+    : type(t),
+      token(s)
+  {}
   /// @brief Default destructor.
   ~token_t() = default;
   /// @brief The operator bool for use in bool contexts.
@@ -98,7 +105,12 @@ struct token_t final
   /// @brief The move constructor.
   ///
   /// @details The moved from token becomes an empty token.
-  token_t(token_t&& t): type(t.type), token(std::move(t.token)) { t.type = type::EMPTY; }
+  token_t(token_t&& t)
+    : type(t.type),
+      token(std::move(t.token))
+  {
+    t.type = type::EMPTY;
+  }
 
   /// @brief Checks that the token is of type SPECIAL and the value matches the
   /// character in the argument.
@@ -158,10 +170,26 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
 class lexer
 {
 public:
-  lexer(ref_file_t input): _lisp(lisp::current()), _input(input), _pos(_input->source().begin()) {}
-  lexer(std::string s): _lisp(lisp::current()), _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
-  lexer(lisp& lisp, ref_file_t input): _lisp(lisp), _input(input), _pos(_input->source().begin()) {}
-  lexer(lisp& lisp, std::string s): _lisp(lisp), _input(ref_file_t::create(s)), _pos(_input->source().begin()) {}
+  lexer(ref_file_t input)
+    : _lisp(lisp::current()),
+      _input(input),
+      _pos(_input->source().begin())
+  {}
+  lexer(std::string s)
+    : _lisp(lisp::current()),
+      _input(ref_file_t::create(s)),
+      _pos(_input->source().begin())
+  {}
+  lexer(lisp& lisp, ref_file_t input)
+    : _lisp(lisp),
+      _input(input),
+      _pos(_input->source().begin())
+  {}
+  lexer(lisp& lisp, std::string s)
+    : _lisp(lisp),
+      _input(ref_file_t::create(s)),
+      _pos(_input->source().begin())
+  {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
@@ -169,10 +197,7 @@ public:
   syntax::type get(std::uint8_t index) const { return _lisp.read_table().get(index); }
   void set(std::uint8_t index, syntax::type value) { _lisp.read_table().set(index, value); }
   void set(std::uint8_t index, LISPT value) { _lisp.read_table().set(index, value); }
-  LISPT macro(token_t token)
-  {
-    return _lisp.read_table().macro(_lisp, _input, token.token[0]);
-  }
+  LISPT macro(token_t token) { return _lisp.read_table().macro(_lisp, _input, token.token[0]); }
 
 private:
   lisp& _lisp;

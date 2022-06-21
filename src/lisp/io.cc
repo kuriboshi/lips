@@ -32,7 +32,7 @@ static std::array digits{
       'u', 'v', 'w', 'x', 'y', 'z'})
 };
 // clang-format on
-}
+} // namespace lisp
 
 namespace lisp::io
 {
@@ -108,14 +108,14 @@ LISPT getline(lisp& l, LISPT file)
 // Print the string s, on stream file
 inline void ps(const std::string& s, file_t& file, bool esc)
 {
-  for(auto c: s) file.putch(c, esc);
+  for(auto c: s)
+    file.putch(c, esc);
 }
 
 inline void pi(std::int64_t i, int base, file_t& file)
 {
   std::array<char, 33> ss{};
-  if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, base);
-    ec == std::errc())
+  if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, base); ec == std::errc())
   {
     *ptr = '\0';
     ps(ss.data(), file, false);
@@ -315,7 +315,8 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
   }
   rplacd(l, x, y);
   LISPT t2 = NIL;
-  for(; type_of(y) == type::CONS; y = y->cdr()) t2 = y;
+  for(; type_of(y) == type::CONS; y = y->cdr())
+    t2 = y;
   return rplacd(l, t2, t);
 }
 
@@ -339,4 +340,4 @@ file_sink::file_sink(const std::string& name, bool append)
     throw lisp_error("Can't open file " + name);
 }
 
-} // namespace io::lisp
+} // namespace lisp::io

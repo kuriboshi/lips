@@ -112,4 +112,4 @@ TEST_CASE("String functions")
   }
 }
 
-}
+} // namespace lisp

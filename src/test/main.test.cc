@@ -62,4 +62,4 @@ TEST_CASE("exit")
   }
 }
 
-}
+} // namespace lisp

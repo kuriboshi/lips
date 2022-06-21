@@ -54,13 +54,10 @@ public:
 
   using iterator = std::istreambuf_iterator<char>;
   virtual iterator begin() = 0;
-  iterator end() { return iterator(); }  
+  iterator end() { return iterator(); }
 
 protected:
-  int getch(std::istream& stream)
-  {
-    return stream.get();
-  }
+  int getch(std::istream& stream) { return stream.get(); }
 
   std::optional<std::string> getline(std::istream& stream)
   {
@@ -83,20 +80,14 @@ public:
   using source::getch;
   using source::getline;
 
-  int getch() override
-  {
-    return getch(*_file);
-  }
+  int getch() override { return getch(*_file); }
   void ungetch(int c) override { _file->putback(c); }
   bool close() override
   {
     _file->close();
     return !_file->is_open();
   }
-  std::optional<std::string> getline() override
-  {
-    return getline(*_file);
-  }
+  std::optional<std::string> getline() override { return getline(*_file); }
 
   iterator begin() override { return iterator(*_file); }
 
@@ -107,22 +98,18 @@ private:
 class stream_source: public source
 {
 public:
-  stream_source(std::istream& stream): _stream(stream) {}
+  stream_source(std::istream& stream)
+    : _stream(stream)
+  {}
   ~stream_source() = default;
 
   using source::getch;
   using source::getline;
 
-  int getch() override
-  {
-    return getch(_stream);
-  }
+  int getch() override { return getch(_stream); }
   void ungetch(int c) override { _stream.putback(c); }
   bool close() override { return true; }
-  std::optional<std::string> getline() override
-  {
-    return getline(_stream);
-  }
+  std::optional<std::string> getline() override { return getline(_stream); }
 
   iterator begin() override { return iterator(_stream); }
 
@@ -133,15 +120,14 @@ private:
 class string_source: public source
 {
 public:
-  string_source(const std::string& string): _string(string) {}
+  string_source(const std::string& string)
+    : _string(string)
+  {}
 
   using source::getch;
   using source::getline;
 
-  int getch() override
-  {
-    return getch(_string);
-  }
+  int getch() override { return getch(_string); }
   void ungetch(int c) override { _string.putback(c); }
   bool close() override { return true; }
   std::optional<std::string> getline() override { return getline(_string); }
@@ -213,7 +199,9 @@ private:
 class stream_sink final: public sink
 {
 public:
-  stream_sink(std::ostream& stream): _stream(stream) {}
+  stream_sink(std::ostream& stream)
+    : _stream(stream)
+  {}
   ~stream_sink() = default;
 
   using sink::putch;
@@ -257,13 +245,29 @@ namespace lisp
 class file_t final: public ref_count<file_t>
 {
 public:
-  file_t(std::unique_ptr<io::source> source): _source(std::move(source)) {}
-  file_t(std::unique_ptr<io::sink> sink): _sink(std::move(sink)) {}
-  file_t(std::unique_ptr<io::source> source, std::unique_ptr<io::sink> sink): _source(std::move(source)), _sink(std::move(sink)) {}
-  file_t(std::istream& stream): _source(std::make_unique<io::stream_source>(stream)) {}
-  file_t(std::ostream& stream): _sink(std::make_unique<io::stream_sink>(stream)) {}
-  file_t(const std::string& string): _source(std::make_unique<io::string_source>(string)) {}
-  file_t(file_t&& file) noexcept: _source(std::move(file._source)), _sink(std::move(file._sink)) {}
+  file_t(std::unique_ptr<io::source> source)
+    : _source(std::move(source))
+  {}
+  file_t(std::unique_ptr<io::sink> sink)
+    : _sink(std::move(sink))
+  {}
+  file_t(std::unique_ptr<io::source> source, std::unique_ptr<io::sink> sink)
+    : _source(std::move(source)),
+      _sink(std::move(sink))
+  {}
+  file_t(std::istream& stream)
+    : _source(std::make_unique<io::stream_source>(stream))
+  {}
+  file_t(std::ostream& stream)
+    : _sink(std::make_unique<io::stream_sink>(stream))
+  {}
+  file_t(const std::string& string)
+    : _source(std::make_unique<io::string_source>(string))
+  {}
+  file_t(file_t&& file) noexcept
+    : _source(std::move(file._source)),
+      _sink(std::move(file._sink))
+  {}
   ~file_t() {}
 
   bool has_source() { return !!_source; }
@@ -271,16 +275,44 @@ public:
 
   // source
   io::source& source() { return *_source; }
-  int getch() { ptrcheck(_source); return _source->getch(); }
-  void ungetch(int c) { ptrcheck(_source); _source->ungetch(c); }
-  std::optional<std::string> getline() { ptrcheck(_source); return _source->getline(); }
+  int getch()
+  {
+    ptrcheck(_source);
+    return _source->getch();
+  }
+  void ungetch(int c)
+  {
+    ptrcheck(_source);
+    _source->ungetch(c);
+  }
+  std::optional<std::string> getline()
+  {
+    ptrcheck(_source);
+    return _source->getline();
+  }
 
   // sink
   io::sink& sink() { return *_sink; }
-  void putch(char c, bool esc = false) { ptrcheck(_sink); _sink->putch(c, esc); }
-  void puts(const std::string_view s) { ptrcheck(_sink); _sink->puts(s); }
-  void terpri() { ptrcheck(_sink); _sink->terpri(); }
-  void flush() { ptrcheck(_sink); _sink->flush(); }
+  void putch(char c, bool esc = false)
+  {
+    ptrcheck(_sink);
+    _sink->putch(c, esc);
+  }
+  void puts(const std::string_view s)
+  {
+    ptrcheck(_sink);
+    _sink->puts(s);
+  }
+  void terpri()
+  {
+    ptrcheck(_sink);
+    _sink->terpri();
+  }
+  void flush()
+  {
+    ptrcheck(_sink);
+    _sink->flush();
+  }
 
   template<typename... Ts>
   void format(std::string_view f, Ts&&... t)

@@ -34,10 +34,7 @@ public:
   /// @brief Stores a block of data to hold the objects of type T.
   struct data final
   {
-    data()
-    {
-      _block = std::malloc(N * sizeof(T));
-    }
+    data() { _block = std::malloc(N * sizeof(T)); }
     /// @brief Disallow copying.
     data(const data&) = delete;
     /// @brief Disallow assignment.
@@ -53,10 +50,7 @@ public:
     /// @brief Disallow move assignment.
     data& operator=(data&&) = delete;
     /// @brief Destructor.
-    ~data()
-    {
-      std::free(_block);
-    }
+    ~data() { std::free(_block); }
     void* _block;
     std::size_t _free_items = N;
   };
@@ -93,7 +87,7 @@ public:
     }
     // Placement new of the new object from our storage. The _current member
     // points to the first available memory in the data block.
-    T* object = ::new (_current) T;
+    T* object = ::new(_current) T;
     --_storage.front()._free_items;
     _current = static_cast<char*>(_current) + sizeof(T);
     return object;
@@ -114,6 +108,7 @@ public:
     _free = i;
     ++_free_count;
   }
+
 private:
   /// @brief Pointer to the head of a list of object previously returned to the
   /// pool by deallocate.
@@ -126,6 +121,6 @@ private:
   /// @brief Pointer to the next available memory in the data block.
   void* _current = nullptr;
 };
-}
+} // namespace lisp
 
 #endif

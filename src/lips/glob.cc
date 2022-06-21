@@ -54,7 +54,8 @@ bool dircheck(const std::string& wild, const std::string& original)
   auto wbegin = wild.begin();
   if(*wbegin == '/')
     return std::filesystem::is_directory(original);
-  while(wbegin != wild.end() && *wbegin == '*') ++wbegin;
+  while(wbegin != wild.end() && *wbegin == '*')
+    ++wbegin;
   return wbegin == wild.end();
 }
 
@@ -170,7 +171,7 @@ TEST_CASE("match")
 /// directories matching a glob pattern.
 ///
 /// @param wild The glob pattern to match. Standard patterns are supported (*, ?, [...]).
-/// 
+///
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::vector<std::string> walkfiles(const std::filesystem::path& wild)
 {
@@ -181,7 +182,7 @@ std::vector<std::string> walkfiles(const std::filesystem::path& wild)
     collect.emplace_back("");
   for(const auto& w: wild)
   {
-    // The iterating over an absolute path starts with a forward slash. We skip this one 
+    // The iterating over an absolute path starts with a forward slash. We skip this one
     if(w == "/")
       continue;
     auto process = std::move(collect);
@@ -256,14 +257,16 @@ TEST_CASE("walkfiles")
     auto result = walkfiles("testdir/*/*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
-    for(const auto* r: {"testdir/x/y"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
+    for(const auto* r: {"testdir/x/y"})
+      CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SECTION("walkfiles: testdir/[b]*")
   {
     auto result = walkfiles("testdir/[b]*");
     REQUIRE(!result.empty());
     CHECK(result.size() == 1);
-    for(const auto* r: {"testdir/bb"}) CHECK(std::find(result.begin(), result.end(), r) != result.end());
+    for(const auto* r: {"testdir/bb"})
+      CHECK(std::find(result.begin(), result.end(), r) != result.end());
   }
   SECTION("walkfiles: ./testd*")
   {
@@ -283,10 +286,11 @@ TEST_CASE("walkfiles")
 LISPT buildlist(const std::vector<std::string>& list)
 {
   LISPT l = NIL;
-  for(auto r: list) l = cons(mkstring(r), l);
+  for(auto r: list)
+    l = cons(mkstring(r), l);
   return l;
 }
-}
+} // namespace
 
 namespace glob
 {

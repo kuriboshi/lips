@@ -32,15 +32,12 @@ void lisp_compare(std::string input, const std::string& result)
   os << res;
   CHECK(os.str() == result);
 }
-}
+} // namespace
 
 namespace lisp
 {
 
-const std::string& pname(LISPT sym)
-{
-  return sym->symbol().pname;
-}
+const std::string& pname(LISPT sym) { return sym->symbol().pname; }
 
 TEST_CASE("parser (a b . c)")
 {
@@ -49,10 +46,7 @@ TEST_CASE("parser (a b . c)")
   CHECK(pname(cdr(cdr(res))) == "c");
 }
 
-TEST_CASE("parser (a . (b))")
-{
-  lisp_compare("(a . (b))", "(a b)");
-}
+TEST_CASE("parser (a . (b))") { lisp_compare("(a . (b))", "(a b)"); }
 
 LISPT nth(LISPT o, int n)
 {
@@ -97,10 +91,7 @@ TEST_CASE("parser (a b . (c d]")
   CHECK(pname(nth(res, 3)) == "d");
 }
 
-TEST_CASE("parser (a . (b . c))")
-{
-  lisp_compare("(a . (b . c))", "(a b . c)");
-}
+TEST_CASE("parser (a . (b . c))") { lisp_compare("(a . (b . c))", "(a b . c)"); }
 
 //
 // Regular objects and lists.
@@ -134,20 +125,11 @@ TEST_CASE("parser super")
   lisp_compare("(a [b (c] d)", "(a (b (c)) d)");
 }
 
-TEST_CASE("parser [a b) c)]")
-{
-  lisp_compare("[a b) c)]", "(((a b) c))");
-}
+TEST_CASE("parser [a b) c)]") { lisp_compare("[a b) c)]", "(((a b) c))"); }
 
-TEST_CASE("parser [a b) c))]")
-{
-  lisp_compare("[a b) c))]", "((((a b) c)))");
-}
+TEST_CASE("parser [a b) c))]") { lisp_compare("[a b) c))]", "((((a b) c)))"); }
 
-TEST_CASE("parser .")
-{
-  lisp_compare(".", ".");
-}
+TEST_CASE("parser .") { lisp_compare(".", "."); }
 
 TEST_CASE("parser end parenthesis")
 {
@@ -218,4 +200,4 @@ TEST_CASE("parser: macro")
   CHECK(r->string().starts_with("/"));
 }
 
-}
+} // namespace lisp

@@ -35,19 +35,14 @@ public:
     t1 = 0;
     t2 = 0;
   }
-  void* operator new(std::size_t)
-  {
-    return _pool.allocate();
-  }
-  void operator delete(void* x)
-  {
-    _pool.deallocate(x);
-  }
+  void* operator new(std::size_t) { return _pool.allocate(); }
+  void operator delete(void* x) { _pool.deallocate(x); }
   int t0 = 1;
   int t1 = 12;
   int t2 = 123;
   using pool_t = ::lisp::pool<Test, 2>;
   static pool_t& pool() { return _pool; };
+
 private:
   static pool_t _pool;
 };
@@ -93,19 +88,11 @@ class Foo
 {
 public:
   Foo() = default;
-  void* operator new(std::size_t)
-  {
-    return _pool.allocate();
-  }
-  void operator delete(void* x)
-  {
-    _pool.deallocate(x);
-  }
-  void operator delete(Foo* x, std::destroying_delete_t)
-  {
-    _pool.deallocate(x);
-  }
+  void* operator new(std::size_t) { return _pool.allocate(); }
+  void operator delete(void* x) { _pool.deallocate(x); }
+  void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
   static std::size_t size() { return _pool.size(); }
+
 private:
   std::string s;
   using pool_t = lisp::pool<Foo, 400>;
@@ -118,6 +105,7 @@ class Bar
 {
 public:
   Bar() = default;
+
 private:
   std::string s;
 };
@@ -153,7 +141,8 @@ std::pair<std::uint64_t, std::uint64_t> do_test()
 {
   std::uint64_t f{0};
   std::uint64_t b{0};
-  for(auto i = 0; i != M; ++i) {
+  for(auto i = 0; i != M; ++i)
+  {
     f += pool_test<Foo, N>();
     b += pool_test<Bar, N>();
   }
@@ -170,4 +159,4 @@ TEST_CASE("pool: speed")
   CHECK(p2.first < (p2.second * 1.50));
 }
 
-}
+} // namespace lisp

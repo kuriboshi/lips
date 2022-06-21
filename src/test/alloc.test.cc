@@ -159,4 +159,4 @@ TEST_CASE("Object sizes")
 }
 #endif
 
-}
+} // namespace lisp

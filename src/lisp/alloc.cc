@@ -20,7 +20,9 @@
 namespace lisp
 {
 /// @brief Class handling allocation of objects.
-alloc::alloc(): local_symbols(lisp_t::symbol_collection().create()) {}
+alloc::alloc()
+  : local_symbols(lisp_t::symbol_collection().create())
+{}
 
 /// @brief Default destructor.
 ///
@@ -32,10 +34,7 @@ alloc::~alloc() = default;
 /// @details If there are no free objects available a new page is allocated.
 ///
 /// @returns A new lisp_t object.
-LISPT alloc::getobject()
-{
-  return {new lisp_t};
-}
+LISPT alloc::getobject() { return {new lisp_t}; }
 
 /// @brief Creates a cons pair.
 ///
@@ -57,10 +56,7 @@ LISPT alloc::obarray()
   return o;
 }
 
-LISPT alloc::freecount()
-{
-  return mknumber(static_cast<int>(lisp_t::freecount()));
-}
+LISPT alloc::freecount() { return mknumber(static_cast<int>(lisp_t::freecount())); }
 
 LISPT alloc::mkstring(const std::string& str)
 {
@@ -75,7 +71,8 @@ LISPT alloc::mkstring(const std::string& str)
 /// @returns An integer number as a LISP object.
 LISPT alloc::mknumber(int number)
 {
-  auto c = getobject();;
+  auto c = getobject();
+  ;
   c->set(number);
   return c;
 }

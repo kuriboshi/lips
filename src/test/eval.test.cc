@@ -132,4 +132,4 @@ TEST_CASE("eval: control limits")
   CHECK(err.str() == "Stack overflow [in f]\n");
 }
 
-}
+} // namespace lisp
