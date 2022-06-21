@@ -1,6 +1,6 @@
 # Lips — lisp shell
 
-Copyright 1988-1989, 1992, 2020-2022 Krister Joas
+Copyright 1988-1989, 1992, 2020-2022 Krister Joas <krister@joas.jp>
 
 ![Ubuntu 18.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-18.04.yml/badge.svg)
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
@@ -156,3 +156,17 @@ From then on the target `test-linux` should work automatically.
 [2] Guy L. Steele, _Common Lisp the Language_, 2nd edition, Digital Press, 1990.<br>
 [3] H. Abelson, G. Sussman, and J. Sussman, _Structure and Interpretation of Computer Programs_, MIT Press, 1985.<br>
 [4] Allen, John, _Anatomy of LISP_, McGraw-Hill, Inc, 1978.
+
+# License
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
