@@ -20,6 +20,8 @@ for file in $(git grep -l Copyright)
 do
     # Skip README.md since it should contain a list of all copyright years.
     [[ "$file" == "README.md" ]] && continue
+    # Skip LICENSE file.
+    [[ "$file" == "LICENSE" ]] && continue
 
     awk -v exclude="$(dirname "$0")/exclude.txt" '
 function add_year(year) {
