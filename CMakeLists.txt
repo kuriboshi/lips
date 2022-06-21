@@ -29,6 +29,8 @@ endif()
 
 include(docker)
 
+include(cmake-format)
+
 set(LIPS_SOURCE_LOCATION
     "${CMAKE_INSTALL_PREFIX}/src/lips"
     CACHE STRING "Where to install source code for cpprint")
