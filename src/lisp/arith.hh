@@ -42,7 +42,7 @@ LISPT iremainder(lisp&, LISPT, LISPT);
 LISPT fdivide(lisp&, LISPT, LISPT);
 LISPT minus(lisp&, LISPT);
 LISPT iminus(lisp&, LISPT);
-LISPT absval(lisp&, LISPT);
+LISPT abs(lisp&, LISPT);
 LISPT itof(lisp&, LISPT);
 LISPT add1(lisp&, LISPT);
 LISPT sub1(lisp&, LISPT);
@@ -88,8 +88,8 @@ inline LISPT minus(lisp& l, LISPT a) { return arith::minus(l, a); }
 inline LISPT minus(LISPT a) { return arith::minus(lisp::current(), a); }
 inline LISPT iminus(lisp& l, LISPT a) { return arith::iminus(l, a); }
 inline LISPT iminus(LISPT a) { return arith::iminus(lisp::current(), a); }
-inline LISPT absval(lisp& l, LISPT i) { return arith::absval(l, i); }
-inline LISPT absval(LISPT i) { return arith::absval(lisp::current(), i); }
+inline LISPT abs(lisp& l, LISPT i) { return arith::abs(l, i); }
+inline LISPT abs(LISPT i) { return arith::abs(lisp::current(), i); }
 inline LISPT itof(lisp& l, LISPT i) { return arith::itof(l, i); }
 inline LISPT itof(LISPT i) { return arith::itof(lisp::current(), i); }
 inline LISPT add1(lisp& l, LISPT a) { return arith::add1(l, a); }

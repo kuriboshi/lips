@@ -296,17 +296,17 @@ TEST_CASE("Arithmetic functions")
   SECTION("abs")
   {
     {
-      auto r = absval(l, mknumber(-1));
+      auto r = abs(l, mknumber(-1));
       REQUIRE(type_of(r) == type::INTEGER);
       CHECK(r->intval() == 1);
     }
     {
-      auto r = absval(mknumber(-1));
+      auto r = abs(mknumber(-1));
       REQUIRE(type_of(r) == type::INTEGER);
       CHECK(r->intval() == 1);
     }
     {
-      auto r = absval(mknumber(1));
+      auto r = abs(mknumber(1));
       REQUIRE(type_of(r) == type::INTEGER);
       CHECK(r->intval() == 1);
     }

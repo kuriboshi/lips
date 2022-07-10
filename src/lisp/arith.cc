@@ -246,7 +246,7 @@ LISPT iminus(lisp& l, LISPT x)
   return mknumber(l, -x->intval());
 }
 
-LISPT absval(lisp& l, LISPT x)
+LISPT abs(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
   if(x->intval() < 0)
@@ -429,7 +429,7 @@ void init()
   mkprim(pn::EQP,         eqp,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::NEQP,        neqp,        subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::MINUSP,      minusp,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::ABS,         absval,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::ABS,         abs,         subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 
