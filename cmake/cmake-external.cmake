@@ -16,20 +16,36 @@
 # limitations under the License.
 #
 
+# Configure and build an external library.
+#
+# Options:
+#   NAME                Name of the external library
+#   URL                 URL from where to download the source code
+#   SHA256              The SHA256 checksum of the library (optional
+#                       but a warning will be issued)
+#   BUILD_COMMAND       The build command if different from the default
+#   INSTALL_COMMAND     The install command if different from the default
+#
+# For the last two the default build and install command uses cmake
+# with the Release configuration.
+#
 function(cmake_external)
   set(oneValueArgs NAME URL SHA256 BUILD_COMMAND INSTALL_COMMAND)
   set(multiValueArgs DEFINE)
   cmake_parse_arguments(EXTERNAL "" "${oneValueArgs}" "${multiValueArgs}"
                         ${ARGN})
 
+  # NAME is mandatory.
   if(NOT EXTERNAL_NAME)
     message(FATAL_ERROR "cmake_external: Missing NAME")
   endif()
 
+  # URL is mandatory.
   if(NOT EXTERNAL_URL)
     message(FATAL_ERROR "cmake_external: Missing URL for ${EXTERNAL_NAME}")
   endif()
 
+  # SHA256 is optional but recommended.
   if(EXTERNAL_SHA256)
     set(SHA256 "URL_HASH SHA256=${EXTERNAL_SHA256}")
   else()
@@ -37,17 +53,25 @@ function(cmake_external)
     set(SHA256 "")
   endif()
 
-  set(DEFS "")
-  set(prefix "")
+  # Build the list of cmake definitions passed on to the configuration
+  # of the external library. Anything specified in the DEFINE option
+  # is included as well as some predefined definitions passed on from
+  # the parent project.
+  set(DEFS "")                  # List of definitions
+  set(prefix "")                # Prefix to keep the output tidy
+  # Add user specified definitions.
   foreach(D ${EXTERNAL_DEFINE})
     string(APPEND DEFS "${prefix}-D ${D}")
     set(prefix "\n    ")
   endforeach()
-  if(CMAKE_OSX_DEPLOYMENT_TARGET)
-    string(
-      APPEND DEFS
-      "${prefix}-D CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-  endif()
+  # Add list of definitions propagated from the parent project.
+  foreach(I CMAKE_OSX_DEPLOYMENT_TARGET BUILD_SHARED_LIBS)
+    if(${I})
+      string(
+        APPEND DEFS
+        "${prefix}-D ${I}=${${I}}")
+    endif()
+  endforeach()
 
   if(EXTERNAL_BUILD_COMMAND)
     set(BUILD_COMMAND "${EXTERNAL_BUILD_COMMAND}")
@@ -61,6 +85,8 @@ function(cmake_external)
     set(INSTALL_COMMAND "${CMAKE_COMMAND} --install . --config Release")
   endif()
 
+  # Generate the cmake configuration file, configure, and install the
+  # external library to a location within the build hierarchy.
   file(
     WRITE "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
     [[
