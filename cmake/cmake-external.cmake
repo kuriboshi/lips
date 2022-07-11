@@ -19,7 +19,8 @@
 function(cmake_external)
   set(oneValueArgs NAME URL SHA256 BUILD_COMMAND INSTALL_COMMAND)
   set(multiValueArgs DEFINE)
-  cmake_parse_arguments(EXTERNAL "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(EXTERNAL "" "${oneValueArgs}" "${multiValueArgs}"
+                        ${ARGN})
 
   if(NOT EXTERNAL_NAME)
     message(FATAL_ERROR "cmake_external: Missing NAME")
@@ -43,7 +44,9 @@ function(cmake_external)
     set(prefix "\n    ")
   endforeach()
   if(CMAKE_OSX_DEPLOYMENT_TARGET)
-    string(APPEND DEFS "${prefix}-D CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    string(
+      APPEND DEFS
+      "${prefix}-D CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
   endif()
 
   if(EXTERNAL_BUILD_COMMAND)
@@ -85,11 +88,11 @@ ExternalProject_Add(${EXTERNAL_NAME}.external
 ]])
 
   configure_file("${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt")
+                 "${CMAKE_CURRENT_BINARY_DIR}/download/CMakeLists.txt")
 
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
+  execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
+  execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/download")
 
 endfunction()

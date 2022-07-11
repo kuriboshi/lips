@@ -44,8 +44,8 @@ endif()
 include(clang-format)
 
 include(docker)
-
 include(cmake-format)
+include(GNUInstallDirs)
 
 set(LIPS_SOURCE_LOCATION
     "${CMAKE_INSTALL_PREFIX}/src/lips"
@@ -70,8 +70,6 @@ if(LIPS_ENABLE_TRACE)
   target_compile_definitions(lisp PRIVATE TRACE)
 endif()
 
-include(GNUInstallDirs)
-install(TARGETS lisp EXPORT lisp)
 install(
   EXPORT lisp
   NAMESPACE lisp::

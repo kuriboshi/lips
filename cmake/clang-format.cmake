@@ -10,12 +10,6 @@ find_program(LLVM_CLANG_FORMAT clang-format)
 message(STATUS "LLVM_CLANG_FORMAT: ${LLVM_CLANG_FORMAT}")
 if(LLVM_CLANG_FORMAT)
   file(GLOB_RECURSE LIPS_FILES "src/*.cc" "src/*.hh")
-  add_custom_target(
-    format
-    COMMAND ${LLVM_CLANG_FORMAT} -i ${LIPS_FILES}
-  )
-  add_custom_target(
-    format-check
-    COMMAND ${LLVM_CLANG_FORMAT} -n ${LIPS_FILES}
-  )
+  add_custom_target(format COMMAND ${LLVM_CLANG_FORMAT} -i ${LIPS_FILES})
+  add_custom_target(format-check COMMAND ${LLVM_CLANG_FORMAT} -n ${LIPS_FILES})
 endif()

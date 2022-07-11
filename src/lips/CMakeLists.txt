@@ -51,3 +51,5 @@ find_package(Curses REQUIRED)
 target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
 
 add_test(NAME lips_test COMMAND lips -T)
+
+install(TARGETS lips RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

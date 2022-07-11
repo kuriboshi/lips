@@ -38,36 +38,38 @@ target_sources(
           lisp/string.cc
           lisp/user.cc
           lisp/version.cc)
-target_sources(
-  liblisp
-  PRIVATE lisp/alloc.hh
-          lisp/arith.hh
-          lisp/error.hh
-          lisp/eval.hh
-          lisp/except.hh
-          lisp/file.hh
-          lisp/io.hh
-          lisp/iter.hh
-          lisp/lexer.hh
-          lisp/lisp.hh
-          lisp/logic.hh
-          lisp/low.hh
-          lisp/map.hh
-          lisp/debug.hh
-          lisp/parser.hh
-          lisp/pool.hh
-          lisp/pred.hh
-          lisp/prim.hh
-          lisp/prop.hh
-          lisp/ref_ptr.hh
-          lisp/repl.hh
-          lisp/rtable.hh
-          lisp/string.hh
-          lisp/user.hh
-          lisp/version.hh)
+
+set(TARGET_HEADERS
+    lisp/alloc.hh
+    lisp/arith.hh
+    lisp/error.hh
+    lisp/eval.hh
+    lisp/except.hh
+    lisp/file.hh
+    lisp/io.hh
+    lisp/iter.hh
+    lisp/lexer.hh
+    lisp/lisp.hh
+    lisp/logic.hh
+    lisp/low.hh
+    lisp/map.hh
+    lisp/debug.hh
+    lisp/parser.hh
+    lisp/pool.hh
+    lisp/pred.hh
+    lisp/prim.hh
+    lisp/prop.hh
+    lisp/ref_ptr.hh
+    lisp/repl.hh
+    lisp/rtable.hh
+    lisp/string.hh
+    lisp/user.hh
+    lisp/version.hh)
+target_sources(liblisp PRIVATE ${TARGET_HEADERS})
 target_include_directories(
   liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                 $<INSTALL_INTERFACE:include/lisp>)
+                 $<INSTALL_INTERFACE:include>)
+set_target_properties(liblisp PROPERTIES PUBLIC_HEADER "${TARGET_HEADERS}")
 target_link_libraries(liblisp PUBLIC fmt::fmt)
 set_target_properties(liblisp PROPERTIES OUTPUT_NAME lisp)
 if(LIPS_ENABLE_CLANG_TIDY)
@@ -85,3 +87,10 @@ add_subdirectory(lips)
 if(LIPS_ENABLE_TESTS)
   add_subdirectory(test)
 endif()
+
+install(TARGETS lisp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(
+  TARGETS liblisp
+  EXPORT lisp
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lisp")
