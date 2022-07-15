@@ -65,32 +65,48 @@ set(TARGET_HEADERS
     lisp/string.hh
     lisp/user.hh
     lisp/version.hh)
+# Add the header files as private so they will show up in the IDE. The
+# header files also need to be added to the PUBLIC_HEADER property so
+# they are installed.
 target_sources(liblisp PRIVATE ${TARGET_HEADERS})
+set_target_properties(liblisp PROPERTIES PUBLIC_HEADER "${TARGET_HEADERS}")
 target_include_directories(
   liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                  $<INSTALL_INTERFACE:include>)
-set_target_properties(liblisp PROPERTIES PUBLIC_HEADER "${TARGET_HEADERS}")
-target_link_libraries(liblisp PUBLIC fmt::fmt)
+
+# We only need to know where the header files for fmt are to be able
+# to build the library. Any executable need to add fmt::fmt as a
+# dependency themselves.
+get_target_property(_fmt_include_directories fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(liblisp PRIVATE ${_fmt_include_directories})
+
+# Since there is both an executable and a library called 'lisp' we use
+# the target 'liblisp' for the library. In order for the name of the
+# library to be 'liblisp.a' we override the OUTPUT_NAME of the
+# library.
 set_target_properties(liblisp PROPERTIES OUTPUT_NAME lisp)
+
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(liblisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
 endif()
 
 add_executable(lisp lisp/main.cc)
 target_sources(lisp PRIVATE lisp/main.hh)
-target_link_libraries(lisp PUBLIC liblisp Catch2::Catch2)
+target_link_libraries(lisp PUBLIC liblisp fmt::fmt Catch2::Catch2)
+
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
 endif()
 
 add_subdirectory(lips)
+
 if(LIPS_ENABLE_TESTS)
   add_subdirectory(test)
 endif()
 
 install(TARGETS lisp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(
-  TARGETS liblisp fmt
+  TARGETS liblisp
   EXPORT lisp
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lisp")
