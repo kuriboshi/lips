@@ -42,7 +42,7 @@
 using namespace lisp;
 using namespace std::literals;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 extern char** environ;
 #endif
 LISPT p_setenv(LISPT, LISPT);
