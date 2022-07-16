@@ -47,8 +47,9 @@ macro(lips_build_and_test dockerfile container_tag)
       GROUP_ID="${LIPS_CONTAINER_GROUP_ID}" -t ${container_tag} -f
       "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
     COMMAND
-      "${LIPS_CONTAINER_APP}" run --rm -u 0:0 -v
-      "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
+      "${LIPS_CONTAINER_APP}" run --rm
+      -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
+      -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
       ${container_tag} bash -c
       "test/build.sh ${LIPS_CONTAINER_TEST} build/${container_tag}")
   add_dependencies(test-linux ubuntu${container_tag})
@@ -62,8 +63,9 @@ macro(lips_build_and_test dockerfile container_tag)
         GROUP_ID="${LIPS_CONTAINER_GROUP_ID}" -t ${container_tag} -f
         "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
       COMMAND
-        "${LIPS_CONTAINER_APP}" run --rm -u 0:0 -v
-        "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
+        "${LIPS_CONTAINER_APP}" run --rm
+        -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
+        -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
         "${container_tag}" bash -c "test/tidy.sh build/${container_tag}")
     add_dependencies(test-linux ubuntu${container_tag}-tidy)
   endif()
