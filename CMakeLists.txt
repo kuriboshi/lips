@@ -46,6 +46,7 @@ include(clang-format)
 include(docker)
 include(cmake-format)
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 set(LIPS_SOURCE_LOCATION
     "${CMAKE_INSTALL_PREFIX}/src/lips"
@@ -68,7 +69,21 @@ if(LIPS_ENABLE_TRACE)
 endif()
 
 install(
-  EXPORT lisp
-  NAMESPACE lisp::
-  FILE lispConfig.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+  EXPORT ${PROJECT_NAME}-targets
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+  # FILE ${PROJECT_NAME}-config.cmake
+  NAMESPACE lips::)
+
+configure_package_config_file(cmake/config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cmake/${PROJECT_NAME})
+
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})

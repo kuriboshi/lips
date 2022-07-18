@@ -79,10 +79,10 @@ set(TARGET_HEADERS
     lisp/details/string.hh
     lisp/details/user.hh)
 # Add the header files as private so they will show up in the IDE. The
-# header files also need to be added to the PUBLIC_HEADER property so
-# they are installed.
+# header files also need to be installed separately. Using
+# PUBLIC_HEADER doesn't work because it doesn't preserve the directory
+# hierarchy.
 target_sources(liblisp PRIVATE ${TARGET_HEADERS})
-set_target_properties(liblisp PROPERTIES PUBLIC_HEADER "${TARGET_HEADERS}")
 target_include_directories(
   liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                  $<INSTALL_INTERFACE:include>)
@@ -144,9 +144,12 @@ if(LIPS_ENABLE_TESTS)
   endif()
 endif()
 
-install(TARGETS lisp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(
-  TARGETS liblisp
-  EXPORT lisp
+install(DIRECTORY lisp/
+  DESTINATION include/lisp
+  FILES_MATCHING PATTERN "*.hh")
+
+install(TARGETS liblisp
+  EXPORT ${PROJECT_NAME}-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lisp")
+  INCLUDES DESTINATION include)
