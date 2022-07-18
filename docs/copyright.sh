@@ -23,6 +23,8 @@ do
     # Skip LICENSE file.
     [[ "$file" == "LICENSE" ]] && continue
 
+    echo "processing: ${file}"
+
     awk -v exclude="$(dirname "$0")/exclude.txt" '
 function add_year(year) {
   if(!(year in years)) {
@@ -108,6 +110,7 @@ function output_years(first, last) {
     # original file mode.
     if ! cmp -s ${file} ${file}~
     then
+        echo "updated: ${file}"
         cp ${file}~ ${file}
     fi
     rm -f ${file}~
