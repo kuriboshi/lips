@@ -54,9 +54,6 @@ set(LIPS_SOURCE_LOCATION
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/install")
 add_subdirectory(external)
 
-find_package(fmt REQUIRED)
-find_package(Catch2 REQUIRED)
-
 add_subdirectory(src)
 
 if(LIPS_ENABLE_TESTS)
