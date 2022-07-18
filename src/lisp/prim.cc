@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "prim.hh"
+#include "lisp/prim.hh"
 
 namespace lisp
 {
@@ -25,7 +25,7 @@ LISPT C_NLAMBDA;
 LISPT C_QUOTE;
 } // namespace lisp
 
-namespace lisp::prim
+namespace lisp::details::prim
 {
 /* 
  * mkindirect - makes an indirect pointer to the object OBJ. If already an 
@@ -414,4 +414,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::prim
+} // namespace lisp::details::prim

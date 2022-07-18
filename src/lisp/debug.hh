@@ -19,17 +19,12 @@
 #define LISP_DEBUG_HH
 
 #include "lisp.hh"
-
-namespace lisp::debug
-{
-LISPT evaltrace(lisp&, LISPT);
-void init();
-} // namespace lisp::debug
+#include "details/debug.hh"
 
 namespace lisp
 {
-inline LISPT evaltrace(lisp& l, LISPT x) { return debug::evaltrace(l, x); }
-inline LISPT evaltrace(LISPT x) { return debug::evaltrace(lisp::current(), x); }
+inline LISPT evaltrace(lisp& l, LISPT x) { return details::debug::evaltrace(l, x); }
+inline LISPT evaltrace(LISPT x) { return details::debug::evaltrace(lisp::current(), x); }
 } // namespace lisp
 
 #endif

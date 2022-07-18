@@ -15,29 +15,32 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_FILE_HH
+#define LISP_DETAILS_FILE_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::file
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT open(lisp&, LISPT, LISPT);
+LISPT close(lisp&, LISPT);
+LISPT ratom(lisp&, LISPT);
+LISPT readc(lisp&, LISPT);
+LISPT read(lisp&, LISPT);
+LISPT print(lisp&, LISPT, LISPT);
+LISPT load(lisp&, LISPT);
+LISPT terpri(lisp&, LISPT);
+LISPT prin1(lisp&, LISPT, LISPT);
+LISPT prin2(lisp&, LISPT, LISPT);
+LISPT printlevel(lisp&, LISPT);
+LISPT spaces(lisp&, LISPT, LISPT);
+LISPT readline(lisp&, LISPT);
+
+bool loadfile(lisp&, const std::string&);
+
+} // namespace lisp::details::file
+
+#endif

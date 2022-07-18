@@ -15,29 +15,20 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_LOGIC_HH
+#define LISP_DETAILS_LOGIC_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::logic
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT p_and(lisp&, LISPT);
+LISPT p_or(lisp&, LISPT);
+LISPT p_not(lisp&, LISPT);
+
+} // namespace lisp::details::logic
+
+#endif

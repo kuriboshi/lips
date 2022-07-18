@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "low.hh"
+#include "lisp/low.hh"
 
-namespace lisp::low
+namespace lisp::details::low
 {
 /// @brief The cond special form.
 ///
@@ -135,4 +135,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::low
+} // namespace lisp::details::low

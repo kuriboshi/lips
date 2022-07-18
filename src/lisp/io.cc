@@ -18,8 +18,8 @@
 #include <charconv>
 #include <array>
 
-#include "io.hh"
-#include "parser.hh"
+#include "lisp/io.hh"
+#include "lisp/parser.hh"
 
 namespace lisp
 {

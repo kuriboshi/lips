@@ -15,29 +15,21 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_USER_HH
+#define LISP_DETAILS_USER_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::user
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT getrep(lisp&, LISPT);
+LISPT define(lisp&, LISPT, LISPT);
+LISPT defineq(lisp&, LISPT);
+LISPT funeq(lisp&, LISPT, LISPT);
+
+} // namespace lisp::details::user
+
+#endif

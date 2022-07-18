@@ -15,12 +15,12 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_MAIN_HH
-#define LIPS_MAIN_HH
+#ifndef LIPS_RUN_HH
+#define LIPS_RUN_HH
 
 #include <iostream>
-#include "lisp.hh"
-#include "repl.hh"
+#include "lisp/lisp.hh"
+#include "lisp/repl.hh"
 
 namespace lisp
 {

@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "alloc.hh"
+#include "lisp/alloc.hh"
 
 namespace lisp
 {

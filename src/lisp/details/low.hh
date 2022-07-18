@@ -15,29 +15,23 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_LOW_HH
+#define LISP_DETAILS_LOW_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::low
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT cond(lisp&, LISPT);
+LISPT prog1(lisp&, LISPT, LISPT);
+LISPT progn(lisp&, LISPT);
+LISPT set(lisp&, LISPT, LISPT);
+LISPT setq(lisp&, LISPT, LISPT);
+LISPT xwhile(lisp&, LISPT, LISPT);
+
+} // namespace lisp::details::low
+
+#endif

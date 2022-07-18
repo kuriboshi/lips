@@ -1,5 +1,6 @@
 #
-# Copyright 2020-2022 Krister Joas
+# Lips, lisp shell.
+# Copyright 2021-2022 Krister Joas
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 
 add_library(liblisp)
 add_library(lips::lisp ALIAS liblisp)
+set_target_properties(liblisp PROPERTIES EXPORT_NAME lisp)
 target_sources(
   liblisp
   PRIVATE lisp/alloc.cc
@@ -64,7 +66,18 @@ set(TARGET_HEADERS
     lisp/rtable.hh
     lisp/string.hh
     lisp/user.hh
-    lisp/version.hh)
+    lisp/version.hh
+    lisp/details/arith.hh
+    lisp/details/debug.hh
+    lisp/details/file.hh
+    lisp/details/logic.hh
+    lisp/details/low.hh
+    lisp/details/map.hh
+    lisp/details/pred.hh
+    lisp/details/prim.hh
+    lisp/details/prop.hh
+    lisp/details/string.hh
+    lisp/details/user.hh)
 # Add the header files as private so they will show up in the IDE. The
 # header files also need to be added to the PUBLIC_HEADER property so
 # they are installed.
@@ -90,9 +103,9 @@ if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(liblisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
 endif()
 
-add_executable(lisp lisp/main.cc)
-target_sources(lisp PRIVATE lisp/main.hh)
-target_link_libraries(lisp PUBLIC liblisp fmt::fmt Catch2::Catch2)
+add_executable(lisp)
+target_sources(lisp PRIVATE lisp/main.cc)
+target_link_libraries(lisp lips::lisp fmt::fmt)
 
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
@@ -101,7 +114,34 @@ endif()
 add_subdirectory(lips)
 
 if(LIPS_ENABLE_TESTS)
-  add_subdirectory(test)
+  add_executable(lisp_test lisp/lisp_test.cc)
+  target_sources(
+    lisp_test
+    PRIVATE lisp/alloc.test.cc
+            lisp/arith.test.cc
+            lisp/debug.test.cc
+            lisp/eval.test.cc
+            lisp/file.test.cc
+            lisp/io.test.cc
+            lisp/lexer.test.cc
+            lisp/lisp.test.cc
+            lisp/logic.test.cc
+            lisp/low.test.cc
+            lisp/map.test.cc
+            lisp/main.test.cc
+            lisp/parser.test.cc
+            lisp/pool.test.cc
+            lisp/pred.test.cc
+            lisp/prim.test.cc
+            lisp/prop.test.cc
+            lisp/repl.test.cc
+            lisp/string.test.cc
+            lisp/symbol.test.cc
+            lisp/user.test.cc)
+  target_link_libraries(lisp_test PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
+  if(LIPS_ENABLE_OBJECT_SIZES)
+    target_compile_definitions(lisp_test PRIVATE ENABLE_OBJECT_SIZES)
+  endif()
 endif()
 
 install(TARGETS lisp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

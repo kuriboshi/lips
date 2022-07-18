@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "prop.hh"
+#include "lisp/prop.hh"
 
-namespace lisp::prop
+namespace lisp::details::prop
 {
 LISPT setplist(lisp& l, LISPT x, LISPT pl)
 {
@@ -100,4 +100,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::prop
+} // namespace lisp::details::prop

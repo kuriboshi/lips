@@ -15,29 +15,26 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_PRED_HH
+#define LISP_DETAILS_PRED_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::pred
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT numberp(lisp&, LISPT);
+LISPT listp(lisp&, LISPT);
+LISPT memb(lisp&, LISPT, LISPT);
+LISPT equal(lisp&, LISPT, LISPT);
+LISPT nlistp(lisp&, LISPT);
+LISPT neq(lisp&, LISPT, LISPT);
+LISPT boundp(lisp&, LISPT);
+LISPT litatom(lisp&, LISPT);
+LISPT xtypeof(lisp&, LISPT);
+
+} // namespace lisp::details::pred
+
+#endif

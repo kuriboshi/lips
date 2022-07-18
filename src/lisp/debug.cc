@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "debug.hh"
+#include "lisp/debug.hh"
 
-namespace lisp::debug
+namespace lisp::details::debug
 {
 LISPT evaltrace(lisp& l, LISPT state)
 {

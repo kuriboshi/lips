@@ -15,29 +15,21 @@
 // limitations under the License.
 //
 
-#include <vector>
-#include <string>
-#include "lisp/run.hh"
+#ifndef LISP_DETAILS_MAP_HH
+#define LISP_DETAILS_MAP_HH
 
-int main(int argc, const char** argv)
+#include <lisp/lisp.hh>
+
+namespace lisp::details::map
 {
-  lisp::lisp lisp;
-  std::vector<std::string> args{argv + 1, argv + argc};
-  for(auto f: args)
-  {
-    try
-    {
-      lisp::load(lisp::mkstring(f));
-    }
-    catch(const lisp::lisp_finish& ex)
-    {
-      return ex.exit_code;
-    }
-    catch(const std::exception& ex)
-    {
-      std::cout << f << ": " << ex.what() << std::endl;
-      return 1;
-    }
-  }
-  return lisp::run(lisp);
-}
+
+void init();
+
+LISPT map(lisp&, LISPT, LISPT, LISPT);
+LISPT mapc(lisp&, LISPT, LISPT, LISPT);
+LISPT maplist(lisp&, LISPT, LISPT, LISPT);
+LISPT mapcar(lisp&, LISPT, LISPT, LISPT);
+
+} // namespace lisp::details::map
+
+#endif

@@ -16,9 +16,9 @@
 //
 
 #include <filesystem>
-#include "lisp.hh"
+#include "lisp/lisp.hh"
 
-namespace lisp::file
+namespace lisp::details::file
 {
 LISPT open(lisp& l, LISPT filename, LISPT mode)
 {
@@ -245,4 +245,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::file
+} // namespace lisp::details::file

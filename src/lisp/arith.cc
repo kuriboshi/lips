@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "arith.hh"
+#include "lisp/arith.hh"
 
-namespace lisp::arith
+namespace lisp::details::arith
 {
 //
 // Functions with an i as a prefix are for integer arithmetic and those whith
@@ -433,4 +433,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::arith
+} // namespace lisp::details::arith

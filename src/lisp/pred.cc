@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "pred.hh"
+#include "lisp/pred.hh"
 
-namespace lisp::pred
+namespace lisp::details::pred
 {
 LISPT numberp(lisp& l, LISPT a)
 {
@@ -187,4 +187,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::pred
+} // namespace lisp::details::pred

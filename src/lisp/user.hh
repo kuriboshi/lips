@@ -19,25 +19,16 @@
 #define LISP_USER_HH
 
 #include "lisp.hh"
-
-namespace lisp::user
-{
-void init();
-
-LISPT getrep(lisp&, LISPT);
-LISPT define(lisp&, LISPT, LISPT);
-LISPT defineq(lisp&, LISPT);
-LISPT funeq(lisp&, LISPT, LISPT);
-} // namespace lisp::user
+#include "details/user.hh"
 
 namespace lisp
 {
-inline LISPT getrep(lisp& l, LISPT a) { return user::getrep(l, a); }
-inline LISPT getrep(LISPT a) { return user::getrep(lisp::current(), a); }
-inline LISPT define(lisp& l, LISPT a, LISPT b) { return user::define(l, a, b); }
-inline LISPT define(LISPT a, LISPT b) { return user::define(lisp::current(), a, b); }
-inline LISPT defineq(lisp& l, LISPT a) { return user::defineq(l, a); }
-inline LISPT defineq(LISPT a) { return user::defineq(lisp::current(), a); }
+inline LISPT define(LISPT a, LISPT b) { return details::user::define(lisp::current(), a, b); }
+inline LISPT define(lisp& l, LISPT a, LISPT b) { return details::user::define(l, a, b); }
+inline LISPT defineq(LISPT a) { return details::user::defineq(lisp::current(), a); }
+inline LISPT defineq(lisp& l, LISPT a) { return details::user::defineq(l, a); }
+inline LISPT getrep(LISPT a) { return details::user::getrep(lisp::current(), a); }
+inline LISPT getrep(lisp& l, LISPT a) { return details::user::getrep(l, a); }
 } // namespace lisp
 
 #endif

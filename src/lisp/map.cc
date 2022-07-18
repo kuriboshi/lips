@@ -15,10 +15,11 @@
 // limitations under the License.
 //
 
-#include "map.hh"
+#include "lisp/map.hh"
 
-namespace lisp::Map
+namespace lisp::details::map
 {
+
 /// @brief Apply function FN1 on each tail of OBJ.
 ///
 /// @param l The lisp interpreter.
@@ -137,4 +138,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::Map
+} // namespace lisp::details::map

@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "user.hh"
+#include "lisp/user.hh"
 
-namespace lisp::user
+namespace lisp::details::user
 {
 LISPT getargs(lisp& l, LISPT al)
 {
@@ -123,4 +123,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::user
+} // namespace lisp::details::user

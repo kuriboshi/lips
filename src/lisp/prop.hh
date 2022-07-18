@@ -19,30 +19,20 @@
 #define LISP_PROP_HH
 
 #include "lisp.hh"
-
-namespace lisp::prop
-{
-void init();
-
-LISPT setplist(lisp&, LISPT, LISPT);
-LISPT getplist(lisp&, LISPT);
-LISPT putprop(lisp&, LISPT, LISPT, LISPT);
-LISPT getprop(lisp&, LISPT, LISPT);
-LISPT remprop(lisp&, LISPT, LISPT);
-} // namespace lisp::prop
+#include "details/prop.hh"
 
 namespace lisp
 {
-inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return prop::setplist(l, a, b); }
-inline LISPT setplist(LISPT a, LISPT b) { return prop::setplist(lisp::current(), a, b); }
-inline LISPT getplist(lisp& l, LISPT a) { return prop::getplist(l, a); }
-inline LISPT getplist(LISPT a) { return prop::getplist(lisp::current(), a); }
-inline LISPT putprop(lisp& l, LISPT a, LISPT b, LISPT c) { return prop::putprop(l, a, b, c); }
-inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return prop::putprop(lisp::current(), a, b, c); }
-inline LISPT getprop(lisp& l, LISPT a, LISPT b) { return prop::getprop(l, a, b); }
-inline LISPT getprop(LISPT a, LISPT b) { return prop::getprop(lisp::current(), a, b); }
-inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return prop::remprop(l, a, b); }
-inline LISPT remprop(LISPT a, LISPT b) { return prop::remprop(lisp::current(), a, b); }
+inline LISPT getplist(LISPT a) { return details::prop::getplist(lisp::current(), a); }
+inline LISPT getplist(lisp& l, LISPT a) { return details::prop::getplist(l, a); }
+inline LISPT getprop(LISPT a, LISPT b) { return details::prop::getprop(lisp::current(), a, b); }
+inline LISPT getprop(lisp& l, LISPT a, LISPT b) { return details::prop::getprop(l, a, b); }
+inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return details::prop::putprop(lisp::current(), a, b, c); }
+inline LISPT putprop(lisp& l, LISPT a, LISPT b, LISPT c) { return details::prop::putprop(l, a, b, c); }
+inline LISPT remprop(LISPT a, LISPT b) { return details::prop::remprop(lisp::current(), a, b); }
+inline LISPT remprop(lisp& l, LISPT a, LISPT b) { return details::prop::remprop(l, a, b); }
+inline LISPT setplist(LISPT a, LISPT b) { return details::prop::setplist(lisp::current(), a, b); }
+inline LISPT setplist(lisp& l, LISPT a, LISPT b) { return details::prop::setplist(l, a, b); }
 } // namespace lisp
 
 #endif

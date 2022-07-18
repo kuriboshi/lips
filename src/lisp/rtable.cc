@@ -14,15 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #include <cstdlib>
-#include "rtable.hh"
+#include "lisp/rtable.hh"
 
 namespace lisp::rtable
 {
 //
 // Read macros.
 //
-LISPT dquote(lisp& l, LISPT stream)
+LISPT rmdquote(lisp& l, LISPT stream)
 {
   check(stream, type::FILET);
   std::string buffer;
@@ -37,7 +38,7 @@ LISPT dquote(lisp& l, LISPT stream)
   return mkstring(l, buffer);
 }
 
-LISPT squote(lisp& l, LISPT stream)
+LISPT rmsquote(lisp& l, LISPT stream)
 {
   check(stream, type::FILET);
   int c = 0;
@@ -50,7 +51,7 @@ LISPT squote(lisp& l, LISPT stream)
   return cons(l, C_QUOTE, cons(l, io::lispread(l, stream->file()), NIL));
 }
 
-LISPT getenv(lisp&, LISPT stream)
+LISPT rmgetenv(lisp&, LISPT stream)
 {
   check(stream, type::FILET);
   auto sym = ratom(stream->file());
@@ -63,8 +64,15 @@ LISPT getenv(lisp&, LISPT stream)
 
 namespace pn
 {
-inline constexpr auto GETENV = "rmgetenv";
-}
+inline constexpr auto RMDQUOTE = "rmdquote";
+inline constexpr auto RMGETENV = "rmgetenv";
+inline constexpr auto RMSQUOTE = "rmsquote";
+} // namespace pn
 
-void init() { mkprim(pn::GETENV, getenv, subr_t::subr::EVAL, subr_t::spread::SPREAD); }
+void init()
+{
+  mkprim(pn::RMDQUOTE, rmdquote, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RMGETENV, rmgetenv, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::RMSQUOTE, rmsquote, subr_t::subr::EVAL, subr_t::spread::SPREAD);
+}
 } // namespace lisp::rtable

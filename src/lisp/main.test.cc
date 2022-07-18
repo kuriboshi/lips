@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 #include <catch2/catch.hpp>
-#include <lisp/main.hh>
+#include <lisp/run.hh>
 
 namespace lisp
 {

@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "logic.hh"
+#include "lisp/logic.hh"
 
-namespace lisp::logic
+namespace lisp::details::logic
 {
 LISPT p_and(lisp& l, LISPT x)
 {
@@ -78,4 +78,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::logic
+} // namespace lisp::details::logic

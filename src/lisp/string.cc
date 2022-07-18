@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "string.hh"
+#include "lisp/string.hh"
 
-namespace lisp::string
+namespace lisp::details::string
 {
 /// @brief Return symbols print name as a string.
 LISPT symstr(lisp& l, LISPT sym)
@@ -135,4 +135,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::string
+} // namespace lisp::details::string

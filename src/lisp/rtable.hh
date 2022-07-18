@@ -22,22 +22,13 @@
 #include <vector>
 #include "lisp.hh"
 
-namespace lisp
-{
-class lisp_t;
-using LISPT = ref_ptr<lisp_t>;
-class file_t;
-using ref_file_t = ref_ptr<file_t>;
-class lisp;
-} // namespace lisp
-
 namespace lisp::rtable
 {
 void init();
 
-LISPT dquote(lisp&, LISPT);
-LISPT squote(lisp&, LISPT);
-LISPT getenv(lisp&, LISPT);
+LISPT rmdquote(lisp&, LISPT);
+LISPT rmsquote(lisp&, LISPT);
+LISPT rmgetenv(lisp&, LISPT);
 } // namespace lisp::rtable
 
 #endif

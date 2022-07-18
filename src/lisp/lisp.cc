@@ -18,7 +18,7 @@
 #include <cstring> // For strerror
 #include <cerrno>  // For errno
 #include <iostream>
-#include "lisp.hh"
+#include "lisp/lisp.hh"
 
 namespace lisp
 {
@@ -159,18 +159,19 @@ lisp::lisp()
     e().undefhook(nullptr);
     e().breakhook(nullptr);
 
-    Map::init();
-    arith::init();
-    debug::init();
-    file::init();
-    logic::init();
-    low::init();
-    pred::init();
-    prim::init();
-    prop::init();
+    details::arith::init();
+    details::debug::init();
+    details::file::init();
+    details::logic::init();
+    details::low::init();
+    details::map::init();
+    details::pred::init();
+    details::prim::init();
+    details::prop::init();
+    details::string::init();
+    details::user::init();
+
     rtable::init();
-    string::init();
-    user::init();
 
     // clang-format off
     mkprim(pn::E,          eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);

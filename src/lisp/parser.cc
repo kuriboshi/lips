@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "parser.hh"
+#include "lisp/parser.hh"
 
 namespace lisp
 {
