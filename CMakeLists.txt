@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.18.0)
 
-project(lips VERSION 0.3.0)
+project(lips VERSION 1.0.3)
 set(CMAKE_CXX_STANDARD 20)
 enable_testing()
 if(POLICY CMP0114)
