@@ -65,11 +65,11 @@ LISPT close(lisp& l, LISPT fildes)
 LISPT ratom(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return io::ratom(l, l.primin());
+    return io::ratom(l.primin());
   if(is_T(file))
-    return io::ratom(l, l.stdin());
+    return io::ratom(l.stdin());
   check(file, type::FILET);
-  return io::ratom(l, file->file());
+  return io::ratom(file->file());
 }
 
 LISPT readc(lisp& l, LISPT file)
@@ -85,11 +85,11 @@ LISPT readc(lisp& l, LISPT file)
 LISPT read(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return lispread(l, l.primin());
+    return lispread(l.primin());
   if(is_T(file))
-    return lispread(l, l.stdin());
+    return lispread(l.stdin());
   check(file, type::FILET);
-  return lispread(l, file->file());
+  return lispread(file->file());
 }
 
 LISPT print(lisp& l, LISPT x, LISPT file)
@@ -113,7 +113,7 @@ bool loadfile(lisp& l, const std::string& lf)
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(l, foo); type_of(rval) != type::EMPTY; rval = lispread(l, foo))
+        for(auto rval = lispread(foo); type_of(rval) != type::EMPTY; rval = lispread(foo))
           rval = l.e().eval(rval);
         return true;
       }
@@ -137,33 +137,33 @@ LISPT load(lisp& l, LISPT f)
 LISPT terpri(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return io::terpri(l, *l.primout());
+    return io::terpri(*l.primout());
   if(is_T(file))
-    return io::terpri(l, *l.primerr());
+    return io::terpri(*l.primerr());
   check(file, type::FILET);
-  return io::terpri(l, *file->file());
+  return io::terpri(*file->file());
 }
 
 LISPT prin1(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
-    return prin0(l, x, *l.primout(), false);
+    return prin0(x, *l.primout(), false);
   if(is_T(file))
-    return prin0(l, x, *l.primerr(), false);
+    return prin0(x, *l.primerr(), false);
   check(file, type::FILET);
-  return prin0(l, x, *file->file(), false);
+  return prin0(x, *file->file(), false);
 }
 
 LISPT prin2(lisp& l, LISPT x, LISPT file)
 {
   l.thisplevel = 0;
   if(is_NIL(file))
-    return prin0(l, x, *l.primout(), true);
+    return prin0(x, *l.primout(), true);
   if(is_T(file))
-    return prin0(l, x, *l.primerr(), true);
+    return prin0(x, *l.primerr(), true);
   check(file, type::FILET);
-  return prin0(l, x, *file->file(), true);
+  return prin0(x, *file->file(), true);
 }
 
 LISPT printlevel(lisp& l, LISPT newl)
@@ -200,11 +200,11 @@ LISPT spaces(lisp& l, LISPT n, LISPT file)
 LISPT readline(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return io::readline(l, l.primin());
+    return io::readline(l.primin());
   if(is_T(file))
-    return io::readline(l, l.stdin());
+    return io::readline(l.stdin());
   check(file, type::FILET);
-  return io::readline(l, file->file());
+  return io::readline(file->file());
 }
 
 namespace pn

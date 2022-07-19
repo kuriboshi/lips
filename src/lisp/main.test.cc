@@ -27,8 +27,7 @@ TEST_CASE("incomplete input")
 {
   // An incomplete input expression is treated as ending with a super
   // parenthesis so there should be no error message in this case.
-  lisp l;
-  current c(l);
+  auto& l = lisp::current();
   std::ostringstream cout;
   auto out = ref_file_t::create(cout);
   l.primout(std::move(out));
@@ -44,8 +43,7 @@ TEST_CASE("incomplete input")
 
 TEST_CASE("exit")
 {
-  lisp l;
-  current c(l);
+  auto& l = lisp::current();
   std::ostringstream cout;
   auto out = ref_file_t::create(cout);
   l.primout(std::move(out));

@@ -35,7 +35,7 @@ LISPT rmdquote(lisp& l, LISPT stream)
     buffer.push_back(static_cast<char>(c));
     c = stream->file()->getch();
   }
-  return mkstring(l, buffer);
+  return mkstring(buffer);
 }
 
 LISPT rmsquote(lisp& l, LISPT stream)
@@ -48,7 +48,7 @@ LISPT rmsquote(lisp& l, LISPT stream)
     return C_QUOTE;
   }
   stream->file()->ungetch(c);
-  return cons(l, C_QUOTE, cons(l, io::lispread(l, stream->file()), NIL));
+  return cons(C_QUOTE, cons(io::lispread(stream->file()), NIL));
 }
 
 LISPT rmgetenv(lisp&, LISPT stream)

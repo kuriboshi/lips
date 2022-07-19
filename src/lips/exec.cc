@@ -472,7 +472,7 @@ LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
-    return syserr(l, file);
+    return syserr(file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
@@ -480,14 +480,14 @@ LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
       l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
-    eval(l, cmd);
+    eval(cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   ::close(fd);
-  return mknumber(l, WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
@@ -544,7 +544,7 @@ LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
-    return syserr(l, file);
+    return syserr(file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
@@ -552,14 +552,14 @@ LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
       l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
-    eval(l, cmd);
+    eval(cmd);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   status = waitfork(pid);
   ::close(fd);
-  return mknumber(l, WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 LISPT pipecmd(lisp& l, LISPT cmds)
@@ -569,7 +569,7 @@ LISPT pipecmd(lisp& l, LISPT cmds)
   if(is_NIL(cmds))
     return NIL;
   if(is_NIL(cmds->cdr()))
-    return eval(l, cmds->car());
+    return eval(cmds->car());
 
   int pid = 0;
   if((pid = mfork()) == 0)
@@ -588,7 +588,7 @@ LISPT pipecmd(lisp& l, LISPT cmds)
         l.stderr()->format("{}\n", strerror(errno));
         exit(1);
       }
-      eval(l, cmds->car());
+      eval(cmds->car());
       exit(0);
     }
     else if(pid < 0)
@@ -600,14 +600,14 @@ LISPT pipecmd(lisp& l, LISPT cmds)
       l.stderr()->format("{}\n", strerror(errno));
       exit(1);
     }
-    eval(l, cmds->car());
+    eval(cmds->car());
     auto status = waitfork(pid);
     exit(WEXITSTATUS(status));
   }
   else if(pid < 0)
     return C_ERROR;
   auto status = waitfork(pid);
-  return mknumber(l, WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status));
 }
 
 LISPT back(lisp& l, LISPT x)
@@ -619,14 +619,14 @@ LISPT back(lisp& l, LISPT x)
     pgrp = getpid();
     insidefork = true;
     preparefork();
-    eval(l, x);
+    eval(x);
     exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
   recordjob(pid, true);
   std::cout << fmt::format("[{}] {}\n", joblist.front().jobnum, pid);
-  return mknumber(l, pid);
+  return mknumber(pid);
 }
 
 LISPT stop(lisp& l)
@@ -699,11 +699,11 @@ LISPT fg(lisp& l, LISPT job)
     tcsetpgrp(1, pgrp);
     if(WIFSTOPPED(current->status))
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(l, mknumber(l, pgrp));
+        return syserr(mknumber(pgrp));
     current->status = 0;
     current->background = false;
     auto status = waitfork(current->procid);
-    return mknumber(l, WEXITSTATUS(status));
+    return mknumber(WEXITSTATUS(status));
   }
   return l.error(NO_SUCH_JOB, job);
 }
@@ -744,7 +744,7 @@ LISPT bg(lisp& l, LISPT job)
     tcsetpgrp(1, pgrp);
     if(!current->background)
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(l, mknumber(l, pgrp));
+        return syserr(mknumber(pgrp));
     current->background = true;
     return T;
   }
@@ -765,7 +765,7 @@ LISPT getenviron(lisp& l, LISPT var)
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
     return NIL;
-  return mkstring(l, s);
+  return mkstring(s);
 }
 
 LISPT cd(lisp& l, LISPT dir, LISPT emess)
@@ -789,7 +789,7 @@ LISPT cd(lisp& l, LISPT dir, LISPT emess)
   if(chdir(ndir->getstr().c_str()) == -1)
   {
     if(is_NIL(emess))
-      return syserr(l, dir);
+      return syserr(dir);
     return NIL;
   }
   auto wd = std::filesystem::current_path();

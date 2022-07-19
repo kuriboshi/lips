@@ -25,7 +25,7 @@ LISPT symstr(lisp& l, LISPT sym)
   check(sym, type::SYMBOL, type::T, type::NIL);
   if(type_of(sym) == type::NIL)
     return mkstring("nil");
-  return mkstring(l, sym->symbol().pname);
+  return mkstring(sym->symbol().pname);
 }
 
 /// @brief T if s is a string, NIL otherwise.
@@ -51,7 +51,7 @@ LISPT strcmp(lisp& l, LISPT s1, LISPT s2)
 {
   check(s1, type::STRING);
   check(s2, type::STRING);
-  return mknumber(l, s1->string().compare(s2->string()));
+  return mknumber(s1->string().compare(s2->string()));
 }
 
 /// @brief Concatenate arbitrary many strings to one string.
@@ -63,14 +63,14 @@ LISPT concat(lisp& l, LISPT strlist)
     check(sl->car(), type::STRING);
     result += sl->car()->string();
   }
-  return mkstring(l, result);
+  return mkstring(result);
 }
 
 /// @brief Return string length of s.
 LISPT strlen(lisp& l, LISPT s)
 {
   check(s, type::STRING);
-  return mknumber(l, static_cast<int>(s->string().length()));
+  return mknumber(static_cast<int>(s->string().length()));
 }
 
 /// @brief Extract a substring from start to end.
@@ -108,7 +108,7 @@ LISPT substring(lisp& l, LISPT str, LISPT begin, LISPT end)
     e = std::string::npos;
   if(b > str->string().length())
     return NIL;
-  return mkstring(l, str->string().substr(b, e));
+  return mkstring(str->string().substr(b, e));
 }
 
 namespace pn

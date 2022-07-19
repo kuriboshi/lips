@@ -32,11 +32,11 @@ LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
-    apply(l, fn1, cons(l, obj, NIL));
+    apply(fn1, cons(obj, NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(fn2, cons(obj, NIL));
   }
   return NIL;
 }
@@ -53,11 +53,11 @@ LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::CONS)
   {
-    apply(l, fn1, cons(l, obj->car(), NIL));
+    apply(fn1, cons(obj->car(), NIL));
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(fn2, cons(obj, NIL));
   }
   return NIL;
 }
@@ -75,18 +75,18 @@ LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
   {
-    tmp = cons(l, apply(l, fn1, cons(l, obj, NIL)), NIL);
+    tmp = cons(apply(fn1, cons(obj, NIL)), NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   while(type_of(obj) == type::CONS)
   {
-    rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj, NIL)), NIL));
+    rplacd(tmp, cons(apply(fn1, cons(obj, NIL)), NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(fn2, cons(obj, NIL));
   }
   return rval;
 }
@@ -104,18 +104,18 @@ LISPT mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
   LISPT tmp = NIL;
   if(type_of(obj) == type::CONS)
   {
-    tmp = cons(l, apply(l, fn1, cons(l, obj->car(), NIL)), NIL);
+    tmp = cons(apply(fn1, cons(obj->car(), NIL)), NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
   while(type_of(obj) == type::CONS)
   {
-    rplacd(l, tmp, cons(l, apply(l, fn1, cons(l, obj->car(), NIL)), NIL));
+    rplacd(tmp, cons(apply(fn1, cons(obj->car(), NIL)), NIL));
     tmp = tmp->cdr();
     if(is_NIL(fn2))
       obj = obj->cdr();
     else
-      obj = apply(l, fn2, cons(l, obj, NIL));
+      obj = apply(fn2, cons(obj, NIL));
   }
   return rval;
 }

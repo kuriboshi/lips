@@ -55,11 +55,12 @@ inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
 } // namespace pn
 
 lisp::lisp()
-  : _alloc(*new alloc()),
-    _eval(*new evaluator(*this))
+  : _alloc(a()), _eval(e())
 {
   if(_current == nullptr)
     _current = this;
+  else
+    throw std::runtime_error("lisp::lisp called twice ");
 
   _syntax = std::make_unique<syntax>();
 
@@ -186,21 +187,32 @@ lisp::lisp()
     mkprim(pn::FREECOUNT,  freecount,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::OBARRAY,    obarray,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     // clang-format on
-  }
 
-  if(_current == this)
-  {
-    // We only need one instance of the version variable.
     intern("version");
     _version = std::move(_alloc.initcvar("version", _alloc.mkstring(VERSION)));
   }
-  _variables = std::make_unique<cvariables>(_alloc);
+
+  _currentbase = std::move(_alloc.initcvar("base", 10_l));
+  _verbose = std::move(_alloc.initcvar("verbose", NIL));
+  _loadpath = std::move(_alloc.initcvar("loadpath", "(.)"_l));
 }
 
 lisp::~lisp()
 {
   if(_current == this)
     _current = nullptr;
+}
+
+alloc& lisp::a() const
+{
+  static alloc a_;
+  return a_;
+}
+
+evaluator& lisp::e()
+{
+  static evaluator e_(*this);
+  return e_;
 }
 
 syntax& lisp::read_table() { return *_syntax; }
@@ -212,7 +224,7 @@ LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
   LISPT f{new lisp_t};
   f->set(source);
   if(fn != NIL)
-    return apply(lisp, fn, cons(f, NIL));
+    return apply(fn, cons(f, NIL));
   return NIL;
 }
 
@@ -246,7 +258,7 @@ LISPT lisp::perror(int messnr, LISPT arg)
 {
   primerr()->format("{} ", geterror(messnr));
   if((messnr & (PRINT_ARG | NOT_A)) != 0)
-    prin2(*this, arg, T);
+    prin2(arg, T);
   return C_ERROR;
 }
 
@@ -262,7 +274,7 @@ LISPT lisp::syserr(LISPT fault)
 {
   if(!is_NIL(fault))
   {
-    prin2(*this, fault, T);
+    prin2(fault, T);
     primerr()->format(": ");
   }
   primerr()->format("{}", strerror(errno));
@@ -270,12 +282,6 @@ LISPT lisp::syserr(LISPT fault)
 }
 
 LISPT lisp::break0(LISPT exp) const { return repl(exp); }
-
-lisp::cvariables::cvariables(alloc& a)
-  : _currentbase(a.initcvar("base", 10_l)),
-    _verbose(a.initcvar("verbose", NIL)),
-    _loadpath(a.initcvar("loadpath", "(.)"_l))
-{}
 
 lisp* lisp::_current = nullptr;
 std::map<int, std::string> lisp::messages;
@@ -285,7 +291,7 @@ subr_t::subr_vector subr_t::subr_store;
 LISPT eval(lisp& l, const std::string& expr)
 {
   auto in = ref_file_t::create(expr);
-  auto e = lispread(l, in);
+  auto e = lispread(in);
   return lisp::eval(l, e);
 }
 

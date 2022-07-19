@@ -23,13 +23,11 @@ namespace lisp
 
 TEST_CASE("Map functions")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   SECTION("map")
   {
     auto& cvar = l.a().initcvar("cvar", NIL);
-    auto r0 = eval(l, R"(
+    auto r0 = eval(R"(
 (map '(1 2 3)
       (lambda (a)
        (setq cvar (cons (car a) cvar)))))");
@@ -39,12 +37,12 @@ TEST_CASE("Map functions")
     CHECK(caddr(cvar)->intval() == 1);
 
     cvar = 0_l;
-    auto f = eval(l, "(lambda (a) (setq cvar (plus (apply plus a) cvar)))");
+    auto f = eval("(lambda (a) (setq cvar (plus (apply plus a) cvar)))");
     map(mklist(1_l, 1_l, 1_l), f, NIL);
     CHECK(cvar->intval() == 6);
 
     cvar = NIL;
-    map(l, "(1 2 3)"_l, lambda(l, "(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda(l, "(a)"_l, "((cdr a))"_l));
+    map("(1 2 3)"_l, lambda("(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda("(a)"_l, "((cdr a))"_l));
     CHECK(type_of(cvar) == type::CONS);
     CHECK(car(cvar)->intval() == 3);
     CHECK(cadr(cvar)->intval() == 2);
@@ -54,7 +52,7 @@ TEST_CASE("Map functions")
   SECTION("mapc")
   {
     auto& cvar = l.a().initcvar("cvar", NIL);
-    auto r0 = eval(l, R"(
+    auto r0 = eval(R"(
 (mapc '(1 2 3)
        (lambda (a)
         (setq cvar (cons a cvar)))))");
@@ -64,23 +62,23 @@ TEST_CASE("Map functions")
     CHECK(caddr(cvar)->intval() == 1);
 
     cvar = 0_l;
-    auto f = lambda(l, "(a)"_l, "((setq cvar (plus a cvar)))"_l);
+    auto f = lambda("(a)"_l, "((setq cvar (plus a cvar)))"_l);
     mapc(mklist(1_l, 1_l, 1_l), f, NIL);
     REQUIRE(type_of(cvar) == type::INTEGER);
     CHECK(cvar->intval() == 3);
 
     cvar = 0_l;
-    mapc(l, mklist(1_l, 2_l, 3_l), f, lambda(l, "(a)"_l, "((cdr a))"_l));
+    mapc(mklist(1_l, 2_l, 3_l), f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(cvar) == type::INTEGER);
     CHECK(cvar->intval() == 6);
   }
 
   SECTION("maplist")
   {
-    auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
-    auto f = lambda(l, "(a)"_l, "((car a))"_l);
+    auto ls = mklist(mknumber(1), mknumber(2), mknumber(3));
+    auto f = lambda("(a)"_l, "((car a))"_l);
 
-    auto r0 = maplist(l, ls, f, NIL);
+    auto r0 = maplist(ls, f, NIL);
     REQUIRE(type_of(r0) == type::CONS);
     CHECK(car(r0)->intval() == 1);
     CHECK(cadr(r0)->intval() == 2);
@@ -92,7 +90,7 @@ TEST_CASE("Map functions")
     CHECK(cadr(r1)->intval() == 2);
     CHECK(caddr(r1)->intval() == 3);
 
-    auto r2 = maplist(l, ls, f, lambda(l, "(a)"_l, "((cdr a))"_l));
+    auto r2 = maplist(ls, f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(r2) == type::CONS);
     CHECK(car(r1)->intval() == 1);
     CHECK(cadr(r1)->intval() == 2);
@@ -101,10 +99,10 @@ TEST_CASE("Map functions")
 
   SECTION("mapcar")
   {
-    auto ls = mklist(l, mknumber(1), mknumber(2), mknumber(3));
-    auto f = lambda(l, "(a)"_l, "((plus a 1))"_l);
+    auto ls = mklist(mknumber(1), mknumber(2), mknumber(3));
+    auto f = lambda("(a)"_l, "((plus a 1))"_l);
 
-    auto r0 = mapcar(l, ls, f, NIL);
+    auto r0 = mapcar(ls, f, NIL);
     REQUIRE(type_of(r0) == type::CONS);
     CHECK(car(r0)->intval() == 2);
     CHECK(cadr(r0)->intval() == 3);
@@ -116,7 +114,7 @@ TEST_CASE("Map functions")
     CHECK(cadr(r1)->intval() == 3);
     CHECK(caddr(r1)->intval() == 4);
 
-    auto r2 = mapcar(l, ls, f, lambda(l, "(a)"_l, "((cdr a))"_l));
+    auto r2 = mapcar(ls, f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(r0) == type::CONS);
     CHECK(car(r2)->intval() == 2);
     CHECK(cadr(r2)->intval() == 3);

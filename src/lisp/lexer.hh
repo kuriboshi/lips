@@ -180,16 +180,6 @@ public:
       _input(ref_file_t::create(s)),
       _pos(_input->source().begin())
   {}
-  lexer(lisp& lisp, ref_file_t input)
-    : _lisp(lisp),
-      _input(input),
-      _pos(_input->source().begin())
-  {}
-  lexer(lisp& lisp, std::string s)
-    : _lisp(lisp),
-      _input(ref_file_t::create(s)),
-      _pos(_input->source().begin())
-  {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);

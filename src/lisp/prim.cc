@@ -55,7 +55,7 @@ LISPT closobj(lisp& l, LISPT vars)
     return NIL;
   check(vars, type::CONS);
   check(vars->car(), type::SYMBOL);
-  return cons(l, mkindirect(l, vars->car()->value()), closobj(l, vars->cdr()));
+  return cons(mkindirect(l, vars->car()->value()), closobj(l, vars->cdr()));
 }
 
 LISPT car(lisp& l, LISPT a)
@@ -216,25 +216,25 @@ LISPT tconc(lisp& l, LISPT cell, LISPT obj)
 {
   if(is_NIL(cell))
   {
-    cell = cons(l, cons(l, obj, NIL), NIL);
+    cell = cons(cons(obj, NIL), NIL);
     return prim::rplacd(l, cell, cell->car());
   }
   check(cell, type::CONS);
   if(type_of(cell->car()) != type::CONS)
   {
-    prim::rplacd(l, cell, cons(l, obj, NIL));
+    prim::rplacd(l, cell, cons(obj, NIL));
     return prim::rplaca(l, cell, cell->cdr());
   }
-  prim::rplacd(l, cell->cdr(), cons(l, obj, NIL));
+  prim::rplacd(l, cell->cdr(), cons(obj, NIL));
   return prim::rplacd(l, cell, cell->cdr()->cdr());
 }
 
 LISPT attach(lisp& l, LISPT obj, LISPT list)
 {
   if(is_NIL(list))
-    return cons(l, obj, NIL);
+    return cons(obj, NIL);
   check(list, type::CONS);
-  prim::rplacd(l, list, cons(l, list->car(), list->cdr()));
+  prim::rplacd(l, list, cons(list->car(), list->cdr()));
   return prim::rplaca(l, list, obj);
 }
 
@@ -242,7 +242,7 @@ LISPT append(lisp& l, LISPT x)
 {
   LISPT cl;
 
-  LISPT newl = cons(l, NIL, NIL);
+  LISPT newl = cons(NIL, NIL);
   LISPT curp = newl;
   for(; !is_NIL(x); x = x->cdr())
   {
@@ -251,7 +251,7 @@ LISPT append(lisp& l, LISPT x)
       check(x->car(), type::CONS);
       for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
       {
-        prim::rplacd(l, curp, cons(l, cl->car(), NIL));
+        prim::rplacd(l, curp, cons(cl->car(), NIL));
         curp = curp->cdr();
       }
     }
@@ -282,7 +282,7 @@ LISPT length(lisp& l, LISPT x)
     x = x->cdr();
     i++;
   }
-  return mknumber(l, i);
+  return mknumber(i);
 }
 
 LISPT closure(lisp& l, LISPT fun, LISPT vars)

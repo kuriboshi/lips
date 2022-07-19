@@ -30,19 +30,16 @@ namespace lisp
 
 TEST_CASE("Logic functions")
 {
-  lisp l;
-  current c(l);
-
   SECTION("and")
   {
     CHECK(p_and(cons(T, cons(T, NIL))) == T);
     CHECK(p_and(cons(NIL, cons(T, NIL))) == NIL);
     CHECK(p_and(cons(T, cons(NIL, NIL))) == NIL);
     CHECK(p_and(cons(NIL, cons(NIL, NIL))) == NIL);
-    CHECK(p_and(l, cons(T, cons(T, NIL))) == T);
-    CHECK(p_and(l, cons(NIL, cons(T, NIL))) == NIL);
-    CHECK(p_and(l, cons(T, cons(NIL, NIL))) == NIL);
-    CHECK(p_and(l, cons(NIL, cons(NIL, NIL))) == NIL);
+    CHECK(p_and(cons(T, cons(T, NIL))) == T);
+    CHECK(p_and(cons(NIL, cons(T, NIL))) == NIL);
+    CHECK(p_and(cons(T, cons(NIL, NIL))) == NIL);
+    CHECK(p_and(cons(NIL, cons(NIL, NIL))) == NIL);
   }
 
   SECTION("or")
@@ -51,16 +48,16 @@ TEST_CASE("Logic functions")
     CHECK(p_or(cons(NIL, cons(T, NIL))) == T);
     CHECK(p_or(cons(T, cons(NIL, NIL))) == T);
     CHECK(p_or(cons(NIL, cons(NIL, NIL))) == NIL);
-    CHECK(p_or(l, cons(T, cons(T, NIL))) == T);
-    CHECK(p_or(l, cons(NIL, cons(T, NIL))) == T);
-    CHECK(p_or(l, cons(T, cons(NIL, NIL))) == T);
-    CHECK(p_or(l, cons(NIL, cons(NIL, NIL))) == NIL);
+    CHECK(p_or(cons(T, cons(T, NIL))) == T);
+    CHECK(p_or(cons(NIL, cons(T, NIL))) == T);
+    CHECK(p_or(cons(T, cons(NIL, NIL))) == T);
+    CHECK(p_or(cons(NIL, cons(NIL, NIL))) == NIL);
   }
 
   SECTION("not")
   {
-    CHECK(p_not(l, T) == NIL);
-    CHECK(p_not(l, NIL) == T);
+    CHECK(p_not(T) == NIL);
+    CHECK(p_not(NIL) == T);
     CHECK(p_not(T) == NIL);
     CHECK(p_not(NIL) == T);
   }

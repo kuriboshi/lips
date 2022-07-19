@@ -24,7 +24,7 @@ LISPT p_and(lisp& l, LISPT x)
   LISPT foo = T;
   while(!is_NIL(x))
   {
-    foo = eval(l, x->car());
+    foo = eval(x->car());
     if(is_NIL(foo))
       return foo;
     x = x->cdr();
@@ -37,7 +37,7 @@ LISPT p_or(lisp& l, LISPT x)
   LISPT foo = NIL;
   while(!is_NIL(x))
   {
-    foo = eval(l, x->car());
+    foo = eval(x->car());
     if(!is_NIL(foo))
       return foo;
     x = x->cdr();
@@ -54,10 +54,10 @@ LISPT p_not(lisp& l, LISPT x)
 
 LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
-  LISPT foo = eval(l, pred);
+  LISPT foo = eval(pred);
   if(is_NIL(foo))
-    return progn(l, false_expr);
-  return eval(l, true_expr);
+    return progn(false_expr);
+  return eval(true_expr);
 }
 
 namespace pn

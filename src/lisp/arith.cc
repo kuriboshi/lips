@@ -58,8 +58,8 @@ LISPT plus(lisp& l, LISPT x)
     x = x->cdr();
   }
   if(f)
-    return mkfloat(l, fsum);
-  return mknumber(l, sum);
+    return mkfloat(fsum);
+  return mknumber(sum);
 }
 
 LISPT iplus(lisp& l, LISPT x)
@@ -70,7 +70,7 @@ LISPT iplus(lisp& l, LISPT x)
     check(*i, type::INTEGER);
     sum += (**i).intval();
   }
-  return mknumber(l, sum);
+  return mknumber(sum);
 }
 
 LISPT fplus(lisp& l, LISPT x)
@@ -84,7 +84,7 @@ LISPT fplus(lisp& l, LISPT x)
     fsum = fsum + x->car()->floatval();
     x = x->cdr();
   }
-  return mkfloat(l, fsum);
+  return mkfloat(fsum);
 }
 
 LISPT difference(lisp& l, LISPT x, LISPT y)
@@ -94,26 +94,26 @@ LISPT difference(lisp& l, LISPT x, LISPT y)
   if(type_of(x) == type::INTEGER)
   {
     if(type_of(y) == type::INTEGER)
-      return mknumber(l, x->intval() - y->intval());
-    return mkfloat(l, static_cast<double>(x->intval()) - y->floatval());
+      return mknumber(x->intval() - y->intval());
+    return mkfloat(static_cast<double>(x->intval()) - y->floatval());
   }
   if(type_of(y) == type::INTEGER)
-    return mkfloat(l, x->floatval() - static_cast<double>(y->intval()));
-  return mkfloat(l, x->floatval() - y->floatval());
+    return mkfloat(x->floatval() - static_cast<double>(y->intval()));
+  return mkfloat(x->floatval() - y->floatval());
 }
 
 LISPT idifference(lisp& l, LISPT x, LISPT y)
 {
   check(x, type::INTEGER);
   check(y, type::INTEGER);
-  return mknumber(l, x->intval() - y->intval());
+  return mknumber(x->intval() - y->intval());
 }
 
 LISPT fdifference(lisp& l, LISPT x, LISPT y)
 {
   check(x, type::FLOAT);
   check(y, type::FLOAT);
-  return mkfloat(l, x->floatval() - y->floatval());
+  return mkfloat(x->floatval() - y->floatval());
 }
 
 LISPT ltimes(lisp& l, LISPT x)
@@ -145,8 +145,8 @@ LISPT ltimes(lisp& l, LISPT x)
     x = x->cdr();
   }
   if(f != 0)
-    return mkfloat(l, fprod);
-  return mknumber(l, prod);
+    return mkfloat(fprod);
+  return mknumber(prod);
 }
 
 LISPT itimes(lisp& l, LISPT x)
@@ -160,7 +160,7 @@ LISPT itimes(lisp& l, LISPT x)
     prod = prod * x->car()->intval();
     x = x->cdr();
   }
-  return mknumber(l, prod);
+  return mknumber(prod);
 }
 
 LISPT ftimes(lisp& l, LISPT x)
@@ -174,7 +174,7 @@ LISPT ftimes(lisp& l, LISPT x)
     prod = prod * x->car()->floatval();
     x = x->cdr();
   }
-  return mkfloat(l, prod);
+  return mkfloat(prod);
 }
 
 LISPT divide(lisp& l, LISPT x, LISPT y)
@@ -186,23 +186,23 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
     {
       if(y->intval() == 0)
         return l.error(DIVIDE_ZERO, NIL);
-      return mknumber(l, x->intval() / y->intval());
+      return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
         return l.error(DIVIDE_ZERO, NIL);
-      return mkfloat(l, (double)x->intval() / y->floatval());
+      return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::INTEGER)
   {
     if(y->intval() == 0)
       return l.error(DIVIDE_ZERO, NIL);
-    return mkfloat(l, x->floatval() / static_cast<double>(y->intval()));
+    return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
     return l.error(DIVIDE_ZERO, NIL);
-  return mkfloat(l, x->floatval() / y->floatval());
+  return mkfloat(x->floatval() / y->floatval());
 }
 
 LISPT iquotient(lisp& l, LISPT x, LISPT y)
@@ -211,7 +211,7 @@ LISPT iquotient(lisp& l, LISPT x, LISPT y)
   check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, NIL);
-  return mknumber(l, x->intval() / y->intval());
+  return mknumber(x->intval() / y->intval());
 }
 
 LISPT iremainder(lisp& l, LISPT x, LISPT y)
@@ -220,7 +220,7 @@ LISPT iremainder(lisp& l, LISPT x, LISPT y)
   check(y, type::INTEGER);
   if(y->intval() == 0)
     return l.error(DIVIDE_ZERO, NIL);
-  return mknumber(l, x->intval() % y->intval());
+  return mknumber(x->intval() % y->intval());
 }
 
 LISPT fdivide(lisp& l, LISPT x, LISPT y)
@@ -229,47 +229,47 @@ LISPT fdivide(lisp& l, LISPT x, LISPT y)
   check(y, type::FLOAT);
   if(y->floatval() == 0.0)
     return l.error(DIVIDE_ZERO, NIL);
-  return mkfloat(l, x->floatval() / y->floatval());
+  return mkfloat(x->floatval() / y->floatval());
 }
 
 LISPT minus(lisp& l, LISPT x)
 {
   check(x, type::FLOAT, type::INTEGER);
   if(type_of(x) == type::INTEGER)
-    return mknumber(l, -x->intval());
-  return mkfloat(l, -x->floatval());
+    return mknumber(-x->intval());
+  return mkfloat(-x->floatval());
 }
 
 LISPT iminus(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
-  return mknumber(l, -x->intval());
+  return mknumber(-x->intval());
 }
 
 LISPT abs(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
   if(x->intval() < 0)
-    return mknumber(l, -x->intval());
-  return mknumber(l, x->intval());
+    return mknumber(-x->intval());
+  return mknumber(x->intval());
 }
 
 LISPT itof(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
-  return mkfloat(l, static_cast<double>(x->intval()));
+  return mkfloat(static_cast<double>(x->intval()));
 }
 
 LISPT add1(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
-  return mknumber(l, x->intval() + 1);
+  return mknumber(x->intval() + 1);
 }
 
 LISPT sub1(lisp& l, LISPT x)
 {
   check(x, type::INTEGER);
-  return mknumber(l, x->intval() - 1);
+  return mknumber(x->intval() - 1);
 }
 
 enum class num_type

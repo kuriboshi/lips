@@ -39,17 +39,15 @@ namespace lisp
 
 TEST_CASE("file: functions")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   SECTION("open and close")
   {
     create_test_file test("()");
     {
-      auto f = open(l, mkstring(test.file), C_READ);
-      auto r = read(l, f);
+      auto f = open(mkstring(test.file), C_READ);
+      auto r = read(f);
       CHECK(is_NIL(r));
-      CHECK(is_T(close(l, f)));
+      CHECK(is_T(close(f)));
     }
 
     {
@@ -64,8 +62,8 @@ TEST_CASE("file: functions")
   {
     create_test_file test("atom\n");
     {
-      auto in0 = open(l, mkstring(test.file), C_READ);
-      auto e0 = ratom(l, in0);
+      auto in0 = open(mkstring(test.file), C_READ);
+      auto e0 = ratom(in0);
       REQUIRE(type_of(e0) == type::SYMBOL);
       CHECK(e0->getstr() == "atom");
     }
@@ -86,7 +84,7 @@ TEST_CASE("file: functions")
     }
     {
       create_test_file test("(setq a 2)\n");
-      auto e0 = load(l, mkstring(test.file));
+      auto e0 = load(mkstring(test.file));
       CHECK("a"_a->value()->intval() == 2);
     }
   }
@@ -95,7 +93,7 @@ TEST_CASE("file: functions")
   {
     constexpr const char* test_file{"test_print.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
-    print(l, "hello"_s, f0);
+    print("hello"_s, f0);
     print("world"_s, f0);
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
@@ -113,7 +111,7 @@ TEST_CASE("file: functions")
     constexpr const char* test_file{"test_terpri.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
     prin1("\"hello"_a, f0);
-    terpri(l, f0);
+    terpri(f0);
     terpri(f0);
     prin1("world\""_a, f0);
     close(f0);
@@ -129,7 +127,7 @@ TEST_CASE("file: functions")
   {
     constexpr const char* test_file{"test_prin1.lisp"};
     auto f0 = open(mkstring(test_file), C_WRITE);
-    prin1(l, mkstring("hello "), f0);
+    prin1(mkstring("hello "), f0);
     prin1(mkstring("\"world\""), f0);
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
@@ -169,26 +167,27 @@ TEST_CASE("file: functions")
     }
     {
       auto f0 = open(mkstring(test_file), C_WRITE);
-      printlevel(l, 2_l);
-      print(l, "(a (b (c)))"_l, f0);
-      close(l, f0);
-      auto f1 = open(l, mkstring(test_file), C_READ);
-      auto r1 = getline(l, f1);
+      printlevel(2_l);
+      print("(a (b (c)))"_l, f0);
+      close(f0);
+      auto f1 = open(mkstring(test_file), C_READ);
+      auto r1 = getline(f1);
       REQUIRE(r1 != NIL);
       CHECK(r1->getstr() == "(a (b &))");
       std::filesystem::remove(test_file);
     }
+    printlevel(0_l);
   }
 
   SECTION("readc")
   {
     LISPT f = l.a().getobject();
     f->set(ref_file_t::create(R"(test)"));
-    auto ch0 = readc(l, f);
+    auto ch0 = readc(f);
     CHECK(ch0->intval() == 't');
     auto ch1 = readc(f);
     CHECK(ch1->intval() == 'e');
-    auto ch2 = readc(l, f);
+    auto ch2 = readc(f);
     CHECK(ch2->intval() == 's');
     auto ch3 = readc(f);
     CHECK(ch3->intval() == 't');
@@ -198,7 +197,7 @@ TEST_CASE("file: functions")
   {
     LISPT f = l.a().getobject();
     f->set(ref_file_t::create(R"((a b c))"));
-    auto sexpr = read(l, f);
+    auto sexpr = read(f);
     CHECK(!is_NIL(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
   }
 
@@ -208,7 +207,7 @@ TEST_CASE("file: functions")
       std::ostringstream cout;
       auto out = ref_file_t::create(cout);
       l.primout(std::move(out));
-      spaces(l, 8_l, NIL);
+      spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
     }
     {
@@ -226,7 +225,7 @@ TEST_CASE("file: functions")
     {
       LISPT f = l.a().getobject();
       f->set(ref_file_t::create(R"(test)"));
-      auto r = readline(l, f);
+      auto r = readline(f);
       CHECK(type_of(r) == type::CONS);
       auto expected = mklist("test"_a);
       CHECK(equal(r, expected));
@@ -246,7 +245,7 @@ TEST_CASE("file: functions")
   {
     create_test_file test("(setq a \"loadfile\")");
     {
-      CHECK(loadfile(l, test.file));
+      CHECK(loadfile(test.file));
       CHECK("a"_a->value()->string() == "loadfile");
     }
     {

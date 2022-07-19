@@ -181,9 +181,9 @@ LISPT top::operator()(LISPT exp)
     //
     if(_options.interactive)
     {
-      if(type_of(eval(l, variables->promptform)) == type::ERROR)
+      if(type_of(eval(variables->promptform)) == type::ERROR)
       {
-        print(mkstring(l, "Error in promptform, reset to nil"), T);
+        print(mkstring("Error in promptform, reset to nil"), T);
         variables->promptform = NIL;
       }
       if(_level > 1)
@@ -258,7 +258,7 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
       break;
     default:
       stream->file()->ungetch(c);
-      auto at = io::ratom(l, stream->file());
+      auto at = io::ratom(stream->file());
       if(type_of(at) == type::INTEGER)
       {
         tmp = histget(at->intval(), variables->history);

@@ -500,6 +500,13 @@ inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
+class context
+{
+public:
+  context();
+  ~context();
+};
+
 /// @brief The lisp interpreter.
 ///
 class lisp
@@ -507,8 +514,8 @@ class lisp
 public:
   lisp();
   ~lisp();
-  alloc& a() const { return _alloc; }
-  evaluator& e() const { return _eval; };
+  alloc& a() const;
+  evaluator& e();
   static lisp& current() { return *_current; }
   static void current(lisp& lisp) { _current = &lisp; }
 
@@ -562,10 +569,10 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  cvariable_t& currentbase() const { return _variables->_currentbase; }
-  cvariable_t& verbose() const { return _variables->_verbose; }
-  cvariable_t& loadpath() const { return _variables->_loadpath; }
-  void loadpath(LISPT newpath) { _variables->_loadpath = newpath; }
+  cvariable_t& currentbase() { return _currentbase; }
+  cvariable_t& verbose() { return _verbose; }
+  cvariable_t& loadpath() { return _loadpath; }
+  void loadpath(LISPT newpath) { _loadpath = newpath; }
   const cvariable_t& version() const { return _version; }
 
 private:
@@ -581,16 +588,10 @@ private:
   ref_file_t _stdin;
   static lisp* _current;
 
-  class cvariables
-  {
-  public:
-    cvariables(alloc&);
-    cvariable_t& _currentbase;
-    cvariable_t& _verbose;
-    cvariable_t& _loadpath;
-  };
   cvariable_t _version;
-  std::unique_ptr<cvariables> _variables;
+  cvariable_t _currentbase;
+  cvariable_t _verbose;
+  cvariable_t _loadpath;
 
   static std::map<int, std::string> messages;
   // Some standard messages, all of them not necessarily used
@@ -620,33 +621,20 @@ private:
   // clang-format on
 };
 
-inline LISPT perror(lisp& l, int i, LISPT a) { return l.perror(i, a); }
-inline LISPT perror(int i, LISPT a) { return perror(lisp::current(), i, a); }
-inline LISPT error(lisp& l, int i, LISPT a) { return l.error(i, a); }
-inline LISPT error(int i, LISPT a) { return error(lisp::current(), i, a); }
-inline LISPT syserr(lisp& l, LISPT a) { return l.syserr(a); }
-inline LISPT syserr(LISPT a) { return syserr(lisp::current(), a); }
-inline LISPT break0(lisp& l, LISPT a) { return l.break0(a); }
-inline LISPT break0(LISPT a) { return break0(lisp::current(), a); }
+inline LISPT perror(int i, LISPT a) { return lisp::current().perror(i, a); }
+inline LISPT error(int i, LISPT a) { return lisp::current().error(i, a); }
+inline LISPT syserr(LISPT a) { return lisp::current().syserr(a); }
+inline LISPT break0(LISPT a) { return lisp::current().break0(a); }
 
-inline LISPT eval(lisp& l, LISPT expr) { return lisp::eval(l, expr); }
 inline LISPT eval(LISPT expr) { return lisp::eval(lisp::current(), expr); }
-LISPT eval(lisp&, const std::string&);
 LISPT eval(const std::string& expr);
-inline LISPT apply(lisp& l, LISPT fun, LISPT args) { return lisp::apply(l, fun, args); }
 inline LISPT apply(LISPT fun, LISPT args) { return lisp::apply(lisp::current(), fun, args); }
-inline LISPT baktrace(lisp& l) { return lisp::baktrace(l); }
 inline LISPT baktrace() { return lisp::baktrace(lisp::current()); }
-inline LISPT topofstack(lisp& l) { return lisp::topofstack(l); }
 inline LISPT topofstack() { return lisp::topofstack(lisp::current()); }
-inline LISPT destblock(lisp& l, LISPT a) { return lisp::destblock(l, a); }
 inline LISPT destblock(LISPT a) { return lisp::destblock(lisp::current(), a); }
 
-inline LISPT cons(lisp& l, LISPT a, LISPT b) { return lisp::cons(l, a, b); }
 inline LISPT cons(LISPT a, LISPT b) { return lisp::cons(lisp::current(), a, b); }
-inline LISPT obarray(lisp& l) { return lisp::obarray(l); }
 inline LISPT obarray() { return lisp::obarray(lisp::current()); }
-inline LISPT freecount(lisp& l) { return lisp::freecount(l); }
 inline LISPT freecount() { return lisp::freecount(lisp::current()); }
 
 //
@@ -707,21 +695,6 @@ extern LISPT C_APPEND;
 
 namespace lisp
 {
-class current
-{
-public:
-  current(lisp& c)
-  {
-    previous = &lisp::current();
-    lisp::current(c);
-  }
-  ~current() { lisp::current(*previous); }
-  current(const current&) = delete;
-
-private:
-  lisp* previous = nullptr;
-};
-
 template<typename T>
 void check(LISPT arg, T type)
 {
@@ -737,7 +710,6 @@ void check(LISPT arg, T type, Ts... types)
   check(arg, types...);
 }
 
-inline void break_flag(lisp& l, bool val) { l.brkflg = val; }
 inline void break_flag(bool val) { lisp::current().brkflg = val; }
 
 } // namespace lisp

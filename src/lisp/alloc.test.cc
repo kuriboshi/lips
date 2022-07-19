@@ -24,9 +24,6 @@ namespace lisp
 
 TEST_CASE("Create lisp objects")
 {
-  lisp lisp;
-  current c(lisp);
-
   SECTION("Multiple calls to intern should return the same object for the same string")
   {
     auto hello0 = intern("hello");
@@ -42,45 +39,43 @@ TEST_CASE("Create lisp objects")
 
   SECTION("Check constants are the same as a local atom")
   {
-    auto lambda = mkatom(lisp, "lambda");
+    auto lambda = mkatom("lambda");
     CHECK(lambda == C_LAMBDA);
   }
 
   SECTION("Set variable")
   {
-    auto i = mkatom(lisp, "i");
-    auto j = mkatom(lisp, "j");
-    auto a = mkstring(lisp, "a");
-    auto b = mkstring(lisp, "b");
+    auto i = mkatom("i");
+    auto j = mkatom("j");
+    auto a = mkstring("a");
+    auto b = mkstring("b");
 
-    set(lisp, i, a);
-    set(lisp, j, b);
+    set(i, a);
+    set(j, b);
     CHECK(i != j);
-    set(lisp, j, a);
+    set(j, a);
     CHECK(i != j);
 
     file_t out0(std::make_unique<io::string_sink>());
-    prin0(lisp, i, out0);
+    prin0(i, out0);
     CHECK(to_string(out0.sink()) == std::string(i->getstr()));
 
     file_t out1(std::make_unique<io::string_sink>());
-    prin0(lisp, j, out1);
+    prin0(j, out1);
     CHECK(to_string(out1.sink()) == std::string(j->getstr()));
 
     std::string s_hello{"(hello)"};
     auto in = ref_file_t::create(s_hello);
-    auto hello = lispread(lisp, in);
+    auto hello = lispread(in);
     file_t out2(std::make_unique<io::string_sink>());
-    prin0(lisp, hello, out2);
+    prin0(hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);
   }
 }
 
 TEST_CASE("C Variables")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   auto& cvar = l.a().initcvar("cvar", 123_l);
   auto a = eval(cvar);
   CHECK(eq(cvar, 123_l));
@@ -90,22 +85,22 @@ TEST_CASE("C Variables")
   auto r0 = eval(cvar);
   CHECK(r0->intval() == 321);
 
-  auto r1 = eval(l, "(setq cvar 444)");
+  auto r1 = eval("(setq cvar 444)");
   CHECK(r1->intval() == 444);
   CHECK(cvar->intval() == 444);
 
-  auto r2 = eval(l, "cvar");
+  auto r2 = eval("cvar");
   CHECK(r2->intval() == 444);
 
   cvar = mkstring("hello");
   CHECK(cvar->getstr() == "hello");
 
   auto& xvar = l.a().initcvar("xvar", "hello"_l);
-  eval(l, "(setq xvar \"world\")");
+  eval("(setq xvar \"world\")");
   CHECK(xvar->getstr() == "world");
 
   auto& yvar = initcvar(l.a(), "yvar", 0_l);
-  eval(l, "(setq yvar \"string\")");
+  eval("(setq yvar \"string\")");
   CHECK(yvar->getstr() == "string");
 
   auto& zvar = initcvar("zvar", 22_l);
@@ -116,9 +111,6 @@ TEST_CASE("C Variables")
 
 TEST_CASE("obarray")
 {
-  lisp l;
-  current c(l);
-
   auto a0 = mkatom("foo");
   auto obs = obarray();
   // The reason this is not 1 is that there are already two symbols in the
@@ -129,7 +121,7 @@ TEST_CASE("obarray")
   CHECK(length(obs)->intval() == 5);
 
   // Test calling from lisp
-  obs = eval(l, "(obarray)");
+  obs = eval("(obarray)");
   CHECK(length(obs)->intval() == 5);
 }
 

@@ -24,9 +24,7 @@ namespace lisp
 
 TEST_CASE("Interactive tests")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   std::ostringstream cout;
   auto out = ref_file_t::create(cout);
   l.primout(std::move(out));

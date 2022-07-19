@@ -135,7 +135,7 @@ private:
   LISPT printwhere();
   void abort(int m, LISPT v);
   void overflow();
-  LISPT destblock(lisp&, const destblock_t*);
+  LISPT destblock(const destblock_t*);
 
   lisp& l;
   alloc& a;
@@ -151,11 +151,8 @@ private:
   bool _interactive = false;
 };
 
-inline void breakhook(lisp& l, evaluator::breakhook_t fun) { l.e().breakhook(fun); }
 inline void breakhook(evaluator::breakhook_t fun) { lisp::current().e().breakhook(fun); }
-inline void undefhook(lisp& l, evaluator::undefhook_t fun) { l.e().undefhook(fun); }
 inline void undefhook(evaluator::undefhook_t fun) { lisp::current().e().undefhook(fun); }
-inline void unwind(lisp& l) { l.e().unwind(); }
 inline void unwind() { lisp::current().e().unwind(); }
 
 } // namespace lisp

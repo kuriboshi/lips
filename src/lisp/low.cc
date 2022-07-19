@@ -54,7 +54,7 @@ LISPT cond(lisp& l, LISPT args)
   {
     auto alt = args->car();
     check(alt, type::CONS);
-    auto res = eval(l, alt->car());
+    auto res = eval(alt->car());
     if(!is_NIL(res))
     {
       if(is_NIL(alt->cdr()))
@@ -74,10 +74,10 @@ LISPT progn(lisp& l, LISPT lexp)
     return NIL;
   while(!is_NIL(lexp->cdr()))
   {
-    eval(l, lexp->car());
+    eval(lexp->car());
     lexp = lexp->cdr();
   }
-  return eval(l, lexp->car());
+  return eval(lexp->car());
 }
 
 LISPT set(lisp& l, LISPT var, LISPT val)
@@ -98,15 +98,15 @@ LISPT set(lisp& l, LISPT var, LISPT val)
   return val;
 }
 
-LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(l, val)); }
+LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(val)); }
 
 LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
 {
-  LISPT res = eval(l, pred);
+  LISPT res = eval(pred);
   while(!is_NIL(res))
   {
     low::progn(l, exp);
-    res = eval(l, pred);
+    res = eval(pred);
   }
   return NIL;
 }

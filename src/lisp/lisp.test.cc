@@ -46,56 +46,6 @@ TEST_CASE("lisp: to_underlying")
   CHECK(to_underlying(type::CVARIABLE) == 20);
 }
 
-TEST_CASE("lisp: current")
-{
-  lisp lisp0;
-  lisp lisp1;
-
-  SECTION("test 1")
-  {
-    auto v0 = mkatom(lisp0, "v0");
-    setqq(lisp0, v0, mkatom(lisp0, "world"));
-    // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp0, v0->value(), mkatom(lisp0, "world")) != NIL);
-    // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp0, v0->value(), mkatom(lisp1, "world")) == NIL);
-  }
-
-  SECTION("test 2")
-  {
-    auto v1 = mkatom(lisp1, "v1");
-    setqq(lisp1, v1, mkatom(lisp1, "world"));
-    // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v1->value(), mkatom(lisp1, "world")) != NIL);
-    // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v1->value(), mkatom(lisp0, "world")) == NIL);
-  }
-
-  SECTION("current 1")
-  {
-    // Set default lisp interpreter to lisp0
-    current c(lisp0);
-    auto v2 = mkatom("v2");
-    setqq(v2, mkatom("world"));
-    // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v2->value(), mkatom(lisp0, "world")) != NIL);
-    // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v2->value(), mkatom(lisp1, "world")) == NIL);
-  }
-
-  SECTION("current 2")
-  {
-    // Set default lisp interpreter to lisp1
-    current c(lisp1);
-    auto v3 = mkatom("v3");
-    setqq(v3, mkatom("world"));
-    // Same atom in the same interpreter should be TRUE.
-    CHECK(eq(lisp1, v3->value(), mkatom(lisp1, "world")) != NIL);
-    // Same printname atom from different interpreters should be FALSE.
-    CHECK(eq(lisp1, v3->value(), mkatom(lisp0, "world")) == NIL);
-  }
-}
-
 TEST_CASE("lisp: mkprim")
 {
   SECTION("Define a new function")

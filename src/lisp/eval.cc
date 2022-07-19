@@ -88,7 +88,7 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
     _breakhook();
   if(env == nullptr)
     throw lisp_reset();
-  details::file::print(l, cons(l, fault, cons(l, C_BROKEN, NIL)), T);
+  details::file::print(l, cons(fault, cons(C_BROKEN, NIL)), T);
   push(next);
   cont = &evaluator::everr;
 }
@@ -185,7 +185,7 @@ LISPT evaluator::apply(LISPT f, LISPT x)
   fun = f;
   push(args);
   args = x;
-  expression = cons(l, f, x);
+  expression = cons(f, x);
   push(&evaluator::apply0);
   cont = &evaluator::peval2;
   while(!(this->*cont)())
@@ -292,7 +292,7 @@ void evaluator::do_unbound(continuation_t continuation)
   // definition from a file. If that doesn't succeed, then the symbol is
   // undefined.
   //
-  LISPT al = getprop(l, expression->car(), C_AUTOLOAD);
+  LISPT al = getprop(expression->car(), C_AUTOLOAD);
   if(!is_NIL(al))
   {
     push(expression);
@@ -572,7 +572,7 @@ bool evaluator::evlis1()
 
 bool evaluator::evlis2()
 {
-  LISPT x = cons(l, receive(), NIL);
+  LISPT x = cons(receive(), NIL);
   send(x);
   pop(cont);
   return false;
@@ -594,7 +594,7 @@ bool evaluator::evlis4()
   LISPT x = receive();
   a.dfree(dest);
   pop(dest);
-  x = cons(l, receive(), x);
+  x = cons(receive(), x);
   send(x);
   pop(cont);
   return false;
@@ -746,6 +746,7 @@ void evaluator::unwind()
     restore_env();
     env = env->link();
   }
+  reset();
 }
 
 bool evaluator::lookup()
@@ -840,16 +841,16 @@ bool evaluator::evseq3()
   return false;
 }
 
-LISPT evaluator::destblock(lisp& l, const destblock_t* block)
+LISPT evaluator::destblock(const destblock_t* block)
 {
   if(block == nullptr)
     return NIL;
-  LISPT foo = tconc(l, NIL, mknumber(l, block->size()));
+  LISPT foo = tconc(NIL, mknumber(block->size()));
   for(int i = 0; i != block->size(); ++i)
   {
-    foo = tconc(l, foo, cons(l, (block + i + 1)->var(), (block + i + 1)->val()));
+    foo = tconc(foo, cons((block + i + 1)->var(), (block + i + 1)->val()));
   }
-  return car(l, foo);
+  return car(foo);
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -863,18 +864,18 @@ LISPT evaluator::baktrace()
       [this](auto&& arg) {
         using ArgType = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<ArgType, LISPT>)
-          print(l, arg, T);
+          print(arg, T);
         else if constexpr(std::is_same_v<ArgType, destblock_t*>)
         {
           if(arg != nullptr)
           {
-            prin1(l, "destblock_t: "_l, T);
-            print(l, destblock(l, arg), T);
+            prin1("destblock_t: "_l, T);
+            print(destblock(arg), T);
           }
           else
           {
-            prin1(l, "destblock_t: nullptr"_l, T);
-            terpri(l, T);
+            prin1("destblock_t: nullptr"_l, T);
+            terpri(T);
           }
         }
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
@@ -967,7 +968,7 @@ LISPT evaluator::topofstack()
 LISPT evaluator::destblock(LISPT e)
 {
   check(e, type::ENVIRON);
-  return destblock(l, e->envval());
+  return destblock(e->envval());
 }
 
 } // namespace lisp

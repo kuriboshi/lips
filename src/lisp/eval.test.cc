@@ -23,35 +23,32 @@ namespace lisp
 
 TEST_CASE("eval: LAMBDA and NLAMBDA")
 {
-  lisp l;
-  current c(l);
-
   SECTION("LAMBDA - basic case")
   {
-    auto a = eval(l, "(setq f (lambda () \"hello\"))");
-    auto b = eval(l, "(f)");
+    auto a = eval("(setq f (lambda () \"hello\"))");
+    auto b = eval("(f)");
     CHECK(type_of(b) == type::STRING);
     CHECK(b->string() == "hello");
   }
   SECTION("LAMBDA - one argument")
   {
-    auto a = eval(l, "(setq f (lambda (x) (cons x nil)))");
-    auto b = eval(l, "(f 10)");
+    auto a = eval("(setq f (lambda (x) (cons x nil)))");
+    auto b = eval("(f 10)");
     CHECK(type_of(b) == type::CONS);
     CHECK(type_of(b->car()) == type::INTEGER);
     CHECK(b->car()->intval() == 10);
   }
   SECTION("LAMBDA - spread case")
   {
-    auto a = eval(l, "(setq f (lambda x (cadr x)))");
-    auto b = eval(l, "(f 1 2)");
+    auto a = eval("(setq f (lambda x (cadr x)))");
+    auto b = eval("(f 1 2)");
     CHECK(type_of(b) == type::INTEGER);
     CHECK(b->intval() == 2);
   }
   SECTION("LAMBDA - half spread")
   {
-    auto a = eval(l, "(setq f (lambda (a . x) (list a (cadr x))))");
-    auto b = eval(l, "(f 0 1 2)");
+    auto a = eval("(setq f (lambda (a . x) (list a (cadr x))))");
+    auto b = eval("(f 0 1 2)");
     CHECK(type_of(b) == type::CONS);
     CHECK(type_of(b->car()) == type::INTEGER);
     CHECK(b->car()->intval() == 0);
@@ -60,8 +57,8 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
   }
   SECTION("NLAMBDA - basic case")
   {
-    auto a = eval(l, "(setq f (nlambda (a) a))");
-    auto b = eval(l, "(f x)");
+    auto a = eval("(setq f (nlambda (a) a))");
+    auto b = eval("(f x)");
     CHECK(type_of(b) == type::SYMBOL);
     CHECK(b->symbol().pname == "x");
   }
@@ -69,62 +66,52 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
 
 TEST_CASE("eval: Eval functions")
 {
-  lisp lisp;
-  current c(lisp);
-
   SECTION("Evaluate variable")
   {
-    auto var = mkatom(lisp, "i");
-    auto val = mknumber(lisp, 123);
-    set(lisp, var, val);
-    auto r0 = eval(lisp, var);
+    auto var = mkatom("i");
+    auto val = mknumber(123);
+    set(var, val);
+    auto r0 = eval(var);
     CHECK(r0->intval() == 123);
   }
 
   SECTION("Evaluate simple expression: (plus 123 1)")
   {
-    auto e1 = cons(lisp, mkatom(lisp, "plus"), cons(lisp, mknumber(lisp, 123), cons(lisp, mknumber(lisp, 1), nullptr)));
+    auto e1 = cons(mkatom("plus"), cons(mknumber(123), cons(mknumber(1), nullptr)));
     auto out0 = std::make_unique<file_t>(std::make_unique<io::string_sink>());
-    prin0(lisp, e1, *out0.get());
+    prin0(e1, *out0.get());
     CHECK(to_string(out0->sink()) == std::string("(plus 123 1)"));
-    auto r1 = eval(lisp, e1);
+    auto r1 = eval(e1);
     CHECK(r1->intval() == 124);
   }
 }
 
 TEST_CASE("eval: Closure")
 {
-  lisp l;
-  current c(l);
-
   auto a = setq(mkatom("a"), mknumber(1));
   auto clos = closure(lambda(NIL, cons(mkatom("a"), NIL)), cons(mkatom("a"), NIL));
   auto r0 = eval(cons(clos, NIL));
   a = setq(mkatom("a"), mknumber(2));
-  auto r1 = eval(apply(l, clos, NIL));
+  auto r1 = eval(apply(clos, NIL));
   CHECK(equal(r0, r1) != NIL);
 }
 
 TEST_CASE("eval: topofstack")
 {
-  lisp l;
-  current c(l);
-
-  auto a = set(l, mkatom("a"), 88_l);
-  eval(l, R"(
+  auto a = set(mkatom("a"), 88_l);
+  eval(R"(
 (defineq (f0 (lambda (a) (destblock (topofstack))))
          (f1 (lambda (a) (f0 a))))
 )");
-  auto r0 = eval(l, "(f0 101)");
+  auto r0 = eval("(f0 101)");
   CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 88_l)), r0)));
-  auto r1 = eval(l, "(f1 99)");
+  auto r1 = eval("(f1 99)");
   CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 99_l)), r1)));
 }
 
 TEST_CASE("eval: control limits")
 {
-  lisp l;
-  current c(l);
+  auto& l = lisp::current();
   std::ostringstream err;
   l.primerr(ref_file_t::create(err));
   "(defineq (f (lambda () (f))))"_e;

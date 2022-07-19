@@ -23,7 +23,7 @@ LISPT getargs(lisp& l, LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
-  return cons(l, al->car(), getargs(l, al->cdr()));
+  return cons(al->car(), getargs(l, al->cdr()));
 }
 
 LISPT getrep(lisp& l, LISPT fun)
@@ -40,8 +40,8 @@ LISPT getrep(lisp& l, LISPT fun)
   else
     args = x.args;
   if(type_of(fun) == type::LAMBDA)
-    return cons(l, C_LAMBDA, cons(l, args, x.body));
-  return cons(l, C_NLAMBDA, cons(l, args, x.body));
+    return cons(C_LAMBDA, cons(args, x.body));
+  return cons(C_NLAMBDA, cons(args, x.body));
 }
 
 LISPT funeq(lisp& l, LISPT f1, LISPT f2)
@@ -52,12 +52,12 @@ LISPT funeq(lisp& l, LISPT f1, LISPT f2)
   {
     LISPT t1 = f1->lambda().args;
     LISPT t2 = f2->lambda().args;
-    LISPT tmp = equal(l, t1, t2);
+    LISPT tmp = equal(t1, t2);
     if(!is_NIL(tmp))
     {
       t1 = f1->lambda().body;
       t2 = f2->lambda().body;
-      tmp = equal(l, t1, t2);
+      tmp = equal(t1, t2);
       if(!is_NIL(tmp))
         return T;
     }
@@ -73,9 +73,9 @@ LISPT checkfn(lisp& l, LISPT name, LISPT lam)
       LISPT t = user::funeq(l, name->value(), lam);
       if(is_NIL(t))
       {
-        putprop(l, name, C_OLDDEF, name->value());
+        putprop(name, C_OLDDEF, name->value());
         if(!is_NIL(l.verbose()))
-          print(l, cons(l, name, cons(l, C_REDEFINED, NIL)));
+          print(cons(name, cons(C_REDEFINED, NIL)));
       }
     }
   return NIL;
@@ -94,13 +94,13 @@ LISPT defineq(lisp& l, LISPT defs)
 {
   if(is_NIL(defs))
     return NIL;
-  auto result = cons(l, NIL, NIL);
+  auto result = cons(NIL, NIL);
   auto r = result;
   for(auto d: defs)
   {
-    auto name = car(l, d);
-    auto lam = eval(l, cadr(l, d));
-    auto def = cons(l, user::define(l, name, lam), NIL);
+    auto name = car(d);
+    auto lam = eval(cadr(d));
+    auto def = cons(user::define(l, name, lam), NIL);
     rplacd(r, def);
     r = def;
   }

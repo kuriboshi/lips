@@ -39,10 +39,10 @@ LISPT putprop(lisp& l, LISPT x, LISPT p, LISPT v)
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
     if(pl->car() == p)
     {
-      rplaca(l, pl->cdr(), v);
+      rplaca(pl->cdr(), v);
       return v;
     }
-  x->symbol().plist = cons(l, p, cons(l, v, x->symbol().plist));
+  x->symbol().plist = cons(p, cons(v, x->symbol().plist));
   return v;
 }
 
@@ -73,7 +73,7 @@ LISPT remprop(lisp& l, LISPT x, LISPT p)
       if(is_NIL(pl2))
         x->symbol().plist = pl->cdr()->cdr();
       else
-        rplacd(l, pl2, pl->cdr()->cdr());
+        rplacd(pl2, pl->cdr()->cdr());
     }
     pl2 = pl->cdr();
   }

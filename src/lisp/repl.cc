@@ -35,35 +35,35 @@ LISPT repl::operator()(LISPT exp)
   {
     while(true)
     {
-      prin0(l, _prompt);
-      auto expr = lispread(l, l.primin());
+      prin0(_prompt);
+      auto expr = lispread(l.primin());
       if(expr == C_EMPTY)
         break;
-      print(l, eval(l, expr));
+      print(eval(expr));
     }
     return NIL;
   }
   while(true)
   {
-    prin0(l, _break_prompt);
-    auto com = lispread(l, l.primin());
+    prin0(_break_prompt);
+    auto com = lispread(l.primin());
     if(com == C_EMPTY)
       return C_EOF;
     /* OK, EVAL, ^, ... */
     if(type_of(com) != type::CONS)
     {
-      prin0(l, "(go) continue"_s);
-      terpri(l);
-      prin0(l, "(reset) back to top loop"_s);
-      terpri(l);
-      prin0(l, "(bt) print backtrace"_s);
-      terpri(l);
-      prin0(l, "(return exp) return expression"_s);
-      terpri(l);
+      prin0("(go) continue"_s);
+      terpri();
+      prin0("(reset) back to top loop"_s);
+      terpri();
+      prin0("(bt) print backtrace"_s);
+      terpri();
+      prin0("(return exp) return expression"_s);
+      terpri();
       continue;
     }
     if(com->car() == C_GO)
-      return print(l, eval(l, exp), false);
+      return print(eval( exp), false);
     if(com->car() == C_RESET)
     {
       l.e().unwind();

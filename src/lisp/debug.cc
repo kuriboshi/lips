@@ -28,7 +28,7 @@ LISPT evaltrace(lisp& l, LISPT state)
     check(state, type::INTEGER);
     l.e().trace(state->intval());
   }
-  return mknumber(l, i);
+  return mknumber(i);
 }
 
 namespace pn

@@ -24,11 +24,8 @@
 namespace lisp
 {
 inline LISPT define(LISPT a, LISPT b) { return details::user::define(lisp::current(), a, b); }
-inline LISPT define(lisp& l, LISPT a, LISPT b) { return details::user::define(l, a, b); }
 inline LISPT defineq(LISPT a) { return details::user::defineq(lisp::current(), a); }
-inline LISPT defineq(lisp& l, LISPT a) { return details::user::defineq(l, a); }
 inline LISPT getrep(LISPT a) { return details::user::getrep(lisp::current(), a); }
-inline LISPT getrep(lisp& l, LISPT a) { return details::user::getrep(l, a); }
 } // namespace lisp
 
 #endif

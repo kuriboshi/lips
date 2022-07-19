@@ -234,14 +234,10 @@ private:
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 
-inline LISPT mkstring(lisp& l, const std::string& s) { return l.a().mkstring(s); }
-inline LISPT mkstring(const std::string& s) { return mkstring(lisp::current(), s); }
-inline LISPT mkatom(lisp& l, const std::string& s) { return l.a().mkatom(s); }
-inline LISPT mkatom(const std::string& s) { return mkatom(lisp::current(), s); }
-inline LISPT mknumber(lisp& l, int i) { return l.a().mknumber(i); }
-inline LISPT mknumber(int i) { return mknumber(lisp::current(), i); }
-inline LISPT mkfloat(lisp& l, double d) { return l.a().mkfloat(d); }
-inline LISPT mkfloat(double d) { return mkfloat(lisp::current(), d); }
+inline LISPT mkstring(const std::string& s) { return lisp::current().a().mkstring(s); }
+inline LISPT mkatom(const std::string& s) { return lisp::current().a().mkatom(s); }
+inline LISPT mknumber(int i) { return lisp::current().a().mknumber(i); }
+inline LISPT mkfloat(double d) { return lisp::current().a().mkfloat(d); }
 
 /// @brief Creates a lisp string.
 inline LISPT operator"" _s(const char* s, std::size_t) { return mkstring(s); }
@@ -258,16 +254,10 @@ inline LISPT operator"" _l(long double d) { return mkfloat(d); }
 /// @brief Evaluates a lisp expression in a string.
 inline LISPT operator"" _e(const char* s, std::size_t) { return eval(s); }
 
-inline LISPT mklist(lisp& l, LISPT t) { return cons(l, t, NIL); }
-
-template<typename... Ts>
-LISPT mklist(lisp& l, LISPT t, Ts... ts)
-{
-  return cons(l, t, mklist(l, ts...));
-}
-
+/// @brief Terminates the list create function.
 inline LISPT mklist(LISPT t) { return cons(t, NIL); }
 
+/// @brief Creates a list from a variadic list of items.
 template<typename... Ts>
 LISPT mklist(LISPT t, Ts... ts)
 {

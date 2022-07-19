@@ -23,13 +23,9 @@
 
 namespace lisp
 {
-inline LISPT map(lisp& l, LISPT a, LISPT b, LISPT c) { return details::map::map(l, a, b, c); }
 inline LISPT map(LISPT a, LISPT b, LISPT c) { return details::map::map(lisp::current(), a, b, c); }
-inline LISPT mapc(lisp& l, LISPT a, LISPT b, LISPT c) { return details::map::mapc(l, a, b, c); }
 inline LISPT mapc(LISPT a, LISPT b, LISPT c) { return details::map::mapc(lisp::current(), a, b, c); }
-inline LISPT maplist(lisp& l, LISPT a, LISPT b, LISPT c) { return details::map::maplist(l, a, b, c); }
 inline LISPT maplist(LISPT a, LISPT b, LISPT c) { return details::map::maplist(lisp::current(), a, b, c); }
-inline LISPT mapcar(lisp& l, LISPT a, LISPT b, LISPT c) { return details::map::mapcar(l, a, b, c); }
 inline LISPT mapcar(LISPT a, LISPT b, LISPT c) { return details::map::mapcar(lisp::current(), a, b, c); }
 } // namespace lisp
 

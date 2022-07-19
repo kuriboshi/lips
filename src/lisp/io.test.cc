@@ -38,19 +38,14 @@ namespace lisp
 
 TEST_CASE("io: Basic I/O")
 {
-  lisp lisp;
-  current c(lisp);
-
-  lisp.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
-  lisp.primout()->format("hello world {}", 123);
-  CHECK(to_string(lisp.primout()->sink()) == std::string("hello world 123"));
+  auto& l = lisp::current();
+  l.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
+  l.primout()->format("hello world {}", 123);
+  CHECK(to_string(l.primout()->sink()) == std::string("hello world 123"));
 }
 
 TEST_CASE("io: ratom")
 {
-  lisp l;
-  current c(l);
-
   SECTION("integer")
   {
     auto in = ref_file_t::create("124");
@@ -66,7 +61,7 @@ TEST_CASE("io: ratom")
     }
     {
       auto in = ref_file_t::create("124abc");
-      auto r = ratom(l, in);
+      auto r = ratom(in);
       CHECK(type_of(r) == type::SYMBOL);
     }
   }
@@ -82,16 +77,13 @@ TEST_CASE("io: ratom")
 
 TEST_CASE("io: lispread/readline")
 {
-  lisp l;
-  current c(l);
-
   SECTION("Read from utf-8")
   {
     std::string s_nihongo{"\"日本語\"\n"};
     auto in = ref_file_t::create(s_nihongo);
-    auto nihongo = lispread(l, in);
+    auto nihongo = lispread(in);
     file_t out(std::make_unique<io::string_sink>());
-    print(l, nihongo, out);
+    print(nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
@@ -101,9 +93,9 @@ TEST_CASE("io: lispread/readline")
       R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
     auto in = ref_file_t::create(s_nihongo);
-    auto nihongo = lispread(l, in);
+    auto nihongo = lispread(in);
     file_t out(std::make_unique<io::string_sink>());
-    print(l, nihongo, out);
+    print(nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
   }
 
@@ -118,9 +110,9 @@ TEST_CASE("io: lispread/readline")
       o << s_nihongo;
     }
     auto f = ref_file_t::create(std::make_unique<io::file_source>(test_file));
-    auto nihongo = lispread(l, f);
+    auto nihongo = lispread(f);
     file_t out(std::make_unique<io::string_sink>());
-    print(l, nihongo, out);
+    print(nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
     std::filesystem::remove(test_file);
   }
@@ -128,10 +120,10 @@ TEST_CASE("io: lispread/readline")
   SECTION("lispread vs. readline")
   {
     auto f0 = ref_file_t::create(R"((hello world))");
-    auto result0 = lispread(l, f0);
+    auto result0 = lispread(f0);
     auto f1 = ref_file_t::create(R"(hello world)");
-    auto result1 = readline(l, f1);
-    CHECK(equal(l, result0, result1) != NIL);
+    auto result1 = readline(f1);
+    CHECK(equal(result0, result1) != NIL);
   }
 
   SECTION("floatp")
@@ -166,14 +158,11 @@ TEST_CASE("io: source/sink")
 
 TEST_CASE("io: file_t functions")
 {
-  lisp l;
-  current c(l);
-
   file_t f0(std::make_unique<io::string_sink>());
   patom("hello"_a, f0);
   terpri(f0);
-  patom(l, "world"_a, f0);
-  terpri(l, f0);
+  patom("world"_a, f0);
+  terpri(f0);
   CHECK(to_string(f0.sink()) == "hello\nworld\n");
 }
 
@@ -282,21 +271,19 @@ TEST_CASE("io: sink")
 
 TEST_CASE("io: patom primout/primerr")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   {
     std::ostringstream out;
     l.primout(ref_file_t::create(out));
-    patom(l, "foo"_a, false);
-    terpri(l, false);
+    patom("foo"_a, false);
+    terpri(false);
     CHECK(out.str() == "foo\n");
   }
   {
     std::ostringstream err;
     l.primerr(ref_file_t::create(err));
-    patom(l, "bar"_a, true);
-    terpri(l, true);
+    patom("bar"_a, true);
+    terpri(true);
     CHECK(err.str() == "bar\n");
   }
   {
@@ -317,14 +304,12 @@ TEST_CASE("io: patom primout/primerr")
 
 TEST_CASE("io: prinbody")
 {
-  lisp l;
-  current c(l);
-
+  auto& l = lisp::current();
   auto list = "(a b c . d)"_l;
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prinbody(l, list, *f);
+    prinbody(list, *f);
     CHECK(os.str() == "a b c . d");
   }
   {
@@ -336,13 +321,13 @@ TEST_CASE("io: prinbody")
   {
     std::ostringstream os;
     l.primout(ref_file_t::create(os));
-    prinbody(l, list, false);
+    prinbody(list, false);
     CHECK(os.str() == "a b c . d");
   }
   {
     std::ostringstream os;
     l.primerr(ref_file_t::create(os));
-    prinbody(l, list, true);
+    prinbody(list, true);
     CHECK(os.str() == "a b c . d");
   }
   {
@@ -437,8 +422,7 @@ TEST_CASE("io: prin0")
 
 TEST_CASE("io: splice")
 {
-  lisp l;
-  current c(l);
+  auto& l = lisp::current();
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
@@ -449,14 +433,14 @@ TEST_CASE("io: splice")
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(l, cdr(l, x), y, false);
+    auto r = io::splice(l, cdr(x), y, false);
     CHECK(!is_NIL(equal(x, "(a x y z c)"_l)));
     CHECK(!is_NIL(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(l, cdr(l, x), y, true);
+    auto r = io::splice(l, cdr(x), y, true);
     CHECK(!is_NIL(equal(x, "(a b x y z c)"_l)));
     CHECK(!is_NIL(equal(r, "(z c)"_l)));
   }

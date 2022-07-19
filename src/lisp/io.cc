@@ -49,9 +49,9 @@ namespace lisp::io
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
 ///
-LISPT ratom(lisp& l, ref_file_t file)
+LISPT ratom(ref_file_t file)
 {
-  lexer lexer{l, file};
+  lexer lexer{file};
   auto token = lexer.read();
   parser parser{lexer};
   return parser.create(token);
@@ -60,13 +60,13 @@ LISPT ratom(lisp& l, ref_file_t file)
 //
 // LISPREAD reads a lisp expression from file FILE.
 //
-LISPT lispread(lisp& l, ref_file_t file)
+LISPT lispread(ref_file_t file)
 {
   lexer lexer(file);
   return parser(lexer).parse();
 }
 
-LISPT readline(lisp& l, ref_file_t file)
+LISPT readline(ref_file_t file)
 {
   auto line = file->getline();
   if(line)
@@ -90,18 +90,18 @@ LISPT readline(lisp& l, ref_file_t file)
         tail = cdr(rplacd(tail, cons(o, NIL)));
     }
     if(tail == NIL)
-      return cons(l, head, NIL);
+      return cons(head, NIL);
     return head;
   }
   return C_EOF;
 }
 
-LISPT getline(lisp& l, LISPT file)
+LISPT getline(LISPT file)
 {
   check(file, type::FILET);
   auto line = file->file()->getline();
   if(line)
-    return mkstring(l, *line);
+    return mkstring(*line);
   return NIL;
 }
 
@@ -137,7 +137,7 @@ inline void pp(const char* s, file_t& file, LISPT x)
   ps(">", file, false);
 }
 
-LISPT patom(lisp&, LISPT x, file_t& file, bool esc)
+LISPT patom(LISPT x, file_t& file, bool esc)
 {
   ps(x->symbol().pname, file, esc);
   return x;
@@ -185,7 +185,7 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       l.thisplevel--;
       break;
     case type::SYMBOL:
-      return io::patom(l, x, file, esc);
+      return io::patom(x, file, esc);
     case type::NIL:
       ps("nil", file, false);
       break;
@@ -259,11 +259,11 @@ LISPT print(lisp& l, LISPT x, file_t& file)
 {
   l.thisplevel = 0;
   io::prin0(l, x, file, true);
-  io::terpri(l, file);
+  io::terpri(file);
   return x;
 }
 
-LISPT terpri(lisp&, file_t& file)
+LISPT terpri(file_t& file)
 {
   file.putch('\n');
   file.flush();
@@ -303,21 +303,21 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
   if(type_of(y) != type::CONS)
   {
     if(tailp)
-      rplacd(l, x, cons(l, y, t));
+      rplacd(x, cons(y, t));
     else
-      rplaca(l, x, y);
+      rplaca(x, y);
     return x;
   }
   if(!tailp)
   {
-    rplaca(l, x, y->car());
+    rplaca(x, y->car());
     y = y->cdr();
   }
-  rplacd(l, x, y);
+  rplacd(x, y);
   LISPT t2 = NIL;
   for(; type_of(y) == type::CONS; y = y->cdr())
     t2 = y;
-  return rplacd(l, t2, t);
+  return rplacd(t2, t);
 }
 
 file_source::file_source(const std::string& name)
