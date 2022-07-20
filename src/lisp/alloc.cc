@@ -19,11 +19,6 @@
 
 namespace lisp
 {
-/// @brief Class handling allocation of objects.
-alloc::alloc()
-  : local_symbols(lisp_t::symbol_collection().create())
-{}
-
 /// @brief Default destructor.
 ///
 // TODO: Free all memory
@@ -51,7 +46,7 @@ LISPT alloc::cons(LISPT a, LISPT b)
 LISPT alloc::obarray()
 {
   LISPT o = NIL;
-  for(auto i: local_symbols)
+  for(auto i: global_symbols())
     o = cons(i.self, o);
   return o;
 }
@@ -72,7 +67,6 @@ LISPT alloc::mkstring(const std::string& str)
 LISPT alloc::mknumber(int number)
 {
   auto c = getobject();
-  ;
   c->set(number);
   return c;
 }
@@ -88,7 +82,7 @@ LISPT alloc::mkfloat(double number)
   return c;
 }
 
-inline LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
+LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 {
   if(type_of(alist) == type::CONS)
   {
@@ -135,11 +129,11 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 /// @returns The symbol as a LISP object.
 LISPT alloc::intern(const std::string& pname)
 {
-  auto& glob = lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  auto& glob = global_symbols();
   auto& sym = glob.get(pname);
   if(sym.self == NIL)
   {
-    sym.self = new lisp_t; // NOLINT
+    sym.self = getobject();
     sym.self->set(sym);
   }
   return sym.self;
@@ -157,7 +151,7 @@ LISPT alloc::mkatom(const std::string& str)
 {
   if(global_symbols().exists(str))
     return global_symbols().get(str).self;
-  auto& sym = local_symbols.get(str);
+  auto& sym = global_symbols().get(str);
   if(sym.self == NIL)
   {
     sym.self = getobject();
@@ -165,32 +159,5 @@ LISPT alloc::mkatom(const std::string& str)
   }
   return sym.self;
 }
-
-///
-/// @brief Allocates a destination block of size size.
-///
-/// @param size The size of the destination block.
-/// @returns A destblock or nullptr if no more space available.
-destblock_t* alloc::dalloc(int size)
-{
-  if(size <= DESTBLOCKSIZE - destblockused - 1)
-  {
-    auto* dest = &destblock[destblockused];
-    destblockused += size + 1;
-    dest->num(static_cast<std::int8_t>(size));
-    for(int i = 1; i <= size; ++i)
-      destblock[destblockused - i].reset();
-    return dest;
-  }
-  return nullptr;
-}
-
-/// @brief Free a destination block.
-///
-/// @param ptr The destination block to free.
-void alloc::dfree(destblock_t* block) { destblockused -= block->size() + 1; }
-
-/// @brief Frees all destination blocks.
-void alloc::dzero() { destblockused = 0; }
 
 } // namespace lisp

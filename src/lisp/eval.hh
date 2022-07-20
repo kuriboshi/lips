@@ -26,6 +26,50 @@
 
 namespace lisp
 {
+/// @brief Destination block is used to collect the parameters to a function.
+///
+/// @details The destblock_t is used to store variables and their values.  Each
+/// block of variable/value pairs is proceeded by a control block which
+/// contains the following pieces of information: The size of the block, the
+/// index of the variable/value pair currently being set, and a link to another
+/// destblock_t in a chain of blocks.
+///
+class destblock_t
+{
+private:
+  struct control_block
+  {
+    std::int8_t size;
+    std::int8_t index;
+    destblock_t* link;
+  };
+  struct var_val_pair
+  {
+    LISPT var;
+    LISPT val;
+  };
+  std::variant<control_block, var_val_pair> u;
+
+public:
+  void reset() { u = var_val_pair{NIL, NIL}; }
+
+  void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
+  int size() const { return std::get<control_block>(u).size; }
+  int index() const { return std::get<control_block>(u).index; }
+  destblock_t* link() const { return std::get<control_block>(u).link; }
+  void link(destblock_t* dest) { std::get<control_block>(u).link = dest; }
+  void decr()
+  {
+    if(std::get<control_block>(u).index > 0)
+      --std::get<control_block>(u).index;
+  }
+
+  void var(LISPT x) { std::get<var_val_pair>(u).var = x; }
+  LISPT var() const { return std::get<var_val_pair>(u).var; }
+  void val(LISPT x) { std::get<var_val_pair>(u).val = x; }
+  LISPT val() const { return std::get<var_val_pair>(u).val; }
+};
+
 class evaluator
 {
 public:
@@ -149,6 +193,32 @@ private:
   destblock_t* env = nullptr;    // Current environment.
   int _trace = 0;
   bool _interactive = false;
+
+  /// @brief Allocate a destination block.
+  ///
+  /// @param size The size of the destination block.
+  ///
+  destblock_t* dalloc(int size);
+
+  /// @brief Free a destination block.
+  ///
+  /// @details The destination blocks are freed in the reverse order of their
+  /// allocation.
+  ///
+  /// @param The block to free.
+  ///
+  void dfree(destblock_t* block);
+
+  /// @brief Release all destination blocks.
+  ///
+  void dzero();
+
+  /// @brief Size of destination block area
+  static constexpr int DESTBLOCKSIZE = 3000;
+  /// @brief Destination block area.
+  std::array<destblock_t, DESTBLOCKSIZE> _destblock;
+  /// @brief Index to last slot in destblock.
+  int _destblockused = 0;
 };
 
 inline void breakhook(evaluator::breakhook_t fun) { lisp::current().e().breakhook(fun); }

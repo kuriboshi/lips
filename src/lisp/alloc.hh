@@ -27,54 +27,10 @@
 
 namespace lisp
 {
-/// @brief Destination block is used to collect the parameters to a function.
-///
-/// @details The destblock_t is used to store variables and their values.  Each
-/// block of variable/value pairs is proceeded by a control block which
-/// contains the following pieces of information: The size of the block, the
-/// index of the variable/value pair currently being set, and a link to another
-/// destblock_t in a chain of blocks.
-///
-class destblock_t
-{
-private:
-  struct control_block
-  {
-    std::int8_t size;
-    std::int8_t index;
-    destblock_t* link;
-  };
-  struct var_val_pair
-  {
-    LISPT var;
-    LISPT val;
-  };
-  std::variant<control_block, var_val_pair> u;
-
-public:
-  void reset() { u = var_val_pair{NIL, NIL}; }
-
-  void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
-  int size() const { return std::get<control_block>(u).size; }
-  int index() const { return std::get<control_block>(u).index; }
-  destblock_t* link() const { return std::get<control_block>(u).link; }
-  void link(destblock_t* dest) { std::get<control_block>(u).link = dest; }
-  void decr()
-  {
-    if(std::get<control_block>(u).index > 0)
-      --std::get<control_block>(u).index;
-  }
-
-  void var(LISPT x) { std::get<var_val_pair>(u).var = x; }
-  LISPT var() const { return std::get<var_val_pair>(u).var; }
-  void val(LISPT x) { std::get<var_val_pair>(u).val = x; }
-  LISPT val() const { return std::get<var_val_pair>(u).val; }
-};
 
 class alloc
 {
 public:
-  alloc();
   ~alloc();
 
   /// @brief Return a cons cell from local storage.
@@ -86,7 +42,7 @@ public:
   ///
   /// @return A new empty cons cell.
   ///
-  LISPT getobject();
+  static LISPT getobject();
 
   /// @brief Initializes a lisp symbol for use in the C++ program.
   ///
@@ -102,7 +58,7 @@ public:
   ///
   /// @return A reference of type cvariable which wraps the LISPT value.
   ///
-  cvariable_t& initcvar(const std::string& name, LISPT val)
+  static cvariable_t& initcvar(const std::string& name, LISPT val)
   {
     auto t = mkatom(name);
     t->symbol().value = new lisp_t;
@@ -135,19 +91,19 @@ public:
     f->value(s);
   }
 
-  LISPT mkatom(const std::string&);
+  static LISPT mkatom(const std::string&);
 
   /// @brief Create a string.
   ///
-  LISPT mkstring(const std::string&);
+  static LISPT mkstring(const std::string&);
 
   /// @brief Create an integer number.
   ///
-  LISPT mknumber(int);
+  static LISPT mknumber(int);
 
   /// @brief Create a double.
   ///
-  LISPT mkfloat(double);
+  static LISPT mkfloat(double);
 
   /// @brief Make a lambda object.
   ///
@@ -156,26 +112,7 @@ public:
   ///
   /// @return The lambda object.
   ///
-  LISPT mklambda(LISPT args, LISPT def, type type);
-
-  /// @brief Allocate a destination block.
-  ///
-  /// @param size The size of the destination block.
-  ///
-  destblock_t* dalloc(int size);
-
-  /// @brief Free a destination block.
-  ///
-  /// @details The destination blocks are freed in the reverse order of their
-  /// allocation.
-  ///
-  /// @param The block to free.
-  ///
-  void dfree(destblock_t* block);
-
-  /// @brief Release all destination blocks.
-  ///
-  void dzero();
+  static LISPT mklambda(LISPT args, LISPT def, type type);
 
   /// @brief Builds a cons cell out of the arguments.
   ///
@@ -187,19 +124,19 @@ public:
   ///
   /// @return The cons cell.
   ///
-  LISPT cons(LISPT, LISPT);
+  static LISPT cons(LISPT, LISPT);
 
   /// @brief Build a list of symbols in the local symbol table.
   ///
   /// @return Returns a list of local symbols in no particular order.
   ///
-  LISPT obarray();
+  static LISPT obarray();
 
   /// @brief Number of free cell in the free cell list.
   ///
   /// @return The number of free cells.
   ///
-  LISPT freecount();
+  static LISPT freecount();
 
 private:
   /// @brief Returns the global symbol table.
@@ -207,8 +144,6 @@ private:
   {
     return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
   }
-  /// @brief The local symbol table, local for each lisp instance.
-  symbol::symbol_store_t& local_symbols;
 
   /// @brief Builds an argument list.
   ///
@@ -222,50 +157,43 @@ private:
   /// Negative for nospread and halfspread.
   ///
   /// @return A straight list of arguments.
-  LISPT mkarglist(LISPT alist, std::int8_t& count);
-
-  /// @brief Size of destination block area
-  static constexpr int DESTBLOCKSIZE = 3000;
-  /// @brief Destination block area.
-  std::array<destblock_t, DESTBLOCKSIZE> destblock;
-  /// @brief Index to last slot in destblock.
-  int destblockused = 0;
+  static LISPT mkarglist(LISPT alist, std::int8_t& count);
 };
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 
-inline LISPT mkstring(const std::string& s) { return lisp::current().a().mkstring(s); }
-inline LISPT mkatom(const std::string& s) { return lisp::current().a().mkatom(s); }
-inline LISPT mknumber(int i) { return lisp::current().a().mknumber(i); }
-inline LISPT mkfloat(double d) { return lisp::current().a().mkfloat(d); }
+inline LISPT mkstring(const std::string& s) { return alloc::mkstring(s); }
+inline LISPT mkatom(const std::string& s) { return alloc::mkatom(s); }
+inline LISPT mknumber(int i) { return alloc::mknumber(i); }
+inline LISPT mkfloat(double d) { return alloc::mkfloat(d); }
 
 /// @brief Creates a lisp string.
-inline LISPT operator"" _s(const char* s, std::size_t) { return mkstring(s); }
+inline LISPT operator"" _s(const char* s, std::size_t) { return alloc::mkstring(s); }
 
 /// @brief Simpler way to create an atom.
-inline LISPT operator"" _a(const char* s, std::size_t) { return mkatom(s); }
+inline LISPT operator"" _a(const char* s, std::size_t) { return alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline LISPT operator"" _l(unsigned long long i) { return mknumber(i); }
+inline LISPT operator"" _l(unsigned long long i) { return alloc::mknumber(i); }
 
 /// @brief Creates a floating point value.
-inline LISPT operator"" _l(long double d) { return mkfloat(d); }
+inline LISPT operator"" _l(long double d) { return alloc::mkfloat(d); }
 
 /// @brief Evaluates a lisp expression in a string.
 inline LISPT operator"" _e(const char* s, std::size_t) { return eval(s); }
 
 /// @brief Terminates the list create function.
-inline LISPT mklist(LISPT t) { return cons(t, NIL); }
+inline LISPT mklist(LISPT t) { return alloc::cons(t, NIL); }
 
 /// @brief Creates a list from a variadic list of items.
 template<typename... Ts>
 LISPT mklist(LISPT t, Ts... ts)
 {
-  return cons(t, mklist(ts...));
+  return alloc::cons(t, mklist(ts...));
 }
 
-inline cvariable_t& initcvar(const std::string& name, LISPT val) { return lisp::current().a().initcvar(name, val); }
-inline cvariable_t& initcvar(alloc& a, const std::string& name, LISPT val) { return a.initcvar(name, val); }
+inline cvariable_t& initcvar(const std::string& name, LISPT val) { return alloc::initcvar(name, val); }
+inline cvariable_t& initcvar(alloc& a, const std::string& name, LISPT val) { return alloc::initcvar(name, val); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {

@@ -28,7 +28,7 @@ evaluator::evaluator(lisp& lisp)
 
 void evaluator::reset()
 {
-  a.dzero();
+  dzero();
   toctrl = 0;
   fun = NIL;
   args = NIL;
@@ -94,13 +94,13 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
 }
 
 /// @brief Creates a new destination block of size 's' and initializes it.
-destblock_t* evaluator::mkdestblock(int s) { return a.dalloc(s); }
+destblock_t* evaluator::mkdestblock(int s) { return dalloc(s); }
 
 void evaluator::storevar(LISPT v, int i) { dest[i].var(v); }
 
 void evaluator::pop_env()
 {
-  a.dfree(env);
+  dfree(env);
   pop(env);
 }
 
@@ -172,7 +172,7 @@ LISPT evaluator::eval(LISPT expr)
 
 bool evaluator::eval0()
 {
-  a.dfree(dest);
+  dfree(dest);
   // Signal the end of the evaluation.
   return true;
 }
@@ -197,7 +197,7 @@ LISPT evaluator::apply(LISPT f, LISPT x)
 
 bool evaluator::apply0()
 {
-  a.dfree(dest);
+  dfree(dest);
   pop(args);
   pop(fun);
   return true;
@@ -592,7 +592,7 @@ bool evaluator::evlis3()
 bool evaluator::evlis4()
 {
   LISPT x = receive();
-  a.dfree(dest);
+  dfree(dest);
   pop(dest);
   x = cons(receive(), x);
   send(x);
@@ -659,7 +659,7 @@ bool evaluator::ev2()
   try
   {
     auto foo = call(fun);
-    a.dfree(dest);
+    dfree(dest);
     pop(dest);
     send(foo);
     pop(cont);
@@ -970,5 +970,32 @@ LISPT evaluator::destblock(LISPT e)
   check(e, type::ENVIRON);
   return destblock(e->envval());
 }
+
+///
+/// @brief Allocates a destination block of size size.
+///
+/// @param size The size of the destination block.
+/// @returns A destblock or nullptr if no more space available.
+destblock_t* evaluator::dalloc(int size)
+{
+  if(size <= DESTBLOCKSIZE - _destblockused - 1)
+  {
+    auto* dest = &_destblock[_destblockused];
+    _destblockused += size + 1;
+    dest->num(static_cast<std::int8_t>(size));
+    for(int i = 1; i <= size; ++i)
+      _destblock[_destblockused - i].reset();
+    return dest;
+  }
+  return nullptr;
+}
+
+/// @brief Free a destination block.
+///
+/// @param ptr The destination block to free.
+void evaluator::dfree(destblock_t* block) { _destblockused -= block->size() + 1; }
+
+/// @brief Frees all destination blocks.
+void evaluator::dzero() { _destblockused = 0; }
 
 } // namespace lisp
