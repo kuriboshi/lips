@@ -157,8 +157,16 @@ LISPT evaluator::eval(LISPT expr)
   //
   push(&evaluator::eval0);
   cont = &evaluator::peval;
-  while(!(this->*cont)())
-    ;
+  try
+  {
+    while(!(this->*cont)())
+      ;
+  }
+  catch(const lisp_finish& ex)
+  {
+    unwind();
+    throw;
+  }
   //
   // Retrieve the result of the evaluation and restore the previous
   // destination.
@@ -187,8 +195,16 @@ LISPT evaluator::apply(LISPT f, LISPT x)
   expression = cons(f, x);
   push(&evaluator::apply0);
   cont = &evaluator::peval2;
-  while(!(this->*cont)())
-    ;
+  try
+  {
+    while(!(this->*cont)())
+      ;
+  }
+  catch(const lisp_finish& ex)
+  {
+    unwind();
+    throw;
+  }
   LISPT foo = receive();
   pop(dest);
   return foo;
