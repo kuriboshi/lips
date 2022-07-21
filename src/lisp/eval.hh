@@ -97,10 +97,10 @@ public:
   using breakhook_t = std::function<void()>;
   void breakhook(breakhook_t fun) { _breakhook = fun; }
 
-  destblock_t* environment() const { return env; }
+  destblock_t* environment() const { return _env; }
 
 private:
-  destblock_t* dest = nullptr; // Current destination being built.
+  destblock_t* _dest = nullptr; // Current destination being built.
 
   //
   // The control stack.
@@ -108,16 +108,16 @@ private:
   using continuation_t = bool (evaluator::*)();
   using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
   static constexpr int CTRLBLKSIZE = 4000;
-  std::array<control_t, CTRLBLKSIZE> control; // Control-stack
-  int toctrl = 0;                             // Control-stack stack pointer
+  std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
+  int _toctrl = 0;                             // Control-stack stack pointer
 
   // @brief Pushes continuations, destinations, or LISPT objects on the control
   // stack.
   template<typename T>
   void push(T t)
   {
-    control[toctrl++] = t;
-    if(toctrl >= CTRLBLKSIZE)
+    _control[_toctrl++] = t;
+    if(_toctrl >= CTRLBLKSIZE)
       overflow();
   }
   // @brief Pops continuations, destinations, or LISPT objects from the control
@@ -125,7 +125,7 @@ private:
   template<typename T>
   void pop(T& t)
   {
-    t = std::get<T>(control[--toctrl]);
+    t = std::get<T>(_control[--_toctrl]);
   }
   void pop_env();
 
@@ -182,14 +182,14 @@ private:
   LISPT destblock(const destblock_t*);
 
   lisp& l;
-  undefhook_t _undefhook;        // Called in case of undefined function.
-  breakhook_t _breakhook;        // Called before going into break.
-  LISPT fun;                     // Store current function being evaluated.
-  LISPT expression;              // Current expression.
-  LISPT args;                    // Current arguments.
-  bool noeval = false;           // Don't evaluate arguments.
-  continuation_t cont = nullptr; // Current continuation.
-  destblock_t* env = nullptr;    // Current environment.
+  undefhook_t _undefhook;         // Called in case of undefined function.
+  breakhook_t _breakhook;         // Called before going into break.
+  LISPT _fun;                     // Store current function being evaluated.
+  LISPT _expression;              // Current expression.
+  LISPT _args;                    // Current arguments.
+  bool _noeval = false;           // Don't evaluate arguments.
+  continuation_t _cont = nullptr; // Current continuation.
+  destblock_t* _env = nullptr;    // Current environment.
   int _trace = 0;
   bool _interactive = false;
 

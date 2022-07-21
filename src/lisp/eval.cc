@@ -28,26 +28,26 @@ evaluator::evaluator(lisp& lisp)
 void evaluator::reset()
 {
   dzero();
-  toctrl = 0;
-  fun = NIL;
-  args = NIL;
-  env = nullptr;
+  _toctrl = 0;
+  _fun = NIL;
+  _args = NIL;
+  _env = nullptr;
 }
 
 LISPT evaluator::printwhere()
 {
   LISPT foo = NIL;
-  int i = toctrl - 1;
+  int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
-    if(auto* cont = std::get_if<continuation_t>(&control[i]); (cont != nullptr) && *cont == &evaluator::evlam0)
+    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::evlam0)
       break;
   }
   for(; i != 0; --i)
   {
-    if(auto* func = std::get_if<continuation_t>(&control[i]); (func != nullptr) && *func == &evaluator::ev0)
+    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &evaluator::ev0)
     {
-      if(auto* lsp = std::get_if<LISPT>(&control[i - 1]);
+      if(auto* lsp = std::get_if<LISPT>(&_control[i - 1]);
          lsp != nullptr && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
       {
         foo = *lsp;
@@ -85,33 +85,33 @@ void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
   }
   if(_breakhook)
     _breakhook();
-  if(env == nullptr)
+  if(_env == nullptr)
     throw lisp_reset();
   details::file::print(l, cons(fault, cons(C_BROKEN, NIL)), T);
   push(next);
-  cont = &evaluator::everr;
+  _cont = &evaluator::everr;
 }
 
 /// @brief Creates a new destination block of size 's' and initializes it.
 destblock_t* evaluator::mkdestblock(int s) { return dalloc(s); }
 
-void evaluator::storevar(LISPT v, int i) { dest[i].var(v); }
+void evaluator::storevar(LISPT v, int i) { _dest[i].var(v); }
 
 void evaluator::pop_env()
 {
-  dfree(env);
-  pop(env);
+  dfree(_env);
+  pop(_env);
 }
 
 void evaluator::send(LISPT a)
 {
-  if(dest[0].index() > 0)
-    dest[dest[0].index()].val(a);
+  if(_dest[0].index() > 0)
+    _dest[_dest[0].index()].val(a);
 }
 
-LISPT evaluator::receive() { return dest[dest[0].index()].val(); }
+LISPT evaluator::receive() { return _dest[_dest[0].index()].val(); }
 
-void evaluator::next() { dest[0].decr(); }
+void evaluator::next() { _dest[0].decr(); }
 
 /// @brief Make a call to the function in parameter `fun'.
 ///
@@ -123,11 +123,11 @@ LISPT evaluator::call(LISPT fun)
     case 0:
       return fun->subrval()(l);
     case 1:
-      return fun->subrval()(l, dest[1].val());
+      return fun->subrval()(l, _dest[1].val());
     case 2:
-      return fun->subrval()(l, dest[2].val(), dest[1].val());
+      return fun->subrval()(l, _dest[2].val(), _dest[1].val());
     case 3:
-      return fun->subrval()(l, dest[3].val(), dest[2].val(), dest[1].val());
+      return fun->subrval()(l, _dest[3].val(), _dest[2].val(), _dest[1].val());
   }
   return NIL;
 }
@@ -142,13 +142,13 @@ LISPT evaluator::eval(LISPT expr)
   // Set the current expression to `expr' and push the current destination onto
   // the control stack.
   //
-  expression = expr;
-  push(dest);
+  _expression = expr;
+  push(_dest);
   //
   // The result of evalutating `expr' is stored in the destination, which is
   // retrieved with the receive function.
   //
-  dest = mkdestblock(1);
+  _dest = mkdestblock(1);
   //
   // This how it works in general: Push the function to be called last, and set
   // the continuation variable `cont' to `peval'. `peval' may push more
@@ -156,10 +156,10 @@ LISPT evaluator::eval(LISPT expr)
   // true, signalling end of evaluation.
   //
   push(&evaluator::eval0);
-  cont = &evaluator::peval;
+  _cont = &evaluator::peval;
   try
   {
-    while(!(this->*cont)())
+    while(!(this->*_cont)())
       ;
   }
   catch(const lisp_finish& ex)
@@ -172,32 +172,32 @@ LISPT evaluator::eval(LISPT expr)
   // destination.
   //
   LISPT foo = receive();
-  pop(dest);
+  pop(_dest);
   // Return the result.
   return foo;
 }
 
 bool evaluator::eval0()
 {
-  dfree(dest);
+  dfree(_dest);
   // Signal the end of the evaluation.
   return true;
 }
 
 LISPT evaluator::apply(LISPT f, LISPT x)
 {
-  push(dest);
-  dest = mkdestblock(1);
-  push(fun);
-  fun = f;
-  push(args);
-  args = x;
-  expression = cons(f, x);
+  push(_dest);
+  _dest = mkdestblock(1);
+  push(_fun);
+  _fun = f;
+  push(_args);
+  _args = x;
+  _expression = cons(f, x);
   push(&evaluator::apply0);
-  cont = &evaluator::peval2;
+  _cont = &evaluator::peval2;
   try
   {
-    while(!(this->*cont)())
+    while(!(this->*_cont)())
       ;
   }
   catch(const lisp_finish& ex)
@@ -206,15 +206,15 @@ LISPT evaluator::apply(LISPT f, LISPT x)
     throw;
   }
   LISPT foo = receive();
-  pop(dest);
+  pop(_dest);
   return foo;
 }
 
 bool evaluator::apply0()
 {
-  dfree(dest);
-  pop(args);
-  pop(fun);
+  dfree(_dest);
+  pop(_args);
+  pop(_fun);
   return true;
 }
 
@@ -225,8 +225,8 @@ bool evaluator::ev0()
   // `eval' above) and restore continuation.  The function `ev0' is also used
   // as a placeholder for the beginning of an eval.
   //
-  toctrl -= 1;
-  pop(cont);
+  _toctrl -= 1;
+  pop(_cont);
   return false;
 }
 
@@ -236,35 +236,35 @@ bool evaluator::peval()
   if(_trace)
     details::file::print(l, expression, T);
 #endif
-  push(expression);
+  push(_expression);
   push(&evaluator::ev0);
-  switch(type_of(expression))
+  switch(type_of(_expression))
   {
     case type::CONS:
-      push(fun);
-      fun = expression->car();
-      push(args);
-      args = expression->cdr();
+      push(_fun);
+      _fun = _expression->car();
+      push(_args);
+      _args = _expression->cdr();
       push(&evaluator::ev1);
-      cont = &evaluator::peval1;
+      _cont = &evaluator::peval1;
       break;
     case type::SYMBOL:
-      cont = &evaluator::lookup;
+      _cont = &evaluator::lookup;
       break;
     case type::INDIRECT:
-      send(expression->indirectval());
-      pop(cont);
+      send(_expression->indirectval());
+      pop(_cont);
       break;
     case type::CVARIABLE:
-      send(expression->cvarval());
-      pop(cont);
+      send(_expression->cvarval());
+      pop(_cont);
       break;
     case type::FREE:
-      abort(CORRUPT_DATA, expression);
+      abort(CORRUPT_DATA, _expression);
       break;
     default:
-      send(expression);
-      pop(cont);
+      send(_expression);
+      pop(_cont);
       break;
   }
   return false;
@@ -272,9 +272,9 @@ bool evaluator::peval()
 
 bool evaluator::ev1()
 {
-  pop(args);
-  pop(fun);
-  pop(cont);
+  pop(_args);
+  pop(_fun);
+  pop(_cont);
   return false;
 }
 
@@ -287,7 +287,7 @@ bool evaluator::evalhook(LISPT exp)
     {
       case 1:
         send(res);
-        pop(cont);
+        pop(_cont);
         return true;
         break;
       case -1:
@@ -307,47 +307,47 @@ void evaluator::do_unbound(continuation_t continuation)
   // definition from a file. If that doesn't succeed, then the symbol is
   // undefined.
   //
-  LISPT al = getprop(expression->car(), C_AUTOLOAD);
+  LISPT al = getprop(_expression->car(), C_AUTOLOAD);
   if(!is_NIL(al))
   {
-    push(expression);
-    push(dest);
+    push(_expression);
+    push(_dest);
     details::file::load(l, al);
-    pop(dest);
-    pop(expression);
-    fun = expression->car()->value();
-    if(type_of(fun) == type::UNBOUND)
+    pop(_dest);
+    pop(_expression);
+    _fun = _expression->car()->value();
+    if(type_of(_fun) == type::UNBOUND)
     {
-      if(!evalhook(expression))
-        xbreak(UNDEF_FUNCTION, expression->car(), continuation);
+      if(!evalhook(_expression))
+        xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
     }
     else
-      cont = continuation;
+      _cont = continuation;
   }
   else
   {
-    if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
-      && type_of(expression->car()->value()) == type::UNBOUND)
+    if(type_of(_expression) == type::CONS && type_of(_expression->car()) == type::SYMBOL
+      && type_of(_expression->car()->value()) == type::UNBOUND)
     {
-      if(!evalhook(expression))
-        xbreak(UNDEF_FUNCTION, expression->car(), continuation);
+      if(!evalhook(_expression))
+        xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
     }
     else
     {
-      fun = expression->car();
-      args = expression->cdr();
-      cont = continuation;
+      _fun = _expression->car();
+      _args = _expression->cdr();
+      _cont = continuation;
     }
   }
 }
 
 bool evaluator::do_default(continuation_t continuation)
 {
-  if(type_of(expression) == type::CONS && type_of(expression->car()) == type::SYMBOL
-    && type_of(expression->car()->value()) == type::UNBOUND)
+  if(type_of(_expression) == type::CONS && type_of(_expression->car()) == type::SYMBOL
+    && type_of(_expression->car()->value()) == type::UNBOUND)
   {
-    if(!evalhook(expression))
-      xbreak(UNDEF_FUNCTION, expression->car(), continuation);
+    if(!evalhook(_expression))
+      xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
     return true;
   }
   return false;
@@ -356,63 +356,63 @@ bool evaluator::do_default(continuation_t continuation)
 bool evaluator::peval1()
 {
   if(l.brkflg)
-    xbreak(KBD_BREAK, fun, &evaluator::peval1);
+    xbreak(KBD_BREAK, _fun, &evaluator::peval1);
   else if(l.interrupt)
     abort(NO_MESSAGE, NIL);
   else
-    switch(type_of(fun))
+    switch(type_of(_fun))
     {
       case type::CLOSURE:
         push(&evaluator::peval1);
-        cont = &evaluator::evclosure;
+        _cont = &evaluator::evclosure;
         break;
       case type::SUBR:
       case type::FSUBR:
-        push(dest);
+        push(_dest);
         push(&evaluator::ev2);
-        dest = mkdestblock(static_cast<int>(fun->subrval().argcount()));
-        noeval = fun->subrval().subr == subr_t::subr::NOEVAL;
-        if(fun->subrval().spread == subr_t::spread::NOSPREAD)
+        _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
+        _noeval = _fun->subrval().subr == subr_t::subr::NOEVAL;
+        if(_fun->subrval().spread == subr_t::spread::NOSPREAD)
         {
-          if(!noeval)
+          if(!_noeval)
           {
             push(&evaluator::noevarg);
-            cont = &evaluator::evlis;
+            _cont = &evaluator::evlis;
           }
           else
-            cont = &evaluator::spread;
+            _cont = &evaluator::spread;
         }
         else
-          cont = &evaluator::evalargs;
+          _cont = &evaluator::evalargs;
         break;
       case type::LAMBDA:
-        noeval = false;
-        cont = &evaluator::evlam;
+        _noeval = false;
+        _cont = &evaluator::evlam;
         break;
       case type::NLAMBDA:
-        noeval = true;
-        cont = &evaluator::evlam;
+        _noeval = true;
+        _cont = &evaluator::evlam;
         break;
       case type::CONS:
       case type::INDIRECT:
-        expression = fun;
+        _expression = _fun;
         push(&evaluator::ev3);
-        cont = &evaluator::peval;
+        _cont = &evaluator::peval;
         break;
       case type::SYMBOL:
-        fun = fun->value();
-        cont = &evaluator::peval1;
+        _fun = _fun->value();
+        _cont = &evaluator::peval1;
         break;
       case type::UNBOUND:
         do_unbound(&evaluator::peval1);
         break;
       case type::STRING:
-        if(!evalhook(expression))
-          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval1);
+        if(!evalhook(_expression))
+          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval1);
         break;
       default:
         if(!do_default(&evaluator::peval1))
-          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval1);
+          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval1);
         break;
     }
   return false;
@@ -421,50 +421,50 @@ bool evaluator::peval1()
 bool evaluator::peval2()
 {
   if(l.brkflg)
-    xbreak(KBD_BREAK, fun, &evaluator::peval2);
+    xbreak(KBD_BREAK, _fun, &evaluator::peval2);
   else
-    switch(type_of(fun))
+    switch(type_of(_fun))
     {
       case type::CLOSURE:
         push(&evaluator::peval2);
-        cont = &evaluator::evclosure;
+        _cont = &evaluator::evclosure;
         break;
       case type::SUBR:
       case type::FSUBR:
-        push(dest);
+        push(_dest);
         push(&evaluator::ev2);
-        dest = mkdestblock(static_cast<int>(fun->subrval().argcount()));
-        noeval = true;
-        if(fun->subrval().spread == subr_t::spread::NOSPREAD)
-          cont = &evaluator::spread;
+        _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
+        _noeval = true;
+        if(_fun->subrval().spread == subr_t::spread::NOSPREAD)
+          _cont = &evaluator::spread;
         else
-          cont = &evaluator::evalargs;
+          _cont = &evaluator::evalargs;
         break;
       case type::LAMBDA:
       case type::NLAMBDA:
-        noeval = true;
-        cont = &evaluator::evlam;
+        _noeval = true;
+        _cont = &evaluator::evlam;
         break;
       case type::CONS:
       case type::INDIRECT:
-        expression = fun;
+        _expression = _fun;
         push(&evaluator::ev3p);
-        cont = &evaluator::peval;
+        _cont = &evaluator::peval;
         break;
       case type::SYMBOL:
-        fun = fun->value();
-        cont = &evaluator::peval2;
+        _fun = _fun->value();
+        _cont = &evaluator::peval2;
         break;
       case type::UNBOUND:
         do_unbound(&evaluator::peval2);
         break;
       case type::STRING:
-        if(!evalhook(expression))
-          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval2);
+        if(!evalhook(_expression))
+          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval2);
         break;
       default:
         if(!do_default(&evaluator::peval2))
-          xbreak(ILLEGAL_FUNCTION, fun, &evaluator::peval2);
+          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval2);
         break;
     }
   return false;
@@ -475,56 +475,56 @@ void evaluator::bt()
 {
   int op = l.printlevel;
   l.printlevel = 2;
-  for(int i = toctrl - 1; i != 0; i--)
+  for(int i = _toctrl - 1; i != 0; i--)
   {
-    if(auto* cont = std::get_if<continuation_t>(&control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
-      details::file::print(l, std::get<LISPT>(control[i - 1]), T);
+    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
+      details::file::print(l, std::get<LISPT>(_control[i - 1]), T);
   }
   l.printlevel = op;
 }
 
 bool evaluator::everr()
 {
-  send(break0(expression));
-  pop(cont); // Discard one continuation.
-  pop(cont);
+  send(break0(_expression));
+  pop(_cont); // Discard one continuation.
+  pop(_cont);
   return false;
 }
 
 bool evaluator::noevarg()
 {
-  args = receive();
-  cont = &evaluator::spread;
+  _args = receive();
+  _cont = &evaluator::spread;
   return false;
 }
 
 bool evaluator::evalargs()
 {
-  if(is_NIL(args))
+  if(is_NIL(_args))
   {
-    pop(cont);
+    pop(_cont);
   }
   else
   {
-    expression = args->car();
-    if(noeval)
-      cont = &evaluator::noev9;
+    _expression = _args->car();
+    if(_noeval)
+      _cont = &evaluator::noev9;
     else
-      cont = &evaluator::ev9;
+      _cont = &evaluator::ev9;
   }
   return false;
 }
 
 bool evaluator::ev9()
 {
-  if(is_NIL(args->cdr()))
+  if(is_NIL(_args->cdr()))
   {
-    cont = &evaluator::peval;
+    _cont = &evaluator::peval;
   }
   else
   {
     push(&evaluator::ev11);
-    cont = &evaluator::peval;
+    _cont = &evaluator::peval;
   }
   return false;
 }
@@ -532,9 +532,9 @@ bool evaluator::ev9()
 bool evaluator::ev11()
 {
   next();
-  args = args->cdr();
-  expression = args->car();
-  cont = &evaluator::ev9;
+  _args = _args->cdr();
+  _expression = _args->car();
+  _cont = &evaluator::ev9;
   return false;
 }
 
@@ -542,45 +542,45 @@ bool evaluator::noev9()
 {
   while(true)
   {
-    if(is_NIL(args->cdr()))
+    if(is_NIL(_args->cdr()))
     {
-      send(expression);
-      pop(cont);
+      send(_expression);
+      pop(_cont);
       break;
     }
-    send(expression);
+    send(_expression);
     next();
-    args = args->cdr();
-    expression = args->car();
+    _args = _args->cdr();
+    _expression = _args->car();
   }
   return false;
 }
 
 bool evaluator::evlis()
 {
-  if(is_NIL(args))
+  if(is_NIL(_args))
   {
-    pop(cont);
+    pop(_cont);
   }
   else
   {
-    expression = args->car();
-    cont = &evaluator::evlis1;
+    _expression = _args->car();
+    _cont = &evaluator::evlis1;
   }
   return false;
 }
 
 bool evaluator::evlis1()
 {
-  if(is_NIL(args->cdr()))
+  if(is_NIL(_args->cdr()))
   {
     push(&evaluator::evlis2);
-    cont = &evaluator::peval;
+    _cont = &evaluator::peval;
   }
   else
   {
     push(&evaluator::evlis3);
-    cont = &evaluator::peval;
+    _cont = &evaluator::peval;
   }
   return false;
 }
@@ -589,61 +589,61 @@ bool evaluator::evlis2()
 {
   LISPT x = cons(receive(), NIL);
   send(x);
-  pop(cont);
+  pop(_cont);
   return false;
 }
 
 bool evaluator::evlis3()
 {
-  push(dest);
-  dest = mkdestblock(1);
+  push(_dest);
+  _dest = mkdestblock(1);
   push(&evaluator::evlis4);
-  args = args->cdr();
-  expression = args->car();
-  cont = &evaluator::evlis1;
+  _args = _args->cdr();
+  _expression = _args->car();
+  _cont = &evaluator::evlis1;
   return false;
 }
 
 bool evaluator::evlis4()
 {
   LISPT x = receive();
-  dfree(dest);
-  pop(dest);
+  dfree(_dest);
+  pop(_dest);
   x = cons(receive(), x);
   send(x);
-  pop(cont);
+  pop(_cont);
   return false;
 }
 
 bool evaluator::evlam()
 {
-  push(expression);
-  push(env);
-  push(dest);
+  push(_expression);
+  push(_env);
+  push(_dest);
   int ac = 0;
   auto spr = false;
-  if((ac = fun->lambda().count) < 0)
+  if((ac = _fun->lambda().count) < 0)
   {
     ac = -ac;
     spr = true;
   }
-  dest = mkdestblock(ac);
+  _dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = fun->lambda().args; i != 0; foo = foo->cdr(), i--)
+  for(auto foo = _fun->lambda().args; i != 0; foo = foo->cdr(), i--)
     storevar(foo->car(), i);
   push(&evaluator::evlam1);
   if(spr)
   {
-    if(noeval)
-      cont = &evaluator::spread;
+    if(_noeval)
+      _cont = &evaluator::spread;
     else
     {
       push(&evaluator::noevarg);
-      cont = &evaluator::evlis;
+      _cont = &evaluator::evlis;
     }
   }
   else
-    cont = &evaluator::evalargs;
+    _cont = &evaluator::evalargs;
   return false;
 }
 
@@ -651,20 +651,20 @@ bool evaluator::spread()
 {
   while(true)
   {
-    if(is_NIL(args))
+    if(is_NIL(_args))
     {
-      pop(cont);
+      pop(_cont);
       break;
     }
-    if(dest[0].index() == 1)
+    if(_dest[0].index() == 1)
     {
-      send(args);
-      pop(cont);
+      send(_args);
+      pop(_cont);
       break;
     }
-    send(args->car());
+    send(_args->car());
     next();
-    args = args->cdr();
+    _args = _args->cdr();
   }
   return false;
 }
@@ -673,11 +673,11 @@ bool evaluator::ev2()
 {
   try
   {
-    auto foo = call(fun);
-    dfree(dest);
-    pop(dest);
+    auto foo = call(_fun);
+    dfree(_dest);
+    pop(_dest);
     send(foo);
-    pop(cont);
+    pop(_cont);
   }
   catch(const lisp_reset&)
   {}
@@ -696,51 +696,51 @@ bool evaluator::ev2()
 
 bool evaluator::ev3()
 {
-  fun = receive();
+  _fun = receive();
   push(&evaluator::ev4);
-  cont = &evaluator::peval1;
+  _cont = &evaluator::peval1;
   return false;
 }
 
 bool evaluator::ev3p()
 {
-  fun = receive();
+  _fun = receive();
   push(&evaluator::ev4);
-  cont = &evaluator::peval2;
+  _cont = &evaluator::peval2;
   return false;
 }
 
 bool evaluator::ev4()
 {
-  pop(cont);
+  pop(_cont);
   return false;
 }
 
 void evaluator::link()
 {
-  dest[0].link(env);
-  env = dest;
-  for(auto i = dest[0].size(); i > 0; i--)
+  _dest[0].link(_env);
+  _env = _dest;
+  for(auto i = _dest[0].size(); i > 0; i--)
   {
-    LISPT t = dest[i].var()->value();
-    dest[i].var()->value(dest[i].val());
-    dest[i].val(t);
+    LISPT t = _dest[i].var()->value();
+    _dest[i].var()->value(_dest[i].val());
+    _dest[i].val(t);
   }
 }
 
 bool evaluator::evlam1()
 {
   link();
-  pop(dest);
-  args = fun->lambda().body;
+  pop(_dest);
+  _args = _fun->lambda().body;
   push(&evaluator::evlam0);
-  cont = &evaluator::evsequence;
+  _cont = &evaluator::evsequence;
   return false;
 }
 
 void evaluator::restore_env()
 {
-  auto* c = env;
+  auto* c = _env;
   for(auto i = c[0].size(); i > 0; i--)
     c[i].var()->value(c[i].val());
 }
@@ -749,28 +749,28 @@ bool evaluator::evlam0()
 {
   restore_env();
   pop_env();
-  pop(expression);
-  pop(cont);
+  pop(_expression);
+  pop(_cont);
   return false;
 }
 
 void evaluator::unwind()
 {
-  while(env != nullptr)
+  while(_env != nullptr)
   {
     restore_env();
-    env = env->link();
+    _env = _env->link();
   }
   reset();
 }
 
 bool evaluator::lookup()
 {
-  LISPT t = expression->value();
+  LISPT t = _expression->value();
   switch(type_of(t))
   {
     case type::UNBOUND:
-      xbreak(UNBOUND_VARIABLE, expression, &evaluator::lookup);
+      xbreak(UNBOUND_VARIABLE, _expression, &evaluator::lookup);
       return false;
       break;
     case type::INDIRECT:
@@ -783,32 +783,32 @@ bool evaluator::lookup()
       send(t);
       break;
   }
-  pop(cont);
+  pop(_cont);
   return false;
 }
 
 bool evaluator::evclosure()
 {
-  push(env);
-  push(dest);
-  dest = mkdestblock(fun->closure()->count);
+  push(_env);
+  push(_dest);
+  _dest = mkdestblock(_fun->closure()->count);
   {
-    auto foo = fun->closure()->closed;
-    auto i = fun->closure()->count;
+    auto foo = _fun->closure()->closed;
+    auto i = _fun->closure()->count;
     for(; i != 0; foo = foo->cdr(), i--)
       storevar(foo->car(), i);
   }
-  for(auto foo = fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
+  for(auto foo = _fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
   }
-  fun = fun->closure()->cfunction;
+  _fun = _fun->closure()->cfunction;
   link();
-  pop(dest);
+  pop(_dest);
   destblock_t* envir = nullptr;
   pop(envir);
-  pop(cont);
+  pop(_cont);
   push(envir);
   push(&evaluator::evclosure1);
   return false;
@@ -818,41 +818,41 @@ bool evaluator::evclosure1()
 {
   restore_env();
   pop_env();
-  pop(cont);
+  pop(_cont);
   return false;
 }
 
 bool evaluator::evsequence()
 {
-  if(is_NIL(args))
+  if(is_NIL(_args))
   {
-    pop(cont);
+    pop(_cont);
   }
   else
   {
-    expression = args->car();
-    cont = &evaluator::evseq1;
+    _expression = _args->car();
+    _cont = &evaluator::evseq1;
   }
   return false;
 }
 
 bool evaluator::evseq1()
 {
-  if(is_NIL(args->cdr()))
-    cont = &evaluator::peval;
+  if(is_NIL(_args->cdr()))
+    _cont = &evaluator::peval;
   else
   {
     push(&evaluator::evseq3);
-    cont = &evaluator::peval;
+    _cont = &evaluator::peval;
   }
   return false;
 }
 
 bool evaluator::evseq3()
 {
-  args = args->cdr();
-  expression = args->car();
-  cont = &evaluator::evseq1;
+  _args = _args->cdr();
+  _expression = _args->car();
+  _cont = &evaluator::evseq1;
   return false;
 }
 
@@ -871,7 +871,7 @@ LISPT evaluator::destblock(const destblock_t* block)
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 LISPT evaluator::baktrace()
 {
-  for(int i = toctrl; i >= 0; i--)
+  for(int i = _toctrl; i >= 0; i--)
   {
     l.primerr()->format("{}: ", i);
     std::visit(
@@ -967,7 +967,7 @@ LISPT evaluator::baktrace()
         else
           ; // Do nothing for monostate
       },
-      control[i]);
+      _control[i]);
   }
   return NIL;
 }
