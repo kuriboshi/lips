@@ -195,7 +195,7 @@ std::unique_ptr<::lisp::lisp> init()
   C_REDIR_TO = alloc::intern(pn::REDIR_TO);
   C_SEMI = alloc::intern(";");
 
-  top::init(l->a());
+  top::init();
 
   environment = std::make_unique<env>();
 

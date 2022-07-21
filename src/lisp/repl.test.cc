@@ -63,6 +63,7 @@ a
 
   SECTION("Break repl (reset)")
   {
+    unwind();
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
 )";

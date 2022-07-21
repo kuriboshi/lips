@@ -33,7 +33,7 @@ public:
   {}
   ~top() = default;
 
-  static void init(alloc&);
+  static void init();
 
   LISPT operator()(LISPT);
 
@@ -62,12 +62,12 @@ private:
   class cvariables
   {
   public:
-    cvariables(alloc& a)
+    cvariables()
       : history(initcvar("history", NIL)),
-        histnum(initcvar("histnum", a.mknumber(1L))),
-        histmax(initcvar("histmax", a.mknumber(100L))),
-        topprompt(initcvar("prompt", a.mkstring("!_"))),
-        brkprompt(initcvar("brkprompt", a.mkstring("!:"))),
+        histnum(initcvar("histnum", mknumber(1L))),
+        histmax(initcvar("histmax", mknumber(100L))),
+        topprompt(initcvar("prompt", mkstring("!_"))),
+        brkprompt(initcvar("brkprompt", mkstring("!:"))),
         promptform(initcvar("promptform", NIL))
     {}
 

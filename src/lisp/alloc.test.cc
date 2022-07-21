@@ -76,7 +76,7 @@ TEST_CASE("Create lisp objects")
 TEST_CASE("C Variables")
 {
   auto& l = lisp::current();
-  auto& cvar = l.a().initcvar("cvar", 123_l);
+  auto& cvar = initcvar("cvar", 123_l);
   auto a = eval(cvar);
   CHECK(eq(cvar, 123_l));
   cvar = 321_l;
@@ -95,11 +95,11 @@ TEST_CASE("C Variables")
   cvar = mkstring("hello");
   CHECK(cvar->getstr() == "hello");
 
-  auto& xvar = l.a().initcvar("xvar", "hello"_l);
+  auto& xvar = initcvar("xvar", "hello"_l);
   eval("(setq xvar \"world\")");
   CHECK(xvar->getstr() == "world");
 
-  auto& yvar = initcvar(l.a(), "yvar", 0_l);
+  auto& yvar = initcvar("yvar", 0_l);
   eval("(setq yvar \"string\")");
   CHECK(yvar->getstr() == "string");
 
@@ -111,18 +111,20 @@ TEST_CASE("C Variables")
 
 TEST_CASE("obarray")
 {
-  auto a0 = mkatom("foo");
   auto obs = obarray();
+  auto cur = length(obs)->intval();
+  auto a0 = mkatom("foo");
+  obs = obarray();
   // The reason this is not 1 is that there are already two symbols in the
   // local symbol table: base and verbose.
-  CHECK(length(obs)->intval() == 4);
+  CHECK(length(obs)->intval() == cur + 1);
   auto a1 = mkatom("bar");
   obs = obarray();
-  CHECK(length(obs)->intval() == 5);
+  CHECK(length(obs)->intval() == cur + 2);
 
   // Test calling from lisp
   obs = eval("(obarray)");
-  CHECK(length(obs)->intval() == 5);
+  CHECK(length(obs)->intval() == cur + 2);
 }
 
 #ifdef ENABLE_OBJECT_SIZES

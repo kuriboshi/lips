@@ -91,8 +91,8 @@ TEST_CASE("lisp: type_of")
 
 TEST_CASE("lisp: version")
 {
-  auto& version = lisp::current().version();
-  CHECK(type_of(version) == type::STRING);
+  auto version = lisp::current().version();
+  CHECK(version == VERSION);
 }
 
 TEST_CASE("lisp: literals")

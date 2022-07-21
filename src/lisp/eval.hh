@@ -182,7 +182,6 @@ private:
   LISPT destblock(const destblock_t*);
 
   lisp& l;
-  alloc& a;
   undefhook_t _undefhook;        // Called in case of undefined function.
   breakhook_t _breakhook;        // Called before going into break.
   LISPT fun;                     // Store current function being evaluated.

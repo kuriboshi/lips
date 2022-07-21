@@ -47,7 +47,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
   }();
   if(f == nullptr)
     return l.error(CANT_OPEN, filename);
-  auto newfile = l.a().getobject();
+  auto newfile = alloc::getobject();
   newfile->set(ref_file_t(f));
   return newfile;
 }
@@ -75,11 +75,11 @@ LISPT ratom(lisp& l, LISPT file)
 LISPT readc(lisp& l, LISPT file)
 {
   if(is_NIL(file))
-    return l.a().mknumber(l.primin()->getch());
+    return mknumber(l.primin()->getch());
   if(is_T(file))
-    return l.a().mknumber(l.stdin()->getch());
+    return mknumber(l.stdin()->getch());
   check(file, type::FILET);
-  return l.a().mknumber(file->file()->getch());
+  return mknumber(file->file()->getch());
 }
 
 LISPT read(lisp& l, LISPT file)
@@ -174,7 +174,7 @@ LISPT printlevel(lisp& l, LISPT newl)
     check(newl, type::INTEGER);
     l.printlevel = newl->intval();
   }
-  return l.a().mknumber(x);
+  return mknumber(x);
 }
 
 LISPT spaces(lisp& l, LISPT n, LISPT file)

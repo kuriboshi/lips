@@ -17,33 +17,34 @@
 
 #include "lisp/alloc.hh"
 
-namespace lisp
+namespace lisp::alloc
 {
-/// @brief Default destructor.
-///
-// TODO: Free all memory
-alloc::~alloc() = default;
+/// @brief Returns the global symbol table.
+symbol::symbol_store_t& global_symbols()
+{
+  return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+}
 
 /// @brief Allocates an object from the list of free objects.
 ///
 /// @details If there are no free objects available a new page is allocated.
 ///
 /// @returns A new lisp_t object.
-LISPT alloc::getobject() { return {new lisp_t}; }
+LISPT getobject() { return {new lisp_t}; }
 
 /// @brief Creates a cons pair.
 ///
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-LISPT alloc::cons(LISPT a, LISPT b)
+LISPT cons(lisp&, LISPT a, LISPT b)
 {
   auto f = getobject();
   f->set(cons_t{a, b});
   return f;
 }
 
-LISPT alloc::obarray()
+LISPT obarray(lisp&)
 {
   LISPT o = NIL;
   for(auto i: global_symbols())
@@ -51,9 +52,7 @@ LISPT alloc::obarray()
   return o;
 }
 
-LISPT alloc::freecount() { return mknumber(static_cast<int>(lisp_t::freecount())); }
-
-LISPT alloc::mkstring(const std::string& str)
+LISPT mkstring(const std::string& str)
 {
   auto s = getobject();
   s->set(str);
@@ -61,28 +60,35 @@ LISPT alloc::mkstring(const std::string& str)
 }
 
 /// @brief Creates an integer number.
-///
-/// @param number The integer number.
-/// @returns An integer number as a LISP object.
-LISPT alloc::mknumber(int number)
+LISPT mknumber(int number)
 {
   auto c = getobject();
   c->set(number);
   return c;
 }
 
-/// @brief Create a floating point number.
+/// @brief Create a double.
 ///
-/// @param number The floating point number.
-/// @returns A floating point number as a LISP object.
-LISPT alloc::mkfloat(double number)
+LISPT mkfloat(double number)
 {
   auto c = getobject();
   c->set(number);
   return c;
 }
 
-LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
+/// @brief Builds an argument list.
+///
+/// @details The list is constructed from the ALIST given in a lambda
+/// definition.  This list may end in an atom if the function is halfspread,
+/// or it could be an atom for a nospread function.  COUNT is set to the
+/// number of arguments and is negative if halfspread or nospread.
+///
+/// @param alist [in] The argument list in a lambda definitions.
+/// @param count [in, out] The number of arguments in the argument list.
+/// Negative for nospread and halfspread.
+///
+/// @return A straight list of arguments.
+LISPT mkarglist(LISPT alist, std::int8_t& count)
 {
   if(type_of(alist) == type::CONS)
   {
@@ -109,7 +115,7 @@ LISPT alloc::mkarglist(LISPT alist, std::int8_t& count)
 /// @param type The type is either type::LAMBDA or type::NLAMBDA.
 ///
 /// @returns A lambda function.
-LISPT alloc::mklambda(LISPT args, LISPT def, type type)
+LISPT mklambda(LISPT args, LISPT def, type type)
 {
   lambda_t lambda;
   lambda.body = def;
@@ -127,7 +133,7 @@ LISPT alloc::mklambda(LISPT args, LISPT def, type type)
 ///
 /// @param pname Name of the symbol.
 /// @returns The symbol as a LISP object.
-LISPT alloc::intern(const std::string& pname)
+LISPT intern(const std::string& pname)
 {
   auto& glob = global_symbols();
   auto& sym = glob.get(pname);
@@ -147,7 +153,7 @@ LISPT alloc::intern(const std::string& pname)
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.
-LISPT alloc::mkatom(const std::string& str)
+LISPT mkatom(const std::string& str)
 {
   if(global_symbols().exists(str))
     return global_symbols().get(str).self;
@@ -160,4 +166,20 @@ LISPT alloc::mkatom(const std::string& str)
   return sym.self;
 }
 
-} // namespace lisp
+namespace pn
+{
+inline constexpr auto CONS = "cons";           // Make a new cons cell
+inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
+inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
+}
+
+void init()
+{
+  // clang-format off
+  mkprim(pn::CONS,       cons,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::FREECOUNT,  freecount,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::OBARRAY,    obarray,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  // clang-format on
+}
+
+} // namespace lisp::alloc

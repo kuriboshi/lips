@@ -26,7 +26,7 @@ TEST_CASE("Map functions")
   auto& l = lisp::current();
   SECTION("map")
   {
-    auto& cvar = l.a().initcvar("cvar", NIL);
+    auto& cvar = initcvar("cvar", NIL);
     auto r0 = eval(R"(
 (map '(1 2 3)
       (lambda (a)
@@ -51,7 +51,7 @@ TEST_CASE("Map functions")
 
   SECTION("mapc")
   {
-    auto& cvar = l.a().initcvar("cvar", NIL);
+    auto& cvar = initcvar("cvar", NIL);
     auto r0 = eval(R"(
 (mapc '(1 2 3)
        (lambda (a)

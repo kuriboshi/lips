@@ -40,7 +40,7 @@ static LISPT mkindirect(lisp& l, LISPT obj)
     return obj;
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
-  auto iobj = l.a().getobject();
+  auto iobj = alloc::getobject();
   iobj->set(indirect_t{obj});
   return iobj;
 }
@@ -268,9 +268,9 @@ LISPT null(lisp& l, LISPT a)
 
 LISPT quote(lisp& l, LISPT x) { return x; }
 
-LISPT lambda(lisp& l, LISPT x, LISPT f) { return l.a().mklambda(x, f, type::LAMBDA); }
+LISPT lambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::LAMBDA); }
 
-LISPT nlambda(lisp& l, LISPT x, LISPT f) { return l.a().mklambda(x, f, type::NLAMBDA); }
+LISPT nlambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::NLAMBDA); }
 
 LISPT list(lisp& l, LISPT x) { return x; }
 
@@ -296,7 +296,7 @@ LISPT closure(lisp& l, LISPT fun, LISPT vars)
   if(type_of(f) == type::ERROR)
     return f;
   c->cvalues = f;
-  auto clos = l.a().getobject();
+  auto clos = alloc::getobject();
   clos->set(c);
   return clos;
 }

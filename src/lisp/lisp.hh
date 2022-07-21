@@ -37,7 +37,6 @@ namespace lisp
 {
 class lisp;
 class evaluator;
-class alloc;
 class file_t;
 class lisp_t;
 using LISPT = ref_ptr<lisp_t>;
@@ -214,7 +213,7 @@ struct subr_index
 
 /// @brief A representation of a C++ variable linked to a lisp variable.
 ///
-/// @details Wrapps a LISPT value in such a way that the value can be changed
+/// @details Wraps a LISPT value in such a way that the value can be changed
 /// from either the C++ context of the lisp context and have the value be
 /// reflected to both.
 ///
@@ -500,6 +499,43 @@ inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
 
+//
+// All lisp constants used internally.
+//
+extern LISPT T;
+extern LISPT C_EMPTY;
+extern LISPT C_AUTOLOAD;
+extern LISPT C_BROKEN;
+extern LISPT C_BT;
+extern LISPT C_CLOSURE;
+extern LISPT C_CONS;
+extern LISPT C_DOT;
+extern LISPT C_ENDOFFILE;
+extern LISPT C_ENVIRON;
+extern LISPT C_EOF;
+extern LISPT C_ERROR;
+extern LISPT C_FILE;
+extern LISPT C_FLOAT;
+extern LISPT C_FREE;
+extern LISPT C_FSUBR;
+extern LISPT C_GO;
+extern LISPT C_INDIRECT;
+extern LISPT C_INTEGER;
+extern LISPT C_LAMBDA;
+extern LISPT C_NLAMBDA;
+extern LISPT C_OLDDEF;
+extern LISPT C_QUOTE;
+extern LISPT C_REDEFINED;
+extern LISPT C_RESET;
+extern LISPT C_RETURN;
+extern LISPT C_STRING;
+extern LISPT C_SUBR;
+extern LISPT C_SYMBOL;
+extern LISPT C_READ;
+extern LISPT C_WRITE;
+extern LISPT C_APPEND;
+extern LISPT C_VERSION;
+
 class context
 {
 public:
@@ -514,7 +550,6 @@ class lisp
 public:
   lisp();
   ~lisp();
-  alloc& a() const;
   evaluator& e();
   static lisp& current() { return *_current; }
   static void current(lisp& lisp) { _current = &lisp; }
@@ -525,7 +560,6 @@ public:
   static LISPT topofstack(lisp& l);
   static LISPT destblock(lisp& l, LISPT a);
 
-  static LISPT cons(lisp& l, LISPT a, LISPT b);
   static LISPT obarray(lisp& l);
   static LISPT freecount(lisp& l);
 
@@ -573,10 +607,9 @@ public:
   cvariable_t& verbose() { return _verbose; }
   cvariable_t& loadpath() { return _loadpath; }
   void loadpath(LISPT newpath) { _loadpath = newpath; }
-  const cvariable_t& version() const { return _version; }
+  std::string version() const { return C_VERSION->value()->getstr(); }
 
 private:
-  alloc& _alloc;
   evaluator& _eval;
   std::unique_ptr<syntax> _syntax;
 
@@ -588,10 +621,10 @@ private:
   ref_file_t _stdin;
   static lisp* _current;
 
-  cvariable_t _version;
-  cvariable_t _currentbase;
-  cvariable_t _verbose;
-  cvariable_t _loadpath;
+  LISPT _version;
+  cvariable_t& _currentbase;
+  cvariable_t& _verbose;
+  cvariable_t& _loadpath;
 
   static std::map<int, std::string> messages;
   // Some standard messages, all of them not necessarily used
@@ -632,46 +665,6 @@ inline LISPT apply(LISPT fun, LISPT args) { return lisp::apply(lisp::current(), 
 inline LISPT baktrace() { return lisp::baktrace(lisp::current()); }
 inline LISPT topofstack() { return lisp::topofstack(lisp::current()); }
 inline LISPT destblock(LISPT a) { return lisp::destblock(lisp::current(), a); }
-
-inline LISPT cons(LISPT a, LISPT b) { return lisp::cons(lisp::current(), a, b); }
-inline LISPT obarray() { return lisp::obarray(lisp::current()); }
-inline LISPT freecount() { return lisp::freecount(lisp::current()); }
-
-//
-// All lisp constants used internally.
-//
-extern LISPT T;
-extern LISPT C_EMPTY;
-extern LISPT C_AUTOLOAD;
-extern LISPT C_BROKEN;
-extern LISPT C_BT;
-extern LISPT C_CLOSURE;
-extern LISPT C_CONS;
-extern LISPT C_DOT;
-extern LISPT C_ENDOFFILE;
-extern LISPT C_ENVIRON;
-extern LISPT C_EOF;
-extern LISPT C_ERROR;
-extern LISPT C_FILE;
-extern LISPT C_FLOAT;
-extern LISPT C_FREE;
-extern LISPT C_FSUBR;
-extern LISPT C_GO;
-extern LISPT C_INDIRECT;
-extern LISPT C_INTEGER;
-extern LISPT C_LAMBDA;
-extern LISPT C_NLAMBDA;
-extern LISPT C_OLDDEF;
-extern LISPT C_QUOTE;
-extern LISPT C_REDEFINED;
-extern LISPT C_RESET;
-extern LISPT C_RETURN;
-extern LISPT C_STRING;
-extern LISPT C_SUBR;
-extern LISPT C_SYMBOL;
-extern LISPT C_READ;
-extern LISPT C_WRITE;
-extern LISPT C_APPEND;
 } // namespace lisp
 
 #include "alloc.hh"

@@ -37,7 +37,7 @@ TEST_CASE("New symbol store")
   CHECK(&sym0 == &sym2);
 
   CHECK(all_symbols.exists(0, "hello"));
-  CHECK(!all_symbols.exists(0, "world"));
+  CHECK(!all_symbols.exists(0, "world0"));
 
   CHECK_THROWS(all_symbols.exists(1000, "hello"));
   CHECK_THROWS(all_symbols.get(1000, "hello"));

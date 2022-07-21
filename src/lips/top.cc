@@ -286,9 +286,9 @@ inline constexpr auto PRINTHIST = "??";  // print history
 inline constexpr auto RMEXCL = "rmexcl"; // History read-macro
 } // namespace lisp::pn
 
-void top::init(alloc& a)
+void top::init()
 {
-  variables = std::make_unique<cvariables>(a);
+  variables = std::make_unique<cvariables>();
   mkprim(
     pn::PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);

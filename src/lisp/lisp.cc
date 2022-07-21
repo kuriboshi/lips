@@ -48,14 +48,13 @@ inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
 inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
 inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
-
-inline constexpr auto CONS = "cons";           // Make a new cons cell
-inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
-inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
 } // namespace pn
 
 lisp::lisp()
-  : _alloc(a()), _eval(e())
+  : _eval(e()),
+    _currentbase(initcvar("base", 10_l)),
+    _verbose(initcvar("verbose", NIL)),
+    _loadpath(initcvar("loadpath", mklist(mkstring("."))))
 {
   if(_current == nullptr)
     _current = this;
@@ -133,7 +132,7 @@ lisp::lisp()
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
     C_CLOSURE = intern("closure");
-    C_CONS = intern(pn::CONS);
+    //C_CONS = intern(pn::CONS);
     C_DOT = intern(".");
     C_ENDOFFILE = intern("endoffile");
     C_ENVIRON = intern("environ");
@@ -157,9 +156,14 @@ lisp::lisp()
     C_WRITE = intern("write");
     C_APPEND = intern("append");
 
+    C_VERSION = intern("version");
+    C_VERSION->value(mkstring(VERSION));
+    C_VERSION->symbol().constant = true;
+
     e().undefhook(nullptr);
     e().breakhook(nullptr);
 
+    alloc::init();
     details::arith::init();
     details::debug::init();
     details::file::init();
@@ -182,31 +186,14 @@ lisp::lisp()
     mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-
-    mkprim(pn::CONS,       cons,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::FREECOUNT,  freecount,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::OBARRAY,    obarray,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     // clang-format on
-
-    intern("version");
-    _version = std::move(_alloc.initcvar("version", _alloc.mkstring(VERSION)));
   }
-
-  _currentbase = std::move(_alloc.initcvar("base", 10_l));
-  _verbose = std::move(_alloc.initcvar("verbose", NIL));
-  _loadpath = std::move(_alloc.initcvar("loadpath", "(.)"_l));
 }
 
 lisp::~lisp()
 {
   if(_current == this)
     _current = nullptr;
-}
-
-alloc& lisp::a() const
-{
-  static alloc a_;
-  return a_;
 }
 
 evaluator& lisp::e()
@@ -237,9 +224,8 @@ LISPT lisp::baktrace(lisp& l) { return l._eval.baktrace(); }
 LISPT lisp::topofstack(lisp& l) { return l._eval.topofstack(); }
 LISPT lisp::destblock(lisp& l, LISPT a) { return l._eval.destblock(a); }
 
-LISPT lisp::cons(lisp& l, LISPT a, LISPT b) { return l._alloc.cons(a, b); }
-LISPT lisp::obarray(lisp& l) { return l._alloc.obarray(); }
-LISPT lisp::freecount(lisp& l) { return l._alloc.freecount(); }
+LISPT lisp::obarray(lisp& l) { return alloc::obarray(l); }
+LISPT lisp::freecount(lisp& l) { return alloc::freecount(l); }
 
 void lisp::primout(ref_file_t f) { _primout = std::move(f); }
 
@@ -329,5 +315,6 @@ LISPT C_UNBOUND;
 LISPT C_READ;
 LISPT C_WRITE;
 LISPT C_APPEND;
+LISPT C_VERSION;
 
 } // namespace lisp

@@ -68,6 +68,8 @@ TEST_CASE("user: User defined functions")
 
   SECTION("Redefine function")
   {
+    remprop(mkatom("f"), C_OLDDEF);
+    set(mkatom("f"), C_UNBOUND);
     auto f0 = define(mkatom("f"), lambda(mklist(mkatom("a")), mklist(mkatom("a"))));
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(is_NIL(redef0));

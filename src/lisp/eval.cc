@@ -22,8 +22,7 @@ using namespace std::literals;
 namespace lisp
 {
 evaluator::evaluator(lisp& lisp)
-  : l(lisp),
-    a(lisp.a())
+  : l(lisp)
 {}
 
 void evaluator::reset()
@@ -959,7 +958,7 @@ LISPT evaluator::baktrace()
 
 LISPT evaluator::topofstack()
 {
-  auto x = a.getobject();
+  auto x = alloc::getobject();
   x->settype(type::ENVIRON);
   x->set(l.e().environment());
   return x;
