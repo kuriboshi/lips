@@ -181,7 +181,7 @@ private:
   void overflow();
   LISPT destblock(const destblock_t*);
 
-  lisp& l;
+  lisp& _lisp;
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
   LISPT _fun;                     // Store current function being evaluated.
