@@ -77,6 +77,7 @@ TEST_CASE("file: functions")
 
   SECTION("load")
   {
+    lisp::current().loadpath(mklist(C_DOT));
     {
       create_test_file test("(setq a 1)\n");
       auto e0 = load(mkstring(test.file));
@@ -243,6 +244,7 @@ TEST_CASE("file: functions")
 
   SECTION("loadfile")
   {
+    lisp::current().loadpath(mklist(C_DOT));
     create_test_file test("(setq a \"loadfile\")");
     {
       REQUIRE(loadfile(test.file));
