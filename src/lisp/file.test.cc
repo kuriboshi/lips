@@ -245,11 +245,11 @@ TEST_CASE("file: functions")
   {
     create_test_file test("(setq a \"loadfile\")");
     {
-      CHECK(loadfile(test.file));
+      REQUIRE(loadfile(test.file));
       CHECK("a"_a->value()->string() == "loadfile");
     }
     {
-      CHECK(loadfile(test.file));
+      REQUIRE(loadfile(test.file));
       CHECK("a"_a->value()->string() == "loadfile");
     }
   }
