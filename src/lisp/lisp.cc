@@ -227,11 +227,9 @@ LISPT lisp::destblock(lisp& l, LISPT a) { return l._eval.destblock(a); }
 LISPT lisp::obarray(lisp& l) { return alloc::obarray(l); }
 LISPT lisp::freecount(lisp& l) { return alloc::freecount(l); }
 
-void lisp::primout(ref_file_t f) { _primout = std::move(f); }
-
-void lisp::primerr(ref_file_t f) { _primerr = std::move(f); }
-
-void lisp::primin(ref_file_t f) { _primin = std::move(f); }
+ref_file_t lisp::primout(ref_file_t f) { auto p = std::move(_primout); _primout = std::move(f); return p; }
+ref_file_t lisp::primerr(ref_file_t f) { auto p = std::move(_primerr); _primerr = std::move(f); return p; }
+ref_file_t lisp::primin(ref_file_t f) { auto p = std::move(_primin); _primin = std::move(f); return p; }
 
 inline std::string lisp::geterror(int messnr)
 {

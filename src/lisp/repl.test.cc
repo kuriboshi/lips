@@ -26,22 +26,21 @@ TEST_CASE("Interactive tests")
 {
   auto& l = lisp::current();
   std::ostringstream cout;
-  auto out = ref_file_t::create(cout);
-  l.primout(std::move(out));
+  auto oldout = l.primout(ref_file_t::create(cout));
 
   std::ostringstream cerr;
-  auto err = ref_file_t::create(cerr);
-  l.primerr(std::move(err));
+  auto olderr = l.primerr(ref_file_t::create(cerr));
 
   SECTION("Simple repl")
   {
-    l.primin(ref_file_t::create(R"((print "hello"))"));
+    auto old = l.primin(ref_file_t::create(R"((print "hello"))"));
     repl repl(l);
     repl(NIL);
     std::string expected = R"(> "hello"
 "hello"
 > )";
     CHECK(cout.str() == expected);
+    l.primin(old);
   }
 
   SECTION("Example interaction")
@@ -51,7 +50,7 @@ TEST_CASE("Interactive tests")
 (setq a 100)
 a
 )";
-    l.primin(ref_file_t::create(is));
+    auto old = l.primin(ref_file_t::create(is));
     repl repl(l);
     repl(NIL);
     std::string expected = R"(> nil
@@ -59,6 +58,7 @@ a
 > 100
 > )";
     CHECK(cout.str() == expected);
+    l.primin(old);
   }
 
   SECTION("Break repl (reset)")
@@ -66,7 +66,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
 )";
-    l.primin(ref_file_t::create(is));
+    auto old = l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
@@ -76,6 +76,7 @@ a
     std::string expected_out = R"(> : )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
+    l.primin(old);
   }
 
   SECTION("Break repl (bt)")
@@ -84,7 +85,7 @@ a
 (bt)
 (reset)
 )";
-    l.primin(ref_file_t::create(is));
+    auto old = l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
@@ -98,6 +99,7 @@ a
     std::string expected_out = R"(> : : )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
+    l.primin(old);
   }
 
   SECTION("Break repl (return)")
@@ -105,7 +107,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (return "hello")
 )";
-    l.primin(ref_file_t::create(is));
+    auto old = l.primin(ref_file_t::create(is));
     repl repl(l);
     l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     repl(NIL);
@@ -116,7 +118,10 @@ a
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
+    l.primin(old);
   }
+  l.primerr(olderr);
+  l.primout(oldout);
 }
 
 } // namespace lisp

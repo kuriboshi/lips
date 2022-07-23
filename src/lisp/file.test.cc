@@ -206,17 +206,17 @@ TEST_CASE("file: functions")
   {
     {
       std::ostringstream cout;
-      auto out = ref_file_t::create(cout);
-      l.primout(std::move(out));
+      auto old = l.primout(ref_file_t::create(cout));
       spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
+      l.primout(old);
     }
     {
       std::ostringstream cout;
-      auto out = ref_file_t::create(cout);
-      l.primout(std::move(out));
+      auto old = l.primout(ref_file_t::create(cout));
       spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
+      l.primout(old);
     }
   }
 

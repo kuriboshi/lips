@@ -569,9 +569,9 @@ public:
   ref_file_t primout() const { return _primout; }
   ref_file_t primerr() const { return _primerr; }
   ref_file_t primin() const { return _primin; }
-  void primout(ref_file_t);
-  void primerr(ref_file_t);
-  void primin(ref_file_t);
+  ref_file_t primout(ref_file_t);
+  ref_file_t primerr(ref_file_t);
+  ref_file_t primin(ref_file_t);
   ref_file_t stdout() const { return _stdout; }
   ref_file_t stderr() const { return _stderr; }
   ref_file_t stdin() const { return _stdin; }

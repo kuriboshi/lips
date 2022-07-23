@@ -39,12 +39,12 @@ TEST_CASE("Low level functions")
   {
     auto& l = lisp::current();
     std::ostringstream os;
-    auto of = ref_file_t::create(os);
-    l.primerr(std::move(of));
+    auto old = l.primerr(ref_file_t::create(os));
     CHECK_THROWS(set(T, NIL));
     CHECK_THROWS(set(mkatom("nil"), NIL));
     CHECK_THROWS(set(T, NIL));
     CHECK_THROWS(set(mkatom("nil"), NIL));
+    l.primerr(old);
   }
 
   SECTION("low: setq")

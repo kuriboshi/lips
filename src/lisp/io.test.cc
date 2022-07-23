@@ -17,6 +17,7 @@
 
 #include <catch2/catch.hpp>
 #include <filesystem>
+#include <functional>
 #include <lisp/lisp.hh>
 
 namespace
@@ -39,9 +40,10 @@ namespace lisp
 TEST_CASE("io: Basic I/O")
 {
   auto& l = lisp::current();
-  l.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
+  auto old = l.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
   l.primout()->format("hello world {}", 123);
   CHECK(to_string(l.primout()->sink()) == std::string("hello world 123"));
+  l.primout(old);
 }
 
 TEST_CASE("io: ratom")
@@ -274,31 +276,35 @@ TEST_CASE("io: patom primout/primerr")
   auto& l = lisp::current();
   {
     std::ostringstream out;
-    l.primout(ref_file_t::create(out));
+    auto old = l.primout(ref_file_t::create(out));
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
+    l.primout(old);
   }
   {
     std::ostringstream err;
-    l.primerr(ref_file_t::create(err));
+    auto old = l.primerr(ref_file_t::create(err));
     patom("bar"_a, true);
     terpri(true);
     CHECK(err.str() == "bar\n");
+    l.primerr(old);
   }
   {
     std::ostringstream out;
-    l.primout(ref_file_t::create(out));
+    auto old = l.primout(ref_file_t::create(out));
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
+    l.primerr(old);
   }
   {
     std::ostringstream err;
-    l.primerr(ref_file_t::create(err));
+    auto old = l.primerr(ref_file_t::create(err));
     patom("bar"_a, true);
     terpri(true);
     CHECK(err.str() == "bar\n");
+    l.primerr(old);
   }
 }
 
@@ -320,27 +326,31 @@ TEST_CASE("io: prinbody")
   }
   {
     std::ostringstream os;
-    l.primout(ref_file_t::create(os));
+    auto old = l.primout(ref_file_t::create(os));
     prinbody(list, false);
     CHECK(os.str() == "a b c . d");
+    l.primout(old);
   }
   {
     std::ostringstream os;
-    l.primerr(ref_file_t::create(os));
+    auto old = l.primerr(ref_file_t::create(os));
     prinbody(list, true);
     CHECK(os.str() == "a b c . d");
+    l.primerr(old);
   }
   {
     std::ostringstream os;
-    l.primout(ref_file_t::create(os));
+    auto old = l.primout(ref_file_t::create(os));
     prinbody(list, false);
     CHECK(os.str() == "a b c . d");
+    l.primout(old);
   }
   {
     std::ostringstream os;
-    l.primerr(ref_file_t::create(os));
+    auto old = l.primerr(ref_file_t::create(os));
     prinbody(list, true);
     CHECK(os.str() == "a b c . d");
+    l.primerr(old);
   }
 }
 

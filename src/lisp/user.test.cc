@@ -74,13 +74,13 @@ TEST_CASE("user: User defined functions")
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(is_NIL(redef0));
     std::ostringstream cout;
-    auto out = ref_file_t::create(cout);
-    l.primout(std::move(out));
+    auto old = l.primout(ref_file_t::create(cout));
     eval("(setq verbose t)");
     auto f1 = define(mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
     auto redef1 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(!is_NIL(redef1));
     CHECK(cout.str() == "(f redefined)\n");
+    l.primout(old);
   }
 }
 

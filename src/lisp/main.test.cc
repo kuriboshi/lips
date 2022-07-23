@@ -29,35 +29,36 @@ TEST_CASE("incomplete input")
   // parenthesis so there should be no error message in this case.
   auto& l = lisp::current();
   std::ostringstream cout;
-  auto out = ref_file_t::create(cout);
-  l.primout(std::move(out));
-
-  l.primin(ref_file_t::create(R"((print "hello")"));
+  auto oldout = l.primout(ref_file_t::create(cout));
+  auto oldin = l.primin(ref_file_t::create(R"((print "hello")"));
   std::ostringstream os;
   run(l, os);
   CHECK(os.str() == "");
   CHECK(cout.str() == R"(> "hello"
 "hello"
 > )");
+  l.primin(oldin);
+  l.primout(oldout);
 }
 
 TEST_CASE("exit")
 {
   auto& l = lisp::current();
   std::ostringstream cout;
-  auto out = ref_file_t::create(cout);
-  l.primout(std::move(out));
-
+  auto old = l.primout(ref_file_t::create(cout));
   {
-    l.primin(ref_file_t::create(R"((exit))"));
+    auto old = l.primin(ref_file_t::create(R"((exit))"));
     std::ostringstream os;
     CHECK(run(l, os) == 0);
+    l.primin(old);
   }
   {
-    l.primin(ref_file_t::create(R"((exit 99))"));
+    auto old = l.primin(ref_file_t::create(R"((exit 99))"));
     std::ostringstream os;
     CHECK(run(l, os) == 99);
+    l.primin(old);
   }
+  l.primout(old);
 }
 
 } // namespace lisp
