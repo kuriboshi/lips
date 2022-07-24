@@ -20,6 +20,7 @@ cmake_minimum_required(VERSION 3.21.0)
 project(lips VERSION 1.0.3)
 set(CMAKE_CXX_STANDARD 20)
 enable_testing()
+set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)

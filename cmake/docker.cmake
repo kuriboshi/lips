@@ -52,6 +52,7 @@ macro(lips_build_and_test dockerfile container_tag)
       -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
       ${container_tag} bash -c
       "test/build.sh ${LIPS_CONTAINER_TEST} build/${container_tag}")
+  set_target_properties(ubuntu${container_tag} PROPERTIES FOLDER "Test")
   add_dependencies(test-linux ubuntu${container_tag})
   if("${ARGV2}" STREQUAL "tidy")
     add_custom_target(
@@ -67,11 +68,13 @@ macro(lips_build_and_test dockerfile container_tag)
         -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
         -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
         "${container_tag}" bash -c "test/tidy.sh build/${container_tag}")
+    set_target_properties(ubuntu${container_tag}-tidy PROPERTIES FOLDER "Test")
     add_dependencies(test-linux ubuntu${container_tag}-tidy)
   endif()
 endmacro()
 
 add_custom_target(test-linux)
+set_target_properties(test-linux PROPERTIES FOLDER "Test")
 lips_build_and_test(Ubuntu-18.04 18)
 lips_build_and_test(Ubuntu-20.04 20)
 lips_build_and_test(Ubuntu-22.04 22 tidy)
