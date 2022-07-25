@@ -38,12 +38,8 @@ target_sources(
           user.cc
           version.cc)
 
-# Add the header files as private so they will show up in the IDE. The
-# header files also need to be installed separately. Using
-# PUBLIC_HEADER doesn't work because it doesn't preserve the directory
-# hierarchy.
-target_sources(liblisp
-  PRIVATE alloc.hh
+set(_liblisp_source
+          alloc.hh
           arith.hh
           error.hh
           eval.hh
@@ -67,7 +63,8 @@ target_sources(liblisp
           rtable.hh
           string.hh
           user.hh
-          version.hh
+          version.hh)
+set(_liblisp_details
           details/arith.hh
           details/debug.hh
           details/file.hh
@@ -79,6 +76,12 @@ target_sources(liblisp
           details/prop.hh
           details/string.hh
           details/user.hh)
+# The reason for defining two variables with the same contents is that
+# adding the PARENT_SCOPE keyword will set the value ONLY in the
+# parent scope and not in the current scope. This is documented
+# behavior but I find it counterintuitive.
+set(_liblisp_details_parent ${_liblisp_details} PARENT_SCOPE)
+target_sources(liblisp PRIVATE ${_liblisp_source} ${_liblisp_details})
 
 add_executable(lisp)
 target_sources(lisp PRIVATE main.cc)

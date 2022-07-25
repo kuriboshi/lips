@@ -39,6 +39,20 @@ if(LIPS_ENABLE_CLANG_TIDY)
 endif()
 
 add_subdirectory(lisp)
+
+# Create a source group for the details header files. Adding the
+# header files as private will flatten the hierarchy so the group
+# "Header Files" ends up with multiple header files with the same
+# name. The header files need to be installed separately anyway. Using
+# PUBLIC_HEADER doesn't work because it also doesn't preserve the
+# directory hierarchy.
+#
+# The source group for the details header files has to be added on the
+# same level as the library to which they belong. At least it seems
+# that way. Creating the source group one level down doesn't work.
+list(TRANSFORM _liblisp_details_parent PREPEND "lisp/" OUTPUT_VARIABLE _liblisp_details)
+source_group("Header Files/Details" FILES ${_liblisp_details})
+
 add_subdirectory(lips)
 
 install(DIRECTORY lisp/
