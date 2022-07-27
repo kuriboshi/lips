@@ -38,7 +38,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
       appendmode = true;
     }
     else
-      return l.error(UNKNOWN_REQUEST, mode);
+      l.error(error_errc::unknown_request, mode);
   }
   auto* f = [&]() {
     if(readmode)
@@ -46,7 +46,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
     return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
   if(f == nullptr)
-    return l.error(CANT_OPEN, filename);
+    l.error(error_errc::cant_open, filename);
   auto newfile = alloc::getobject();
   newfile->set(ref_file_t(f));
   return newfile;
@@ -130,7 +130,7 @@ LISPT load(lisp& l, LISPT f)
 {
   check(f, type::STRING, type::SYMBOL);
   if(!file::loadfile(l, f->getstr()))
-    l.fatal(CANT_LOAD);
+    l.fatal(error_errc::cant_load);
   return f;
 }
 

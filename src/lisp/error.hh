@@ -18,44 +18,231 @@
 #ifndef LISP_ERROR_HH
 #define LISP_ERROR_HH
 
+#include <system_error>
+
 namespace lisp
 {
-inline constexpr int PRINT_ARG = 1 << 8;
-inline constexpr int NOT_A = 1 << 9;
+enum class type_errc
+{
+  not_nil = 1,
+  not_t,
+  not_empty,
+  not_symbol,
+  not_integer,
+  not_float,
+  not_indirect,
+  not_cons,
+  not_string,
+  not_subr,
+  not_fsubr,
+  not_lambda,
+  not_nlambda,
+  not_closure,
+  not_unbound,
+  not_environ,
+  not_filet,
+  not_free,
+  not_endoffile,
+  not_error,
+  not_cvariable
+};
 
-inline constexpr int NO_MESSAGE = 0;
-inline constexpr int ILLEGAL_ARG = (PRINT_ARG | 1);
-inline constexpr int DIVIDE_ZERO = 2;
-inline constexpr int BUG = 3;
-inline constexpr int NO_MATCH = (PRINT_ARG | 4);
-inline constexpr int CANT_CREATE = (PRINT_ARG | 6);
-inline constexpr int CANT_CREATE_OPEN = (PRINT_ARG | 7);
-inline constexpr int CANT_OPEN = (PRINT_ARG | 8);
-inline constexpr int NO_SUCH_JOB = (PRINT_ARG | 9);
-inline constexpr int NOT_PRINTABLE = (PRINT_ARG | 10);
-inline constexpr int NO_DIRECTORY = (PRINT_ARG | 11);
-inline constexpr int NO_USER = (PRINT_ARG | 12);
-inline constexpr int ATTEMPT_TO_CLOBBER = (PRINT_ARG | 13);
-inline constexpr int OUT_OF_MEMORY = 14;
-inline constexpr int UNEXPECTED_EOF = 15;
-inline constexpr int EVENT_NOT_FOUND = 16;
-inline constexpr int UNKNOWN_REQUEST = (PRINT_ARG | 17);
-inline constexpr int ILLEGAL_SIGNAL = 18;
-inline constexpr int STACK_OVERFLOW = 19;
-inline constexpr int CORRUPT_DATA = (PRINT_ARG | 20);
-inline constexpr int COMMAND_ABORTED = 21;
-inline constexpr int ALIAS_LOOP = (PRINT_ARG | 22);
-inline constexpr int ILLEGAL_FUNCTION = (PRINT_ARG | 23);
-inline constexpr int UNDEF_FUNCTION = (PRINT_ARG | 24);
-inline constexpr int UNBOUND_VARIABLE = (PRINT_ARG | 25);
-inline constexpr int KBD_BREAK = (PRINT_ARG | 26);
-inline constexpr int AMBIGUOUS = (PRINT_ARG | 27);
-inline constexpr int USER_ERROR = (PRINT_ARG | 28);
-inline constexpr int CANT_LOAD = (PRINT_ARG | 29);
-inline constexpr int MAXMESSAGE = 30;
+class type_category : public std::error_category
+{
+public:
+  const char* name() const noexcept override { return "type"; }
+  std::string message(int condition) const override
+  {
+    switch(static_cast<type_errc>(condition))
+    {
+      case type_errc::not_nil:
+        return "Not NIL";
+      case type_errc::not_t:
+        return "Not T";
+      case type_errc::not_empty:
+        return "Not empty";
+      case type_errc::not_symbol:
+        return "Not a symbol";
+      case type_errc::not_integer:
+        return "Not an integer";
+      case type_errc::not_float:
+        return "Not a float";
+      case type_errc::not_indirect:
+        return "Not indirect";
+      case type_errc::not_cons:
+        return "Not a cons cell";
+      case type_errc::not_string:
+        return "Not a string";
+      case type_errc::not_subr:
+        return "Not SUBR";
+      case type_errc::not_fsubr:
+        return "Not FSUBR";
+      case type_errc::not_lambda:
+        return "Not LAMBDA";
+      case type_errc::not_nlambda:
+        return "Not NLAMBDA";
+      case type_errc::not_closure:
+        return "Not a closure";
+      case type_errc::not_unbound:
+        return "Not unbound";
+      case type_errc::not_environ:
+        return "Not an environment";
+      case type_errc::not_filet:
+        return "Not a file pointer";
+      case type_errc::not_free:
+        return "Not free";
+      case type_errc::not_endoffile:
+        return "Not EOF";
+      case type_errc::not_error:
+        return "Not an ERROR";
+      case type_errc::not_cvariable:
+        return "Not a c-variable";
+    }
+  }
+  static const std::error_category& category()
+  {
+    static type_category instance;
+    return instance;
+  }
+};
 
-inline constexpr int error_code(int x) { return x & ~PRINT_ARG & ~NOT_A; }
+inline std::error_code make_error_code(type_errc e)
+{
+  return std::error_code(static_cast<int>(e), type_category::category());
+}
+
+inline std::error_condition make_error_condition(type_errc e)
+{
+  return std::error_condition(static_cast<int>(e), type_category::category());
+}
+
+enum class error_errc
+{
+  no_message = 1,
+  illegal_arg,
+  divide_zero,
+  bug,
+  no_match,
+  cant_create,
+  cant_create_open,
+  cant_open,
+  no_such_job,
+  not_printable,
+  no_directory,
+  no_user,
+  attempt_to_clobber,
+  out_of_memory,
+  unexpected_eof,
+  event_not_found,
+  unknown_request,
+  illegal_signal,
+  stack_overflow,
+  corrupt_data,
+  command_aborted,
+  alias_loop,
+  illegal_function,
+  undef_function,
+  unbound_variable,
+  kbd_break,
+  ambiguous,
+  user_error,
+  cant_load
+};
+
+class error_category : public std::error_category
+{
+public:
+  const char* name() const noexcept override { return "error"; }
+  std::string message(int condition) const override
+  {
+    switch(static_cast<error_errc>(condition))
+    {
+      case error_errc::no_message:
+        return "";
+      case error_errc::illegal_arg:
+        return "Illegal argument";
+      case error_errc::divide_zero:
+        return "Divide by zero";
+      case error_errc::bug:
+        return "Internal bug";
+      case error_errc::no_match:
+        return "No match for";
+      case error_errc::cant_create:
+        return "Can't create file";
+      case error_errc::cant_create_open:
+        return "Can't create or open file";
+      case error_errc::cant_open:
+        return "Can't open file";
+      case error_errc::no_such_job:
+        return "No such job";
+      case error_errc::not_printable:
+        return "Not printable";
+      case error_errc::no_directory:
+        return "No directory";
+      case error_errc::no_user:
+        return "No such user";
+      case error_errc::attempt_to_clobber:
+        return "Attempt to clobber constant";
+      case error_errc::out_of_memory:
+        return "Out of memory";
+      case error_errc::unexpected_eof:
+        return "Unexpected end of file";
+      case error_errc::event_not_found:
+        return "Event not found";
+      case error_errc::unknown_request:
+        return "Unknown request";
+      case error_errc::illegal_signal:
+        return "Illegal signal";
+      case error_errc::stack_overflow:
+        return "Stack overflow";
+      case error_errc::corrupt_data:
+        return "Bug: corrupt data";
+      case error_errc::command_aborted:
+        return "Command aborted";
+      case error_errc::alias_loop:
+        return "Alias loop";
+      case error_errc::illegal_function:
+        return "Illegal function";
+      case error_errc::undef_function:
+        return "Undefined function";
+      case error_errc::unbound_variable:
+        return "Unbound variable";
+      case error_errc::kbd_break:
+        return "Break";
+      case error_errc::ambiguous:
+        return "Ambiguous";
+      case error_errc::user_error:
+        return "User error";
+      case error_errc::cant_load:
+        return "Can't load file";
+    }
+  }
+  static const std::error_category& category()
+  {
+    static error_category instance;
+    return instance;
+  }
+};
+
+inline std::error_code make_error_code(error_errc e)
+{
+  return std::error_code(static_cast<int>(e), error_category::category());
+}
+
+inline std::error_condition make_error_condition(error_errc e)
+{
+  return std::error_condition(static_cast<int>(e), error_category::category());
+}
 
 } // namespace lisp
+
+namespace std
+{
+template<>
+struct is_error_code_enum<lisp::type_errc> : public true_type {};
+
+template<>
+struct is_error_code_enum<lisp::error_errc> : public true_type {};
+}
 
 #endif

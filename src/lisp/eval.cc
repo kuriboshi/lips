@@ -64,23 +64,23 @@ LISPT evaluator::printwhere()
 
 /// @brief Print error message, abort current evaluation, and return to top
 /// level.
-void evaluator::abort(int m, LISPT v)
+void evaluator::abort(std::error_code error, LISPT v)
 {
-  _lisp.perror(m, v);
+  _lisp.perror(error, v);
   printwhere();
   unwind();
   throw lisp_error("abort");
 }
 
-void evaluator::overflow() { abort(STACK_OVERFLOW, NIL); }
+void evaluator::overflow() { abort(error_errc::stack_overflow, C_EMPTY); }
 
 /// @brief This function prints an error message, and sets up a call to everr
 /// that handles breaks.
-void evaluator::xbreak(int mess, LISPT fault, continuation_t next)
+void evaluator::xbreak(std::error_code code, LISPT fault, continuation_t next)
 {
-  if(mess != 0)
+  if(code)
   {
-    _lisp.perror(mess, fault);
+    _lisp.perror(code, fault);
     printwhere();
   }
   if(_breakhook)
@@ -260,7 +260,7 @@ bool evaluator::peval()
       pop(_cont);
       break;
     case type::FREE:
-      abort(CORRUPT_DATA, _expression);
+      abort(error_errc::corrupt_data, _expression);
       break;
     default:
       send(_expression);
@@ -291,7 +291,7 @@ bool evaluator::evalhook(LISPT exp)
         return true;
         break;
       case -1:
-        abort(NO_MESSAGE, NIL);
+        abort(error_errc::no_message, NIL);
         break;
       default:
         return false;
@@ -319,7 +319,7 @@ void evaluator::do_unbound(continuation_t continuation)
     if(type_of(_fun) == type::UNBOUND)
     {
       if(!evalhook(_expression))
-        xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
+        xbreak(error_errc::undef_function, _expression->car(), continuation);
     }
     else
       _cont = continuation;
@@ -330,7 +330,7 @@ void evaluator::do_unbound(continuation_t continuation)
       && type_of(_expression->car()->value()) == type::UNBOUND)
     {
       if(!evalhook(_expression))
-        xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
+        xbreak(error_errc::undef_function, _expression->car(), continuation);
     }
     else
     {
@@ -347,7 +347,7 @@ bool evaluator::do_default(continuation_t continuation)
     && type_of(_expression->car()->value()) == type::UNBOUND)
   {
     if(!evalhook(_expression))
-      xbreak(UNDEF_FUNCTION, _expression->car(), continuation);
+      xbreak(error_errc::undef_function, _expression->car(), continuation);
     return true;
   }
   return false;
@@ -356,9 +356,9 @@ bool evaluator::do_default(continuation_t continuation)
 bool evaluator::peval1()
 {
   if(_lisp.brkflg)
-    xbreak(KBD_BREAK, _fun, &evaluator::peval1);
+    xbreak(error_errc::kbd_break, _fun, &evaluator::peval1);
   else if(_lisp.interrupt)
-    abort(NO_MESSAGE, NIL);
+    abort(error_errc::no_message, NIL);
   else
     switch(type_of(_fun))
     {
@@ -408,11 +408,11 @@ bool evaluator::peval1()
         break;
       case type::STRING:
         if(!evalhook(_expression))
-          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval1);
+          xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
         break;
       default:
         if(!do_default(&evaluator::peval1))
-          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval1);
+          xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
         break;
     }
   return false;
@@ -421,7 +421,7 @@ bool evaluator::peval1()
 bool evaluator::peval2()
 {
   if(_lisp.brkflg)
-    xbreak(KBD_BREAK, _fun, &evaluator::peval2);
+    xbreak(error_errc::kbd_break, _fun, &evaluator::peval2);
   else
     switch(type_of(_fun))
     {
@@ -460,11 +460,11 @@ bool evaluator::peval2()
         break;
       case type::STRING:
         if(!evalhook(_expression))
-          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval2);
+          xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
         break;
       default:
         if(!do_default(&evaluator::peval2))
-          xbreak(ILLEGAL_FUNCTION, _fun, &evaluator::peval2);
+          xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
         break;
     }
   return false;
@@ -687,9 +687,9 @@ bool evaluator::ev2()
       throw;
     auto foo = printwhere();
     if(is_NIL(foo))
-      xbreak(0, NIL, &evaluator::peval1);
+      xbreak({}, NIL, &evaluator::peval1);
     else
-      xbreak(0, foo->car(), &evaluator::peval1); /* CAR(_) broken */
+      xbreak({}, foo->car(), &evaluator::peval1); /* CAR(_) broken */
   }
   return false;
 }
@@ -770,7 +770,7 @@ bool evaluator::lookup()
   switch(type_of(t))
   {
     case type::UNBOUND:
-      xbreak(UNBOUND_VARIABLE, _expression, &evaluator::lookup);
+      xbreak(error_errc::unbound_variable, _expression, &evaluator::lookup);
       return false;
       break;
     case type::INDIRECT:

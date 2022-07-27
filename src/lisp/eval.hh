@@ -129,7 +129,7 @@ private:
   }
   void pop_env();
 
-  void xbreak(int mess, LISPT fault, continuation_t next);
+  void xbreak(std::error_code, LISPT fault, continuation_t next);
   destblock_t* mkdestblock(int);
   void storevar(LISPT v, int i);
   void send(LISPT a);
@@ -177,7 +177,7 @@ private:
   bool lookup();
 
   LISPT printwhere();
-  void abort(int m, LISPT v);
+  void abort(std::error_code, LISPT v);
   void overflow();
   LISPT destblock(const destblock_t*);
 

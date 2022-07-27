@@ -274,7 +274,7 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
         }
         return NIL;
       }
-      l.error(EVENT_NOT_FOUND, at);
+      l.error(error_errc::event_not_found, at);
       return NIL;
   }
   return NIL;

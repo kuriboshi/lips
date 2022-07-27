@@ -323,7 +323,7 @@ LISPT nth(lisp& l, LISPT x, LISPT p)
 LISPT error(lisp& l, LISPT mess)
 {
   check(mess, type::STRING);
-  return l.error(USER_ERROR, mess);
+  return l.error(error_errc::user_error, mess);
 }
 
 LISPT uxexit(lisp& l, LISPT status)

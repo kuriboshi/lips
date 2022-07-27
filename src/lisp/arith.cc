@@ -41,7 +41,7 @@ LISPT plus(lisp& l, LISPT x)
       else if(type_of(x->car()) == type::FLOAT)
         fsum += x->car()->floatval();
       else
-        return l.error(ILLEGAL_ARG, x->car());
+        l.error(error_errc::illegal_arg, x->car());
     }
     else
     {
@@ -53,7 +53,7 @@ LISPT plus(lisp& l, LISPT x)
         fsum = x->car()->floatval() + static_cast<double>(sum);
       }
       else
-        return l.error(ILLEGAL_ARG, x->car());
+        l.error(error_errc::illegal_arg, x->car());
     }
     x = x->cdr();
   }
@@ -131,7 +131,7 @@ LISPT ltimes(lisp& l, LISPT x)
       else if(type_of(x->car()) == type::FLOAT)
         fprod *= x->car()->floatval();
       else
-        return l.error(ILLEGAL_ARG, x->car());
+        l.error(error_errc::illegal_arg, x->car());
     }
     else if(type_of(x->car()) == type::INTEGER)
       prod *= x->car()->intval();
@@ -141,7 +141,7 @@ LISPT ltimes(lisp& l, LISPT x)
       fprod = x->car()->floatval() * (double)prod;
     }
     else
-      return l.error(ILLEGAL_ARG, x->car());
+      l.error(error_errc::illegal_arg, x->car());
     x = x->cdr();
   }
   if(f != 0)
@@ -185,23 +185,23 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
     if(type_of(y) == type::INTEGER)
     {
       if(y->intval() == 0)
-        return l.error(DIVIDE_ZERO, NIL);
+        l.error(error_errc::divide_zero, NIL);
       return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        return l.error(DIVIDE_ZERO, NIL);
+        l.error(error_errc::divide_zero, NIL);
       return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::INTEGER)
   {
     if(y->intval() == 0)
-      return l.error(DIVIDE_ZERO, NIL);
+      l.error(error_errc::divide_zero, NIL);
     return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    return l.error(DIVIDE_ZERO, NIL);
+    l.error(error_errc::divide_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -210,7 +210,7 @@ LISPT iquotient(lisp& l, LISPT x, LISPT y)
   check(x, type::INTEGER);
   check(y, type::INTEGER);
   if(y->intval() == 0)
-    return l.error(DIVIDE_ZERO, NIL);
+    l.error(error_errc::divide_zero, NIL);
   return mknumber(x->intval() / y->intval());
 }
 
@@ -219,7 +219,7 @@ LISPT iremainder(lisp& l, LISPT x, LISPT y)
   check(x, type::INTEGER);
   check(y, type::INTEGER);
   if(y->intval() == 0)
-    return l.error(DIVIDE_ZERO, NIL);
+    l.error(error_errc::divide_zero, NIL);
   return mknumber(x->intval() % y->intval());
 }
 
@@ -228,7 +228,7 @@ LISPT fdivide(lisp& l, LISPT x, LISPT y)
   check(x, type::FLOAT);
   check(y, type::FLOAT);
   if(y->floatval() == 0.0)
-    return l.error(DIVIDE_ZERO, NIL);
+    l.error(error_errc::divide_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -311,7 +311,7 @@ inline LISPT docheck(Type x, Type y, Comparor cmp)
   return NIL;
 }
 
-inline LISPT illegalreturn(lisp& l, LISPT x) { return l.error(ILLEGAL_ARG, x); }
+inline LISPT illegalreturn(lisp& l, LISPT x) { return l.error(error_errc::illegal_arg, x); }
 
 template<template<typename> typename Comparer>
 inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
@@ -366,7 +366,7 @@ LISPT minusp(lisp& l, LISPT x)
       return T;
     return NIL;
   }
-  return l.error(ILLEGAL_ARG, x);
+  return l.error(error_errc::illegal_arg, x);
 }
 
 namespace pn

@@ -576,10 +576,9 @@ public:
   ref_file_t stderr() const { return _stderr; }
   ref_file_t stdin() const { return _stdin; }
 
-  std::string geterror(int);
-  LISPT perror(int, LISPT);
-  LISPT error(int, LISPT);
-  void fatal(int);
+  LISPT perror(std::error_code, LISPT);
+  LISPT error(std::error_code, LISPT);
+  void fatal(std::error_code);
   LISPT syserr(LISPT);
   LISPT break0(LISPT) const;
 
@@ -626,36 +625,10 @@ private:
   cvariable_t& _verbose;
   cvariable_t& _loadpath;
 
-  static std::map<int, std::string> messages;
-  // Some standard messages, all of them not necessarily used
-  // clang-format off
-  const std::vector<std::string> errmess = {
-    "Not NIL",
-    "Not T",
-    "Not a symbol",
-    "Not an integer",
-    "Not a float",
-    "Not indirect",
-    "Not a cons cell",
-    "Not a string",
-    "Not SUBR",
-    "Not FSUBR",
-    "Not LAMBDA",
-    "Not NLAMBDA",
-    "Not a closure",
-    "Not unbound",
-    "Not an environment",
-    "Not a file pointer",
-    "Not free",
-    "Not EOF",
-    "Not an ERROR",
-    "Not a c-variable"
-  };
-  // clang-format on
 };
 
-inline LISPT perror(int i, LISPT a) { return lisp::current().perror(i, a); }
-inline LISPT error(int i, LISPT a) { return lisp::current().error(i, a); }
+inline LISPT perror(std::error_code code, LISPT a) { return lisp::current().perror(code, a); }
+inline LISPT error(std::error_code code, LISPT a) { return lisp::current().error(code, a); }
 inline LISPT syserr(LISPT a) { return lisp::current().syserr(a); }
 inline LISPT break0(LISPT a) { return lisp::current().break0(a); }
 
@@ -692,7 +665,7 @@ template<typename T>
 void check(LISPT arg, T type)
 {
   if(type_of(arg) != type)
-    error(ILLEGAL_ARG, arg);
+    error(error_errc::illegal_arg, arg);
 }
 
 template<typename T, typename... Ts>

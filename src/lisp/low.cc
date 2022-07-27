@@ -84,7 +84,7 @@ LISPT set(lisp& l, LISPT var, LISPT val)
 {
   check(var, type::SYMBOL);
   if(var->symbol().constant)
-    return l.error(ATTEMPT_TO_CLOBBER, var);
+    l.error(error_errc::attempt_to_clobber, var);
   if(type_of(var->value()) == type::INDIRECT)
     var->value()->set(indirect_t{val});
   else if(type_of(var->value()) == type::CVARIABLE)
