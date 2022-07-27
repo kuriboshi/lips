@@ -659,7 +659,75 @@ template<typename T>
 void check(LISPT arg, T type)
 {
   if(type_of(arg) != type)
+  {
+    switch(type)
+    {
+      case type::NIL:
+        error(type_errc::not_nil, arg);
+        break;
+      case type::T:
+        error(type_errc::not_t, arg);
+        break;
+      case type::EMPTY:
+        error(type_errc::not_empty, arg);
+        break;
+      case type::SYMBOL:
+        error(type_errc::not_symbol, arg);
+        break;
+      case type::INTEGER:
+        error(type_errc::not_integer, arg);
+        break;
+      case type::FLOAT:
+        error(type_errc::not_float, arg);
+        break;
+      case type::INDIRECT:
+        error(type_errc::not_indirect, arg);
+        break;
+      case type::CONS:
+        error(type_errc::not_cons, arg);
+        break;
+      case type::STRING:
+        error(type_errc::not_string, arg);
+        break;
+      case type::SUBR:
+        error(type_errc::not_subr, arg);
+        break;
+      case type::FSUBR:
+        error(type_errc::not_fsubr, arg);
+        break;
+      case type::LAMBDA:
+        error(type_errc::not_lambda, arg);
+        break;
+      case type::NLAMBDA:
+        error(type_errc::not_nlambda, arg);
+        break;
+      case type::CLOSURE:
+        error(type_errc::not_closure, arg);
+        break;
+      case type::UNBOUND:
+        error(type_errc::not_unbound, arg);
+        break;
+      case type::ENVIRON:
+        error(type_errc::not_environ, arg);
+        break;
+      case type::FILET:
+        error(type_errc::not_filet, arg);
+        break;
+      case type::FREE:
+        error(type_errc::not_free, arg);
+        break;
+      case type::ENDOFFILE:
+        error(type_errc::not_endoffile, arg);
+        break;
+      case type::ERROR:
+        error(type_errc::not_error, arg);
+        break;
+      case type::CVARIABLE:
+        error(type_errc::not_cvariable, arg);
+        break;
+    }
     error(error_errc::illegal_arg, arg);
+  }
 }
 
 template<typename T, typename... Ts>
