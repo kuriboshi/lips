@@ -50,12 +50,6 @@ using LISPT = ref_ptr<lisp_t>;
 ///
 void ref_deleter(lisp_t* obj);
 
-template<typename Enum>
-constexpr auto to_underlying(Enum e) noexcept
-{
-  return static_cast<std::underlying_type_t<Enum>>(e);
-}
-
 enum class type
 {
   NIL = 0,   // so that nullptr also becomes NIL

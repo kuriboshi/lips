@@ -19,6 +19,7 @@
 #define LIPS_LIPS_ERROR_HH
 
 #include <system_error>
+#include <lisp/util.hh>
 
 namespace lisp
 {
@@ -58,12 +59,12 @@ public:
 
 inline std::error_code make_error_code(lips_errc e)
 {
-  return std::error_code(static_cast<int>(e), lips_category::category());
+  return std::error_code(to_underlying(e), lips_category::category());
 }
 
 inline std::error_condition make_error_condition(lips_errc e)
 {
-  return std::error_condition(static_cast<int>(e), lips_category::category());
+  return std::error_condition(to_underlying(e), lips_category::category());
 }
 
 }
