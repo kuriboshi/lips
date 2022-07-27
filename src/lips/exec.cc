@@ -38,6 +38,7 @@
 #include "top.hh"
 #include "exec.hh"
 #include "env.hh"
+#include "lips_error.hh"
 
 using namespace lisp;
 using namespace std::literals;
@@ -255,7 +256,7 @@ std::optional<std::vector<std::string>> process_one(LISPT arg)
       }
       else if(is_NIL(files))
       {
-        error(error_errc::no_match, arg);
+        error(lips_errc::no_match, arg);
         return {};
       }
     }
@@ -274,7 +275,7 @@ std::optional<std::vector<std::string>> process_one(LISPT arg)
   }
   else
   {
-    error(error_errc::illegal_arg, arg);
+    error(lips_errc::illegal_arg, arg);
     return {};
   }
   return args;
@@ -705,7 +706,7 @@ LISPT fg(lisp& l, LISPT job)
     auto status = waitfork(current->procid);
     return mknumber(WEXITSTATUS(status));
   }
-  return l.error(error_errc::no_such_job, job);
+  return l.error(lips_errc::no_such_job, job);
 }
 
 LISPT bg(lisp& l, LISPT job)
@@ -748,7 +749,7 @@ LISPT bg(lisp& l, LISPT job)
     current->background = true;
     return T;
   }
-  return l.error(error_errc::no_such_job, job);
+  return l.error(lips_errc::no_such_job, job);
 }
 
 LISPT setenv(lisp& l, LISPT var, LISPT val)
@@ -783,7 +784,7 @@ LISPT cd(lisp& l, LISPT dir, LISPT emess)
   if(is_NIL(ndir))
   {
     if(is_NIL(emess))
-      return l.error(error_errc::no_match, dir);
+      return l.error(lips_errc::no_match, dir);
     return NIL;
   }
   if(chdir(ndir->getstr().c_str()) == -1)

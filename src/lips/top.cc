@@ -22,6 +22,7 @@
 #include <lisp/lisp.hh>
 #include "main.hh"
 #include "top.hh"
+#include "lips_error.hh"
 
 using namespace lisp;
 
@@ -274,7 +275,7 @@ LISPT top::rmexcl(lisp& l, LISPT stream)
         }
         return NIL;
       }
-      l.error(error_errc::event_not_found, at);
+      l.error(lips_errc::event_not_found, at);
       return NIL;
   }
   return NIL;

@@ -118,35 +118,20 @@ inline std::error_condition make_error_condition(type_errc e)
 
 enum class error_errc
 {
-  no_message = 1,
-  illegal_arg,
-  divide_zero,
-  bug,
-  no_match,
-  cant_create,
-  cant_create_open,
+  attempt_to_clobber = 1,
+  cant_load,
   cant_open,
-  no_such_job,
-  not_printable,
-  no_directory,
-  no_user,
-  attempt_to_clobber,
-  out_of_memory,
-  unexpected_eof,
-  event_not_found,
-  unknown_request,
-  illegal_signal,
-  stack_overflow,
   corrupt_data,
-  command_aborted,
-  alias_loop,
+  divide_by_zero,
+  illegal_arg,
   illegal_function,
-  undef_function,
-  unbound_variable,
   kbd_break,
-  ambiguous,
-  user_error,
-  cant_load
+  no_message,
+  stack_overflow,
+  unbound_variable,
+  undef_function,
+  unknown_request,
+  user_error
 };
 
 class error_category : public std::error_category
@@ -157,64 +142,34 @@ public:
   {
     switch(static_cast<error_errc>(condition))
     {
-      case error_errc::no_message:
-        return "";
-      case error_errc::illegal_arg:
-        return "Illegal argument";
-      case error_errc::divide_zero:
-        return "Divide by zero";
-      case error_errc::bug:
-        return "Internal bug";
-      case error_errc::no_match:
-        return "No match for";
-      case error_errc::cant_create:
-        return "Can't create file";
-      case error_errc::cant_create_open:
-        return "Can't create or open file";
-      case error_errc::cant_open:
-        return "Can't open file";
-      case error_errc::no_such_job:
-        return "No such job";
-      case error_errc::not_printable:
-        return "Not printable";
-      case error_errc::no_directory:
-        return "No directory";
-      case error_errc::no_user:
-        return "No such user";
       case error_errc::attempt_to_clobber:
         return "Attempt to clobber constant";
-      case error_errc::out_of_memory:
-        return "Out of memory";
-      case error_errc::unexpected_eof:
-        return "Unexpected end of file";
-      case error_errc::event_not_found:
-        return "Event not found";
-      case error_errc::unknown_request:
-        return "Unknown request";
-      case error_errc::illegal_signal:
-        return "Illegal signal";
-      case error_errc::stack_overflow:
-        return "Stack overflow";
-      case error_errc::corrupt_data:
-        return "Bug: corrupt data";
-      case error_errc::command_aborted:
-        return "Command aborted";
-      case error_errc::alias_loop:
-        return "Alias loop";
-      case error_errc::illegal_function:
-        return "Illegal function";
-      case error_errc::undef_function:
-        return "Undefined function";
-      case error_errc::unbound_variable:
-        return "Unbound variable";
-      case error_errc::kbd_break:
-        return "Break";
-      case error_errc::ambiguous:
-        return "Ambiguous";
-      case error_errc::user_error:
-        return "User error";
       case error_errc::cant_load:
         return "Can't load file";
+      case error_errc::cant_open:
+        return "Can't open file";
+      case error_errc::corrupt_data:
+        return "Bug: corrupt data";
+      case error_errc::divide_by_zero:
+        return "Divide by zero";
+      case error_errc::illegal_arg:
+        return "Illegal argument";
+      case error_errc::illegal_function:
+        return "Illegal function";
+      case error_errc::kbd_break:
+        return "Break";
+      case error_errc::no_message:
+        return "No message";
+      case error_errc::stack_overflow:
+        return "Stack overflow";
+      case error_errc::unbound_variable:
+        return "Unbound variable";
+      case error_errc::undef_function:
+        return "Undefined function";
+      case error_errc::unknown_request:
+        return "Unknown request";
+      case error_errc::user_error:
+        return "User error";
     }
   }
   static const std::error_category& category()

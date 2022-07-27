@@ -185,23 +185,23 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
     if(type_of(y) == type::INTEGER)
     {
       if(y->intval() == 0)
-        l.error(error_errc::divide_zero, NIL);
+        l.error(error_errc::divide_by_zero, NIL);
       return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        l.error(error_errc::divide_zero, NIL);
+        l.error(error_errc::divide_by_zero, NIL);
       return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::INTEGER)
   {
     if(y->intval() == 0)
-      l.error(error_errc::divide_zero, NIL);
+      l.error(error_errc::divide_by_zero, NIL);
     return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    l.error(error_errc::divide_zero, NIL);
+    l.error(error_errc::divide_by_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -210,7 +210,7 @@ LISPT iquotient(lisp& l, LISPT x, LISPT y)
   check(x, type::INTEGER);
   check(y, type::INTEGER);
   if(y->intval() == 0)
-    l.error(error_errc::divide_zero, NIL);
+    l.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() / y->intval());
 }
 
@@ -219,7 +219,7 @@ LISPT iremainder(lisp& l, LISPT x, LISPT y)
   check(x, type::INTEGER);
   check(y, type::INTEGER);
   if(y->intval() == 0)
-    l.error(error_errc::divide_zero, NIL);
+    l.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() % y->intval());
 }
 
@@ -228,7 +228,7 @@ LISPT fdivide(lisp& l, LISPT x, LISPT y)
   check(x, type::FLOAT);
   check(y, type::FLOAT);
   if(y->floatval() == 0.0)
-    l.error(error_errc::divide_zero, NIL);
+    l.error(error_errc::divide_by_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
