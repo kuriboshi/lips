@@ -455,7 +455,7 @@ int execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -491,7 +491,7 @@ LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -527,7 +527,7 @@ LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -563,7 +563,7 @@ LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT pipecmd(lisp& l, LISPT cmds)
+LISPT pipecmd(context& l, LISPT cmds)
 {
   print(cmds);
 
@@ -611,7 +611,7 @@ LISPT pipecmd(lisp& l, LISPT cmds)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT back(lisp& l, LISPT x)
+LISPT back(context& l, LISPT x)
 {
   int pid = 0;
 
@@ -630,13 +630,13 @@ LISPT back(lisp& l, LISPT x)
   return mknumber(pid);
 }
 
-LISPT stop(lisp& l)
+LISPT stop(context& l)
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-LISPT rehash(lisp&)
+LISPT rehash(context&)
 {
   do_rehash();
   return NIL;
@@ -658,14 +658,14 @@ void do_rehash()
   }
 }
 
-LISPT jobs(lisp& l)
+LISPT jobs(context& l)
 {
   for(const auto& job: joblist)
     printjob(job);
   return NIL;
 }
 
-LISPT fg(lisp& l, LISPT job)
+LISPT fg(context& l, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -709,7 +709,7 @@ LISPT fg(lisp& l, LISPT job)
   return l.error(lips_errc::no_such_job, job);
 }
 
-LISPT bg(lisp& l, LISPT job)
+LISPT bg(context& l, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -752,7 +752,7 @@ LISPT bg(lisp& l, LISPT job)
   return l.error(lips_errc::no_such_job, job);
 }
 
-LISPT setenv(lisp& l, LISPT var, LISPT val)
+LISPT setenv(context& l, LISPT var, LISPT val)
 {
   check(var, type::String, type::Symbol);
   check(val, type::String, type::Symbol);
@@ -760,7 +760,7 @@ LISPT setenv(lisp& l, LISPT var, LISPT val)
   return var;
 }
 
-LISPT getenviron(lisp& l, LISPT var)
+LISPT getenviron(context& l, LISPT var)
 {
   check(var, type::String, type::Symbol);
   char* s = getenv(var->getstr().c_str());
@@ -769,7 +769,7 @@ LISPT getenviron(lisp& l, LISPT var)
   return mkstring(s);
 }
 
-LISPT cd(lisp& l, LISPT dir, LISPT emess)
+LISPT cd(context& l, LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -798,7 +798,7 @@ LISPT cd(lisp& l, LISPT dir, LISPT emess)
   return T;
 }
 
-LISPT doexec(lisp& l, LISPT cmd)
+LISPT doexec(context& l, LISPT cmd)
 {
   LISPT res;
 

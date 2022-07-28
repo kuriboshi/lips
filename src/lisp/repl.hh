@@ -26,7 +26,7 @@ namespace lisp
 class repl
 {
 public:
-  repl(lisp&);
+  repl(context&);
   ~repl() = default;
 
   class level
@@ -46,7 +46,7 @@ public:
   LISPT operator()(LISPT);
 
 private:
-  lisp& l;
+  context& _ctx;
   int _level = 0;
   LISPT _prompt;
   LISPT _break_prompt;

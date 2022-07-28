@@ -23,7 +23,7 @@ namespace lisp
 
 TEST_CASE("user: User defined functions")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   SECTION("defineq")
   {
     auto f0 = mklist(mklist(mkatom("f0"), lambda(mklist(mkatom("a")), mklist(mkatom("a")))),
@@ -61,9 +61,9 @@ TEST_CASE("user: User defined functions")
 
   SECTION("Verbose flag")
   {
-    CHECK(is_NIL(l.verbose()));
+    CHECK(is_NIL(ctx.verbose()));
     eval("(setq verbose t)");
-    CHECK(is_T(l.verbose()));
+    CHECK(is_T(ctx.verbose()));
   }
 
   SECTION("Redefine function")
@@ -74,13 +74,13 @@ TEST_CASE("user: User defined functions")
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(is_NIL(redef0));
     std::ostringstream cout;
-    auto old = l.primout(ref_file_t::create(cout));
+    auto old = ctx.primout(ref_file_t::create(cout));
     eval("(setq verbose t)");
     auto f1 = define(mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
     auto redef1 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(!is_NIL(redef1));
     CHECK(cout.str() == "(f redefined)\n");
-    l.primout(old);
+    ctx.primout(old);
   }
 }
 

@@ -23,7 +23,6 @@ namespace lisp
 
 TEST_CASE("Map functions")
 {
-  auto& l = lisp::current();
   SECTION("map")
   {
     auto& cvar = initcvar("cvar", NIL);

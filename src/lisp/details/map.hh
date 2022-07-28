@@ -25,10 +25,10 @@ namespace lisp::details::map
 
 void init();
 
-LISPT map(lisp&, LISPT, LISPT, LISPT);
-LISPT mapc(lisp&, LISPT, LISPT, LISPT);
-LISPT maplist(lisp&, LISPT, LISPT, LISPT);
-LISPT mapcar(lisp&, LISPT, LISPT, LISPT);
+LISPT map(context&, LISPT, LISPT, LISPT);
+LISPT mapc(context&, LISPT, LISPT, LISPT);
+LISPT maplist(context&, LISPT, LISPT, LISPT);
+LISPT mapcar(context&, LISPT, LISPT, LISPT);
 
 } // namespace lisp::details::map
 

@@ -24,23 +24,23 @@ namespace lisp
 
 TEST_CASE("Interactive tests")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   std::ostringstream cout;
-  auto oldout = l.primout(ref_file_t::create(cout));
+  auto oldout = ctx.primout(ref_file_t::create(cout));
 
   std::ostringstream cerr;
-  auto olderr = l.primerr(ref_file_t::create(cerr));
+  auto olderr = ctx.primerr(ref_file_t::create(cerr));
 
   SECTION("Simple repl")
   {
-    auto old = l.primin(ref_file_t::create(R"((print "hello"))"));
-    repl repl(l);
+    auto old = ctx.primin(ref_file_t::create(R"((print "hello"))"));
+    repl repl(ctx);
     repl(NIL);
     std::string expected = R"(> "hello"
 "hello"
 > )";
     CHECK(cout.str() == expected);
-    l.primin(old);
+    ctx.primin(old);
   }
 
   SECTION("Example interaction")
@@ -50,15 +50,15 @@ TEST_CASE("Interactive tests")
 (setq a 100)
 a
 )";
-    auto old = l.primin(ref_file_t::create(is));
-    repl repl(l);
+    auto old = ctx.primin(ref_file_t::create(is));
+    repl repl(ctx);
     repl(NIL);
     std::string expected = R"(> nil
 > 100
 > 100
 > )";
     CHECK(cout.str() == expected);
-    l.primin(old);
+    ctx.primin(old);
   }
 
   SECTION("Break repl (reset)")
@@ -66,9 +66,9 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
 )";
-    auto old = l.primin(ref_file_t::create(is));
-    repl repl(l);
-    l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+    auto old = ctx.primin(ref_file_t::create(is));
+    repl repl(ctx);
+    ctx.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
@@ -76,7 +76,7 @@ a
     std::string expected_out = R"(> : )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    l.primin(old);
+    ctx.primin(old);
   }
 
   SECTION("Break repl (bt)")
@@ -85,9 +85,9 @@ a
 (bt)
 (reset)
 )";
-    auto old = l.primin(ref_file_t::create(is));
-    repl repl(l);
-    l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+    auto old = ctx.primin(ref_file_t::create(is));
+    repl repl(ctx);
+    ctx.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     CHECK_THROWS(repl(NIL));
     // Backtrace sets the print level to 2 which is why the '&' is printed
     // representing a deeper level.
@@ -99,7 +99,7 @@ a
     std::string expected_out = R"(> : : )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    l.primin(old);
+    ctx.primin(old);
   }
 
   SECTION("Break repl (return)")
@@ -107,9 +107,9 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (return "hello")
 )";
-    auto old = l.primin(ref_file_t::create(is));
-    repl repl(l);
-    l.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+    auto old = ctx.primin(ref_file_t::create(is));
+    repl repl(ctx);
+    ctx.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
     repl(NIL);
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
@@ -118,10 +118,10 @@ a
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    l.primin(old);
+    ctx.primin(old);
   }
-  l.primerr(olderr);
-  l.primout(oldout);
+  ctx.primerr(olderr);
+  ctx.primout(oldout);
 }
 
 } // namespace lisp

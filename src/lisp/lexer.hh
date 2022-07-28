@@ -172,12 +172,12 @@ class lexer
 {
 public:
   lexer(ref_file_t input)
-    : _lisp(lisp::current()),
+    : _ctx(context::current()),
       _input(input),
       _pos(_input->source().begin())
   {}
   lexer(std::string s)
-    : _lisp(lisp::current()),
+    : _ctx(context::current()),
       _input(ref_file_t::create(s)),
       _pos(_input->source().begin())
   {}
@@ -185,13 +185,13 @@ public:
   token_t read();
   void unread(token_t);
   // Syntax table member functions.
-  syntax::type get(std::uint8_t index) const { return _lisp.read_table().get(index); }
-  void set(std::uint8_t index, syntax::type value) { _lisp.read_table().set(index, value); }
-  void set(std::uint8_t index, LISPT value) { _lisp.read_table().set(index, value); }
-  LISPT macro(token_t token) { return _lisp.read_table().macro(_lisp, _input, token.token[0]); }
+  syntax::type get(std::uint8_t index) const { return _ctx.read_table().get(index); }
+  void set(std::uint8_t index, syntax::type value) { _ctx.read_table().set(index, value); }
+  void set(std::uint8_t index, LISPT value) { _ctx.read_table().set(index, value); }
+  LISPT macro(token_t token) { return _ctx.read_table().macro(_ctx, _input, token.token[0]); }
 
 private:
-  lisp& _lisp;
+  context& _ctx;
   ref_file_t _input;
   typename io::source::iterator _pos;
   token_t _token;
@@ -199,7 +199,7 @@ private:
 
   void next()
   {
-    _start_of_line = _lisp.read_table().get(*_pos) == syntax::type::NEWLINE;
+    _start_of_line = _ctx.read_table().get(*_pos) == syntax::type::NEWLINE;
     ++_pos;
   }
 

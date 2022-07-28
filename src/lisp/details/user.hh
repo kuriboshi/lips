@@ -25,10 +25,10 @@ namespace lisp::details::user
 
 void init();
 
-LISPT getrep(lisp&, LISPT);
-LISPT define(lisp&, LISPT, LISPT);
-LISPT defineq(lisp&, LISPT);
-LISPT funeq(lisp&, LISPT, LISPT);
+LISPT getrep(context&, LISPT);
+LISPT define(context&, LISPT, LISPT);
+LISPT defineq(context&, LISPT);
+LISPT funeq(context&, LISPT, LISPT);
 
 } // namespace lisp::details::user
 

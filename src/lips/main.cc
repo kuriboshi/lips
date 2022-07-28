@@ -78,7 +78,7 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT transform(::lisp::lisp& l, LISPT list)
+LISPT transform(::lisp::context& l, LISPT list)
 {
   LISPT tl = NIL;
   LISPT res = NIL;
@@ -170,14 +170,14 @@ void onbreak()
     exit(1);
 }
 
-std::unique_ptr<::lisp::lisp> init()
+std::unique_ptr<::lisp::context> init()
 {
   signal(SIGTTIN, SIG_IGN); // NOLINT
   signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back NOLINT
 
   fixpgrp();
 
-  auto l = std::make_unique<::lisp::lisp>();
+  auto l = std::make_unique<::lisp::context>();
 
   C_ALIAS = alloc::intern("alias");
   C_AMPER = alloc::intern("&");

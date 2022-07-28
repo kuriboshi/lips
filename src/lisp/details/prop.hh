@@ -25,11 +25,11 @@ namespace lisp::details::prop
 
 void init();
 
-LISPT getplist(lisp&, LISPT);
-LISPT getprop(lisp&, LISPT, LISPT);
-LISPT putprop(lisp&, LISPT, LISPT, LISPT);
-LISPT remprop(lisp&, LISPT, LISPT);
-LISPT setplist(lisp&, LISPT, LISPT);
+LISPT getplist(context&, LISPT);
+LISPT getprop(context&, LISPT, LISPT);
+LISPT putprop(context&, LISPT, LISPT, LISPT);
+LISPT remprop(context&, LISPT, LISPT);
+LISPT setplist(context&, LISPT, LISPT);
 
 } // namespace lisp::details::prop
 

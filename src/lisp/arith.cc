@@ -26,7 +26,7 @@ namespace lisp::details::arith
 // generic function results in a float.
 //
 
-LISPT plus(lisp& l, LISPT x)
+LISPT plus(context& ctx, LISPT x)
 {
   double fsum = 0.0;
   int sum = 0;
@@ -41,7 +41,7 @@ LISPT plus(lisp& l, LISPT x)
       else if(type_of(x->car()) == type::Float)
         fsum += x->car()->floatval();
       else
-        l.error(error_errc::illegal_arg, x->car());
+        ctx.error(error_errc::illegal_arg, x->car());
     }
     else
     {
@@ -53,7 +53,7 @@ LISPT plus(lisp& l, LISPT x)
         fsum = x->car()->floatval() + static_cast<double>(sum);
       }
       else
-        l.error(error_errc::illegal_arg, x->car());
+        ctx.error(error_errc::illegal_arg, x->car());
     }
     x = x->cdr();
   }
@@ -62,7 +62,7 @@ LISPT plus(lisp& l, LISPT x)
   return mknumber(sum);
 }
 
-LISPT iplus(lisp& l, LISPT x)
+LISPT iplus(context& ctx, LISPT x)
 {
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
@@ -73,7 +73,7 @@ LISPT iplus(lisp& l, LISPT x)
   return mknumber(sum);
 }
 
-LISPT fplus(lisp& l, LISPT x)
+LISPT fplus(context& ctx, LISPT x)
 {
   check(x->car(), type::Float);
   auto fsum = x->car()->floatval();
@@ -87,7 +87,7 @@ LISPT fplus(lisp& l, LISPT x)
   return mkfloat(fsum);
 }
 
-LISPT difference(lisp& l, LISPT x, LISPT y)
+LISPT difference(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -102,21 +102,21 @@ LISPT difference(lisp& l, LISPT x, LISPT y)
   return mkfloat(x->floatval() - y->floatval());
 }
 
-LISPT idifference(lisp& l, LISPT x, LISPT y)
+LISPT idifference(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   return mknumber(x->intval() - y->intval());
 }
 
-LISPT fdifference(lisp& l, LISPT x, LISPT y)
+LISPT fdifference(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Float);
   check(y, type::Float);
   return mkfloat(x->floatval() - y->floatval());
 }
 
-LISPT ltimes(lisp& l, LISPT x)
+LISPT ltimes(context& ctx, LISPT x)
 {
   double fprod = 1.0;
   int prod = 1;
@@ -131,7 +131,7 @@ LISPT ltimes(lisp& l, LISPT x)
       else if(type_of(x->car()) == type::Float)
         fprod *= x->car()->floatval();
       else
-        l.error(error_errc::illegal_arg, x->car());
+        ctx.error(error_errc::illegal_arg, x->car());
     }
     else if(type_of(x->car()) == type::Integer)
       prod *= x->car()->intval();
@@ -141,7 +141,7 @@ LISPT ltimes(lisp& l, LISPT x)
       fprod = x->car()->floatval() * (double)prod;
     }
     else
-      l.error(error_errc::illegal_arg, x->car());
+      ctx.error(error_errc::illegal_arg, x->car());
     x = x->cdr();
   }
   if(f != 0)
@@ -149,7 +149,7 @@ LISPT ltimes(lisp& l, LISPT x)
   return mknumber(prod);
 }
 
-LISPT itimes(lisp& l, LISPT x)
+LISPT itimes(context& ctx, LISPT x)
 {
   check(x->car(), type::Integer);
   auto prod = x->car()->intval();
@@ -163,7 +163,7 @@ LISPT itimes(lisp& l, LISPT x)
   return mknumber(prod);
 }
 
-LISPT ftimes(lisp& l, LISPT x)
+LISPT ftimes(context& ctx, LISPT x)
 {
   check(x->car(), type::Float);
   auto prod = x->car()->floatval();
@@ -177,7 +177,7 @@ LISPT ftimes(lisp& l, LISPT x)
   return mkfloat(prod);
 }
 
-LISPT divide(lisp& l, LISPT x, LISPT y)
+LISPT divide(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -185,54 +185,54 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
     if(type_of(y) == type::Integer)
     {
       if(y->intval() == 0)
-        l.error(error_errc::divide_by_zero, NIL);
+        ctx.error(error_errc::divide_by_zero, NIL);
       return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        l.error(error_errc::divide_by_zero, NIL);
+        ctx.error(error_errc::divide_by_zero, NIL);
       return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::Integer)
   {
     if(y->intval() == 0)
-      l.error(error_errc::divide_by_zero, NIL);
+      ctx.error(error_errc::divide_by_zero, NIL);
     return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    l.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
-LISPT iquotient(lisp& l, LISPT x, LISPT y)
+LISPT iquotient(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    l.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() / y->intval());
 }
 
-LISPT iremainder(lisp& l, LISPT x, LISPT y)
+LISPT iremainder(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    l.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() % y->intval());
 }
 
-LISPT fdivide(lisp& l, LISPT x, LISPT y)
+LISPT fdivide(context& ctx, LISPT x, LISPT y)
 {
   check(x, type::Float);
   check(y, type::Float);
   if(y->floatval() == 0.0)
-    l.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
 }
 
-LISPT minus(lisp& l, LISPT x)
+LISPT minus(context& ctx, LISPT x)
 {
   check(x, type::Float, type::Integer);
   if(type_of(x) == type::Integer)
@@ -240,13 +240,13 @@ LISPT minus(lisp& l, LISPT x)
   return mkfloat(-x->floatval());
 }
 
-LISPT iminus(lisp& l, LISPT x)
+LISPT iminus(context& ctx, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(-x->intval());
 }
 
-LISPT abs(lisp& l, LISPT x)
+LISPT abs(context& ctx, LISPT x)
 {
   check(x, type::Integer);
   if(x->intval() < 0)
@@ -254,19 +254,19 @@ LISPT abs(lisp& l, LISPT x)
   return mknumber(x->intval());
 }
 
-LISPT itof(lisp& l, LISPT x)
+LISPT itof(context& ctx, LISPT x)
 {
   check(x, type::Integer);
   return mkfloat(static_cast<double>(x->intval()));
 }
 
-LISPT add1(lisp& l, LISPT x)
+LISPT add1(context& ctx, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() + 1);
 }
 
-LISPT sub1(lisp& l, LISPT x)
+LISPT sub1(context& ctx, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() - 1);
@@ -311,10 +311,10 @@ inline LISPT docheck(Type x, Type y, Comparor cmp)
   return NIL;
 }
 
-inline LISPT illegalreturn(lisp& l, LISPT x) { return l.error(error_errc::illegal_arg, x); }
+inline LISPT illegalreturn(context& ctx, LISPT x) { return ctx.error(error_errc::illegal_arg, x); }
 
 template<template<typename> typename Comparer>
-inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
+inline LISPT numcheck(context& ctx, LISPT x, LISPT y)
 {
   switch(numtype(x, y))
   {
@@ -327,32 +327,32 @@ inline LISPT numcheck(lisp& l, LISPT x, LISPT y)
     case num_type::INTINT:
       return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
-      return illegalreturn(l, x);
+      return illegalreturn(ctx, x);
     default:
-      return illegalreturn(l, y);
+      return illegalreturn(ctx, y);
   }
 }
 
-LISPT greaterp(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater>(l, x, y); }
+LISPT greaterp(context& ctx, LISPT x, LISPT y) { return numcheck<std::greater>(ctx, x, y); }
 
-LISPT lessp(lisp& l, LISPT x, LISPT y) { return numcheck<std::less>(l, x, y); }
+LISPT lessp(context& ctx, LISPT x, LISPT y) { return numcheck<std::less>(ctx, x, y); }
 
-LISPT eqp(lisp& l, LISPT x, LISPT y) { return numcheck<std::equal_to>(l, x, y); }
+LISPT eqp(context& ctx, LISPT x, LISPT y) { return numcheck<std::equal_to>(ctx, x, y); }
 
-LISPT geq(lisp& l, LISPT x, LISPT y) { return numcheck<std::greater_equal>(l, x, y); }
+LISPT geq(context& ctx, LISPT x, LISPT y) { return numcheck<std::greater_equal>(ctx, x, y); }
 
-LISPT leq(lisp& l, LISPT x, LISPT y) { return numcheck<std::less_equal>(l, x, y); }
+LISPT leq(context& ctx, LISPT x, LISPT y) { return numcheck<std::less_equal>(ctx, x, y); }
 
-LISPT neqp(lisp& l, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, x, y); }
+LISPT neqp(context& ctx, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(ctx, x, y); }
 
-LISPT zerop(lisp& l, LISPT x)
+LISPT zerop(context& ctx, LISPT x)
 {
   if(type_of(x) == type::Integer && x->intval() == 0)
     return T;
   return NIL;
 }
 
-LISPT minusp(lisp& l, LISPT x)
+LISPT minusp(context& ctx, LISPT x)
 {
   if(type_of(x) == type::Float)
   {
@@ -366,7 +366,7 @@ LISPT minusp(lisp& l, LISPT x)
       return T;
     return NIL;
   }
-  return l.error(error_errc::illegal_arg, x);
+  return ctx.error(error_errc::illegal_arg, x);
 }
 
 namespace pn

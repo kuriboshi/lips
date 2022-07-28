@@ -39,7 +39,7 @@ namespace lisp
 
 TEST_CASE("file: functions")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   SECTION("open and close")
   {
     create_test_file test("()");
@@ -77,7 +77,7 @@ TEST_CASE("file: functions")
 
   SECTION("load")
   {
-    lisp::current().loadpath(mklist(C_DOT));
+    context::current().loadpath(mklist(C_DOT));
     {
       create_test_file test("(setq a 1)\n");
       auto e0 = load(mkstring(test.file));
@@ -206,17 +206,17 @@ TEST_CASE("file: functions")
   {
     {
       std::ostringstream cout;
-      auto old = l.primout(ref_file_t::create(cout));
+      auto old = ctx.primout(ref_file_t::create(cout));
       spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
-      l.primout(old);
+      ctx.primout(old);
     }
     {
       std::ostringstream cout;
-      auto old = l.primout(ref_file_t::create(cout));
+      auto old = ctx.primout(ref_file_t::create(cout));
       spaces(8_l, NIL);
       CHECK(cout.str() == "        ");
-      l.primout(old);
+      ctx.primout(old);
     }
   }
 
@@ -244,7 +244,7 @@ TEST_CASE("file: functions")
 
   SECTION("loadfile")
   {
-    lisp::current().loadpath(mklist(C_DOT));
+    context::current().loadpath(mklist(C_DOT));
     create_test_file test("(setq a \"loadfile\")");
     {
       REQUIRE(loadfile(test.file));

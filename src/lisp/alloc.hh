@@ -66,19 +66,19 @@ LISPT mkfloat(double);
 ///
 /// @return The cons cell.
 ///
-LISPT cons(lisp&, LISPT, LISPT);
+LISPT cons(context&, LISPT, LISPT);
 
 /// @brief Build a list of symbols in the local symbol table.
 ///
 /// @return Returns a list of local symbols in no particular order.
 ///
-LISPT obarray(lisp&);
+LISPT obarray(context&);
 
 /// @brief Number of free cell in the free cell list.
 ///
 /// @return The number of free cells.
 ///
-inline LISPT freecount(lisp&) { return mknumber(static_cast<int>(lisp_t::freecount())); }
+inline LISPT freecount(context&) { return mknumber(static_cast<int>(lisp_t::freecount())); }
 
 /// @brief Make a lambda object.
 ///
@@ -148,9 +148,9 @@ inline LISPT mkstring(const std::string& s) { return alloc::mkstring(s); }
 inline LISPT mknumber(int i) { return alloc::mknumber(i); }
 inline LISPT mkfloat(double d) { return alloc::mkfloat(d); }
 
-inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(lisp::current(), a, b); }
-inline LISPT obarray() { return alloc::obarray(lisp::current()); }
-inline LISPT freecount() { return alloc::freecount(lisp::current()); }
+inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(context::current(), a, b); }
+inline LISPT obarray() { return alloc::obarray(context::current()); }
+inline LISPT freecount() { return alloc::freecount(context::current()); }
 
 inline LISPT intern(const std::string& s) { return alloc::intern(s); }
 inline LISPT mkatom(const std::string& s) { return alloc::mkatom(s); }

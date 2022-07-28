@@ -19,7 +19,7 @@
 
 namespace lisp::details::pred
 {
-LISPT numberp(lisp& l, LISPT a)
+LISPT numberp(context&, LISPT a)
 {
   switch(type_of(a))
   {
@@ -31,14 +31,14 @@ LISPT numberp(lisp& l, LISPT a)
   }
 }
 
-LISPT listp(lisp& l, LISPT a)
+LISPT listp(context&, LISPT a)
 {
   if(type_of(a) == type::Cons)
     return a;
   return NIL;
 }
 
-LISPT memb(lisp& l, LISPT x, LISPT ls)
+LISPT memb(context&, LISPT x, LISPT ls)
 {
   while(!eq(ls, NIL))
   {
@@ -49,7 +49,7 @@ LISPT memb(lisp& l, LISPT x, LISPT ls)
   return NIL;
 }
 
-LISPT equal(lisp& l, LISPT l1, LISPT l2)
+LISPT equal(context& ctx, LISPT l1, LISPT l2)
 {
   if(type_of(l1) != type_of(l2))
     return NIL;
@@ -60,15 +60,15 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
     case type::Cons:
       while(type_of(l1) == type_of(l2))
       {
-        if(pred::equal(l, l1->car(), l2->car()) != NIL)
-          return pred::equal(l, l1->cdr(), l2->cdr());
+        if(pred::equal(ctx, l1->car(), l2->car()) != NIL)
+          return pred::equal(ctx, l1->cdr(), l2->cdr());
         return NIL;
       }
     case type::String:
       return (l1->string() == l2->string()) ? T : NIL;
     case type::Lambda:
     case type::Nlambda:
-      return user::funeq(l, l1, l2);
+      return user::funeq(ctx, l1, l2);
     case type::Integer:
       return (l1->intval() == l2->intval() ? T : NIL);
     default:
@@ -77,7 +77,7 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
   return NIL;
 }
 
-LISPT nlistp(lisp& l, LISPT a)
+LISPT nlistp(context&, LISPT a)
 {
   if(a == NIL)
     return T;
@@ -86,14 +86,14 @@ LISPT nlistp(lisp& l, LISPT a)
   return NIL;
 }
 
-LISPT neq(lisp& l, LISPT a, LISPT b)
+LISPT neq(context&, LISPT a, LISPT b)
 {
   if(a != b)
     return T;
   return NIL;
 }
 
-LISPT boundp(lisp& l, LISPT a)
+LISPT boundp(context&, LISPT a)
 {
   if(type_of(a) != type::Symbol)
     return NIL;
@@ -102,14 +102,14 @@ LISPT boundp(lisp& l, LISPT a)
   return NIL;
 }
 
-LISPT litatom(lisp& l, LISPT a)
+LISPT litatom(context&, LISPT a)
 {
   if(type_of(a) == type::Symbol || type_of(a) == type::T)
     return T;
   return NIL;
 }
 
-LISPT xtypeof(lisp& l, LISPT a)
+LISPT xtypeof(context&, LISPT a)
 {
   switch(type_of(a))
   {

@@ -143,12 +143,12 @@ LISPT patom(LISPT x, file_t& file, bool esc)
   return x;
 }
 
-LISPT prinbody(lisp& l, LISPT x, file_t& file, bool esc)
+LISPT prinbody(context& ctx, LISPT x, file_t& file, bool esc)
 {
   auto i = x;
   for(;;)
   {
-    io::prin0(l, i->car(), file, esc);
+    io::prin0(ctx, i->car(), file, esc);
     if(is_NIL(i->cdr()))
       break;
     if(type_of(i->cdr()) == type::Cons)
@@ -161,28 +161,28 @@ LISPT prinbody(lisp& l, LISPT x, file_t& file, bool esc)
       file.putch(' ');
       file.putch('.');
       file.putch(' ');
-      io::prin0(l, i->cdr(), file, esc);
+      io::prin0(ctx, i->cdr(), file, esc);
       break;
     }
   }
   return x;
 }
 
-LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
+LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
     case type::Cons:
-      l.thisplevel++;
-      if(l.thisplevel <= l.printlevel || l.printlevel <= 0)
+      ctx.thisplevel++;
+      if(ctx.thisplevel <= ctx.printlevel || ctx.printlevel <= 0)
       {
         file.putch('(');
-        io::prinbody(l, x, file, esc);
+        io::prinbody(ctx, x, file, esc);
         file.putch(')');
       }
       else
         file.putch('&');
-      l.thisplevel--;
+      ctx.thisplevel--;
       break;
     case type::Symbol:
       return io::patom(x, file, esc);
@@ -196,7 +196,7 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       file.putch('t');
       break;
     case type::Integer:
-      pi(x->intval(), l.currentbase()->intval(), file);
+      pi(x->intval(), ctx.currentbase()->intval(), file);
       break;
     case type::Float:
       pf(x->floatval(), file);
@@ -249,16 +249,16 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       break;
     default:
       ps("#<illegal type_of:", file, false);
-      pi(to_underlying(type_of(x)), l.currentbase()->intval(), file);
+      pi(to_underlying(type_of(x)), ctx.currentbase()->intval(), file);
       pp("", file, x);
   }
   return x;
 }
 
-LISPT print(lisp& l, LISPT x, file_t& file)
+LISPT print(context& ctx, LISPT x, file_t& file)
 {
-  l.thisplevel = 0;
-  io::prin0(l, x, file, true);
+  ctx.thisplevel = 0;
+  io::prin0(ctx, x, file, true);
   io::terpri(file);
   return x;
 }
@@ -294,7 +294,7 @@ LISPT terpri(file_t& file)
 /// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
 /// car of x.
 ///
-LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
+LISPT splice(context& ctx, LISPT x, LISPT y, bool tailp)
 {
   check(x, type::Cons);
   if(is_NIL(y))

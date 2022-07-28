@@ -25,9 +25,9 @@ namespace lisp::details::logic
 
 void init();
 
-LISPT p_and(lisp&, LISPT);
-LISPT p_or(lisp&, LISPT);
-LISPT p_not(lisp&, LISPT);
+LISPT p_and(context&, LISPT);
+LISPT p_or(context&, LISPT);
+LISPT p_not(context&, LISPT);
 
 } // namespace lisp::details::logic
 

@@ -23,7 +23,7 @@
 namespace lisp::details::debug
 {
 
-LISPT evaltrace(lisp&, LISPT);
+LISPT evaltrace(context&, LISPT);
 void init();
 
 } // namespace lisp::details::debug

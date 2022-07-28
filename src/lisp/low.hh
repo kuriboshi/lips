@@ -23,13 +23,13 @@
 
 namespace lisp
 {
-inline LISPT cond(LISPT a) { return details::low::cond(lisp::current(), a); }
-inline LISPT prog1(LISPT a, LISPT b) { return details::low::prog1(lisp::current(), a, b); }
-inline LISPT progn(LISPT a) { return details::low::progn(lisp::current(), a); }
-inline LISPT set(LISPT a, LISPT b) { return details::low::set(lisp::current(), a, b); }
-inline LISPT setq(LISPT a, LISPT b) { return details::low::setq(lisp::current(), a, b); }
-inline LISPT setqq(LISPT a, LISPT b) { return details::low::set(lisp::current(), a, b); }
-inline LISPT xwhile(LISPT a, LISPT b) { return details::low::xwhile(lisp::current(), a, b); }
+inline LISPT cond(LISPT a) { return details::low::cond(context::current(), a); }
+inline LISPT prog1(LISPT a, LISPT b) { return details::low::prog1(context::current(), a, b); }
+inline LISPT progn(LISPT a) { return details::low::progn(context::current(), a); }
+inline LISPT set(LISPT a, LISPT b) { return details::low::set(context::current(), a, b); }
+inline LISPT setq(LISPT a, LISPT b) { return details::low::setq(context::current(), a, b); }
+inline LISPT setqq(LISPT a, LISPT b) { return details::low::set(context::current(), a, b); }
+inline LISPT xwhile(LISPT a, LISPT b) { return details::low::xwhile(context::current(), a, b); }
 } // namespace lisp
 
 #endif

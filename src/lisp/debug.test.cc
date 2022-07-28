@@ -23,14 +23,14 @@ namespace lisp
 
 TEST_CASE("Debug functions")
 {
-  auto& l = lisp::current();
-  auto t = l.e().trace();
+  auto& ctx = context::current();
+  auto t = ctx.e().trace();
   CHECK(t == 0);
   evaltrace(mknumber(1));
-  t = l.e().trace();
+  t = ctx.e().trace();
   CHECK(t == 1);
   evaltrace(mknumber(0));
-  t = l.e().trace();
+  t = ctx.e().trace();
   CHECK(t == 0);
 }
 

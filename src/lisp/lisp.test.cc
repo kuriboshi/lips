@@ -54,7 +54,7 @@ TEST_CASE("lisp: mkprim")
     std::vector<int> result;
     mkprim(
       "printall",
-      [&result](lisp& l, LISPT a) -> LISPT {
+      [&result](context&, LISPT a) -> LISPT {
         for(auto p: a)
         {
           result.push_back(p->intval());
@@ -71,7 +71,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-                        "plus", [](lisp& l) -> LISPT { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+                        "plus", [](context&) -> LISPT { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "redefinition of subr not allowed");
   }
 }
@@ -92,7 +92,7 @@ TEST_CASE("lisp: type_of")
 
 TEST_CASE("lisp: version")
 {
-  auto version = lisp::current().version();
+  auto version = context::current().version();
   CHECK(version == VERSION);
 }
 

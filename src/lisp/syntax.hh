@@ -82,7 +82,7 @@ public:
     set(index, type::MACRO);
     _macro[index] = value;
   }
-  LISPT macro(lisp& lisp, ref_file_t source, std::uint8_t index);
+  LISPT macro(context&, ref_file_t source, std::uint8_t index);
   /// @brief Reset read table to the defaults.
   void reset()
   {

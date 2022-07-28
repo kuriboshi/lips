@@ -111,13 +111,13 @@ TEST_CASE("eval: topofstack")
 
 TEST_CASE("eval: control limits")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   std::ostringstream err;
-  auto old = l.primerr(ref_file_t::create(err));
+  auto old = ctx.primerr(ref_file_t::create(err));
   "(defineq (f (lambda () (f))))"_e;
   CHECK_THROWS_WITH("(f)"_e, "abort");
   CHECK(err.str() == "Stack overflow [in f]\n");
-  l.primerr(old);
+  ctx.primerr(old);
 }
 
 } // namespace lisp

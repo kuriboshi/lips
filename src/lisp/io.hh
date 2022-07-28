@@ -34,12 +34,12 @@ LISPT readline(ref_file_t);
 LISPT getline(LISPT);
 
 LISPT patom(LISPT, file_t&, bool esc = false);
-LISPT prinbody(lisp& l, LISPT, file_t&, bool esc = false);
-LISPT prin0(lisp& l, LISPT, file_t&, bool esc = false);
-LISPT print(lisp& l, LISPT, file_t&);
+LISPT prinbody(context&, LISPT, file_t&, bool esc = false);
+LISPT prin0(context&, LISPT, file_t&, bool esc = false);
+LISPT print(context&, LISPT, file_t&);
 LISPT terpri(file_t&);
 
-LISPT splice(lisp&, LISPT, LISPT, bool);
+LISPT splice(context&, LISPT, LISPT, bool);
 
 class source
 {
@@ -358,32 +358,32 @@ inline LISPT getline(LISPT f) { return io::getline(f); }
 inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io::patom(a, f, esc); }
 inline LISPT patom(LISPT a, bool out = false, bool esc = false)
 {
-  auto& l = lisp::current();
-  return io::patom(a, out ? *l.primerr() : *l.primout(), esc);
+  auto& ctx = context::current();
+  return io::patom(a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
 inline LISPT terpri(file_t& f) { return io::terpri(f); }
 inline LISPT terpri(bool out = false)
 {
-  auto& l = lisp::current();
-  return io::terpri(out ? *l.primerr() : *l.primout());
+  auto& ctx = context::current();
+  return io::terpri(out ? *ctx.primerr() : *ctx.primout());
 }
-inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io::prinbody(lisp::current(), a, f, esc); }
+inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io::prinbody(context::current(), a, f, esc); }
 inline LISPT prinbody(LISPT a, bool out = false, bool esc = false)
 {
-  auto& l = lisp::current();
-  return io::prinbody(l, a, out ? *l.primerr() : *l.primout(), esc);
+  auto& ctx = context::current();
+  return io::prinbody(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io::prin0(lisp::current(), a, f, esc); }
+inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io::prin0(context::current(), a, f, esc); }
 inline LISPT prin0(LISPT a, bool out = false, bool esc = false)
 {
-  auto& l = lisp::current();
-  return io::prin0(l, a, out ? *l.primerr() : *l.primout(), esc);
+  auto& ctx = context::current();
+  return io::prin0(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline LISPT print(LISPT a, file_t& f) { return io::print(lisp::current(), a, f); }
+inline LISPT print(LISPT a, file_t& f) { return io::print(context::current(), a, f); }
 inline LISPT print(LISPT a, bool out = false)
 {
-  auto& l = lisp::current();
-  return io::print(l, a, out ? *l.primerr() : *l.primout());
+  auto& ctx = context::current();
+  return io::print(ctx, a, out ? *ctx.primerr() : *ctx.primout());
 }
 
 template<typename T>

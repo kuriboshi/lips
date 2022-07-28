@@ -25,36 +25,36 @@ namespace lisp::exec
 {
 void init();
 
-LISPT redir_to(lisp&, LISPT cmd, LISPT file, LISPT filed);
-LISPT redir_append(lisp&, LISPT cmd, LISPT file, LISPT filed);
-LISPT redir_from(lisp&, LISPT cmd, LISPT file, LISPT filed);
-LISPT pipecmd(lisp&, LISPT cmds);
-LISPT back(lisp&, LISPT x);
-LISPT stop(lisp&);
-LISPT jobs(lisp&);
-LISPT fg(lisp&, LISPT job);
-LISPT bg(lisp&, LISPT job);
-LISPT setenv(lisp&, LISPT var, LISPT val);
-LISPT getenviron(lisp&, LISPT var);
-LISPT cd(lisp&, LISPT dir, LISPT emess);
-LISPT doexec(lisp&, LISPT cmd);
+LISPT redir_to(context&, LISPT cmd, LISPT file, LISPT filed);
+LISPT redir_append(context&, LISPT cmd, LISPT file, LISPT filed);
+LISPT redir_from(context&, LISPT cmd, LISPT file, LISPT filed);
+LISPT pipecmd(context&, LISPT cmds);
+LISPT back(context&, LISPT x);
+LISPT stop(context&);
+LISPT jobs(context&);
+LISPT fg(context&, LISPT job);
+LISPT bg(context&, LISPT job);
+LISPT setenv(context&, LISPT var, LISPT val);
+LISPT getenviron(context&, LISPT var);
+LISPT cd(context&, LISPT dir, LISPT emess);
+LISPT doexec(context&, LISPT cmd);
 
-LISPT rehash(lisp&);
+LISPT rehash(context&);
 void do_rehash();
 } // namespace lisp::exec
 
 namespace lisp
 {
-inline LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(l, cmd, file, filed); }
-inline LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
+inline LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(l, cmd, file, filed); }
+inline LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
 {
   return exec::redir_append(l, cmd, file, filed);
 }
-inline LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(l, cmd, file, filed); }
-inline LISPT pipecmd(lisp& l, LISPT cmds) { return exec::pipecmd(l, cmds); }
-inline LISPT back(lisp& l, LISPT x) { return exec::back(l, x); }
-inline LISPT stop(lisp& l) { return exec::stop(l); }
-inline LISPT rehash(lisp&)
+inline LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(l, cmd, file, filed); }
+inline LISPT pipecmd(context& l, LISPT cmds) { return exec::pipecmd(l, cmds); }
+inline LISPT back(context& l, LISPT x) { return exec::back(l, x); }
+inline LISPT stop(context& l) { return exec::stop(l); }
+inline LISPT rehash(context&)
 {
   exec::do_rehash();
   return NIL;
@@ -64,13 +64,13 @@ inline LISPT rehash()
   exec::do_rehash();
   return NIL;
 }
-inline LISPT jobs(lisp& l) { return exec::jobs(l); }
-inline LISPT fg(lisp& l, LISPT job) { return exec::fg(l, job); }
-inline LISPT bg(lisp& l, LISPT job) { return exec::bg(l, job); }
-inline LISPT setenv(lisp& l, LISPT var, LISPT val) { return exec::setenv(l, var, val); }
-inline LISPT getenviron(lisp& l, LISPT var) { return exec::getenviron(l, var); }
-inline LISPT cd(lisp& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess); }
-inline LISPT doexec(lisp& l, LISPT cmd) { return exec::doexec(l, cmd); }
+inline LISPT jobs(context& l) { return exec::jobs(l); }
+inline LISPT fg(context& l, LISPT job) { return exec::fg(l, job); }
+inline LISPT bg(context& l, LISPT job) { return exec::bg(l, job); }
+inline LISPT setenv(context& l, LISPT var, LISPT val) { return exec::setenv(l, var, val); }
+inline LISPT getenviron(context& l, LISPT var) { return exec::getenviron(l, var); }
+inline LISPT cd(context& l, LISPT dir, LISPT emess) { return exec::cd(l, dir, emess); }
+inline LISPT doexec(context& l, LISPT cmd) { return exec::doexec(l, cmd); }
 
 namespace pn
 {

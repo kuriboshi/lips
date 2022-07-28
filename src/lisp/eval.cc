@@ -21,8 +21,8 @@ using namespace std::literals;
 
 namespace lisp
 {
-evaluator::evaluator(lisp& lisp)
-  : _lisp(lisp)
+evaluator::evaluator(context& ctx)
+  : _ctx(ctx)
 {}
 
 void evaluator::reset()
@@ -51,14 +51,14 @@ LISPT evaluator::printwhere()
          lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
       {
         foo = *lsp;
-        _lisp.primerr()->format("[in ");
-        details::file::prin2(_lisp, foo->car(), T);
-        _lisp.primerr()->putch(']');
+        _ctx.primerr()->format("[in ");
+        details::file::prin2(_ctx, foo->car(), T);
+        _ctx.primerr()->putch(']');
         break;
       }
     }
   }
-  _lisp.primerr()->putch('\n');
+  _ctx.primerr()->putch('\n');
   return foo;
 }
 
@@ -66,7 +66,7 @@ LISPT evaluator::printwhere()
 /// level.
 void evaluator::abort(std::error_code error, LISPT v)
 {
-  _lisp.perror(error, v);
+  _ctx.perror(error, v);
   printwhere();
   unwind();
   throw lisp_error("abort");
@@ -80,14 +80,14 @@ void evaluator::xbreak(std::error_code code, LISPT fault, continuation_t next)
 {
   if(code)
   {
-    _lisp.perror(code, fault);
+    _ctx.perror(code, fault);
     printwhere();
   }
   if(_breakhook)
     _breakhook();
   if(_env == nullptr)
     throw lisp_reset();
-  details::file::print(_lisp, cons(fault, cons(C_BROKEN, NIL)), T);
+  details::file::print(_ctx, cons(fault, cons(C_BROKEN, NIL)), T);
   push(next);
   _cont = &evaluator::everr;
 }
@@ -121,13 +121,13 @@ LISPT evaluator::call(LISPT fun)
   switch(fun->subrval().argcount())
   {
     case 0:
-      return fun->subrval()(_lisp);
+      return fun->subrval()(_ctx);
     case 1:
-      return fun->subrval()(_lisp, _dest[1].val());
+      return fun->subrval()(_ctx, _dest[1].val());
     case 2:
-      return fun->subrval()(_lisp, _dest[2].val(), _dest[1].val());
+      return fun->subrval()(_ctx, _dest[2].val(), _dest[1].val());
     case 3:
-      return fun->subrval()(_lisp, _dest[3].val(), _dest[2].val(), _dest[1].val());
+      return fun->subrval()(_ctx, _dest[3].val(), _dest[2].val(), _dest[1].val());
   }
   return NIL;
 }
@@ -312,7 +312,7 @@ void evaluator::do_unbound(continuation_t continuation)
   {
     push(_expression);
     push(_dest);
-    details::file::load(_lisp, al);
+    details::file::load(_ctx, al);
     pop(_dest);
     pop(_expression);
     _fun = _expression->car()->value();
@@ -355,9 +355,9 @@ bool evaluator::do_default(continuation_t continuation)
 
 bool evaluator::peval1()
 {
-  if(_lisp.brkflg)
+  if(_ctx.brkflg)
     xbreak(error_errc::kbd_break, _fun, &evaluator::peval1);
-  else if(_lisp.interrupt)
+  else if(_ctx.interrupt)
     abort(error_errc::no_message, NIL);
   else
     switch(type_of(_fun))
@@ -420,7 +420,7 @@ bool evaluator::peval1()
 
 bool evaluator::peval2()
 {
-  if(_lisp.brkflg)
+  if(_ctx.brkflg)
     xbreak(error_errc::kbd_break, _fun, &evaluator::peval2);
   else
     switch(type_of(_fun))
@@ -473,14 +473,14 @@ bool evaluator::peval2()
 /// @brief Prints a backtrace of all expressions on the stack.
 void evaluator::bt()
 {
-  int op = _lisp.printlevel;
-  _lisp.printlevel = 2;
+  int op = _ctx.printlevel;
+  _ctx.printlevel = 2;
   for(int i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
-      details::file::print(_lisp, std::get<LISPT>(_control[i - 1]), T);
+      details::file::print(_ctx, std::get<LISPT>(_control[i - 1]), T);
   }
-  _lisp.printlevel = op;
+  _ctx.printlevel = op;
 }
 
 bool evaluator::everr()
@@ -873,7 +873,7 @@ LISPT evaluator::baktrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
-    _lisp.primerr()->format("{}: ", i);
+    _ctx.primerr()->format("{}: ", i);
     std::visit(
       // NOLINTNEXTLINE(readability-function-cognitive-complexity)
       [this](auto&& arg) {
@@ -896,73 +896,73 @@ LISPT evaluator::baktrace()
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
         {
           if(arg == &evaluator::ev0)
-            _lisp.primerr()->format("ev0\n");
+            _ctx.primerr()->format("ev0\n");
           else if(arg == &evaluator::peval)
-            _lisp.primerr()->format("peval\n");
+            _ctx.primerr()->format("peval\n");
           else if(arg == &evaluator::peval1)
-            _lisp.primerr()->format("peval1\n");
+            _ctx.primerr()->format("peval1\n");
           else if(arg == &evaluator::peval2)
-            _lisp.primerr()->format("peval2\n");
+            _ctx.primerr()->format("peval2\n");
           else if(arg == &evaluator::ev0)
-            _lisp.primerr()->format("ev0\n");
+            _ctx.primerr()->format("ev0\n");
           else if(arg == &evaluator::ev1)
-            _lisp.primerr()->format("ev1\n");
+            _ctx.primerr()->format("ev1\n");
           else if(arg == &evaluator::ev2)
-            _lisp.primerr()->format("ev2\n");
+            _ctx.primerr()->format("ev2\n");
           else if(arg == &evaluator::ev3)
-            _lisp.primerr()->format("ev3\n");
+            _ctx.primerr()->format("ev3\n");
           else if(arg == &evaluator::ev4)
-            _lisp.primerr()->format("ev4\n");
+            _ctx.primerr()->format("ev4\n");
           else if(arg == &evaluator::evlam0)
-            _lisp.primerr()->format("evlam0\n");
+            _ctx.primerr()->format("evlam0\n");
           else if(arg == &evaluator::evlam1)
-            _lisp.primerr()->format("evlam1\n");
+            _ctx.primerr()->format("evlam1\n");
           else if(arg == &evaluator::ev9)
-            _lisp.primerr()->format("ev9\n");
+            _ctx.primerr()->format("ev9\n");
           else if(arg == &evaluator::ev11)
-            _lisp.primerr()->format("ev11\n");
+            _ctx.primerr()->format("ev11\n");
           else if(arg == &evaluator::ev3p)
-            _lisp.primerr()->format("ev3p\n");
+            _ctx.primerr()->format("ev3p\n");
           else if(arg == &evaluator::evalargs)
-            _lisp.primerr()->format("evalargs\n");
+            _ctx.primerr()->format("evalargs\n");
           else if(arg == &evaluator::noevarg)
-            _lisp.primerr()->format("noevarg\n");
+            _ctx.primerr()->format("noevarg\n");
           else if(arg == &evaluator::evlam)
-            _lisp.primerr()->format("evlam\n");
+            _ctx.primerr()->format("evlam\n");
           else if(arg == &evaluator::spread)
-            _lisp.primerr()->format("spread\n");
+            _ctx.primerr()->format("spread\n");
           else if(arg == &evaluator::evlis)
-            _lisp.primerr()->format("evlis\n");
+            _ctx.primerr()->format("evlis\n");
           else if(arg == &evaluator::evlis1)
-            _lisp.primerr()->format("evlis1\n");
+            _ctx.primerr()->format("evlis1\n");
           else if(arg == &evaluator::evlis2)
-            _lisp.primerr()->format("evlis2\n");
+            _ctx.primerr()->format("evlis2\n");
           else if(arg == &evaluator::evlis3)
-            _lisp.primerr()->format("evlis3\n");
+            _ctx.primerr()->format("evlis3\n");
           else if(arg == &evaluator::evlis4)
-            _lisp.primerr()->format("evlis4\n");
+            _ctx.primerr()->format("evlis4\n");
           else if(arg == &evaluator::noev9)
-            _lisp.primerr()->format("noev9\n");
+            _ctx.primerr()->format("noev9\n");
           else if(arg == &evaluator::evsequence)
-            _lisp.primerr()->format("evsequence\n");
+            _ctx.primerr()->format("evsequence\n");
           else if(arg == &evaluator::evseq1)
-            _lisp.primerr()->format("evseq1\n");
+            _ctx.primerr()->format("evseq1\n");
           else if(arg == &evaluator::evseq3)
-            _lisp.primerr()->format("evseq3\n");
+            _ctx.primerr()->format("evseq3\n");
           else if(arg == &evaluator::evclosure)
-            _lisp.primerr()->format("evclosure\n");
+            _ctx.primerr()->format("evclosure\n");
           else if(arg == &evaluator::evclosure1)
-            _lisp.primerr()->format("evclosure1\n");
+            _ctx.primerr()->format("evclosure1\n");
           else if(arg == &evaluator::eval0)
-            _lisp.primerr()->format("eval0\n");
+            _ctx.primerr()->format("eval0\n");
           else if(arg == &evaluator::apply0)
-            _lisp.primerr()->format("apply0\n");
+            _ctx.primerr()->format("apply0\n");
           else if(arg == &evaluator::everr)
-            _lisp.primerr()->format("everr\n");
+            _ctx.primerr()->format("everr\n");
           else if(arg == &evaluator::lookup)
-            _lisp.primerr()->format("lookup\n");
+            _ctx.primerr()->format("lookup\n");
           else
-            _lisp.stderr()->format("Unknown control stack element\n");
+            _ctx.stderr()->format("Unknown control stack element\n");
         }
         else
           ; // Do nothing for monostate
@@ -976,7 +976,7 @@ LISPT evaluator::topofstack()
 {
   auto x = alloc::getobject();
   x->settype(type::Environ);
-  x->set(_lisp.e().environment());
+  x->set(_ctx.e().environment());
   return x;
 }
 

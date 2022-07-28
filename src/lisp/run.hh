@@ -25,21 +25,21 @@
 namespace lisp
 {
 
-inline int run(lisp& lisp, std::ostream& out = std::cout)
+inline int run(context& ctx, std::ostream& out = std::cout)
 {
-  repl repl(lisp);
-  lisp.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+  repl repl(ctx);
+  ctx.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
   while(true)
   {
     try
     {
-      lisp.repl(NIL);
+      ctx.repl(NIL);
       // If we return normally from repl we exit the program
       return 0;
     }
     catch(const lisp_reset& ex)
     {
-      lisp.e().reset();
+      ctx.e().reset();
     }
     catch(const lisp_error& ex)
     {

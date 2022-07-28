@@ -24,9 +24,9 @@
 namespace lisp
 {
 
-inline LISPT p_and(LISPT x) { return details::logic::p_and(lisp::current(), x); }
-inline LISPT p_or(LISPT x) { return details::logic::p_or(lisp::current(), x); }
-inline LISPT p_not(LISPT x) { return details::logic::p_not(lisp::current(), x); }
+inline LISPT p_and(LISPT x) { return details::logic::p_and(context::current(), x); }
+inline LISPT p_or(LISPT x) { return details::logic::p_or(context::current(), x); }
+inline LISPT p_not(LISPT x) { return details::logic::p_not(context::current(), x); }
 
 } // namespace lisp
 

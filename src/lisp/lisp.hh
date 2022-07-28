@@ -36,7 +36,7 @@
 namespace lisp
 {
 class syntax;
-class lisp;
+class context;
 class evaluator;
 class file_t;
 class lisp_t;
@@ -109,10 +109,10 @@ struct subr_t
     NOSPREAD
   };
 
-  using func0_t = std::function<LISPT(lisp&)>;
-  using func1_t = std::function<LISPT(lisp&, LISPT)>;
-  using func2_t = std::function<LISPT(lisp&, LISPT, LISPT)>;
-  using func3_t = std::function<LISPT(lisp&, LISPT, LISPT, LISPT)>;
+  using func0_t = std::function<LISPT(context&)>;
+  using func1_t = std::function<LISPT(context&, LISPT)>;
+  using func2_t = std::function<LISPT(context&, LISPT, LISPT)>;
+  using func3_t = std::function<LISPT(context&, LISPT, LISPT, LISPT)>;
 
   subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
     : name(pname),
@@ -140,10 +140,10 @@ struct subr_t
   {}
   constexpr std::size_t argcount() const noexcept { return f.index(); }
 
-  LISPT operator()(lisp& l) const { return std::get<func0_t>(f)(l); }
-  LISPT operator()(lisp& l, LISPT a) const { return std::get<func1_t>(f)(l, a); }
-  LISPT operator()(lisp& l, LISPT a, LISPT b) const { return std::get<func2_t>(f)(l, a, b); }
-  LISPT operator()(lisp& l, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(l, a, b, c); }
+  LISPT operator()(context& ctx) const { return std::get<func0_t>(f)(ctx); }
+  LISPT operator()(context& ctx, LISPT a) const { return std::get<func1_t>(f)(ctx, a); }
+  LISPT operator()(context& ctx, LISPT a, LISPT b) const { return std::get<func2_t>(f)(ctx, a, b); }
+  LISPT operator()(context& ctx, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(ctx, a, b, c); }
 
   std::string name;
   std::variant<func0_t, func1_t, func2_t, func3_t> f;
@@ -439,32 +439,25 @@ extern LISPT C_WRITE;
 extern LISPT C_APPEND;
 extern LISPT C_VERSION;
 
+/// @brief The lisp interpreter.
+///
 class context
 {
 public:
   context();
   ~context();
-};
-
-/// @brief The lisp interpreter.
-///
-class lisp
-{
-public:
-  lisp();
-  ~lisp();
   evaluator& e();
-  static lisp& current();
-  static void current(lisp&);
+  static context& current();
+  static void current(context&);
 
-  static LISPT eval(lisp& l, LISPT expr);
-  static LISPT apply(lisp& l, LISPT fun, LISPT args);
-  static LISPT baktrace(lisp& l);
-  static LISPT topofstack(lisp& l);
-  static LISPT destblock(lisp& l, LISPT a);
+  static LISPT eval(context&, LISPT expr);
+  static LISPT apply(context&, LISPT fun, LISPT args);
+  static LISPT baktrace(context&);
+  static LISPT topofstack(context&);
+  static LISPT destblock(context&, LISPT a);
 
-  static LISPT obarray(lisp& l);
-  static LISPT freecount(lisp& l);
+  static LISPT obarray(context&);
+  static LISPT freecount(context&);
 
   syntax& read_table();
   void read_table(std::unique_ptr<syntax>);
@@ -514,20 +507,20 @@ public:
 private:
   class impl;
   std::unique_ptr<impl> _pimpl;
-  static lisp* _current;
+  static context* _current;
 };
 
-inline LISPT perror(std::error_code code, LISPT a) { return lisp::current().perror(code, a); }
-inline LISPT error(std::error_code code, LISPT a) { return lisp::current().error(code, a); }
-inline LISPT syserr(LISPT a) { return lisp::current().syserr(a); }
-inline LISPT break0(LISPT a) { return lisp::current().break0(a); }
+inline LISPT perror(std::error_code code, LISPT a) { return context::current().perror(code, a); }
+inline LISPT error(std::error_code code, LISPT a) { return context::current().error(code, a); }
+inline LISPT syserr(LISPT a) { return context::current().syserr(a); }
+inline LISPT break0(LISPT a) { return context::current().break0(a); }
 
-inline LISPT eval(LISPT expr) { return lisp::eval(lisp::current(), expr); }
+inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }
 LISPT eval(const std::string& expr);
-inline LISPT apply(LISPT fun, LISPT args) { return lisp::apply(lisp::current(), fun, args); }
-inline LISPT baktrace() { return lisp::baktrace(lisp::current()); }
-inline LISPT topofstack() { return lisp::topofstack(lisp::current()); }
-inline LISPT destblock(LISPT a) { return lisp::destblock(lisp::current(), a); }
+inline LISPT apply(LISPT fun, LISPT args) { return context::apply(context::current(), fun, args); }
+inline LISPT baktrace() { return context::baktrace(context::current()); }
+inline LISPT topofstack() { return context::topofstack(context::current()); }
+inline LISPT destblock(LISPT a) { return context::destblock(context::current(), a); }
 } // namespace lisp
 
 #include "alloc.hh"
@@ -634,7 +627,7 @@ void check(LISPT arg, T type, Ts... types)
   check(arg, types...);
 }
 
-inline void break_flag(bool val) { lisp::current().brkflg = val; }
+inline void break_flag(bool val) { context::current().brkflg = val; }
 
 } // namespace lisp
 

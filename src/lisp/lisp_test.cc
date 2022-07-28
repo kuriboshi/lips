@@ -45,11 +45,11 @@ int main(int argc, const char** argv)
       | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
     session.cli(cli);
     session.applyCommandLine(argc, argv);
-    lisp::lisp lisp;
+    lisp::context ctx;
     if(!loadpath.empty())
     {
       auto path = buildpath(loadpath.begin(), loadpath.end());
-      lisp.loadpath(path);
+      ctx.loadpath(path);
     }
     for(auto i: load)
       lisp::loadfile(i);

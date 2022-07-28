@@ -24,21 +24,21 @@
 namespace lisp
 {
 
-inline LISPT close(LISPT a) { return details::file::close(lisp::current(), a); }
-inline LISPT load(LISPT a) { return details::file::load(lisp::current(), a); }
-inline LISPT open(LISPT a, LISPT b) { return details::file::open(lisp::current(), a, b); }
-inline LISPT prin1(LISPT a, LISPT b) { return details::file::prin1(lisp::current(), a, b); }
-inline LISPT prin2(LISPT a, LISPT b) { return details::file::prin2(lisp::current(), a, b); }
-inline LISPT print(LISPT a, LISPT b) { return details::file::print(lisp::current(), a, b); }
-inline LISPT printlevel(LISPT a) { return details::file::printlevel(lisp::current(), a); }
-inline LISPT ratom(LISPT a) { return details::file::ratom(lisp::current(), a); }
-inline LISPT read(LISPT a) { return details::file::read(lisp::current(), a); }
-inline LISPT readc(LISPT a) { return details::file::readc(lisp::current(), a); }
-inline LISPT readline(LISPT a) { return details::file::readline(lisp::current(), a); }
-inline LISPT spaces(LISPT a, LISPT b) { return details::file::spaces(lisp::current(), a, b); }
-inline LISPT terpri(LISPT a) { return details::file::terpri(lisp::current(), a); }
+inline LISPT close(LISPT a) { return details::file::close(context::current(), a); }
+inline LISPT load(LISPT a) { return details::file::load(context::current(), a); }
+inline LISPT open(LISPT a, LISPT b) { return details::file::open(context::current(), a, b); }
+inline LISPT prin1(LISPT a, LISPT b) { return details::file::prin1(context::current(), a, b); }
+inline LISPT prin2(LISPT a, LISPT b) { return details::file::prin2(context::current(), a, b); }
+inline LISPT print(LISPT a, LISPT b) { return details::file::print(context::current(), a, b); }
+inline LISPT printlevel(LISPT a) { return details::file::printlevel(context::current(), a); }
+inline LISPT ratom(LISPT a) { return details::file::ratom(context::current(), a); }
+inline LISPT read(LISPT a) { return details::file::read(context::current(), a); }
+inline LISPT readc(LISPT a) { return details::file::readc(context::current(), a); }
+inline LISPT readline(LISPT a) { return details::file::readline(context::current(), a); }
+inline LISPT spaces(LISPT a, LISPT b) { return details::file::spaces(context::current(), a, b); }
+inline LISPT terpri(LISPT a) { return details::file::terpri(context::current(), a); }
 
-inline bool loadfile(const std::string& filename) { return details::file::loadfile(lisp::current(), filename); }
+inline bool loadfile(const std::string& filename) { return details::file::loadfile(context::current(), filename); }
 
 } // namespace lisp
 

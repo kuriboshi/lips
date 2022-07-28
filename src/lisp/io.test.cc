@@ -39,11 +39,11 @@ namespace lisp
 
 TEST_CASE("io: Basic I/O")
 {
-  auto& l = lisp::current();
-  auto old = l.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
-  l.primout()->format("hello world {}", 123);
-  CHECK(to_string(l.primout()->sink()) == std::string("hello world 123"));
-  l.primout(old);
+  auto& ctx = context::current();
+  auto old = ctx.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
+  ctx.primout()->format("hello world {}", 123);
+  CHECK(to_string(ctx.primout()->sink()) == std::string("hello world 123"));
+  ctx.primout(old);
 }
 
 TEST_CASE("io: ratom")
@@ -273,44 +273,44 @@ TEST_CASE("io: sink")
 
 TEST_CASE("io: patom primout/primerr")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   {
     std::ostringstream out;
-    auto old = l.primout(ref_file_t::create(out));
+    auto old = ctx.primout(ref_file_t::create(out));
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
-    l.primout(old);
+    ctx.primout(old);
   }
   {
     std::ostringstream err;
-    auto old = l.primerr(ref_file_t::create(err));
+    auto old = ctx.primerr(ref_file_t::create(err));
     patom("bar"_a, true);
     terpri(true);
     CHECK(err.str() == "bar\n");
-    l.primerr(old);
+    ctx.primerr(old);
   }
   {
     std::ostringstream out;
-    auto old = l.primout(ref_file_t::create(out));
+    auto old = ctx.primout(ref_file_t::create(out));
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
-    l.primerr(old);
+    ctx.primerr(old);
   }
   {
     std::ostringstream err;
-    auto old = l.primerr(ref_file_t::create(err));
+    auto old = ctx.primerr(ref_file_t::create(err));
     patom("bar"_a, true);
     terpri(true);
     CHECK(err.str() == "bar\n");
-    l.primerr(old);
+    ctx.primerr(old);
   }
 }
 
 TEST_CASE("io: prinbody")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   auto list = "(a b c . d)"_l;
   {
     std::ostringstream os;
@@ -326,31 +326,31 @@ TEST_CASE("io: prinbody")
   }
   {
     std::ostringstream os;
-    auto old = l.primout(ref_file_t::create(os));
+    auto old = ctx.primout(ref_file_t::create(os));
     prinbody(list, false);
     CHECK(os.str() == "a b c . d");
-    l.primout(old);
+    ctx.primout(old);
   }
   {
     std::ostringstream os;
-    auto old = l.primerr(ref_file_t::create(os));
+    auto old = ctx.primerr(ref_file_t::create(os));
     prinbody(list, true);
     CHECK(os.str() == "a b c . d");
-    l.primerr(old);
+    ctx.primerr(old);
   }
   {
     std::ostringstream os;
-    auto old = l.primout(ref_file_t::create(os));
+    auto old = ctx.primout(ref_file_t::create(os));
     prinbody(list, false);
     CHECK(os.str() == "a b c . d");
-    l.primout(old);
+    ctx.primout(old);
   }
   {
     std::ostringstream os;
-    auto old = l.primerr(ref_file_t::create(os));
+    auto old = ctx.primerr(ref_file_t::create(os));
     prinbody(list, true);
     CHECK(os.str() == "a b c . d");
-    l.primerr(old);
+    ctx.primerr(old);
   }
 }
 
@@ -432,39 +432,39 @@ TEST_CASE("io: prin0")
 
 TEST_CASE("io: splice")
 {
-  auto& l = lisp::current();
+  auto& ctx = context::current();
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(l, x, y, false);
+    auto r = io::splice(ctx, x, y, false);
     CHECK(!is_NIL(equal(x, "(x y z b c)"_l)));
     CHECK(!is_NIL(equal(r, "(z b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(l, cdr(x), y, false);
+    auto r = io::splice(ctx, cdr(x), y, false);
     CHECK(!is_NIL(equal(x, "(a x y z c)"_l)));
     CHECK(!is_NIL(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(l, cdr(x), y, true);
+    auto r = io::splice(ctx, cdr(x), y, true);
     CHECK(!is_NIL(equal(x, "(a b x y z c)"_l)));
     CHECK(!is_NIL(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(l, x, y, false);
+    auto r = io::splice(ctx, x, y, false);
     CHECK(!is_NIL(equal(x, "(x b c)"_l)));
     CHECK(!is_NIL(equal(r, "(x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(l, x, y, true);
+    auto r = io::splice(ctx, x, y, true);
     CHECK(!is_NIL(equal(x, "(a x b c)"_l)));
     CHECK(!is_NIL(equal(r, "(a x b c)"_l)));
   }

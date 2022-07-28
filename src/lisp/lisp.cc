@@ -51,7 +51,7 @@ inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
-class lisp::impl
+class context::impl
 {
 public:
   impl(evaluator& e)
@@ -85,7 +85,7 @@ public:
 
 };
 
-lisp::lisp()
+context::context()
   : _pimpl(std::make_unique<impl>(e()))
 {
   if(_current == nullptr)
@@ -183,25 +183,25 @@ lisp::lisp()
   }
 }
 
-lisp::~lisp()
+context::~context()
 {
   if(_current == this)
     _current = nullptr;
 }
 
-evaluator& lisp::e()
+evaluator& context::e()
 {
   static evaluator e_(*this);
   return e_;
 }
 
-lisp& lisp::current() { return *_current; }
-void lisp::current(lisp& lisp) { _current = &lisp; }
+context& context::current() { return *_current; }
+void context::current(context& lisp) { _current = &lisp; }
 
-syntax& lisp::read_table() { return *_pimpl->_syntax; }
-void lisp::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
+syntax& context::read_table() { return *_pimpl->_syntax; }
+void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
 
-LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
+LISPT syntax::macro(context& ctx, ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro[index];
   LISPT f{new lisp_t};
@@ -214,49 +214,49 @@ LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
 closure_t::pool_t closure_t::_pool;
 lisp_t::pool_t lisp_t::_pool;
 
-LISPT lisp::eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
-LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
-LISPT lisp::baktrace(lisp& l) { return l.e().baktrace(); }
-LISPT lisp::topofstack(lisp& l) { return l.e().topofstack(); }
-LISPT lisp::destblock(lisp& l, LISPT a) { return l.e().destblock(a); }
+LISPT context::eval(context& ctx, LISPT expr) { return ctx.e().eval(expr); }
+LISPT context::apply(context& ctx, LISPT fun, LISPT args) { return ctx.e().apply(fun, args); }
+LISPT context::baktrace(context& ctx) { return ctx.e().baktrace(); }
+LISPT context::topofstack(context& ctx) { return ctx.e().topofstack(); }
+LISPT context::destblock(context& ctx, LISPT a) { return ctx.e().destblock(a); }
 
-LISPT lisp::obarray(lisp& l) { return alloc::obarray(l); }
-LISPT lisp::freecount(lisp& l) { return alloc::freecount(l); }
+LISPT context::obarray(context& ctx) { return alloc::obarray(ctx); }
+LISPT context::freecount(context& ctx) { return alloc::freecount(ctx); }
 
-ref_file_t lisp::primout() const { return _pimpl->_primout; }
+ref_file_t context::primout() const { return _pimpl->_primout; }
 
-ref_file_t lisp::primerr() const { return _pimpl->_primerr; }
+ref_file_t context::primerr() const { return _pimpl->_primerr; }
 
-ref_file_t lisp::primin() const { return _pimpl->_primin; }
+ref_file_t context::primin() const { return _pimpl->_primin; }
 
-ref_file_t lisp::primout(ref_file_t f)
+ref_file_t context::primout(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primout);
   _pimpl->_primout = std::move(f);
   return p;
 }
 
-ref_file_t lisp::primerr(ref_file_t f)
+ref_file_t context::primerr(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primerr);
   _pimpl->_primerr = std::move(f);
   return p;
 }
 
-ref_file_t lisp::primin(ref_file_t f)
+ref_file_t context::primin(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primin);
   _pimpl->_primin = std::move(f);
   return p;
 }
 
-ref_file_t lisp::stdout() const { return _pimpl->_stdout; }
+ref_file_t context::stdout() const { return _pimpl->_stdout; }
 
-ref_file_t lisp::stderr() const { return _pimpl->_stderr; }
+ref_file_t context::stderr() const { return _pimpl->_stderr; }
 
-ref_file_t lisp::stdin() const { return _pimpl->_stdin; }
+ref_file_t context::stdin() const { return _pimpl->_stdin; }
 
-LISPT lisp::perror(std::error_code error, LISPT arg)
+LISPT context::perror(std::error_code error, LISPT arg)
 {
   primerr()->format("{} ", error.message());
   if(type_of(arg) != type::Empty)
@@ -264,15 +264,15 @@ LISPT lisp::perror(std::error_code error, LISPT arg)
   return NIL;
 }
 
-LISPT lisp::error(std::error_code error, LISPT arg)
+LISPT context::error(std::error_code error, LISPT arg)
 {
   perror(error, arg);
   throw lisp_error(error.message());
 }
 
-void lisp::fatal(std::error_code error) { throw lisp_error(error.message()); }
+void context::fatal(std::error_code error) { throw lisp_error(error.message()); }
 
-LISPT lisp::syserr(LISPT fault)
+LISPT context::syserr(LISPT fault)
 {
   if(!is_NIL(fault))
   {
@@ -283,25 +283,25 @@ LISPT lisp::syserr(LISPT fault)
   return C_ERROR;
 }
 
-LISPT lisp::break0(LISPT exp) const { return repl(exp); }
+LISPT context::break0(LISPT exp) const { return repl(exp); }
 
-cvariable_t& lisp::currentbase() { return _pimpl->_currentbase; }
-cvariable_t& lisp::verbose() { return _pimpl->_verbose; }
-cvariable_t& lisp::loadpath() { return _pimpl->_loadpath; }
-void lisp::loadpath(LISPT newpath) { _pimpl->_loadpath = newpath; }
+cvariable_t& context::currentbase() { return _pimpl->_currentbase; }
+cvariable_t& context::verbose() { return _pimpl->_verbose; }
+cvariable_t& context::loadpath() { return _pimpl->_loadpath; }
+void context::loadpath(LISPT newpath) { _pimpl->_loadpath = newpath; }
 
-lisp* lisp::_current = nullptr;
+context* context::_current = nullptr;
 std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;
 subr_t::subr_vector subr_t::subr_store;
 
-LISPT eval(lisp& l, const std::string& expr)
+LISPT eval(context& ctx, const std::string& expr)
 {
   auto in = ref_file_t::create(expr);
   auto e = lispread(in);
-  return lisp::eval(l, e);
+  return context::eval(ctx, e);
 }
 
-LISPT eval(const std::string& expr) { return eval(lisp::current(), expr); }
+LISPT eval(const std::string& expr) { return eval(context::current(), expr); }
 
 //
 // All lisp constants needed internally.

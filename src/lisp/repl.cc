@@ -20,12 +20,12 @@
 namespace lisp
 {
 
-repl::repl(lisp& lisp)
-  : l(lisp)
+repl::repl(context& ctx)
+  : _ctx(ctx)
 {
   _prompt = "> "_s;
   _break_prompt = ": "_s;
-  lisp.e().interactive(true);
+  ctx.e().interactive(true);
 }
 
 LISPT repl::operator()(LISPT exp)
@@ -36,7 +36,7 @@ LISPT repl::operator()(LISPT exp)
     while(true)
     {
       prin0(_prompt);
-      auto expr = lispread(l.primin());
+      auto expr = lispread(_ctx.primin());
       if(expr == C_EMPTY)
         break;
       print(eval(expr));
@@ -46,7 +46,7 @@ LISPT repl::operator()(LISPT exp)
   while(true)
   {
     prin0(_break_prompt);
-    auto com = lispread(l.primin());
+    auto com = lispread(_ctx.primin());
     if(com == C_EMPTY)
       return C_EOF;
     /* OK, EVAL, ^, ... */
@@ -66,12 +66,12 @@ LISPT repl::operator()(LISPT exp)
       return print(eval( exp), false);
     if(com->car() == C_RESET)
     {
-      l.e().unwind();
+      _ctx.e().unwind();
       throw lisp_reset();
     }
     if(com->car() == C_BT)
     {
-      l.e().bt();
+      _ctx.e().bt();
       continue;
     }
     if(com->car() == C_RETURN)

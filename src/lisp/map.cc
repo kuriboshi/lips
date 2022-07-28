@@ -28,7 +28,7 @@ namespace lisp::details::map
 /// @param fn2 Function to apply to get the next element of the list (default is CDR).
 ///
 /// @returns NIL
-LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
+LISPT map(context&, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::Cons)
   {
@@ -49,7 +49,7 @@ LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns NIL
-LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
+LISPT mapc(context&, LISPT obj, LISPT fn1, LISPT fn2)
 {
   while(type_of(obj) == type::Cons)
   {
@@ -70,7 +70,7 @@ LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
+LISPT maplist(context&, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::Cons)
@@ -99,7 +99,7 @@ LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-LISPT mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
+LISPT mapcar(context&, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
   if(type_of(obj) == type::Cons)

@@ -39,7 +39,7 @@ void top::phist()
   for(auto hl: variables->history)
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
-    prinbody(hl->cdr(), *lisp::current().stdout(), true);
+    prinbody(hl->cdr(), *context::current().stdout(), true);
     primout()->terpri();
   }
 }
@@ -200,7 +200,7 @@ LISPT top::operator()(LISPT exp)
     if(is_NIL(input_exp->car()))
       continue;
     top::addhist(input_exp);
-    if(lisp::current().echoline)
+    if(context::current().echoline)
     {
       prinbody(input_exp, *primout(), true);
       primout()->terpri();
@@ -233,7 +233,7 @@ LISPT top::operator()(LISPT exp)
 ///  !$      - last argument
 ///  !*      - all arguments
 /// others could be added easily.
-LISPT top::rmexcl(lisp& l, LISPT stream)
+LISPT top::rmexcl(context& l, LISPT stream)
 {
   int c = stream->file()->getch();
   if(std::isspace(c) != 0)
@@ -291,12 +291,12 @@ void top::init()
 {
   variables = std::make_unique<cvariables>();
   mkprim(
-    pn::PRINTHIST, [](lisp&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    pn::PRINTHIST, [](context&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
 LISPT top::input_exp; // The input expression.
-std::function<LISPT(::lisp::lisp&, LISPT)> top::transform_hook;
+std::function<LISPT(::lisp::context&, LISPT)> top::transform_hook;
 std::function<void()> top::prompt_hook;
 LISPT top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;

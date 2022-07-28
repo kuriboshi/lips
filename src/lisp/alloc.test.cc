@@ -75,7 +75,6 @@ TEST_CASE("Create lisp objects")
 
 TEST_CASE("C Variables")
 {
-  auto& l = lisp::current();
   auto& cvar = initcvar("cvar", 123_l);
   auto a = eval(cvar);
   CHECK(eq(cvar, 123_l));

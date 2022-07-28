@@ -19,14 +19,14 @@
 
 namespace lisp::details::debug
 {
-LISPT evaltrace(lisp& l, LISPT state)
+LISPT evaltrace(context& ctx, LISPT state)
 {
-  auto i = l.e().trace();
+  auto i = ctx.e().trace();
 
   if(!is_NIL(state))
   {
     check(state, type::Integer);
-    l.e().trace(state->intval());
+    ctx.e().trace(state->intval());
   }
   return mknumber(i);
 }

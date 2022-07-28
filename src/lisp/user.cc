@@ -19,14 +19,14 @@
 
 namespace lisp::details::user
 {
-LISPT getargs(lisp& l, LISPT al)
+LISPT getargs(context& ctx, LISPT al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
-  return cons(al->car(), getargs(l, al->cdr()));
+  return cons(al->car(), getargs(ctx, al->cdr()));
 }
 
-LISPT getrep(lisp& l, LISPT fun)
+LISPT getrep(context& ctx, LISPT fun)
 {
   LISPT args;
 
@@ -36,7 +36,7 @@ LISPT getrep(lisp& l, LISPT fun)
   if(x.count == -1)
     args = x.args->car();
   else if(x.count < 0)
-    args = getargs(l, x.args);
+    args = getargs(ctx, x.args);
   else
     args = x.args;
   if(type_of(fun) == type::Lambda)
@@ -44,7 +44,7 @@ LISPT getrep(lisp& l, LISPT fun)
   return cons(C_NLAMBDA, cons(args, x.body));
 }
 
-LISPT funeq(lisp& l, LISPT f1, LISPT f2)
+LISPT funeq(context&, LISPT f1, LISPT f2)
 {
   if(f1 == f2)
     return T;
@@ -65,32 +65,32 @@ LISPT funeq(lisp& l, LISPT f1, LISPT f2)
   return NIL;
 }
 
-LISPT checkfn(lisp& l, LISPT name, LISPT lam)
+LISPT checkfn(context& ctx, LISPT name, LISPT lam)
 {
   if(type_of(name->value()) != type::Unbound)
     if(type_of(name->value()) == type::Lambda || type_of(name->value()) == type::Nlambda)
     {
-      LISPT t = user::funeq(l, name->value(), lam);
+      LISPT t = user::funeq(ctx, name->value(), lam);
       if(is_NIL(t))
       {
         putprop(name, C_OLDDEF, name->value());
-        if(!is_NIL(l.verbose()))
+        if(!is_NIL(ctx.verbose()))
           print(cons(name, cons(C_REDEFINED, NIL)));
       }
     }
   return NIL;
 }
 
-LISPT define(lisp& l, LISPT name, LISPT lam)
+LISPT define(context& ctx, LISPT name, LISPT lam)
 {
   check(name, type::Symbol);
   check(lam, type::Lambda, type::Nlambda);
-  checkfn(l, name, lam);
+  checkfn(ctx, name, lam);
   name->value(lam);
   return name;
 }
 
-LISPT defineq(lisp& l, LISPT defs)
+LISPT defineq(context& ctx, LISPT defs)
 {
   if(is_NIL(defs))
     return NIL;
@@ -100,7 +100,7 @@ LISPT defineq(lisp& l, LISPT defs)
   {
     auto name = car(d);
     auto lam = eval(cadr(d));
-    auto def = cons(user::define(l, name, lam), NIL);
+    auto def = cons(user::define(ctx, name, lam), NIL);
     rplacd(r, def);
     r = def;
   }

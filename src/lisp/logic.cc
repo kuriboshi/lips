@@ -19,7 +19,7 @@
 
 namespace lisp::details::logic
 {
-LISPT p_and(lisp& l, LISPT x)
+LISPT p_and(context&, LISPT x)
 {
   LISPT foo = T;
   while(!is_NIL(x))
@@ -32,7 +32,7 @@ LISPT p_and(lisp& l, LISPT x)
   return foo;
 }
 
-LISPT p_or(lisp& l, LISPT x)
+LISPT p_or(context&, LISPT x)
 {
   LISPT foo = NIL;
   while(!is_NIL(x))
@@ -45,14 +45,14 @@ LISPT p_or(lisp& l, LISPT x)
   return foo;
 }
 
-LISPT p_not(lisp& l, LISPT x)
+LISPT p_not(context&, LISPT x)
 {
   if(is_NIL(x))
     return T;
   return NIL;
 }
 
-LISPT xif(lisp& l, LISPT pred, LISPT true_expr, LISPT false_expr)
+LISPT xif(context&, LISPT pred, LISPT true_expr, LISPT false_expr)
 {
   LISPT foo = eval(pred);
   if(is_NIL(foo))

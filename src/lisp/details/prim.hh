@@ -24,44 +24,44 @@ namespace lisp::details::prim
 {
 void init();
 
-LISPT car(lisp&, LISPT);
-LISPT cdr(lisp&, LISPT);
-LISPT cadr(lisp&, LISPT);
-LISPT cdar(lisp&, LISPT);
-LISPT caar(lisp&, LISPT);
-LISPT cddr(lisp&, LISPT);
-LISPT cdddr(lisp&, LISPT);
-LISPT caddr(lisp&, LISPT);
-LISPT cdadr(lisp&, LISPT);
-LISPT caadr(lisp&, LISPT);
-LISPT cddar(lisp&, LISPT);
-LISPT cadar(lisp&, LISPT);
-LISPT cdaar(lisp&, LISPT);
-LISPT caaar(lisp&, LISPT);
-LISPT rplaca(lisp&, LISPT, LISPT);
-LISPT rplacd(lisp&, LISPT, LISPT);
-LISPT eq(lisp&, LISPT, LISPT);
-LISPT atom(lisp&, LISPT);
-LISPT nconc(lisp&, LISPT);
-LISPT tconc(lisp&, LISPT, LISPT);
-LISPT attach(lisp&, LISPT, LISPT);
-LISPT append(lisp&, LISPT);
-LISPT null(lisp&, LISPT);
-LISPT quote(lisp&, LISPT);
-LISPT lambda(lisp&, LISPT, LISPT);
-LISPT nlambda(lisp&, LISPT, LISPT);
-LISPT list(lisp&, LISPT);
-LISPT length(lisp&, LISPT);
-LISPT closure(lisp&, LISPT, LISPT);
+LISPT car(context&, LISPT);
+LISPT cdr(context&, LISPT);
+LISPT cadr(context&, LISPT);
+LISPT cdar(context&, LISPT);
+LISPT caar(context&, LISPT);
+LISPT cddr(context&, LISPT);
+LISPT cdddr(context&, LISPT);
+LISPT caddr(context&, LISPT);
+LISPT cdadr(context&, LISPT);
+LISPT caadr(context&, LISPT);
+LISPT cddar(context&, LISPT);
+LISPT cadar(context&, LISPT);
+LISPT cdaar(context&, LISPT);
+LISPT caaar(context&, LISPT);
+LISPT rplaca(context&, LISPT, LISPT);
+LISPT rplacd(context&, LISPT, LISPT);
+LISPT eq(context&, LISPT, LISPT);
+LISPT atom(context&, LISPT);
+LISPT nconc(context&, LISPT);
+LISPT tconc(context&, LISPT, LISPT);
+LISPT attach(context&, LISPT, LISPT);
+LISPT append(context&, LISPT);
+LISPT null(context&, LISPT);
+LISPT quote(context&, LISPT);
+LISPT lambda(context&, LISPT, LISPT);
+LISPT nlambda(context&, LISPT, LISPT);
+LISPT list(context&, LISPT);
+LISPT length(context&, LISPT);
+LISPT closure(context&, LISPT, LISPT);
 
 /// @brief Return the N'th element in the list LIST.  If N is greater than
 /// the length of LIST, return NIL.
 ///
-LISPT nth(lisp&, LISPT, LISPT);
-LISPT error(lisp&, LISPT);
-LISPT uxexit(lisp&, LISPT);
+LISPT nth(context&, LISPT, LISPT);
+LISPT error(context&, LISPT);
+LISPT uxexit(context&, LISPT);
 
-LISPT closobj(lisp&, LISPT);
+LISPT closobj(context&, LISPT);
 } // namespace lisp::details::prim
 
 #endif

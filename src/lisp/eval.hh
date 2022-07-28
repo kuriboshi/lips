@@ -73,7 +73,7 @@ public:
 class evaluator
 {
 public:
-  evaluator(lisp&);
+  evaluator(context&);
   ~evaluator() = default;
 
   void reset();
@@ -181,7 +181,7 @@ private:
   void overflow();
   LISPT destblock(const destblock_t*);
 
-  lisp& _lisp;
+  context& _ctx;
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
   LISPT _fun;                     // Store current function being evaluated.
@@ -220,9 +220,9 @@ private:
   int _destblockused = 0;
 };
 
-inline void breakhook(evaluator::breakhook_t fun) { lisp::current().e().breakhook(fun); }
-inline void undefhook(evaluator::undefhook_t fun) { lisp::current().e().undefhook(fun); }
-inline void unwind() { lisp::current().e().unwind(); }
+inline void breakhook(evaluator::breakhook_t fun) { context::current().e().breakhook(fun); }
+inline void undefhook(evaluator::undefhook_t fun) { context::current().e().undefhook(fun); }
+inline void unwind() { context::current().e().unwind(); }
 
 } // namespace lisp
 

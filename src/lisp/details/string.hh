@@ -25,13 +25,13 @@ namespace lisp::details::string
 
 void init();
 
-LISPT symstr(lisp&, LISPT);
-LISPT stringp(lisp&, LISPT);
-LISPT strequal(lisp&, LISPT, LISPT);
-LISPT strcmp(lisp&, LISPT, LISPT);
-LISPT concat(lisp&, LISPT);
-LISPT strlen(lisp&, LISPT);
-LISPT substring(lisp&, LISPT, LISPT, LISPT);
+LISPT symstr(context&, LISPT);
+LISPT stringp(context&, LISPT);
+LISPT strequal(context&, LISPT, LISPT);
+LISPT strcmp(context&, LISPT, LISPT);
+LISPT concat(context&, LISPT);
+LISPT strlen(context&, LISPT);
+LISPT substring(context&, LISPT, LISPT, LISPT);
 
 } // namespace lisp::details::string
 

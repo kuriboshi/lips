@@ -37,14 +37,14 @@ LISPT getobject() { return {new lisp_t}; }
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-LISPT cons(lisp&, LISPT a, LISPT b)
+LISPT cons(context&, LISPT a, LISPT b)
 {
   auto f = getobject();
   f->set(cons_t{a, b});
   return f;
 }
 
-LISPT obarray(lisp&)
+LISPT obarray(context&)
 {
   LISPT o = NIL;
   for(auto i: global_symbols())

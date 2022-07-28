@@ -46,7 +46,7 @@ public:
   }
 
 private:
-  bool getline(lisp::lisp&);
+  bool getline(lisp::context&);
   void init_keymap();
   void init_term();
   void pputc(int c, FILE* file);

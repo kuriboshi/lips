@@ -25,33 +25,33 @@ namespace lisp::details::arith
 
 void init();
 
-LISPT abs(lisp&, LISPT);
-LISPT add1(lisp&, LISPT);
-LISPT difference(lisp&, LISPT, LISPT);
-LISPT divide(lisp&, LISPT, LISPT);
-LISPT eqp(lisp&, LISPT, LISPT);
-LISPT fdifference(lisp&, LISPT, LISPT);
-LISPT fdivide(lisp&, LISPT, LISPT);
-LISPT fplus(lisp&, LISPT);
-LISPT ftimes(lisp&, LISPT);
-LISPT geq(lisp&, LISPT, LISPT);
-LISPT greaterp(lisp&, LISPT, LISPT);
-LISPT idifference(lisp&, LISPT, LISPT);
-LISPT iminus(lisp&, LISPT);
-LISPT iplus(lisp&, LISPT);
-LISPT iquotient(lisp&, LISPT, LISPT);
-LISPT iremainder(lisp&, LISPT, LISPT);
-LISPT itimes(lisp&, LISPT);
-LISPT itof(lisp&, LISPT);
-LISPT leq(lisp&, LISPT, LISPT);
-LISPT lessp(lisp&, LISPT, LISPT);
-LISPT ltimes(lisp&, LISPT);
-LISPT minus(lisp&, LISPT);
-LISPT minusp(lisp&, LISPT);
-LISPT neqp(lisp&, LISPT, LISPT);
-LISPT plus(lisp&, LISPT);
-LISPT sub1(lisp&, LISPT);
-LISPT zerop(lisp&, LISPT);
+LISPT abs(context&, LISPT);
+LISPT add1(context&, LISPT);
+LISPT difference(context&, LISPT, LISPT);
+LISPT divide(context&, LISPT, LISPT);
+LISPT eqp(context&, LISPT, LISPT);
+LISPT fdifference(context&, LISPT, LISPT);
+LISPT fdivide(context&, LISPT, LISPT);
+LISPT fplus(context&, LISPT);
+LISPT ftimes(context&, LISPT);
+LISPT geq(context&, LISPT, LISPT);
+LISPT greaterp(context&, LISPT, LISPT);
+LISPT idifference(context&, LISPT, LISPT);
+LISPT iminus(context&, LISPT);
+LISPT iplus(context&, LISPT);
+LISPT iquotient(context&, LISPT, LISPT);
+LISPT iremainder(context&, LISPT, LISPT);
+LISPT itimes(context&, LISPT);
+LISPT itof(context&, LISPT);
+LISPT leq(context&, LISPT, LISPT);
+LISPT lessp(context&, LISPT, LISPT);
+LISPT ltimes(context&, LISPT);
+LISPT minus(context&, LISPT);
+LISPT minusp(context&, LISPT);
+LISPT neqp(context&, LISPT, LISPT);
+LISPT plus(context&, LISPT);
+LISPT sub1(context&, LISPT);
+LISPT zerop(context&, LISPT);
 
 } // namespace lisp::details::arith
 

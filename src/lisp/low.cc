@@ -48,7 +48,7 @@ namespace lisp::details::low
 ///       (t r3))
 /// @endcode
 ///
-LISPT cond(lisp& l, LISPT args)
+LISPT cond(context& ctx, LISPT args)
 {
   while(!is_NIL(args))
   {
@@ -59,16 +59,16 @@ LISPT cond(lisp& l, LISPT args)
     {
       if(is_NIL(alt->cdr()))
         return res;
-      return low::progn(l, alt->cdr());
+      return low::progn(ctx, alt->cdr());
     }
     args = args->cdr();
   }
   return NIL;
 }
 
-LISPT prog1(lisp& l, LISPT a1, LISPT) { return a1; }
+LISPT prog1(context&, LISPT a1, LISPT) { return a1; }
 
-LISPT progn(lisp& l, LISPT lexp)
+LISPT progn(context&, LISPT lexp)
 {
   if(is_NIL(lexp))
     return NIL;
@@ -80,11 +80,11 @@ LISPT progn(lisp& l, LISPT lexp)
   return eval(lexp->car());
 }
 
-LISPT set(lisp& l, LISPT var, LISPT val)
+LISPT set(context& ctx, LISPT var, LISPT val)
 {
   check(var, type::Symbol);
   if(var->symbol().constant)
-    l.error(error_errc::attempt_to_clobber, var);
+    ctx.error(error_errc::attempt_to_clobber, var);
   if(type_of(var->value()) == type::Indirect)
     var->value()->set(indirect_t{val});
   else if(type_of(var->value()) == type::Cvariable)
@@ -98,14 +98,14 @@ LISPT set(lisp& l, LISPT var, LISPT val)
   return val;
 }
 
-LISPT setq(lisp& l, LISPT var, LISPT val) { return low::set(l, var, eval(val)); }
+LISPT setq(context& ctx, LISPT var, LISPT val) { return low::set(ctx, var, eval(val)); }
 
-LISPT xwhile(lisp& l, LISPT pred, LISPT exp)
+LISPT xwhile(context& ctx, LISPT pred, LISPT exp)
 {
   LISPT res = eval(pred);
   while(!is_NIL(res))
   {
-    low::progn(l, exp);
+    low::progn(ctx, exp);
     res = eval(pred);
   }
   return NIL;
