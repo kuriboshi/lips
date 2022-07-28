@@ -488,8 +488,6 @@ public:
   repl_fun_t repl;
 
   // Used by lisp::io
-  LISPT top = NIL;
-  LISPT rstack = NIL;
   int printlevel = 0;
   int thisplevel = 0;
   bool echoline = false;
