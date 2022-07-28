@@ -67,7 +67,7 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
     return cons(obj, NIL);
   }
   LISPT t;
-  for(t = list; type_of(t->cdr()) == type::CONS; t = t->cdr())
+  for(t = list; type_of(t->cdr()) == type::Cons; t = t->cdr())
     ;
   if(conc)
     rplacd(t, obj);
@@ -82,9 +82,9 @@ LISPT transform(::lisp::lisp& l, LISPT list)
   LISPT tl = NIL;
   LISPT res = NIL;
   bool conc = false;
-  for(auto ll = list; type_of(ll) == type::CONS; ll = ll->cdr())
+  for(auto ll = list; type_of(ll) == type::Cons; ll = ll->cdr())
   {
-    if(type_of(ll->car()) == type::CONS)
+    if(type_of(ll->car()) == type::Cons)
       tl = put_end(tl, transform(l, ll->car()), conc);
     else if(ll->car() == C_BAR)
     {

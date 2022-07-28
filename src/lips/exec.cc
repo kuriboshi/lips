@@ -238,7 +238,7 @@ std::pair<bool, std::string> check_meta(const std::string& s)
 std::optional<std::vector<std::string>> process_one(LISPT arg)
 {
   std::vector<std::string> args;
-  if(type_of(arg) == type::SYMBOL)
+  if(type_of(arg) == type::Symbol)
   {
     auto c = glob::extilde(arg->getstr());
     if(!c)
@@ -249,7 +249,7 @@ std::optional<std::vector<std::string>> process_one(LISPT arg)
     else
     {
       auto files = glob::expandfiles(*c, true);
-      if(type_of(files) == type::CONS)
+      if(type_of(files) == type::Cons)
       {
         for(auto f: files)
           args.push_back(f->getstr());
@@ -261,11 +261,11 @@ std::optional<std::vector<std::string>> process_one(LISPT arg)
       }
     }
   }
-  else if(type_of(arg) == type::INTEGER)
+  else if(type_of(arg) == type::Integer)
     args.push_back(std::to_string(arg->intval()));
-  else if(type_of(arg) == type::STRING)
+  else if(type_of(arg) == type::String)
     args.push_back(arg->getstr());
-  else if(type_of(arg) == type::CONS)
+  else if(type_of(arg) == type::Cons)
   {
     auto result = process_one(eval(arg));
     if(!result)
@@ -464,12 +464,12 @@ LISPT redir_to(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  check(file, type::STRING, type::SYMBOL);
+  check(file, type::String, type::Symbol);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    check(filed, type::INTEGER);
+    check(filed, type::Integer);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
@@ -500,12 +500,12 @@ LISPT redir_append(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  check(file, type::STRING, type::SYMBOL);
+  check(file, type::String, type::Symbol);
   if(is_NIL(filed))
     oldfd = 1;
   else
   {
-    check(filed, type::INTEGER);
+    check(filed, type::Integer);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
@@ -536,12 +536,12 @@ LISPT redir_from(lisp& l, LISPT cmd, LISPT file, LISPT filed)
 
   if(is_NIL(cmd))
     return NIL;
-  check(file, type::STRING, type::SYMBOL);
+  check(file, type::String, type::Symbol);
   if(is_NIL(filed))
     oldfd = 0;
   else
   {
-    check(filed, type::INTEGER);
+    check(filed, type::Integer);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
@@ -650,7 +650,7 @@ void do_rehash()
   {
     if(is_NIL(p))
       continue;
-    check(p, type::STRING, type::SYMBOL);
+    check(p, type::String, type::Symbol);
     std::error_code ec;
     for(const auto& odir:
       std::filesystem::directory_iterator(p->getstr(), std::filesystem::directory_options::skip_permission_denied, ec))
@@ -682,7 +682,7 @@ LISPT fg(lisp& l, LISPT job)
   }
   else
   {
-    check(job, type::INTEGER);
+    check(job, type::Integer);
     for(auto& j: joblist)
     {
       if(j.jobnum == job->intval())
@@ -726,7 +726,7 @@ LISPT bg(lisp& l, LISPT job)
   }
   else
   {
-    check(job, type::INTEGER);
+    check(job, type::Integer);
     for(auto& j: joblist)
     {
       if(j.jobnum == job->intval())
@@ -754,15 +754,15 @@ LISPT bg(lisp& l, LISPT job)
 
 LISPT setenv(lisp& l, LISPT var, LISPT val)
 {
-  check(var, type::STRING, type::SYMBOL);
-  check(val, type::STRING, type::SYMBOL);
+  check(var, type::String, type::Symbol);
+  check(val, type::String, type::Symbol);
   ::setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
 LISPT getenviron(lisp& l, LISPT var)
 {
-  check(var, type::STRING, type::SYMBOL);
+  check(var, type::String, type::Symbol);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
     return NIL;
@@ -778,7 +778,7 @@ LISPT cd(lisp& l, LISPT dir, LISPT emess)
   else
   {
     ndir = expand(l, dir);
-    if(type_of(ndir) == type::CONS)
+    if(type_of(ndir) == type::Cons)
       ndir = ndir->car();
   }
   if(is_NIL(ndir))

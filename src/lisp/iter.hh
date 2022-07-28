@@ -39,7 +39,7 @@ public:
   bool operator!=(const iterator& x) const { return _car != x._car; }
   iterator& operator++()
   {
-    if(type_of(_car) == type::CONS)
+    if(type_of(_car) == type::Cons)
       _car = _car->cdr();
     else
       _car = nullptr;
@@ -53,7 +53,7 @@ public:
   }
   LISPT operator*() const
   {
-    if(type_of(_car) == type::CONS)
+    if(type_of(_car) == type::Cons)
       return _car->car();
     else
       return nullptr;

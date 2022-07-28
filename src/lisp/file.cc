@@ -22,12 +22,12 @@ namespace lisp::details::file
 {
 LISPT open(lisp& l, LISPT filename, LISPT mode)
 {
-  check(filename, type::STRING, type::SYMBOL);
+  check(filename, type::String, type::Symbol);
   bool readmode = true;
   bool appendmode = false;
   if(!is_NIL(mode))
   {
-    check(mode, type::SYMBOL);
+    check(mode, type::Symbol);
     if(mode == C_READ)
       readmode = true;
     else if(mode == C_WRITE)
@@ -54,7 +54,7 @@ LISPT open(lisp& l, LISPT filename, LISPT mode)
 
 LISPT close(lisp& l, LISPT fildes)
 {
-  check(fildes, type::FILET);
+  check(fildes, type::File);
   if(fildes->file()->has_sink())
     fildes->file()->flush();
   if(fildes->file()->close())
@@ -68,7 +68,7 @@ LISPT ratom(lisp& l, LISPT file)
     return io::ratom(l.primin());
   if(is_T(file))
     return io::ratom(l.stdin());
-  check(file, type::FILET);
+  check(file, type::File);
   return io::ratom(file->file());
 }
 
@@ -78,7 +78,7 @@ LISPT readc(lisp& l, LISPT file)
     return mknumber(l.primin()->getch());
   if(is_T(file))
     return mknumber(l.stdin()->getch());
-  check(file, type::FILET);
+  check(file, type::File);
   return mknumber(file->file()->getch());
 }
 
@@ -88,7 +88,7 @@ LISPT read(lisp& l, LISPT file)
     return lispread(l.primin());
   if(is_T(file))
     return lispread(l.stdin());
-  check(file, type::FILET);
+  check(file, type::File);
   return lispread(file->file());
 }
 
@@ -98,7 +98,7 @@ LISPT print(lisp& l, LISPT x, LISPT file)
     return io::print(l, x, *l.primout());
   if(is_T(file))
     return io::print(l, x, *l.primerr());
-  check(file, type::FILET);
+  check(file, type::File);
   return io::print(l, x, *file->file());
 }
 
@@ -113,7 +113,7 @@ bool loadfile(lisp& l, const std::string& lf)
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(foo); type_of(rval) != type::EMPTY; rval = lispread(foo))
+        for(auto rval = lispread(foo); type_of(rval) != type::Empty; rval = lispread(foo))
           rval = l.e().eval(rval);
         return true;
       }
@@ -128,7 +128,7 @@ bool loadfile(lisp& l, const std::string& lf)
 
 LISPT load(lisp& l, LISPT f)
 {
-  check(f, type::STRING, type::SYMBOL);
+  check(f, type::String, type::Symbol);
   if(!file::loadfile(l, f->getstr()))
     l.fatal(error_errc::cant_load);
   return f;
@@ -140,7 +140,7 @@ LISPT terpri(lisp& l, LISPT file)
     return io::terpri(*l.primout());
   if(is_T(file))
     return io::terpri(*l.primerr());
-  check(file, type::FILET);
+  check(file, type::File);
   return io::terpri(*file->file());
 }
 
@@ -151,7 +151,7 @@ LISPT prin1(lisp& l, LISPT x, LISPT file)
     return prin0(x, *l.primout(), false);
   if(is_T(file))
     return prin0(x, *l.primerr(), false);
-  check(file, type::FILET);
+  check(file, type::File);
   return prin0(x, *file->file(), false);
 }
 
@@ -162,7 +162,7 @@ LISPT prin2(lisp& l, LISPT x, LISPT file)
     return prin0(x, *l.primout(), true);
   if(is_T(file))
     return prin0(x, *l.primerr(), true);
-  check(file, type::FILET);
+  check(file, type::File);
   return prin0(x, *file->file(), true);
 }
 
@@ -171,7 +171,7 @@ LISPT printlevel(lisp& l, LISPT newl)
   auto x = l.printlevel;
   if(!is_NIL(newl))
   {
-    check(newl, type::INTEGER);
+    check(newl, type::Integer);
     l.printlevel = newl->intval();
   }
   return mknumber(x);
@@ -182,14 +182,14 @@ LISPT spaces(lisp& l, LISPT n, LISPT file)
   int i = 0;
   ref_file_t f;
 
-  check(n, type::INTEGER);
+  check(n, type::Integer);
   if(is_NIL(file))
     f = l.primout();
   else if(is_T(file))
     f = l.primerr();
   else
   {
-    check(file, type::FILET);
+    check(file, type::File);
     f = file->file();
   }
   for(i = n->intval(); i > 0; i--)
@@ -203,7 +203,7 @@ LISPT readline(lisp& l, LISPT file)
     return io::readline(l.primin());
   if(is_T(file))
     return io::readline(l.stdin());
-  check(file, type::FILET);
+  check(file, type::File);
   return io::readline(file->file());
 }
 

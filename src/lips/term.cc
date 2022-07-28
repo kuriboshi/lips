@@ -594,15 +594,15 @@ std::optional<std::string> term_source::getline()
           break;
         }
         auto ex = glob::expandfiles(*t, true);
-        if(type_of(ex) == type::CONS && strlen(s) > 1)
+        if(type_of(ex) == type::Cons && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
-        if(type_of(ex) == type::CONS && is_NIL(ex->cdr()))
+        if(type_of(ex) == type::Cons && is_NIL(ex->cdr()))
         {
           fillrest(ex->car()->getstr().c_str());
         }
         else
         {
-          if(type_of(ex) == type::CONS)
+          if(type_of(ex) == type::Cons)
             complete(ex);
           putc(BELL, stdout);
         }

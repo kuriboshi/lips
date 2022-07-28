@@ -34,7 +34,7 @@ void ref_deleter(lisp_t* object)
   // Set the type to FREE to make it possible to detect use of objects already
   // freed.
   object->set();
-  object->settype(type::FREE);
+  object->settype(type::Free);
   // This will return the object to the memory pool.
   delete object; // NOLINT
 }
@@ -82,7 +82,7 @@ lisp::lisp()
     C_UNBOUND = intern("unbound");
     C_UNBOUND->symbol().constant = true;
     C_UNBOUND->set();
-    C_UNBOUND->settype(type::UNBOUND);
+    C_UNBOUND->settype(type::Unbound);
 
     auto nil = intern("nil");
     nil->value(NIL);
@@ -107,7 +107,7 @@ lisp::lisp()
     C_ENDOFFILE = intern("endoffile");
     C_ENVIRON = intern("environ");
     C_EOF = intern("eof");
-    C_EOF->settype(type::ENDOFFILE);
+    C_EOF->settype(type::Eof);
     C_FILE = intern("file");
     C_FLOAT = intern("float");
     C_FREE = intern("free");
@@ -204,7 +204,7 @@ ref_file_t lisp::primin(ref_file_t f) { auto p = std::move(_primin); _primin = s
 LISPT lisp::perror(std::error_code error, LISPT arg)
 {
   primerr()->format("{} ", error.message());
-  if(type_of(arg) != type::EMPTY)
+  if(type_of(arg) != type::Empty)
     prin2(arg, T);
   return NIL;
 }

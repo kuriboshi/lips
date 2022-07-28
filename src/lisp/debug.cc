@@ -25,7 +25,7 @@ LISPT evaltrace(lisp& l, LISPT state)
 
   if(!is_NIL(state))
   {
-    check(state, type::INTEGER);
+    check(state, type::Integer);
     l.e().trace(state->intval());
   }
   return mknumber(i);

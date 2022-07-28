@@ -36,8 +36,8 @@ TEST_CASE("Primary functions")
     set("a"_a, 1_l);
     auto f0 = lambda("(a)"_l, "((plus a 1))"_l);
     auto r0 = apply(f0, mklist(2_l));
-    CHECK(type_of(r0) == type::INTEGER);
-    CHECK(type_of(3_l) == type::INTEGER);
+    CHECK(type_of(r0) == type::Integer);
+    CHECK(type_of(3_l) == type::Integer);
     // TODO: Can't do this because Catch2 goes into an infinite loop when
     // converting a LISPT to a string.
     // CHECK(r0 == 3_l);

@@ -23,8 +23,8 @@ LISPT numberp(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
-    case type::INTEGER:
-    case type::FLOAT:
+    case type::Integer:
+    case type::Float:
       return a;
     default:
       return NIL;
@@ -33,7 +33,7 @@ LISPT numberp(lisp& l, LISPT a)
 
 LISPT listp(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return a;
   return NIL;
 }
@@ -57,19 +57,19 @@ LISPT equal(lisp& l, LISPT l1, LISPT l2)
     return T;
   switch(type_of(l1))
   {
-    case type::CONS:
+    case type::Cons:
       while(type_of(l1) == type_of(l2))
       {
         if(pred::equal(l, l1->car(), l2->car()) != NIL)
           return pred::equal(l, l1->cdr(), l2->cdr());
         return NIL;
       }
-    case type::STRING:
+    case type::String:
       return (l1->string() == l2->string()) ? T : NIL;
-    case type::LAMBDA:
-    case type::NLAMBDA:
+    case type::Lambda:
+    case type::Nlambda:
       return user::funeq(l, l1, l2);
-    case type::INTEGER:
+    case type::Integer:
       return (l1->intval() == l2->intval() ? T : NIL);
     default:
       break;
@@ -81,7 +81,7 @@ LISPT nlistp(lisp& l, LISPT a)
 {
   if(a == NIL)
     return T;
-  if(type_of(a) != type::CONS)
+  if(type_of(a) != type::Cons)
     return a;
   return NIL;
 }
@@ -95,16 +95,16 @@ LISPT neq(lisp& l, LISPT a, LISPT b)
 
 LISPT boundp(lisp& l, LISPT a)
 {
-  if(type_of(a) != type::SYMBOL)
+  if(type_of(a) != type::Symbol)
     return NIL;
-  if(type_of(a->value()) != type::UNBOUND)
+  if(type_of(a->value()) != type::Unbound)
     return T;
   return NIL;
 }
 
 LISPT litatom(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::SYMBOL || type_of(a) == type::T)
+  if(type_of(a) == type::Symbol || type_of(a) == type::T)
     return T;
   return NIL;
 }
@@ -113,43 +113,43 @@ LISPT xtypeof(lisp& l, LISPT a)
 {
   switch(type_of(a))
   {
-    case type::NIL:
+    case type::Nil:
       return NIL;
-    case type::SYMBOL:
+    case type::Symbol:
       return C_SYMBOL;
-    case type::INTEGER:
+    case type::Integer:
       return C_INTEGER;
-    case type::FLOAT:
+    case type::Float:
       return C_FLOAT;
-    case type::INDIRECT:
+    case type::Indirect:
       return C_INDIRECT;
-    case type::CONS:
+    case type::Cons:
       return C_CONS;
-    case type::STRING:
+    case type::String:
       return C_STRING;
-    case type::SUBR:
+    case type::Subr:
       return C_SUBR;
-    case type::FSUBR:
+    case type::Fsubr:
       return C_FSUBR;
-    case type::LAMBDA:
+    case type::Lambda:
       return C_LAMBDA;
-    case type::NLAMBDA:
+    case type::Nlambda:
       return C_NLAMBDA;
-    case type::CLOSURE:
+    case type::Closure:
       return C_CLOSURE;
-    case type::UNBOUND:
+    case type::Unbound:
       return C_UNBOUND;
-    case type::ENVIRON:
+    case type::Environ:
       return C_ENVIRON;
     case type::T:
       return T;
-    case type::FREE:
+    case type::Free:
       return C_FREE;
-    case type::ENDOFFILE:
+    case type::Eof:
       return C_ENDOFFILE;
-    case type::ERROR:
+    case type::Error:
       return C_ERROR;
-    case type::FILET:
+    case type::File:
       return C_FILE;
     default:
       return NIL;

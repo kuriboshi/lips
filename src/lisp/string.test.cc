@@ -86,10 +86,10 @@ TEST_CASE("String functions")
   {
     auto p0 = intern("symbol");
     auto r0 = symstr(p0);
-    CHECK(type_of(r0) == type::STRING);
+    CHECK(type_of(r0) == type::String);
     CHECK(r0->string() == p0->getstr());
     auto r1 = symstr(p0);
-    CHECK(type_of(r1) == type::STRING);
+    CHECK(type_of(r1) == type::String);
     CHECK(r1->string() == p0->getstr());
   }
 
@@ -98,13 +98,13 @@ TEST_CASE("String functions")
     auto s0 = mkstring("alpha");
     auto s1 = mkstring("zeta");
     auto r0 = strcmp(s0, s1);
-    REQUIRE(type_of(r0) == type::INTEGER);
+    REQUIRE(type_of(r0) == type::Integer);
     CHECK(r0->intval() < 0);
     auto r1 = strcmp(s1, s0);
-    REQUIRE(type_of(r1) == type::INTEGER);
+    REQUIRE(type_of(r1) == type::Integer);
     CHECK(r1->intval() > 0);
     auto r2 = strcmp(s0, s0);
-    REQUIRE(type_of(r2) == type::INTEGER);
+    REQUIRE(type_of(r2) == type::Integer);
     CHECK(r2->intval() == 0);
   }
 }

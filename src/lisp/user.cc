@@ -30,7 +30,7 @@ LISPT getrep(lisp& l, LISPT fun)
 {
   LISPT args;
 
-  if(type_of(fun) != type::LAMBDA && type_of(fun) != type::NLAMBDA)
+  if(type_of(fun) != type::Lambda && type_of(fun) != type::Nlambda)
     return NIL;
   auto& x = fun->lambda();
   if(x.count == -1)
@@ -39,7 +39,7 @@ LISPT getrep(lisp& l, LISPT fun)
     args = getargs(l, x.args);
   else
     args = x.args;
-  if(type_of(fun) == type::LAMBDA)
+  if(type_of(fun) == type::Lambda)
     return cons(C_LAMBDA, cons(args, x.body));
   return cons(C_NLAMBDA, cons(args, x.body));
 }
@@ -67,8 +67,8 @@ LISPT funeq(lisp& l, LISPT f1, LISPT f2)
 
 LISPT checkfn(lisp& l, LISPT name, LISPT lam)
 {
-  if(type_of(name->value()) != type::UNBOUND)
-    if(type_of(name->value()) == type::LAMBDA || type_of(name->value()) == type::NLAMBDA)
+  if(type_of(name->value()) != type::Unbound)
+    if(type_of(name->value()) == type::Lambda || type_of(name->value()) == type::Nlambda)
     {
       LISPT t = user::funeq(l, name->value(), lam);
       if(is_NIL(t))
@@ -83,8 +83,8 @@ LISPT checkfn(lisp& l, LISPT name, LISPT lam)
 
 LISPT define(lisp& l, LISPT name, LISPT lam)
 {
-  check(name, type::SYMBOL);
-  check(lam, type::LAMBDA, type::NLAMBDA);
+  check(name, type::Symbol);
+  check(lam, type::Lambda, type::Nlambda);
   checkfn(l, name, lam);
   name->value(lam);
   return name;

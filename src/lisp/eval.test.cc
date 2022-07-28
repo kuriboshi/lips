@@ -27,39 +27,39 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
   {
     auto a = eval("(setq f (lambda () \"hello\"))");
     auto b = eval("(f)");
-    CHECK(type_of(b) == type::STRING);
+    CHECK(type_of(b) == type::String);
     CHECK(b->string() == "hello");
   }
   SECTION("LAMBDA - one argument")
   {
     auto a = eval("(setq f (lambda (x) (cons x nil)))");
     auto b = eval("(f 10)");
-    CHECK(type_of(b) == type::CONS);
-    CHECK(type_of(b->car()) == type::INTEGER);
+    CHECK(type_of(b) == type::Cons);
+    CHECK(type_of(b->car()) == type::Integer);
     CHECK(b->car()->intval() == 10);
   }
   SECTION("LAMBDA - spread case")
   {
     auto a = eval("(setq f (lambda x (cadr x)))");
     auto b = eval("(f 1 2)");
-    CHECK(type_of(b) == type::INTEGER);
+    CHECK(type_of(b) == type::Integer);
     CHECK(b->intval() == 2);
   }
   SECTION("LAMBDA - half spread")
   {
     auto a = eval("(setq f (lambda (a . x) (list a (cadr x))))");
     auto b = eval("(f 0 1 2)");
-    CHECK(type_of(b) == type::CONS);
-    CHECK(type_of(b->car()) == type::INTEGER);
+    CHECK(type_of(b) == type::Cons);
+    CHECK(type_of(b->car()) == type::Integer);
     CHECK(b->car()->intval() == 0);
-    CHECK(type_of(b->cdr()->car()) == type::INTEGER);
+    CHECK(type_of(b->cdr()->car()) == type::Integer);
     CHECK(b->cdr()->car()->intval() == 2);
   }
   SECTION("NLAMBDA - basic case")
   {
     auto a = eval("(setq f (nlambda (a) a))");
     auto b = eval("(f x)");
-    CHECK(type_of(b) == type::SYMBOL);
+    CHECK(type_of(b) == type::Symbol);
     CHECK(b->symbol().pname == "x");
   }
 }

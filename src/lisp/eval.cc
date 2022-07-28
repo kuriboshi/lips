@@ -48,7 +48,7 @@ LISPT evaluator::printwhere()
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &evaluator::ev0)
     {
       if(auto* lsp = std::get_if<LISPT>(&_control[i - 1]);
-         lsp != nullptr && (type_of(*lsp) == type::CONS && type_of((*lsp)->car()) != type::CONS))
+         lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
       {
         foo = *lsp;
         _lisp.primerr()->format("[in ");
@@ -240,7 +240,7 @@ bool evaluator::peval()
   push(&evaluator::ev0);
   switch(type_of(_expression))
   {
-    case type::CONS:
+    case type::Cons:
       push(_fun);
       _fun = _expression->car();
       push(_args);
@@ -248,18 +248,18 @@ bool evaluator::peval()
       push(&evaluator::ev1);
       _cont = &evaluator::peval1;
       break;
-    case type::SYMBOL:
+    case type::Symbol:
       _cont = &evaluator::lookup;
       break;
-    case type::INDIRECT:
+    case type::Indirect:
       send(_expression->indirectval());
       pop(_cont);
       break;
-    case type::CVARIABLE:
+    case type::Cvariable:
       send(_expression->cvarval());
       pop(_cont);
       break;
-    case type::FREE:
+    case type::Free:
       abort(error_errc::corrupt_data, _expression);
       break;
     default:
@@ -316,7 +316,7 @@ void evaluator::do_unbound(continuation_t continuation)
     pop(_dest);
     pop(_expression);
     _fun = _expression->car()->value();
-    if(type_of(_fun) == type::UNBOUND)
+    if(type_of(_fun) == type::Unbound)
     {
       if(!evalhook(_expression))
         xbreak(error_errc::undef_function, _expression->car(), continuation);
@@ -326,8 +326,8 @@ void evaluator::do_unbound(continuation_t continuation)
   }
   else
   {
-    if(type_of(_expression) == type::CONS && type_of(_expression->car()) == type::SYMBOL
-      && type_of(_expression->car()->value()) == type::UNBOUND)
+    if(type_of(_expression) == type::Cons && type_of(_expression->car()) == type::Symbol
+      && type_of(_expression->car()->value()) == type::Unbound)
     {
       if(!evalhook(_expression))
         xbreak(error_errc::undef_function, _expression->car(), continuation);
@@ -343,8 +343,8 @@ void evaluator::do_unbound(continuation_t continuation)
 
 bool evaluator::do_default(continuation_t continuation)
 {
-  if(type_of(_expression) == type::CONS && type_of(_expression->car()) == type::SYMBOL
-    && type_of(_expression->car()->value()) == type::UNBOUND)
+  if(type_of(_expression) == type::Cons && type_of(_expression->car()) == type::Symbol
+    && type_of(_expression->car()->value()) == type::Unbound)
   {
     if(!evalhook(_expression))
       xbreak(error_errc::undef_function, _expression->car(), continuation);
@@ -362,12 +362,12 @@ bool evaluator::peval1()
   else
     switch(type_of(_fun))
     {
-      case type::CLOSURE:
+      case type::Closure:
         push(&evaluator::peval1);
         _cont = &evaluator::evclosure;
         break;
-      case type::SUBR:
-      case type::FSUBR:
+      case type::Subr:
+      case type::Fsubr:
         push(_dest);
         push(&evaluator::ev2);
         _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
@@ -385,28 +385,28 @@ bool evaluator::peval1()
         else
           _cont = &evaluator::evalargs;
         break;
-      case type::LAMBDA:
+      case type::Lambda:
         _noeval = false;
         _cont = &evaluator::evlam;
         break;
-      case type::NLAMBDA:
+      case type::Nlambda:
         _noeval = true;
         _cont = &evaluator::evlam;
         break;
-      case type::CONS:
-      case type::INDIRECT:
+      case type::Cons:
+      case type::Indirect:
         _expression = _fun;
         push(&evaluator::ev3);
         _cont = &evaluator::peval;
         break;
-      case type::SYMBOL:
+      case type::Symbol:
         _fun = _fun->value();
         _cont = &evaluator::peval1;
         break;
-      case type::UNBOUND:
+      case type::Unbound:
         do_unbound(&evaluator::peval1);
         break;
-      case type::STRING:
+      case type::String:
         if(!evalhook(_expression))
           xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
         break;
@@ -425,12 +425,12 @@ bool evaluator::peval2()
   else
     switch(type_of(_fun))
     {
-      case type::CLOSURE:
+      case type::Closure:
         push(&evaluator::peval2);
         _cont = &evaluator::evclosure;
         break;
-      case type::SUBR:
-      case type::FSUBR:
+      case type::Subr:
+      case type::Fsubr:
         push(_dest);
         push(&evaluator::ev2);
         _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
@@ -440,25 +440,25 @@ bool evaluator::peval2()
         else
           _cont = &evaluator::evalargs;
         break;
-      case type::LAMBDA:
-      case type::NLAMBDA:
+      case type::Lambda:
+      case type::Nlambda:
         _noeval = true;
         _cont = &evaluator::evlam;
         break;
-      case type::CONS:
-      case type::INDIRECT:
+      case type::Cons:
+      case type::Indirect:
         _expression = _fun;
         push(&evaluator::ev3p);
         _cont = &evaluator::peval;
         break;
-      case type::SYMBOL:
+      case type::Symbol:
         _fun = _fun->value();
         _cont = &evaluator::peval2;
         break;
-      case type::UNBOUND:
+      case type::Unbound:
         do_unbound(&evaluator::peval2);
         break;
-      case type::STRING:
+      case type::String:
         if(!evalhook(_expression))
           xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
         break;
@@ -769,14 +769,14 @@ bool evaluator::lookup()
   LISPT t = _expression->value();
   switch(type_of(t))
   {
-    case type::UNBOUND:
+    case type::Unbound:
       xbreak(error_errc::unbound_variable, _expression, &evaluator::lookup);
       return false;
       break;
-    case type::INDIRECT:
+    case type::Indirect:
       send(t->indirectval());
       break;
-    case type::CVARIABLE:
+    case type::Cvariable:
       send(t->cvarval());
       break;
     default:
@@ -975,14 +975,14 @@ LISPT evaluator::baktrace()
 LISPT evaluator::topofstack()
 {
   auto x = alloc::getobject();
-  x->settype(type::ENVIRON);
+  x->settype(type::Environ);
   x->set(_lisp.e().environment());
   return x;
 }
 
 LISPT evaluator::destblock(LISPT e)
 {
-  check(e, type::ENVIRON);
+  check(e, type::Environ);
   return destblock(e->envval());
 }
 

@@ -52,19 +52,19 @@ TEST_CASE("io: ratom")
   {
     auto in = ref_file_t::create("124");
     auto r = ratom(in);
-    CHECK(type_of(r) == type::INTEGER);
+    CHECK(type_of(r) == type::Integer);
   }
   SECTION("symbol")
   {
     {
       auto in = ref_file_t::create("124abc");
       auto r = ratom(in);
-      CHECK(type_of(r) == type::SYMBOL);
+      CHECK(type_of(r) == type::Symbol);
     }
     {
       auto in = ref_file_t::create("124abc");
       auto r = ratom(in);
-      CHECK(type_of(r) == type::SYMBOL);
+      CHECK(type_of(r) == type::Symbol);
     }
   }
   SECTION("string")
@@ -73,7 +73,7 @@ TEST_CASE("io: ratom")
     // symbol \".
     auto in = ref_file_t::create(R"("hello")");
     auto r = ratom(in);
-    CHECK(type_of(r) == type::STRING);
+    CHECK(type_of(r) == type::String);
   }
 }
 

@@ -21,21 +21,21 @@ namespace lisp::details::prop
 {
 LISPT setplist(lisp& l, LISPT x, LISPT pl)
 {
-  check(x, type::SYMBOL);
+  check(x, type::Symbol);
   x->symbol().plist = pl;
   return pl;
 }
 
 LISPT getplist(lisp& l, LISPT x)
 {
-  check(x, type::SYMBOL);
+  check(x, type::Symbol);
   return x->symbol().plist;
 }
 
 LISPT putprop(lisp& l, LISPT x, LISPT p, LISPT v)
 {
-  check(x, type::SYMBOL);
-  check(p, type::SYMBOL);
+  check(x, type::Symbol);
+  check(p, type::Symbol);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
     if(pl->car() == p)
     {
@@ -48,8 +48,8 @@ LISPT putprop(lisp& l, LISPT x, LISPT p, LISPT v)
 
 LISPT getprop(lisp& l, LISPT x, LISPT p)
 {
-  check(x, type::SYMBOL);
-  check(p, type::SYMBOL);
+  check(x, type::Symbol);
+  check(p, type::Symbol);
   for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
@@ -60,8 +60,8 @@ LISPT getprop(lisp& l, LISPT x, LISPT p)
 
 LISPT remprop(lisp& l, LISPT x, LISPT p)
 {
-  check(x, type::SYMBOL);
-  check(p, type::SYMBOL);
+  check(x, type::Symbol);
+  check(p, type::Symbol);
   LISPT r = NIL;
   auto pl = x->symbol().plist;
   LISPT pl2 = NIL;

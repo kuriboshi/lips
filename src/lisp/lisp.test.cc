@@ -24,27 +24,27 @@ namespace lisp
 
 TEST_CASE("lisp: to_underlying")
 {
-  CHECK(to_underlying(type::NIL) == 0);
+  CHECK(to_underlying(type::Nil) == 0);
   CHECK(to_underlying(type::T) == 1);
-  CHECK(to_underlying(type::EMPTY) == 2);
-  CHECK(to_underlying(type::SYMBOL) == 3);
-  CHECK(to_underlying(type::INTEGER) == 4);
-  CHECK(to_underlying(type::FLOAT) == 5);
-  CHECK(to_underlying(type::INDIRECT) == 6);
-  CHECK(to_underlying(type::CONS) == 7);
-  CHECK(to_underlying(type::STRING) == 8);
-  CHECK(to_underlying(type::SUBR) == 9);
-  CHECK(to_underlying(type::FSUBR) == 10);
-  CHECK(to_underlying(type::LAMBDA) == 11);
-  CHECK(to_underlying(type::NLAMBDA) == 12);
-  CHECK(to_underlying(type::CLOSURE) == 13);
-  CHECK(to_underlying(type::UNBOUND) == 14);
-  CHECK(to_underlying(type::ENVIRON) == 15);
-  CHECK(to_underlying(type::FILET) == 16);
-  CHECK(to_underlying(type::FREE) == 17);
-  CHECK(to_underlying(type::ENDOFFILE) == 18);
-  CHECK(to_underlying(type::ERROR) == 19);
-  CHECK(to_underlying(type::CVARIABLE) == 20);
+  CHECK(to_underlying(type::Empty) == 2);
+  CHECK(to_underlying(type::Symbol) == 3);
+  CHECK(to_underlying(type::Integer) == 4);
+  CHECK(to_underlying(type::Float) == 5);
+  CHECK(to_underlying(type::Indirect) == 6);
+  CHECK(to_underlying(type::Cons) == 7);
+  CHECK(to_underlying(type::String) == 8);
+  CHECK(to_underlying(type::Subr) == 9);
+  CHECK(to_underlying(type::Fsubr) == 10);
+  CHECK(to_underlying(type::Lambda) == 11);
+  CHECK(to_underlying(type::Nlambda) == 12);
+  CHECK(to_underlying(type::Closure) == 13);
+  CHECK(to_underlying(type::Unbound) == 14);
+  CHECK(to_underlying(type::Environ) == 15);
+  CHECK(to_underlying(type::File) == 16);
+  CHECK(to_underlying(type::Free) == 17);
+  CHECK(to_underlying(type::Eof) == 18);
+  CHECK(to_underlying(type::Error) == 19);
+  CHECK(to_underlying(type::Cvariable) == 20);
 }
 
 TEST_CASE("lisp: mkprim")
@@ -79,7 +79,7 @@ TEST_CASE("lisp: mkprim")
 TEST_CASE("lisp: cons")
 {
   auto v = cons("a"_a, "b"_a);
-  REQUIRE(type_of(v) == type::CONS);
+  REQUIRE(type_of(v) == type::Cons);
   CHECK(v->cons().car == "a"_a);
   CHECK(v->cons().cdr == "b"_a);
 }
@@ -87,7 +87,7 @@ TEST_CASE("lisp: cons")
 TEST_CASE("lisp: type_of")
 {
   auto v = "string"_s;
-  CHECK(type_of(*v) == type::STRING);
+  CHECK(type_of(*v) == type::String);
 }
 
 TEST_CASE("lisp: version")
@@ -101,27 +101,27 @@ TEST_CASE("lisp: literals")
   SECTION("string")
   {
     auto s = "string"_s;
-    CHECK(type_of(s) == type::STRING);
+    CHECK(type_of(s) == type::String);
   }
 
   SECTION("integer")
   {
     auto i = 1001_l;
-    CHECK(type_of(i) == type::INTEGER);
+    CHECK(type_of(i) == type::Integer);
   }
 
   SECTION("float")
   {
     auto d = 1.2_l;
-    CHECK(type_of(d) == type::FLOAT);
+    CHECK(type_of(d) == type::Float);
   }
 
   SECTION("sexpr")
   {
     auto sexpr = "((a b) c)"_l;
-    REQUIRE(type_of(sexpr) == type::CONS);
+    REQUIRE(type_of(sexpr) == type::Cons);
     auto a = caar(sexpr);
-    CHECK(type_of(a) == type::SYMBOL);
+    CHECK(type_of(a) == type::Symbol);
     CHECK(a->symbol().pname == "a");
     file_t out(std::make_unique<io::string_sink>());
     prin0(sexpr, out);
@@ -131,13 +131,13 @@ TEST_CASE("lisp: literals")
   SECTION("atom")
   {
     auto a = "atom"_a;
-    CHECK(type_of(a) == type::SYMBOL);
+    CHECK(type_of(a) == type::Symbol);
   }
 
   SECTION("eval")
   {
     auto e = "(plus 1 2)"_e;
-    REQUIRE(type_of(e) == type::INTEGER);
+    REQUIRE(type_of(e) == type::Integer);
     CHECK(e->intval() == 3);
   }
 }
@@ -148,7 +148,7 @@ TEST_CASE("lisp: iter")
   {
     auto list = "(a b c)"_l;
     auto i = begin(list);
-    CHECK(type_of(*i) == type::SYMBOL);
+    CHECK(type_of(*i) == type::Symbol);
     CHECK(*i == "a"_a);
     CHECK(*++i == "b"_a);
     CHECK(*i++ == "b"_a);
@@ -163,7 +163,7 @@ TEST_CASE("lisp: iter")
     // elements but the last one will be nil and 'c' will never be accessed.
     auto list = "(a b . c)"_l;
     auto i = begin(list);
-    CHECK(type_of(*i) == type::SYMBOL);
+    CHECK(type_of(*i) == type::Symbol);
     CHECK(*i == "a"_a);
     CHECK(*++i == "b"_a);
     CHECK(*i++ == "b"_a);

@@ -50,7 +50,7 @@ LISPT repl::operator()(LISPT exp)
     if(com == C_EMPTY)
       return C_EOF;
     /* OK, EVAL, ^, ... */
-    if(type_of(com) != type::CONS)
+    if(type_of(com) != type::Cons)
     {
       prin0("(go) continue"_s);
       terpri();

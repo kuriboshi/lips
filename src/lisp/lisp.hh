@@ -52,27 +52,27 @@ void ref_deleter(lisp_t* obj);
 
 enum class type
 {
-  NIL = 0,   // so that nullptr also becomes NIL
+  Nil = 0,   // so that nullptr also becomes NIL
   T,         // the truth object
-  EMPTY,     // the empty object, contains no value
-  SYMBOL,    // an atomic symbol
-  INTEGER,   // 24 bit integer in same word
-  FLOAT,     // a double
-  INDIRECT,  // used when a value is stored in a closure
-  CONS,      // a pair
-  STRING,    // character strings
-  SUBR,      // eval type primitive function
-  FSUBR,     // noeval
-  LAMBDA,    // lambda function
-  NLAMBDA,   // noeval
-  CLOSURE,   // static binding object
-  UNBOUND,   // unbound indicator
-  ENVIRON,   // environment stack type for gc use
-  FILET,     // file pointer
-  FREE,      // an object on the freelist, used for consistency checks
-  ENDOFFILE, // returned from read at end of file
-  ERROR,     // returned from primitive when an error occured
-  CVARIABLE  // is a pointer to c-variable
+  Empty,     // the empty object, contains no value
+  Symbol,    // an atomic symbol
+  Integer,   // 24 bit integer in same word
+  Float,     // floating point value
+  Indirect,  // used when a value is stored in a closure
+  Cons,      // a pair
+  String,    // character strings
+  Subr,      // eval type primitive function
+  Fsubr,     // noeval primitive function
+  Lambda,    // lambda function
+  Nlambda,   // noeval lambda function
+  Closure,   // static binding object
+  Unbound,   // unbound indicator
+  Environ,   // environment stack type for gc use
+  File,      // file pointer
+  Free,      // an object on the freelist -- used for consistency checks
+  Eof,       // returned from read at end of file
+  Error,     // returned from primitive when an error occured
+  Cvariable  // is a pointer to c-variable
 };
 
 inline constexpr auto NIL = nullptr;
@@ -353,19 +353,19 @@ public:
 
   void set()
   {
-    _type = type::NIL;
+    _type = type::Nil;
     _u = {};
   }
   void set(std::nullptr_t)
   {
-    _type = type::EMPTY;
+    _type = type::Empty;
     _u = nullptr;
   }
   bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
   void set(const symbol::symbol_t& sym)
   {
-    _type = type::SYMBOL;
+    _type = type::Symbol;
     _u = sym.id;
   }
   auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
@@ -373,25 +373,25 @@ public:
   auto intval() const -> int { return std::get<int>(_u); }
   void set(int x)
   {
-    _type = type::INTEGER;
+    _type = type::Integer;
     _u = x;
   }
   auto floatval() const -> double { return std::get<double>(_u); }
   void set(double f)
   {
-    _type = type::FLOAT;
+    _type = type::Float;
     _u = f;
   }
   auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
   void set(indirect_t x)
   {
-    _type = type::INDIRECT;
+    _type = type::Indirect;
     _u = x;
   }
   auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
   void set(cons_t x)
   {
-    _type = type::CONS;
+    _type = type::Cons;
     _u = x;
   }
   auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
@@ -401,49 +401,49 @@ public:
   auto string() const -> const std::string& { return std::get<std::string>(_u); }
   void set(const std::string& s)
   {
-    _type = type::STRING;
+    _type = type::String;
     _u = s;
   }
   auto subrval() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
   void set(subr_index x)
   {
-    _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::SUBR : type::FSUBR;
+    _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::Subr : type::Fsubr;
     _u = x;
   }
   auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
   void set(lambda_t x, bool lambda)
   {
-    _type = lambda ? type::LAMBDA : type::NLAMBDA;
+    _type = lambda ? type::Lambda : type::Nlambda;
     _u = x;
   }
   auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
   void set(ref_closure_t x)
   {
-    _type = type::CLOSURE;
+    _type = type::Closure;
     _u = x;
   }
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env)
   {
-    _type = type::ENVIRON;
+    _type = type::Environ;
     _u = env;
   }
   auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
   void set(ref_file_t f)
   {
-    _type = type::FILET;
+    _type = type::File;
     _u = f;
   }
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
   void set(cvariable_t&& x)
   {
-    _type = type::CVARIABLE;
+    _type = type::Cvariable;
     _u = std::move(x);
   }
 
   const std::string& getstr() const
   {
-    return _type == type::STRING ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
+    return _type == type::String ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
   }
 
   type gettype() const { return _type; }
@@ -466,7 +466,7 @@ private:
   using pool_t = pool<lisp_t, 256>;
   static pool_t _pool;
 
-  type _type = type::NIL;
+  type _type = type::Nil;
 
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
@@ -488,10 +488,10 @@ private:
     _u;
 };
 
-inline type type_of(LISPT a) { return a == nullptr ? type::NIL : a->gettype(); }
+inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
 inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == type::NIL; }
+inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
 
 //
 // All lisp constants used internally.
@@ -662,67 +662,67 @@ void check(LISPT arg, T type)
   {
     switch(type)
     {
-      case type::NIL:
+      case type::Nil:
         error(type_errc::not_nil, arg);
         break;
       case type::T:
         error(type_errc::not_t, arg);
         break;
-      case type::EMPTY:
+      case type::Empty:
         error(type_errc::not_empty, arg);
         break;
-      case type::SYMBOL:
+      case type::Symbol:
         error(type_errc::not_symbol, arg);
         break;
-      case type::INTEGER:
+      case type::Integer:
         error(type_errc::not_integer, arg);
         break;
-      case type::FLOAT:
+      case type::Float:
         error(type_errc::not_float, arg);
         break;
-      case type::INDIRECT:
+      case type::Indirect:
         error(type_errc::not_indirect, arg);
         break;
-      case type::CONS:
+      case type::Cons:
         error(type_errc::not_cons, arg);
         break;
-      case type::STRING:
+      case type::String:
         error(type_errc::not_string, arg);
         break;
-      case type::SUBR:
+      case type::Subr:
         error(type_errc::not_subr, arg);
         break;
-      case type::FSUBR:
+      case type::Fsubr:
         error(type_errc::not_fsubr, arg);
         break;
-      case type::LAMBDA:
+      case type::Lambda:
         error(type_errc::not_lambda, arg);
         break;
-      case type::NLAMBDA:
+      case type::Nlambda:
         error(type_errc::not_nlambda, arg);
         break;
-      case type::CLOSURE:
+      case type::Closure:
         error(type_errc::not_closure, arg);
         break;
-      case type::UNBOUND:
+      case type::Unbound:
         error(type_errc::not_unbound, arg);
         break;
-      case type::ENVIRON:
+      case type::Environ:
         error(type_errc::not_environ, arg);
         break;
-      case type::FILET:
+      case type::File:
         error(type_errc::not_filet, arg);
         break;
-      case type::FREE:
+      case type::Free:
         error(type_errc::not_free, arg);
         break;
-      case type::ENDOFFILE:
+      case type::Eof:
         error(type_errc::not_endoffile, arg);
         break;
-      case type::ERROR:
+      case type::Error:
         error(type_errc::not_error, arg);
         break;
-      case type::CVARIABLE:
+      case type::Cvariable:
         error(type_errc::not_cvariable, arg);
         break;
     }

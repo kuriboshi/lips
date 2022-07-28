@@ -30,7 +30,7 @@ namespace lisp::details::map
 /// @returns NIL
 LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(type_of(obj) == type::CONS)
+  while(type_of(obj) == type::Cons)
   {
     apply(fn1, cons(obj, NIL));
     if(is_NIL(fn2))
@@ -51,7 +51,7 @@ LISPT map(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 /// @returns NIL
 LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
-  while(type_of(obj) == type::CONS)
+  while(type_of(obj) == type::Cons)
   {
     apply(fn1, cons(obj->car(), NIL));
     if(is_NIL(fn2))
@@ -73,13 +73,13 @@ LISPT mapc(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
-  if(type_of(obj) == type::CONS)
+  if(type_of(obj) == type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj, NIL)), NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  while(type_of(obj) == type::CONS)
+  while(type_of(obj) == type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj, NIL)), NIL));
     tmp = tmp->cdr();
@@ -102,13 +102,13 @@ LISPT maplist(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 LISPT mapcar(lisp& l, LISPT obj, LISPT fn1, LISPT fn2)
 {
   LISPT tmp = NIL;
-  if(type_of(obj) == type::CONS)
+  if(type_of(obj) == type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj->car(), NIL)), NIL);
     obj = obj->cdr();
   }
   LISPT rval = tmp;
-  while(type_of(obj) == type::CONS)
+  while(type_of(obj) == type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj->car(), NIL)), NIL));
     tmp = tmp->cdr();

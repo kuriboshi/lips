@@ -98,7 +98,7 @@ LISPT readline(ref_file_t file)
 
 LISPT getline(LISPT file)
 {
-  check(file, type::FILET);
+  check(file, type::File);
   auto line = file->file()->getline();
   if(line)
     return mkstring(*line);
@@ -151,7 +151,7 @@ LISPT prinbody(lisp& l, LISPT x, file_t& file, bool esc)
     io::prin0(l, i->car(), file, esc);
     if(is_NIL(i->cdr()))
       break;
-    if(type_of(i->cdr()) == type::CONS)
+    if(type_of(i->cdr()) == type::Cons)
     {
       file.putch(' ');
       i = i->cdr();
@@ -172,7 +172,7 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
-    case type::CONS:
+    case type::Cons:
       l.thisplevel++;
       if(l.thisplevel <= l.printlevel || l.printlevel <= 0)
       {
@@ -184,24 +184,24 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
         file.putch('&');
       l.thisplevel--;
       break;
-    case type::SYMBOL:
+    case type::Symbol:
       return io::patom(x, file, esc);
-    case type::NIL:
+    case type::Nil:
       ps("nil", file, false);
       break;
-    case type::EMPTY:
+    case type::Empty:
       ps("", file, false);
       break;
     case type::T:
       file.putch('t');
       break;
-    case type::INTEGER:
+    case type::Integer:
       pi(x->intval(), l.currentbase()->intval(), file);
       break;
-    case type::FLOAT:
+    case type::Float:
       pf(x->floatval(), file);
       break;
-    case type::STRING:
+    case type::String:
       if(esc)
       {
         file.putch('"');
@@ -211,40 +211,40 @@ LISPT prin0(lisp& l, LISPT x, file_t& file, bool esc)
       else
         ps(x->string(), file, false);
       break;
-    case type::CLOSURE:
+    case type::Closure:
       pp("#<closure", file, x);
       break;
-    case type::LAMBDA:
+    case type::Lambda:
       pp("#<lambda", file, x);
       break;
-    case type::NLAMBDA:
+    case type::Nlambda:
       pp("#<nlambda", file, x);
       break;
-    case type::INDIRECT:
+    case type::Indirect:
       pp("#<indirect", file, x);
       break;
-    case type::SUBR:
+    case type::Subr:
       pp("#<subr", file, x);
       break;
-    case type::FSUBR:
+    case type::Fsubr:
       pp("#<fsubr", file, x);
       break;
-    case type::UNBOUND:
+    case type::Unbound:
       ps("#<unbound>", file, false);
       break;
-    case type::ENVIRON:
+    case type::Environ:
       pp("#<environ", file, x);
       break;
-    case type::FREE:
+    case type::Free:
       pp("#<free", file, x);
       break;
-    case type::ENDOFFILE:
+    case type::Eof:
       pp("#<endoffile", file, x);
       break;
-    case type::FILET:
+    case type::File:
       pp("#<file", file, x);
       break;
-    case type::ERROR:
+    case type::Error:
       pp("#<error", file, x);
       break;
     default:
@@ -296,11 +296,11 @@ LISPT terpri(file_t& file)
 ///
 LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
 {
-  check(x, type::CONS);
+  check(x, type::Cons);
   if(is_NIL(y))
     return x;
   LISPT t = x->cdr();
-  if(type_of(y) != type::CONS)
+  if(type_of(y) != type::Cons)
   {
     if(tailp)
       rplacd(x, cons(y, t));
@@ -315,7 +315,7 @@ LISPT splice(lisp& l, LISPT x, LISPT y, bool tailp)
   }
   rplacd(x, y);
   LISPT t2 = NIL;
-  for(; type_of(y) == type::CONS; y = y->cdr())
+  for(; type_of(y) == type::Cons; y = y->cdr())
     t2 = y;
   return rplacd(t2, t);
 }

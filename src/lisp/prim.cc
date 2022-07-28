@@ -36,7 +36,7 @@ static LISPT mkindirect(lisp& l, LISPT obj)
   /* If already an indirect type object, return it. */
   /* We want all symbols that we include in closures */
   /* on the same level to refer to the same value. */
-  if(type_of(obj) == type::INDIRECT)
+  if(type_of(obj) == type::Indirect)
     return obj;
   /* If it's a new object, cons up the storage for it */
   /* wasting the car part. */
@@ -53,119 +53,119 @@ LISPT closobj(lisp& l, LISPT vars)
 {
   if(is_NIL(vars))
     return NIL;
-  check(vars, type::CONS);
-  check(vars->car(), type::SYMBOL);
+  check(vars, type::Cons);
+  check(vars->car(), type::Symbol);
   return cons(mkindirect(l, vars->car()->value()), closobj(l, vars->cdr()));
 }
 
 LISPT car(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return a->car();
   return NIL;
 }
 
 LISPT cdr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return a->cdr();
   return NIL;
 }
 
 LISPT cadr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, a->cdr());
   return NIL;
 }
 
 LISPT cdar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, a->car());
   return NIL;
 }
 
 LISPT caar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, a->car());
   return NIL;
 }
 
 LISPT cddr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, a->cdr());
   return NIL;
 }
 
 LISPT cdddr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, prim::cdr(l, a->cdr()));
   return NIL;
 }
 
 LISPT caddr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, prim::cdr(l, a->cdr()));
   return NIL;
 }
 
 LISPT cdadr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, prim::car(l, a->cdr()));
   return NIL;
 }
 
 LISPT caadr(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, prim::car(l, a->cdr()));
   return NIL;
 }
 
 LISPT cddar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, prim::cdr(l, a->car()));
   return NIL;
 }
 
 LISPT cadar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, prim::cdr(l, a->car()));
   return NIL;
 }
 
 LISPT cdaar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::cdr(l, prim::car(l, a->car()));
   return NIL;
 }
 
 LISPT caaar(lisp& l, LISPT a)
 {
-  if(type_of(a) == type::CONS)
+  if(type_of(a) == type::Cons)
     return prim::car(l, prim::car(l, a->car()));
   return NIL;
 }
 
 LISPT rplaca(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::CONS);
+  check(x, type::Cons);
   x->car(y);
   return x;
 }
 
 LISPT rplacd(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::CONS);
+  check(x, type::Cons);
   x->cdr(y);
   return x;
 }
@@ -174,14 +174,14 @@ LISPT eq(lisp& l, LISPT a, LISPT b)
 {
   if(a == b)
     return T;
-  if(type_of(a) == type::INTEGER && type_of(b) == type::INTEGER && a->intval() == b->intval())
+  if(type_of(a) == type::Integer && type_of(b) == type::Integer && a->intval() == b->intval())
     return T;
   return NIL;
 }
 
 LISPT atom(lisp& l, LISPT a)
 {
-  if(is_NIL(a) || is_T(a) || type_of(a) == type::SYMBOL || type_of(a) == type::INTEGER || type_of(a) == type::FLOAT)
+  if(is_NIL(a) || is_T(a) || type_of(a) == type::Symbol || type_of(a) == type::Integer || type_of(a) == type::Float)
     return T;
   return NIL;
 }
@@ -196,7 +196,7 @@ LISPT nconc(lisp& l, LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      check(x->car(), type::CONS);
+      check(x->car(), type::Cons);
       if(is_NIL(curp))
       {
         curp = x->car();
@@ -219,8 +219,8 @@ LISPT tconc(lisp& l, LISPT cell, LISPT obj)
     cell = cons(cons(obj, NIL), NIL);
     return prim::rplacd(l, cell, cell->car());
   }
-  check(cell, type::CONS);
-  if(type_of(cell->car()) != type::CONS)
+  check(cell, type::Cons);
+  if(type_of(cell->car()) != type::Cons)
   {
     prim::rplacd(l, cell, cons(obj, NIL));
     return prim::rplaca(l, cell, cell->cdr());
@@ -233,7 +233,7 @@ LISPT attach(lisp& l, LISPT obj, LISPT list)
 {
   if(is_NIL(list))
     return cons(obj, NIL);
-  check(list, type::CONS);
+  check(list, type::Cons);
   prim::rplacd(l, list, cons(list->car(), list->cdr()));
   return prim::rplaca(l, list, obj);
 }
@@ -248,7 +248,7 @@ LISPT append(lisp& l, LISPT x)
   {
     if(!is_NIL(x->car()))
     {
-      check(x->car(), type::CONS);
+      check(x->car(), type::Cons);
       for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
       {
         prim::rplacd(l, curp, cons(cl->car(), NIL));
@@ -268,16 +268,16 @@ LISPT null(lisp& l, LISPT a)
 
 LISPT quote(lisp& l, LISPT x) { return x; }
 
-LISPT lambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::LAMBDA); }
+LISPT lambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::Lambda); }
 
-LISPT nlambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::NLAMBDA); }
+LISPT nlambda(lisp& l, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::Nlambda); }
 
 LISPT list(lisp& l, LISPT x) { return x; }
 
 LISPT length(lisp& l, LISPT x)
 {
   int i = 0;
-  while(!is_NIL(x) && type_of(x) == type::CONS)
+  while(!is_NIL(x) && type_of(x) == type::Cons)
   {
     x = x->cdr();
     i++;
@@ -293,7 +293,7 @@ LISPT closure(lisp& l, LISPT fun, LISPT vars)
   auto f = prim::length(l, vars);
   c->count = f->intval();
   f = closobj(l, vars);
-  if(type_of(f) == type::ERROR)
+  if(type_of(f) == type::Error)
     return f;
   c->cvalues = f;
   auto clos = alloc::getobject();
@@ -313,16 +313,16 @@ inline LISPT _nth(lisp& l, LISPT list, int n)
 
 LISPT nth(lisp& l, LISPT x, LISPT p)
 {
-  check(p, type::INTEGER);
+  check(p, type::Integer);
   if(is_NIL(x))
     return NIL;
-  check(x, type::CONS);
+  check(x, type::Cons);
   return _nth(l, x, p->intval());
 }
 
 LISPT error(lisp& l, LISPT mess)
 {
-  check(mess, type::STRING);
+  check(mess, type::String);
   return l.error(error_errc::user_error, mess);
 }
 
@@ -330,7 +330,7 @@ LISPT uxexit(lisp& l, LISPT status)
 {
   if(is_NIL(status))
     throw lisp_finish("exit called", 0);
-  check(status, type::INTEGER);
+  check(status, type::Integer);
   throw lisp_finish("exit called", status->intval());
 }
 
@@ -373,7 +373,7 @@ inline constexpr auto EXIT = "exit";       // exit lips
 void init()
 {
   C_ERROR = intern(pn::ERROR);
-  C_ERROR->settype(type::ERROR);
+  C_ERROR->settype(type::Error);
   C_LAMBDA = intern(pn::LAMBDA);
   C_NLAMBDA = intern(pn::NLAMBDA);
   C_QUOTE = intern(pn::QUOTE);

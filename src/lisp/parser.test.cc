@@ -175,7 +175,7 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
 {
   lexer lexer{"(greaterp 1.0 \"b\")"};
   auto res = parser(lexer).parse();
-  REQUIRE(type_of(res) == type::CONS);
+  REQUIRE(type_of(res) == type::Cons);
   CHECK(car(res) == "greaterp"_a);
   CHECK(cadr(res)->floatval() == 1.0);
   CHECK(caddr(res)->string() == "b");
@@ -196,7 +196,7 @@ TEST_CASE("parser: macro")
   lexer.set('$', "rmgetenv"_l);
   auto r = parser(lexer).parse();
   REQUIRE(r);
-  REQUIRE(type_of(r) == type::STRING);
+  REQUIRE(type_of(r) == type::String);
   CHECK(r->string().starts_with("/"));
 }
 

@@ -495,7 +495,7 @@ TEST_CASE("expandfiles")
 //
 LISPT expand(LISPT wild)
 {
-  check(wild, type::STRING, type::SYMBOL);
+  check(wild, type::String, type::Symbol);
   auto wstr = extilde(wild->getstr());
   if(!wstr)
     return NIL;

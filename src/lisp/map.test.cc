@@ -31,7 +31,7 @@ TEST_CASE("Map functions")
 (map '(1 2 3)
       (lambda (a)
        (setq cvar (cons (car a) cvar)))))");
-    CHECK(type_of(cvar) == type::CONS);
+    CHECK(type_of(cvar) == type::Cons);
     CHECK(car(cvar)->intval() == 3);
     CHECK(cadr(cvar)->intval() == 2);
     CHECK(caddr(cvar)->intval() == 1);
@@ -43,7 +43,7 @@ TEST_CASE("Map functions")
 
     cvar = NIL;
     map("(1 2 3)"_l, lambda("(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda("(a)"_l, "((cdr a))"_l));
-    CHECK(type_of(cvar) == type::CONS);
+    CHECK(type_of(cvar) == type::Cons);
     CHECK(car(cvar)->intval() == 3);
     CHECK(cadr(cvar)->intval() == 2);
     CHECK(caddr(cvar)->intval() == 1);
@@ -56,7 +56,7 @@ TEST_CASE("Map functions")
 (mapc '(1 2 3)
        (lambda (a)
         (setq cvar (cons a cvar)))))");
-    REQUIRE(type_of(cvar) == type::CONS);
+    REQUIRE(type_of(cvar) == type::Cons);
     CHECK(car(cvar)->intval() == 3);
     CHECK(cadr(cvar)->intval() == 2);
     CHECK(caddr(cvar)->intval() == 1);
@@ -64,12 +64,12 @@ TEST_CASE("Map functions")
     cvar = 0_l;
     auto f = lambda("(a)"_l, "((setq cvar (plus a cvar)))"_l);
     mapc(mklist(1_l, 1_l, 1_l), f, NIL);
-    REQUIRE(type_of(cvar) == type::INTEGER);
+    REQUIRE(type_of(cvar) == type::Integer);
     CHECK(cvar->intval() == 3);
 
     cvar = 0_l;
     mapc(mklist(1_l, 2_l, 3_l), f, lambda("(a)"_l, "((cdr a))"_l));
-    REQUIRE(type_of(cvar) == type::INTEGER);
+    REQUIRE(type_of(cvar) == type::Integer);
     CHECK(cvar->intval() == 6);
   }
 
@@ -79,19 +79,19 @@ TEST_CASE("Map functions")
     auto f = lambda("(a)"_l, "((car a))"_l);
 
     auto r0 = maplist(ls, f, NIL);
-    REQUIRE(type_of(r0) == type::CONS);
+    REQUIRE(type_of(r0) == type::Cons);
     CHECK(car(r0)->intval() == 1);
     CHECK(cadr(r0)->intval() == 2);
     CHECK(caddr(r0)->intval() == 3);
 
     auto r1 = maplist(ls, f, NIL);
-    REQUIRE(type_of(r1) == type::CONS);
+    REQUIRE(type_of(r1) == type::Cons);
     CHECK(car(r1)->intval() == 1);
     CHECK(cadr(r1)->intval() == 2);
     CHECK(caddr(r1)->intval() == 3);
 
     auto r2 = maplist(ls, f, lambda("(a)"_l, "((cdr a))"_l));
-    REQUIRE(type_of(r2) == type::CONS);
+    REQUIRE(type_of(r2) == type::Cons);
     CHECK(car(r1)->intval() == 1);
     CHECK(cadr(r1)->intval() == 2);
     CHECK(caddr(r1)->intval() == 3);
@@ -103,19 +103,19 @@ TEST_CASE("Map functions")
     auto f = lambda("(a)"_l, "((plus a 1))"_l);
 
     auto r0 = mapcar(ls, f, NIL);
-    REQUIRE(type_of(r0) == type::CONS);
+    REQUIRE(type_of(r0) == type::Cons);
     CHECK(car(r0)->intval() == 2);
     CHECK(cadr(r0)->intval() == 3);
     CHECK(caddr(r0)->intval() == 4);
 
     auto r1 = mapcar(ls, f, NIL);
-    REQUIRE(type_of(r1) == type::CONS);
+    REQUIRE(type_of(r1) == type::Cons);
     CHECK(car(r1)->intval() == 2);
     CHECK(cadr(r1)->intval() == 3);
     CHECK(caddr(r1)->intval() == 4);
 
     auto r2 = mapcar(ls, f, lambda("(a)"_l, "((cdr a))"_l));
-    REQUIRE(type_of(r0) == type::CONS);
+    REQUIRE(type_of(r0) == type::Cons);
     CHECK(car(r2)->intval() == 2);
     CHECK(cadr(r2)->intval() == 3);
     CHECK(caddr(r2)->intval() == 4);

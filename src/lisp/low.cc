@@ -53,7 +53,7 @@ LISPT cond(lisp& l, LISPT args)
   while(!is_NIL(args))
   {
     auto alt = args->car();
-    check(alt, type::CONS);
+    check(alt, type::Cons);
     auto res = eval(alt->car());
     if(!is_NIL(res))
     {
@@ -82,12 +82,12 @@ LISPT progn(lisp& l, LISPT lexp)
 
 LISPT set(lisp& l, LISPT var, LISPT val)
 {
-  check(var, type::SYMBOL);
+  check(var, type::Symbol);
   if(var->symbol().constant)
     l.error(error_errc::attempt_to_clobber, var);
-  if(type_of(var->value()) == type::INDIRECT)
+  if(type_of(var->value()) == type::Indirect)
     var->value()->set(indirect_t{val});
-  else if(type_of(var->value()) == type::CVARIABLE)
+  else if(type_of(var->value()) == type::Cvariable)
   {
     auto symval = var->value();
     auto& cvar = symval->cvarval();

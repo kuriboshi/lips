@@ -32,22 +32,22 @@ LISPT plus(lisp& l, LISPT x)
   int sum = 0;
   bool f = false;
 
-  while(type_of(x) == type::CONS)
+  while(type_of(x) == type::Cons)
   {
     if(f)
     {
-      if(type_of(x->car()) == type::INTEGER)
+      if(type_of(x->car()) == type::Integer)
         fsum += static_cast<double>(x->car()->intval());
-      else if(type_of(x->car()) == type::FLOAT)
+      else if(type_of(x->car()) == type::Float)
         fsum += x->car()->floatval();
       else
         l.error(error_errc::illegal_arg, x->car());
     }
     else
     {
-      if(type_of(x->car()) == type::INTEGER)
+      if(type_of(x->car()) == type::Integer)
         sum += x->car()->intval();
-      else if(type_of(x->car()) == type::FLOAT)
+      else if(type_of(x->car()) == type::Float)
       {
         f = true;
         fsum = x->car()->floatval() + static_cast<double>(sum);
@@ -67,7 +67,7 @@ LISPT iplus(lisp& l, LISPT x)
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
   {
-    check(*i, type::INTEGER);
+    check(*i, type::Integer);
     sum += (**i).intval();
   }
   return mknumber(sum);
@@ -75,12 +75,12 @@ LISPT iplus(lisp& l, LISPT x)
 
 LISPT fplus(lisp& l, LISPT x)
 {
-  check(x->car(), type::FLOAT);
+  check(x->car(), type::Float);
   auto fsum = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == type::CONS)
+  while(type_of(x) == type::Cons)
   {
-    check(x->car(), type::FLOAT);
+    check(x->car(), type::Float);
     fsum = fsum + x->car()->floatval();
     x = x->cdr();
   }
@@ -89,30 +89,30 @@ LISPT fplus(lisp& l, LISPT x)
 
 LISPT difference(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::INTEGER, type::FLOAT);
-  check(y, type::INTEGER, type::FLOAT);
-  if(type_of(x) == type::INTEGER)
+  check(x, type::Integer, type::Float);
+  check(y, type::Integer, type::Float);
+  if(type_of(x) == type::Integer)
   {
-    if(type_of(y) == type::INTEGER)
+    if(type_of(y) == type::Integer)
       return mknumber(x->intval() - y->intval());
     return mkfloat(static_cast<double>(x->intval()) - y->floatval());
   }
-  if(type_of(y) == type::INTEGER)
+  if(type_of(y) == type::Integer)
     return mkfloat(x->floatval() - static_cast<double>(y->intval()));
   return mkfloat(x->floatval() - y->floatval());
 }
 
 LISPT idifference(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::INTEGER);
-  check(y, type::INTEGER);
+  check(x, type::Integer);
+  check(y, type::Integer);
   return mknumber(x->intval() - y->intval());
 }
 
 LISPT fdifference(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::FLOAT);
-  check(y, type::FLOAT);
+  check(x, type::Float);
+  check(y, type::Float);
   return mkfloat(x->floatval() - y->floatval());
 }
 
@@ -122,20 +122,20 @@ LISPT ltimes(lisp& l, LISPT x)
   int prod = 1;
   int f = 0;
 
-  while(type_of(x) == type::CONS)
+  while(type_of(x) == type::Cons)
   {
     if(f != 0)
     {
-      if(type_of(x->car()) == type::INTEGER)
+      if(type_of(x->car()) == type::Integer)
         fprod *= (double)x->car()->intval();
-      else if(type_of(x->car()) == type::FLOAT)
+      else if(type_of(x->car()) == type::Float)
         fprod *= x->car()->floatval();
       else
         l.error(error_errc::illegal_arg, x->car());
     }
-    else if(type_of(x->car()) == type::INTEGER)
+    else if(type_of(x->car()) == type::Integer)
       prod *= x->car()->intval();
-    else if(type_of(x->car()) == type::FLOAT)
+    else if(type_of(x->car()) == type::Float)
     {
       f = 1;
       fprod = x->car()->floatval() * (double)prod;
@@ -151,12 +151,12 @@ LISPT ltimes(lisp& l, LISPT x)
 
 LISPT itimes(lisp& l, LISPT x)
 {
-  check(x->car(), type::INTEGER);
+  check(x->car(), type::Integer);
   auto prod = x->car()->intval();
   x = x->cdr();
-  while(type_of(x) == type::CONS)
+  while(type_of(x) == type::Cons)
   {
-    check(x->car(), type::INTEGER);
+    check(x->car(), type::Integer);
     prod = prod * x->car()->intval();
     x = x->cdr();
   }
@@ -165,12 +165,12 @@ LISPT itimes(lisp& l, LISPT x)
 
 LISPT ftimes(lisp& l, LISPT x)
 {
-  check(x->car(), type::FLOAT);
+  check(x->car(), type::Float);
   auto prod = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == type::CONS)
+  while(type_of(x) == type::Cons)
   {
-    check(x->car(), type::FLOAT);
+    check(x->car(), type::Float);
     prod = prod * x->car()->floatval();
     x = x->cdr();
   }
@@ -179,10 +179,10 @@ LISPT ftimes(lisp& l, LISPT x)
 
 LISPT divide(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::INTEGER, type::FLOAT);
-  check(y, type::INTEGER, type::FLOAT);
-  if(type_of(x) == type::INTEGER)
-    if(type_of(y) == type::INTEGER)
+  check(x, type::Integer, type::Float);
+  check(y, type::Integer, type::Float);
+  if(type_of(x) == type::Integer)
+    if(type_of(y) == type::Integer)
     {
       if(y->intval() == 0)
         l.error(error_errc::divide_by_zero, NIL);
@@ -194,7 +194,7 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
         l.error(error_errc::divide_by_zero, NIL);
       return mkfloat((double)x->intval() / y->floatval());
     }
-  else if(type_of(y) == type::INTEGER)
+  else if(type_of(y) == type::Integer)
   {
     if(y->intval() == 0)
       l.error(error_errc::divide_by_zero, NIL);
@@ -207,8 +207,8 @@ LISPT divide(lisp& l, LISPT x, LISPT y)
 
 LISPT iquotient(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::INTEGER);
-  check(y, type::INTEGER);
+  check(x, type::Integer);
+  check(y, type::Integer);
   if(y->intval() == 0)
     l.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() / y->intval());
@@ -216,8 +216,8 @@ LISPT iquotient(lisp& l, LISPT x, LISPT y)
 
 LISPT iremainder(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::INTEGER);
-  check(y, type::INTEGER);
+  check(x, type::Integer);
+  check(y, type::Integer);
   if(y->intval() == 0)
     l.error(error_errc::divide_by_zero, NIL);
   return mknumber(x->intval() % y->intval());
@@ -225,8 +225,8 @@ LISPT iremainder(lisp& l, LISPT x, LISPT y)
 
 LISPT fdivide(lisp& l, LISPT x, LISPT y)
 {
-  check(x, type::FLOAT);
-  check(y, type::FLOAT);
+  check(x, type::Float);
+  check(y, type::Float);
   if(y->floatval() == 0.0)
     l.error(error_errc::divide_by_zero, NIL);
   return mkfloat(x->floatval() / y->floatval());
@@ -234,21 +234,21 @@ LISPT fdivide(lisp& l, LISPT x, LISPT y)
 
 LISPT minus(lisp& l, LISPT x)
 {
-  check(x, type::FLOAT, type::INTEGER);
-  if(type_of(x) == type::INTEGER)
+  check(x, type::Float, type::Integer);
+  if(type_of(x) == type::Integer)
     return mknumber(-x->intval());
   return mkfloat(-x->floatval());
 }
 
 LISPT iminus(lisp& l, LISPT x)
 {
-  check(x, type::INTEGER);
+  check(x, type::Integer);
   return mknumber(-x->intval());
 }
 
 LISPT abs(lisp& l, LISPT x)
 {
-  check(x, type::INTEGER);
+  check(x, type::Integer);
   if(x->intval() < 0)
     return mknumber(-x->intval());
   return mknumber(x->intval());
@@ -256,19 +256,19 @@ LISPT abs(lisp& l, LISPT x)
 
 LISPT itof(lisp& l, LISPT x)
 {
-  check(x, type::INTEGER);
+  check(x, type::Integer);
   return mkfloat(static_cast<double>(x->intval()));
 }
 
 LISPT add1(lisp& l, LISPT x)
 {
-  check(x, type::INTEGER);
+  check(x, type::Integer);
   return mknumber(x->intval() + 1);
 }
 
 LISPT sub1(lisp& l, LISPT x)
 {
-  check(x, type::INTEGER);
+  check(x, type::Integer);
   return mknumber(x->intval() - 1);
 }
 
@@ -284,19 +284,19 @@ enum class num_type
 
 inline num_type numtype(LISPT x, LISPT y)
 {
-  if(type_of(x) == type::FLOAT)
+  if(type_of(x) == type::Float)
   {
-    if(type_of(y) == type::FLOAT)
+    if(type_of(y) == type::Float)
       return num_type::FLOATFLOAT;
-    if(type_of(y) == type::INTEGER)
+    if(type_of(y) == type::Integer)
       return num_type::FLOATINT;
     return num_type::ILLEGAL2;
   }
-  if(type_of(x) == type::INTEGER)
+  if(type_of(x) == type::Integer)
   {
-    if(type_of(y) == type::FLOAT)
+    if(type_of(y) == type::Float)
       return num_type::INTFLOAT;
-    if(type_of(y) == type::INTEGER)
+    if(type_of(y) == type::Integer)
       return num_type::INTINT;
     return num_type::ILLEGAL2;
   }
@@ -347,20 +347,20 @@ LISPT neqp(lisp& l, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(l, x,
 
 LISPT zerop(lisp& l, LISPT x)
 {
-  if(type_of(x) == type::INTEGER && x->intval() == 0)
+  if(type_of(x) == type::Integer && x->intval() == 0)
     return T;
   return NIL;
 }
 
 LISPT minusp(lisp& l, LISPT x)
 {
-  if(type_of(x) == type::FLOAT)
+  if(type_of(x) == type::Float)
   {
     if(x->floatval() < 0.0)
       return T;
     return NIL;
   }
-  if(type_of(x) == type::INTEGER)
+  if(type_of(x) == type::Integer)
   {
     if(x->intval() < 0)
       return T;

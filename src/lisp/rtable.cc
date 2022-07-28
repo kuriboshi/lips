@@ -25,7 +25,7 @@ namespace lisp::rtable
 //
 LISPT rmdquote(lisp& l, LISPT stream)
 {
-  check(stream, type::FILET);
+  check(stream, type::File);
   std::string buffer;
   auto c = stream->file()->getch();
   while(c != '"')
@@ -40,7 +40,7 @@ LISPT rmdquote(lisp& l, LISPT stream)
 
 LISPT rmsquote(lisp& l, LISPT stream)
 {
-  check(stream, type::FILET);
+  check(stream, type::File);
   int c = 0;
   if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
   {
@@ -53,9 +53,9 @@ LISPT rmsquote(lisp& l, LISPT stream)
 
 LISPT rmgetenv(lisp&, LISPT stream)
 {
-  check(stream, type::FILET);
+  check(stream, type::File);
   auto sym = ratom(stream->file());
-  check(sym, type::SYMBOL, type::STRING);
+  check(sym, type::Symbol, type::String);
   auto* val = std::getenv(sym->getstr().c_str());
   if(val == nullptr)
     return NIL;

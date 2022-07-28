@@ -90,7 +90,7 @@ LISPT mkfloat(double number)
 /// @return A straight list of arguments.
 LISPT mkarglist(LISPT alist, std::int8_t& count)
 {
-  if(type_of(alist) == type::CONS)
+  if(type_of(alist) == type::Cons)
   {
     ++count;
     return cons(alist->car(), mkarglist(alist->cdr(), count));
@@ -123,7 +123,7 @@ LISPT mklambda(LISPT args, LISPT def, type type)
   lambda.args = mkarglist(args, count);
   lambda.count = count;
   auto s = getobject();
-  s->set(lambda, type == type::LAMBDA);
+  s->set(lambda, type == type::Lambda);
   return s;
 }
 

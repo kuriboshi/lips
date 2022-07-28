@@ -22,8 +22,8 @@ namespace lisp::details::string
 /// @brief Return symbols print name as a string.
 LISPT symstr(lisp& l, LISPT sym)
 {
-  check(sym, type::SYMBOL, type::T, type::NIL);
-  if(type_of(sym) == type::NIL)
+  check(sym, type::Symbol, type::T, type::Nil);
+  if(type_of(sym) == type::Nil)
     return mkstring("nil");
   return mkstring(sym->symbol().pname);
 }
@@ -31,7 +31,7 @@ LISPT symstr(lisp& l, LISPT sym)
 /// @brief T if s is a string, NIL otherwise.
 LISPT stringp(lisp& l, LISPT s)
 {
-  if(type_of(s) == type::STRING)
+  if(type_of(s) == type::String)
     return s;
   return NIL;
 }
@@ -39,8 +39,8 @@ LISPT stringp(lisp& l, LISPT s)
 /// @brief T if both strings are equal.
 LISPT strequal(lisp& l, LISPT s1, LISPT s2)
 {
-  check(s1, type::STRING);
-  check(s2, type::STRING);
+  check(s1, type::String);
+  check(s2, type::String);
   if(s1->string() == s2->string())
     return T;
   return NIL;
@@ -49,8 +49,8 @@ LISPT strequal(lisp& l, LISPT s1, LISPT s2)
 /// @brief Compare two strings.
 LISPT strcmp(lisp& l, LISPT s1, LISPT s2)
 {
-  check(s1, type::STRING);
-  check(s2, type::STRING);
+  check(s1, type::String);
+  check(s2, type::String);
   return mknumber(s1->string().compare(s2->string()));
 }
 
@@ -60,7 +60,7 @@ LISPT concat(lisp& l, LISPT strlist)
   std::string result;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
   {
-    check(sl->car(), type::STRING);
+    check(sl->car(), type::String);
     result += sl->car()->string();
   }
   return mkstring(result);
@@ -69,7 +69,7 @@ LISPT concat(lisp& l, LISPT strlist)
 /// @brief Return string length of s.
 LISPT strlen(lisp& l, LISPT s)
 {
-  check(s, type::STRING);
+  check(s, type::String);
   return mknumber(static_cast<int>(s->string().length()));
 }
 
@@ -80,9 +80,9 @@ LISPT strlen(lisp& l, LISPT s)
 /// start is equal to one is accepted.
 LISPT substring(lisp& l, LISPT str, LISPT begin, LISPT end)
 {
-  check(str, type::STRING);
-  check(begin, type::INTEGER);
-  check(end, type::INTEGER, type::NIL);
+  check(str, type::String);
+  check(begin, type::Integer);
+  check(end, type::Integer, type::Nil);
   const auto& s = str->string();
   auto i = begin->intval();
   if(i == 0)
@@ -93,7 +93,7 @@ LISPT substring(lisp& l, LISPT str, LISPT begin, LISPT end)
     return i - 1;
   }();
   std::string::size_type e{0};
-  if(type_of(end) == type::INTEGER)
+  if(type_of(end) == type::Integer)
   {
     auto j = end->intval();
     if(j == 0)

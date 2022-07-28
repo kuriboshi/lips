@@ -29,10 +29,10 @@ TEST_CASE("user: User defined functions")
     auto f0 = mklist(mklist(mkatom("f0"), lambda(mklist(mkatom("a")), mklist(mkatom("a")))),
       mklist(mkatom("f1"), lambda(mklist(mkatom("b")), mklist(mkatom("b")))));
     auto r0 = defineq(f0);
-    REQUIRE(type_of(r0) == type::CONS);
+    REQUIRE(type_of(r0) == type::Cons);
     CHECK(equal(r0, mklist(mkatom("f0"), mkatom("f1"))));
     auto r1 = defineq(f0);
-    REQUIRE(type_of(r1) == type::CONS);
+    REQUIRE(type_of(r1) == type::Cons);
     CHECK(equal(r1, mklist(mkatom("f0"), mkatom("f1"))));
     auto r2 = defineq(NIL);
     CHECK(is_NIL(r2));
