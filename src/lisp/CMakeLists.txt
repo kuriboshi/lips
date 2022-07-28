@@ -62,6 +62,7 @@ set(_liblisp_source
           repl.hh
           rtable.hh
           string.hh
+          syntax.hh
           user.hh
           version.hh)
 set(_liblisp_details

@@ -18,7 +18,8 @@
 #include <cstring> // For strerror
 #include <cerrno>  // For errno
 #include <iostream>
-#include "lisp/lisp.hh"
+#include "lisp.hh"
+#include "syntax.hh"
 
 namespace lisp
 {
@@ -50,25 +51,47 @@ inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
+class lisp::impl
+{
+public:
+  impl(evaluator& e)
+    : _eval(e),
+      _currentbase(initcvar("base", 10_l)),
+      _verbose(initcvar("verbose", NIL)),
+      _loadpath(initcvar("loadpath", mklist(mkstring("."))))
+  {
+    _syntax = std::make_unique<syntax>();
+
+    _primout = new file_t(std::cout); // NOLINT
+    _primerr = new file_t(std::cerr); // NOLINT
+    _primin = new file_t(std::cin);   // NOLINT
+    _stdout = new file_t(std::cout);  // NOLINT
+    _stderr = new file_t(std::cerr);  // NOLINT
+    _stdin = new file_t(std::cin);    // NOLINT
+  }
+  evaluator& _eval;
+  std::unique_ptr<syntax> _syntax;
+
+  ref_file_t _primout;
+  ref_file_t _primerr;
+  ref_file_t _primin;
+  ref_file_t _stdout;
+  ref_file_t _stderr;
+  ref_file_t _stdin;
+
+  cvariable_t& _currentbase;
+  cvariable_t& _verbose;
+  cvariable_t& _loadpath;
+
+};
+
 lisp::lisp()
-  : _eval(e()),
-    _currentbase(initcvar("base", 10_l)),
-    _verbose(initcvar("verbose", NIL)),
-    _loadpath(initcvar("loadpath", mklist(mkstring("."))))
+  : _pimpl(std::make_unique<impl>(e()))
 {
   if(_current == nullptr)
     _current = this;
   else
     throw std::runtime_error("lisp::lisp called twice ");
-
-  _syntax = std::make_unique<syntax>();
-
-  _primout = new file_t(std::cout); // NOLINT
-  _primerr = new file_t(std::cerr); // NOLINT
-  _primin = new file_t(std::cin);   // NOLINT
-  _stdout = new file_t(std::cout);  // NOLINT
-  _stderr = new file_t(std::cerr);  // NOLINT
-  _stdin = new file_t(std::cin);    // NOLINT
 
   static auto global_set = false;
   if(!global_set)
@@ -172,8 +195,11 @@ evaluator& lisp::e()
   return e_;
 }
 
-syntax& lisp::read_table() { return *_syntax; }
-void lisp::read_table(std::unique_ptr<syntax> syntax) { _syntax = std::move(syntax); }
+lisp& lisp::current() { return *_current; }
+void lisp::current(lisp& lisp) { _current = &lisp; }
+
+syntax& lisp::read_table() { return *_pimpl->_syntax; }
+void lisp::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
 
 LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
 {
@@ -188,18 +214,47 @@ LISPT syntax::macro(lisp& lisp, ref_file_t source, std::uint8_t index)
 closure_t::pool_t closure_t::_pool;
 lisp_t::pool_t lisp_t::_pool;
 
-LISPT lisp::eval(lisp& l, LISPT expr) { return l._eval.eval(expr); }
-LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l._eval.apply(fun, args); }
-LISPT lisp::baktrace(lisp& l) { return l._eval.baktrace(); }
-LISPT lisp::topofstack(lisp& l) { return l._eval.topofstack(); }
-LISPT lisp::destblock(lisp& l, LISPT a) { return l._eval.destblock(a); }
+LISPT lisp::eval(lisp& l, LISPT expr) { return l.e().eval(expr); }
+LISPT lisp::apply(lisp& l, LISPT fun, LISPT args) { return l.e().apply(fun, args); }
+LISPT lisp::baktrace(lisp& l) { return l.e().baktrace(); }
+LISPT lisp::topofstack(lisp& l) { return l.e().topofstack(); }
+LISPT lisp::destblock(lisp& l, LISPT a) { return l.e().destblock(a); }
 
 LISPT lisp::obarray(lisp& l) { return alloc::obarray(l); }
 LISPT lisp::freecount(lisp& l) { return alloc::freecount(l); }
 
-ref_file_t lisp::primout(ref_file_t f) { auto p = std::move(_primout); _primout = std::move(f); return p; }
-ref_file_t lisp::primerr(ref_file_t f) { auto p = std::move(_primerr); _primerr = std::move(f); return p; }
-ref_file_t lisp::primin(ref_file_t f) { auto p = std::move(_primin); _primin = std::move(f); return p; }
+ref_file_t lisp::primout() const { return _pimpl->_primout; }
+
+ref_file_t lisp::primerr() const { return _pimpl->_primerr; }
+
+ref_file_t lisp::primin() const { return _pimpl->_primin; }
+
+ref_file_t lisp::primout(ref_file_t f)
+{
+  auto p = std::move(_pimpl->_primout);
+  _pimpl->_primout = std::move(f);
+  return p;
+}
+
+ref_file_t lisp::primerr(ref_file_t f)
+{
+  auto p = std::move(_pimpl->_primerr);
+  _pimpl->_primerr = std::move(f);
+  return p;
+}
+
+ref_file_t lisp::primin(ref_file_t f)
+{
+  auto p = std::move(_pimpl->_primin);
+  _pimpl->_primin = std::move(f);
+  return p;
+}
+
+ref_file_t lisp::stdout() const { return _pimpl->_stdout; }
+
+ref_file_t lisp::stderr() const { return _pimpl->_stderr; }
+
+ref_file_t lisp::stdin() const { return _pimpl->_stdin; }
 
 LISPT lisp::perror(std::error_code error, LISPT arg)
 {
@@ -229,6 +284,11 @@ LISPT lisp::syserr(LISPT fault)
 }
 
 LISPT lisp::break0(LISPT exp) const { return repl(exp); }
+
+cvariable_t& lisp::currentbase() { return _pimpl->_currentbase; }
+cvariable_t& lisp::verbose() { return _pimpl->_verbose; }
+cvariable_t& lisp::loadpath() { return _pimpl->_loadpath; }
+void lisp::loadpath(LISPT newpath) { _pimpl->_loadpath = newpath; }
 
 lisp* lisp::_current = nullptr;
 std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;

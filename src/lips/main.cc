@@ -30,6 +30,7 @@
 #include <string>
 
 #include <lisp/lisp.hh>
+#include <lisp/syntax.hh>
 #include "main.hh"
 #include "env.hh"
 #include "exec.hh"

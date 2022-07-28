@@ -31,6 +31,7 @@ target_sources(
           exec.hh
           glob.hh
           main.hh
+          lips_error.hh
           os.hh
           term.hh
           top.hh)

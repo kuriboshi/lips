@@ -35,6 +35,7 @@
 
 namespace lisp
 {
+class syntax;
 class lisp;
 class evaluator;
 class file_t;
@@ -252,98 +253,6 @@ struct indirect_t
 
 class destblock_t;
 
-// ^# start of line comment
-// #' Function quote
-// ' Quote
-// " String
-// ! Repeat
-// ?? History
-// >
-// >>
-// <
-// |
-// &
-// *
-// `
-// ,@
-// ;
-
-class syntax
-{
-public:
-  syntax() { reset(); }
-  enum class type
-  {
-    OTHER = 0,
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACKET,
-    RIGHT_BRACKET,
-    STRING_DELIM,
-    ESCAPE,
-    BREAKCHAR,
-    SEPARATOR,
-    //
-    QUOTE,
-    // Integers and floating point numbers
-    EXPONENT,
-    SIGN,
-    DIGIT,
-    DECIMAL_POINT,
-    // Comments
-    COMMENT,
-    SHELL_COMMENT,
-    NEWLINE,
-    // Macros
-    MACRO,
-    SPLICE,
-    INFIX
-  };
-  type get(std::uint8_t index) const { return _table[index]; }
-  void set(std::uint8_t index, type value) { _table[index] = value; }
-  void set(std::uint8_t index, LISPT value)
-  {
-    set(index, type::MACRO);
-    _macro[index] = value;
-  }
-  LISPT macro(lisp& lisp, ref_file_t source, std::uint8_t index);
-  /// @brief Reset read table to the defaults.
-  void reset()
-  {
-    set('(', type::LEFT_PAREN);
-    set(')', type::RIGHT_PAREN);
-    set('[', type::LEFT_BRACKET);
-    set(']', type::RIGHT_BRACKET);
-    set('"', type::STRING_DELIM);
-    set('\\', type::ESCAPE);
-    set(' ', type::SEPARATOR);
-    set('\t', type::SEPARATOR);
-    set('\n', type::NEWLINE);
-    set('0', type::DIGIT);
-    set('1', type::DIGIT);
-    set('2', type::DIGIT);
-    set('3', type::DIGIT);
-    set('4', type::DIGIT);
-    set('5', type::DIGIT);
-    set('6', type::DIGIT);
-    set('7', type::DIGIT);
-    set('8', type::DIGIT);
-    set('9', type::DIGIT);
-    set('+', type::SIGN);
-    set('-', type::SIGN);
-    set('.', type::DECIMAL_POINT);
-    set('e', type::EXPONENT);
-    set('E', type::EXPONENT);
-    set(';', type::COMMENT);
-    set('#', type::SHELL_COMMENT);
-    set('\'', type::QUOTE);
-  }
-
-private:
-  std::array<type, 256> _table = {type::OTHER};
-  std::array<LISPT, 256> _macro = {NIL};
-};
-
 class lisp_t final: public ref_count<lisp_t>
 {
 public:
@@ -470,20 +379,20 @@ private:
 
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
-  std::variant<std::monostate, // NIL
-    std::nullptr_t,            // EMPTY
-    symbol::symbol_id,         // SYMBOL
-    int,                       // INTEGER
-    double,                    // FLOAT
-    indirect_t,                // INDIRECT
-    cons_t,                    // CONS
-    std::string,               // STRING
-    subr_index,                // SUBR
-    lambda_t,                  // LAMBDA
-    ref_closure_t,             // CLOSURE
-    destblock_t*,              // ENVIRON
-    ref_file_t,                // FILE
-    cvariable_t                // CVARIABLE
+  std::variant<std::monostate, // Nil
+    std::nullptr_t,            // Empty
+    symbol::symbol_id,         // Symbol
+    int,                       // Integer
+    double,                    // Float
+    indirect_t,                // Indirect
+    cons_t,                    // Cons
+    std::string,               // String
+    subr_index,                // Subr/Fsubr
+    lambda_t,                  // Lambda/Nlambda
+    ref_closure_t,             // Closure
+    destblock_t*,              // Environ
+    ref_file_t,                // File
+    cvariable_t                // Cvariable
     >
     _u;
 };
@@ -545,8 +454,8 @@ public:
   lisp();
   ~lisp();
   evaluator& e();
-  static lisp& current() { return *_current; }
-  static void current(lisp& lisp) { _current = &lisp; }
+  static lisp& current();
+  static void current(lisp&);
 
   static LISPT eval(lisp& l, LISPT expr);
   static LISPT apply(lisp& l, LISPT fun, LISPT args);
@@ -560,15 +469,15 @@ public:
   syntax& read_table();
   void read_table(std::unique_ptr<syntax>);
 
-  ref_file_t primout() const { return _primout; }
-  ref_file_t primerr() const { return _primerr; }
-  ref_file_t primin() const { return _primin; }
+  ref_file_t primout() const;
+  ref_file_t primerr() const;
+  ref_file_t primin() const;
   ref_file_t primout(ref_file_t);
   ref_file_t primerr(ref_file_t);
   ref_file_t primin(ref_file_t);
-  ref_file_t stdout() const { return _stdout; }
-  ref_file_t stderr() const { return _stderr; }
-  ref_file_t stdin() const { return _stdin; }
+  ref_file_t stdout() const;
+  ref_file_t stderr() const;
+  ref_file_t stdin() const;
 
   LISPT perror(std::error_code, LISPT);
   LISPT error(std::error_code, LISPT);
@@ -596,29 +505,16 @@ public:
   bool brkflg = false;
   bool interrupt = false;
 
-  cvariable_t& currentbase() { return _currentbase; }
-  cvariable_t& verbose() { return _verbose; }
-  cvariable_t& loadpath() { return _loadpath; }
-  void loadpath(LISPT newpath) { _loadpath = newpath; }
+  cvariable_t& currentbase();
+  cvariable_t& verbose();
+  cvariable_t& loadpath();
+  void loadpath(LISPT);
   std::string version() const { return C_VERSION->value()->getstr(); }
 
 private:
-  evaluator& _eval;
-  std::unique_ptr<syntax> _syntax;
-
-  ref_file_t _primout;
-  ref_file_t _primerr;
-  ref_file_t _primin;
-  ref_file_t _stdout;
-  ref_file_t _stderr;
-  ref_file_t _stdin;
+  class impl;
+  std::unique_ptr<impl> _pimpl;
   static lisp* _current;
-
-  LISPT _version;
-  cvariable_t& _currentbase;
-  cvariable_t& _verbose;
-  cvariable_t& _loadpath;
-
 };
 
 inline LISPT perror(std::error_code code, LISPT a) { return lisp::current().perror(code, a); }

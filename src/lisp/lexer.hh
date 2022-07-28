@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include "lisp.hh"
+#include "syntax.hh"
 
 namespace lisp
 {
