@@ -20,9 +20,11 @@
 #include <cstdint>
 #include <string>
 
-#include "prim.hh"
+#include "check.hh"
 #include "io.hh"
 #include "parser.hh"
+#include "pred.hh"
+#include "prim.hh"
 
 namespace lisp
 {

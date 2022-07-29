@@ -15,7 +15,10 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
+#include "check.hh"
 #include "debug.hh"
+#include "eval.hh"
 
 namespace lisp::details::debug
 {

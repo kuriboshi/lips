@@ -21,7 +21,9 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "file.hh"
+#include "pred.hh"
 
 namespace
 {

@@ -15,6 +15,12 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
+#include "check.hh"
+#include "iter.hh"
+#include "pred.hh"
+#include "prim.hh"
+#include "prop.hh"
 #include "user.hh"
 
 namespace lisp::details::user

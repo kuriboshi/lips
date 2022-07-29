@@ -15,7 +15,10 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
 #include "pred.hh"
+#include "prim.hh"
+#include "user.hh"
 
 namespace lisp::details::pred
 {

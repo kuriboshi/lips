@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
 #include "map.hh"
+#include "prim.hh"
 
 namespace lisp::details::map
 {

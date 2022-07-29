@@ -22,6 +22,7 @@
 
 #include "alloc.hh"
 #include "low.hh"
+#include "prim.hh"
 
 namespace lisp
 {

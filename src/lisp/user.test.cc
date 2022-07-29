@@ -20,6 +20,11 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
+#include "low.hh"
+#include "pred.hh"
+#include "prim.hh"
+#include "prop.hh"
 #include "user.hh"
 
 namespace lisp

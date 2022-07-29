@@ -18,7 +18,7 @@
 #ifndef LISP_DETAILS_LOGIC_HH
 #define LISP_DETAILS_LOGIC_HH
 
-#include <lisp/lisp.hh>
+#include <lisp/logic.hh>
 
 namespace lisp::details::logic
 {

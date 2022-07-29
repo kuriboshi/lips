@@ -15,7 +15,10 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
 #include "arith.hh"
+#include "check.hh"
+#include "iter.hh"
 
 namespace lisp::details::arith
 {

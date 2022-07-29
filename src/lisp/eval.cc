@@ -15,9 +15,13 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
+#include "check.hh"
 #include "eval.hh"
 #include "file.hh"
 #include "io.hh"
+#include "prim.hh"
+#include "prop.hh"
 
 using namespace std::literals;
 

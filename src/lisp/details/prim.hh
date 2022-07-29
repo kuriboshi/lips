@@ -18,7 +18,7 @@
 #ifndef LISP_DETAILS_PRIM_HH
 #define LISP_DETAILS_PRIM_HH
 
-#include <lisp/lisp.hh>
+#include <lisp/types.hh>
 
 namespace lisp::details::prim
 {

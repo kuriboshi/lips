@@ -18,7 +18,7 @@
 #ifndef LISP_DETAILS_FILE_HH
 #define LISP_DETAILS_FILE_HH
 
-#include <lisp/lisp.hh>
+#include <lisp/types.hh>
 
 namespace lisp::details::file
 {

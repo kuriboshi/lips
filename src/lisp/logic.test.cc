@@ -19,6 +19,7 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "logic.hh"
 
 template<typename Enumeration>

@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "alloc.hh"
+#include "check.hh"
 #include "string.hh"
 
 namespace lisp::details::string

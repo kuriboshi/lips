@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 
+#include "pred.hh"
 #include "prim.hh"
 #include "parser.hh"
 

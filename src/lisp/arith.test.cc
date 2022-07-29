@@ -19,6 +19,7 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "arith.hh"
 
 namespace lisp

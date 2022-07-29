@@ -17,6 +17,10 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
+#include "arith.hh"
+#include "low.hh"
+#include "pred.hh"
 #include "prim.hh"
 
 namespace lisp

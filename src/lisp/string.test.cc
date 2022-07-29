@@ -17,6 +17,7 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "string.hh"
 
 namespace lisp

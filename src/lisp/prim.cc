@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
+#include "check.hh"
 #include "prim.hh"
 
 namespace lisp

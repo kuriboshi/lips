@@ -18,7 +18,7 @@
 #ifndef LISP_DETAILS_PRED_HH
 #define LISP_DETAILS_PRED_HH
 
-#include <lisp/lisp.hh>
+#include <lisp/types.hh>
 
 namespace lisp::details::pred
 {

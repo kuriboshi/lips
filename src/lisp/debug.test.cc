@@ -17,7 +17,9 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "debug.hh"
+#include "eval.hh"
 
 namespace lisp
 {

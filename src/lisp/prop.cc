@@ -15,6 +15,9 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
+#include "check.hh"
+#include "prim.hh"
 #include "prop.hh"
 
 namespace lisp::details::prop

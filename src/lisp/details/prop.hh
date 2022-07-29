@@ -18,7 +18,7 @@
 #ifndef LISP_DETAILS_PROP_HH
 #define LISP_DETAILS_PROP_HH
 
-#include <lisp/lisp.hh>
+#include <lisp/types.hh>
 
 namespace lisp::details::prop
 {

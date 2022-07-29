@@ -20,9 +20,10 @@
 
 #include <catch2/catch.hpp>
 
-#include "prim.hh"
-#include "parser.hh"
 #include "io.hh"
+#include "parser.hh"
+#include "pred.hh"
+#include "prim.hh"
 #include "rtable.hh"
 
 namespace

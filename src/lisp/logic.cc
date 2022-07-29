@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
+#include "alloc.hh"
 #include "logic.hh"
+#include "low.hh"
 
 namespace lisp::details::logic
 {

@@ -17,7 +17,9 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "map.hh"
+#include "prim.hh"
 
 namespace lisp
 {

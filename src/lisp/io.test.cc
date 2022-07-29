@@ -20,8 +20,10 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
 #include "io.hh"
 #include "pred.hh"
+#include "prim.hh"
 
 namespace
 {
