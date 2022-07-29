@@ -18,6 +18,11 @@
 #ifndef LISP_TYPES_HH
 #define LISP_TYPES_HH
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <variant>
+
 #include "error.hh"
 #include "except.hh"
 #include "pool.hh"

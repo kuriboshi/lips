@@ -101,6 +101,7 @@ public:
       case type_errc::not_cvariable:
         return "Not a c-variable";
     }
+    return "";
   }
   static const std::error_category& category()
   {
@@ -174,6 +175,7 @@ public:
       case error_errc::user_error:
         return "User error";
     }
+    return "";
   }
   static const std::error_category& category()
   {

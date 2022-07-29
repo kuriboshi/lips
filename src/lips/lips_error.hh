@@ -49,6 +49,7 @@ public:
       case lips_errc::no_such_job:
         return "No such job";
     }
+    return "";
   }
   static const std::error_category& category()
   {
