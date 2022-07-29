@@ -111,7 +111,7 @@ LISPT top::printhist()
 LISPT top::transform(LISPT list)
 {
   if(transform_hook)
-    return transform_hook(l, list);
+    return transform_hook(_ctx, list);
   return list;
 }
 
@@ -174,7 +174,7 @@ LISPT top::operator()(LISPT exp)
   ++_level;
   while(true)
   {
-    l.echoline = false;
+    _ctx.echoline = false;
     if(prompt_hook)
       prompt_hook();
     //
@@ -233,12 +233,12 @@ LISPT top::operator()(LISPT exp)
 ///  !$      - last argument
 ///  !*      - all arguments
 /// others could be added easily.
-LISPT top::rmexcl(context& l, LISPT stream)
+LISPT top::rmexcl(context& ctx, LISPT stream)
 {
   int c = stream->file()->getch();
   if(std::isspace(c) != 0)
     return C_EXCL;
-  l.echoline = true;
+  ctx.echoline = true;
   LISPT tmp = histget(0L, variables->history);
   switch(c)
   {
@@ -254,7 +254,7 @@ LISPT top::rmexcl(context& l, LISPT stream)
       return tmp->cdr();
       break;
     case '\n':
-      l.echoline = false;
+      ctx.echoline = false;
       return C_EXCL;
       break;
     default:
@@ -275,7 +275,7 @@ LISPT top::rmexcl(context& l, LISPT stream)
         }
         return NIL;
       }
-      l.error(lips_errc::event_not_found, at);
+      ctx.error(lips_errc::event_not_found, at);
       return NIL;
   }
   return NIL;

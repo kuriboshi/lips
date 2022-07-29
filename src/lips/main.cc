@@ -78,7 +78,7 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT transform(::lisp::context& l, LISPT list)
+LISPT transform(::lisp::context& ctx, LISPT list)
 {
   LISPT tl = NIL;
   LISPT res = NIL;
@@ -86,7 +86,7 @@ LISPT transform(::lisp::context& l, LISPT list)
   for(auto ll = list; type_of(ll) == type::Cons; ll = ll->cdr())
   {
     if(type_of(ll->car()) == type::Cons)
-      tl = put_end(tl, transform(l, ll->car()), conc);
+      tl = put_end(tl, transform(ctx, ll->car()), conc);
     else if(ll->car() == C_BAR)
     {
       if(is_NIL(res))
@@ -177,7 +177,7 @@ std::unique_ptr<::lisp::context> init()
 
   fixpgrp();
 
-  auto l = std::make_unique<::lisp::context>();
+  auto ctx = std::make_unique<::lisp::context>();
 
   C_ALIAS = alloc::intern("alias");
   C_AMPER = alloc::intern("&");
@@ -206,9 +206,9 @@ std::unique_ptr<::lisp::context> init()
 
   exec::init();
 
-  l->read_table().set('!', "rmexcl"_l);
+  ctx->read_table().set('!', "rmexcl"_l);
 
-  return l;
+  return ctx;
 }
 
 //

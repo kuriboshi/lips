@@ -455,7 +455,7 @@ int execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -478,7 +478,7 @@ LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -491,7 +491,7 @@ LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_append(context& ctx, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -514,7 +514,7 @@ LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -527,7 +527,7 @@ LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed)
+LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed)
 {
   int fd = 0;
   int pid = 0;
@@ -550,7 +550,7 @@ LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -563,7 +563,7 @@ LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT pipecmd(context& l, LISPT cmds)
+LISPT pipecmd(context& ctx, LISPT cmds)
 {
   print(cmds);
 
@@ -578,7 +578,7 @@ LISPT pipecmd(context& l, LISPT cmds)
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1) // NOLINT
     {
-      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     if((pid = mfork()) == 0)
@@ -586,7 +586,7 @@ LISPT pipecmd(context& l, LISPT cmds)
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+        ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
         exit(1);
       }
       eval(cmds->car());
@@ -598,7 +598,7 @@ LISPT pipecmd(context& l, LISPT cmds)
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmds->car());
@@ -611,7 +611,7 @@ LISPT pipecmd(context& l, LISPT cmds)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT back(context& l, LISPT x)
+LISPT back(context& ctx, LISPT x)
 {
   int pid = 0;
 
@@ -630,7 +630,7 @@ LISPT back(context& l, LISPT x)
   return mknumber(pid);
 }
 
-LISPT stop(context& l)
+LISPT stop(context& ctx)
 {
   kill(0, SIGSTOP);
   return T;
@@ -658,14 +658,14 @@ void do_rehash()
   }
 }
 
-LISPT jobs(context& l)
+LISPT jobs(context&)
 {
   for(const auto& job: joblist)
     printjob(job);
   return NIL;
 }
 
-LISPT fg(context& l, LISPT job)
+LISPT fg(context& ctx, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -706,10 +706,10 @@ LISPT fg(context& l, LISPT job)
     auto status = waitfork(current->procid);
     return mknumber(WEXITSTATUS(status));
   }
-  return l.error(lips_errc::no_such_job, job);
+  return ctx.error(lips_errc::no_such_job, job);
 }
 
-LISPT bg(context& l, LISPT job)
+LISPT bg(context& ctx, LISPT job)
 {
   job_t* current = nullptr;
 
@@ -749,10 +749,10 @@ LISPT bg(context& l, LISPT job)
     current->background = true;
     return T;
   }
-  return l.error(lips_errc::no_such_job, job);
+  return ctx.error(lips_errc::no_such_job, job);
 }
 
-LISPT setenv(context& l, LISPT var, LISPT val)
+LISPT setenv(context&, LISPT var, LISPT val)
 {
   check(var, type::String, type::Symbol);
   check(val, type::String, type::Symbol);
@@ -760,7 +760,7 @@ LISPT setenv(context& l, LISPT var, LISPT val)
   return var;
 }
 
-LISPT getenviron(context& l, LISPT var)
+LISPT getenviron(context&, LISPT var)
 {
   check(var, type::String, type::Symbol);
   char* s = getenv(var->getstr().c_str());
@@ -769,7 +769,7 @@ LISPT getenviron(context& l, LISPT var)
   return mkstring(s);
 }
 
-LISPT cd(context& l, LISPT dir, LISPT emess)
+LISPT cd(context& ctx, LISPT dir, LISPT emess)
 {
   LISPT ndir;
 
@@ -777,14 +777,14 @@ LISPT cd(context& l, LISPT dir, LISPT emess)
     ndir = environment->home;
   else
   {
-    ndir = expand(l, dir);
+    ndir = expand(ctx, dir);
     if(type_of(ndir) == type::Cons)
       ndir = ndir->car();
   }
   if(is_NIL(ndir))
   {
     if(is_NIL(emess))
-      return l.error(lips_errc::no_match, dir);
+      return error(lips_errc::no_match, dir);
     return NIL;
   }
   if(chdir(ndir->getstr().c_str()) == -1)
@@ -798,7 +798,7 @@ LISPT cd(context& l, LISPT dir, LISPT emess)
   return T;
 }
 
-LISPT doexec(context& l, LISPT cmd)
+LISPT doexec(context& ctx, LISPT cmd)
 {
   LISPT res;
 

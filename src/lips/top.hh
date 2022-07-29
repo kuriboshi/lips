@@ -26,8 +26,8 @@ namespace lisp
 class top
 {
 public:
-  top(context& lisp, const options_t& options, ref_file_t file)
-    : l(lisp),
+  top(context& ctx, const options_t& options, ref_file_t file)
+    : _ctx(ctx),
       _options(options),
       _file(file)
   {}
@@ -80,7 +80,7 @@ private:
   };
   static std::unique_ptr<cvariables> variables;
 
-  context& l;
+  context& _ctx;
   const options_t& _options;
   ref_file_t _file;
   int _level = 0;
