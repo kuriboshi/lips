@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/logic.hh"
+#include "logic.hh"
 
 namespace lisp::details::logic
 {

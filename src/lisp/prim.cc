@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/prim.hh"
+#include "prim.hh"
 
 namespace lisp
 {

@@ -15,8 +15,11 @@
 // limitations under the License.
 //
 
+#include <sstream>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "arith.hh"
 
 namespace lisp
 {

@@ -19,10 +19,12 @@
 #define LISP_EVAL_HH
 
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <variant>
 
-#include "lisp.hh"
+#include "error.hh"
+#include "types.hh"
 
 namespace lisp
 {

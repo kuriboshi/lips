@@ -18,9 +18,12 @@
 #ifndef LISP_LEXER_HH
 #define LISP_LEXER_HH
 
+#include <cstdint>
 #include <iostream>
 #include <string>
-#include "lisp.hh"
+
+#include "io.hh"
+#include "types.hh"
 #include "syntax.hh"
 
 namespace lisp

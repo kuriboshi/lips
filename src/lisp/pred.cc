@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/pred.hh"
+#include "pred.hh"
 
 namespace lisp::details::pred
 {

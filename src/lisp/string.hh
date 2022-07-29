@@ -18,7 +18,7 @@
 #ifndef LISP_STRING_HH
 #define LISP_STRING_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/string.hh"
 
 namespace lisp

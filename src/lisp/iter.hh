@@ -19,7 +19,8 @@
 #define LISP_ITER_HH
 
 #include <iterator>
-#include "lisp.hh"
+
+#include "types.hh"
 
 namespace lisp
 {

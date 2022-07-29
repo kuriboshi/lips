@@ -16,6 +16,9 @@
 //
 
 #include <iostream>
+#include <memory>
+#include <system_error>
+
 #include "lisp.hh"
 #include "syntax.hh"
 

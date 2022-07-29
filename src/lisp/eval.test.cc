@@ -15,8 +15,15 @@
 // limitations under the License.
 //
 
+#include <memory>
+#include <sstream>
+#include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "alloc.hh"
+#include "eval.hh"
+#include "low.hh"
 
 namespace lisp
 {

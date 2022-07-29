@@ -16,11 +16,14 @@
 //
 
 #include <sstream>
-#include <cstdlib>
+#include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/parser.hh>
-#include <lisp/io.hh>
-#include <lisp/rtable.hh>
+
+#include "prim.hh"
+#include "parser.hh"
+#include "io.hh"
+#include "rtable.hh"
 
 namespace
 {

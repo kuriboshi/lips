@@ -16,7 +16,12 @@
 //
 
 #include <cstdlib>
-#include "lisp/rtable.hh"
+#include <string>
+
+#include "alloc.hh"
+#include "check.hh"
+#include "io.hh"
+#include "rtable.hh"
 
 namespace lisp::rtable
 {

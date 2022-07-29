@@ -18,7 +18,7 @@
 #ifndef LISP_LOGIC_HH
 #define LISP_LOGIC_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/logic.hh"
 
 namespace lisp

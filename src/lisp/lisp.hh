@@ -18,24 +18,14 @@
 #ifndef LISP_LISP_HH
 #define LISP_LISP_HH
 
-#include <array>
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
-#include <variant>
-#include <vector>
-
-#include "types.hh"
-
 #include "alloc.hh"
 #include "arith.hh"
+#include "check.hh"
 #include "debug.hh"
 #include "eval.hh"
 #include "file.hh"
-#include "iter.hh"
 #include "io.hh"
+#include "iter.hh"
 #include "logic.hh"
 #include "low.hh"
 #include "map.hh"
@@ -47,6 +37,5 @@
 #include "string.hh"
 #include "user.hh"
 #include "version.hh"
-#include "check.hh"
 
 #endif

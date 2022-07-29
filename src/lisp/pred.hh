@@ -18,7 +18,7 @@
 #ifndef LISP_PRED_HH
 #define LISP_PRED_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/pred.hh"
 
 namespace lisp

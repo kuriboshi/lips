@@ -17,11 +17,13 @@
 
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <string>
-#include <utility>
+
 #include <catch2/catch.hpp>
-#include <lisp/pool.hh>
+
+#include "pool.hh"
 
 namespace lisp
 {

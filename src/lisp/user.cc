@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/user.hh"
+#include "user.hh"
 
 namespace lisp::details::user
 {

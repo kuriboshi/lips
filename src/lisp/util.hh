@@ -18,6 +18,8 @@
 #ifndef LISP_UTIL_HH
 #define LISP_UTIL_HH
 
+#include <type_traits>
+
 namespace lisp
 {
 

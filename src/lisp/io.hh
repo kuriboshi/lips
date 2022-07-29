@@ -18,13 +18,16 @@
 #ifndef LISP_IO_HH
 #define LISP_IO_HH
 
+#include <fstream>
+#include <memory>
 #include <optional>
 #include <sstream>
-#include <fstream>
 #include <string>
 #include <string_view>
+
 #include <fmt/format.h>
-#include "lisp.hh"
+
+#include "types.hh"
 
 namespace lisp::io
 {

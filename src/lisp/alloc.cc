@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
-#include "lisp/alloc.hh"
+#include <cstdint>
+
+#include "alloc.hh"
 
 namespace lisp::alloc
 {

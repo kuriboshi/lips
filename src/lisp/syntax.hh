@@ -19,8 +19,10 @@
 #define LISP_SYNTAX_HH
 
 #include <cstdint>
+#include <array>
+
 #include "ref_ptr.hh"
-#include "lisp.hh"
+#include "types.hh"
 
 namespace lisp
 {

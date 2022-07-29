@@ -18,6 +18,7 @@
 #ifndef LISP_CHECK_HH
 #define LISP_CHECK_HH
 
+#include "types.hh"
 #include "error.hh"
 
 namespace lisp

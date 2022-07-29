@@ -18,7 +18,7 @@
 #ifndef LISP_REPL_HH
 #define LISP_REPL_HH
 
-#include "lisp.hh"
+#include "types.hh"
 
 namespace lisp
 {

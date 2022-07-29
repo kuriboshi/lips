@@ -18,7 +18,9 @@
 #ifndef LISP_ERROR_HH
 #define LISP_ERROR_HH
 
+#include <string>
 #include <system_error>
+
 #include "util.hh"
 
 namespace lisp

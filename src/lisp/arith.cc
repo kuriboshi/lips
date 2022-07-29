@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/arith.hh"
+#include "arith.hh"
 
 namespace lisp::details::arith
 {

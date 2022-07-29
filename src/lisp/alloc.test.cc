@@ -16,8 +16,12 @@
 //
 
 #include <iostream>
+#include <memory>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "alloc.hh"
+#include "low.hh"
 
 namespace lisp
 {

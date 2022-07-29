@@ -18,7 +18,7 @@
 #ifndef LISP_PROP_HH
 #define LISP_PROP_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/prop.hh"
 
 namespace lisp

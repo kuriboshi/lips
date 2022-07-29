@@ -15,9 +15,17 @@
 // limitations under the License.
 //
 
+#include <memory>
+#include <vector>
+
 #include <catch2/catch.hpp>
-#include "lisp.hh"
+
+#include "alloc.hh"
+#include "iter.hh"
+#include "prim.hh"
+#include "types.hh"
 #include "util.hh"
+#include "version.hh"
 
 namespace lisp
 {

@@ -16,10 +16,13 @@
 //
 
 #define CATCH_CONFIG_RUNNER
+
 #include <vector>
 #include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "lisp.hh"
 
 namespace
 {

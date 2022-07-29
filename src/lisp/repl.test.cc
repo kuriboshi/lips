@@ -14,10 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#include <catch2/catch.hpp>
+
 #include <iostream>
-#include <lisp/lisp.hh>
-#include <lisp/repl.hh>
+#include <sstream>
+#include <string>
+
+#include <catch2/catch.hpp>
+
+#include "io.hh"
+#include "repl.hh"
 
 namespace lisp
 {

@@ -19,10 +19,10 @@
 #ifndef LISP_PARSER_HH
 #define LISP_PARSER_HH
 
-#include <deque>
-#include <memory>
-#include <utility>
-#include "lisp.hh"
+#include <string>
+
+#include "alloc.hh"
+#include "types.hh"
 #include "lexer.hh"
 
 namespace lisp

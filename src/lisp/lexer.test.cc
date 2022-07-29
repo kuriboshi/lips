@@ -17,9 +17,11 @@
 
 #include <string>
 #include <sstream>
+
 #include <catch2/catch.hpp>
-#include <lisp/lexer.hh>
-#include <lisp/alloc.hh>
+
+#include "alloc.hh"
+#include "lexer.hh"
 
 namespace
 {

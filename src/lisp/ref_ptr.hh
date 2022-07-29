@@ -19,6 +19,7 @@
 #define LISP_REF_PTR_HH
 
 #include <atomic>
+#include <utility>
 
 namespace lisp
 {

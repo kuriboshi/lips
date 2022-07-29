@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
-#include "lisp/string.hh"
+#include <string>
+
+#include "string.hh"
 
 namespace lisp::details::string
 {

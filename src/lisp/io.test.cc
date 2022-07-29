@@ -15,10 +15,13 @@
 // limitations under the License.
 //
 
-#include <catch2/catch.hpp>
 #include <filesystem>
 #include <functional>
-#include <lisp/lisp.hh>
+
+#include <catch2/catch.hpp>
+
+#include "io.hh"
+#include "pred.hh"
 
 namespace
 {

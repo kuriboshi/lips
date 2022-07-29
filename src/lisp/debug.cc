@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/debug.hh"
+#include "debug.hh"
 
 namespace lisp::details::debug
 {

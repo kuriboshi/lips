@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
-#include "lisp/eval.hh"
+#include "eval.hh"
+#include "file.hh"
+#include "io.hh"
 
 using namespace std::literals;
 
@@ -52,7 +54,7 @@ LISPT evaluator::printwhere()
       {
         foo = *lsp;
         _ctx.primerr()->format("[in ");
-        details::file::prin2(_ctx, foo->car(), T);
+        prin2(foo->car(), T);
         _ctx.primerr()->putch(']');
         break;
       }
@@ -87,7 +89,7 @@ void evaluator::xbreak(std::error_code code, LISPT fault, continuation_t next)
     _breakhook();
   if(_env == nullptr)
     throw lisp_reset();
-  details::file::print(_ctx, cons(fault, cons(C_BROKEN, NIL)), T);
+  print(cons(fault, cons(C_BROKEN, NIL)), T);
   push(next);
   _cont = &evaluator::everr;
 }
@@ -312,7 +314,7 @@ void evaluator::do_unbound(continuation_t continuation)
   {
     push(_expression);
     push(_dest);
-    details::file::load(_ctx, al);
+    load(al);
     pop(_dest);
     pop(_expression);
     _fun = _expression->car()->value();
@@ -478,7 +480,7 @@ void evaluator::bt()
   for(int i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
-      details::file::print(_ctx, std::get<LISPT>(_control[i - 1]), T);
+      print(std::get<LISPT>(_control[i - 1]), T);
   }
   _ctx.printlevel = op;
 }

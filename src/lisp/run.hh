@@ -19,8 +19,10 @@
 #define LIPS_RUN_HH
 
 #include <iostream>
-#include "lisp/lisp.hh"
-#include "lisp/repl.hh"
+
+#include "eval.hh"
+#include "types.hh"
+#include "repl.hh"
 
 namespace lisp
 {

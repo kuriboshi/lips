@@ -18,7 +18,7 @@
 #ifndef LISP_LOW_HH
 #define LISP_LOW_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/low.hh"
 
 namespace lisp

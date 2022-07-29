@@ -18,9 +18,7 @@
 #ifndef LISP_RTABLE_HH
 #define LISP_RTABLE_HH
 
-#include <array>
-#include <vector>
-#include "lisp.hh"
+#include "types.hh"
 
 namespace lisp::rtable
 {

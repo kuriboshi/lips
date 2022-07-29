@@ -17,8 +17,11 @@
 
 #include <fstream>
 #include <filesystem>
+#include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "file.hh"
 
 namespace
 {

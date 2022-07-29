@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/low.hh"
+#include "low.hh"
 
 namespace lisp::details::low
 {

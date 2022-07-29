@@ -15,8 +15,12 @@
 // limitations under the License.
 //
 
+#include <sstream>
+#include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "user.hh"
 
 namespace lisp
 {

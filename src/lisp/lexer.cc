@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/lexer.hh"
+#include "lexer.hh"
 
 namespace lisp
 {

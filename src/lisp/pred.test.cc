@@ -16,7 +16,8 @@
 //
 
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "pred.hh"
 
 namespace lisp
 {

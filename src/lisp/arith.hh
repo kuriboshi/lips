@@ -24,7 +24,7 @@
 /// functions specific for either integers or floating points as well as
 /// generic functions which can take either type.
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/arith.hh"
 
 namespace lisp

@@ -15,7 +15,9 @@
 // limitations under the License.
 //
 
-#include "lisp/repl.hh"
+#include "alloc.hh"
+#include "eval.hh"
+#include "repl.hh"
 
 namespace lisp
 {

@@ -16,9 +16,11 @@
 //
 
 #include <sstream>
-#include <string>
+
 #include <catch2/catch.hpp>
-#include <lisp/run.hh>
+
+#include "io.hh"
+#include "run.hh"
 
 namespace lisp
 {

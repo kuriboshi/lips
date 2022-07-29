@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/prop.hh"
+#include "prop.hh"
 
 namespace lisp::details::prop
 {

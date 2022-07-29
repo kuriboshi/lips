@@ -18,7 +18,7 @@
 #ifndef LISP_MAP_HH
 #define LISP_MAP_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/map.hh"
 
 namespace lisp

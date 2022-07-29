@@ -17,7 +17,10 @@
 
 #include <vector>
 #include <string>
-#include "lisp/run.hh"
+
+#include "alloc.hh"
+#include "file.hh"
+#include "run.hh"
 
 int main(int argc, const char** argv)
 {

@@ -18,12 +18,10 @@
 #ifndef LISP_ALLOC_HH
 #define LISP_ALLOC_HH
 
-#include <array>
-#include <deque>
-#include <list>
-#include <vector>
+#include <string>
 
-#include "lisp.hh"
+#include "io.hh"
+#include "types.hh"
 
 namespace lisp::alloc
 {

@@ -16,8 +16,11 @@
 //
 
 #include <iostream>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "io.hh"
+#include "types.hh"
 
 namespace lisp::symbol
 {

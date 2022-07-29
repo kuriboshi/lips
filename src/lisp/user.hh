@@ -18,7 +18,7 @@
 #ifndef LISP_USER_HH
 #define LISP_USER_HH
 
-#include "lisp.hh"
+#include "types.hh"
 #include "details/user.hh"
 
 namespace lisp

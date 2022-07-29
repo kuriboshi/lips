@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "lisp/map.hh"
+#include "map.hh"
 
 namespace lisp::details::map
 {

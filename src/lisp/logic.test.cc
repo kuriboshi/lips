@@ -16,8 +16,10 @@
 //
 
 #include <iostream>
+
 #include <catch2/catch.hpp>
-#include <lisp/lisp.hh>
+
+#include "logic.hh"
 
 template<typename Enumeration>
 typename std::underlying_type<Enumeration>::type as_integer(Enumeration const value)
