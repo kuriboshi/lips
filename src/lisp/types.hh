@@ -34,15 +34,6 @@ class file_t;
 class lisp_t;
 using LISPT = ref_ptr<lisp_t>;
 
-///
-/// @brief Puts the lisp_t object back on the freelist.
-///
-/// @details The definition can be found in alloc.hh. See also ref_ptr.hh.
-///
-/// @param obj The object to be returned to the freelist.
-///
-void ref_deleter(lisp_t* obj);
-
 enum class type
 {
   Nil = 0,   // so that nullptr also becomes NIL
@@ -389,10 +380,14 @@ private:
     _u;
 };
 
-inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
-inline type type_of(lisp_t& a) { return a.gettype(); }
-inline bool is_T(LISPT x) { return type_of(x) == type::T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
+///
+/// @brief Puts the lisp_t object back on the freelist.
+///
+/// @details The definition can be found in alloc.hh. See also ref_ptr.hh.
+///
+/// @param obj The object to be returned to the freelist.
+///
+void ref_deleter(lisp_t* obj);
 
 //
 // All lisp constants used internally.
@@ -499,6 +494,11 @@ private:
   std::unique_ptr<impl> _pimpl;
   static context* _current;
 };
+
+inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
+inline type type_of(lisp_t& a) { return a.gettype(); }
+inline bool is_T(LISPT x) { return type_of(x) == type::T; }
+inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
 
 inline LISPT perror(std::error_code code, LISPT a) { return context::current().perror(code, a); }
 inline LISPT error(std::error_code code, LISPT a) { return context::current().error(code, a); }
