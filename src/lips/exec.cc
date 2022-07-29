@@ -28,8 +28,8 @@
 #include <string>
 #include <iostream>
 #include <array>
+#include <system_error>
 #include <cstdlib>
-#include <cerrno>
 #include <csignal>
 
 #include <lisp/lisp.hh>
@@ -198,9 +198,9 @@ int mfork()
   if(pid < 0)
   {
     if(insidefork)
-      std::cerr << fmt::format("{}\n", strerror(errno));
+      std::cerr << fmt::format("{}\n", std::error_code(errno, std::system_category()).message());
     else
-      syserr(NIL);
+      context::current().primerr()->format("{}\n", std::error_code(errno, std::system_category()).message());
     return pid;
   }
   recordjob(pid, false);
@@ -351,7 +351,7 @@ LISPT execute(const std::string& name, LISPT command)
     execve(name.c_str(), argv.data(), environ);
     if(errno == ENOEXEC)
       execvp(name.c_str(), argv.data());
-    std::cerr << strerror(errno) << '\n';
+    std::cerr << std::error_code(errno, std::system_category()).message() << '\n';
     exit(1);
     /* No return */
   }
@@ -361,7 +361,7 @@ LISPT execute(const std::string& name, LISPT command)
     execve(name.c_str(), argv.data(), environ);
     if(errno == ENOEXEC)
       execvp(name.c_str(), argv.data());
-    std::cerr << strerror(errno) << '\n';
+    std::cerr << std::error_code(errno, std::system_category()).message() << '\n';
     exit(1);
   }
   else if(pid < 0)
@@ -473,12 +473,12 @@ LISPT redir_to(context& l, LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
-    return syserr(file);
+    return error(std::error_code(errno, std::system_category()), file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -509,12 +509,12 @@ LISPT redir_append(context& l, LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
-    return syserr(file);
+    return error(std::error_code(errno, std::system_category()), file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -545,12 +545,12 @@ LISPT redir_from(context& l, LISPT cmd, LISPT file, LISPT filed)
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
-    return syserr(file);
+    return error(std::error_code(errno, std::system_category()), file);
   if((pid = mfork()) == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      l.stderr()->format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmd);
@@ -578,7 +578,7 @@ LISPT pipecmd(context& l, LISPT cmds)
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1) // NOLINT
     {
-      l.stderr()->format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     if((pid = mfork()) == 0)
@@ -586,7 +586,7 @@ LISPT pipecmd(context& l, LISPT cmds)
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        l.stderr()->format("{}\n", strerror(errno));
+        l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
         exit(1);
       }
       eval(cmds->car());
@@ -598,7 +598,7 @@ LISPT pipecmd(context& l, LISPT cmds)
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      l.stderr()->format("{}\n", strerror(errno));
+      l.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       exit(1);
     }
     eval(cmds->car());
@@ -700,7 +700,7 @@ LISPT fg(context& l, LISPT job)
     tcsetpgrp(1, pgrp);
     if(WIFSTOPPED(current->status))
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber(pgrp));
+        return error(std::error_code(errno, std::system_category()), mknumber(pgrp));
     current->status = 0;
     current->background = false;
     auto status = waitfork(current->procid);
@@ -745,7 +745,7 @@ LISPT bg(context& l, LISPT job)
     tcsetpgrp(1, pgrp);
     if(!current->background)
       if(killpg(pgrp, SIGCONT) < 0)
-        return syserr(mknumber(pgrp));
+        return error(std::error_code(errno, std::system_category()), mknumber(pgrp));
     current->background = true;
     return T;
   }
@@ -790,7 +790,7 @@ LISPT cd(context& l, LISPT dir, LISPT emess)
   if(chdir(ndir->getstr().c_str()) == -1)
   {
     if(is_NIL(emess))
-      return syserr(dir);
+      return error(std::error_code(errno, std::system_category()), dir);
     return NIL;
   }
   auto wd = std::filesystem::current_path();

@@ -462,7 +462,6 @@ public:
   LISPT perror(std::error_code, LISPT);
   LISPT error(std::error_code, LISPT);
   void fatal(std::error_code);
-  LISPT syserr(LISPT);
   LISPT break0(LISPT) const;
 
   enum class break_return
@@ -502,7 +501,6 @@ inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
 
 inline LISPT perror(std::error_code code, LISPT a) { return context::current().perror(code, a); }
 inline LISPT error(std::error_code code, LISPT a) { return context::current().error(code, a); }
-inline LISPT syserr(LISPT a) { return context::current().syserr(a); }
 inline LISPT break0(LISPT a) { return context::current().break0(a); }
 
 inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }

@@ -15,8 +15,6 @@
 // limitations under the License.
 //
 
-#include <cstring> // For strerror
-#include <cerrno>  // For errno
 #include <iostream>
 #include "lisp.hh"
 #include "syntax.hh"
@@ -271,17 +269,6 @@ LISPT context::error(std::error_code error, LISPT arg)
 }
 
 void context::fatal(std::error_code error) { throw lisp_error(error.message()); }
-
-LISPT context::syserr(LISPT fault)
-{
-  if(!is_NIL(fault))
-  {
-    prin2(fault, T);
-    primerr()->format(": ");
-  }
-  primerr()->format("{}", strerror(errno));
-  return C_ERROR;
-}
 
 LISPT context::break0(LISPT exp) const { return repl(exp); }
 
