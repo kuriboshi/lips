@@ -48,7 +48,7 @@ enum class type_errc
   not_cvariable
 };
 
-class type_category : public std::error_category
+class type_category: public std::error_category
 {
 public:
   const char* name() const noexcept override { return "type"; }
@@ -135,7 +135,7 @@ enum class error_errc
   user_error
 };
 
-class error_category : public std::error_category
+class error_category: public std::error_category
 {
 public:
   const char* name() const noexcept override { return "error"; }
@@ -195,10 +195,12 @@ inline std::error_condition make_error_condition(error_errc e)
 namespace std
 {
 template<>
-struct is_error_code_enum<lisp::type_errc> : public true_type {};
+struct is_error_code_enum<lisp::type_errc>: public true_type
+{};
 
 template<>
-struct is_error_code_enum<lisp::error_errc> : public true_type {};
-}
+struct is_error_code_enum<lisp::error_errc>: public true_type
+{};
+} // namespace std
 
 #endif

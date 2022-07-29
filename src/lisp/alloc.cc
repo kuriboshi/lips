@@ -171,7 +171,7 @@ namespace pn
 inline constexpr auto CONS = "cons";           // Make a new cons cell
 inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
 inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
-}
+} // namespace pn
 
 void init()
 {

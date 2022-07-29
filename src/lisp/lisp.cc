@@ -80,7 +80,6 @@ public:
   cvariable_t& _currentbase;
   cvariable_t& _verbose;
   cvariable_t& _loadpath;
-
 };
 
 context::context()

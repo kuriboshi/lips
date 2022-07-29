@@ -120,6 +120,6 @@ private:
   std::array<LISPT, 256> _macro = {NIL};
 };
 
-}
+} // namespace lisp
 
 #endif

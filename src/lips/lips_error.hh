@@ -32,7 +32,7 @@ enum class lips_errc
   no_such_job
 };
 
-class lips_category : public std::error_category
+class lips_category: public std::error_category
 {
 public:
   const char* name() const noexcept override { return "lips"; }
@@ -67,12 +67,13 @@ inline std::error_condition make_error_condition(lips_errc e)
   return std::error_condition(to_underlying(e), lips_category::category());
 }
 
-}
+} // namespace lisp
 
 namespace std
 {
 template<>
-struct is_error_code_enum<lisp::lips_errc> : public true_type {};
-}
+struct is_error_code_enum<lisp::lips_errc>: public true_type
+{};
+} // namespace std
 
 #endif

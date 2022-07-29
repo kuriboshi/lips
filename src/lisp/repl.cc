@@ -63,7 +63,7 @@ LISPT repl::operator()(LISPT exp)
       continue;
     }
     if(com->car() == C_GO)
-      return print(eval( exp), false);
+      return print(eval(exp), false);
     if(com->car() == C_RESET)
     {
       _ctx.e().unwind();

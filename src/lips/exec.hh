@@ -45,12 +45,18 @@ void do_rehash();
 
 namespace lisp
 {
-inline LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_to(ctx, cmd, file, filed); }
+inline LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed)
+{
+  return exec::redir_to(ctx, cmd, file, filed);
+}
 inline LISPT redir_append(context& ctx, LISPT cmd, LISPT file, LISPT filed)
 {
   return exec::redir_append(ctx, cmd, file, filed);
 }
-inline LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed) { return exec::redir_from(ctx, cmd, file, filed); }
+inline LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed)
+{
+  return exec::redir_from(ctx, cmd, file, filed);
+}
 inline LISPT pipecmd(context& ctx, LISPT cmds) { return exec::pipecmd(ctx, cmds); }
 inline LISPT back(context& ctx, LISPT x) { return exec::back(ctx, x); }
 inline LISPT stop(context& ctx) { return exec::stop(ctx); }

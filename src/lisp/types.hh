@@ -36,27 +36,27 @@ using LISPT = ref_ptr<lisp_t>;
 
 enum class type
 {
-  Nil = 0,   // so that nullptr also becomes NIL
-  T,         // the truth object
-  Empty,     // the empty object, contains no value
-  Symbol,    // an atomic symbol
-  Integer,   // 24 bit integer in same word
-  Float,     // floating point value
-  Indirect,  // used when a value is stored in a closure
-  Cons,      // a pair
-  String,    // character strings
-  Subr,      // eval type primitive function
-  Fsubr,     // noeval primitive function
-  Lambda,    // lambda function
-  Nlambda,   // noeval lambda function
-  Closure,   // static binding object
-  Unbound,   // unbound indicator
-  Environ,   // environment stack type for gc use
-  File,      // file pointer
-  Free,      // an object on the freelist -- used for consistency checks
-  Eof,       // returned from read at end of file
-  Error,     // returned from primitive when an error occured
-  Cvariable  // is a pointer to c-variable
+  Nil = 0,  // so that nullptr also becomes NIL
+  T,        // the truth object
+  Empty,    // the empty object, contains no value
+  Symbol,   // an atomic symbol
+  Integer,  // 24 bit integer in same word
+  Float,    // floating point value
+  Indirect, // used when a value is stored in a closure
+  Cons,     // a pair
+  String,   // character strings
+  Subr,     // eval type primitive function
+  Fsubr,    // noeval primitive function
+  Lambda,   // lambda function
+  Nlambda,  // noeval lambda function
+  Closure,  // static binding object
+  Unbound,  // unbound indicator
+  Environ,  // environment stack type for gc use
+  File,     // file pointer
+  Free,     // an object on the freelist -- used for consistency checks
+  Eof,      // returned from read at end of file
+  Error,    // returned from primitive when an error occured
+  Cvariable // is a pointer to c-variable
 };
 
 inline constexpr auto NIL = nullptr;
