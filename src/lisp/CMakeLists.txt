@@ -41,6 +41,7 @@ target_sources(
 set(_liblisp_source
           alloc.hh
           arith.hh
+          check.hh
           error.hh
           eval.hh
           except.hh
@@ -63,6 +64,7 @@ set(_liblisp_source
           rtable.hh
           string.hh
           syntax.hh
+          types.hh
           user.hh
           version.hh)
 set(_liblisp_details
