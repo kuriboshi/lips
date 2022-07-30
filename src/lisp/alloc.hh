@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "eval.hh"
 #include "io.hh"
 #include "types.hh"
 #include "details/alloc.hh"

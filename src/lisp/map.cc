@@ -16,6 +16,7 @@
 //
 
 #include "alloc.hh"
+#include "eval.hh"
 #include "map.hh"
 #include "prim.hh"
 

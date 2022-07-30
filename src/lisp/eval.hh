@@ -226,6 +226,13 @@ inline void breakhook(evaluator::breakhook_t fun) { context::current().e().break
 inline void undefhook(evaluator::undefhook_t fun) { context::current().e().undefhook(fun); }
 inline void unwind() { context::current().e().unwind(); }
 
+inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }
+LISPT eval(const std::string& expr);
+inline LISPT apply(LISPT fun, LISPT args) { return context::apply(context::current(), fun, args); }
+inline LISPT baktrace() { return context::baktrace(context::current()); }
+inline LISPT topofstack() { return context::topofstack(context::current()); }
+inline LISPT destblock(LISPT a) { return context::destblock(context::current(), a); }
+
 } // namespace lisp
 
 #endif
