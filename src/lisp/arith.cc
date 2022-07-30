@@ -68,10 +68,10 @@ LISPT plus(context& ctx, LISPT x)
 LISPT iplus(context&, LISPT x)
 {
   int sum = 0;
-  for(auto i = begin(x); i != end(x); ++i)
+  for(auto i: x)
   {
-    check(*i, type::Integer);
-    sum += (**i).intval();
+    check(i, type::Integer);
+    sum += i->intval();
   }
   return mknumber(sum);
 }
