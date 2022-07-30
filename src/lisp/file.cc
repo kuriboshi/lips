@@ -58,7 +58,7 @@ LISPT open(context& ctx, LISPT filename, LISPT mode)
   return newfile;
 }
 
-LISPT close(context& ctx, LISPT fildes)
+LISPT close(context&, LISPT fildes)
 {
   check(fildes, type::File);
   if(fildes->file()->has_sink())

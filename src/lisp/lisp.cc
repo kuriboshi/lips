@@ -201,7 +201,7 @@ void context::current(context& lisp) { _current = &lisp; }
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
 
-LISPT syntax::macro(context& ctx, ref_file_t source, std::uint8_t index)
+LISPT syntax::macro(context&, ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro[index];
   LISPT f{new lisp_t};

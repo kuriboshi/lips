@@ -299,7 +299,7 @@ LISPT terpri(file_t& file)
 /// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
 /// car of x.
 ///
-LISPT splice(context& ctx, LISPT x, LISPT y, bool tailp)
+LISPT splice(context&, LISPT x, LISPT y, bool tailp)
 {
   check(x, type::Cons);
   if(is_NIL(y))

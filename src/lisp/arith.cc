@@ -65,7 +65,7 @@ LISPT plus(context& ctx, LISPT x)
   return mknumber(sum);
 }
 
-LISPT iplus(context& ctx, LISPT x)
+LISPT iplus(context&, LISPT x)
 {
   int sum = 0;
   for(auto i = begin(x); i != end(x); ++i)
@@ -76,7 +76,7 @@ LISPT iplus(context& ctx, LISPT x)
   return mknumber(sum);
 }
 
-LISPT fplus(context& ctx, LISPT x)
+LISPT fplus(context&, LISPT x)
 {
   check(x->car(), type::Float);
   auto fsum = x->car()->floatval();
@@ -90,7 +90,7 @@ LISPT fplus(context& ctx, LISPT x)
   return mkfloat(fsum);
 }
 
-LISPT difference(context& ctx, LISPT x, LISPT y)
+LISPT difference(context&, LISPT x, LISPT y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -105,14 +105,14 @@ LISPT difference(context& ctx, LISPT x, LISPT y)
   return mkfloat(x->floatval() - y->floatval());
 }
 
-LISPT idifference(context& ctx, LISPT x, LISPT y)
+LISPT idifference(context&, LISPT x, LISPT y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   return mknumber(x->intval() - y->intval());
 }
 
-LISPT fdifference(context& ctx, LISPT x, LISPT y)
+LISPT fdifference(context&, LISPT x, LISPT y)
 {
   check(x, type::Float);
   check(y, type::Float);
@@ -152,7 +152,7 @@ LISPT ltimes(context& ctx, LISPT x)
   return mknumber(prod);
 }
 
-LISPT itimes(context& ctx, LISPT x)
+LISPT itimes(context&, LISPT x)
 {
   check(x->car(), type::Integer);
   auto prod = x->car()->intval();
@@ -166,7 +166,7 @@ LISPT itimes(context& ctx, LISPT x)
   return mknumber(prod);
 }
 
-LISPT ftimes(context& ctx, LISPT x)
+LISPT ftimes(context&, LISPT x)
 {
   check(x->car(), type::Float);
   auto prod = x->car()->floatval();
@@ -235,7 +235,7 @@ LISPT fdivide(context& ctx, LISPT x, LISPT y)
   return mkfloat(x->floatval() / y->floatval());
 }
 
-LISPT minus(context& ctx, LISPT x)
+LISPT minus(context&, LISPT x)
 {
   check(x, type::Float, type::Integer);
   if(type_of(x) == type::Integer)
@@ -243,13 +243,13 @@ LISPT minus(context& ctx, LISPT x)
   return mkfloat(-x->floatval());
 }
 
-LISPT iminus(context& ctx, LISPT x)
+LISPT iminus(context&, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(-x->intval());
 }
 
-LISPT abs(context& ctx, LISPT x)
+LISPT abs(context&, LISPT x)
 {
   check(x, type::Integer);
   if(x->intval() < 0)
@@ -257,19 +257,19 @@ LISPT abs(context& ctx, LISPT x)
   return mknumber(x->intval());
 }
 
-LISPT itof(context& ctx, LISPT x)
+LISPT itof(context&, LISPT x)
 {
   check(x, type::Integer);
   return mkfloat(static_cast<double>(x->intval()));
 }
 
-LISPT add1(context& ctx, LISPT x)
+LISPT add1(context&, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() + 1);
 }
 
-LISPT sub1(context& ctx, LISPT x)
+LISPT sub1(context&, LISPT x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() - 1);
@@ -348,7 +348,7 @@ LISPT leq(context& ctx, LISPT x, LISPT y) { return numcheck<std::less_equal>(ctx
 
 LISPT neqp(context& ctx, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(ctx, x, y); }
 
-LISPT zerop(context& ctx, LISPT x)
+LISPT zerop(context&, LISPT x)
 {
   if(type_of(x) == type::Integer && x->intval() == 0)
     return T;
