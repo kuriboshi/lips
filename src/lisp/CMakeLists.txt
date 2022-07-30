@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+configure_file(version.cc.in version.cc)
+
 target_sources(
   liblisp
   PRIVATE alloc.cc
@@ -36,7 +38,7 @@ target_sources(
           rtable.cc
           string.cc
           user.cc
-          version.cc)
+          ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
 
 set(_liblisp_source
           alloc.hh
