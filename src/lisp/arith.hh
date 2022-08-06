@@ -20,21 +20,31 @@
 
 /// @file arith.hh
 ///
-/// @lips supports both integer and floating point numbers. There are
-/// functions specific for either integers or floating points as well as
-/// generic functions which can take either type.
+/// Lips supports both integer and floating point numbers. There are functions
+/// specific for either integers or floating points as well as generic
+/// functions which can take either type.
 
 #include "types.hh"
 #include "details/arith.hh"
 
 namespace lisp
 {
-inline LISPT abs(LISPT i) { return details::arith::abs(context::current(), i); }
-inline LISPT add1(LISPT a) { return details::arith::add1(context::current(), a); }
-inline LISPT difference(LISPT a, LISPT b) { return details::arith::difference(context::current(), a, b); }
-inline LISPT divide(LISPT a, LISPT b) { return details::arith::divide(context::current(), a, b); }
+/// @brief Absolute value of n.
+inline LISPT abs(LISPT n) { return details::arith::abs(context::current(), n); }
+/// @brief Add 1 to n and return the value.
+inline LISPT add1(LISPT n) { return details::arith::add1(context::current(), n); }
+/// @brief Calculates the difference between x and y.
+inline LISPT difference(LISPT x, LISPT y) { return details::arith::difference(context::current(), x, y); }
+/// @brief Divides x by y.
+///
+/// @details The result may be an integer or a floating point depending on the
+/// types of x and y. If both are integers the result will be an integer and if
+/// either x or y, ot both, is a floating point number the result will be a
+/// floating point number.
+inline LISPT divide(LISPT x, LISPT y) { return details::arith::divide(context::current(), x, y); }
 inline LISPT eqp(LISPT x, LISPT y) { return details::arith::eqp(context::current(), x, y); }
-inline LISPT fdifference(LISPT a, LISPT b) { return details::arith::fdifference(context::current(), a, b); }
+/// @brief Floating point difference between x and y.
+inline LISPT fdifference(LISPT x, LISPT y) { return details::arith::fdifference(context::current(), x, y); }
 inline LISPT fdivide(LISPT a, LISPT b) { return details::arith::fdivide(context::current(), a, b); }
 inline LISPT fplus(LISPT a) { return details::arith::fplus(context::current(), a); }
 inline LISPT ftimes(LISPT a) { return details::arith::ftimes(context::current(), a); }

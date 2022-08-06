@@ -22,37 +22,30 @@
 
 #include "io.hh"
 #include "types.hh"
+#include "details/alloc.hh"
 
-namespace lisp::details::alloc
+namespace lisp
 {
-/// @brief Return a cons cell from local storage.
-///
-/// @details If the free cell list is empty a new block of cons cells is
-/// allocated.  The LISPT ref_ptr created by this function will have its
-/// delete function overridden with a function which puts the cell back on
-/// the free cell list.
-///
-/// @return A new empty cons cell.
-///
-LISPT getobject();
-
 /// @brief Create a string.
 ///
-LISPT mkstring(const std::string&);
+/// @param s The string.
+/// @return A LISP object of type string.
+///
+inline LISPT mkstring(const std::string& s) { return details::alloc::mkstring(s); }
 
 /// @brief Create an integer number.
 ///
 /// @param number The integer number.
-/// @returns An integer number as a LISP object.
+/// @return An integer number as a LISP object.
 ///
-LISPT mknumber(int);
+inline LISPT mknumber(int i) { return details::alloc::mknumber(i); }
 
 /// @brief Create a floating point number.
 ///
 /// @param number The floating point number.
-/// @returns A floating point number as a LISP object.
+/// @return A floating point number as a LISP object.
 ///
-LISPT mkfloat(double);
+inline LISPT mkfloat(double number) { return details::alloc::mkfloat(number); }
 
 /// @brief Builds a cons cell out of the arguments.
 ///
@@ -64,28 +57,19 @@ LISPT mkfloat(double);
 ///
 /// @return The cons cell.
 ///
-LISPT cons(context&, LISPT, LISPT);
+inline LISPT cons(LISPT a, LISPT b) { return details::alloc::cons(context::current(), a, b); }
 
 /// @brief Build a list of symbols in the local symbol table.
 ///
 /// @return Returns a list of local symbols in no particular order.
 ///
-LISPT obarray(context&);
+inline LISPT obarray() { return details::alloc::obarray(context::current()); }
 
 /// @brief Number of free cell in the free cell list.
 ///
 /// @return The number of free cells.
 ///
-inline LISPT freecount(context&) { return mknumber(static_cast<int>(lisp_t::freecount())); }
-
-/// @brief Make a lambda object.
-///
-/// @details Make a lambda object with the argument ARGS and definition DEF
-/// and the type TYPE, which is either LAMBDA or NLAMBDA.
-///
-/// @return The lambda object.
-///
-LISPT mklambda(LISPT args, LISPT def, type type);
+inline LISPT freecount() { return details::alloc::freecount(context::current()); }
 
 /// @brief Create a symbol in the global symbol table, accessable from all
 /// lisp instances.
@@ -94,24 +78,39 @@ LISPT mklambda(LISPT args, LISPT def, type type);
 ///
 /// @return The interned symbol.
 ///
-LISPT intern(const std::string& pname);
+inline LISPT intern(const std::string& s) { return details::alloc::intern(s); }
 
-LISPT mkatom(const std::string&);
+/// @brief Create a literal atom.
+///
+/// @details Currently there is no difference between `intern` and `mkatom` as
+/// they both create a symbol in the global symbol table.
+///
+/// @return The literal atom.
+///
+inline LISPT mkatom(const std::string& s) { return details::alloc::mkatom(s); }
 
-/// @brief Register a primitive function.
-///
-/// @param pname [in] The print name of the internal function.  This is put in
-/// the global symbol table using intern.
-/// @param subr [in] The calling details of the function.  This in includes
-/// number of parameters, whether the function is spread, nospread, or
-/// halfspread, whether the function should evaluate it's arguments or not.
-///
-inline void mkprim(subr_t subr)
+/// @brief Overload of mkprim for a function with zero parameters.
+inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  auto s = new lisp_t;
-  s->set(subr_index{subr_t::put(subr)});
-  LISPT f = intern(subr.name);
-  f->value(s);
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
+}
+
+/// @brief Overload of mkprim for a function with one parameter.
+inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+{
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
+}
+
+/// @brief Overload of mkprim for a function with two parameters.
+inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+{
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
+}
+
+/// @brief Overload of mkprim for a function with three parameters.
+inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+{
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 /// @brief Initializes a lisp symbol for use in the C++ program.
@@ -128,51 +127,6 @@ inline void mkprim(subr_t subr)
 ///
 /// @return A reference of type cvariable which wraps the LISPT value.
 ///
-inline cvariable_t& initcvar(const std::string& name, LISPT val)
-{
-  auto t = mkatom(name);
-  t->symbol().value = new lisp_t;
-  t->value()->set(cvariable_t(val));
-  return t->value()->cvarval();
-}
-
-void init();
-
-} // namespace lisp::details::alloc
-
-namespace lisp
-{
-inline LISPT mkstring(const std::string& s) { return details::alloc::mkstring(s); }
-inline LISPT mknumber(int i) { return details::alloc::mknumber(i); }
-inline LISPT mkfloat(double d) { return details::alloc::mkfloat(d); }
-
-inline LISPT cons(LISPT a, LISPT b) { return details::alloc::cons(context::current(), a, b); }
-inline LISPT obarray() { return details::alloc::obarray(context::current()); }
-inline LISPT freecount() { return details::alloc::freecount(context::current()); }
-
-inline LISPT intern(const std::string& s) { return details::alloc::intern(s); }
-inline LISPT mkatom(const std::string& s) { return details::alloc::mkatom(s); }
-
-inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
 inline cvariable_t& initcvar(const std::string& name, LISPT val) { return details::alloc::initcvar(name, val); }
 
 /// @brief Terminates the list create function.

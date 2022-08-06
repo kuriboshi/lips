@@ -70,6 +70,7 @@ set(_liblisp_source
           user.hh
           version.hh)
 set(_liblisp_details
+          details/alloc.hh
           details/arith.hh
           details/debug.hh
           details/file.hh
