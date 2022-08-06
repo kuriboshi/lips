@@ -19,7 +19,7 @@
 
 #include "alloc.hh"
 
-namespace lisp::alloc
+namespace lisp::details::alloc
 {
 /// @brief Returns the global symbol table.
 symbol::symbol_store_t& global_symbols()
@@ -184,4 +184,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::alloc
+} // namespace lisp::details::alloc

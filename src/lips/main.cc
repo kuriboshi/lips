@@ -179,22 +179,22 @@ std::unique_ptr<::lisp::context> init()
 
   auto ctx = std::make_unique<::lisp::context>();
 
-  C_ALIAS = alloc::intern("alias");
-  C_AMPER = alloc::intern("&");
-  C_BACK = alloc::intern(pn::BACK);
-  C_BAR = alloc::intern("|");
-  C_EXCL = alloc::intern("!");
-  C_EXEC = alloc::intern(pn::EXEC);
-  C_GGT = alloc::intern(">>");
-  C_GT = alloc::intern(">");
-  C_LT = alloc::intern("<");
-  C_OLDVAL = alloc::intern("oldval");
-  C_PIPE = alloc::intern(pn::PIPECMD);
-  C_PROGN = alloc::intern("progn");
-  C_REDIR_APPEND = alloc::intern(pn::REDIR_APPEND);
-  C_REDIR_FROM = alloc::intern(pn::REDIR_FROM);
-  C_REDIR_TO = alloc::intern(pn::REDIR_TO);
-  C_SEMI = alloc::intern(";");
+  C_ALIAS = intern("alias");
+  C_AMPER = intern("&");
+  C_BACK = intern(pn::BACK);
+  C_BAR = intern("|");
+  C_EXCL = intern("!");
+  C_EXEC = intern(pn::EXEC);
+  C_GGT = intern(">>");
+  C_GT = intern(">");
+  C_LT = intern("<");
+  C_OLDVAL = intern("oldval");
+  C_PIPE = intern(pn::PIPECMD);
+  C_PROGN = intern("progn");
+  C_REDIR_APPEND = intern(pn::REDIR_APPEND);
+  C_REDIR_FROM = intern(pn::REDIR_FROM);
+  C_REDIR_TO = intern(pn::REDIR_TO);
+  C_SEMI = intern(";");
 
   top::init();
 

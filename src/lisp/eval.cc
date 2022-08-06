@@ -980,7 +980,7 @@ LISPT evaluator::baktrace()
 
 LISPT evaluator::topofstack()
 {
-  auto x = alloc::getobject();
+  auto x = details::alloc::getobject();
   x->settype(type::Environ);
   x->set(_ctx.e().environment());
   return x;

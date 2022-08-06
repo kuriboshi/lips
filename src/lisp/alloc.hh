@@ -23,7 +23,7 @@
 #include "io.hh"
 #include "types.hh"
 
-namespace lisp::alloc
+namespace lisp::details::alloc
 {
 /// @brief Return a cons cell from local storage.
 ///
@@ -138,42 +138,42 @@ inline cvariable_t& initcvar(const std::string& name, LISPT val)
 
 void init();
 
-} // namespace lisp::alloc
+} // namespace lisp::details::alloc
 
 namespace lisp
 {
-inline LISPT mkstring(const std::string& s) { return alloc::mkstring(s); }
-inline LISPT mknumber(int i) { return alloc::mknumber(i); }
-inline LISPT mkfloat(double d) { return alloc::mkfloat(d); }
+inline LISPT mkstring(const std::string& s) { return details::alloc::mkstring(s); }
+inline LISPT mknumber(int i) { return details::alloc::mknumber(i); }
+inline LISPT mkfloat(double d) { return details::alloc::mkfloat(d); }
 
-inline LISPT cons(LISPT a, LISPT b) { return alloc::cons(context::current(), a, b); }
-inline LISPT obarray() { return alloc::obarray(context::current()); }
-inline LISPT freecount() { return alloc::freecount(context::current()); }
+inline LISPT cons(LISPT a, LISPT b) { return details::alloc::cons(context::current(), a, b); }
+inline LISPT obarray() { return details::alloc::obarray(context::current()); }
+inline LISPT freecount() { return details::alloc::freecount(context::current()); }
 
-inline LISPT intern(const std::string& s) { return alloc::intern(s); }
-inline LISPT mkatom(const std::string& s) { return alloc::mkatom(s); }
+inline LISPT intern(const std::string& s) { return details::alloc::intern(s); }
+inline LISPT mkatom(const std::string& s) { return details::alloc::mkatom(s); }
 
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, fun, subr, spread));
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, fun, subr, spread));
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, fun, subr, spread));
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  alloc::mkprim(subr_t(pname, fun, subr, spread));
+  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
-inline cvariable_t& initcvar(const std::string& name, LISPT val) { return alloc::initcvar(name, val); }
+inline cvariable_t& initcvar(const std::string& name, LISPT val) { return details::alloc::initcvar(name, val); }
 
 /// @brief Terminates the list create function.
 inline LISPT mklist(LISPT t) { return cons(t, NIL); }
@@ -186,16 +186,16 @@ LISPT mklist(LISPT t, Ts... ts)
 }
 
 /// @brief Creates a lisp string.
-inline LISPT operator"" _s(const char* s, std::size_t) { return alloc::mkstring(s); }
+inline LISPT operator"" _s(const char* s, std::size_t) { return details::alloc::mkstring(s); }
 
 /// @brief Simpler way to create an atom.
-inline LISPT operator"" _a(const char* s, std::size_t) { return alloc::mkatom(s); }
+inline LISPT operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline LISPT operator"" _l(unsigned long long i) { return alloc::mknumber(i); }
+inline LISPT operator"" _l(unsigned long long i) { return details::alloc::mknumber(i); }
 
 /// @brief Creates a floating point value.
-inline LISPT operator"" _l(long double d) { return alloc::mkfloat(d); }
+inline LISPT operator"" _l(long double d) { return details::alloc::mkfloat(d); }
 
 /// @brief Evaluates a lisp expression in a string.
 inline LISPT operator"" _e(const char* s, std::size_t) { return eval(s); }

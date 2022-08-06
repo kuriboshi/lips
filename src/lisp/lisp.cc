@@ -98,7 +98,7 @@ context::context()
   {
     global_set = true;
 
-    auto intern = [this](const auto s) { return alloc::intern(s); };
+    auto intern = [this](const auto s) { return details::alloc::intern(s); };
 
     // Must be early since it's used by symbol_store_t to initialize new
     // symbols.
@@ -156,7 +156,7 @@ context::context()
     e().undefhook(nullptr);
     e().breakhook(nullptr);
 
-    alloc::init();
+    details::alloc::init();
     details::arith::init();
     details::debug::init();
     details::file::init();
@@ -220,8 +220,8 @@ LISPT context::baktrace(context& ctx) { return ctx.e().baktrace(); }
 LISPT context::topofstack(context& ctx) { return ctx.e().topofstack(); }
 LISPT context::destblock(context& ctx, LISPT a) { return ctx.e().destblock(a); }
 
-LISPT context::obarray(context& ctx) { return alloc::obarray(ctx); }
-LISPT context::freecount(context& ctx) { return alloc::freecount(ctx); }
+LISPT context::obarray(context& ctx) { return details::alloc::obarray(ctx); }
+LISPT context::freecount(context& ctx) { return details::alloc::freecount(ctx); }
 
 ref_file_t context::primout() const { return _pimpl->_primout; }
 
