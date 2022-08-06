@@ -29,35 +29,30 @@ LISPT C_QUOTE;
 
 namespace lisp::details::prim
 {
-/* 
- * mkindirect - makes an indirect pointer to the object OBJ. If already an 
- *              indirect object,  return it.
- */
-static LISPT mkindirect(context&, LISPT obj)
+/// @brief Make an indirect pointer to the object OBJ.
+///
+LISPT mkindirect(LISPT obj)
 {
-  /* If already an indirect type object, return it. */
-  /* We want all symbols that we include in closures */
-  /* on the same level to refer to the same value. */
+  // If already an indirect type object, return it.  We want all symbols that
+  // we include in closures on the same level to refer to the same value.
   if(type_of(obj) == type::Indirect)
     return obj;
-  /* If it's a new object, cons up the storage for it */
-  /* wasting the car part. */
+  // If it's a new object, cons up the storage for it wasting the car part.
   auto iobj = alloc::getobject();
   iobj->set(indirect_t{obj});
   return iobj;
 }
 
-/* 
- * closobj - builds a list of indirect pointers to the values of the 
- *           symbols in the list VARS. Used to construct a closure.
- */
+/// @brief Builds a list of indirect pointers to the values of the symbols in
+/// the list VARS. Used to construct a closure.
+///
 LISPT closobj(context& ctx, LISPT vars)
 {
   if(is_NIL(vars))
     return NIL;
   check(vars, type::Cons);
   check(vars->car(), type::Symbol);
-  return cons(mkindirect(ctx, vars->car()->value()), closobj(ctx, vars->cdr()));
+  return cons(mkindirect(vars->car()->value()), closobj(ctx, vars->cdr()));
 }
 
 LISPT car(context&, LISPT a)
