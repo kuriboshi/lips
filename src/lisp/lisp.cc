@@ -283,15 +283,6 @@ context* context::_current = nullptr;
 std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;
 subr_t::subr_vector subr_t::subr_store;
 
-LISPT eval(context& ctx, const std::string& expr)
-{
-  auto in = ref_file_t::create(expr);
-  auto e = lispread(in);
-  return context::eval(ctx, e);
-}
-
-LISPT eval(const std::string& expr) { return eval(context::current(), expr); }
-
 //
 // All lisp constants needed internally.
 //

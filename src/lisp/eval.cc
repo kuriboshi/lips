@@ -1019,4 +1019,13 @@ void evaluator::dfree(destblock_t* block) { _destblockused -= block->size() + 1;
 /// @brief Frees all destination blocks.
 void evaluator::dzero() { _destblockused = 0; }
 
+LISPT eval(context& ctx, const std::string& expr)
+{
+  auto in = ref_file_t::create(expr);
+  auto e = lispread(in);
+  return context::eval(ctx, e);
+}
+
+LISPT eval(const std::string& expr) { return eval(context::current(), expr); }
+
 } // namespace lisp
