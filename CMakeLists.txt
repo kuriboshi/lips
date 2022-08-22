@@ -24,6 +24,10 @@ if(POLICY CMP0114)
   cmake_policy(SET CMP0114 NEW)
 endif()
 
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 option(LIPS_ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
 option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
 option(LIPS_ENABLE_TESTS "Enable compiling test code" ON)
