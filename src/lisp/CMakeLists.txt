@@ -120,6 +120,7 @@ if(LIPS_ENABLE_TESTS)
             prim.test.cc
             prop.test.cc
             repl.test.cc
+            rtable.test.cc
             string.test.cc
             symbol.test.cc
             user.test.cc)

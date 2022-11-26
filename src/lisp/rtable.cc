@@ -50,7 +50,7 @@ LISPT rmsquote(context&, LISPT stream)
   if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
   {
     stream->file()->ungetch(c);
-    return C_QUOTE;
+    return "'"_a;
   }
   stream->file()->ungetch(c);
   return cons(C_QUOTE, cons(io::lispread(stream->file()), NIL));
