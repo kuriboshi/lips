@@ -131,6 +131,12 @@ TEST_CASE("obarray")
   CHECK(length(obs)->intval() == cur + 2);
 }
 
+TEST_CASE("alloc: freecount")
+{
+  auto free = freecount();
+  CHECK(free != NIL);
+}
+
 #ifdef ENABLE_OBJECT_SIZES
 TEST_CASE("Object sizes")
 {
