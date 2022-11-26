@@ -165,12 +165,42 @@ TEST_CASE("io: source/sink")
 
 TEST_CASE("io: file_t functions")
 {
-  file_t f0(std::make_unique<io::string_sink>());
-  patom("hello"_a, f0);
-  terpri(f0);
-  patom("world"_a, f0);
-  terpri(f0);
-  CHECK(to_string(f0.sink()) == "hello\nworld\n");
+  file_t f_out(std::make_unique<io::string_sink>());
+  file_t f_in(std::make_unique<io::string_source>("hello"));
+
+  SECTION("patom")
+  {
+    patom("hello"_a, f_out);
+    terpri(f_out);
+    patom("world"_a, f_out);
+    terpri(f_out);
+    CHECK(to_string(f_out.sink()) == "hello\nworld\n");
+  }
+
+  SECTION("puts")
+  {
+    f_out.puts("hello");
+    CHECK(to_string(f_out.sink()) == "hello");
+  }
+
+  SECTION("move file_t")
+  {
+    file_t f = std::move(f_out);
+    CHECK(!f_out.has_sink());
+    CHECK(f.has_sink());
+  }
+
+  SECTION("ungetch")
+  {
+    auto c = f_in.getch();
+    CHECK(c == 'h');
+    c = f_in.getch();
+    CHECK(c == 'e');
+    f_in.ungetch(c);
+    c = 0;
+    c = f_in.getch();
+    CHECK(c == 'e');
+  }
 }
 
 TEST_CASE("io: source")
@@ -222,6 +252,12 @@ TEST_CASE("io: source")
       CHECK(*b == '\n');
       ++b;
       CHECK(b == f.end());
+    }
+    {
+      std::ifstream is{"/dev/null"};
+      io::stream_source f{is};
+      auto g = f.getline();
+      CHECK(!g);
     }
   }
 

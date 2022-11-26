@@ -37,8 +37,8 @@ public:
     t1 = 0;
     t2 = 0;
   }
-  void* operator new(std::size_t) { return _pool.allocate(); }
-  void operator delete(void* x) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
   int t0 = 1;
   int t1 = 12;
   int t2 = 123;
@@ -77,6 +77,11 @@ TEST_CASE("pool: simple")
   CHECK(p.size() == 4);
   p.deallocate(t);
   CHECK(p.size() == 5);
+  auto* n = new Test;
+  REQUIRE(n != nullptr);
+  CHECK(p.size() == 4);
+  delete n;
+  CHECK(p.size() == 5);
 }
 
 template<class T>
@@ -90,10 +95,8 @@ class Foo
 {
 public:
   Foo() = default;
-  void* operator new(std::size_t) { return _pool.allocate(); }
-  void operator delete(void* x) { _pool.deallocate(x); }
-  void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
-  static std::size_t size() { return _pool.size(); }
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
 
 private:
   std::string s;

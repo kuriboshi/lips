@@ -54,6 +54,7 @@ public:
     void* _block;
     std::size_t _free_items = N;
   };
+  /// @brief Returns the number of free items.
   std::size_t size() const
   {
     if(!_storage.empty())

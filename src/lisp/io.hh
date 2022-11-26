@@ -150,7 +150,7 @@ public:
   virtual void putch(int, bool esc = false) = 0;
   virtual void puts(const std::string_view) = 0;
   virtual void terpri() = 0;
-  virtual void flush() {}
+  virtual void flush() = 0;
   virtual bool close() = 0;
 
 protected:
@@ -253,10 +253,6 @@ public:
   {}
   file_t(std::unique_ptr<io::sink> sink)
     : _sink(std::move(sink))
-  {}
-  file_t(std::unique_ptr<io::source> source, std::unique_ptr<io::sink> sink)
-    : _source(std::move(source)),
-      _sink(std::move(sink))
   {}
   file_t(std::istream& stream)
     : _source(std::make_unique<io::stream_source>(stream))
