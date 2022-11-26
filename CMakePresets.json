@@ -7,15 +7,29 @@
     },
     "configurePresets": [
         {
-            "name": "default",
-            "displayName": "Default Config",
-            "description": "Default build using Ninja generator",
+            "name": "debug",
+            "displayName": "Debug Config",
+            "description": "Debug build using Ninja generator",
             "binaryDir": "${sourceDir}/build/debug",
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "LIPS_ENABLE_TESTS": "ON"
+            }
+        },
+        {
+            "name": "default",
+            "inherits": "debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Release Config",
+            "description": "Release build using Ninja generator",
+            "binaryDir": "${sourceDir}/build/release",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
@@ -26,7 +40,7 @@
         },
         {
             "name": "make",
-            "inherits": "default",
+            "inherits": "debug",
             "displayName": "Makefile preset",
             "description": "Default build using make",
             "generator": "Unix Makefiles",
@@ -36,7 +50,7 @@
         },
         {
             "name": "docker",
-            "inherits": "default",
+            "inherits": "debug",
             "displayName": "Docker preset",
             "description": "Default preset for use in docker",
             "cacheVariables": {
@@ -45,7 +59,7 @@
         },
         {
             "name": "clang-tidy",
-            "inherits": "default",
+            "inherits": "debug",
             "displayName": "Run clang-tidy",
             "description": "Run clang-tidy on the source code",
             "binaryDir": "${sourceDir}/build/clang-tidy",
@@ -58,6 +72,14 @@
         {
             "name": "default",
             "configurePreset": "default"
+        },
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
         },
         {
             "name": "make",
@@ -76,6 +98,10 @@
         {
             "name": "default",
             "configurePreset": "default"
+        },
+        {
+            "name": "debug",
+            "configurePreset": "debug"
         },
         {
             "name": "make",
