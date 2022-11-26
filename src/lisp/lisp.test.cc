@@ -184,4 +184,10 @@ TEST_CASE("lisp: iter")
   }
 }
 
+TEST_CASE("lisp: create lisp twice")
+{
+  auto f = []() { context c; };
+  CHECK_THROWS_WITH(f(), "context::context called twice");
+}
+
 } // namespace lisp

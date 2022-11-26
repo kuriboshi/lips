@@ -86,12 +86,13 @@ public:
 };
 
 context::context()
-  : _pimpl(std::make_unique<impl>(e()))
 {
   if(_current == nullptr)
     _current = this;
   else
-    throw std::runtime_error("lisp::lisp called twice ");
+    throw std::runtime_error("context::context called twice");
+
+  _pimpl = std::make_unique<impl>(e());
 
   static auto global_set = false;
   if(!global_set)
@@ -196,7 +197,7 @@ evaluator& context::e()
 }
 
 context& context::current() { return *_current; }
-void context::current(context& lisp) { _current = &lisp; }
+void context::current(context& ctx) { _current = &ctx; }
 
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
