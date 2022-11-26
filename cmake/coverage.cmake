@@ -53,7 +53,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
       ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
       -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
       -show-line-counts-or-regions -output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
-      -format="html"
+      -format="html" ${CMAKE_CURRENT_SOURCE_DIR}/src
     DEPENDS ccov-preprocessing)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS
