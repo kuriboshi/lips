@@ -231,49 +231,6 @@ private:
     IN_EXP2,  // Next state after finding a '+', '-', or a
               // digit.
   };
-  friend std::ostream& operator<<(std::ostream& os, enum state_t state)
-  {
-    switch(state)
-    {
-      case state_t::START:
-        os << "START";
-        break;
-      case state_t::IN_STRING:
-        os << "IN_STRING";
-        break;
-      case state_t::IN_SYMBOL:
-        os << "IN_SYMBOL";
-        break;
-      case state_t::IN_QUOTE:
-        os << "IN_QUOTE";
-        break;
-      case state_t::IN_COMMENT:
-        os << "IN_COMMENT";
-        break;
-      case state_t::IN_DOT:
-        os << "IN_DOT";
-        break;
-      case state_t::IN_SIGN:
-        os << "IN_SIGN";
-        break;
-      case state_t::IN_INT:
-        os << "IN_INT";
-        break;
-      case state_t::IN_FLOAT:
-        os << "IN_FLOAT";
-        break;
-      case state_t::IN_EXP1:
-        os << "IN_EXP1";
-        break;
-      case state_t::IN_EXP2:
-        os << "IN_EXP2";
-        break;
-      case state_t::IN_HASH:
-        os << "IN_HASH";
-        break;
-    }
-    return os;
-  }
 };
 
 } // namespace lisp
