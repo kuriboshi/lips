@@ -136,7 +136,7 @@ LISPT load(context& ctx, LISPT f)
 {
   check(f, type::String, type::Symbol);
   if(!file::loadfile(ctx, f->getstr()))
-    ctx.fatal(error_errc::cant_load);
+    ctx.fatal(error_errc::cant_load, f->getstr());
   return f;
 }
 

@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <sstream>
 #include <variant>
 
 #include "error.hh"
@@ -464,7 +465,18 @@ public:
 
   LISPT perror(std::error_code, LISPT);
   LISPT error(std::error_code, LISPT);
-  void fatal(std::error_code);
+
+  void fatal(std::error_code error)
+  {
+    throw lisp_error(error.message());
+  }
+
+  template<typename... Ts>
+  void fatal(std::error_code error, const Ts&... args)
+  {
+    throw lisp_error(error.message() + ": " + cat(args...));
+  }
+
   LISPT break0(LISPT) const;
 
   enum class break_return
@@ -492,6 +504,22 @@ public:
   std::string version() const { return C_VERSION->value()->getstr(); }
 
 private:
+  template<typename T>
+  std::string cat(const T& arg)
+  {
+    std::ostringstream os;
+    os << arg;
+    return os.str();
+  }
+
+  template<typename T, typename... Ts>
+  std::string cat(const T& first, const Ts&... args)
+  {
+    std::ostringstream os;
+    os << first << " " << cat(args...);
+    return os.str();
+  }
+
   class impl;
   std::unique_ptr<impl> _pimpl;
   static context* _current;

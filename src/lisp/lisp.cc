@@ -271,8 +271,6 @@ LISPT context::error(std::error_code error, LISPT arg)
   throw lisp_error(error.message());
 }
 
-void context::fatal(std::error_code error) { throw lisp_error(error.message()); }
-
 LISPT context::break0(LISPT exp) const { return repl(exp); }
 
 cvariable_t& context::currentbase() { return _pimpl->_currentbase; }
