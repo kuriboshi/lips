@@ -104,6 +104,7 @@ if(LIPS_ENABLE_TESTS)
     PRIVATE lisp_test.cc
             alloc.test.cc
             arith.test.cc
+            check.test.cc
             debug.test.cc
             error.test.cc
             eval.test.cc
