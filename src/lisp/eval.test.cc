@@ -139,4 +139,26 @@ TEST_CASE("eval: undefhook")
   std::ignore = undefhook(old);
 }
 
+TEST_CASE("eval: breakhook")
+{
+  bool called = false;
+  auto f = [&called]() { called = true; };
+  auto old = breakhook(f);
+  CHECK_THROWS("(undefined)"_e);
+  CHECK(called);
+  std::ignore = breakhook(old);
+}
+
+TEST_CASE("eval: apply throws")
+{
+  try
+  {
+    apply("exit"_a, "(100)"_l);
+  }
+  catch(const lisp_finish& ex)
+  {
+    CHECK(ex.exit_code == 100);
+  }
+}
+
 } // namespace lisp

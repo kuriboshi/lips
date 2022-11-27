@@ -295,13 +295,10 @@ bool evaluator::evalhook(LISPT exp)
         send(res);
         pop(_cont);
         return true;
-        break;
       case -1:
         abort(error_errc::no_message, NIL);
-        break;
       default:
         return false;
-        break;
     }
   return false;
 }
