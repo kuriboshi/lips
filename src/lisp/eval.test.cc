@@ -23,9 +23,11 @@
 
 #include "alloc.hh"
 #include "eval.hh"
+#include "file.hh"
 #include "low.hh"
 #include "pred.hh"
 #include "prim.hh"
+#include "prop.hh"
 
 namespace lisp
 {
@@ -159,6 +161,21 @@ TEST_CASE("eval: apply throws")
   {
     CHECK(ex.exit_code == 100);
   }
+}
+
+TEST_CASE("eval: autoload")
+{
+  std::string autoload{R"((setq auto (lambda () 123))
+)"};
+  {
+    std::ofstream of{"autoload.lisp"};
+    of << autoload;
+  }
+  putprop("auto"_a, "autoload"_a, "autoload.lisp"_a);
+  auto result = "(auto)"_e;
+  CHECK(type_of(result) == type::Integer);
+  CHECK(result->intval() == 123);
+  std::filesystem::remove("autoload.lisp");
 }
 
 } // namespace lisp
