@@ -95,9 +95,9 @@ public:
   void interactive(bool b) { _interactive = b; }
 
   using undefhook_t = std::function<int(LISPT, LISPT*)>;
-  void undefhook(undefhook_t fun) { _undefhook = fun; }
+  undefhook_t undefhook(undefhook_t fun) { auto f = _undefhook; _undefhook = fun; return f; }
   using breakhook_t = std::function<void()>;
-  void breakhook(breakhook_t fun) { _breakhook = fun; }
+  breakhook_t breakhook(breakhook_t fun) { auto f = _breakhook; _breakhook = fun; return f; }
 
   destblock_t* environment() const { return _env; }
 
@@ -222,8 +222,8 @@ private:
   int _destblockused = 0;
 };
 
-inline void breakhook(evaluator::breakhook_t fun) { context::current().e().breakhook(fun); }
-inline void undefhook(evaluator::undefhook_t fun) { context::current().e().undefhook(fun); }
+inline evaluator::breakhook_t breakhook(evaluator::breakhook_t fun) { return context::current().e().breakhook(fun); }
+inline evaluator::undefhook_t undefhook(evaluator::undefhook_t fun) { return context::current().e().undefhook(fun); }
 inline void unwind() { context::current().e().unwind(); }
 
 inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }

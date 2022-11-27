@@ -129,4 +129,14 @@ TEST_CASE("eval: control limits")
   ctx.primerr(old);
 }
 
+TEST_CASE("eval: undefhook")
+{
+  bool called = false;
+  auto f = [&called](LISPT, LISPT*) -> int { called = true; return 1; };
+  auto old = undefhook(f);
+  std::ignore = "(undefined)"_e;
+  CHECK(called);
+  std::ignore = undefhook(old);
+}
+
 } // namespace lisp
