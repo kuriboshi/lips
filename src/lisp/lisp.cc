@@ -197,7 +197,6 @@ evaluator& context::e()
 }
 
 context& context::current() { return *_current; }
-void context::current(context& ctx) { _current = &ctx; }
 
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
@@ -220,9 +219,6 @@ LISPT context::apply(context& ctx, LISPT fun, LISPT args) { return ctx.e().apply
 LISPT context::baktrace(context& ctx) { return ctx.e().baktrace(); }
 LISPT context::topofstack(context& ctx) { return ctx.e().topofstack(); }
 LISPT context::destblock(context& ctx, LISPT a) { return ctx.e().destblock(a); }
-
-LISPT context::obarray(context& ctx) { return details::alloc::obarray(ctx); }
-LISPT context::freecount(context& ctx) { return details::alloc::freecount(ctx); }
 
 ref_file_t context::primout() const { return _pimpl->_primout; }
 
