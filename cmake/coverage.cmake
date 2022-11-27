@@ -34,9 +34,10 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     ccov-preprocessing
     COMMAND
       LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
-      $<TARGET_FILE:${TARGET_NAME}> --load
-      ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp --loadpath
-      ${CMAKE_CURRENT_SOURCE_DIR}
+        $<TARGET_FILE:${TARGET_NAME}>
+        --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
+        --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
+        --loadpath ${CMAKE_CURRENT_BINARY_DIR}
     COMMAND
       ${LLVM_PROFDATA} merge -sparse
       ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw -o
@@ -51,9 +52,11 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     ccov
     COMMAND
       ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
-      -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
-      -show-line-counts-or-regions -output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
-      -format="html" ${CMAKE_CURRENT_SOURCE_DIR}/src
+        -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+        -show-line-counts-or-regions
+        -format="html"
+        -output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
     DEPENDS ccov-preprocessing)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS
