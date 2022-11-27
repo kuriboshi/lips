@@ -5,6 +5,7 @@ all: debug
 .PHONY: coverage
 .PHONY: release.config
 .PHONY: release
+.PHONY: xcode
 
 debug.config: build/debug/CMakeCache.txt
 
@@ -27,3 +28,6 @@ coverage: debug.config
 
 test: debug
 	ctest --preset default
+
+xcode:
+	cmake --preset xcode
