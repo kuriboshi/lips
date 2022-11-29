@@ -44,7 +44,8 @@ TEST_CASE("Property functions")
   setplist(sym, mklist(prop0, value0, prop1, value1));
   CHECK(length(getplist(sym))->intval() == 4);
   CHECK(getprop(sym, prop1) == value1);
-  CHECK(getprop(sym, mkatom("prop2")) == NIL);
+  CHECK(getprop(sym, "prop2"_a) == NIL);
+  CHECK_THROWS(getprop(1_l, "prop3"_a));
 }
 
 } // namespace lisp

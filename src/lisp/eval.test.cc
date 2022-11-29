@@ -175,6 +175,8 @@ TEST_CASE("eval: autoload")
   auto result = "(auto)"_e;
   CHECK(type_of(result) == type::Integer);
   CHECK(result->intval() == 123);
+  putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
+  CHECK_THROWS("(noauto)"_e);
   std::filesystem::remove("autoload.lisp");
 }
 
