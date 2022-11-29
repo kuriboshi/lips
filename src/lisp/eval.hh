@@ -140,7 +140,6 @@ private:
   LISPT call(LISPT fun);
   bool evalhook(LISPT exp);
   void do_unbound(continuation_t);
-  bool do_default(continuation_t);
   void link();
   void restore_env();
 

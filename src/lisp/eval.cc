@@ -315,6 +315,7 @@ void evaluator::do_unbound(continuation_t continuation)
   {
     push(_expression);
     push(_dest);
+    // al has to be a string or a symbol
     load(al);
     pop(_dest);
     pop(_expression);
@@ -329,31 +330,9 @@ void evaluator::do_unbound(continuation_t continuation)
   }
   else
   {
-    if(type_of(_expression) == type::Cons && type_of(_expression->car()) == type::Symbol
-      && type_of(_expression->car()->value()) == type::Unbound)
-    {
-      if(!evalhook(_expression))
-        xbreak(error_errc::undef_function, _expression->car(), continuation);
-    }
-    else
-    {
-      _fun = _expression->car();
-      _args = _expression->cdr();
-      _cont = continuation;
-    }
-  }
-}
-
-bool evaluator::do_default(continuation_t continuation)
-{
-  if(type_of(_expression) == type::Cons && type_of(_expression->car()) == type::Symbol
-    && type_of(_expression->car()->value()) == type::Unbound)
-  {
     if(!evalhook(_expression))
       xbreak(error_errc::undef_function, _expression->car(), continuation);
-    return true;
   }
-  return false;
 }
 
 bool evaluator::peval1()
@@ -414,8 +393,7 @@ bool evaluator::peval1()
           xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
         break;
       default:
-        if(!do_default(&evaluator::peval1))
-          xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
+        xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
         break;
     }
   return false;
@@ -466,8 +444,7 @@ bool evaluator::peval2()
           xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
         break;
       default:
-        if(!do_default(&evaluator::peval2))
-          xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
+        xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
         break;
     }
   return false;
