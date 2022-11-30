@@ -134,7 +134,10 @@ TEST_CASE("eval: control limits")
 TEST_CASE("eval: undefhook")
 {
   bool called = false;
-  auto f = [&called](LISPT, LISPT*) -> int { called = true; return 1; };
+  auto f = [&called](LISPT, LISPT*) -> int {
+    called = true;
+    return 1;
+  };
   auto old = undefhook(f);
   std::ignore = "(undefined)"_e;
   CHECK(called);

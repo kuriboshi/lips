@@ -95,9 +95,19 @@ public:
   void interactive(bool b) { _interactive = b; }
 
   using undefhook_t = std::function<int(LISPT, LISPT*)>;
-  undefhook_t undefhook(undefhook_t fun) { auto f = _undefhook; _undefhook = fun; return f; }
+  undefhook_t undefhook(undefhook_t fun)
+  {
+    auto f = _undefhook;
+    _undefhook = fun;
+    return f;
+  }
   using breakhook_t = std::function<void()>;
-  breakhook_t breakhook(breakhook_t fun) { auto f = _breakhook; _breakhook = fun; return f; }
+  breakhook_t breakhook(breakhook_t fun)
+  {
+    auto f = _breakhook;
+    _breakhook = fun;
+    return f;
+  }
 
   destblock_t* environment() const { return _env; }
 

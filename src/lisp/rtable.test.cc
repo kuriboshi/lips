@@ -74,4 +74,4 @@ TEST_CASE("rtable: rmgetenv")
   }
 }
 
-}
+} // namespace lisp

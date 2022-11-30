@@ -49,20 +49,20 @@ TEST_CASE("error: type error messages")
 
 TEST_CASE("error: error messages")
 {
-  CHECK(make_error_code(error_errc::attempt_to_clobber).message() ==  "Attempt to clobber constant");
-  CHECK(make_error_code(error_errc::cant_load).message() ==  "Can't load file");
-  CHECK(make_error_code(error_errc::cant_open).message() ==  "Can't open file");
-  CHECK(make_error_code(error_errc::corrupt_data).message() ==  "Bug: corrupt data");
-  CHECK(make_error_code(error_errc::divide_by_zero).message() ==  "Divide by zero");
-  CHECK(make_error_code(error_errc::illegal_arg).message() ==  "Illegal argument");
-  CHECK(make_error_code(error_errc::illegal_function).message() ==  "Illegal function");
-  CHECK(make_error_code(error_errc::kbd_break).message() ==  "Break");
-  CHECK(make_error_code(error_errc::no_message).message() ==  "No message");
-  CHECK(make_error_code(error_errc::stack_overflow).message() ==  "Stack overflow");
-  CHECK(make_error_code(error_errc::unbound_variable).message() ==  "Unbound variable");
-  CHECK(make_error_code(error_errc::undef_function).message() ==  "Undefined function");
-  CHECK(make_error_code(error_errc::unknown_request).message() ==  "Unknown request");
-  CHECK(make_error_code(error_errc::user_error).message() ==  "User error");
+  CHECK(make_error_code(error_errc::attempt_to_clobber).message() == "Attempt to clobber constant");
+  CHECK(make_error_code(error_errc::cant_load).message() == "Can't load file");
+  CHECK(make_error_code(error_errc::cant_open).message() == "Can't open file");
+  CHECK(make_error_code(error_errc::corrupt_data).message() == "Bug: corrupt data");
+  CHECK(make_error_code(error_errc::divide_by_zero).message() == "Divide by zero");
+  CHECK(make_error_code(error_errc::illegal_arg).message() == "Illegal argument");
+  CHECK(make_error_code(error_errc::illegal_function).message() == "Illegal function");
+  CHECK(make_error_code(error_errc::kbd_break).message() == "Break");
+  CHECK(make_error_code(error_errc::no_message).message() == "No message");
+  CHECK(make_error_code(error_errc::stack_overflow).message() == "Stack overflow");
+  CHECK(make_error_code(error_errc::unbound_variable).message() == "Unbound variable");
+  CHECK(make_error_code(error_errc::undef_function).message() == "Undefined function");
+  CHECK(make_error_code(error_errc::unknown_request).message() == "Unknown request");
+  CHECK(make_error_code(error_errc::user_error).message() == "User error");
 }
 
 TEST_CASE("error: type error name")
@@ -77,4 +77,4 @@ TEST_CASE("error: error_condition")
   CHECK(make_error_condition(type_errc::not_nil));
 }
 
-}
+} // namespace lisp

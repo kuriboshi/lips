@@ -462,10 +462,7 @@ public:
   LISPT perror(std::error_code, LISPT);
   LISPT error(std::error_code, LISPT);
 
-  void fatal(std::error_code error)
-  {
-    throw lisp_error(error.message());
-  }
+  void fatal(std::error_code error) { throw lisp_error(error.message()); }
 
   template<typename... Ts>
   void fatal(std::error_code error, const Ts&... args)
