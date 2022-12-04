@@ -194,13 +194,21 @@ TEST_CASE("eval: autoload")
 TEST_CASE("eval: string function")
 {
   auto fun = R"(("fun"))";
+  std::ostringstream os;
+  auto& ctx = context::current();
+  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(eval(fun));
+  ctx.primerr(old);
 }
 
 TEST_CASE("eval: illegal function")
 {
   auto fun = R"((1))";
+  std::ostringstream os;
+  auto& ctx = context::current();
+  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(eval(fun));
+  ctx.primerr(old);
 }
 
 } // namespace lisp
