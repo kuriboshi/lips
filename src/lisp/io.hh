@@ -27,6 +27,7 @@
 
 #include <fmt/format.h>
 
+#include "context.hh"
 #include "types.hh"
 
 namespace lisp::io

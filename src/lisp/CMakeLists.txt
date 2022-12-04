@@ -21,6 +21,7 @@ target_sources(
   liblisp
   PRIVATE alloc.cc
           arith.cc
+          context.cc
           eval.cc
           file.cc
           io.cc
@@ -44,6 +45,7 @@ set(_liblisp_source
           alloc.hh
           arith.hh
           check.hh
+          context.hh
           error.hh
           eval.hh
           except.hh

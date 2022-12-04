@@ -21,6 +21,7 @@
 #include "alloc.hh"
 #include "arith.hh"
 #include "check.hh"
+#include "context.hh"
 #include "debug.hh"
 #include "eval.hh"
 #include "file.hh"

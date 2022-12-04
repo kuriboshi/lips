@@ -439,105 +439,13 @@ extern LISPT C_SYMBOL;
 extern LISPT C_READ;
 extern LISPT C_WRITE;
 extern LISPT C_APPEND;
-extern LISPT C_VERSION;
 
 /// @brief The lisp interpreter.
 ///
-class context
-{
-public:
-  context();
-  ~context();
-  evaluator& e();
-  static context& current();
-
-  static LISPT eval(context&, LISPT expr);
-  static LISPT apply(context&, LISPT fun, LISPT args);
-  static LISPT baktrace(context&);
-  static LISPT topofstack(context&);
-  static LISPT destblock(context&, LISPT a);
-
-  syntax& read_table();
-  void read_table(std::unique_ptr<syntax>);
-
-  ref_file_t primout() const;
-  ref_file_t primerr() const;
-  ref_file_t primin() const;
-  ref_file_t primout(ref_file_t);
-  ref_file_t primerr(ref_file_t);
-  ref_file_t primin(ref_file_t);
-  ref_file_t stdout() const;
-  ref_file_t stderr() const;
-  ref_file_t stdin() const;
-
-  LISPT perror(std::error_code);
-  LISPT perror(std::error_code, LISPT);
-  LISPT error(std::error_code, LISPT);
-
-  void fatal(std::error_code error) { throw lisp_error(error.message()); }
-
-  template<typename... Ts>
-  void fatal(std::error_code error, const Ts&... args)
-  {
-    throw lisp_error(error.message() + ": " + cat(args...));
-  }
-
-  LISPT break0(LISPT) const;
-
-  enum class break_return
-  {
-    RETURN,  // Return from recursive repl
-    PROCEED, // Proceed with repl
-    SKIP,    // Skip eval
-  };
-  using repl_fun_t = std::function<LISPT(LISPT)>;
-  repl_fun_t repl;
-
-  // Used by lisp::io
-  int printlevel = 0;
-  int thisplevel = 0;
-  bool echoline = false;
-
-  // Used by the interpreter
-  bool brkflg = false;
-  bool interrupt = false;
-
-  cvariable_t& currentbase();
-  cvariable_t& verbose();
-  cvariable_t& loadpath();
-  void loadpath(LISPT);
-  std::string version() const { return C_VERSION->value()->getstr(); }
-
-private:
-  template<typename T>
-  std::string cat(const T& arg)
-  {
-    std::ostringstream os;
-    os << arg;
-    return os.str();
-  }
-
-  template<typename T, typename... Ts>
-  std::string cat(const T& first, const Ts&... args)
-  {
-    std::ostringstream os;
-    os << first << " " << cat(args...);
-    return os.str();
-  }
-
-  class impl;
-  std::unique_ptr<impl> _pimpl;
-  static context* _current;
-};
-
 inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
 inline type type_of(lisp_t& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
-
-inline LISPT perror(std::error_code code, LISPT a) { return context::current().perror(code, a); }
-inline LISPT error(std::error_code code, LISPT a) { return context::current().error(code, a); }
-inline LISPT break0(LISPT a) { return context::current().break0(a); }
 
 } // namespace lisp
 

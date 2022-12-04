@@ -23,6 +23,7 @@
 #include <functional>
 #include <variant>
 
+#include "context.hh"
 #include "error.hh"
 #include "types.hh"
 
