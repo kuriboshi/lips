@@ -26,6 +26,9 @@ namespace lisp
 
 TEST_CASE("check: type checking")
 {
+  std::ostringstream os;
+  auto& ctx = context::current();
+  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(check(T, type::Nil));
   CHECK_THROWS(check(NIL, type::T));
   CHECK_THROWS(check(NIL, type::Symbol));
@@ -43,6 +46,7 @@ TEST_CASE("check: type checking")
   CHECK_THROWS(check(NIL, type::Eof));
   CHECK_THROWS(check(NIL, type::Error));
   CHECK_THROWS(check(NIL, type::Cvariable));
+  ctx.primerr(old);
 }
 
 } // namespace lisp
