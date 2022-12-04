@@ -82,9 +82,6 @@ void check(LISPT arg, T type)
       case type::File:
         error(type_errc::not_filet, arg);
         break;
-      case type::Free:
-        error(type_errc::not_free, arg);
-        break;
       case type::Eof:
         error(type_errc::not_endoffile, arg);
         break;

@@ -59,7 +59,6 @@ enum class type
   Unbound,  // unbound indicator
   Environ,  // environment stack type for gc use
   File,     // file pointer
-  Free,     // an object on the freelist -- used for consistency checks
   Eof,      // returned from read at end of file
   Error,    // returned from primitive when an error occured
   Cvariable // is a pointer to c-variable
@@ -418,15 +417,6 @@ private:
     _u;
 };
 
-///
-/// @brief Puts the lisp_t object back on the freelist.
-///
-/// @details The definition can be found in alloc.hh. See also ref_ptr.hh.
-///
-/// @param obj The object to be returned to the freelist.
-///
-void ref_deleter(lisp_t* obj);
-
 //
 // All lisp constants used internally.
 //
@@ -444,7 +434,6 @@ extern LISPT C_EOF;
 extern LISPT C_ERROR;
 extern LISPT C_FILE;
 extern LISPT C_FLOAT;
-extern LISPT C_FREE;
 extern LISPT C_FSUBR;
 extern LISPT C_GO;
 extern LISPT C_INDIRECT;

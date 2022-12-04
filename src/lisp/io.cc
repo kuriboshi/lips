@@ -240,9 +240,6 @@ LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
     case type::Environ:
       pp("#<environ", file, x);
       break;
-    case type::Free:
-      pp("#<free", file, x);
-      break;
     case type::Eof:
       pp("#<endoffile", file, x);
       break;

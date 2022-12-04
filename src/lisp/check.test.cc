@@ -43,7 +43,6 @@ TEST_CASE("check: type checking")
   CHECK_THROWS(check(NIL, type::Unbound));
   CHECK_THROWS(check(NIL, type::Environ));
   CHECK_THROWS(check(NIL, type::File));
-  CHECK_THROWS(check(NIL, type::Free));
   CHECK_THROWS(check(NIL, type::Eof));
   CHECK_THROWS(check(NIL, type::Error));
   CHECK_THROWS(check(NIL, type::Cvariable));

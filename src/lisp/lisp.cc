@@ -24,23 +24,6 @@
 
 namespace lisp
 {
-/// @brief Returns the lisp_t object to the list of free objects.
-///
-/// @details Instead of new/delete lisp_t objects are allocated from the list
-/// of free objects. When an object is deleted it's returned to the list of
-/// free lisp_t objects.
-///
-/// @param object A pointer to the lisp_t object to "delete".
-void ref_deleter(lisp_t* object)
-{
-  // Set the type to FREE to make it possible to detect use of objects already
-  // freed.
-  object->set();
-  object->settype(type::Free);
-  // This will return the object to the memory pool.
-  delete object; // NOLINT
-}
-
 namespace pn
 {
 inline constexpr auto E = "e";                   // noeval version of eval
@@ -134,7 +117,6 @@ context::context()
     C_EOF->settype(type::Eof);
     C_FILE = intern("file");
     C_FLOAT = intern("float");
-    C_FREE = intern("free");
     C_FSUBR = intern("fsubr");
     C_GO = intern("go");
     C_INDIRECT = intern("indirect");
@@ -294,7 +276,6 @@ LISPT C_ENVIRON;
 LISPT C_EOF;
 LISPT C_FILE;
 LISPT C_FLOAT;
-LISPT C_FREE;
 LISPT C_FSUBR;
 LISPT C_GO;
 LISPT C_INDIRECT;

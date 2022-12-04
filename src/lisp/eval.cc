@@ -265,9 +265,6 @@ bool evaluator::peval()
       send(_expression->cvarval());
       pop(_cont);
       break;
-    case type::Free:
-      abort(error_errc::corrupt_data, _expression);
-      break;
     default:
       send(_expression);
       pop(_cont);

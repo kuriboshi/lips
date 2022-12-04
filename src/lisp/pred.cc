@@ -146,8 +146,6 @@ LISPT xtypeof(context&, LISPT a)
       return C_ENVIRON;
     case type::T:
       return T;
-    case type::Free:
-      return C_FREE;
     case type::Eof:
       return C_ENDOFFILE;
     case type::Error:
