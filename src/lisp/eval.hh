@@ -188,7 +188,7 @@ private:
   bool lookup();
 
   LISPT printwhere();
-  void abort(std::error_code, LISPT v);
+  void abort(std::error_code);
   void overflow();
   LISPT destblock(const destblock_t*);
 

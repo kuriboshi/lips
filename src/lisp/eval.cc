@@ -70,15 +70,15 @@ LISPT evaluator::printwhere()
 
 /// @brief Print error message, abort current evaluation, and return to top
 /// level.
-void evaluator::abort(std::error_code error, LISPT v)
+void evaluator::abort(std::error_code error)
 {
-  _ctx.perror(error, v);
+  _ctx.perror(error);
   printwhere();
   unwind();
   throw lisp_error("abort");
 }
 
-void evaluator::overflow() { abort(error_errc::stack_overflow, C_EMPTY); }
+void evaluator::overflow() { abort(error_errc::stack_overflow); }
 
 /// @brief This function prints an error message, and sets up a call to everr
 /// that handles breaks.
@@ -293,7 +293,7 @@ bool evaluator::evalhook(LISPT exp)
         pop(_cont);
         return true;
       case -1:
-        abort(error_errc::no_message, NIL);
+        abort(error_errc::no_message);
       default:
         return false;
     }
@@ -337,7 +337,7 @@ bool evaluator::peval1()
   if(_ctx.brkflg)
     xbreak(error_errc::kbd_break, _fun, &evaluator::peval1);
   else if(_ctx.interrupt)
-    abort(error_errc::no_message, NIL);
+    abort(error_errc::no_message);
   else
     switch(type_of(_fun))
     {

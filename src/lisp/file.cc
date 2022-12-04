@@ -117,7 +117,7 @@ bool loadfile(context& ctx, const std::string& lf)
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(foo); type_of(rval) != type::Empty; rval = lispread(foo))
+        for(auto rval = lispread(foo); type_of(rval) != type::Eof; rval = lispread(foo))
           rval = ctx.e().eval(rval);
         return true;
       }

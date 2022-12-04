@@ -39,7 +39,7 @@ LISPT repl::operator()(LISPT exp)
     {
       prin0(_prompt);
       auto expr = lispread(_ctx.primin());
-      if(expr == C_EMPTY)
+      if(expr == C_EOF)
         break;
       print(eval(expr));
     }
@@ -49,7 +49,7 @@ LISPT repl::operator()(LISPT exp)
   {
     prin0(_break_prompt);
     auto com = lispread(_ctx.primin());
-    if(com == C_EMPTY)
+    if(com == C_EOF)
       return C_EOF;
     /* OK, EVAL, ^, ... */
     if(type_of(com) != type::Cons)

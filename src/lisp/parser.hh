@@ -76,7 +76,7 @@ public:
       default:
         return NIL;
     }
-    return C_EMPTY;
+    return C_EOF;
   }
 
 private:

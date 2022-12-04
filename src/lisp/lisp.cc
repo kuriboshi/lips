@@ -101,10 +101,6 @@ context::context()
     t->settype(type::T);
     t->symbol().constant = true;
 
-    C_EMPTY = intern("empty");
-    C_EMPTY->symbol().constant = true;
-    C_EMPTY->set(nullptr);
-
     C_AUTOLOAD = intern("autoload");
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
@@ -235,11 +231,16 @@ ref_file_t context::stderr() const { return _pimpl->_stderr; }
 
 ref_file_t context::stdin() const { return _pimpl->_stdin; }
 
+LISPT context::perror(std::error_code error)
+{
+  primerr()->format("{} ", error.message());
+  return NIL;
+}
+
 LISPT context::perror(std::error_code error, LISPT arg)
 {
   primerr()->format("{} ", error.message());
-  if(type_of(arg) != type::Empty)
-    prin2(arg, T);
+  prin2(arg, T);
   return NIL;
 }
 
@@ -264,7 +265,6 @@ subr_t::subr_vector subr_t::subr_store;
 // All lisp constants needed internally.
 //
 LISPT T;
-LISPT C_EMPTY;
 LISPT C_AUTOLOAD;
 LISPT C_BROKEN;
 LISPT C_BT;

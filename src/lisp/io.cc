@@ -79,7 +79,7 @@ LISPT readline(ref_file_t file)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(head && head->empty())
+    if(head && type_of(head) == type::Eof)
       return head;
     if(listp(head) || head == NIL)
       return head;
@@ -87,7 +87,7 @@ LISPT readline(ref_file_t file)
     while(true)
     {
       auto o = parser.parse();
-      if(o && o->empty())
+      if(o && type_of(o) == type::Eof)
         break;
       if(tail == NIL)
         tail = cdr(head = cons(head, cons(o, NIL)));
@@ -193,9 +193,6 @@ LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
       return io::patom(x, file, esc);
     case type::Nil:
       ps("nil", file, false);
-      break;
-    case type::Empty:
-      ps("", file, false);
       break;
     case type::T:
       file.putch('t');

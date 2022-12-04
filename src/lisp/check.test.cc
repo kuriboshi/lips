@@ -28,7 +28,6 @@ TEST_CASE("check: type checking")
 {
   CHECK_THROWS(check(T, type::Nil));
   CHECK_THROWS(check(NIL, type::T));
-  CHECK_THROWS(check(NIL, type::Empty));
   CHECK_THROWS(check(NIL, type::Symbol));
   CHECK_THROWS(check(NIL, type::Integer));
   CHECK_THROWS(check(NIL, type::Float));

@@ -37,9 +37,6 @@ void check(LISPT arg, T type)
       case type::T:
         error(type_errc::not_t, arg);
         break;
-      case type::Empty:
-        error(type_errc::not_empty, arg);
-        break;
       case type::Symbol:
         error(type_errc::not_symbol, arg);
         break;

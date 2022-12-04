@@ -44,7 +44,6 @@ enum class type
 {
   Nil = 0,  // so that nullptr also becomes NIL
   T,        // the truth object
-  Empty,    // the empty object, contains no value
   Symbol,   // an atomic symbol
   Integer,  // 24 bit integer in same word
   Float,    // floating point value
@@ -258,14 +257,6 @@ public:
     _u = {};
   }
 
-  /// @brief The empty value
-  bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
-  void set(std::nullptr_t)
-  {
-    _type = type::Empty;
-    _u = nullptr;
-  }
-
   /// @brief Litatom
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
   void set(const symbol::symbol_t& sym)
@@ -421,7 +412,6 @@ private:
 // All lisp constants used internally.
 //
 extern LISPT T;
-extern LISPT C_EMPTY;
 extern LISPT C_AUTOLOAD;
 extern LISPT C_BROKEN;
 extern LISPT C_BT;
@@ -482,6 +472,7 @@ public:
   ref_file_t stderr() const;
   ref_file_t stdin() const;
 
+  LISPT perror(std::error_code);
   LISPT perror(std::error_code, LISPT);
   LISPT error(std::error_code, LISPT);
 

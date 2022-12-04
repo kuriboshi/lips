@@ -400,12 +400,6 @@ TEST_CASE("io: prin0")
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(C_EMPTY, *f);
-    CHECK(os.str().empty());
-  }
-  {
-    std::ostringstream os;
-    auto f = std::make_unique<file_t>(os);
     prin0(NIL, *f);
     CHECK(os.str() == "nil");
   }

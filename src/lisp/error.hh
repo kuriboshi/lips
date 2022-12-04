@@ -29,7 +29,6 @@ enum class type_errc
 {
   not_nil = 1,
   not_t,
-  not_empty,
   not_symbol,
   not_integer,
   not_float,
@@ -60,8 +59,6 @@ public:
         return "Not NIL";
       case type_errc::not_t:
         return "Not T";
-      case type_errc::not_empty:
-        return "Not empty";
       case type_errc::not_symbol:
         return "Not a symbol";
       case type_errc::not_integer:

@@ -25,7 +25,7 @@ namespace lisp
 LISPT parser::parse_object()
 {
   if(!next())
-    return C_EMPTY;
+    return C_EOF;
   if(_token.is_special('\''))
     return cons(mkatom("quote"), cons(parse_object(), NIL));
   if(_token.is_special('('))
