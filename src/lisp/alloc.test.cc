@@ -27,7 +27,7 @@
 namespace lisp
 {
 
-TEST_CASE("Create lisp objects")
+TEST_CASE("alloc: create lisp objects")
 {
   SECTION("Multiple calls to intern should return the same object for the same string")
   {
@@ -78,7 +78,7 @@ TEST_CASE("Create lisp objects")
   }
 }
 
-TEST_CASE("C Variables")
+TEST_CASE("alloc: c variables")
 {
   auto& cvar = initcvar("cvar", 123_l);
   auto a = eval(cvar);
@@ -113,7 +113,7 @@ TEST_CASE("C Variables")
   CHECK(zvar->getstr() == "foo");
 }
 
-TEST_CASE("obarray")
+TEST_CASE("alloc: obarray")
 {
   auto obs = obarray();
   auto cur = length(obs)->intval();
@@ -138,7 +138,7 @@ TEST_CASE("alloc: freecount")
 }
 
 #ifdef ENABLE_OBJECT_SIZES
-TEST_CASE("Object sizes")
+TEST_CASE("alloc: object sizes")
 {
   std::cout << "==========\n";
   std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;

@@ -25,7 +25,7 @@
 namespace lisp
 {
 
-TEST_CASE("Arithmetic functions")
+TEST_CASE("arith: arithmetic functions")
 {
   std::ostringstream os;
   auto& ctx = context::current();

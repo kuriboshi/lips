@@ -75,7 +75,7 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
   }
 }
 
-TEST_CASE("eval: Eval functions")
+TEST_CASE("eval: eval functions")
 {
   SECTION("Evaluate variable")
   {
@@ -97,7 +97,7 @@ TEST_CASE("eval: Eval functions")
   }
 }
 
-TEST_CASE("eval: Closure")
+TEST_CASE("eval: closure")
 {
   auto a = setq(mkatom("a"), mknumber(1));
   auto clos = closure(lambda(NIL, cons(mkatom("a"), NIL)), cons(mkatom("a"), NIL));

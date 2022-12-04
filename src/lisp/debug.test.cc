@@ -24,7 +24,7 @@
 namespace lisp
 {
 
-TEST_CASE("Debug functions")
+TEST_CASE("debug: debug functions")
 {
   auto& ctx = context::current();
   auto t = ctx.e().trace();

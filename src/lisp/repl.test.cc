@@ -27,7 +27,7 @@
 namespace lisp
 {
 
-TEST_CASE("Interactive tests")
+TEST_CASE("repl: interactive tests")
 {
   auto& ctx = context::current();
   std::ostringstream cout;

@@ -25,7 +25,7 @@
 namespace lisp::symbol
 {
 
-TEST_CASE("New symbol store")
+TEST_CASE("symbol: new symbol store")
 {
   symbol_collection& all_symbols = lisp_t::symbol_collection();
   auto& syms = all_symbols.create();
@@ -64,7 +64,7 @@ TEST_CASE("New symbol store")
   }
 }
 
-TEST_CASE("symbol: Print sizes")
+TEST_CASE("symbol: print sizes")
 {
 #ifdef ENABLE_OBJECT_SIZES
   std::cout << "==========\n";

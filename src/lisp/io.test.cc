@@ -42,7 +42,7 @@ struct create_test_file final
 namespace lisp
 {
 
-TEST_CASE("io: Basic I/O")
+TEST_CASE("io: basic i/o")
 {
   auto& ctx = context::current();
   auto old = ctx.primout(ref_file_t::create(std::make_unique<io::string_sink>()));

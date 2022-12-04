@@ -26,7 +26,7 @@
 namespace lisp
 {
 
-TEST_CASE("Low level functions")
+TEST_CASE("low: low level functions")
 {
   SECTION("low: set")
   {

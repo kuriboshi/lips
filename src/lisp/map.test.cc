@@ -24,7 +24,7 @@
 namespace lisp
 {
 
-TEST_CASE("Map functions")
+TEST_CASE("map: map functions")
 {
   SECTION("map")
   {

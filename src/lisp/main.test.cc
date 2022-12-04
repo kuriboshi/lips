@@ -25,7 +25,7 @@
 namespace lisp
 {
 
-TEST_CASE("incomplete input")
+TEST_CASE("main: incomplete input")
 {
   // An incomplete input expression is treated as ending with a super
   // parenthesis so there should be no error message in this case.
@@ -43,7 +43,7 @@ TEST_CASE("incomplete input")
   ctx.primout(oldout);
 }
 
-TEST_CASE("exit")
+TEST_CASE("main: exit")
 {
   auto& ctx = context::current();
   std::ostringstream cout;

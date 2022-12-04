@@ -31,7 +31,7 @@ typename std::underlying_type<Enumeration>::type as_integer(Enumeration const va
 namespace lisp
 {
 
-TEST_CASE("Logic functions")
+TEST_CASE("logic: logic functions")
 {
   SECTION("and")
   {

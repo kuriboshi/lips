@@ -26,7 +26,7 @@
 namespace lisp
 {
 
-TEST_CASE("Primary functions")
+TEST_CASE("prim: primary functions")
 {
   SECTION("QUOTE")
   {

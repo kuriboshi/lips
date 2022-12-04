@@ -23,7 +23,7 @@
 namespace lisp
 {
 
-TEST_CASE("String functions")
+TEST_CASE("string: string functions")
 {
   SECTION("string: stringp")
   {

@@ -25,7 +25,7 @@
 namespace lisp
 {
 
-TEST_CASE("Predicate functions")
+TEST_CASE("pred: predicate functions")
 {
   SECTION("numberp")
   {

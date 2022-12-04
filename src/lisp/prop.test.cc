@@ -24,7 +24,7 @@
 namespace lisp
 {
 
-TEST_CASE("Property functions")
+TEST_CASE("prop: property functions")
 {
   auto sym = mkatom("sym");
   auto prop0 = mkatom("prop0");
