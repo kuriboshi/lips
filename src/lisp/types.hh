@@ -248,43 +248,61 @@ public:
   ~lisp_t() = default;
   lisp_t(const lisp_t&) = delete;
 
+  /// @brief Constructor for anything with a defined set function
+  template<typename T>
+  lisp_t(T x) { set(x); }
+
+  /// @brief Set to NIL
   void set()
   {
     _type = type::Nil;
     _u = {};
   }
+
+  /// @brief The empty value
+  bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
   void set(std::nullptr_t)
   {
     _type = type::Empty;
     _u = nullptr;
   }
-  bool empty() const { return std::holds_alternative<std::nullptr_t>(_u); }
+
+  /// @brief Litatom
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
   void set(const symbol::symbol_t& sym)
   {
     _type = type::Symbol;
     _u = sym.id;
   }
+
+  /// @brief Get and set the value of a litatom
   auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
   void value(LISPT x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
+
+  /// @brief Integer
   auto intval() const -> int { return std::get<int>(_u); }
   void set(int x)
   {
     _type = type::Integer;
     _u = x;
   }
+
+  /// @brief Floating point (double)
   auto floatval() const -> double { return std::get<double>(_u); }
   void set(double f)
   {
     _type = type::Float;
     _u = f;
   }
+
   auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
   void set(indirect_t x)
   {
     _type = type::Indirect;
     _u = x;
   }
+
+  /// @brief Cons cell and car/cdr
   auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
   void set(cons_t x)
   {
@@ -292,45 +310,59 @@ public:
     _u = x;
   }
   auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
-  auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
   void car(LISPT x) { std::get<cons_t>(_u).car = x; }
+  auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
   void cdr(LISPT x) { std::get<cons_t>(_u).cdr = x; }
+
+  /// @brief Character string
   auto string() const -> const std::string& { return std::get<std::string>(_u); }
   void set(const std::string& s)
   {
     _type = type::String;
     _u = s;
   }
+
+  /// @brief Compiled function (subr)
   auto subrval() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
   void set(subr_index x)
   {
     _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::Subr : type::Fsubr;
     _u = x;
   }
+
+  /// @brief Lambda expression
   auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
   void set(lambda_t x, bool lambda)
   {
     _type = lambda ? type::Lambda : type::Nlambda;
     _u = x;
   }
+
+  /// @brief Closure
   auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
   void set(ref_closure_t x)
   {
     _type = type::Closure;
     _u = x;
   }
+
+  /// @brief Destination environment
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
   void set(destblock_t* env)
   {
     _type = type::Environ;
     _u = env;
   }
+
+  /// @brief File reference
   auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
   void set(ref_file_t f)
   {
     _type = type::File;
     _u = f;
   }
+
+  /// @brief Link to a c/c++ variable
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
   void set(cvariable_t&& x)
   {
@@ -338,11 +370,13 @@ public:
     _u = std::move(x);
   }
 
+  /// @brief Get the string if the lisp_t holds a litatom or a proper string
   const std::string& getstr() const
   {
     return _type == type::String ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
   }
 
+  /// @brief Access the type of object
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
 
@@ -352,7 +386,7 @@ public:
     return all_symbols;
   }
 
-  // The new and delete operators uses the global pool to create objects.
+  /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
   static void operator delete(lisp_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 

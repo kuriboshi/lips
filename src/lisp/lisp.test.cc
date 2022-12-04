@@ -190,4 +190,10 @@ TEST_CASE("lisp: create lisp twice")
   CHECK_THROWS_WITH(f(), "context::context called twice");
 }
 
+TEST_CASE("lisp: new lisp_t")
+{
+  LISPT obj{new lisp_t(100)};
+  CHECK(obj->intval() == 100);
+}
+
 } // namespace lisp
