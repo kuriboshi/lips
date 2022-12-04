@@ -169,7 +169,7 @@ public:
   /// @brief Smart pointer access operator.
   T* operator->() const { return _ptr; }
   /// @brief Smart pointer comparor for sorting purposes.
-  bool operator<(const ref_ptr<T>& x) const { return _ptr < x._ptr; }
+  bool operator<(const ref_ptr<T>& x) const { return *_ptr < *x._ptr; }
   explicit operator bool() const noexcept { return _ptr != nullptr; }
 
 private:
