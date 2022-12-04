@@ -239,6 +239,11 @@ struct indirect_t
 
 class destblock_t;
 
+/// @brief A class able to hold a value of any lisp type
+///
+/// @details The lisp objects are stored in a variant with accessor methods to
+/// set or get the values. There is no checking of the correct type for the
+/// accessor functions so calling them for the wrong type throws an exception.
 class lisp_t final: public ref_count<lisp_t>
 {
 public:
