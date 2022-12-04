@@ -61,14 +61,20 @@ public:
       return _free_count + _storage.front()._free_items;
     return _free_count;
   }
+
+  /// @brief Allow objects using the pool to allocate and deallocate objects.
+  friend T;
+
+private:
   /// @brief Allocate memory for an object of type T.
   T* allocate()
   {
     // If we have any free objects already available we return that.
     if(_free != nullptr)
     {
-      T* object = reinterpret_cast<T*>(_free);
-      _free = _free->_next;
+      auto* tmp = _free->_next;
+      T* object = std::construct_at(reinterpret_cast<T*>(_free));
+      _free = tmp;
       --_free_count;
       return object;
     }
@@ -110,7 +116,6 @@ public:
     ++_free_count;
   }
 
-private:
   /// @brief Pointer to the head of a list of object previously returned to the
   /// pool by deallocate.
   item* _free = nullptr;

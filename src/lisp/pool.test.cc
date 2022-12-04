@@ -55,33 +55,40 @@ TEST_CASE("pool: simple")
 {
   auto& p = Test::pool();
   CHECK(p.size() == 0);
-  auto* t = p.allocate();
+
+  auto* t = new Test;
   REQUIRE(t != nullptr);
+  CHECK(p.size() == 1);
   CHECK(t->t0 == 1);
   CHECK(t->t1 == 12);
   CHECK(t->t2 == 123);
-  CHECK(p.size() == 1);
-  p.deallocate(t);
+  t->t0 = 99;
+  t->t1 = 199;
+  t->t2 = 321;
+  delete t;
   CHECK(p.size() == 2);
-  auto t0 = p.allocate();
+
+  auto* t0 = new Test;
+  CHECK(t0->t0 == 1);
+  CHECK(t0->t1 == 12);
+  CHECK(t0->t2 == 123);
   CHECK(p.size() == 1);
-  auto t1 = p.allocate();
+  auto* t1 = new Test;
   CHECK(p.size() == 0);
-  auto t2 = p.allocate();
+  auto* t2 = new Test;
   CHECK(p.size() == 1);
-  p.deallocate(t2);
+  delete t2;
   CHECK(p.size() == 2);
-  p.deallocate(t1);
+  delete t1;
   CHECK(p.size() == 3);
-  p.deallocate(t0);
+  delete t0;
   CHECK(p.size() == 4);
-  p.deallocate(t);
-  CHECK(p.size() == 5);
+
   auto* n = new Test;
   REQUIRE(n != nullptr);
-  CHECK(p.size() == 4);
+  CHECK(p.size() == 3);
   delete n;
-  CHECK(p.size() == 5);
+  CHECK(p.size() == 4);
 }
 
 template<class T>
