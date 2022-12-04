@@ -250,13 +250,6 @@ public:
   template<typename T>
   lisp_t(T x) { set(x); }
 
-  /// @brief Set to NIL
-  void set()
-  {
-    _type = type::Nil;
-    _u = {};
-  }
-
   /// @brief Litatom
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
   void set(const symbol::symbol_t& sym)

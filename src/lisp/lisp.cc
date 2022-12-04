@@ -88,11 +88,9 @@ context::context()
     // symbols.
     C_UNBOUND = intern("unbound");
     C_UNBOUND->symbol().constant = true;
-    C_UNBOUND->set();
     C_UNBOUND->settype(type::Unbound);
 
     auto nil = intern("nil");
-    nil->value(NIL);
     nil->symbol().constant = true;
 
     auto t = intern("t");
@@ -105,7 +103,6 @@ context::context()
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
     C_CLOSURE = intern("closure");
-    //C_CONS = intern(pn::CONS);
     C_DOT = intern(".");
     C_ENDOFFILE = intern("endoffile");
     C_ENVIRON = intern("environ");
