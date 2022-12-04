@@ -229,10 +229,10 @@ LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
       pp("#<indirect", file, x);
       break;
     case type::Subr:
-      pp("#<subr", file, x);
-      break;
-    case type::Fsubr:
-      pp("#<fsubr", file, x);
+      if(x->subr().subr == subr_t::subr::EVAL)
+        pp("#<subr", file, x);
+      else
+        pp("#<fsubr", file, x);
       break;
     case type::Unbound:
       ps("#<unbound>", file, false);

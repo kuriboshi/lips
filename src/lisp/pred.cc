@@ -130,8 +130,8 @@ LISPT xtypeof(context&, LISPT a)
     case type::String:
       return C_STRING;
     case type::Subr:
-      return C_SUBR;
-    case type::Fsubr:
+      if(a->subr().subr == subr_t::subr::EVAL)
+        return C_SUBR;
       return C_FSUBR;
     case type::Lambda:
       if(a->lambda().eval)

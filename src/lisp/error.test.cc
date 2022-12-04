@@ -34,7 +34,6 @@ TEST_CASE("error: type error messages")
   CHECK(make_error_code(type_errc::not_cons).message() == "Not a cons cell");
   CHECK(make_error_code(type_errc::not_string).message() == "Not a string");
   CHECK(make_error_code(type_errc::not_subr).message() == "Not SUBR");
-  CHECK(make_error_code(type_errc::not_fsubr).message() == "Not FSUBR");
   CHECK(make_error_code(type_errc::not_lambda).message() == "Not LAMBDA");
   CHECK(make_error_code(type_errc::not_closure).message() == "Not a closure");
   CHECK(make_error_code(type_errc::not_unbound).message() == "Not unbound");

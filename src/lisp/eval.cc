@@ -124,16 +124,16 @@ void evaluator::next() { _dest[0].decr(); }
 /// @details It can handle functions with up to three arguments.
 LISPT evaluator::call(LISPT fun)
 {
-  switch(fun->subrval().argcount())
+  switch(fun->subr().argcount())
   {
     case 0:
-      return fun->subrval()(_ctx);
+      return fun->subr()(_ctx);
     case 1:
-      return fun->subrval()(_ctx, _dest[1].val());
+      return fun->subr()(_ctx, _dest[1].val());
     case 2:
-      return fun->subrval()(_ctx, _dest[2].val(), _dest[1].val());
+      return fun->subr()(_ctx, _dest[2].val(), _dest[1].val());
     case 3:
-      return fun->subrval()(_ctx, _dest[3].val(), _dest[2].val(), _dest[1].val());
+      return fun->subr()(_ctx, _dest[3].val(), _dest[2].val(), _dest[1].val());
   }
   return NIL;
 }
@@ -346,12 +346,11 @@ bool evaluator::peval1()
         _cont = &evaluator::evclosure;
         break;
       case type::Subr:
-      case type::Fsubr:
         push(_dest);
         push(&evaluator::ev2);
-        _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
-        _noeval = _fun->subrval().subr == subr_t::subr::NOEVAL;
-        if(_fun->subrval().spread == subr_t::spread::NOSPREAD)
+        _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
+        _noeval = _fun->subr().subr == subr_t::subr::NOEVAL;
+        if(_fun->subr().spread == subr_t::spread::NOSPREAD)
         {
           if(!_noeval)
           {
@@ -404,12 +403,11 @@ bool evaluator::peval2()
         _cont = &evaluator::evclosure;
         break;
       case type::Subr:
-      case type::Fsubr:
         push(_dest);
         push(&evaluator::ev2);
-        _dest = mkdestblock(static_cast<int>(_fun->subrval().argcount()));
+        _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
         _noeval = true;
-        if(_fun->subrval().spread == subr_t::spread::NOSPREAD)
+        if(_fun->subr().spread == subr_t::spread::NOSPREAD)
           _cont = &evaluator::spread;
         else
           _cont = &evaluator::evalargs;

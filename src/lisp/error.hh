@@ -37,7 +37,6 @@ enum class type_errc
   not_cons,
   not_string,
   not_subr,
-  not_fsubr,
   not_lambda,
   not_closure,
   not_unbound,
@@ -77,8 +76,6 @@ public:
         return "Not a string";
       case type_errc::not_subr:
         return "Not SUBR";
-      case type_errc::not_fsubr:
-        return "Not FSUBR";
       case type_errc::not_lambda:
         return "Not LAMBDA";
       case type_errc::not_closure:

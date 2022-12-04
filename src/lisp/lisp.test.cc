@@ -42,15 +42,14 @@ TEST_CASE("lisp: to_underlying")
   CHECK(to_underlying(type::Cons) == 7);
   CHECK(to_underlying(type::String) == 8);
   CHECK(to_underlying(type::Subr) == 9);
-  CHECK(to_underlying(type::Fsubr) == 10);
-  CHECK(to_underlying(type::Lambda) == 11);
-  CHECK(to_underlying(type::Closure) == 12);
-  CHECK(to_underlying(type::Unbound) == 13);
-  CHECK(to_underlying(type::Environ) == 14);
-  CHECK(to_underlying(type::File) == 15);
-  CHECK(to_underlying(type::Eof) == 16);
-  CHECK(to_underlying(type::Error) == 17);
-  CHECK(to_underlying(type::Cvariable) == 18);
+  CHECK(to_underlying(type::Lambda) == 10);
+  CHECK(to_underlying(type::Closure) == 11);
+  CHECK(to_underlying(type::Unbound) == 12);
+  CHECK(to_underlying(type::Environ) == 13);
+  CHECK(to_underlying(type::File) == 14);
+  CHECK(to_underlying(type::Eof) == 15);
+  CHECK(to_underlying(type::Error) == 16);
+  CHECK(to_underlying(type::Cvariable) == 17);
 }
 
 TEST_CASE("lisp: mkprim")

@@ -51,8 +51,7 @@ enum class type
   Indirect, // used when a value is stored in a closure
   Cons,     // a pair
   String,   // character strings
-  Subr,     // eval type primitive function
-  Fsubr,    // noeval primitive function
+  Subr,     // primitive function
   Lambda,   // lambda function
   Closure,  // static binding object
   Unbound,  // unbound indicator
@@ -323,10 +322,10 @@ public:
   }
 
   /// @brief Compiled function (subr)
-  auto subrval() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
+  auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
   void set(subr_index x)
   {
-    _type = subr_t::get(x.index).subr == subr_t::subr::EVAL ? type::Subr : type::Fsubr;
+    _type = type::Subr;
     _u = x;
   }
 
@@ -408,7 +407,7 @@ private:
     indirect_t,                // Indirect
     cons_t,                    // Cons
     std::string,               // String
-    subr_index,                // Subr/Fsubr
+    subr_index,                // Subr
     lambda_t,                  // Lambda/Nlambda
     ref_closure_t,             // Closure
     destblock_t*,              // Environ

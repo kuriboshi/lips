@@ -61,9 +61,6 @@ void check(LISPT arg, T type)
       case type::Subr:
         error(type_errc::not_subr, arg);
         break;
-      case type::Fsubr:
-        error(type_errc::not_fsubr, arg);
-        break;
       case type::Lambda:
         error(type_errc::not_lambda, arg);
         break;
