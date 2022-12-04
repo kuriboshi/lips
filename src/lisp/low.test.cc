@@ -61,6 +61,18 @@ TEST_CASE("Low level functions")
     CHECK(a->value()->intval() == 200);
   }
 
+  SECTION("low: setqq")
+  {
+    // In C++ there is no real difference between 'set' and 'setqq'.
+    auto r = setqq("a"_a, "b"_a);
+    REQUIRE(type_of(r) == type::Symbol);
+    CHECK(r->symbol().pname == "b");
+    // In lisp, however, it matters so test it by evaluating a lisp expression.
+    r = "(progn (setqq a b) a)"_e;
+    REQUIRE(type_of(r) == type::Symbol);
+    CHECK(r->symbol().pname == "b");
+  }
+
   SECTION("low: while")
   {
     set("a"_l, 0_l);

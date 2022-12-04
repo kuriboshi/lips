@@ -191,4 +191,16 @@ TEST_CASE("eval: autoload")
   std::filesystem::remove("autoload.lisp");
 }
 
+TEST_CASE("eval: string function")
+{
+  auto fun = R"(("fun"))";
+  CHECK_THROWS(eval(fun));
+}
+
+TEST_CASE("eval: illegal function")
+{
+  auto fun = R"((1))";
+  CHECK_THROWS(eval(fun));
+}
+
 } // namespace lisp

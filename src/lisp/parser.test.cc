@@ -204,4 +204,15 @@ TEST_CASE("parser: macro")
   CHECK(r->string().starts_with("/"));
 }
 
+TEST_CASE("parser: syntax table")
+{
+  lexer lexer{"[quote]"};
+  lexer.set('[', syntax::type::LEFT_PAREN);
+  lexer.set(']', syntax::type::RIGHT_PAREN);
+  auto t = parser(lexer).parse();
+  REQUIRE(t);
+  REQUIRE(type_of(t) == type::Cons);
+  CHECK(t->car() == C_QUOTE);
+}
+
 } // namespace lisp

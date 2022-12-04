@@ -345,6 +345,30 @@ TEST_CASE("lexer: operator<<")
     os << token;
     CHECK(os.str() == "FLOAT:1.234");
   }
+
+  SECTION("MACRO")
+  {
+    std::ostringstream os;
+    token_t token{token_t::type::MACRO, "!"};
+    os << token;
+    CHECK(os.str() == "MACRO:!");
+  }
+
+  SECTION("SPLICE")
+  {
+    std::ostringstream os;
+    token_t token{token_t::type::SPLICE, "&"};
+    os << token;
+    CHECK(os.str() == "SPLICE:&");
+  }
+
+  SECTION("INFIX")
+  {
+    std::ostringstream os;
+    token_t token{token_t::type::INFIX, "|"};
+    os << token;
+    CHECK(os.str() == "INFIX:|");
+  }
 }
 
 TEST_CASE("lexer: operator==")
