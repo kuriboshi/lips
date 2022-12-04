@@ -365,11 +365,7 @@ bool evaluator::peval1()
           _cont = &evaluator::evalargs;
         break;
       case type::Lambda:
-        _noeval = false;
-        _cont = &evaluator::evlam;
-        break;
-      case type::Nlambda:
-        _noeval = true;
+        _noeval = !_fun->lambda().eval;
         _cont = &evaluator::evlam;
         break;
       case type::Cons:
@@ -419,7 +415,6 @@ bool evaluator::peval2()
           _cont = &evaluator::evalargs;
         break;
       case type::Lambda:
-      case type::Nlambda:
         _noeval = true;
         _cont = &evaluator::evlam;
         break;

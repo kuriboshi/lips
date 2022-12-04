@@ -220,10 +220,10 @@ LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
       pp("#<closure", file, x);
       break;
     case type::Lambda:
-      pp("#<lambda", file, x);
-      break;
-    case type::Nlambda:
-      pp("#<nlambda", file, x);
+      if(x->lambda().eval)
+        pp("#<lambda", file, x);
+      else
+        pp("#<nlambda", file, x);
       break;
     case type::Indirect:
       pp("#<indirect", file, x);

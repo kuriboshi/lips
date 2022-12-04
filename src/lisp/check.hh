@@ -67,9 +67,6 @@ void check(LISPT arg, T type)
       case type::Lambda:
         error(type_errc::not_lambda, arg);
         break;
-      case type::Nlambda:
-        error(type_errc::not_nlambda, arg);
-        break;
       case type::Closure:
         error(type_errc::not_closure, arg);
         break;

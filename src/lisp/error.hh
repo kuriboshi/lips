@@ -39,7 +39,6 @@ enum class type_errc
   not_subr,
   not_fsubr,
   not_lambda,
-  not_nlambda,
   not_closure,
   not_unbound,
   not_environ,
@@ -82,8 +81,6 @@ public:
         return "Not FSUBR";
       case type_errc::not_lambda:
         return "Not LAMBDA";
-      case type_errc::not_nlambda:
-        return "Not NLAMBDA";
       case type_errc::not_closure:
         return "Not a closure";
       case type_errc::not_unbound:

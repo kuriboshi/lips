@@ -54,7 +54,6 @@ enum class type
   Subr,     // eval type primitive function
   Fsubr,    // noeval primitive function
   Lambda,   // lambda function
-  Nlambda,  // noeval lambda function
   Closure,  // static binding object
   Unbound,  // unbound indicator
   Environ,  // environment stack type for gc use
@@ -165,6 +164,8 @@ struct lambda_t
   LISPT args = NIL;
   /// @brief The number of arguments.
   std::int8_t count = 0;
+  /// @brief True if arguments are evaluated, false if not (nlambda).
+  bool eval = true;
 };
 
 /// @brief A closure (static binding).
@@ -331,9 +332,9 @@ public:
 
   /// @brief Lambda expression
   auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
-  void set(lambda_t x, bool lambda)
+  void set(lambda_t x)
   {
-    _type = lambda ? type::Lambda : type::Nlambda;
+    _type = type::Lambda;
     _u = x;
   }
 

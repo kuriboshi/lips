@@ -51,7 +51,7 @@ inline LISPT freecount(context&) { return mknumber(static_cast<int>(lisp_t::free
 ///
 /// @return The lambda object.
 ///
-LISPT mklambda(LISPT args, LISPT def, type type);
+LISPT mklambda(LISPT args, LISPT def, bool eval);
 LISPT intern(const std::string& pname);
 LISPT mkatom(const std::string&);
 

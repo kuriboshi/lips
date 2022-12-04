@@ -263,9 +263,9 @@ LISPT null(context&, LISPT a)
 
 LISPT quote(context&, LISPT x) { return x; }
 
-LISPT lambda(context&, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::Lambda); }
+LISPT lambda(context&, LISPT x, LISPT f) { return alloc::mklambda(x, f, true); }
 
-LISPT nlambda(context&, LISPT x, LISPT f) { return alloc::mklambda(x, f, type::Nlambda); }
+LISPT nlambda(context&, LISPT x, LISPT f) { return alloc::mklambda(x, f, false); }
 
 LISPT list(context&, LISPT x) { return x; }
 

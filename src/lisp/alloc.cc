@@ -99,19 +99,18 @@ LISPT mkarglist(LISPT alist, std::int8_t& count)
 /// atom. For a half spread function the list should end with a dotted pair.
 /// @param def The definition of the lambda function. The body of the function
 /// should be a list of expressions.
-/// @param type The type is either type::LAMBDA or type::NLAMBDA.
+/// @param eval True means lambda while false means nlambda.
 ///
 /// @returns A lambda function.
-LISPT mklambda(LISPT args, LISPT def, type type)
+LISPT mklambda(LISPT args, LISPT def, bool eval)
 {
   lambda_t lambda;
   lambda.body = def;
   std::int8_t count = 0;
   lambda.args = mkarglist(args, count);
   lambda.count = count;
-  auto s = getobject();
-  s->set(lambda, type == type::Lambda);
-  return s;
+  lambda.eval = eval;
+  return getobject(lambda);
 }
 
 /// @brief Make interned symbol in obarray.

@@ -38,7 +38,6 @@ TEST_CASE("check: type checking")
   CHECK_THROWS(check(NIL, type::Subr));
   CHECK_THROWS(check(NIL, type::Fsubr));
   CHECK_THROWS(check(NIL, type::Lambda));
-  CHECK_THROWS(check(NIL, type::Nlambda));
   CHECK_THROWS(check(NIL, type::Closure));
   CHECK_THROWS(check(NIL, type::Unbound));
   CHECK_THROWS(check(NIL, type::Environ));

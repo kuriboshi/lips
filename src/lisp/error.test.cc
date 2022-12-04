@@ -36,7 +36,6 @@ TEST_CASE("error: type error messages")
   CHECK(make_error_code(type_errc::not_subr).message() == "Not SUBR");
   CHECK(make_error_code(type_errc::not_fsubr).message() == "Not FSUBR");
   CHECK(make_error_code(type_errc::not_lambda).message() == "Not LAMBDA");
-  CHECK(make_error_code(type_errc::not_nlambda).message() == "Not NLAMBDA");
   CHECK(make_error_code(type_errc::not_closure).message() == "Not a closure");
   CHECK(make_error_code(type_errc::not_unbound).message() == "Not unbound");
   CHECK(make_error_code(type_errc::not_environ).message() == "Not an environment");

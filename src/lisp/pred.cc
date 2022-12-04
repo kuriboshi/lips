@@ -70,7 +70,6 @@ LISPT equal(context& ctx, LISPT l1, LISPT l2)
     case type::String:
       return (l1->string() == l2->string()) ? T : NIL;
     case type::Lambda:
-    case type::Nlambda:
       return user::funeq(ctx, l1, l2);
     case type::Integer:
       return (l1->intval() == l2->intval() ? T : NIL);
@@ -135,8 +134,8 @@ LISPT xtypeof(context&, LISPT a)
     case type::Fsubr:
       return C_FSUBR;
     case type::Lambda:
-      return C_LAMBDA;
-    case type::Nlambda:
+      if(a->lambda().eval)
+        return C_LAMBDA;
       return C_NLAMBDA;
     case type::Closure:
       return C_CLOSURE;
