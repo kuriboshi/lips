@@ -27,13 +27,6 @@ symbol::symbol_store_t& global_symbols()
   return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
 }
 
-/// @brief Allocates an object from the list of free objects.
-///
-/// @details If there are no free objects available a new page is allocated.
-///
-/// @returns A new lisp_t object.
-LISPT getobject() { return {new lisp_t}; }
-
 /// @brief Creates a cons pair.
 ///
 /// @param a The car of the pair.
@@ -41,9 +34,7 @@ LISPT getobject() { return {new lisp_t}; }
 /// @returns The cons pair.
 LISPT cons(context&, LISPT a, LISPT b)
 {
-  auto f = getobject();
-  f->set(cons_t{a, b});
-  return f;
+  return getobject(cons_t{a, b});
 }
 
 LISPT obarray(context&)
@@ -56,26 +47,20 @@ LISPT obarray(context&)
 
 LISPT mkstring(const std::string& str)
 {
-  auto s = getobject();
-  s->set(str);
-  return s;
+  return getobject(str);
 }
 
 /// @brief Creates an integer number.
 LISPT mknumber(int number)
 {
-  auto c = getobject();
-  c->set(number);
-  return c;
+  return getobject(number);
 }
 
 /// @brief Create a double.
 ///
 LISPT mkfloat(double number)
 {
-  auto c = getobject();
-  c->set(number);
-  return c;
+  return getobject(number);
 }
 
 /// @brief Builds an argument list.
@@ -140,10 +125,7 @@ LISPT intern(const std::string& pname)
   auto& glob = global_symbols();
   auto& sym = glob.get(pname);
   if(sym.self == NIL)
-  {
-    sym.self = getobject();
-    sym.self->set(sym);
-  }
+    sym.self = getobject(sym);
   return sym.self;
 }
 
@@ -161,10 +143,7 @@ LISPT mkatom(const std::string& str)
     return global_symbols().get(str).self;
   auto& sym = global_symbols().get(str);
   if(sym.self == NIL)
-  {
-    sym.self = getobject();
-    sym.self->set(sym);
-  }
+    sym.self = getobject(sym);
   return sym.self;
 }
 

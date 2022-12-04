@@ -22,16 +22,21 @@
 
 namespace lisp::details::alloc
 {
-/// @brief Return a cons cell from local storage.
+/// @brief Allocates an object from the list of free objects.
 ///
-/// @details If the free cell list is empty a new block of cons cells is
-/// allocated.  The LISPT ref_ptr created by this function will have its
-/// delete function overridden with a function which puts the cell back on
-/// the free cell list.
+/// @details If the free cell list is empty a new block of objects is
+/// allocated.  The LISPT ref_ptr created by this function will have its delete
+/// function overridden with a function which puts the cell back on the free
+/// cell list.
 ///
-/// @return A new empty cons cell.
-///
-LISPT getobject();
+/// @return A new empty lisp object.
+inline LISPT getobject() { return {new lisp_t}; }
+
+/// @brief Templated version of getobject which returns a LISPT object
+/// initialized with a typed lisp_t object.
+template<typename T>
+LISPT getobject(T x) { return {new lisp_t(x)}; }
+
 LISPT mkstring(const std::string&);
 LISPT mknumber(int);
 LISPT mkfloat(double);

@@ -53,9 +53,7 @@ LISPT open(context& ctx, LISPT filename, LISPT mode)
   }();
   if(f == nullptr)
     ctx.error(error_errc::cant_open, filename);
-  auto newfile = alloc::getobject();
-  newfile->set(ref_file_t(f));
-  return newfile;
+  return alloc::getobject(ref_file_t(f));
 }
 
 LISPT close(context&, LISPT fildes)

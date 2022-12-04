@@ -26,8 +26,7 @@ namespace lisp
 
 TEST_CASE("rtable: rmdquote")
 {
-  LISPT in = details::alloc::getobject();
-  in->set(ref_file_t::create(R"(he\"llo")"));
+  LISPT in = details::alloc::getobject(ref_file_t::create(R"(he\"llo")"));
   auto hello = rtable::rmdquote(context::current(), in);
   CHECK(type_of(hello) == type::String);
   CHECK(hello->string() == "he\"llo");
@@ -57,18 +56,16 @@ TEST_CASE("rtable: rmsquote")
 
 TEST_CASE("rtable: rmgetenv")
 {
-  LISPT in = details::alloc::getobject();
-
   SECTION("existing environment variable")
   {
-    in->set(ref_file_t::create(R"(HOME)"));
+    LISPT in = details::alloc::getobject(ref_file_t::create(R"(HOME)"));
     auto home = rtable::rmgetenv(context::current(), in);
     CHECK(type_of(home) == type::String);
   }
 
   SECTION("non-existing environment variable")
   {
-    in->set(ref_file_t::create(R"(DOES_NOT_EXIST)"));
+    LISPT in = details::alloc::getobject(ref_file_t::create(R"(DOES_NOT_EXIST)"));
     auto none = rtable::rmgetenv(context::current(), in);
     CHECK(none == NIL);
   }

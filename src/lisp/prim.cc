@@ -38,9 +38,7 @@ LISPT mkindirect(LISPT obj)
   if(type_of(obj) == type::Indirect)
     return obj;
   // If it's a new object, cons up the storage for it wasting the car part.
-  auto iobj = alloc::getobject();
-  iobj->set(indirect_t{obj});
-  return iobj;
+  return alloc::getobject(indirect_t{obj});
 }
 
 /// @brief Builds a list of indirect pointers to the values of the symbols in
@@ -293,9 +291,7 @@ LISPT closure(context& ctx, LISPT fun, LISPT vars)
   if(type_of(f) == type::Error)
     return f;
   c->cvalues = f;
-  auto clos = alloc::getobject();
-  clos->set(c);
-  return clos;
+  return alloc::getobject(c);
 }
 
 inline LISPT _nth(context&, LISPT list, int n)

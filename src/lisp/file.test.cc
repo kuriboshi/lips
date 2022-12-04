@@ -187,8 +187,7 @@ TEST_CASE("file: functions")
 
   SECTION("readc")
   {
-    LISPT f = details::alloc::getobject();
-    f->set(ref_file_t::create(R"(test)"));
+    LISPT f = details::alloc::getobject(ref_file_t::create(R"(test)"));
     auto ch0 = readc(f);
     CHECK(ch0->intval() == 't');
     auto ch1 = readc(f);
@@ -201,8 +200,7 @@ TEST_CASE("file: functions")
 
   SECTION("read")
   {
-    LISPT f = details::alloc::getobject();
-    f->set(ref_file_t::create(R"((a b c))"));
+    LISPT f = details::alloc::getobject(ref_file_t::create(R"((a b c))"));
     auto sexpr = read(f);
     CHECK(!is_NIL(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
   }
@@ -229,8 +227,7 @@ TEST_CASE("file: functions")
   {
     SECTION("One atom")
     {
-      LISPT f = details::alloc::getobject();
-      f->set(ref_file_t::create(R"(test)"));
+      LISPT f = details::alloc::getobject(ref_file_t::create(R"(test)"));
       auto r = readline(f);
       CHECK(type_of(r) == type::Cons);
       auto expected = mklist("test"_a);
@@ -238,8 +235,7 @@ TEST_CASE("file: functions")
     }
     SECTION("Two atoms")
     {
-      LISPT f = details::alloc::getobject();
-      f->set(ref_file_t::create(R"(test test)"));
+      LISPT f = details::alloc::getobject(ref_file_t::create(R"(test test)"));
       auto r = readline(f);
       CHECK(type_of(r) == type::Cons);
       auto expected = mklist("test"_a, "test"_a);
