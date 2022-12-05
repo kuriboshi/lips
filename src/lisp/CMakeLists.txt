@@ -38,6 +38,7 @@ target_sources(
           repl.cc
           rtable.cc
           string.cc
+          syntax.cc
           user.cc
           ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
 
@@ -127,6 +128,7 @@ if(LIPS_ENABLE_TESTS)
             rtable.test.cc
             string.test.cc
             symbol.test.cc
+            syntax.test.cc
             user.test.cc)
   target_link_libraries(lisp_test PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
   if(LIPS_ENABLE_OBJECT_SIZES)

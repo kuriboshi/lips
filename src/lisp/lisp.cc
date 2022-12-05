@@ -24,16 +24,6 @@
 
 namespace lisp
 {
-LISPT syntax::macro(context&, ref_file_t source, std::uint8_t index)
-{
-  auto fn = _macro[index];
-  LISPT f{new lisp_t};
-  f->set(source);
-  if(fn != NIL)
-    return apply(fn, cons(f, NIL));
-  return NIL;
-}
-
 closure_t::pool_t closure_t::_pool;
 lisp_t::pool_t lisp_t::_pool;
 
