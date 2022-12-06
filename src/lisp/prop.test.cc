@@ -45,11 +45,7 @@ TEST_CASE("prop: property functions")
   CHECK(length(getplist(sym))->intval() == 4);
   CHECK(getprop(sym, prop1) == value1);
   CHECK(getprop(sym, "prop2"_a) == NIL);
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(getprop(1_l, "prop3"_a));
-  ctx.primerr(old);
 }
 
 } // namespace lisp

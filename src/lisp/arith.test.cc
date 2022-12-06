@@ -27,10 +27,6 @@ namespace lisp
 
 TEST_CASE("arith: arithmetic functions")
 {
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
-
   SECTION("+")
   {
     {
@@ -479,8 +475,6 @@ TEST_CASE("arith: arithmetic functions")
     CHECK(is_NIL(minusp(1.0_l)));
     CHECK_THROWS_WITH(minusp("string"_s), "Illegal argument");
   }
-
-  ctx.primerr(old);
 }
 
 } // namespace lisp

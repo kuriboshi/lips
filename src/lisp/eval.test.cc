@@ -146,16 +146,12 @@ TEST_CASE("eval: undefhook")
 
 TEST_CASE("eval: breakhook")
 {
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
   bool called = false;
   auto f = [&called]() { called = true; };
   auto hook = breakhook(f);
   CHECK_THROWS("(undefined)"_e);
   CHECK(called);
   std::ignore = breakhook(hook);
-  ctx.primerr(old);
 }
 
 TEST_CASE("eval: apply throws")
@@ -183,32 +179,20 @@ TEST_CASE("eval: autoload")
   CHECK(type_of(result) == type::Integer);
   CHECK(result->intval() == 123);
   putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS("(noauto)"_e);
-  ctx.primerr(old);
   std::filesystem::remove("autoload.lisp");
 }
 
 TEST_CASE("eval: string function")
 {
   auto fun = R"(("fun"))";
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(eval(fun));
-  ctx.primerr(old);
 }
 
 TEST_CASE("eval: illegal function")
 {
   auto fun = R"((1))";
-  std::ostringstream os;
-  auto& ctx = context::current();
-  auto old = ctx.primerr(ref_file_t::create(os));
   CHECK_THROWS(eval(fun));
-  ctx.primerr(old);
 }
 
 } // namespace lisp

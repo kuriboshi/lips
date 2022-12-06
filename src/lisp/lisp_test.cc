@@ -49,6 +49,9 @@ int main(int argc, const char** argv)
     session.cli(cli);
     session.applyCommandLine(argc, argv);
     lisp::context ctx;
+    std::ostringstream os;
+    auto quiet = lisp::ref_file_t::create(os);
+    ctx.primerr(quiet);
     if(!loadpath.empty())
     {
       auto path = buildpath(loadpath.begin(), loadpath.end());

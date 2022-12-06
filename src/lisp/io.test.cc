@@ -337,7 +337,7 @@ TEST_CASE("io: patom primout/primerr")
     patom("foo"_a, false);
     terpri(false);
     CHECK(out.str() == "foo\n");
-    ctx.primerr(old);
+    ctx.primout(old);
   }
   {
     std::ostringstream err;

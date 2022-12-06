@@ -108,6 +108,7 @@ if(LIPS_ENABLE_TESTS)
             alloc.test.cc
             arith.test.cc
             check.test.cc
+            context.test.cc
             debug.test.cc
             error.test.cc
             eval.test.cc
