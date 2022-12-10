@@ -282,7 +282,7 @@ LISPT length(context&, LISPT x)
 
 LISPT closure(context& ctx, LISPT fun, LISPT vars)
 {
-  ref_closure_t c(new closure_t);
+  auto c = ref_closure_t::create();
   c->cfunction = fun;
   c->closed = vars;
   auto f = prim::length(ctx, vars);

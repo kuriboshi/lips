@@ -371,7 +371,7 @@ public:
 
   static symbol::symbol_collection& symbol_collection()
   {
-    static symbol::symbol_collection& all_symbols = *new symbol::symbol_collection;
+    static symbol::symbol_collection all_symbols;
     return all_symbols;
   }
 

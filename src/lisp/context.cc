@@ -58,12 +58,12 @@ public:
   {
     _syntax = std::make_unique<syntax>();
 
-    _primout = new file_t(std::cout); // NOLINT
-    _primerr = new file_t(std::cerr); // NOLINT
-    _primin = new file_t(std::cin);   // NOLINT
-    _stdout = new file_t(std::cout);  // NOLINT
-    _stderr = new file_t(std::cerr);  // NOLINT
-    _stdin = new file_t(std::cin);    // NOLINT
+    _primout = ref_file_t::create(std::cout); // NOLINT
+    _primerr = ref_file_t::create(std::cerr); // NOLINT
+    _primin = ref_file_t::create(std::cin);   // NOLINT
+    _stdout = ref_file_t::create(std::cout);  // NOLINT
+    _stderr = ref_file_t::create(std::cerr);  // NOLINT
+    _stdin = ref_file_t::create(std::cin);    // NOLINT
   }
   evaluator& _eval;
   std::unique_ptr<syntax> _syntax;
