@@ -80,20 +80,11 @@ public:
   cvariable_t& _loadpath;
 };
 
-context::context()
+class init
 {
-  if(_current == nullptr)
-    _current = this;
-  else
-    throw std::runtime_error("context::context called twice");
-
-  _pimpl = std::make_unique<impl>(e());
-
-  static auto global_set = false;
-  if(!global_set)
+public:
+  init()
   {
-    global_set = true;
-
     auto intern = [this](const auto s) { return details::alloc::intern(s); };
 
     // Must be early since it's used by symbol_store_t to initialize new
@@ -141,9 +132,6 @@ context::context()
     C_VERSION->value(mkstring(VERSION));
     C_VERSION->symbol().constant = true;
 
-    e().undefhook(nullptr);
-    e().breakhook(nullptr);
-
     details::alloc::init();
     details::arith::init();
     details::debug::init();
@@ -160,15 +148,27 @@ context::context()
     rtable::init();
 
     // clang-format off
-    mkprim(pn::E,          eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-    mkprim(pn::EVAL,       eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::APPLY,      apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-    mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::E,          context::eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+    mkprim(pn::EVAL,       context::eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::APPLY,      context::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::APPLYSTAR,  context::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+    mkprim(pn::BAKTRACE,   context::baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::TOPOFSTACK, context::topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+    mkprim(pn::DESTBLOCK,  context::destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
     // clang-format on
   }
+};
+
+context::context()
+{
+  if(_current == nullptr)
+    _current = this;
+  else
+    throw std::runtime_error("context::context called twice");
+
+  _pimpl = std::make_unique<impl>(e());
+
+  static init init;
 }
 
 context::~context()
