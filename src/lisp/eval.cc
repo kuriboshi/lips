@@ -944,7 +944,7 @@ LISPT evaluator::baktrace()
 
 LISPT evaluator::topofstack()
 {
-  return details::alloc::getobject(_ctx.e().environment());
+  return details::alloc::getobject(environment());
 }
 
 LISPT evaluator::destblock(LISPT e)
