@@ -57,9 +57,17 @@ TEST_CASE("pred: predicate functions")
     CHECK(nlistp(NIL) == T);
   }
 
+  SECTION("neq")
+  {
+    CHECK(neq(NIL, T) == T);
+    CHECK(neq(T, T) == NIL);
+    CHECK(neq(NIL, NIL) == NIL);
+    CHECK(neq("a"_s, "a"_s) == T);
+  }
+
   SECTION("boundp")
   {
-    CHECK(is_NIL(boundp("string"_l)));
+    CHECK(is_NIL(boundp("string"_s)));
     auto ub = mkatom("ub");
     CHECK(is_NIL(boundp(ub)));
     auto bd = mkatom("bd");
@@ -124,7 +132,10 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(lambda(NIL, NIL)) == C_LAMBDA);
     CHECK(xtypeof(nlambda(NIL, NIL)) == C_NLAMBDA);
     CHECK(xtypeof(closure(NIL, NIL)) == C_CLOSURE);
-    //CHECK(xtypeof(eval("unbound")) == C_UNBOUND);
+    CHECK(xtypeof(eval("unbound")) == C_UNBOUND);
+    CHECK(xtypeof(""_l) == C_ENDOFFILE);
+    auto f = LISPT::create(ref_file_t::create(""));
+    CHECK(xtypeof(f) == C_FILE);
     CHECK(xtypeof(T) == T);
   }
 }

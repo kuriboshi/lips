@@ -212,6 +212,18 @@ TEST_CASE("prim: primary functions")
     CHECK(is_NIL(null(0_l)));
     CHECK(is_NIL(null(0_l)));
   }
+
+  SECTION("list")
+  {
+    auto l = list(mklist(1_l, 2_l));
+    CHECK(type_of(l) == type::Cons);
+    CHECK(length(l)->intval() == 2);
+  }
+
+  SECTION("error")
+  {
+    CHECK_THROWS(error("error"_s));
+  }
 }
 
 } // namespace lisp

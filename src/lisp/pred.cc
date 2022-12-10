@@ -115,8 +115,6 @@ LISPT xtypeof(context&, LISPT a)
 {
   switch(type_of(a))
   {
-    case type::Nil:
-      return NIL;
     case type::Symbol:
       return C_SYMBOL;
     case type::Integer:
@@ -151,10 +149,12 @@ LISPT xtypeof(context&, LISPT a)
       return C_ERROR;
     case type::File:
       return C_FILE;
-    default:
+    case type::Cvariable:
+      return C_CVARIABLE;
+    case type::Nil:
       return NIL;
   }
-  return NIL;
+  // Never reached since all cases are handled in the switch statement.
 }
 
 namespace pn

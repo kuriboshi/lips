@@ -441,6 +441,7 @@ extern LISPT C_SYMBOL;
 extern LISPT C_READ;
 extern LISPT C_WRITE;
 extern LISPT C_APPEND;
+extern LISPT C_CVARIABLE;
 
 /// @brief The lisp interpreter.
 ///
