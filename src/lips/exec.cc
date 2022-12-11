@@ -352,7 +352,7 @@ LISPT execute(const std::string& name, LISPT command)
     if(errno == ENOEXEC)
       execvp(name.c_str(), argv.data());
     std::cerr << std::error_code(errno, std::system_category()).message() << '\n';
-    exit(1);
+    ::exit(1);
     /* No return */
   }
   auto pid = mfork();
@@ -362,7 +362,7 @@ LISPT execute(const std::string& name, LISPT command)
     if(errno == ENOEXEC)
       execvp(name.c_str(), argv.data());
     std::cerr << std::error_code(errno, std::system_category()).message() << '\n';
-    exit(1);
+    ::exit(1);
   }
   else if(pid < 0)
     return C_ERROR;
@@ -479,10 +479,10 @@ LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed)
     if(dup2(fd, oldfd) < 0)
     {
       ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-      exit(1);
+      ::exit(1);
     }
     eval(cmd);
-    exit(0);
+    ::exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
@@ -515,10 +515,10 @@ LISPT redir_append(context& ctx, LISPT cmd, LISPT file, LISPT filed)
     if(dup2(fd, oldfd) < 0)
     {
       ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-      exit(1);
+      ::exit(1);
     }
     eval(cmd);
-    exit(0);
+    ::exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
@@ -551,10 +551,10 @@ LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed)
     if(dup2(fd, oldfd) < 0)
     {
       ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-      exit(1);
+      ::exit(1);
     }
     eval(cmd);
-    exit(0);
+    ::exit(0);
   }
   else if(pid < 0)
     return C_ERROR;
@@ -579,7 +579,7 @@ LISPT pipecmd(context& ctx, LISPT cmds)
     if(pipe(pd.data()) == -1) // NOLINT
     {
       ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-      exit(1);
+      ::exit(1);
     }
     if((pid = mfork()) == 0)
     {
@@ -587,23 +587,23 @@ LISPT pipecmd(context& ctx, LISPT cmds)
       if(dup2(pd[1], 1) < 0)
       {
         ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-        exit(1);
+        ::exit(1);
       }
       eval(cmds->car());
-      exit(0);
+      ::exit(0);
     }
     else if(pid < 0)
-      exit(1);
+      ::exit(1);
     cmds = cmds->cdr();
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
       ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
-      exit(1);
+      ::exit(1);
     }
     eval(cmds->car());
     auto status = waitfork(pid);
-    exit(WEXITSTATUS(status));
+    ::exit(WEXITSTATUS(status));
   }
   else if(pid < 0)
     return C_ERROR;
@@ -621,7 +621,7 @@ LISPT back(context& ctx, LISPT x)
     insidefork = true;
     preparefork();
     eval(x);
-    exit(0);
+    ::exit(0);
   }
   else if(pid < 0)
     return C_ERROR;

@@ -59,7 +59,7 @@ LISPT closure(context&, LISPT, LISPT);
 ///
 LISPT nth(context&, LISPT, LISPT);
 LISPT error(context&, LISPT);
-LISPT uxexit(context&, LISPT);
+LISPT exit(context&, LISPT);
 
 LISPT closobj(context&, LISPT);
 } // namespace lisp::details::prim

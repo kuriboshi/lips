@@ -319,7 +319,7 @@ LISPT error(context& ctx, LISPT mess)
   return ctx.error(error_errc::user_error, mess);
 }
 
-LISPT uxexit(context&, LISPT status)
+LISPT exit(context&, LISPT status)
 {
   if(is_NIL(status))
     throw lisp_finish("exit called", 0);
@@ -392,7 +392,7 @@ void init()
   mkprim(pn::CLOSURE, closure, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::EQ,      eq,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::ERROR,   error,   subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::EXIT,    uxexit,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::EXIT,    exit,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::LAMBDA,  lambda,  subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::LENGTH,  length,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::LIST,    list,    subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);

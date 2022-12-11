@@ -167,7 +167,7 @@ void promptfun()
 void onbreak()
 {
   if(insidefork)
-    exit(1);
+    ::exit(1);
 }
 
 std::unique_ptr<::lisp::context> init()
@@ -292,7 +292,7 @@ int main(int argc, char* const* argv)
         break;
       default:
         std::cout << "usage: -fvicT [arguments]\n";
-        exit(1);
+        ::exit(1);
         break;
     }
   }

@@ -543,7 +543,7 @@ std::optional<std::string> term_source::getline()
   {
     std::cerr << "Unbalanced parenthesis\n";
     end_term();
-    exit(1);
+    ::exit(1);
   }
   position = 0;
   linepos = 0;
