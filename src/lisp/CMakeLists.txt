@@ -67,6 +67,7 @@ set(_liblisp_source
           ref_ptr.hh
           repl.hh
           rtable.hh
+          run.hh
           string.hh
           syntax.hh
           types.hh
