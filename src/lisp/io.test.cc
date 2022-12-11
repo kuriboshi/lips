@@ -463,6 +463,24 @@ TEST_CASE("io: prin0")
     prin0(C_ERROR, *f);
     CHECK(os.str().starts_with("#<error"));
   }
+  {
+    std::ostringstream os;
+    auto out = ref_file_t::create(os);
+    auto old = context::current().primerr(out);
+    prin0(NIL, true);
+    CHECK(os.str() == "nil");
+    context::current().primerr(old);
+  }
+}
+
+TEST_CASE("io: print")
+{
+  std::ostringstream os;
+  auto out = ref_file_t::create(os);
+  auto old = context::current().primerr(out);
+  print(NIL, true);
+  CHECK(os.str() == "nil\n");
+  context::current().primerr(old);
 }
 
 TEST_CASE("io: splice")
