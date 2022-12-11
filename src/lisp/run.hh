@@ -53,10 +53,11 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     }
     catch(const std::exception& ex)
     {
-      out << ex.what() << std::endl;
+      // Any standard exception resets the evaluator
+      out << "exception: " << ex.what() << std::endl;
+      ctx.e().reset();
     }
   }
-  return 1;
 }
 
 } // namespace lisp

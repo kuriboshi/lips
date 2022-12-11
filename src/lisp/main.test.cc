@@ -19,6 +19,8 @@
 
 #include <catch2/catch.hpp>
 
+#include "alloc.hh"
+#include "check.hh"
 #include "io.hh"
 #include "run.hh"
 
@@ -60,6 +62,54 @@ TEST_CASE("main: exit")
     CHECK(run(ctx, os) == 99);
     ctx.primin(old);
   }
+  ctx.primout(old);
+}
+
+TEST_CASE("main: reset")
+{
+  auto& ctx = context::current();
+  std::ostringstream cout;
+  auto old = ctx.primout(ref_file_t::create(cout));
+
+  SECTION("throw lisp_reset")
+  {
+    // The symbol 'foo' is undefined so this will throw a lisp_reset exception
+    // which is caught by 'run' which returns 0.
+    auto old = ctx.primin(ref_file_t::create(R"((foo))"));
+    std::ostringstream os;
+    CHECK(run(ctx, os) == 0);
+    ctx.primin(old);
+  }
+
+  SECTION("context interrupt")
+  {
+    auto old = ctx.primin(ref_file_t::create(R"((plus 1 2))"));
+    // This will cause abort to be called and a lisp_error exception to be
+    // called.
+    ctx.interrupt = true;
+    std::ostringstream os;
+    CHECK(run(ctx, os) == 0);
+    ctx.interrupt = false;
+    ctx.primin(old);
+  }
+
+  SECTION("std::exception")
+  {
+    // Throw a standard exception which will reset the evaluator.
+    mkprim(
+      "throw",
+      [](context&, LISPT a) -> LISPT {
+        check(a, type::String);
+        throw std::runtime_error(a->string());
+      },
+      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+    auto old = ctx.primin(ref_file_t::create(R"((throw "exception"))"));
+    std::ostringstream os;
+    CHECK(run(ctx, os) == 0);
+    CHECK(os.str() == "exception: exception\n");
+    ctx.primin(old);
+  }
+
   ctx.primout(old);
 }
 
