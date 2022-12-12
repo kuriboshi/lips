@@ -125,6 +125,31 @@ a
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
   }
+
+  SECTION("help")
+  {
+    std::string is = R"(((lambda () (xyzzy)))
+help
+(return nil)
+)";
+    auto old = ctx.primin(ref_file_t::create(is));
+    repl repl(ctx);
+    ctx.repl = [&repl](LISPT) -> LISPT { return repl(NIL); };
+    repl(NIL);
+    std::string expected_err = R"(Undefined function xyzzy
+(xyzzy broken)
+)";
+    std::string expected_out = R"(> : (go) continue
+(reset) back to top loop
+(bt) print backtrace
+(return exp) return expression
+: nil
+> )";
+    CHECK(cout.str() == expected_out);
+    CHECK(cerr.str() == expected_err);
+    ctx.primin(old);
+  }
+
   ctx.primerr(olderr);
   ctx.primout(oldout);
 }
