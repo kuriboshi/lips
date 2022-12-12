@@ -256,6 +256,19 @@ TEST_CASE("file: functions")
       CHECK("a"_a->value()->string() == "loadfile");
     }
   }
+
+  SECTION("append")
+  {
+    create_test_file test("(setq a");
+    auto f = open(mkstring(test.file), C_APPEND);
+    prin1(" 999)"_s, f);
+    terpri(f);
+    close(f);
+    context::current().loadpath(mklist(C_DOT));
+    auto e = load(mkstring(test.file));
+    REQUIRE(type_of("a"_a->value()) == type::Integer);
+    CHECK("a"_a->value()->intval() == 999);
+  }
 }
 
 } // namespace lisp

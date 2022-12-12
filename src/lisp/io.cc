@@ -334,7 +334,7 @@ file_source::file_source(const std::string& name)
 
 file_sink::file_sink(const std::string& name, bool append)
 {
-  _file = std::make_unique<std::ofstream>(name, append ? std::ios_base::ate : std::ios_base::out);
+  _file = std::make_unique<std::ofstream>(name, append ? std::ios_base::app : std::ios_base::out);
   if(_file->fail())
     throw lisp_error("Can't open file " + name);
 }

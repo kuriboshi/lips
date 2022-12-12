@@ -127,7 +127,7 @@ public:
     C_READ = intern("read");
     C_WRITE = intern("write");
     C_APPEND = intern("append");
-    C_APPEND = intern("cvariable");
+    C_CVARIABLE = intern("cvariable");
 
     C_VERSION = intern("version");
     C_VERSION->value(mkstring(VERSION));
