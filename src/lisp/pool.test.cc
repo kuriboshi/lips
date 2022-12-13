@@ -38,6 +38,7 @@ public:
     t2 = 0;
   }
   static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(Test* x, std::destroying_delete_t) { _pool.deallocate(x); }
   int t0 = 1;
   int t1 = 12;
@@ -103,6 +104,7 @@ class Foo
 public:
   Foo() = default;
   static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
 private:

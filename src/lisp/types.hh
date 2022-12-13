@@ -177,6 +177,7 @@ public:
   std::uint8_t count = 0;
 
   static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(closure_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
 private:
@@ -376,6 +377,7 @@ public:
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(lisp_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
   static std::size_t freecount() { return _pool.size(); }
