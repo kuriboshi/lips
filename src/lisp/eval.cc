@@ -126,7 +126,9 @@ LISPT evaluator::call(LISPT fun)
 {
   switch(fun->subr().argcount())
   {
-    case 0:
+    default:
+      // argcount can only be 0, 1, 2, or 3. In order to nudge closer to 100%
+      // test coverage treat 0 and >= 4 the same.
       return fun->subr()(_ctx);
     case 1:
       return fun->subr()(_ctx, _dest[1].val());
@@ -135,7 +137,6 @@ LISPT evaluator::call(LISPT fun)
     case 3:
       return fun->subr()(_ctx, _dest[3].val(), _dest[2].val(), _dest[1].val());
   }
-  return NIL;
 }
 
 /// @brief This is the LISP evaluator.
