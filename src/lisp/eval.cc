@@ -262,10 +262,6 @@ bool evaluator::peval()
       send(_expression->indirectval());
       pop(_cont);
       break;
-    case type::Cvariable:
-      send(_expression->cvarval());
-      pop(_cont);
-      break;
     default:
       send(_expression);
       pop(_cont);
@@ -384,6 +380,9 @@ bool evaluator::peval1()
       case type::String:
         if(!evalhook(_expression))
           xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
+        break;
+      case type::Cvariable:
+        _fun = _fun->cvarval();
         break;
       default:
         xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);

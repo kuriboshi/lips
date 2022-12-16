@@ -196,4 +196,41 @@ TEST_CASE("eval: illegal function")
   CHECK_THROWS(eval(fun));
 }
 
+TEST_CASE("eval: indirect and cvariable")
+{
+  SECTION("indirect function")
+  {
+    auto& cvar = initcvar("f0", "(lambda () 99)"_l);
+    auto result = "(f0)"_e;
+    REQUIRE(type_of(result) == type::Integer);
+    CHECK(result->intval() == 99);
+  }
+
+  SECTION("indirect variable")
+  {
+    auto& cvar = initcvar("c0", 123_l);
+    auto result = "(plus c0)"_e;
+    REQUIRE(type_of(result) == type::Integer);
+    CHECK(result->intval() == 123);
+  }
+}
+
+TEST_CASE("eval: illegal apply")
+{
+  SECTION("apply string")
+  {
+    CHECK_THROWS(R"((apply "string" nil))"_e);
+  }
+
+  SECTION("apply unbound")
+  {
+    CHECK_THROWS(R"((apply unbound nil))"_e);
+  }
+
+  SECTION("apply int")
+  {
+    CHECK_THROWS(R"((apply 100 nil))"_e);
+  }
+}
+
 } // namespace lisp
