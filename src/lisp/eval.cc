@@ -456,7 +456,10 @@ void evaluator::bt()
 
 bool evaluator::everr()
 {
-  send(break0(_expression));
+  auto b = break0(_expression);
+  if(b == C_EOF)
+    throw lisp_reset();
+  send(b);
   pop(_cont); // Discard one continuation.
   pop(_cont);
   return false;
