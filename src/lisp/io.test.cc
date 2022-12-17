@@ -216,7 +216,7 @@ TEST_CASE("io: source")
     CHECK(c == '#');
     c = f.getch();
     CHECK(c == '!');
-    CHECK(f.close());
+    f.close();
   }
 
   SECTION("io::stream_source")
@@ -232,7 +232,7 @@ TEST_CASE("io: source")
       CHECK(c == '#');
       c = f.getch();
       CHECK(c == '!');
-      CHECK(f.close());
+      f.close();
     }
     {
       std::ifstream is{test.file};
@@ -269,7 +269,7 @@ TEST_CASE("io: source")
     ss.ungetch(c);
     c = ss.getch();
     CHECK(c == '#');
-    CHECK(ss.close());
+    ss.close();
   }
 }
 
@@ -281,7 +281,7 @@ TEST_CASE("io: sink")
     io::file_sink f(test.file);
     f.puts("hello");
     f.terpri();
-    CHECK(f.close());
+    f.close();
     std::ifstream fs(test.file);
     std::ostringstream ss;
     ss << fs.rdbuf();
@@ -295,7 +295,7 @@ TEST_CASE("io: sink")
     io::stream_sink f(of);
     f.puts("hello");
     f.terpri();
-    CHECK(f.close());
+    f.close();
     std::ifstream fs(test.file);
     std::ostringstream ss;
     ss << fs.rdbuf();

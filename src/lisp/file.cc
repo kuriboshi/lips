@@ -61,9 +61,8 @@ LISPT close(context&, LISPT fildes)
   check(fildes, type::File);
   if(fildes->file()->has_sink())
     fildes->file()->flush();
-  if(fildes->file()->close())
-    return T;
-  return NIL;
+  fildes->file()->close();
+  return T;
 }
 
 LISPT ratom(context& ctx, LISPT file)

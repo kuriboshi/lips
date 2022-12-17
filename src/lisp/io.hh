@@ -53,7 +53,7 @@ public:
 
   virtual int getch() = 0;
   virtual void ungetch(int) = 0;
-  virtual bool close() = 0;
+  virtual void close() = 0;
   virtual std::optional<std::string> getline() = 0;
 
   using iterator = std::istreambuf_iterator<char>;
@@ -86,10 +86,9 @@ public:
 
   int getch() override { return getch(*_file); }
   void ungetch(int c) override { _file->putback(c); }
-  bool close() override
+  void close() override
   {
     _file->close();
-    return !_file->is_open();
   }
   std::optional<std::string> getline() override { return getline(*_file); }
 
@@ -112,7 +111,7 @@ public:
 
   int getch() override { return getch(_stream); }
   void ungetch(int c) override { _stream.putback(c); }
-  bool close() override { return true; }
+  void close() override { return; }
   std::optional<std::string> getline() override { return getline(_stream); }
 
   iterator begin() override { return iterator(_stream); }
@@ -133,7 +132,7 @@ public:
 
   int getch() override { return getch(_string); }
   void ungetch(int c) override { _string.putback(c); }
-  bool close() override { return true; }
+  void close() override { return; }
   std::optional<std::string> getline() override { return getline(_string); }
 
   iterator begin() override { return iterator(_string); }
@@ -152,7 +151,7 @@ public:
   virtual void puts(const std::string_view) = 0;
   virtual void terpri() = 0;
   virtual void flush() = 0;
-  virtual bool close() = 0;
+  virtual void close() = 0;
 
 protected:
   //
@@ -190,10 +189,9 @@ public:
   void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
   void terpri() override { _file->put('\n'); }
   void flush() override { _file->flush(); }
-  bool close() override
+  void close() override
   {
     _file->close();
-    return !_file->is_open();
   }
 
 private:
@@ -214,10 +212,9 @@ public:
   void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
-  bool close() override
+  void close() override
   {
     _stream.flush();
-    return true;
   }
 
 private:
@@ -237,7 +234,7 @@ public:
   void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
-  bool close() override { return true; }
+  void close() override { return; }
 
 private:
   std::ostringstream _stream;
@@ -321,11 +318,10 @@ public:
     _sink->puts(ret);
   }
 
-  bool close()
+  void close()
   {
     _source.release();
     _sink.release();
-    return true;
   }
 
 private:
