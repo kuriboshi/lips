@@ -37,6 +37,7 @@ void evaluator::reset()
   _toctrl = 0;
   _fun = NIL;
   _args = NIL;
+  _dest = nullptr;
   _env = nullptr;
 }
 
