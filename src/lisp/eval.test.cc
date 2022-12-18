@@ -279,4 +279,14 @@ TEST_CASE("eval: baktrace")
   ctx.primerr(old);
 }
 
+TEST_CASE("eval: baktrace, topofstack, destblock")
+{
+  auto b = baktrace();
+  CHECK(b == NIL);
+  auto t = topofstack();
+  CHECK(type_of(t) == type::Environ);
+  auto d = destblock(t);
+  CHECK(d == NIL);
+}
+
 } // namespace lisp

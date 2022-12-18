@@ -271,4 +271,18 @@ TEST_CASE("file: functions")
   }
 }
 
+TEST_CASE("file: open error conditions")
+{
+  SECTION("open with illegal mode")
+  {
+    create_test_file test("");
+    CHECK_THROWS(open(mkstring(test.file), C_CONS));
+  }
+
+  SECTION("open non-existing file")
+  {
+    CHECK_THROWS(open(mkstring("/etc/xyzzy"), NIL));
+  }
+}
+
 } // namespace lisp

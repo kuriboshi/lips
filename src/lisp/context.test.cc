@@ -17,6 +17,7 @@
 
 #include "context.hh"
 #include "io.hh"
+#include "syntax.hh"
 
 #include <catch2/catch.hpp>
 
@@ -28,6 +29,18 @@ TEST_CASE("context: fatal error")
   CHECK_THROWS(context::current().fatal(error_errc::user_error, "user", "error"));
   CHECK_THROWS(context::current().fatal(error_errc::user_error));
   CHECK(perror(error_errc::user_error, NIL) == NIL);
+}
+
+TEST_CASE("context: stdin, stdout, stderr")
+{
+  CHECK(context::current().stdin() != nullptr);
+  CHECK(context::current().stdout() != nullptr);
+  CHECK(context::current().stderr() != nullptr);
+}
+
+TEST_CASE("context: syntax")
+{
+  context::current().read_table(std::make_unique<syntax>());
 }
 
 }

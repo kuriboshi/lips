@@ -44,15 +44,13 @@ LISPT open(context& ctx, LISPT filename, LISPT mode)
       appendmode = true;
     }
     else
-      ctx.error(error_errc::unknown_request, mode);
+      return ctx.error(error_errc::unknown_request, mode);
   }
   auto* f = [&]() {
     if(readmode)
       return new file_t(std::make_unique<io::file_source>(filename->getstr()));
     return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
-  if(f == nullptr)
-    ctx.error(error_errc::cant_open, filename);
   return alloc::getobject(ref_file_t(f));
 }
 

@@ -35,6 +35,9 @@ TEST_CASE("debug: debug functions")
   evaltrace(mknumber(0));
   t = ctx.e().trace();
   CHECK(t == 0);
+  auto r = evaltrace(NIL);
+  REQUIRE(type_of(r) == type::Integer);
+  CHECK(r->intval() == t);
 }
 
 } // namespace lisp

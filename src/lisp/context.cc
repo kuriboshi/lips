@@ -106,6 +106,7 @@ public:
     C_BROKEN = intern("broken");
     C_BT = intern("bt");
     C_CLOSURE = intern("closure");
+    C_CONS = intern("cons");
     C_DOT = intern(".");
     C_ENDOFFILE = intern("endoffile");
     C_ENVIRON = intern("environ");
@@ -172,11 +173,7 @@ context::context()
   static init init;
 }
 
-context::~context()
-{
-  if(_current == this)
-    _current = nullptr;
-}
+context::~context() = default;
 
 evaluator& context::e()
 {
