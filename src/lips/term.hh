@@ -33,7 +33,6 @@ public:
   // io::source
   int getch() override;
   void ungetch(int) override;
-  bool close() override { return true; }
   std::optional<std::string> getline() override;
 
   static void end_term();
