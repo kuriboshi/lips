@@ -19,8 +19,10 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <catch2/catch.hpp>
+using Catch::Matchers::Matches;
 
 #include "alloc.hh"
 #include "eval.hh"
@@ -150,7 +152,7 @@ TEST_CASE("eval: breakhook")
   bool called = false;
   auto f = [&called]() { called = true; };
   auto hook = breakhook(f);
-  CHECK_THROWS("(undefined)"_e);
+  CHECK_NOTHROW("(undefined)"_e);
   CHECK(called);
   std::ignore = breakhook(hook);
 }
@@ -180,20 +182,20 @@ TEST_CASE("eval: autoload")
   CHECK(type_of(result) == type::Integer);
   CHECK(result->intval() == 123);
   putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
-  CHECK_THROWS("(noauto)"_e);
+  CHECK_NOTHROW("(noauto)"_e);
   std::filesystem::remove("autoload.lisp");
 }
 
 TEST_CASE("eval: string function")
 {
   auto fun = R"(("fun"))";
-  CHECK_THROWS(eval(fun));
+  CHECK_NOTHROW(eval(fun));
 }
 
 TEST_CASE("eval: illegal function")
 {
   auto fun = R"((1))";
-  CHECK_THROWS(eval(fun));
+  CHECK_NOTHROW(eval(fun));
 }
 
 TEST_CASE("eval: indirect and cvariable")
@@ -219,7 +221,7 @@ TEST_CASE("eval: illegal apply")
 {
   SECTION("apply string")
   {
-    CHECK_THROWS(R"((apply "string" nil))"_e);
+    CHECK_NOTHROW(R"((apply "string" nil))"_e);
   }
 
   SECTION("apply unbound")
@@ -229,8 +231,52 @@ TEST_CASE("eval: illegal apply")
 
   SECTION("apply int")
   {
-    CHECK_THROWS(R"((apply 100 nil))"_e);
+    CHECK_NOTHROW(R"((apply 100 nil))"_e);
   }
+}
+
+TEST_CASE("eval: baktrace")
+{
+  auto& ctx = context::current();
+  std::ostringstream err;
+  auto old = ctx.primerr(ref_file_t::create(err));
+  auto result = R"(
+((lambda (a b)
+  (a)
+  b)
+ baktrace
+ 99)
+)"_e;
+  const std::vector<std::string> expected{
+    R"(18: ev2)",
+    R"(17: destblock_t:\(1 \(nil . #<lambda [0-9a-f]+>\)\))",
+    R"(16: ev1)",
+    R"(15: \(\(a\) b\))",
+    R"(14: #<lambda [0-9a-f]+>)",
+    R"(13: ev0)",
+    R"(12: \(a\))",
+    R"(11: evseq3)",
+    R"(10: evlam0)",
+    R"(9: destblock_t:)",
+    R"(8: \(lambda \(a b\) \(a\) b\))",
+    R"(7: ev4)",
+    R"(6: ev1)",
+    R"(5: nil)",
+    R"(4: nil)",
+    R"(3: ev0)",
+    R"(2: \(\(lambda \(a b\) \(a\) b\) baktrace 99\))",
+    R"(1: eval0)",
+    R"(0: destblock_t:)"
+  };
+  const auto str = err.str();
+  std::istringstream is{str};
+  for(auto e: expected)
+  {
+    std::string line;
+    CHECK(std::getline(is, line));
+    CHECK_THAT(line, Matches(e));
+  }
+  ctx.primerr(old);
 }
 
 } // namespace lisp

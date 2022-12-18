@@ -175,6 +175,11 @@ LISPT evaluator::eval(LISPT expr)
     unwind();
     throw;
   }
+  catch(const lisp_reset& ex)
+  {
+    unwind();
+    return C_ERROR;
+  }
   //
   // Retrieve the result of the evaluation and restore the previous
   // destination.
@@ -653,8 +658,6 @@ bool evaluator::ev2()
     send(foo);
     pop(_cont);
   }
-  catch(const lisp_reset&)
-  {}
   catch(const lisp_error& ex)
   {
     if(!_interactive)

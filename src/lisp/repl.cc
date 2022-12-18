@@ -41,7 +41,9 @@ LISPT repl::operator()(LISPT exp)
       auto expr = lispread(_ctx.primin());
       if(expr == C_EOF)
         break;
-      print(eval(expr));
+      auto result = eval(expr);
+      if(result != C_ERROR)
+        print(result);
     }
     return NIL;
   }
