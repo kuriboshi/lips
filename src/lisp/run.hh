@@ -41,7 +41,7 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     }
     catch(const lisp_reset& ex)
     {
-      ctx.e().reset();
+      ctx.vm().reset();
     }
     catch(const lisp_error& ex)
     {
@@ -53,9 +53,9 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     }
     catch(const std::exception& ex)
     {
-      // Any standard exception resets the evaluator
+      // Any standard exception resets the vm.
       out << "exception: " << ex.what() << std::endl;
-      ctx.e().reset();
+      ctx.vm().reset();
     }
   }
 }

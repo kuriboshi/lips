@@ -27,11 +27,11 @@ using namespace std::literals;
 
 namespace lisp
 {
-evaluator::evaluator(context& ctx)
+vm::vm(context& ctx)
   : _ctx(ctx)
 {}
 
-void evaluator::reset()
+void vm::reset()
 {
   dzero();
   _toctrl = 0;
@@ -41,18 +41,18 @@ void evaluator::reset()
   _env = nullptr;
 }
 
-LISPT evaluator::printwhere()
+LISPT vm::printwhere()
 {
   LISPT foo = NIL;
   int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
-    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::evlam0)
+    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::evlam0)
       break;
   }
   for(; i != 0; --i)
   {
-    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &evaluator::ev0)
+    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::ev0)
     {
       if(auto* lsp = std::get_if<LISPT>(&_control[i - 1]);
          lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
@@ -71,7 +71,7 @@ LISPT evaluator::printwhere()
 
 /// @brief Print error message, abort current evaluation, and return to top
 /// level.
-void evaluator::abort(std::error_code error)
+void vm::abort(std::error_code error)
 {
   _ctx.perror(error);
   printwhere();
@@ -79,11 +79,11 @@ void evaluator::abort(std::error_code error)
   throw lisp_error("abort");
 }
 
-void evaluator::overflow() { abort(error_errc::stack_overflow); }
+void vm::overflow() { abort(error_errc::stack_overflow); }
 
 /// @brief This function prints an error message, and sets up a call to everr
 /// that handles breaks.
-void evaluator::xbreak(std::error_code code, LISPT fault, continuation_t next)
+void vm::xbreak(std::error_code code, LISPT fault, continuation_t next)
 {
   if(code)
   {
@@ -96,34 +96,34 @@ void evaluator::xbreak(std::error_code code, LISPT fault, continuation_t next)
     throw lisp_reset();
   print(cons(fault, cons(C_BROKEN, NIL)), T);
   push(next);
-  _cont = &evaluator::everr;
+  _cont = &vm::everr;
 }
 
 /// @brief Creates a new destination block of size 's' and initializes it.
-destblock_t* evaluator::mkdestblock(int s) { return dalloc(s); }
+destblock_t* vm::mkdestblock(int s) { return dalloc(s); }
 
-void evaluator::storevar(LISPT v, int i) { _dest[i].var(v); }
+void vm::storevar(LISPT v, int i) { _dest[i].var(v); }
 
-void evaluator::pop_env()
+void vm::pop_env()
 {
   dfree(_env);
   pop(_env);
 }
 
-void evaluator::send(LISPT a)
+void vm::send(LISPT a)
 {
   if(_dest[0].index() > 0)
     _dest[_dest[0].index()].val(a);
 }
 
-LISPT evaluator::receive() { return _dest[_dest[0].index()].val(); }
+LISPT vm::receive() { return _dest[_dest[0].index()].val(); }
 
-void evaluator::next() { _dest[0].decr(); }
+void vm::next() { _dest[0].decr(); }
 
 /// @brief Make a call to the function in parameter `fun'.
 ///
 /// @details It can handle functions with up to three arguments.
-LISPT evaluator::call(LISPT fun)
+LISPT vm::call(LISPT fun)
 {
   switch(fun->subr().argcount())
   {
@@ -140,11 +140,11 @@ LISPT evaluator::call(LISPT fun)
   }
 }
 
-/// @brief This is the LISP evaluator.
+/// @brief This is the LISP vm.
 ///
-/// @details The evaluator allocates a destination slot for the result and
+/// @details The vm allocates a destination slot for the result and
 /// starts munching continuations.
-LISPT evaluator::eval(LISPT expr)
+LISPT vm::eval(LISPT expr)
 {
   //
   // Set the current expression to `expr' and push the current destination onto
@@ -163,8 +163,8 @@ LISPT evaluator::eval(LISPT expr)
   // contiuations onto the stack but eventaully `eval0' is called which returns
   // true, signalling end of evaluation.
   //
-  push(&evaluator::eval0);
-  _cont = &evaluator::peval;
+  push(&vm::eval0);
+  _cont = &vm::peval;
   try
   {
     while(!(this->*_cont)())
@@ -190,14 +190,14 @@ LISPT evaluator::eval(LISPT expr)
   return foo;
 }
 
-bool evaluator::eval0()
+bool vm::eval0()
 {
   dfree(_dest);
   // Signal the end of the evaluation.
   return true;
 }
 
-LISPT evaluator::apply(LISPT f, LISPT x)
+LISPT vm::apply(LISPT f, LISPT x)
 {
   push(_dest);
   _dest = mkdestblock(1);
@@ -206,8 +206,8 @@ LISPT evaluator::apply(LISPT f, LISPT x)
   push(_args);
   _args = x;
   _expression = cons(f, x);
-  push(&evaluator::apply0);
-  _cont = &evaluator::peval2;
+  push(&vm::apply0);
+  _cont = &vm::peval2;
   try
   {
     while(!(this->*_cont)())
@@ -223,7 +223,7 @@ LISPT evaluator::apply(LISPT f, LISPT x)
   return foo;
 }
 
-bool evaluator::apply0()
+bool vm::apply0()
 {
   dfree(_dest);
   pop(_args);
@@ -231,7 +231,7 @@ bool evaluator::apply0()
   return true;
 }
 
-bool evaluator::ev0()
+bool vm::ev0()
 {
   //
   // Discard the top of stack (it's the previous expression, see comment in
@@ -243,14 +243,14 @@ bool evaluator::ev0()
   return false;
 }
 
-bool evaluator::peval()
+bool vm::peval()
 {
 #ifdef TRACE
   if(_trace)
     details::file::print(l, expression, T);
 #endif
   push(_expression);
-  push(&evaluator::ev0);
+  push(&vm::ev0);
   switch(type_of(_expression))
   {
     case type::Cons:
@@ -258,11 +258,11 @@ bool evaluator::peval()
       _fun = _expression->car();
       push(_args);
       _args = _expression->cdr();
-      push(&evaluator::ev1);
-      _cont = &evaluator::peval1;
+      push(&vm::ev1);
+      _cont = &vm::peval1;
       break;
     case type::Symbol:
-      _cont = &evaluator::lookup;
+      _cont = &vm::lookup;
       break;
     case type::Indirect:
       send(_expression->indirectval());
@@ -276,7 +276,7 @@ bool evaluator::peval()
   return false;
 }
 
-bool evaluator::ev1()
+bool vm::ev1()
 {
   pop(_args);
   pop(_fun);
@@ -284,7 +284,7 @@ bool evaluator::ev1()
   return false;
 }
 
-bool evaluator::evalhook(LISPT exp)
+bool vm::evalhook(LISPT exp)
 {
   LISPT res;
 
@@ -303,7 +303,7 @@ bool evaluator::evalhook(LISPT exp)
   return false;
 }
 
-void evaluator::do_unbound(continuation_t continuation)
+void vm::do_unbound(continuation_t continuation)
 {
   //
   // If an undefined symbol has the AUTOLOAD property, we try to load the
@@ -335,131 +335,131 @@ void evaluator::do_unbound(continuation_t continuation)
   }
 }
 
-bool evaluator::peval1()
+bool vm::peval1()
 {
   if(_ctx.brkflg)
-    xbreak(error_errc::kbd_break, _fun, &evaluator::peval1);
+    xbreak(error_errc::kbd_break, _fun, &vm::peval1);
   else if(_ctx.interrupt)
     abort(error_errc::no_message);
   else
     switch(type_of(_fun))
     {
       case type::Closure:
-        push(&evaluator::peval1);
-        _cont = &evaluator::evclosure;
+        push(&vm::peval1);
+        _cont = &vm::evclosure;
         break;
       case type::Subr:
         push(_dest);
-        push(&evaluator::ev2);
+        push(&vm::ev2);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
         _noeval = _fun->subr().subr == subr_t::subr::NOEVAL;
         if(_fun->subr().spread == subr_t::spread::NOSPREAD)
         {
           if(!_noeval)
           {
-            push(&evaluator::noevarg);
-            _cont = &evaluator::evlis;
+            push(&vm::noevarg);
+            _cont = &vm::evlis;
           }
           else
-            _cont = &evaluator::spread;
+            _cont = &vm::spread;
         }
         else
-          _cont = &evaluator::evalargs;
+          _cont = &vm::evalargs;
         break;
       case type::Lambda:
         _noeval = !_fun->lambda().eval;
-        _cont = &evaluator::evlam;
+        _cont = &vm::evlam;
         break;
       case type::Cons:
       case type::Indirect:
         _expression = _fun;
-        push(&evaluator::ev3);
-        _cont = &evaluator::peval;
+        push(&vm::ev3);
+        _cont = &vm::peval;
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &evaluator::peval1;
+        _cont = &vm::peval1;
         break;
       case type::Unbound:
-        do_unbound(&evaluator::peval1);
+        do_unbound(&vm::peval1);
         break;
       case type::String:
         if(!evalhook(_expression))
-          xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
+          xbreak(error_errc::illegal_function, _fun, &vm::peval1);
         break;
       case type::Cvariable:
         _fun = _fun->cvarval();
         break;
       default:
-        xbreak(error_errc::illegal_function, _fun, &evaluator::peval1);
+        xbreak(error_errc::illegal_function, _fun, &vm::peval1);
         break;
     }
   return false;
 }
 
-bool evaluator::peval2()
+bool vm::peval2()
 {
   if(_ctx.brkflg)
-    xbreak(error_errc::kbd_break, _fun, &evaluator::peval2);
+    xbreak(error_errc::kbd_break, _fun, &vm::peval2);
   else
     switch(type_of(_fun))
     {
       case type::Closure:
-        push(&evaluator::peval2);
-        _cont = &evaluator::evclosure;
+        push(&vm::peval2);
+        _cont = &vm::evclosure;
         break;
       case type::Subr:
         push(_dest);
-        push(&evaluator::ev2);
+        push(&vm::ev2);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
         _noeval = true;
         if(_fun->subr().spread == subr_t::spread::NOSPREAD)
-          _cont = &evaluator::spread;
+          _cont = &vm::spread;
         else
-          _cont = &evaluator::evalargs;
+          _cont = &vm::evalargs;
         break;
       case type::Lambda:
         _noeval = true;
-        _cont = &evaluator::evlam;
+        _cont = &vm::evlam;
         break;
       case type::Cons:
       case type::Indirect:
         _expression = _fun;
-        push(&evaluator::ev3p);
-        _cont = &evaluator::peval;
+        push(&vm::ev3p);
+        _cont = &vm::peval;
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &evaluator::peval2;
+        _cont = &vm::peval2;
         break;
       case type::Unbound:
-        do_unbound(&evaluator::peval2);
+        do_unbound(&vm::peval2);
         break;
       case type::String:
         if(!evalhook(_expression))
-          xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
+          xbreak(error_errc::illegal_function, _fun, &vm::peval2);
         break;
       default:
-        xbreak(error_errc::illegal_function, _fun, &evaluator::peval2);
+        xbreak(error_errc::illegal_function, _fun, &vm::peval2);
         break;
     }
   return false;
 }
 
 /// @brief Prints a backtrace of all expressions on the stack.
-void evaluator::bt()
+void vm::bt()
 {
   int op = _ctx.printlevel;
   _ctx.printlevel = 2;
   for(int i = _toctrl - 1; i != 0; i--)
   {
-    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &evaluator::ev0)
+    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::ev0)
       print(std::get<LISPT>(_control[i - 1]), T);
   }
   _ctx.printlevel = op;
 }
 
-bool evaluator::everr()
+bool vm::everr()
 {
   auto b = break0(_expression);
   if(b == C_EOF)
@@ -470,14 +470,14 @@ bool evaluator::everr()
   return false;
 }
 
-bool evaluator::noevarg()
+bool vm::noevarg()
 {
   _args = receive();
-  _cont = &evaluator::spread;
+  _cont = &vm::spread;
   return false;
 }
 
-bool evaluator::evalargs()
+bool vm::evalargs()
 {
   if(is_NIL(_args))
   {
@@ -487,37 +487,37 @@ bool evaluator::evalargs()
   {
     _expression = _args->car();
     if(_noeval)
-      _cont = &evaluator::noev9;
+      _cont = &vm::noev9;
     else
-      _cont = &evaluator::ev9;
+      _cont = &vm::ev9;
   }
   return false;
 }
 
-bool evaluator::ev9()
+bool vm::ev9()
 {
   if(is_NIL(_args->cdr()))
   {
-    _cont = &evaluator::peval;
+    _cont = &vm::peval;
   }
   else
   {
-    push(&evaluator::ev11);
-    _cont = &evaluator::peval;
+    push(&vm::ev11);
+    _cont = &vm::peval;
   }
   return false;
 }
 
-bool evaluator::ev11()
+bool vm::ev11()
 {
   next();
   _args = _args->cdr();
   _expression = _args->car();
-  _cont = &evaluator::ev9;
+  _cont = &vm::ev9;
   return false;
 }
 
-bool evaluator::noev9()
+bool vm::noev9()
 {
   while(true)
   {
@@ -535,7 +535,7 @@ bool evaluator::noev9()
   return false;
 }
 
-bool evaluator::evlis()
+bool vm::evlis()
 {
   if(is_NIL(_args))
   {
@@ -544,27 +544,27 @@ bool evaluator::evlis()
   else
   {
     _expression = _args->car();
-    _cont = &evaluator::evlis1;
+    _cont = &vm::evlis1;
   }
   return false;
 }
 
-bool evaluator::evlis1()
+bool vm::evlis1()
 {
   if(is_NIL(_args->cdr()))
   {
-    push(&evaluator::evlis2);
-    _cont = &evaluator::peval;
+    push(&vm::evlis2);
+    _cont = &vm::peval;
   }
   else
   {
-    push(&evaluator::evlis3);
-    _cont = &evaluator::peval;
+    push(&vm::evlis3);
+    _cont = &vm::peval;
   }
   return false;
 }
 
-bool evaluator::evlis2()
+bool vm::evlis2()
 {
   LISPT x = cons(receive(), NIL);
   send(x);
@@ -572,18 +572,18 @@ bool evaluator::evlis2()
   return false;
 }
 
-bool evaluator::evlis3()
+bool vm::evlis3()
 {
   push(_dest);
   _dest = mkdestblock(1);
-  push(&evaluator::evlis4);
+  push(&vm::evlis4);
   _args = _args->cdr();
   _expression = _args->car();
-  _cont = &evaluator::evlis1;
+  _cont = &vm::evlis1;
   return false;
 }
 
-bool evaluator::evlis4()
+bool vm::evlis4()
 {
   LISPT x = receive();
   dfree(_dest);
@@ -594,7 +594,7 @@ bool evaluator::evlis4()
   return false;
 }
 
-bool evaluator::evlam()
+bool vm::evlam()
 {
   push(_expression);
   push(_env);
@@ -610,23 +610,23 @@ bool evaluator::evlam()
   auto i = ac;
   for(auto foo = _fun->lambda().args; i != 0; foo = foo->cdr(), i--)
     storevar(foo->car(), i);
-  push(&evaluator::evlam1);
+  push(&vm::evlam1);
   if(spr)
   {
     if(_noeval)
-      _cont = &evaluator::spread;
+      _cont = &vm::spread;
     else
     {
-      push(&evaluator::noevarg);
-      _cont = &evaluator::evlis;
+      push(&vm::noevarg);
+      _cont = &vm::evlis;
     }
   }
   else
-    _cont = &evaluator::evalargs;
+    _cont = &vm::evalargs;
   return false;
 }
 
-bool evaluator::spread()
+bool vm::spread()
 {
   while(true)
   {
@@ -648,7 +648,7 @@ bool evaluator::spread()
   return false;
 }
 
-bool evaluator::ev2()
+bool vm::ev2()
 {
   try
   {
@@ -664,36 +664,36 @@ bool evaluator::ev2()
       throw;
     auto foo = printwhere();
     if(is_NIL(foo))
-      xbreak({}, NIL, &evaluator::peval1);
+      xbreak({}, NIL, &vm::peval1);
     else
-      xbreak({}, foo->car(), &evaluator::peval1); /* CAR(_) broken */
+      xbreak({}, foo->car(), &vm::peval1); /* CAR(_) broken */
   }
   return false;
 }
 
-bool evaluator::ev3()
+bool vm::ev3()
 {
   _fun = receive();
-  push(&evaluator::ev4);
-  _cont = &evaluator::peval1;
+  push(&vm::ev4);
+  _cont = &vm::peval1;
   return false;
 }
 
-bool evaluator::ev3p()
+bool vm::ev3p()
 {
   _fun = receive();
-  push(&evaluator::ev4);
-  _cont = &evaluator::peval2;
+  push(&vm::ev4);
+  _cont = &vm::peval2;
   return false;
 }
 
-bool evaluator::ev4()
+bool vm::ev4()
 {
   pop(_cont);
   return false;
 }
 
-void evaluator::link()
+void vm::link()
 {
   _dest[0].link(_env);
   _env = _dest;
@@ -705,24 +705,24 @@ void evaluator::link()
   }
 }
 
-bool evaluator::evlam1()
+bool vm::evlam1()
 {
   link();
   pop(_dest);
   _args = _fun->lambda().body;
-  push(&evaluator::evlam0);
-  _cont = &evaluator::evsequence;
+  push(&vm::evlam0);
+  _cont = &vm::evsequence;
   return false;
 }
 
-void evaluator::restore_env()
+void vm::restore_env()
 {
   auto* c = _env;
   for(auto i = c[0].size(); i > 0; i--)
     c[i].var()->value(c[i].val());
 }
 
-bool evaluator::evlam0()
+bool vm::evlam0()
 {
   restore_env();
   pop_env();
@@ -731,7 +731,7 @@ bool evaluator::evlam0()
   return false;
 }
 
-void evaluator::unwind()
+void vm::unwind()
 {
   while(_env != nullptr)
   {
@@ -741,13 +741,13 @@ void evaluator::unwind()
   reset();
 }
 
-bool evaluator::lookup()
+bool vm::lookup()
 {
   LISPT t = _expression->value();
   switch(type_of(t))
   {
     case type::Unbound:
-      xbreak(error_errc::unbound_variable, _expression, &evaluator::lookup);
+      xbreak(error_errc::unbound_variable, _expression, &vm::lookup);
       return false;
       break;
     case type::Indirect:
@@ -764,7 +764,7 @@ bool evaluator::lookup()
   return false;
 }
 
-bool evaluator::evclosure()
+bool vm::evclosure()
 {
   push(_env);
   push(_dest);
@@ -787,11 +787,11 @@ bool evaluator::evclosure()
   pop(envir);
   pop(_cont);
   push(envir);
-  push(&evaluator::evclosure1);
+  push(&vm::evclosure1);
   return false;
 }
 
-bool evaluator::evclosure1()
+bool vm::evclosure1()
 {
   restore_env();
   pop_env();
@@ -799,7 +799,7 @@ bool evaluator::evclosure1()
   return false;
 }
 
-bool evaluator::evsequence()
+bool vm::evsequence()
 {
   if(is_NIL(_args))
   {
@@ -808,32 +808,32 @@ bool evaluator::evsequence()
   else
   {
     _expression = _args->car();
-    _cont = &evaluator::evseq1;
+    _cont = &vm::evseq1;
   }
   return false;
 }
 
-bool evaluator::evseq1()
+bool vm::evseq1()
 {
   if(is_NIL(_args->cdr()))
-    _cont = &evaluator::peval;
+    _cont = &vm::peval;
   else
   {
-    push(&evaluator::evseq3);
-    _cont = &evaluator::peval;
+    push(&vm::evseq3);
+    _cont = &vm::peval;
   }
   return false;
 }
 
-bool evaluator::evseq3()
+bool vm::evseq3()
 {
   _args = _args->cdr();
   _expression = _args->car();
-  _cont = &evaluator::evseq1;
+  _cont = &vm::evseq1;
   return false;
 }
 
-LISPT evaluator::destblock(const destblock_t* block)
+LISPT vm::destblock(const destblock_t* block)
 {
   if(block == nullptr)
     return NIL;
@@ -846,7 +846,7 @@ LISPT evaluator::destblock(const destblock_t* block)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT evaluator::baktrace()
+LISPT vm::baktrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
@@ -872,71 +872,71 @@ LISPT evaluator::baktrace()
         }
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
         {
-          if(arg == &evaluator::ev0)
+          if(arg == &vm::ev0)
             _ctx.primerr()->format("ev0\n");
-          else if(arg == &evaluator::peval)
+          else if(arg == &vm::peval)
             _ctx.primerr()->format("peval\n");
-          else if(arg == &evaluator::peval1)
+          else if(arg == &vm::peval1)
             _ctx.primerr()->format("peval1\n");
-          else if(arg == &evaluator::peval2)
+          else if(arg == &vm::peval2)
             _ctx.primerr()->format("peval2\n");
-          else if(arg == &evaluator::ev0)
+          else if(arg == &vm::ev0)
             _ctx.primerr()->format("ev0\n");
-          else if(arg == &evaluator::ev1)
+          else if(arg == &vm::ev1)
             _ctx.primerr()->format("ev1\n");
-          else if(arg == &evaluator::ev2)
+          else if(arg == &vm::ev2)
             _ctx.primerr()->format("ev2\n");
-          else if(arg == &evaluator::ev3)
+          else if(arg == &vm::ev3)
             _ctx.primerr()->format("ev3\n");
-          else if(arg == &evaluator::ev4)
+          else if(arg == &vm::ev4)
             _ctx.primerr()->format("ev4\n");
-          else if(arg == &evaluator::evlam0)
+          else if(arg == &vm::evlam0)
             _ctx.primerr()->format("evlam0\n");
-          else if(arg == &evaluator::evlam1)
+          else if(arg == &vm::evlam1)
             _ctx.primerr()->format("evlam1\n");
-          else if(arg == &evaluator::ev9)
+          else if(arg == &vm::ev9)
             _ctx.primerr()->format("ev9\n");
-          else if(arg == &evaluator::ev11)
+          else if(arg == &vm::ev11)
             _ctx.primerr()->format("ev11\n");
-          else if(arg == &evaluator::ev3p)
+          else if(arg == &vm::ev3p)
             _ctx.primerr()->format("ev3p\n");
-          else if(arg == &evaluator::evalargs)
+          else if(arg == &vm::evalargs)
             _ctx.primerr()->format("evalargs\n");
-          else if(arg == &evaluator::noevarg)
+          else if(arg == &vm::noevarg)
             _ctx.primerr()->format("noevarg\n");
-          else if(arg == &evaluator::evlam)
+          else if(arg == &vm::evlam)
             _ctx.primerr()->format("evlam\n");
-          else if(arg == &evaluator::spread)
+          else if(arg == &vm::spread)
             _ctx.primerr()->format("spread\n");
-          else if(arg == &evaluator::evlis)
+          else if(arg == &vm::evlis)
             _ctx.primerr()->format("evlis\n");
-          else if(arg == &evaluator::evlis1)
+          else if(arg == &vm::evlis1)
             _ctx.primerr()->format("evlis1\n");
-          else if(arg == &evaluator::evlis2)
+          else if(arg == &vm::evlis2)
             _ctx.primerr()->format("evlis2\n");
-          else if(arg == &evaluator::evlis3)
+          else if(arg == &vm::evlis3)
             _ctx.primerr()->format("evlis3\n");
-          else if(arg == &evaluator::evlis4)
+          else if(arg == &vm::evlis4)
             _ctx.primerr()->format("evlis4\n");
-          else if(arg == &evaluator::noev9)
+          else if(arg == &vm::noev9)
             _ctx.primerr()->format("noev9\n");
-          else if(arg == &evaluator::evsequence)
+          else if(arg == &vm::evsequence)
             _ctx.primerr()->format("evsequence\n");
-          else if(arg == &evaluator::evseq1)
+          else if(arg == &vm::evseq1)
             _ctx.primerr()->format("evseq1\n");
-          else if(arg == &evaluator::evseq3)
+          else if(arg == &vm::evseq3)
             _ctx.primerr()->format("evseq3\n");
-          else if(arg == &evaluator::evclosure)
+          else if(arg == &vm::evclosure)
             _ctx.primerr()->format("evclosure\n");
-          else if(arg == &evaluator::evclosure1)
+          else if(arg == &vm::evclosure1)
             _ctx.primerr()->format("evclosure1\n");
-          else if(arg == &evaluator::eval0)
+          else if(arg == &vm::eval0)
             _ctx.primerr()->format("eval0\n");
-          else if(arg == &evaluator::apply0)
+          else if(arg == &vm::apply0)
             _ctx.primerr()->format("apply0\n");
-          else if(arg == &evaluator::everr)
+          else if(arg == &vm::everr)
             _ctx.primerr()->format("everr\n");
-          else if(arg == &evaluator::lookup)
+          else if(arg == &vm::lookup)
             _ctx.primerr()->format("lookup\n");
           else
             _ctx.stderr()->format("Unknown control stack element\n");
@@ -949,12 +949,12 @@ LISPT evaluator::baktrace()
   return NIL;
 }
 
-LISPT evaluator::topofstack()
+LISPT vm::topofstack()
 {
   return details::alloc::getobject(environment());
 }
 
-LISPT evaluator::destblock(LISPT e)
+LISPT vm::destblock(LISPT e)
 {
   check(e, type::Environ);
   return destblock(e->envval());
@@ -965,7 +965,7 @@ LISPT evaluator::destblock(LISPT e)
 ///
 /// @param size The size of the destination block.
 /// @returns A destblock or nullptr if no more space available.
-destblock_t* evaluator::dalloc(int size)
+destblock_t* vm::dalloc(int size)
 {
   if(size <= DESTBLOCKSIZE - _destblockused - 1)
   {
@@ -982,10 +982,10 @@ destblock_t* evaluator::dalloc(int size)
 /// @brief Free a destination block.
 ///
 /// @param ptr The destination block to free.
-void evaluator::dfree(destblock_t* block) { _destblockused -= block->size() + 1; }
+void vm::dfree(destblock_t* block) { _destblockused -= block->size() + 1; }
 
 /// @brief Frees all destination blocks.
-void evaluator::dzero() { _destblockused = 0; }
+void vm::dzero() { _destblockused = 0; }
 
 LISPT eval(context& ctx, const std::string& expr)
 {

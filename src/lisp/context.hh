@@ -30,7 +30,7 @@ namespace lisp
 
 class syntax;
 class context;
-class evaluator;
+class vm;
 class cvariable_t;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
@@ -44,7 +44,7 @@ class context
 public:
   context();
   ~context();
-  evaluator& e();
+  vm& vm();
   static context& current();
 
   static LISPT eval(context&, LISPT expr);

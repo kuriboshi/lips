@@ -27,13 +27,13 @@ namespace lisp
 TEST_CASE("debug: debug functions")
 {
   auto& ctx = context::current();
-  auto t = ctx.e().trace();
+  auto t = ctx.vm().trace();
   CHECK(t == 0);
   evaltrace(mknumber(1));
-  t = ctx.e().trace();
+  t = ctx.vm().trace();
   CHECK(t == 1);
   evaltrace(mknumber(0));
-  t = ctx.e().trace();
+  t = ctx.vm().trace();
   CHECK(t == 0);
   auto r = evaltrace(NIL);
   REQUIRE(type_of(r) == type::Integer);

@@ -35,7 +35,7 @@ namespace lisp
 
 class syntax;
 class context;
-class evaluator;
+class vm;
 class file_t;
 class lisp_t;
 using LISPT = ref_ptr<lisp_t>;

@@ -24,12 +24,12 @@ namespace lisp::details::debug
 {
 LISPT evaltrace(context& ctx, LISPT state)
 {
-  auto i = ctx.e().trace();
+  auto i = ctx.vm().trace();
 
   if(!is_NIL(state))
   {
     check(state, type::Integer);
-    ctx.e().trace(state->intval());
+    ctx.vm().trace(state->intval());
   }
   return mknumber(i);
 }

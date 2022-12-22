@@ -73,11 +73,11 @@ public:
   LISPT val() const { return std::get<var_val_pair>(u).val; }
 };
 
-class evaluator
+class vm
 {
 public:
-  evaluator(context&);
-  ~evaluator() = default;
+  vm(context&);
+  ~vm() = default;
 
   void reset();
 
@@ -118,7 +118,7 @@ private:
   //
   // The control stack.
   //
-  using continuation_t = bool (evaluator::*)();
+  using continuation_t = bool (vm::*)();
   using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
   static constexpr int CTRLBLKSIZE = 4000;
   std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
@@ -232,9 +232,9 @@ private:
   int _destblockused = 0;
 };
 
-inline evaluator::breakhook_t breakhook(evaluator::breakhook_t fun) { return context::current().e().breakhook(fun); }
-inline evaluator::undefhook_t undefhook(evaluator::undefhook_t fun) { return context::current().e().undefhook(fun); }
-inline void unwind() { context::current().e().unwind(); }
+inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return context::current().vm().breakhook(fun); }
+inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return context::current().vm().undefhook(fun); }
+inline void unwind() { context::current().vm().unwind(); }
 
 inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }
 LISPT eval(const std::string& expr);

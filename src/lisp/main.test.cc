@@ -95,7 +95,7 @@ TEST_CASE("main: reset")
 
   SECTION("std::exception")
   {
-    // Throw a standard exception which will reset the evaluator.
+    // Throw a standard exception which will reset the vm.
     mkprim(
       "throw",
       [](context&, LISPT a) -> LISPT {

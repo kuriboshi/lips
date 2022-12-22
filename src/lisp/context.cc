@@ -50,8 +50,8 @@ inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 class context::impl
 {
 public:
-  impl(evaluator& e)
-    : _eval(e),
+  impl(class vm& vm)
+    : _vm(vm),
       _currentbase(initcvar("base", 10_l)),
       _verbose(initcvar("verbose", NIL)),
       _loadpath(initcvar("loadpath", mklist(mkstring("."))))
@@ -65,7 +65,7 @@ public:
     _stderr = ref_file_t::create(std::cerr);  // NOLINT
     _stdin = ref_file_t::create(std::cin);    // NOLINT
   }
-  evaluator& _eval;
+  class vm& _vm;
   std::unique_ptr<syntax> _syntax;
 
   ref_file_t _primout;
@@ -168,17 +168,17 @@ context::context()
   else
     throw std::runtime_error("context::context called twice");
 
-  _pimpl = std::make_unique<impl>(e());
+  _pimpl = std::make_unique<impl>(vm());
 
   static init init;
 }
 
 context::~context() = default;
 
-evaluator& context::e()
+vm& context::vm()
 {
-  static evaluator e_(*this);
-  return e_;
+  static class vm vm_(*this);
+  return vm_;
 }
 
 context& context::current() { return *_current; }
@@ -186,11 +186,11 @@ context& context::current() { return *_current; }
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
 
-LISPT context::eval(context& ctx, LISPT expr) { return ctx.e().eval(expr); }
-LISPT context::apply(context& ctx, LISPT fun, LISPT args) { return ctx.e().apply(fun, args); }
-LISPT context::baktrace(context& ctx) { return ctx.e().baktrace(); }
-LISPT context::topofstack(context& ctx) { return ctx.e().topofstack(); }
-LISPT context::destblock(context& ctx, LISPT a) { return ctx.e().destblock(a); }
+LISPT context::eval(context& ctx, LISPT expr) { return ctx.vm().eval(expr); }
+LISPT context::apply(context& ctx, LISPT fun, LISPT args) { return ctx.vm().apply(fun, args); }
+LISPT context::baktrace(context& ctx) { return ctx.vm().baktrace(); }
+LISPT context::topofstack(context& ctx) { return ctx.vm().topofstack(); }
+LISPT context::destblock(context& ctx, LISPT a) { return ctx.vm().destblock(a); }
 
 ref_file_t context::primout() const { return _pimpl->_primout; }
 

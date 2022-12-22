@@ -330,7 +330,7 @@ int main(int argc, char* const* argv)
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      lisp->e().reset();
+      lisp->vm().reset();
       lisp->repl = [&toploop](LISPT exp) -> LISPT { return toploop(exp); };
       lisp->repl(NIL);
       return 0;
