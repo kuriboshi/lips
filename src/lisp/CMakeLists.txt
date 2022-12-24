@@ -50,6 +50,7 @@ set(_liblisp_source
           error.hh
           eval.hh
           except.hh
+          exit.hh
           file.hh
           io.hh
           iter.hh

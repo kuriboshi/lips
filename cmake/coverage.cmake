@@ -46,16 +46,17 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
   add_custom_target(
     ccov-report
     COMMAND ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
-            -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+            --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
     DEPENDS ccov-preprocessing)
   add_custom_target(
     ccov
     COMMAND
       ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
-        -instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
-        -show-line-counts-or-regions
-        -format="html"
-        -output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
+        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+        --show-line-counts-or-regions
+        --format="html"
+        --output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
+        --ignore-filename-regex=exit.hh
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     DEPENDS ccov-preprocessing)
 elseif(CMAKE_COMPILER_IS_GNUCXX)

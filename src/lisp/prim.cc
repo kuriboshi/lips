@@ -18,6 +18,7 @@
 #include "alloc.hh"
 #include "check.hh"
 #include "prim.hh"
+#include "exit.hh"
 
 namespace lisp
 {

@@ -55,7 +55,6 @@ inline LISPT length(LISPT a) { return details::prim::length(context::current(), 
 inline LISPT closure(LISPT a, LISPT b) { return details::prim::closure(context::current(), a, b); }
 inline LISPT nth(LISPT a, LISPT b) { return details::prim::nth(context::current(), a, b); }
 inline LISPT error(LISPT a) { return details::prim::error(context::current(), a); }
-inline LISPT exit(LISPT a) { return details::prim::exit(context::current(), a); }
 
 inline LISPT rplaca(LISPT a, LISPT b) { return details::prim::rplaca(context::current(), a, b); }
 inline LISPT rplacd(LISPT a, LISPT b) { return details::prim::rplacd(context::current(), a, b); }
