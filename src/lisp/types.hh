@@ -205,7 +205,7 @@ public:
   explicit cvariable_t(LISPT value)
     : _value(value)
   {}
-  cvariable_t() {}
+  cvariable_t() = delete;
   ~cvariable_t() = default;
   cvariable_t(const cvariable_t& other) = delete;
   cvariable_t(cvariable_t&& other) noexcept { _value = std::move(other._value); }
