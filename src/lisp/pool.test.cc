@@ -30,7 +30,12 @@ namespace lisp
 class Test
 {
 public:
-  Test() = default;
+  explicit Test(bool t = false)
+  {
+    // This is to cover operator delete(void*)
+    if(t)
+      throw std::runtime_error("Test");
+  }
   ~Test()
   {
     t0 = 0;
@@ -90,6 +95,8 @@ TEST_CASE("pool: simple")
   CHECK(p.size() == 3);
   delete n;
   CHECK(p.size() == 4);
+
+  CHECK_THROWS(new Test(true));
 }
 
 template<class T>
@@ -102,7 +109,12 @@ auto timing(T t0, T t1) -> decltype(std::chrono::microseconds(0).count())
 class Foo
 {
 public:
-  Foo() = default;
+  explicit Foo(bool t = false)
+  {
+    // This is to cover operator delete(void*)
+    if(t)
+      throw std::runtime_error("Test");
+  }
   static void* operator new(std::size_t) { return _pool.allocate(); }
   static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
@@ -165,6 +177,7 @@ std::pair<std::uint64_t, std::uint64_t> do_test()
 
 TEST_CASE("pool: speed")
 {
+  CHECK_THROWS(new Foo(true));
   auto p0 = do_test<100>();
   CHECK(p0.first < (p0.second * 1.50));
   auto p1 = do_test<500>();
