@@ -235,7 +235,7 @@ TEST_CASE("eval: illegal apply")
   }
 }
 
-TEST_CASE("eval: baktrace")
+TEST_CASE("eval: backtrace")
 {
   auto& ctx = context::current();
   std::ostringstream err;
@@ -244,7 +244,7 @@ TEST_CASE("eval: baktrace")
 ((lambda (a b)
   (a)
   b)
- baktrace
+ backtrace
  99)
 )"_e;
   const std::vector<std::string> expected{
@@ -264,7 +264,7 @@ TEST_CASE("eval: baktrace")
     R"(5: nil)",
     R"(4: nil)",
     R"(3: ev0)",
-    R"(2: \(\(lambda \(a b\) \(a\) b\) baktrace 99\))",
+    R"(2: \(\(lambda \(a b\) \(a\) b\) backtrace 99\))",
     R"(1: eval0)",
     R"(0: destblock_t:)"
   };
@@ -279,9 +279,9 @@ TEST_CASE("eval: baktrace")
   ctx.primerr(old);
 }
 
-TEST_CASE("eval: baktrace, topofstack, destblock")
+TEST_CASE("eval: backtrace, topofstack, destblock")
 {
-  auto b = baktrace();
+  auto b = backtrace();
   CHECK(b == NIL);
   auto t = topofstack();
   CHECK(type_of(t) == type::Environ);

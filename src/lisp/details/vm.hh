@@ -26,7 +26,7 @@ void init();
 
 LISPT eval(context&, LISPT);
 LISPT apply(context&, LISPT, LISPT);
-LISPT baktrace(context&);
+LISPT backtrace(context&);
 LISPT topofstack(context&);
 LISPT destblock(context&, LISPT);
 

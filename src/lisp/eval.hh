@@ -84,7 +84,7 @@ public:
 
   LISPT eval(LISPT);
   LISPT apply(LISPT, LISPT);
-  LISPT baktrace();
+  LISPT backtrace();
   /// @brief Return the current environment.
   LISPT topofstack();
   /// @brief Convert an environment to a list.
@@ -240,7 +240,7 @@ inline void unwind() { context::current().vm().unwind(); }
 inline LISPT eval(LISPT expr) { return details::vm::eval(context::current(), expr); }
 LISPT eval(const std::string& expr);
 inline LISPT apply(LISPT fun, LISPT args) { return details::vm::apply(context::current(), fun, args); }
-inline LISPT baktrace() { return details::vm::baktrace(context::current()); }
+inline LISPT backtrace() { return details::vm::backtrace(context::current()); }
 inline LISPT topofstack() { return details::vm::topofstack(context::current()); }
 inline LISPT destblock(LISPT a) { return details::vm::destblock(context::current(), a); }
 

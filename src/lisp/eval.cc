@@ -34,14 +34,14 @@ inline constexpr auto E = "e";                   // noeval version of eval
 inline constexpr auto EVAL = "eval";             // evaluate exp
 inline constexpr auto APPLY = "apply";           // apply function on args
 inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
-inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
+inline constexpr auto BACKTRACE = "backtrace";   // control stack backtrace
 inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
 LISPT eval(context& ctx, LISPT expr) { return ctx.vm().eval(expr); }
 LISPT apply(context& ctx, LISPT fun, LISPT args) { return ctx.vm().apply(fun, args); }
-LISPT baktrace(context& ctx) { return ctx.vm().baktrace(); }
+LISPT backtrace(context& ctx) { return ctx.vm().backtrace(); }
 LISPT topofstack(context& ctx) { return ctx.vm().topofstack(); }
 LISPT destblock(context& ctx, LISPT a) { return ctx.vm().destblock(a); }
 
@@ -52,7 +52,7 @@ void init()
   mkprim(pn::EVAL,       eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::APPLY,      apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-  mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::BACKTRACE,  backtrace,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
@@ -881,7 +881,7 @@ LISPT vm::destblock(const destblock_t* block)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT vm::baktrace()
+LISPT vm::backtrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
