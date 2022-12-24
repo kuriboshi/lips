@@ -111,6 +111,17 @@ TEST_CASE("alloc: c variables")
   CHECK(zvar->intval() == 22);
   eval("(setq zvar \"foo\")");
   CHECK(zvar->getstr() == "foo");
+
+  SECTION("move assignment")
+  {
+    auto& move0 = initcvar("move0", 321_l);
+    auto& move1 = initcvar("move1", 432_l);
+    CHECK(move0->intval() == 321);
+    CHECK(move1->intval() == 432);
+    move0 = std::move(move1);
+    CHECK(move0->intval() == 432);
+    CHECK(move1->intval() == 432);
+  }
 }
 
 TEST_CASE("alloc: obarray")

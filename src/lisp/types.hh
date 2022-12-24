@@ -220,7 +220,7 @@ public:
   cvariable_t(cvariable_t&& other) noexcept { _value = std::move(other._value); }
   cvariable_t& operator=(cvariable_t&& other) noexcept
   {
-    std::swap(_value, other._value);
+    _value = std::move(other._value);
     return *this;
   }
   cvariable_t& operator=(const cvariable_t& other) = delete;
