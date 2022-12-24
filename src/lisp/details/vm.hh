@@ -15,20 +15,21 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_LOGIC_HH
-#define LISP_DETAILS_LOGIC_HH
+#ifndef LISP_DETAILS_VM_HH
+#define LISP_DETAILS_VM_HH
 
 #include <lisp/types.hh>
 
-namespace lisp::details::logic
+namespace lisp::details::vm
 {
-
 void init();
 
-LISPT p_and(context&, LISPT);
-LISPT p_or(context&, LISPT);
-LISPT p_not(context&, LISPT);
+LISPT eval(context&, LISPT);
+LISPT apply(context&, LISPT, LISPT);
+LISPT baktrace(context&);
+LISPT topofstack(context&);
+LISPT destblock(context&, LISPT);
 
-} // namespace lisp::details::logic
+}
 
 #endif

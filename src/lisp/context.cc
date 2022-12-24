@@ -36,16 +36,6 @@
 
 namespace lisp
 {
-namespace pn
-{
-inline constexpr auto E = "e";                   // noeval version of eval
-inline constexpr auto EVAL = "eval";             // evaluate exp
-inline constexpr auto APPLY = "apply";           // apply function on args
-inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
-inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
-inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
-inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
-} // namespace pn
 
 class context::impl
 {
@@ -146,18 +136,9 @@ public:
     details::prop::init();
     details::string::init();
     details::user::init();
+    details::vm::init();
 
     rtable::init();
-
-    // clang-format off
-    mkprim(pn::E,          context::eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-    mkprim(pn::EVAL,       context::eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::APPLY,      context::apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::APPLYSTAR,  context::apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
-    mkprim(pn::BAKTRACE,   context::baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::TOPOFSTACK, context::topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    mkprim(pn::DESTBLOCK,  context::destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
-    // clang-format on
   }
 };
 
@@ -185,12 +166,6 @@ context& context::current() { return *_current; }
 
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
-
-LISPT context::eval(context& ctx, LISPT expr) { return ctx.vm().eval(expr); }
-LISPT context::apply(context& ctx, LISPT fun, LISPT args) { return ctx.vm().apply(fun, args); }
-LISPT context::baktrace(context& ctx) { return ctx.vm().baktrace(); }
-LISPT context::topofstack(context& ctx) { return ctx.vm().topofstack(); }
-LISPT context::destblock(context& ctx, LISPT a) { return ctx.vm().destblock(a); }
 
 ref_file_t context::primout() const { return _pimpl->_primout; }
 

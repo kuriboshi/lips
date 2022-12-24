@@ -26,6 +26,7 @@
 #include "context.hh"
 #include "error.hh"
 #include "types.hh"
+#include "details/vm.hh"
 
 namespace lisp
 {
@@ -236,12 +237,12 @@ inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return context::current(
 inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return context::current().vm().undefhook(fun); }
 inline void unwind() { context::current().vm().unwind(); }
 
-inline LISPT eval(LISPT expr) { return context::eval(context::current(), expr); }
+inline LISPT eval(LISPT expr) { return details::vm::eval(context::current(), expr); }
 LISPT eval(const std::string& expr);
-inline LISPT apply(LISPT fun, LISPT args) { return context::apply(context::current(), fun, args); }
-inline LISPT baktrace() { return context::baktrace(context::current()); }
-inline LISPT topofstack() { return context::topofstack(context::current()); }
-inline LISPT destblock(LISPT a) { return context::destblock(context::current(), a); }
+inline LISPT apply(LISPT fun, LISPT args) { return details::vm::apply(context::current(), fun, args); }
+inline LISPT baktrace() { return details::vm::baktrace(context::current()); }
+inline LISPT topofstack() { return details::vm::topofstack(context::current()); }
+inline LISPT destblock(LISPT a) { return details::vm::destblock(context::current(), a); }
 
 } // namespace lisp
 

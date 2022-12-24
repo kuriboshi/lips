@@ -47,12 +47,6 @@ public:
   vm& vm();
   static context& current();
 
-  static LISPT eval(context&, LISPT expr);
-  static LISPT apply(context&, LISPT fun, LISPT args);
-  static LISPT baktrace(context&);
-  static LISPT topofstack(context&);
-  static LISPT destblock(context&, LISPT a);
-
   syntax& read_table();
   void read_table(std::unique_ptr<syntax>);
 

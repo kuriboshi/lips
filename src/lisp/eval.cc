@@ -25,6 +25,41 @@
 
 using namespace std::literals;
 
+namespace lisp::details::vm
+{
+
+namespace pn
+{
+inline constexpr auto E = "e";                   // noeval version of eval
+inline constexpr auto EVAL = "eval";             // evaluate exp
+inline constexpr auto APPLY = "apply";           // apply function on args
+inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
+inline constexpr auto BAKTRACE = "baktrace";     // control stack backtrace
+inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
+} // namespace pn
+
+LISPT eval(context& ctx, LISPT expr) { return ctx.vm().eval(expr); }
+LISPT apply(context& ctx, LISPT fun, LISPT args) { return ctx.vm().apply(fun, args); }
+LISPT baktrace(context& ctx) { return ctx.vm().baktrace(); }
+LISPT topofstack(context& ctx) { return ctx.vm().topofstack(); }
+LISPT destblock(context& ctx, LISPT a) { return ctx.vm().destblock(a); }
+
+void init()
+{
+  // clang-format off
+  mkprim(pn::E,          eval,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EVAL,       eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::APPLY,      apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::BAKTRACE,   baktrace,   subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  // clang-format on
+}
+
+}
+
 namespace lisp
 {
 vm::vm(context& ctx)
@@ -991,7 +1026,7 @@ LISPT eval(context& ctx, const std::string& expr)
 {
   auto in = ref_file_t::create(expr);
   auto e = lispread(in);
-  return context::eval(ctx, e);
+  return details::vm::eval(ctx, e);
 }
 
 LISPT eval(const std::string& expr) { return eval(context::current(), expr); }

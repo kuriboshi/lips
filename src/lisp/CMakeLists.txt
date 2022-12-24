@@ -85,7 +85,8 @@ set(_liblisp_details
           details/prim.hh
           details/prop.hh
           details/string.hh
-          details/user.hh)
+          details/user.hh
+          details/vm.hh)
 # The reason for defining two variables with the same contents is that
 # adding the PARENT_SCOPE keyword will set the value ONLY in the
 # parent scope and not in the current scope. This is documented
