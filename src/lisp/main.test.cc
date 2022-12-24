@@ -110,6 +110,31 @@ TEST_CASE("main: reset")
     ctx.primin(old);
   }
 
+  SECTION("unwind")
+  {
+    // Unwind the stack before throwing a standard exception
+    mkprim(
+      "throw_unwind",
+      [](context&, LISPT a) -> LISPT {
+        check(a, type::String);
+        // The lamda ensure we have an environment at this point.
+        CHECK(topofstack()->envval() != NIL);
+        // Unwind the stack and check if the stack has been unwound.
+        unwind();
+        CHECK(topofstack()->envval() == NIL);
+        // Returning at this point doesn't work so we bail out with an
+        // exception.
+        throw std::runtime_error(a->string());
+      },
+      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+    // Throw inside a lambda so that we have one environment.
+    auto old = ctx.primin(ref_file_t::create(R"(((lambda () (throw_unwind "throw_unwind"))))"));
+    std::ostringstream os;
+    CHECK(run(ctx, os) == 0);
+    CHECK(os.str() == "exception: throw_unwind\n");
+    ctx.primin(old);
+  }
+
   ctx.primout(old);
 }
 
