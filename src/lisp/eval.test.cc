@@ -289,4 +289,20 @@ TEST_CASE("eval: backtrace, topofstack, destblock")
   CHECK(d == NIL);
 }
 
+template<class T>
+void pool_test()
+{
+  new T(pool_test_t());
+}
+
+TEST_CASE("pool: lisp_t and closure_t")
+{
+  auto c0 = lisp::lisp_t::freecount();
+  CHECK_THROWS(pool_test<lisp::lisp_t>());
+  CHECK(c0 == lisp::lisp_t::freecount());
+  c0 = lisp::closure_t::freecount();
+  CHECK_THROWS(pool_test<lisp::closure_t>());
+  CHECK(c0 == lisp::closure_t::freecount());
+}
+
 } // namespace lisp

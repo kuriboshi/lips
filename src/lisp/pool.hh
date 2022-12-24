@@ -127,6 +127,9 @@ private:
   /// @brief Pointer to the next available memory in the data block.
   void* _current = nullptr;
 };
+
+struct pool_test_t {};
+
 } // namespace lisp
 
 #endif

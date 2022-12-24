@@ -171,6 +171,9 @@ struct lambda_t
 class closure_t: public ref_count<closure_t>
 {
 public:
+  closure_t() = default;
+  ~closure_t() = default;
+
   LISPT cfunction = NIL;
   LISPT closed = NIL;
   LISPT cvalues = NIL;
@@ -180,7 +183,13 @@ public:
   static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(closure_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
+  static std::size_t freecount() { return _pool.size(); }
+
 private:
+  closure_t(pool_test_t) { throw std::runtime_error("closure_t"); }
+  template<class T>
+  friend void pool_test();
+
   using pool_t = pool<closure_t, 256>;
   static pool_t _pool;
 };
@@ -383,6 +392,11 @@ public:
   static std::size_t freecount() { return _pool.size(); }
 
 private:
+  template<>
+  lisp_t(pool_test_t) { throw std::runtime_error("lisp_t"); }
+  template<class T>
+  friend void pool_test();
+
   using pool_t = pool<lisp_t, 256>;
   static pool_t _pool;
 

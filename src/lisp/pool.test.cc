@@ -49,7 +49,7 @@ public:
   int t1 = 12;
   int t2 = 123;
   using pool_t = ::lisp::pool<Test, 2>;
-  static pool_t& pool() { return _pool; };
+  static const pool_t& pool() { return _pool; };
 
 private:
   static pool_t _pool;
@@ -96,7 +96,7 @@ TEST_CASE("pool: simple")
   delete n;
   CHECK(p.size() == 4);
 
-  CHECK_THROWS(new Test(true));
+  CHECK(p.size() == 4);
 }
 
 template<class T>
@@ -119,9 +119,11 @@ public:
   static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
+  using pool_t = lisp::pool<Foo, 400>;
+  static const pool_t& pool() { return _pool; }
+
 private:
   std::string s;
-  using pool_t = lisp::pool<Foo, 400>;
   static pool_t _pool;
 };
 
@@ -175,9 +177,26 @@ std::pair<std::uint64_t, std::uint64_t> do_test()
   return {f, b};
 }
 
+TEST_CASE("pool: exception thrown in constructor")
+{
+  SECTION("Test")
+  {
+    auto c0 = Test::pool().size();
+    CHECK_THROWS(new Test(true));
+    CHECK(c0 == Test::pool().size());
+  }
+
+  SECTION("Foo")
+  {
+    auto foo = std::make_unique<Foo>();
+    auto c0 = Foo::pool().size();
+    CHECK_THROWS(new Foo(true));
+    CHECK(c0 == Foo::pool().size());
+  }
+}
+
 TEST_CASE("pool: speed")
 {
-  CHECK_THROWS(new Foo(true));
   auto p0 = do_test<100>();
   CHECK(p0.first < (p0.second * 1.50));
   auto p1 = do_test<500>();
