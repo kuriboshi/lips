@@ -162,7 +162,7 @@ TEST_CASE("alloc: object sizes")
   std::cout << "cons_t: " << sizeof(cons_t) << std::endl;
   std::cout << "std::string: " << sizeof(std::string) << std::endl;
   std::cout << "subr_index: " << sizeof(subr_index) << std::endl;
-  std::cout << "lambda_t: " << sizeof(lambda_t) << std::endl;
+  std::cout << "ref_lambda_t: " << sizeof(ref_lambda_t) << std::endl;
   std::cout << "ref_closure_t: " << sizeof(ref_closure_t) << std::endl;
   std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
   std::cout << "ref_file_t: " << sizeof(ref_file_t) << std::endl;

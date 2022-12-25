@@ -132,7 +132,7 @@ lisp_t xtypeof(context&, lisp_t a)
         return C_SUBR;
       return C_FSUBR;
     case type::Lambda:
-      if(a->lambda().eval)
+      if(a->lambda()->eval)
         return C_LAMBDA;
       return C_NLAMBDA;
     case type::Closure:

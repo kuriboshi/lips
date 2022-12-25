@@ -92,12 +92,13 @@ lisp_t mkarglist(lisp_t alist, std::int8_t& count)
 /// @returns A lambda function.
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {
-  lambda_t lambda;
-  lambda.body = def;
+
+  auto lambda = ref_lambda_t::create();
+  lambda->body = def;
   std::int8_t count = 0;
-  lambda.args = mkarglist(args, count);
-  lambda.count = count;
-  lambda.eval = eval;
+  lambda->args = mkarglist(args, count);
+  lambda->count = count;
+  lambda->eval = eval;
   return getobject(lambda);
 }
 

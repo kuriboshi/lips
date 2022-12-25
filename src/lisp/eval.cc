@@ -388,7 +388,7 @@ bool vm::peval1()
           _cont = &vm::evalargs;
         break;
       case type::Lambda:
-        _noeval = !_fun->lambda().eval;
+        _noeval = !_fun->lambda()->eval;
         _cont = &vm::evlam;
         break;
       case type::Cons:
@@ -621,14 +621,14 @@ bool vm::evlam()
   push(_dest);
   int ac = 0;
   auto spr = false;
-  if((ac = _fun->lambda().count) < 0)
+  if((ac = _fun->lambda()->count) < 0)
   {
     ac = -ac;
     spr = true;
   }
   _dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = _fun->lambda().args; i != 0; foo = foo->cdr(), i--)
+  for(auto foo = _fun->lambda()->args; i != 0; foo = foo->cdr(), i--)
     storevar(foo->car(), i);
   push(&vm::evlam1);
   if(spr)
@@ -729,7 +729,7 @@ bool vm::evlam1()
 {
   link();
   pop(_dest);
-  _args = _fun->lambda().body;
+  _args = _fun->lambda()->body;
   push(&vm::evlam0);
   _cont = &vm::evsequence;
   return false;

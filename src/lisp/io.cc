@@ -217,7 +217,7 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
       pp("#<closure", file, x);
       break;
     case type::Lambda:
-      if(x->lambda().eval)
+      if(x->lambda()->eval)
         pp("#<lambda", file, x);
       else
         pp("#<nlambda", file, x);

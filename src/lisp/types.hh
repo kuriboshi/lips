@@ -154,8 +154,12 @@ struct subr_t
 
 /// @brief Lambda representation.
 ///
-struct lambda_t
+class lambda_t: public ref_count<lambda_t>
 {
+public:
+  lambda_t() = default;
+  ~lambda_t() = default;
+
   /// @brief The S-expression representation of the lambda function.
   lisp_t body = nil;
   /// @brief The list of arguments.
@@ -164,6 +168,24 @@ struct lambda_t
   std::int8_t count = 0;
   /// @brief True if arguments are evaluated, false if not (nlambda).
   bool eval = true;
+
+  /// @brief The new and delete operators uses the global pool to create objects.
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
+  static void operator delete(lambda_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+
+  static std::size_t freecount() { return _pool.size(); }
+
+private:
+  lambda_t(pool_test_t)
+  {
+    throw std::runtime_error("lambda_t");
+  }
+  template<class T>
+  friend void pool_test();
+
+  using pool_t = pool<lambda_t, 256>;
+  static pool_t _pool;
 };
 
 /// @brief A closure (static binding).
@@ -179,6 +201,7 @@ public:
   lisp_t cvalues = nil;
   std::uint8_t count = 0;
 
+  /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
   static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(closure_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
@@ -196,6 +219,7 @@ private:
 
 using ref_closure_t = ref_ptr<closure_t>;
 using ref_file_t = ref_ptr<file_t>;
+using ref_lambda_t = ref_ptr<lambda_t>;
 
 struct subr_index
 {
@@ -332,8 +356,8 @@ public:
   }
 
   /// @brief Lambda expression
-  auto lambda() -> lambda_t& { return std::get<lambda_t>(_u); }
-  void set(lambda_t x)
+  auto lambda() -> ref_lambda_t { return std::get<ref_lambda_t>(_u); }
+  void set(ref_lambda_t x)
   {
     _type = type::Lambda;
     _u = x;
@@ -419,7 +443,7 @@ private:
     cons_t,                    // Cons
     std::string,               // String
     subr_index,                // Subr
-    lambda_t,                  // Lambda/Nlambda
+    ref_lambda_t,              // Lambda/Nlambda
     ref_closure_t,             // Closure
     destblock_t*,              // Environ
     ref_file_t,                // File
