@@ -144,7 +144,7 @@ inline void pp(const char* s, file_t& file, lisp_t x)
 
 lisp_t patom(lisp_t x, file_t& file, bool esc)
 {
-  ps(x->symbol().pname, file, esc);
+  ps(x->symbol()->pname, file, esc);
   return x;
 }
 

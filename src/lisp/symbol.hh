@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "ref_ptr.hh"
 #include "types.hh"
 
 namespace lisp
@@ -34,145 +35,67 @@ extern lisp_t C_UNBOUND;
 
 namespace symbol
 {
-struct symbol_t;
-using store_t = std::vector<symbol_t>;
-using symbol_index_t = store_t::size_type;
-using symbol_collection_id = std::uint32_t;
-
-struct symbol_index
+class symbol_t: public ref_count<symbol_t>
 {
-  symbol_index_t index;
-};
+public:
+  symbol_t() = default;
+  ~symbol_t() = default;
 
-// The print_name class contains the symbol store identifier and the name of
-// the symbol.
-struct symbol_id
-{
-  symbol_collection_id ident = 0;
-  symbol_index_t index = 0;
-};
-
-struct symbol_t
-{
-  symbol_id id; // The id of the atom
   std::string pname;
   lisp_t self{};         // The lisp_t object for this symbol
   lisp_t value{};        // Value
   lisp_t plist{};        // The property list
   lisp_t topval{};       // Holds top value (not used yet)
   bool constant = false; // If true this is a constant which can't be set
-};
 
-class symbol_store_t
-{
-public:
-  symbol_store_t(symbol_collection_id id)
-    : _id(id)
-  {}
-  symbol_store_t(symbol_store_t&& other) noexcept
-    : _id(other._id),
-      _map(std::move(other._map)),
-      _store(std::move(other._store))
-  {}
-  ~symbol_store_t() {}
+  /// @brief The new and delete operators uses the global pool to create objects.
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
+  static void operator delete(symbol_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
-  symbol_store_t& operator=(const symbol_store_t&) = delete;
-  symbol_store_t& operator=(symbol_store_t&& other) noexcept
+  static std::size_t freecount() { return _pool.size(); }
+
+  static symbol_t* intern(const std::string& pname)
   {
-    std::swap(other._map, _map);
-    std::swap(other._store, _store);
-    _id = other._id;
-    return *this;
-  }
-  bool exists(const std::string& name) { return _map.find(name) != _map.end(); }
-  symbol_t& get(const std::string& name)
-  {
-    auto p = _map.find(name);
-    if(p != _map.end())
-      return _store[p->second];
-    symbol_t symbol;
-    symbol.pname = name;
-    symbol.id = {_id, _store.size()};
-    symbol.value = C_UNBOUND;
-    _store.push_back(symbol);
-    _map.emplace(name, symbol.id.index);
-    return _store[symbol.id.index];
-  }
-  symbol_t& get(symbol_index_t index) { return _store.at(index); }
-  store_t::iterator begin() { return _store.begin(); }
-  store_t::iterator end() { return _store.end(); }
-
-private:
-  symbol_collection_id _id;
-  using map_type = std::unordered_map<std::string, symbol_index_t>;
-  map_type _map;
-  store_t _store;
-};
-
-class symbol_collection
-{
-public:
-  static const constexpr symbol_collection_id global_id = 0;
-
-  symbol_collection()
-  {
-    // Create the global symbol store
-    create();
-  }
-  ~symbol_collection() {}
-
-  std::unordered_map<symbol_collection_id, symbol_store_t> collection;
-
-  symbol_store_t& create()
-  {
-    auto [p, inserted] = collection.try_emplace(_free, _free);
-    ++_free;
-    return p->second;
+    auto p = store().find(pname);
+    if(p != store().end())
+      return p->second;
+    auto* sym = new symbol_t;
+    sym->pname = pname;
+    sym->value = C_UNBOUND;
+    auto i = store().insert(std::make_pair(pname, sym));
+    return i.first->second;
   }
 
-  symbol_store_t& symbol_store(symbol_collection_id id)
+  static void unintern(const std::string& pname)
   {
-    auto p = collection.find(id);
-    if(p == collection.end())
-      throw std::runtime_error("no such symbol store");
-    return p->second;
+    auto p = store().find(pname);
+    delete p->second;
+    store().erase(p);
   }
 
-  bool exists(symbol_collection_id id, const std::string& name)
+  static bool exists(const std::string& pname)
   {
-    auto p = collection.find(id);
-    if(p == collection.end())
-      throw std::runtime_error("no such symbol store");
-    return p->second.exists(name);
+    return store().find(pname) != store().end();
   }
 
-  symbol_t& get(const symbol_id& id)
+  using store_t = std::unordered_map<std::string, symbol_t*>;
+  static store_t& store()
   {
-    auto p = collection.find(id.ident);
-    if(p == collection.end())
-      throw std::runtime_error("no such symbol store");
-    return p->second.get(id.index);
-  }
-
-  symbol_t& get(symbol_collection_id id, const std::string& name)
-  {
-    auto p = collection.find(id);
-    if(p == collection.end())
-      throw std::runtime_error("no such symbol store");
-    return p->second.get(name);
-  }
-
-  symbol_t& get(symbol_collection_id id, symbol_index_t index)
-  {
-    auto p = collection.find(id);
-    if(p == collection.end())
-      throw std::runtime_error("no such symbol store");
-    return p->second.get(index);
+    static store_t _store;
+    return _store;
   }
 
 private:
-  symbol_collection_id _free = 0;
+  symbol_t(pool_test_t) { throw std::runtime_error("symbol_t"); }
+  template<class T>
+  friend void pool_test();
+
+  using pool_t = pool<symbol_t, 256>;
+  static pool_t _pool;
 };
+
+using ref_symbol_t = ref_ptr<symbol_t>;
 
 } // namespace symbol
 } // namespace lisp

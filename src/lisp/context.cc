@@ -80,17 +80,17 @@ public:
     // Must be early since it's used by symbol_store_t to initialize new
     // symbols.
     C_UNBOUND = intern("unbound");
-    C_UNBOUND->symbol().constant = true;
+    C_UNBOUND->symbol()->constant = true;
     C_UNBOUND->settype(type::Unbound);
 
     auto nil = intern("nil");
-    nil->symbol().constant = true;
+    nil->symbol()->constant = true;
 
     auto t = intern("t");
     T = t;
     t->value(T);
     t->settype(type::T);
-    t->symbol().constant = true;
+    t->symbol()->constant = true;
 
     C_AUTOLOAD = intern("autoload");
     C_BROKEN = intern("broken");
@@ -122,7 +122,7 @@ public:
 
     C_VERSION = intern("version");
     C_VERSION->value(mkstring(VERSION));
-    C_VERSION->symbol().constant = true;
+    C_VERSION->symbol()->constant = true;
 
     details::alloc::init();
     details::arith::init();

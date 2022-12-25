@@ -155,7 +155,7 @@ TEST_CASE("alloc: object sizes")
   std::cout << "sizeof object: " << sizeof(object) << std::endl;
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
-  std::cout << "symbol::symbol_id: " << sizeof(symbol::symbol_id) << std::endl;
+  std::cout << "symbol::ref_symbol_t: " << sizeof(symbol::ref_symbol_t) << std::endl;
   std::cout << "int: " << sizeof(int) << std::endl;
   std::cout << "double: " << sizeof(double) << std::endl;
   std::cout << "indirect_t: " << sizeof(indirect_t) << std::endl;

@@ -29,7 +29,7 @@ lisp_t symstr(context&, lisp_t sym)
   check(sym, type::Symbol, type::T, type::Nil);
   if(type_of(sym) == type::Nil)
     return mkstring("nil");
-  return mkstring(sym->symbol().pname);
+  return mkstring(sym->symbol()->pname);
 }
 
 /// @brief T if s is a string, nil otherwise.

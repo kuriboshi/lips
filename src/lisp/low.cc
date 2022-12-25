@@ -85,7 +85,7 @@ lisp_t progn(context&, lisp_t lexp)
 lisp_t set(context& ctx, lisp_t var, lisp_t val)
 {
   check(var, type::Symbol);
-  if(var->symbol().constant)
+  if(var->symbol()->constant)
     ctx.error(error_errc::attempt_to_clobber, var);
   if(type_of(var->value()) == type::Indirect)
     var->value()->set(indirect_t{val});

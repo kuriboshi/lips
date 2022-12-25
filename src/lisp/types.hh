@@ -293,16 +293,16 @@ public:
   }
 
   /// @brief Litatom
-  auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
-  void set(const symbol::symbol_t& sym)
+  auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
+  void set(const symbol::ref_symbol_t sym)
   {
     _type = type::Symbol;
-    _u = sym.id;
+    _u = sym;
   }
 
   /// @brief Get and set the value of a litatom
-  auto value() const -> lisp_t { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
-  void value(lisp_t x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
+  auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
+  void value(lisp_t x) { std::get<symbol::ref_symbol_t>(_u)->value = x; }
 
   /// @brief Integer
   auto intval() const -> int { return std::get<int>(_u); }
@@ -398,18 +398,12 @@ public:
   /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const
   {
-    return _type == type::String ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
+    return _type == type::String ? string() : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
-
-  static symbol::symbol_collection& symbol_collection()
-  {
-    static symbol::symbol_collection all_symbols;
-    return all_symbols;
-  }
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
@@ -436,7 +430,7 @@ private:
   // indicated by a comment.
   std::variant<std::monostate, // Nil
     std::nullptr_t,            // Empty
-    symbol::symbol_id,         // Symbol
+    symbol::ref_symbol_t,      // Symbol
     int,                       // Integer
     double,                    // Float
     indirect_t,                // Indirect

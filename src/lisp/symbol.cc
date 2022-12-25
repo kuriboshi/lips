@@ -15,35 +15,9 @@
 // limitations under the License.
 //
 
-#include "alloc.hh"
-#include "syntax.hh"
+#include "lisp.hh"
 
-#include <catch2/catch.hpp>
-
-namespace lisp
+namespace lisp::symbol
 {
-
-TEST_CASE("syntax: macro")
-{
-  syntax stx;
-  auto f0 = ref_file_t::create(R"(hello)");
-
-  SECTION("Read macro")
-  {
-    auto f = "(lambda (f) (read f))"_l;
-    stx.set('^', f);
-    auto r = stx.macro(context::current(), f0, '^');
-    REQUIRE(r != nil);
-    REQUIRE(type_of(r) == type::Symbol);
-    REQUIRE(r->symbol()->pname == "hello");
-  }
-
-  SECTION("Read macro is nil")
-  {
-    stx.set('*', nil);
-    auto r = stx.macro(context::current(), f0, '*');
-    CHECK(r == nil);
-  }
+symbol_t::pool_t symbol_t::_pool;
 }
-
-} // namespace lisp

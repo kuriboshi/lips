@@ -38,6 +38,7 @@ target_sources(
           repl.cc
           rtable.cc
           string.cc
+          symbol.cc
           syntax.cc
           user.cc
           ${CMAKE_CURRENT_BINARY_DIR}/version.cc)

@@ -41,7 +41,7 @@ void lisp_compare(std::string input, const std::string& result)
 namespace lisp
 {
 
-const std::string& pname(lisp_t sym) { return sym->symbol().pname; }
+const std::string& pname(lisp_t sym) { return sym->symbol()->pname; }
 
 TEST_CASE("parser: (a b . c)")
 {

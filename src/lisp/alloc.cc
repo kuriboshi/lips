@@ -21,12 +21,6 @@
 
 namespace lisp::details::alloc
 {
-/// @brief Returns the global symbol table.
-symbol::symbol_store_t& global_symbols()
-{
-  return object::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
-}
-
 /// @brief Creates a cons pair.
 ///
 /// @param a The car of the pair.
@@ -37,8 +31,8 @@ lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(cons_t{a, b}); }
 lisp_t obarray(context&)
 {
   lisp_t o = nil;
-  for(auto i: global_symbols())
-    o = cons(i.self, o);
+  for(auto i: symbol::symbol_t::store())
+    o = cons(i.second->self, o);
   return o;
 }
 
@@ -110,11 +104,10 @@ lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 /// @returns The symbol as a LISP object.
 lisp_t intern(const std::string& pname)
 {
-  auto& glob = global_symbols();
-  auto& sym = glob.get(pname);
-  if(sym.self == nil)
-    sym.self = getobject(sym);
-  return sym.self;
+  auto sym = symbol::symbol_t::intern(pname);
+  if(sym->self == nil)
+    sym->self = getobject(sym);
+  return sym->self;
 }
 
 /// @brief Get an existing symbol.
@@ -125,14 +118,9 @@ lisp_t intern(const std::string& pname)
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.
-lisp_t mkatom(const std::string& str)
+lisp_t mkatom(const std::string& pname)
 {
-  if(global_symbols().exists(str))
-    return global_symbols().get(str).self;
-  auto& sym = global_symbols().get(str);
-  if(sym.self == nil)
-    sym.self = getobject(sym);
-  return sym.self;
+  return intern(pname);
 }
 
 namespace pn
