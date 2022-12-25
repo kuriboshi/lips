@@ -27,7 +27,7 @@ namespace lisp::symbol
 
 TEST_CASE("symbol: new symbol store")
 {
-  symbol_collection& all_symbols = lisp_t::symbol_collection();
+  symbol_collection& all_symbols = object::symbol_collection();
   auto& syms = all_symbols.create();
 
   auto& sym0 = syms.get("hello");

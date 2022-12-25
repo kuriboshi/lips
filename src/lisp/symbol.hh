@@ -28,8 +28,8 @@
 
 namespace lisp
 {
-class lisp_t;
-using LISPT = ref_ptr<lisp_t>;
+class object;
+using LISPT = ref_ptr<object>;
 extern LISPT C_UNBOUND;
 
 namespace symbol

@@ -186,9 +186,9 @@ TEST_CASE("lisp: create lisp twice")
   CHECK_THROWS_WITH(f(), "context::context called twice");
 }
 
-TEST_CASE("lisp: new lisp_t")
+TEST_CASE("lisp: new object")
 {
-  LISPT obj{new lisp_t(100)};
+  LISPT obj{new object(100)};
   CHECK(obj->intval() == 100);
 }
 

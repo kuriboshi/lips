@@ -24,7 +24,7 @@ namespace lisp::details::alloc
 /// @brief Returns the global symbol table.
 symbol::symbol_store_t& global_symbols()
 {
-  return lisp_t::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
+  return object::symbol_collection().symbol_store(symbol::symbol_collection::global_id);
 }
 
 /// @brief Creates a cons pair.

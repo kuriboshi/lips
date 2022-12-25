@@ -34,8 +34,8 @@ class vm;
 class cvariable_t;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
-class lisp_t;
-using LISPT = ref_ptr<lisp_t>;
+class object;
+using LISPT = ref_ptr<object>;
 
 extern LISPT C_VERSION;
 

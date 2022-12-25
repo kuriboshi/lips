@@ -27,8 +27,8 @@
 namespace lisp
 {
 
-class lisp_t;
-using LISPT = ref_ptr<lisp_t>;
+class object;
+using LISPT = ref_ptr<object>;
 
 // ^# start of line comment
 // #' Function quote

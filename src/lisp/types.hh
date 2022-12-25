@@ -37,8 +37,8 @@ class syntax;
 class context;
 class vm;
 class file_t;
-class lisp_t;
-using LISPT = ref_ptr<lisp_t>;
+class object;
+using LISPT = ref_ptr<object>;
 
 enum class type
 {
@@ -254,16 +254,16 @@ class destblock_t;
 /// @details The lisp objects are stored in a variant with accessor methods to
 /// set or get the values. There is no checking of the correct type for the
 /// accessor functions so calling them for the wrong type throws an exception.
-class lisp_t final: public ref_count<lisp_t>
+class object final: public ref_count<object>
 {
 public:
-  lisp_t() = default;
-  ~lisp_t() = default;
-  lisp_t(const lisp_t&) = delete;
+  object() = default;
+  ~object() = default;
+  object(const object&) = delete;
 
   /// @brief Constructor for anything with a defined set function
   template<typename T>
-  lisp_t(T x) { set(x); }
+  object(T x) { set(x); }
 
   /// @brief Litatom
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
@@ -368,7 +368,7 @@ public:
     _u = std::move(x);
   }
 
-  /// @brief Get the string if the lisp_t holds a litatom or a proper string
+  /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const
   {
     return _type == type::String ? string() : symbol_collection().get(std::get<symbol::symbol_id>(_u)).pname;
@@ -387,17 +387,17 @@ public:
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
   static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(lisp_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void operator delete(object* x, std::destroying_delete_t) { _pool.deallocate(x); }
 
   static std::size_t freecount() { return _pool.size(); }
 
 private:
   template<>
-  lisp_t(pool_test_t) { throw std::runtime_error("lisp_t"); }
+  object(pool_test_t) { throw std::runtime_error("object"); }
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<lisp_t, 256>;
+  using pool_t = pool<object, 256>;
   static pool_t _pool;
 
   type _type = type::Nil;
@@ -460,7 +460,7 @@ extern LISPT C_CVARIABLE;
 /// @brief The lisp interpreter.
 ///
 inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
-inline type type_of(lisp_t& a) { return a.gettype(); }
+inline type type_of(object& a) { return a.gettype(); }
 inline bool is_T(LISPT x) { return type_of(x) == type::T; }
 inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
 

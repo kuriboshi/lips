@@ -25,7 +25,7 @@
 namespace lisp
 {
 closure_t::pool_t closure_t::_pool;
-lisp_t::pool_t lisp_t::_pool;
+object::pool_t object::_pool;
 
 std::unordered_map<std::string, subr_t::subr_index> subr_t::subr_map;
 subr_t::subr_vector subr_t::subr_store;

@@ -152,7 +152,7 @@ TEST_CASE("alloc: freecount")
 TEST_CASE("alloc: object sizes")
 {
   std::cout << "==========\n";
-  std::cout << "sizeof lisp_t: " << sizeof(lisp_t) << std::endl;
+  std::cout << "sizeof object: " << sizeof(object) << std::endl;
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
   std::cout << "symbol::symbol_id: " << sizeof(symbol::symbol_id) << std::endl;

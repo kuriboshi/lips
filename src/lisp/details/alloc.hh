@@ -30,19 +30,19 @@ namespace lisp::details::alloc
 /// cell list.
 ///
 /// @return A new empty lisp object.
-inline LISPT getobject() { return {new lisp_t}; }
+inline LISPT getobject() { return {new object}; }
 
 /// @brief Templated version of getobject which returns a LISPT object
-/// initialized with a typed lisp_t object.
+/// initialized with a typed object object.
 template<typename T>
-LISPT getobject(T x) { return {new lisp_t(x)}; }
+LISPT getobject(T x) { return {new object(x)}; }
 
 LISPT mkstring(const std::string&);
 LISPT mknumber(int);
 LISPT mkfloat(double);
 LISPT cons(context&, LISPT, LISPT);
 LISPT obarray(context&);
-inline LISPT freecount(context&) { return mknumber(static_cast<int>(lisp_t::freecount())); }
+inline LISPT freecount(context&) { return mknumber(static_cast<int>(object::freecount())); }
 
 /// @brief Make a lambda object.
 ///
@@ -65,7 +65,7 @@ LISPT mkatom(const std::string&);
 ///
 inline void mkprim(subr_t subr)
 {
-  auto s = new lisp_t;
+  auto s = new object;
   s->set(subr_index{subr_t::put(subr)});
   LISPT f = intern(subr.name);
   f->value(s);
@@ -74,7 +74,7 @@ inline void mkprim(subr_t subr)
 inline cvariable_t& initcvar(const std::string& name, LISPT val)
 {
   auto t = mkatom(name);
-  t->symbol().value = new lisp_t;
+  t->symbol().value = new object;
   t->value()->set(cvariable_t(val));
   return t->value()->cvarval();
 }

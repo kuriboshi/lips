@@ -295,11 +295,11 @@ void pool_test()
   new T(pool_test_t());
 }
 
-TEST_CASE("pool: lisp_t and closure_t")
+TEST_CASE("pool: object and closure_t")
 {
-  auto c0 = lisp::lisp_t::freecount();
-  CHECK_THROWS(pool_test<lisp::lisp_t>());
-  CHECK(c0 == lisp::lisp_t::freecount());
+  auto c0 = lisp::object::freecount();
+  CHECK_THROWS(pool_test<lisp::object>());
+  CHECK(c0 == lisp::object::freecount());
   c0 = lisp::closure_t::freecount();
   CHECK_THROWS(pool_test<lisp::closure_t>());
   CHECK(c0 == lisp::closure_t::freecount());
