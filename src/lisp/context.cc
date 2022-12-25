@@ -228,4 +228,4 @@ void context::loadpath(lisp_t newpath) { _pimpl->_loadpath = newpath; }
 
 context* context::_current = nullptr;
 
-}
+} // namespace lisp

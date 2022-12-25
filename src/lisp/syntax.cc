@@ -28,4 +28,4 @@ lisp_t syntax::macro(context&, ref_file_t source, std::uint8_t index)
     return apply(fn, cons(f, NIL));
   return NIL;
 }
-}
+} // namespace lisp

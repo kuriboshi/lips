@@ -27,6 +27,6 @@
 namespace lisp
 {
 inline lisp_t exit(lisp_t a) { return details::prim::exit(context::current(), a); }
-}
+} // namespace lisp
 
 #endif

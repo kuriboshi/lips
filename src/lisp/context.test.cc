@@ -38,9 +38,6 @@ TEST_CASE("context: stdin, stdout, stderr")
   CHECK(context::current().stderr() != nullptr);
 }
 
-TEST_CASE("context: syntax")
-{
-  context::current().read_table(std::make_unique<syntax>());
-}
+TEST_CASE("context: syntax") { context::current().read_table(std::make_unique<syntax>()); }
 
-}
+} // namespace lisp

@@ -279,10 +279,7 @@ TEST_CASE("file: open error conditions")
     CHECK_THROWS(open(mkstring(test.file), C_CONS));
   }
 
-  SECTION("open non-existing file")
-  {
-    CHECK_THROWS(open(mkstring("/etc/xyzzy"), NIL));
-  }
+  SECTION("open non-existing file") { CHECK_THROWS(open(mkstring("/etc/xyzzy"), NIL)); }
 }
 
 } // namespace lisp

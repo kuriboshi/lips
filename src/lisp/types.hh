@@ -263,7 +263,10 @@ public:
 
   /// @brief Constructor for anything with a defined set function
   template<typename T>
-  object(T x) { set(x); }
+  object(T x)
+  {
+    set(x);
+  }
 
   /// @brief Litatom
   auto symbol() -> symbol::symbol_t& { return symbol_collection().get(std::get<symbol::symbol_id>(_u)); }
@@ -393,7 +396,10 @@ public:
 
 private:
   template<>
-  object(pool_test_t) { throw std::runtime_error("object"); }
+  object(pool_test_t)
+  {
+    throw std::runtime_error("object");
+  }
   template<class T>
   friend void pool_test();
 

@@ -219,20 +219,11 @@ TEST_CASE("eval: indirect and cvariable")
 
 TEST_CASE("eval: illegal apply")
 {
-  SECTION("apply string")
-  {
-    CHECK_NOTHROW(R"((apply "string" nil))"_e);
-  }
+  SECTION("apply string") { CHECK_NOTHROW(R"((apply "string" nil))"_e); }
 
-  SECTION("apply unbound")
-  {
-    CHECK_THROWS(R"((apply unbound nil))"_e);
-  }
+  SECTION("apply unbound") { CHECK_THROWS(R"((apply unbound nil))"_e); }
 
-  SECTION("apply int")
-  {
-    CHECK_NOTHROW(R"((apply 100 nil))"_e);
-  }
+  SECTION("apply int") { CHECK_NOTHROW(R"((apply 100 nil))"_e); }
 }
 
 TEST_CASE("eval: backtrace")
@@ -247,6 +238,7 @@ TEST_CASE("eval: backtrace")
  backtrace
  99)
 )"_e;
+  // clang-format off
   const std::vector<std::string> expected{
     R"(18: ev2)",
     R"(17: destblock_t:\(1 \(nil . #<lambda [0-9a-f]+>\)\))",
@@ -268,6 +260,7 @@ TEST_CASE("eval: backtrace")
     R"(1: eval0)",
     R"(0: destblock_t:)"
   };
+  // clang-format on
   const auto str = err.str();
   std::istringstream is{str};
   for(auto e: expected)

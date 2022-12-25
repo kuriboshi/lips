@@ -32,10 +32,7 @@ symbol::symbol_store_t& global_symbols()
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-lisp_t cons(context&, lisp_t a, lisp_t b)
-{
-  return getobject(cons_t{a, b});
-}
+lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(cons_t{a, b}); }
 
 lisp_t obarray(context&)
 {
@@ -45,23 +42,14 @@ lisp_t obarray(context&)
   return o;
 }
 
-lisp_t mkstring(const std::string& str)
-{
-  return getobject(str);
-}
+lisp_t mkstring(const std::string& str) { return getobject(str); }
 
 /// @brief Creates an integer number.
-lisp_t mknumber(int number)
-{
-  return getobject(number);
-}
+lisp_t mknumber(int number) { return getobject(number); }
 
 /// @brief Create a double.
 ///
-lisp_t mkfloat(double number)
-{
-  return getobject(number);
-}
+lisp_t mkfloat(double number) { return getobject(number); }
 
 /// @brief Builds an argument list.
 ///

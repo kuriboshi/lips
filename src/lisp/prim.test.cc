@@ -220,10 +220,7 @@ TEST_CASE("prim: primary functions")
     CHECK(length(l)->intval() == 2);
   }
 
-  SECTION("error")
-  {
-    CHECK_THROWS(error("error"_s));
-  }
+  SECTION("error") { CHECK_THROWS(error("error"_s)); }
 }
 
 } // namespace lisp

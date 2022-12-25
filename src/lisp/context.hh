@@ -124,6 +124,6 @@ inline lisp_t perror(std::error_code code, lisp_t a) { return context::current()
 inline lisp_t error(std::error_code code, lisp_t a) { return context::current().error(code, a); }
 inline lisp_t break0(lisp_t a) { return context::current().break0(a); }
 
-}
+} // namespace lisp
 
 #endif

@@ -46,4 +46,4 @@ TEST_CASE("syntax: macro")
   }
 }
 
-}
+} // namespace lisp

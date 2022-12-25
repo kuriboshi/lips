@@ -58,7 +58,7 @@ void init()
   // clang-format on
 }
 
-}
+} // namespace lisp::details::vm
 
 namespace lisp
 {
@@ -984,10 +984,7 @@ lisp_t vm::backtrace()
   return NIL;
 }
 
-lisp_t vm::topofstack()
-{
-  return details::alloc::getobject(environment());
-}
+lisp_t vm::topofstack() { return details::alloc::getobject(environment()); }
 
 lisp_t vm::destblock(lisp_t e)
 {

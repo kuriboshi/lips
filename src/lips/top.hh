@@ -54,7 +54,7 @@ public:
 
   static lisp_t input_exp;
   static std::function<lisp_t(context&, lisp_t)> transform_hook; // Applied on input if non-nullptr.
-  static std::function<void()> prompt_hook;                    // Called before the prompt is printed.
+  static std::function<void()> prompt_hook;                      // Called before the prompt is printed.
 
 private:
   static lisp_t alias_expanded; //For checking alias loops.

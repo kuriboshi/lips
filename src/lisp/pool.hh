@@ -128,7 +128,8 @@ private:
   void* _current = nullptr;
 };
 
-struct pool_test_t {};
+struct pool_test_t
+{};
 
 } // namespace lisp
 

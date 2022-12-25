@@ -30,6 +30,6 @@ lisp_t backtrace(context&);
 lisp_t topofstack(context&);
 lisp_t destblock(context&, lisp_t);
 
-}
+} // namespace lisp::details::vm
 
 #endif

@@ -28,7 +28,10 @@ inline lisp_t strcmp(lisp_t x, lisp_t y) { return details::string::strcmp(contex
 inline lisp_t strequal(lisp_t x, lisp_t y) { return details::string::strequal(context::current(), x, y); }
 inline lisp_t stringp(lisp_t x) { return details::string::stringp(context::current(), x); }
 inline lisp_t strlen(lisp_t x) { return details::string::strlen(context::current(), x); }
-inline lisp_t substring(lisp_t x, lisp_t y, lisp_t z) { return details::string::substring(context::current(), x, y, z); }
+inline lisp_t substring(lisp_t x, lisp_t y, lisp_t z)
+{
+  return details::string::substring(context::current(), x, y, z);
+}
 inline lisp_t symstr(lisp_t x) { return details::string::symstr(context::current(), x); }
 } // namespace lisp
 

@@ -35,7 +35,10 @@ inline lisp_t getobject() { return {new object}; }
 /// @brief Templated version of getobject which returns a lisp_t object
 /// initialized with a typed object object.
 template<typename T>
-lisp_t getobject(T x) { return {new object(x)}; }
+lisp_t getobject(T x)
+{
+  return {new object(x)};
+}
 
 lisp_t mkstring(const std::string&);
 lisp_t mknumber(int);
