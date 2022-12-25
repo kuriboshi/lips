@@ -82,6 +82,10 @@ public:
 
   void reset();
 
+  /// @brief This is the LISP vm.
+  ///
+  /// @details The vm allocates a destination slot for the result and
+  /// starts munching continuations.
   lisp_t eval(lisp_t);
   lisp_t apply(lisp_t, lisp_t);
   lisp_t backtrace();
@@ -90,6 +94,7 @@ public:
   /// @brief Convert an environment to a list.
   lisp_t destblock(lisp_t);
 
+  /// @brief Prints a backtrace of all expressions on the stack.
   void bt();
   void unwind();
   bool trace() const { return _trace; }
@@ -143,11 +148,16 @@ private:
   }
   void pop_env();
 
+  /// @brief This function prints an error message, and sets up a call to everr
+  /// that handles breaks.
   void xbreak(std::error_code, lisp_t fault, continuation_t next);
   void storevar(lisp_t v, int i);
   void send(lisp_t a);
   lisp_t receive();
   void next();
+  /// @brief Make a call to the function in parameter `fun'.
+  ///
+  /// @details It can handle functions with up to three arguments.
   lisp_t call(lisp_t fun);
   bool evalhook(lisp_t exp);
   void do_unbound(continuation_t);
@@ -189,6 +199,8 @@ private:
   bool lookup();
 
   lisp_t printwhere();
+  /// @brief Print error message, abort current evaluation, and return to top
+  /// level.
   void abort(std::error_code);
   void overflow();
   lisp_t destblock(const destblock_t*);

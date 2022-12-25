@@ -104,8 +104,6 @@ lisp_t vm::printwhere()
   return foo;
 }
 
-/// @brief Print error message, abort current evaluation, and return to top
-/// level.
 void vm::abort(std::error_code error)
 {
   _ctx.perror(error);
@@ -116,8 +114,6 @@ void vm::abort(std::error_code error)
 
 void vm::overflow() { abort(error_errc::stack_overflow); }
 
-/// @brief This function prints an error message, and sets up a call to everr
-/// that handles breaks.
 void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
 {
   if(code)
@@ -152,9 +148,6 @@ lisp_t vm::receive() { return _dest[_dest[0].index()].val(); }
 
 void vm::next() { _dest[0].decr(); }
 
-/// @brief Make a call to the function in parameter `fun'.
-///
-/// @details It can handle functions with up to three arguments.
 lisp_t vm::call(lisp_t fun)
 {
   switch(fun->subr().argcount())
@@ -172,10 +165,6 @@ lisp_t vm::call(lisp_t fun)
   }
 }
 
-/// @brief This is the LISP vm.
-///
-/// @details The vm allocates a destination slot for the result and
-/// starts munching continuations.
 lisp_t vm::eval(lisp_t expr)
 {
   //
@@ -478,7 +467,6 @@ bool vm::peval2()
   return false;
 }
 
-/// @brief Prints a backtrace of all expressions on the stack.
 void vm::bt()
 {
   int op = _ctx.printlevel;
