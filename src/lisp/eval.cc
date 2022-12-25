@@ -68,7 +68,7 @@ vm::vm(context& ctx)
 
 void vm::reset()
 {
-  dzero();
+  _destblockused = 0;
   _toctrl = 0;
   _fun = NIL;
   _args = NIL;
@@ -134,14 +134,11 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
   _cont = &vm::everr;
 }
 
-/// @brief Creates a new destination block of size 's' and initializes it.
-destblock_t* vm::mkdestblock(int s) { return dalloc(s); }
-
 void vm::storevar(lisp_t v, int i) { _dest[i].var(v); }
 
 void vm::pop_env()
 {
-  dfree(_env);
+  free(_env);
   pop(_env);
 }
 
@@ -227,7 +224,7 @@ lisp_t vm::eval(lisp_t expr)
 
 bool vm::eval0()
 {
-  dfree(_dest);
+  free(_dest);
   // Signal the end of the evaluation.
   return true;
 }
@@ -260,7 +257,7 @@ lisp_t vm::apply(lisp_t f, lisp_t x)
 
 bool vm::apply0()
 {
-  dfree(_dest);
+  free(_dest);
   pop(_args);
   pop(_fun);
   return true;
@@ -621,7 +618,7 @@ bool vm::evlis3()
 bool vm::evlis4()
 {
   lisp_t x = receive();
-  dfree(_dest);
+  free(_dest);
   pop(_dest);
   x = cons(receive(), x);
   send(x);
@@ -688,7 +685,7 @@ bool vm::ev2()
   try
   {
     auto foo = call(_fun);
-    dfree(_dest);
+    free(_dest);
     pop(_dest);
     send(foo);
     pop(_cont);
@@ -992,12 +989,7 @@ lisp_t vm::destblock(lisp_t e)
   return destblock(e->envval());
 }
 
-///
-/// @brief Allocates a destination block of size size.
-///
-/// @param size The size of the destination block.
-/// @returns A destblock or nullptr if no more space available.
-destblock_t* vm::dalloc(int size)
+destblock_t* vm::mkdestblock(int size)
 {
   if(size <= DESTBLOCKSIZE - _destblockused - 1)
   {
@@ -1011,13 +1003,7 @@ destblock_t* vm::dalloc(int size)
   return nullptr;
 }
 
-/// @brief Free a destination block.
-///
-/// @param ptr The destination block to free.
-void vm::dfree(destblock_t* block) { _destblockused -= block->size() + 1; }
-
-/// @brief Frees all destination blocks.
-void vm::dzero() { _destblockused = 0; }
+void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
 lisp_t eval(context& ctx, const std::string& expr)
 {

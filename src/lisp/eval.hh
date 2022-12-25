@@ -92,8 +92,8 @@ public:
 
   void bt();
   void unwind();
-  int trace() const { return _trace; }
-  void trace(int t) { _trace = t; }
+  bool trace() const { return _trace; }
+  void trace(bool t) { _trace = t; }
   void interactive(bool b) { _interactive = b; }
 
   using undefhook_t = std::function<int(lisp_t, lisp_t*)>;
@@ -144,7 +144,6 @@ private:
   void pop_env();
 
   void xbreak(std::error_code, lisp_t fault, continuation_t next);
-  destblock_t* mkdestblock(int);
   void storevar(lisp_t v, int i);
   void send(lisp_t a);
   lisp_t receive();
@@ -194,6 +193,21 @@ private:
   void overflow();
   lisp_t destblock(const destblock_t*);
 
+  ///
+  /// @brief Allocates a destination block of size size.
+  ///
+  /// @param size The size of the destination block.
+  /// @returns A destblock or nullptr if no more space available.
+  destblock_t* mkdestblock(int);
+  ///
+  /// @brief Free a destination block.
+  ///
+  /// @details The destination blocks are freed in the reverse order of their
+  /// allocation.
+  ///
+  /// @param The destination block to free.
+  void free(destblock_t* block);
+
   context& _ctx;
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
@@ -203,27 +217,8 @@ private:
   bool _noeval = false;           // Don't evaluate arguments.
   continuation_t _cont = nullptr; // Current continuation.
   destblock_t* _env = nullptr;    // Current environment.
-  int _trace = 0;
+  bool _trace = false;
   bool _interactive = false;
-
-  /// @brief Allocate a destination block.
-  ///
-  /// @param size The size of the destination block.
-  ///
-  destblock_t* dalloc(int size);
-
-  /// @brief Free a destination block.
-  ///
-  /// @details The destination blocks are freed in the reverse order of their
-  /// allocation.
-  ///
-  /// @param The block to free.
-  ///
-  void dfree(destblock_t* block);
-
-  /// @brief Release all destination blocks.
-  ///
-  void dzero();
 
   /// @brief Size of destination block area
   static constexpr int DESTBLOCKSIZE = 3000;
