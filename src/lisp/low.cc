@@ -26,21 +26,21 @@ namespace lisp::details::low
 /// @details The generalized conditional special form. The function takes zero
 /// or more clauses. Each clause has one test followed by zero or more
 /// expressions called consequents. The function evaluates each test in
-/// sequence until one of them is evaluated to true (not @c NIL). It then
+/// sequence until one of them is evaluated to true (not @c nil). It then
 /// evaluates each consequent in order and returns the value of the last
 /// consequent. If there are no consequents the result is the value of the test
 /// expression. The degenerate @c cond expression with no clauses at all
-/// evaluates to @c NIL.
+/// evaluates to @c nil.
 ///
 /// In the following example the return value is the value of the expression
-/// @c r0 if @c e0 evaluates to non-NIL, @c r2 if @c e1 is evaluated to non-NIL,
-/// @c e2 if @c e2 evaluates to non-NIL. Finally, if none of the expressions
+/// @c r0 if @c e0 evaluates to non-nil, @c r2 if @c e1 is evaluated to non-nil,
+/// @c e2 if @c e2 evaluates to non-nil. Finally, if none of the expressions
 /// @c e0, @c e1, or @c e2 is non-nil the final @c t provides a default
-/// value. If none of the test expressions evaluate to non-NIL then the result
-/// of the entire @c cond expression is @c NIL.
+/// value. If none of the test expressions evaluate to non-nil then the result
+/// of the entire @c cond expression is @c nil.
 ///
 /// Note that the expressions after the conditional expressions are evaluated
-/// in an implicit @c progn which is why the result of @c e1 being non-NIL is
+/// in an implicit @c progn which is why the result of @c e1 being non-nil is
 /// the value of @c r2.
 ///
 /// @code{.lisp}
@@ -52,29 +52,29 @@ namespace lisp::details::low
 ///
 lisp_t cond(context& ctx, lisp_t args)
 {
-  while(!is_NIL(args))
+  while(!is_nil(args))
   {
     auto alt = args->car();
     check(alt, type::Cons);
     auto res = eval(alt->car());
-    if(!is_NIL(res))
+    if(!is_nil(res))
     {
-      if(is_NIL(alt->cdr()))
+      if(is_nil(alt->cdr()))
         return res;
       return low::progn(ctx, alt->cdr());
     }
     args = args->cdr();
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t prog1(context&, lisp_t a1, lisp_t) { return a1; }
 
 lisp_t progn(context&, lisp_t lexp)
 {
-  if(is_NIL(lexp))
-    return NIL;
-  while(!is_NIL(lexp->cdr()))
+  if(is_nil(lexp))
+    return nil;
+  while(!is_nil(lexp->cdr()))
   {
     eval(lexp->car());
     lexp = lexp->cdr();
@@ -105,12 +105,12 @@ lisp_t setq(context& ctx, lisp_t var, lisp_t val) { return low::set(ctx, var, ev
 lisp_t xwhile(context& ctx, lisp_t pred, lisp_t exp)
 {
   lisp_t res = eval(pred);
-  while(!is_NIL(res))
+  while(!is_nil(res))
   {
     low::progn(ctx, exp);
     res = eval(pred);
   }
-  return NIL;
+  return nil;
 }
 
 namespace pn

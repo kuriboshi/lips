@@ -53,7 +53,7 @@ lisp_t rmsquote(context&, lisp_t stream)
     return "'"_a;
   }
   stream->file()->ungetch(c);
-  return cons(C_QUOTE, cons(io::lispread(stream->file()), NIL));
+  return cons(C_QUOTE, cons(io::lispread(stream->file()), nil));
 }
 
 lisp_t rmgetenv(context&, lisp_t stream)
@@ -63,7 +63,7 @@ lisp_t rmgetenv(context&, lisp_t stream)
   check(sym, type::Symbol, type::String);
   auto* val = std::getenv(sym->getstr().c_str());
   if(val == nullptr)
-    return NIL;
+    return nil;
   return mkstring(val);
 }
 

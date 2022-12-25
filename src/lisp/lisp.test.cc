@@ -63,7 +63,7 @@ TEST_CASE("lisp: mkprim")
         {
           result.push_back(p->intval());
         }
-        return NIL;
+        return nil;
       },
       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
     eval("(printall 0 1 2)");
@@ -75,7 +75,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-                        "plus", [](context&) -> lisp_t { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+                        "plus", [](context&) -> lisp_t { return nil; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "redefinition of subr not allowed");
   }
 }
@@ -176,7 +176,7 @@ TEST_CASE("lisp: iter")
     CHECK(i == end(list));
     // It's possible to dereference the end marker because it's a lisp_t with a
     // nil value.
-    CHECK(is_NIL(*end(list)));
+    CHECK(is_nil(*end(list)));
   }
 }
 

@@ -63,12 +63,12 @@ inline lisp_t stop(context& ctx) { return exec::stop(ctx); }
 inline lisp_t rehash(context&)
 {
   exec::do_rehash();
-  return NIL;
+  return nil;
 }
 inline lisp_t rehash()
 {
   exec::do_rehash();
-  return NIL;
+  return nil;
 }
 inline lisp_t jobs(context& ctx) { return exec::jobs(ctx); }
 inline lisp_t fg(context& ctx, lisp_t job) { return exec::fg(ctx, job); }

@@ -50,7 +50,7 @@ private:
   static lisp_t mungepath()
   {
     auto pstr = get("PATH");
-    lisp_t result = NIL;
+    lisp_t result = nil;
     auto pos = pstr.size();
     for(;;)
     {

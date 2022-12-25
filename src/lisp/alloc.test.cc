@@ -145,7 +145,7 @@ TEST_CASE("alloc: obarray")
 TEST_CASE("alloc: freecount")
 {
   auto free = freecount();
-  CHECK(free != NIL);
+  CHECK(free != nil);
 }
 
 #ifdef ENABLE_OBJECT_SIZES

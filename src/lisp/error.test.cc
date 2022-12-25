@@ -24,7 +24,7 @@ namespace lisp
 
 TEST_CASE("error: type error messages")
 {
-  CHECK(make_error_code(type_errc::not_nil).message() == "Not NIL");
+  CHECK(make_error_code(type_errc::not_nil).message() == "Not nil");
   CHECK(make_error_code(type_errc::not_t).message() == "Not T");
   CHECK(make_error_code(type_errc::not_symbol).message() == "Not a symbol");
   CHECK(make_error_code(type_errc::not_integer).message() == "Not an integer");

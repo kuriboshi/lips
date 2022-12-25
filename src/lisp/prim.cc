@@ -47,8 +47,8 @@ lisp_t mkindirect(lisp_t obj)
 ///
 lisp_t closobj(context& ctx, lisp_t vars)
 {
-  if(is_NIL(vars))
-    return NIL;
+  if(is_nil(vars))
+    return nil;
   check(vars, type::Cons);
   check(vars->car(), type::Symbol);
   return cons(mkindirect(vars->car()->value()), closobj(ctx, vars->cdr()));
@@ -58,98 +58,98 @@ lisp_t car(context&, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return a->car();
-  return NIL;
+  return nil;
 }
 
 lisp_t cdr(context&, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return a->cdr();
-  return NIL;
+  return nil;
 }
 
 lisp_t cadr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, a->cdr());
-  return NIL;
+  return nil;
 }
 
 lisp_t cdar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, a->car());
-  return NIL;
+  return nil;
 }
 
 lisp_t caar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, a->car());
-  return NIL;
+  return nil;
 }
 
 lisp_t cddr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, a->cdr());
-  return NIL;
+  return nil;
 }
 
 lisp_t cdddr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, prim::cdr(ctx, a->cdr()));
-  return NIL;
+  return nil;
 }
 
 lisp_t caddr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, prim::cdr(ctx, a->cdr()));
-  return NIL;
+  return nil;
 }
 
 lisp_t cdadr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, prim::car(ctx, a->cdr()));
-  return NIL;
+  return nil;
 }
 
 lisp_t caadr(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, prim::car(ctx, a->cdr()));
-  return NIL;
+  return nil;
 }
 
 lisp_t cddar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, prim::cdr(ctx, a->car()));
-  return NIL;
+  return nil;
 }
 
 lisp_t cadar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, prim::cdr(ctx, a->car()));
-  return NIL;
+  return nil;
 }
 
 lisp_t cdaar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::cdr(ctx, prim::car(ctx, a->car()));
-  return NIL;
+  return nil;
 }
 
 lisp_t caaar(context& ctx, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return prim::car(ctx, prim::car(ctx, a->car()));
-  return NIL;
+  return nil;
 }
 
 lisp_t rplaca(context&, lisp_t x, lisp_t y)
@@ -172,35 +172,35 @@ lisp_t eq(context&, lisp_t a, lisp_t b)
     return T;
   if(type_of(a) == type::Integer && type_of(b) == type::Integer && a->intval() == b->intval())
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t atom(context&, lisp_t a)
 {
-  if(is_NIL(a) || is_T(a) || type_of(a) == type::Symbol || type_of(a) == type::Integer || type_of(a) == type::Float)
+  if(is_nil(a) || is_T(a) || type_of(a) == type::Symbol || type_of(a) == type::Integer || type_of(a) == type::Float)
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t nconc(context& ctx, lisp_t x)
 {
   lisp_t cl;
 
-  lisp_t newl = NIL;
+  lisp_t newl = nil;
   lisp_t curp = newl;
-  for(; !is_NIL(x); x = x->cdr())
+  for(; !is_nil(x); x = x->cdr())
   {
-    if(!is_NIL(x->car()))
+    if(!is_nil(x->car()))
     {
       check(x->car(), type::Cons);
-      if(is_NIL(curp))
+      if(is_nil(curp))
       {
         curp = x->car();
         newl = curp;
       }
       else
         prim::rplacd(ctx, curp, x->car());
-      for(cl = x->car(); !is_NIL(cl->cdr()); cl = cl->cdr())
+      for(cl = x->car(); !is_nil(cl->cdr()); cl = cl->cdr())
         ;
       curp = cl;
     }
@@ -210,25 +210,25 @@ lisp_t nconc(context& ctx, lisp_t x)
 
 lisp_t tconc(context& ctx, lisp_t cell, lisp_t obj)
 {
-  if(is_NIL(cell))
+  if(is_nil(cell))
   {
-    cell = cons(cons(obj, NIL), NIL);
+    cell = cons(cons(obj, nil), nil);
     return prim::rplacd(ctx, cell, cell->car());
   }
   check(cell, type::Cons);
   if(type_of(cell->car()) != type::Cons)
   {
-    prim::rplacd(ctx, cell, cons(obj, NIL));
+    prim::rplacd(ctx, cell, cons(obj, nil));
     return prim::rplaca(ctx, cell, cell->cdr());
   }
-  prim::rplacd(ctx, cell->cdr(), cons(obj, NIL));
+  prim::rplacd(ctx, cell->cdr(), cons(obj, nil));
   return prim::rplacd(ctx, cell, cell->cdr()->cdr());
 }
 
 lisp_t attach(context& ctx, lisp_t obj, lisp_t list)
 {
-  if(is_NIL(list))
-    return cons(obj, NIL);
+  if(is_nil(list))
+    return cons(obj, nil);
   check(list, type::Cons);
   prim::rplacd(ctx, list, cons(list->car(), list->cdr()));
   return prim::rplaca(ctx, list, obj);
@@ -238,16 +238,16 @@ lisp_t append(context& ctx, lisp_t x)
 {
   lisp_t cl;
 
-  lisp_t newl = cons(NIL, NIL);
+  lisp_t newl = cons(nil, nil);
   lisp_t curp = newl;
-  for(; !is_NIL(x); x = x->cdr())
+  for(; !is_nil(x); x = x->cdr())
   {
-    if(!is_NIL(x->car()))
+    if(!is_nil(x->car()))
     {
       check(x->car(), type::Cons);
-      for(cl = x->car(); !is_NIL(cl); cl = cl->cdr())
+      for(cl = x->car(); !is_nil(cl); cl = cl->cdr())
       {
-        prim::rplacd(ctx, curp, cons(cl->car(), NIL));
+        prim::rplacd(ctx, curp, cons(cl->car(), nil));
         curp = curp->cdr();
       }
     }
@@ -257,9 +257,9 @@ lisp_t append(context& ctx, lisp_t x)
 
 lisp_t null(context&, lisp_t a)
 {
-  if(is_NIL(a))
+  if(is_nil(a))
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t quote(context&, lisp_t x) { return x; }
@@ -273,7 +273,7 @@ lisp_t list(context&, lisp_t x) { return x; }
 lisp_t length(context&, lisp_t x)
 {
   int i = 0;
-  while(!is_NIL(x) && type_of(x) == type::Cons)
+  while(!is_nil(x) && type_of(x) == type::Cons)
   {
     x = x->cdr();
     i++;
@@ -298,18 +298,18 @@ lisp_t closure(context& ctx, lisp_t fun, lisp_t vars)
 inline lisp_t _nth(context&, lisp_t list, int n)
 {
   lisp_t ls;
-  for(ls = list; n > 1 && !is_NIL(ls); n--, ls = ls->cdr())
+  for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())
     ;
-  if(!is_NIL(ls))
+  if(!is_nil(ls))
     return ls;
-  return NIL;
+  return nil;
 }
 
 lisp_t nth(context& ctx, lisp_t x, lisp_t p)
 {
   check(p, type::Integer);
-  if(is_NIL(x))
-    return NIL;
+  if(is_nil(x))
+    return nil;
   check(x, type::Cons);
   return _nth(ctx, x, p->intval());
 }
@@ -322,7 +322,7 @@ lisp_t error(context& ctx, lisp_t mess)
 
 lisp_t exit(context&, lisp_t status)
 {
-  if(is_NIL(status))
+  if(is_nil(status))
     throw lisp_finish("exit called", 0);
   check(status, type::Integer);
   throw lisp_finish("exit called", status->intval());

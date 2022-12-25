@@ -28,7 +28,7 @@ TEST_CASE("map: map functions")
 {
   SECTION("map")
   {
-    auto& cvar = initcvar("cvar", NIL);
+    auto& cvar = initcvar("cvar", nil);
     auto r0 = eval(R"(
 (map '(1 2 3)
       (lambda (a)
@@ -40,10 +40,10 @@ TEST_CASE("map: map functions")
 
     cvar = 0_l;
     auto f = eval("(lambda (a) (setq cvar (plus (apply plus a) cvar)))");
-    map(mklist(1_l, 1_l, 1_l), f, NIL);
+    map(mklist(1_l, 1_l, 1_l), f, nil);
     CHECK(cvar->intval() == 6);
 
-    cvar = NIL;
+    cvar = nil;
     map("(1 2 3)"_l, lambda("(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda("(a)"_l, "((cdr a))"_l));
     CHECK(type_of(cvar) == type::Cons);
     CHECK(car(cvar)->intval() == 3);
@@ -53,7 +53,7 @@ TEST_CASE("map: map functions")
 
   SECTION("mapc")
   {
-    auto& cvar = initcvar("cvar", NIL);
+    auto& cvar = initcvar("cvar", nil);
     auto r0 = eval(R"(
 (mapc '(1 2 3)
        (lambda (a)
@@ -65,7 +65,7 @@ TEST_CASE("map: map functions")
 
     cvar = 0_l;
     auto f = lambda("(a)"_l, "((setq cvar (plus a cvar)))"_l);
-    mapc(mklist(1_l, 1_l, 1_l), f, NIL);
+    mapc(mklist(1_l, 1_l, 1_l), f, nil);
     REQUIRE(type_of(cvar) == type::Integer);
     CHECK(cvar->intval() == 3);
 
@@ -80,13 +80,13 @@ TEST_CASE("map: map functions")
     auto ls = mklist(mknumber(1), mknumber(2), mknumber(3));
     auto f = lambda("(a)"_l, "((car a))"_l);
 
-    auto r0 = maplist(ls, f, NIL);
+    auto r0 = maplist(ls, f, nil);
     REQUIRE(type_of(r0) == type::Cons);
     CHECK(car(r0)->intval() == 1);
     CHECK(cadr(r0)->intval() == 2);
     CHECK(caddr(r0)->intval() == 3);
 
-    auto r1 = maplist(ls, f, NIL);
+    auto r1 = maplist(ls, f, nil);
     REQUIRE(type_of(r1) == type::Cons);
     CHECK(car(r1)->intval() == 1);
     CHECK(cadr(r1)->intval() == 2);
@@ -104,13 +104,13 @@ TEST_CASE("map: map functions")
     auto ls = mklist(mknumber(1), mknumber(2), mknumber(3));
     auto f = lambda("(a)"_l, "((plus a 1))"_l);
 
-    auto r0 = mapcar(ls, f, NIL);
+    auto r0 = mapcar(ls, f, nil);
     REQUIRE(type_of(r0) == type::Cons);
     CHECK(car(r0)->intval() == 2);
     CHECK(cadr(r0)->intval() == 3);
     CHECK(caddr(r0)->intval() == 4);
 
-    auto r1 = mapcar(ls, f, NIL);
+    auto r1 = mapcar(ls, f, nil);
     REQUIRE(type_of(r1) == type::Cons);
     CHECK(car(r1)->intval() == 2);
     CHECK(cadr(r1)->intval() == 3);

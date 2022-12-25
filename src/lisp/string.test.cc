@@ -29,11 +29,11 @@ TEST_CASE("string: string functions")
   {
     auto s = mkstring("hello");
     auto r0 = stringp(s);
-    CHECK(r0 != NIL);
+    CHECK(r0 != nil);
     CHECK(r0->string() == s->string());
     auto i = mknumber(100);
     auto r1 = stringp(i);
-    CHECK(r1 == NIL);
+    CHECK(r1 == nil);
   }
 
   SECTION("string: strequal")
@@ -44,16 +44,16 @@ TEST_CASE("string: string functions")
     auto r0 = strequal(s0, s1);
     CHECK(r0 == T);
     auto r1 = strequal(s0, s2);
-    CHECK(r1 == NIL);
+    CHECK(r1 == nil);
   }
 
   SECTION("string: concat")
   {
     auto s0 = mkstring("hello ");
     auto s1 = mkstring("world");
-    auto s2 = concat(cons(s0, cons(s1, NIL)));
+    auto s2 = concat(cons(s0, cons(s1, nil)));
     CHECK(s2->string() == mkstring("hello world")->string());
-    auto s3 = concat(cons(s0, cons(s1, NIL)));
+    auto s3 = concat(cons(s0, cons(s1, nil)));
     CHECK(s3->string() == mkstring("hello world")->string());
   }
 
@@ -70,18 +70,18 @@ TEST_CASE("string: string functions")
   {
     auto s0 = mkstring("hello world");
     auto s1 = substring(s0, mknumber(1), mknumber(5));
-    REQUIRE(s1 != NIL);
+    REQUIRE(s1 != nil);
     CHECK(s1->string() == "hello");
     auto s2 = substring(s0, mknumber(7), mknumber(11));
-    REQUIRE(s2 != NIL);
+    REQUIRE(s2 != nil);
     CHECK(s2->string() == "world");
     auto s3 = substring(s0, mknumber(-1), mknumber(5));
-    REQUIRE(s3 != NIL);
+    REQUIRE(s3 != nil);
     CHECK(s3->string() == "d");
     auto s4 = substring(s0, mknumber(0), mknumber(15));
-    CHECK(s4 == NIL);
+    CHECK(s4 == nil);
     auto s5 = substring(s0, mknumber(0), mknumber(-1));
-    CHECK(s5 == NIL);
+    CHECK(s5 == nil);
   }
 
   SECTION("string: symstr")

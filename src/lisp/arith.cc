@@ -188,23 +188,23 @@ lisp_t divide(context& ctx, lisp_t x, lisp_t y)
     if(type_of(y) == type::Integer)
     {
       if(y->intval() == 0)
-        ctx.error(error_errc::divide_by_zero, NIL);
+        ctx.error(error_errc::divide_by_zero, nil);
       return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        ctx.error(error_errc::divide_by_zero, NIL);
+        ctx.error(error_errc::divide_by_zero, nil);
       return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::Integer)
   {
     if(y->intval() == 0)
-      ctx.error(error_errc::divide_by_zero, NIL);
+      ctx.error(error_errc::divide_by_zero, nil);
     return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    ctx.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, nil);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -213,7 +213,7 @@ lisp_t iquotient(context& ctx, lisp_t x, lisp_t y)
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    ctx.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() / y->intval());
 }
 
@@ -222,7 +222,7 @@ lisp_t iremainder(context& ctx, lisp_t x, lisp_t y)
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    ctx.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() % y->intval());
 }
 
@@ -231,7 +231,7 @@ lisp_t fdivide(context& ctx, lisp_t x, lisp_t y)
   check(x, type::Float);
   check(y, type::Float);
   if(y->floatval() == 0.0)
-    ctx.error(error_errc::divide_by_zero, NIL);
+    ctx.error(error_errc::divide_by_zero, nil);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -311,7 +311,7 @@ inline lisp_t docheck(Type x, Type y, Comparor cmp)
 {
   if(cmp(x, y))
     return T;
-  return NIL;
+  return nil;
 }
 
 inline lisp_t illegalreturn(context& ctx, lisp_t x) { return ctx.error(error_errc::illegal_arg, x); }
@@ -352,7 +352,7 @@ lisp_t zerop(context&, lisp_t x)
 {
   if(type_of(x) == type::Integer && x->intval() == 0)
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t minusp(context& ctx, lisp_t x)
@@ -361,13 +361,13 @@ lisp_t minusp(context& ctx, lisp_t x)
   {
     if(x->floatval() < 0.0)
       return T;
-    return NIL;
+    return nil;
   }
   if(type_of(x) == type::Integer)
   {
     if(x->intval() < 0)
       return T;
-    return NIL;
+    return nil;
   }
   return ctx.error(error_errc::illegal_arg, x);
 }

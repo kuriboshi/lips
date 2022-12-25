@@ -35,34 +35,34 @@ TEST_CASE("logic: logic functions")
 {
   SECTION("and")
   {
-    CHECK(p_and(cons(T, cons(T, NIL))) == T);
-    CHECK(p_and(cons(NIL, cons(T, NIL))) == NIL);
-    CHECK(p_and(cons(T, cons(NIL, NIL))) == NIL);
-    CHECK(p_and(cons(NIL, cons(NIL, NIL))) == NIL);
-    CHECK(p_and(cons(T, cons(T, NIL))) == T);
-    CHECK(p_and(cons(NIL, cons(T, NIL))) == NIL);
-    CHECK(p_and(cons(T, cons(NIL, NIL))) == NIL);
-    CHECK(p_and(cons(NIL, cons(NIL, NIL))) == NIL);
+    CHECK(p_and(cons(T, cons(T, nil))) == T);
+    CHECK(p_and(cons(nil, cons(T, nil))) == nil);
+    CHECK(p_and(cons(T, cons(nil, nil))) == nil);
+    CHECK(p_and(cons(nil, cons(nil, nil))) == nil);
+    CHECK(p_and(cons(T, cons(T, nil))) == T);
+    CHECK(p_and(cons(nil, cons(T, nil))) == nil);
+    CHECK(p_and(cons(T, cons(nil, nil))) == nil);
+    CHECK(p_and(cons(nil, cons(nil, nil))) == nil);
   }
 
   SECTION("or")
   {
-    CHECK(p_or(cons(T, cons(T, NIL))) == T);
-    CHECK(p_or(cons(NIL, cons(T, NIL))) == T);
-    CHECK(p_or(cons(T, cons(NIL, NIL))) == T);
-    CHECK(p_or(cons(NIL, cons(NIL, NIL))) == NIL);
-    CHECK(p_or(cons(T, cons(T, NIL))) == T);
-    CHECK(p_or(cons(NIL, cons(T, NIL))) == T);
-    CHECK(p_or(cons(T, cons(NIL, NIL))) == T);
-    CHECK(p_or(cons(NIL, cons(NIL, NIL))) == NIL);
+    CHECK(p_or(cons(T, cons(T, nil))) == T);
+    CHECK(p_or(cons(nil, cons(T, nil))) == T);
+    CHECK(p_or(cons(T, cons(nil, nil))) == T);
+    CHECK(p_or(cons(nil, cons(nil, nil))) == nil);
+    CHECK(p_or(cons(T, cons(T, nil))) == T);
+    CHECK(p_or(cons(nil, cons(T, nil))) == T);
+    CHECK(p_or(cons(T, cons(nil, nil))) == T);
+    CHECK(p_or(cons(nil, cons(nil, nil))) == nil);
   }
 
   SECTION("not")
   {
-    CHECK(p_not(T) == NIL);
-    CHECK(p_not(NIL) == T);
-    CHECK(p_not(T) == NIL);
-    CHECK(p_not(NIL) == T);
+    CHECK(p_not(T) == nil);
+    CHECK(p_not(nil) == T);
+    CHECK(p_not(T) == nil);
+    CHECK(p_not(nil) == T);
   }
 
   SECTION("logic: if")

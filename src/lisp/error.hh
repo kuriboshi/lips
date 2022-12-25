@@ -56,7 +56,7 @@ public:
     switch(static_cast<type_errc>(condition))
     {
       case type_errc::not_nil:
-        return "Not NIL";
+        return "Not nil";
       case type_errc::not_t:
         return "Not T";
       case type_errc::not_symbol:

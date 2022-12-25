@@ -30,7 +30,7 @@ template<typename I>
 lisp::lisp_t buildpath(I i, I end)
 {
   if(i == end)
-    return lisp::NIL;
+    return lisp::nil;
   auto s = lisp::mkstring(*i);
   return lisp::cons(s, buildpath(++i, end));
 }

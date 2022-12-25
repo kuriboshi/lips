@@ -45,10 +45,10 @@ TEST_CASE("low: low level functions")
     auto& ctx = context::current();
     std::ostringstream os;
     auto old = ctx.primerr(ref_file_t::create(os));
-    CHECK_THROWS(set(T, NIL));
-    CHECK_THROWS(set(mkatom("nil"), NIL));
-    CHECK_THROWS(set(T, NIL));
-    CHECK_THROWS(set(mkatom("nil"), NIL));
+    CHECK_THROWS(set(T, nil));
+    CHECK_THROWS(set(mkatom("nil"), nil));
+    CHECK_THROWS(set(T, nil));
+    CHECK_THROWS(set(mkatom("nil"), nil));
     ctx.primerr(old);
   }
 
@@ -102,15 +102,15 @@ TEST_CASE("low: low level functions")
 (cond (nil nil))
 )";
     auto a1 = eval(cond1);
-    CHECK(is_NIL(a1));
+    CHECK(is_nil(a1));
 
-    auto a2 = cond(NIL);
-    CHECK(is_NIL(a2));
+    auto a2 = cond(nil);
+    CHECK(is_nil(a2));
 
-    auto a3 = cond(cons(mklist(T, mkstring("A")), NIL));
+    auto a3 = cond(cons(mklist(T, mkstring("A")), nil));
     CHECK(a3->getstr() == "A");
 
-    auto a4 = cond(cons(mklist(T, mkstring("A")), NIL));
+    auto a4 = cond(cons(mklist(T, mkstring("A")), nil));
     CHECK(a4->getstr() == "A");
 
     std::string cond5 = R"(
@@ -134,8 +134,8 @@ TEST_CASE("low: low level functions")
     CHECK(a0->intval() == 3);
     auto a1 = progn(mklist(1_l, 2_l, 3_l));
     CHECK(a1->intval() == 3);
-    auto a2 = progn(NIL);
-    CHECK(a2 == NIL);
+    auto a2 = progn(nil);
+    CHECK(a2 == nil);
   }
 
   SECTION("low: while")

@@ -43,7 +43,7 @@ public:
   impl(class vm& vm)
     : _vm(vm),
       _currentbase(initcvar("base", 10_l)),
-      _verbose(initcvar("verbose", NIL)),
+      _verbose(initcvar("verbose", nil)),
       _loadpath(initcvar("loadpath", mklist(mkstring("."))))
   {
     _syntax = std::make_unique<syntax>();
@@ -203,14 +203,14 @@ ref_file_t context::stdin() const { return _pimpl->_stdin; }
 lisp_t context::perror(std::error_code error)
 {
   primerr()->format("{} ", error.message());
-  return NIL;
+  return nil;
 }
 
 lisp_t context::perror(std::error_code error, lisp_t arg)
 {
   primerr()->format("{} ", error.message());
   prin2(arg, T);
-  return NIL;
+  return nil;
 }
 
 lisp_t context::error(std::error_code error, lisp_t arg)

@@ -35,7 +35,7 @@ TEST_CASE("debug: debug functions")
   evaltrace(mknumber(0));
   t = ctx.vm().trace();
   CHECK(t == 0);
-  auto r = evaltrace(NIL);
+  auto r = evaltrace(nil);
   REQUIRE(type_of(r) == type::Integer);
   CHECK(r->intval() == t);
 }

@@ -28,7 +28,7 @@ TEST_CASE("context: fatal error")
 {
   CHECK_THROWS(context::current().fatal(error_errc::user_error, "user", "error"));
   CHECK_THROWS(context::current().fatal(error_errc::user_error));
-  CHECK(perror(error_errc::user_error, NIL) == NIL);
+  CHECK(perror(error_errc::user_error, nil) == nil);
 }
 
 TEST_CASE("context: stdin, stdout, stderr")

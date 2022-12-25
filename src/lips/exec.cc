@@ -254,7 +254,7 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
         for(auto f: files)
           args.push_back(f->getstr());
       }
-      else if(is_NIL(files))
+      else if(is_nil(files))
       {
         error(lips_errc::no_match, arg);
         return {};
@@ -435,7 +435,7 @@ int execcommand(lisp_t exp, lisp_t* res)
   std::string comdir;
   for(auto cdir: environment->path)
   {
-    if(is_NIL(cdir) || cdir->getstr() == ".")
+    if(is_nil(cdir) || cdir->getstr() == ".")
       comdir = ".";
     else if(cmd != exechash.end() && *command == cmd->first)
       comdir = cdir->getstr();
@@ -462,10 +462,10 @@ lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   int oldfd = 0;
   int status = 0;
 
-  if(is_NIL(cmd))
-    return NIL;
+  if(is_nil(cmd))
+    return nil;
   check(file, type::String, type::Symbol);
-  if(is_NIL(filed))
+  if(is_nil(filed))
     oldfd = 1;
   else
   {
@@ -498,10 +498,10 @@ lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   int oldfd = 0;
   int status = 0;
 
-  if(is_NIL(cmd))
-    return NIL;
+  if(is_nil(cmd))
+    return nil;
   check(file, type::String, type::Symbol);
-  if(is_NIL(filed))
+  if(is_nil(filed))
     oldfd = 1;
   else
   {
@@ -534,10 +534,10 @@ lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   int oldfd = 0;
   int status = 0;
 
-  if(is_NIL(cmd))
-    return NIL;
+  if(is_nil(cmd))
+    return nil;
   check(file, type::String, type::Symbol);
-  if(is_NIL(filed))
+  if(is_nil(filed))
     oldfd = 0;
   else
   {
@@ -567,9 +567,9 @@ lisp_t pipecmd(context& ctx, lisp_t cmds)
 {
   print(cmds);
 
-  if(is_NIL(cmds))
-    return NIL;
-  if(is_NIL(cmds->cdr()))
+  if(is_nil(cmds))
+    return nil;
+  if(is_nil(cmds->cdr()))
     return eval(cmds->car());
 
   int pid = 0;
@@ -639,7 +639,7 @@ lisp_t stop(context& ctx)
 lisp_t rehash(context&)
 {
   do_rehash();
-  return NIL;
+  return nil;
 }
 
 void do_rehash()
@@ -648,7 +648,7 @@ void do_rehash()
 
   for(auto p: environment->path)
   {
-    if(is_NIL(p))
+    if(is_nil(p))
       continue;
     check(p, type::String, type::Symbol);
     std::error_code ec;
@@ -662,14 +662,14 @@ lisp_t jobs(context&)
 {
   for(const auto& job: joblist)
     printjob(job);
-  return NIL;
+  return nil;
 }
 
 lisp_t fg(context& ctx, lisp_t job)
 {
   job_t* current = nullptr;
 
-  if(is_NIL(job))
+  if(is_nil(job))
   {
     for(auto& j: joblist)
     {
@@ -713,7 +713,7 @@ lisp_t bg(context& ctx, lisp_t job)
 {
   job_t* current = nullptr;
 
-  if(is_NIL(job))
+  if(is_nil(job))
   {
     for(auto& j: joblist)
     {
@@ -765,7 +765,7 @@ lisp_t getenviron(context&, lisp_t var)
   check(var, type::String, type::Symbol);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
-    return NIL;
+    return nil;
   return mkstring(s);
 }
 
@@ -773,7 +773,7 @@ lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
 {
   lisp_t ndir;
 
-  if(is_NIL(dir))
+  if(is_nil(dir))
     ndir = environment->home;
   else
   {
@@ -781,17 +781,17 @@ lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
     if(type_of(ndir) == type::Cons)
       ndir = ndir->car();
   }
-  if(is_NIL(ndir))
+  if(is_nil(ndir))
   {
-    if(is_NIL(emess))
+    if(is_nil(emess))
       return error(lips_errc::no_match, dir);
-    return NIL;
+    return nil;
   }
   if(chdir(ndir->getstr().c_str()) == -1)
   {
-    if(is_NIL(emess))
+    if(is_nil(emess))
       return error(std::error_code(errno, std::system_category()), dir);
-    return NIL;
+    return nil;
   }
   auto wd = std::filesystem::current_path();
   ::setenv("PWD", wd.c_str(), 1);
@@ -811,7 +811,7 @@ lisp_t doexec(context& ctx, lisp_t cmd)
     default:
       break; /* Never reached */
   }
-  return NIL;
+  return nil;
 }
 
 void init()
@@ -876,7 +876,7 @@ TEST_CASE("exec.cc: make_exec")
 {
   SECTION("(make_exec (a b c)) -> a b c")
   {
-    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), NIL))));
+    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), nil))));
     REQUIRE(result);
     CHECK(result->size() == 3);
     auto i = result->begin();
@@ -886,7 +886,7 @@ TEST_CASE("exec.cc: make_exec")
   }
   SECTION("(make_exec (100)) -> 100")
   {
-    auto result = make_exec(cons(mknumber(100), NIL));
+    auto result = make_exec(cons(mknumber(100), nil));
     REQUIRE(result);
     CHECK(result->at(0) == "100"s);
   }
@@ -916,6 +916,6 @@ TEST_CASE("exec.cc: make_exec")
 
 TEST_CASE("execute")
 {
-  auto result = execute("/bin/ls", cons(mkstring("ls"), NIL));
+  auto result = execute("/bin/ls", cons(mkstring("ls"), nil));
   CHECK(result->intval() == 0);
 }

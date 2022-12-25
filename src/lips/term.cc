@@ -321,7 +321,7 @@ bool term_source::checkchar(lisp_t words, std::size_t pos, char* c)
 {
   lisp_t w = words;
   *c = (w->car()->getstr())[pos];
-  for(; !is_NIL(w); w = w->cdr())
+  for(; !is_nil(w); w = w->cdr())
   {
     if(*c != (w->car()->getstr())[pos])
       return false;
@@ -347,7 +347,7 @@ lisp_t term_source::strip(lisp_t files, const char* prefix, const char* suffix)
 
   if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;
-  for(stripped = cons(NIL, NIL); !is_NIL(files); files = files->cdr())
+  for(stripped = cons(nil, nil); !is_nil(files); files = files->cdr())
   {
     const auto* s = files->car()->getstr().c_str() + strlen(prefix) - strlen(suffix);
     // s[0] = '~';
@@ -596,7 +596,7 @@ std::optional<std::string> term_source::getline()
         auto ex = glob::expandfiles(*t, true);
         if(type_of(ex) == type::Cons && strlen(s) > 1)
           ex = strip(ex, t->c_str(), s);
-        if(type_of(ex) == type::Cons && is_NIL(ex->cdr()))
+        if(type_of(ex) == type::Cons && is_nil(ex->cdr()))
         {
           fillrest(ex->car()->getstr().c_str());
         }

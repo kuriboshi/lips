@@ -61,11 +61,11 @@ void init_all_signals()
 
 lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
 {
-  if(is_NIL(list))
+  if(is_nil(list))
   {
     if(conc)
       return obj;
-    return cons(obj, NIL);
+    return cons(obj, nil);
   }
   lisp_t t;
   for(t = list; type_of(t->cdr()) == type::Cons; t = t->cdr())
@@ -73,15 +73,15 @@ lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
   if(conc)
     rplacd(t, obj);
   else
-    rplacd(t, cons(obj, NIL));
+    rplacd(t, cons(obj, nil));
   return list;
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 lisp_t transform(::lisp::context& ctx, lisp_t list)
 {
-  lisp_t tl = NIL;
-  lisp_t res = NIL;
+  lisp_t tl = nil;
+  lisp_t res = nil;
   bool conc = false;
   for(auto ll = list; type_of(ll) == type::Cons; ll = ll->cdr())
   {
@@ -89,66 +89,66 @@ lisp_t transform(::lisp::context& ctx, lisp_t list)
       tl = put_end(tl, transform(ctx, ll->car()), conc);
     else if(ll->car() == C_BAR)
     {
-      if(is_NIL(res))
-        res = cons(C_PIPE, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_PIPE, cons(tl, nil));
       else
-        res = cons(C_PIPE, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_PIPE, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = false;
     }
     else if(ll->car() == C_SEMI)
     {
       // Semicolon is considered a comment character. If progn transformation
       // is to be effective ';' cannot be a comment character.
-      if(is_NIL(res))
-        res = cons(C_PROGN, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_PROGN, cons(tl, nil));
       else
-        res = cons(C_PROGN, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_PROGN, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = false;
     }
     else if(ll->car() == C_GT)
     {
-      if(is_NIL(res))
-        res = cons(C_REDIR_TO, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_REDIR_TO, cons(tl, nil));
       else
-        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = true;
     }
     else if(ll->car() == C_GGT)
     {
-      if(is_NIL(res))
-        res = cons(C_REDIR_APPEND, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_REDIR_APPEND, cons(tl, nil));
       else
-        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = true;
     }
     else if(ll->car() == C_LT)
     {
-      if(is_NIL(res))
-        res = cons(C_REDIR_FROM, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_REDIR_FROM, cons(tl, nil));
       else
-        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = true;
     }
     else if(ll->car() == C_AMPER)
     {
-      if(is_NIL(res))
-        res = cons(C_BACK, cons(tl, NIL));
+      if(is_nil(res))
+        res = cons(C_BACK, cons(tl, nil));
       else
-        res = cons(C_BACK, cons(put_end(res, tl, conc), NIL));
-      tl = NIL;
+        res = cons(C_BACK, cons(put_end(res, tl, conc), nil));
+      tl = nil;
       conc = true;
     }
     else
       tl = put_end(tl, ll->car(), false);
   }
-  if(is_NIL(res))
+  if(is_nil(res))
     return tl;
-  if(!is_NIL(tl))
+  if(!is_nil(tl))
     res = put_end(res, tl, conc);
   return res;
 }
@@ -223,15 +223,15 @@ void loadinit(const std::string& initfile) { loadfile(initfile); }
 lisp_t greet(lisp_t who)
 {
   std::string s;
-  if(is_NIL(who))
+  if(is_nil(who))
     s = getenv("USER");
   else
     s = who->string();
   if(s.empty())
-    return NIL;
+    return nil;
   struct passwd* pws = getpwnam(s.c_str());
   if(pws == nullptr)
-    return NIL;
+    return nil;
   std::string loadf;
   loadf = pws->pw_dir;
   loadf.append("/.lipsrc");
@@ -315,7 +315,7 @@ int main(int argc, char* const* argv)
     try
     {
       loadinit(LIPSRC);
-      greet(NIL);
+      greet(nil);
     }
     catch(const lisp_error& error)
     {
@@ -332,7 +332,7 @@ int main(int argc, char* const* argv)
         init_all_signals();
       lisp->vm().reset();
       lisp->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
-      lisp->repl(NIL);
+      lisp->repl(nil);
       return 0;
     }
     catch(const lisp_reset&)

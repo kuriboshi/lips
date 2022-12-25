@@ -40,7 +40,7 @@ TEST_CASE("repl: interactive tests")
   {
     auto old = ctx.primin(ref_file_t::create(R"((print "hello"))"));
     repl repl(ctx);
-    repl(NIL);
+    repl(nil);
     std::string expected = R"(> "hello"
 "hello"
 > )";
@@ -57,7 +57,7 @@ a
 )";
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(ctx);
-    repl(NIL);
+    repl(nil);
     std::string expected = R"(> nil
 > 100
 > 100
@@ -73,8 +73,8 @@ a
 )";
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(NIL); };
-    CHECK_NOTHROW(repl(NIL));
+    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    CHECK_NOTHROW(repl(nil));
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
@@ -92,8 +92,8 @@ a
 )";
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(NIL); };
-    CHECK_NOTHROW(repl(NIL));
+    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    CHECK_NOTHROW(repl(nil));
     // Backtrace sets the print level to 2 which is why the '&' is printed
     // representing a deeper level.
     std::string expected_err = R"(Undefined function xyzzy
@@ -114,8 +114,8 @@ a
 )";
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(NIL); };
-    repl(NIL);
+    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl(nil);
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
@@ -134,8 +134,8 @@ help
 )";
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(NIL); };
-    repl(NIL);
+    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl(nil);
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";

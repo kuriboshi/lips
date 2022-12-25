@@ -70,15 +70,15 @@ void vm::reset()
 {
   _destblockused = 0;
   _toctrl = 0;
-  _fun = NIL;
-  _args = NIL;
+  _fun = nil;
+  _args = nil;
   _dest = nullptr;
   _env = nullptr;
 }
 
 lisp_t vm::printwhere()
 {
-  lisp_t foo = NIL;
+  lisp_t foo = nil;
   int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
@@ -125,7 +125,7 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
     _breakhook();
   if(_env == nullptr)
     throw lisp_reset();
-  print(cons(fault, cons(C_BROKEN, NIL)), T);
+  print(cons(fault, cons(C_BROKEN, nil)), T);
   push(next);
   _cont = &vm::everr;
 }
@@ -332,7 +332,7 @@ void vm::do_unbound(continuation_t continuation)
   // undefined.
   //
   lisp_t al = getprop(_expression->car(), C_AUTOLOAD);
-  if(!is_NIL(al))
+  if(!is_nil(al))
   {
     push(_expression);
     push(_dest);
@@ -499,7 +499,7 @@ bool vm::noevarg()
 
 bool vm::evalargs()
 {
-  if(is_NIL(_args))
+  if(is_nil(_args))
   {
     pop(_cont);
   }
@@ -516,7 +516,7 @@ bool vm::evalargs()
 
 bool vm::ev9()
 {
-  if(is_NIL(_args->cdr()))
+  if(is_nil(_args->cdr()))
   {
     _cont = &vm::peval;
   }
@@ -541,7 +541,7 @@ bool vm::noev9()
 {
   while(true)
   {
-    if(is_NIL(_args->cdr()))
+    if(is_nil(_args->cdr()))
     {
       send(_expression);
       pop(_cont);
@@ -557,7 +557,7 @@ bool vm::noev9()
 
 bool vm::evlis()
 {
-  if(is_NIL(_args))
+  if(is_nil(_args))
   {
     pop(_cont);
   }
@@ -571,7 +571,7 @@ bool vm::evlis()
 
 bool vm::evlis1()
 {
-  if(is_NIL(_args->cdr()))
+  if(is_nil(_args->cdr()))
   {
     push(&vm::evlis2);
     _cont = &vm::peval;
@@ -586,7 +586,7 @@ bool vm::evlis1()
 
 bool vm::evlis2()
 {
-  lisp_t x = cons(receive(), NIL);
+  lisp_t x = cons(receive(), nil);
   send(x);
   pop(_cont);
   return false;
@@ -650,7 +650,7 @@ bool vm::spread()
 {
   while(true)
   {
-    if(is_NIL(_args))
+    if(is_nil(_args))
     {
       pop(_cont);
       break;
@@ -683,8 +683,8 @@ bool vm::ev2()
     if(!_interactive)
       throw;
     auto foo = printwhere();
-    if(is_NIL(foo))
-      xbreak({}, NIL, &vm::peval1);
+    if(is_nil(foo))
+      xbreak({}, nil, &vm::peval1);
     else
       xbreak({}, foo->car(), &vm::peval1); /* CAR(_) broken */
   }
@@ -795,7 +795,7 @@ bool vm::evclosure()
     for(; i != 0; foo = foo->cdr(), i--)
       storevar(foo->car(), i);
   }
-  for(auto foo = _fun->closure()->cvalues; !is_NIL(foo); foo = foo->cdr())
+  for(auto foo = _fun->closure()->cvalues; !is_nil(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
@@ -821,7 +821,7 @@ bool vm::evclosure1()
 
 bool vm::evsequence()
 {
-  if(is_NIL(_args))
+  if(is_nil(_args))
   {
     pop(_cont);
   }
@@ -835,7 +835,7 @@ bool vm::evsequence()
 
 bool vm::evseq1()
 {
-  if(is_NIL(_args->cdr()))
+  if(is_nil(_args->cdr()))
     _cont = &vm::peval;
   else
   {
@@ -856,8 +856,8 @@ bool vm::evseq3()
 lisp_t vm::destblock(const destblock_t* block)
 {
   if(block == nullptr)
-    return NIL;
-  lisp_t foo = tconc(NIL, mknumber(block->size()));
+    return nil;
+  lisp_t foo = tconc(nil, mknumber(block->size()));
   for(int i = 0; i != block->size(); ++i)
   {
     foo = tconc(foo, cons((block + i + 1)->var(), (block + i + 1)->val()));
@@ -966,7 +966,7 @@ lisp_t vm::backtrace()
       },
       _control[i]);
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t vm::topofstack() { return details::alloc::getobject(environment()); }

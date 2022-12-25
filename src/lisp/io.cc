@@ -81,7 +81,7 @@ lisp_t readline(ref_file_t file)
     auto head = parser.parse();
     if(head && type_of(head) == type::Eof)
       return head;
-    if(listp(head) || head == NIL)
+    if(listp(head) || head == nil)
       return head;
     lisp_t tail;
     while(true)
@@ -89,13 +89,13 @@ lisp_t readline(ref_file_t file)
       auto o = parser.parse();
       if(o && type_of(o) == type::Eof)
         break;
-      if(tail == NIL)
-        tail = cdr(head = cons(head, cons(o, NIL)));
+      if(tail == nil)
+        tail = cdr(head = cons(head, cons(o, nil)));
       else
-        tail = cdr(rplacd(tail, cons(o, NIL)));
+        tail = cdr(rplacd(tail, cons(o, nil)));
     }
-    if(tail == NIL)
-      return cons(head, NIL);
+    if(tail == nil)
+      return cons(head, nil);
     return head;
   }
   return C_EOF;
@@ -107,7 +107,7 @@ lisp_t getline(lisp_t file)
   auto line = file->file()->getline();
   if(line)
     return mkstring(*line);
-  return NIL;
+  return nil;
 }
 
 // Print the string s, on stream file
@@ -154,7 +154,7 @@ lisp_t prinbody(context& ctx, lisp_t x, file_t& file, bool esc)
   for(;;)
   {
     io::prin0(ctx, i->car(), file, esc);
-    if(is_NIL(i->cdr()))
+    if(is_nil(i->cdr()))
       break;
     if(type_of(i->cdr()) == type::Cons)
     {
@@ -266,7 +266,7 @@ lisp_t terpri(file_t& file)
 {
   file.putch('\n');
   file.flush();
-  return NIL;
+  return nil;
 }
 
 /// @brief Splice an object into a list.
@@ -296,7 +296,7 @@ lisp_t terpri(file_t& file)
 lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
 {
   check(x, type::Cons);
-  if(is_NIL(y))
+  if(is_nil(y))
     return x;
   lisp_t t = x->cdr();
   if(type_of(y) != type::Cons)
@@ -313,7 +313,7 @@ lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
     y = y->cdr();
   }
   rplacd(x, y);
-  lisp_t t2 = NIL;
+  lisp_t t2 = nil;
   for(; type_of(y) == type::Cons; y = y->cdr())
     t2 = y;
   return rplacd(t2, t);

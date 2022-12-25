@@ -31,7 +31,7 @@ lisp_t open(context& ctx, lisp_t filename, lisp_t mode)
   check(filename, type::String, type::Symbol);
   bool readmode = true;
   bool appendmode = false;
-  if(!is_NIL(mode))
+  if(!is_nil(mode))
   {
     check(mode, type::Symbol);
     if(mode == C_READ)
@@ -65,7 +65,7 @@ lisp_t close(context&, lisp_t fildes)
 
 lisp_t ratom(context& ctx, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return io::ratom(ctx.primin());
   if(is_T(file))
     return io::ratom(ctx.stdin());
@@ -75,7 +75,7 @@ lisp_t ratom(context& ctx, lisp_t file)
 
 lisp_t readc(context& ctx, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return mknumber(ctx.primin()->getch());
   if(is_T(file))
     return mknumber(ctx.stdin()->getch());
@@ -85,7 +85,7 @@ lisp_t readc(context& ctx, lisp_t file)
 
 lisp_t read(context& ctx, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return lispread(ctx.primin());
   if(is_T(file))
     return lispread(ctx.stdin());
@@ -95,7 +95,7 @@ lisp_t read(context& ctx, lisp_t file)
 
 lisp_t print(context& ctx, lisp_t x, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return io::print(ctx, x, *ctx.primout());
   if(is_T(file))
     return io::print(ctx, x, *ctx.primerr());
@@ -137,7 +137,7 @@ lisp_t load(context& ctx, lisp_t f)
 
 lisp_t terpri(context& ctx, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return io::terpri(*ctx.primout());
   if(is_T(file))
     return io::terpri(*ctx.primerr());
@@ -148,7 +148,7 @@ lisp_t terpri(context& ctx, lisp_t file)
 lisp_t prin1(context& ctx, lisp_t x, lisp_t file)
 {
   ctx.thisplevel = 0;
-  if(is_NIL(file))
+  if(is_nil(file))
     return prin0(x, *ctx.primout(), false);
   if(is_T(file))
     return prin0(x, *ctx.primerr(), false);
@@ -159,7 +159,7 @@ lisp_t prin1(context& ctx, lisp_t x, lisp_t file)
 lisp_t prin2(context& ctx, lisp_t x, lisp_t file)
 {
   ctx.thisplevel = 0;
-  if(is_NIL(file))
+  if(is_nil(file))
     return prin0(x, *ctx.primout(), true);
   if(is_T(file))
     return prin0(x, *ctx.primerr(), true);
@@ -170,7 +170,7 @@ lisp_t prin2(context& ctx, lisp_t x, lisp_t file)
 lisp_t printlevel(context& ctx, lisp_t newl)
 {
   auto x = ctx.printlevel;
-  if(!is_NIL(newl))
+  if(!is_nil(newl))
   {
     check(newl, type::Integer);
     ctx.printlevel = newl->intval();
@@ -184,7 +184,7 @@ lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
   ref_file_t f;
 
   check(n, type::Integer);
-  if(is_NIL(file))
+  if(is_nil(file))
     f = ctx.primout();
   else if(is_T(file))
     f = ctx.primerr();
@@ -195,12 +195,12 @@ lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
   }
   for(i = n->intval(); i > 0; i--)
     f->putch(' ');
-  return NIL;
+  return nil;
 }
 
 lisp_t readline(context& ctx, lisp_t file)
 {
-  if(is_NIL(file))
+  if(is_nil(file))
     return io::readline(ctx.primin());
   if(is_T(file))
     return io::readline(ctx.stdin());

@@ -33,16 +33,16 @@ TEST_CASE("syntax: macro")
     auto f = "(lambda (f) (read f))"_l;
     stx.set('^', f);
     auto r = stx.macro(context::current(), f0, '^');
-    REQUIRE(r != NIL);
+    REQUIRE(r != nil);
     REQUIRE(type_of(r) == type::Symbol);
     REQUIRE(r->symbol().pname == "hello");
   }
 
-  SECTION("Read macro is NIL")
+  SECTION("Read macro is nil")
   {
-    stx.set('*', NIL);
+    stx.set('*', nil);
     auto r = stx.macro(context::current(), f0, '*');
-    CHECK(r == NIL);
+    CHECK(r == nil);
   }
 }
 

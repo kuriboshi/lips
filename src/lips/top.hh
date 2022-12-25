@@ -63,12 +63,12 @@ private:
   {
   public:
     cvariables()
-      : history(initcvar("history", NIL)),
+      : history(initcvar("history", nil)),
         histnum(initcvar("histnum", mknumber(1L))),
         histmax(initcvar("histmax", mknumber(100L))),
         topprompt(initcvar("prompt", mkstring("!_"))),
         brkprompt(initcvar("brkprompt", mkstring("!:"))),
-        promptform(initcvar("promptform", NIL))
+        promptform(initcvar("promptform", nil))
     {}
 
     cvariable_t& history; // Holds the history list.

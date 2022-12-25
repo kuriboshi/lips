@@ -131,7 +131,7 @@ inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::s
 inline cvariable_t& initcvar(const std::string& name, lisp_t val) { return details::alloc::initcvar(name, val); }
 
 /// @brief Terminates the list create function.
-inline lisp_t mklist(lisp_t t) { return cons(t, NIL); }
+inline lisp_t mklist(lisp_t t) { return cons(t, nil); }
 
 /// @brief Creates a list from a variadic list of items.
 template<typename... Ts>

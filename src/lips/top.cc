@@ -68,10 +68,10 @@ void top::remhist()
 void top::trimhist()
 {
   lisp_t hl = variables->history;
-  for(int i = 0; i < variables->histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
+  for(int i = 0; i < variables->histmax->intval() && !is_nil(hl); i++, hl = hl->cdr())
     ;
-  if(!is_NIL(hl))
-    rplacd(hl, NIL);
+  if(!is_nil(hl))
+    rplacd(hl, nil);
 }
 
 /*
@@ -84,28 +84,28 @@ lisp_t top::histget(int num, lisp_t hlist)
   {
     for(; type_of(hlist) == type::Cons && num < 0; hlist = hlist->cdr(), num++)
       ;
-    if(is_NIL(hlist))
-      return NIL;
+    if(is_nil(hlist))
+      return nil;
     return hlist->car()->cdr();
   }
   if(num > 0)
   {
     for(; type_of(hlist) == type::Cons && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
       ;
-    if(is_NIL(hlist))
-      return NIL;
+    if(is_nil(hlist))
+      return nil;
     return hlist->car()->cdr();
   }
-  if(!is_NIL(hlist))
+  if(!is_nil(hlist))
     return hlist->car()->cdr();
-  return NIL;
+  return nil;
 }
 
 lisp_t top::printhist()
 {
   remhist(); /* Removes itself from history. */
   phist();
-  return NIL;
+  return nil;
 }
 
 lisp_t top::transform(lisp_t list)
@@ -131,12 +131,12 @@ lisp_t top::findalias(lisp_t exp)
     if(type_of(rval) == type::Cons && type_of(rval->car()) == type::Symbol)
     {
       auto alias = getprop(rval->car(), C_ALIAS);
-      if(!is_NIL(alias) && (is_NIL(alias_expanded) || rval->car() != alias_expanded->car()))
+      if(!is_nil(alias) && (is_nil(alias_expanded) || rval->car() != alias_expanded->car()))
       {
-        if(!is_NIL(memb(rval->car(), alias_expanded)))
+        if(!is_nil(memb(rval->car(), alias_expanded)))
           throw lisp_error("Alias loop");
         alias_expanded = cons(rval->car(), alias_expanded);
-        rval = append(cons(alias, cons(rval->cdr(), NIL)));
+        rval = append(cons(alias, cons(rval->cdr(), nil)));
       }
       else
         break;
@@ -185,7 +185,7 @@ lisp_t top::operator()(lisp_t exp)
       if(type_of(eval(variables->promptform)) == type::Error)
       {
         print(mkstring("Error in promptform, reset to nil"), T);
-        variables->promptform = NIL;
+        variables->promptform = nil;
       }
       if(_level > 1)
         promptprint(variables->brkprompt);
@@ -194,10 +194,10 @@ lisp_t top::operator()(lisp_t exp)
     }
     input_exp = readline(_file);
     if(type_of(input_exp) == type::Eof)
-      return NIL;
-    if(is_NIL(input_exp))
+      return nil;
+    if(is_nil(input_exp))
       continue;
-    if(is_NIL(input_exp->car()))
+    if(is_nil(input_exp->car()))
       continue;
     top::addhist(input_exp);
     if(context::current().echoline)
@@ -212,15 +212,15 @@ lisp_t top::operator()(lisp_t exp)
       topexp = topexp->car();
       printit = true;
     }
-    alias_expanded = NIL;
+    alias_expanded = nil;
     topexp = eval(topexp);
     if(printit)
       print(topexp, T);
     if(!_options.interactive && _options.command)
-      return NIL;
+      return nil;
     top::trimhist();
   }
-  return NIL;
+  return nil;
 }
 
 /// @brief Redo read macro.
@@ -273,12 +273,12 @@ lisp_t top::rmexcl(context& ctx, lisp_t stream)
           if(strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())) == 0)
             return tmp;
         }
-        return NIL;
+        return nil;
       }
       ctx.error(lips_errc::event_not_found, at);
-      return NIL;
+      return nil;
   }
-  return NIL;
+  return nil;
 }
 
 namespace lisp::pn

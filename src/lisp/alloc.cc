@@ -36,7 +36,7 @@ lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(cons_t{a, b}); }
 
 lisp_t obarray(context&)
 {
-  lisp_t o = NIL;
+  lisp_t o = nil;
   for(auto i: global_symbols())
     o = cons(i.self, o);
   return o;
@@ -70,11 +70,11 @@ lisp_t mkarglist(lisp_t alist, std::int8_t& count)
     ++count;
     return cons(alist->car(), mkarglist(alist->cdr(), count));
   }
-  if(is_NIL(alist))
-    return NIL;
+  if(is_nil(alist))
+    return nil;
   ++count;
   count = static_cast<std::int8_t>(-count);
-  return cons(alist, NIL);
+  return cons(alist, nil);
 }
 
 /// @brief Creates a lambda function.
@@ -111,7 +111,7 @@ lisp_t intern(const std::string& pname)
 {
   auto& glob = global_symbols();
   auto& sym = glob.get(pname);
-  if(sym.self == NIL)
+  if(sym.self == nil)
     sym.self = getobject(sym);
   return sym.self;
 }
@@ -129,7 +129,7 @@ lisp_t mkatom(const std::string& str)
   if(global_symbols().exists(str))
     return global_symbols().get(str).self;
   auto& sym = global_symbols().get(str);
-  if(sym.self == NIL)
+  if(sym.self == nil)
     sym.self = getobject(sym);
   return sym.self;
 }

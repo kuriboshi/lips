@@ -130,7 +130,7 @@ TEST_CASE("io: lispread/readline")
     auto result0 = lispread(f0);
     auto f1 = ref_file_t::create(R"(hello world)");
     auto result1 = readline(f1);
-    CHECK(equal(result0, result1) != NIL);
+    CHECK(equal(result0, result1) != nil);
   }
 
   SECTION("floatp")
@@ -400,7 +400,7 @@ TEST_CASE("io: prin0")
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(NIL, *f);
+    prin0(nil, *f);
     CHECK(os.str() == "nil");
   }
   {
@@ -418,19 +418,19 @@ TEST_CASE("io: prin0")
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(lambda("a"_a, NIL), *f);
+    prin0(lambda("a"_a, nil), *f);
     CHECK(os.str().starts_with("#<lambda"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(nlambda("a"_a, NIL), *f);
+    prin0(nlambda("a"_a, nil), *f);
     CHECK(os.str().starts_with("#<nlambda"));
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(closure(lambda(NIL, "(a)"_l), "(a)"_l), *f);
+    prin0(closure(lambda(nil, "(a)"_l), "(a)"_l), *f);
     CHECK(os.str().starts_with("#<closure"));
   }
   {
@@ -467,7 +467,7 @@ TEST_CASE("io: prin0")
     std::ostringstream os;
     auto out = ref_file_t::create(os);
     auto old = context::current().primerr(out);
-    prin0(NIL, true);
+    prin0(nil, true);
     CHECK(os.str() == "nil");
     context::current().primerr(old);
   }
@@ -478,7 +478,7 @@ TEST_CASE("io: print")
   std::ostringstream os;
   auto out = ref_file_t::create(os);
   auto old = context::current().primerr(out);
-  print(NIL, true);
+  print(nil, true);
   CHECK(os.str() == "nil\n");
   context::current().primerr(old);
 }
@@ -490,36 +490,36 @@ TEST_CASE("io: splice")
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
     auto r = io::splice(ctx, x, y, false);
-    CHECK(!is_NIL(equal(x, "(x y z b c)"_l)));
-    CHECK(!is_NIL(equal(r, "(z b c)"_l)));
+    CHECK(!is_nil(equal(x, "(x y z b c)"_l)));
+    CHECK(!is_nil(equal(r, "(z b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
     auto r = io::splice(ctx, cdr(x), y, false);
-    CHECK(!is_NIL(equal(x, "(a x y z c)"_l)));
-    CHECK(!is_NIL(equal(r, "(z c)"_l)));
+    CHECK(!is_nil(equal(x, "(a x y z c)"_l)));
+    CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
     auto r = io::splice(ctx, cdr(x), y, true);
-    CHECK(!is_NIL(equal(x, "(a b x y z c)"_l)));
-    CHECK(!is_NIL(equal(r, "(z c)"_l)));
+    CHECK(!is_nil(equal(x, "(a b x y z c)"_l)));
+    CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
     auto r = io::splice(ctx, x, y, false);
-    CHECK(!is_NIL(equal(x, "(x b c)"_l)));
-    CHECK(!is_NIL(equal(r, "(x b c)"_l)));
+    CHECK(!is_nil(equal(x, "(x b c)"_l)));
+    CHECK(!is_nil(equal(r, "(x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
     auto r = io::splice(ctx, x, y, true);
-    CHECK(!is_NIL(equal(x, "(a x b c)"_l)));
-    CHECK(!is_NIL(equal(r, "(a x b c)"_l)));
+    CHECK(!is_nil(equal(x, "(a x b c)"_l)));
+    CHECK(!is_nil(equal(r, "(a x b c)"_l)));
   }
 }
 

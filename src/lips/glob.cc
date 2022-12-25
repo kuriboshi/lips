@@ -285,7 +285,7 @@ TEST_CASE("walkfiles")
 
 lisp_t buildlist(const std::vector<std::string>& list)
 {
-  lisp_t l = NIL;
+  lisp_t l = nil;
   for(auto r: list)
     l = cons(mkstring(r), l);
   return l;
@@ -375,7 +375,7 @@ TEST_CASE("extilde")
 lisp_t expandfiles(const std::string& wild, bool sort)
 {
   if(wild == "/"s)
-    return cons(mkstring(wild), NIL);
+    return cons(mkstring(wild), nil);
   auto files = walkfiles(wild);
   if(files.empty())
     return C_ERROR;
@@ -383,7 +383,7 @@ lisp_t expandfiles(const std::string& wild, bool sort)
   {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }
   } reverse;
-  if(!is_NIL(environment->globsort) || sort)
+  if(!is_nil(environment->globsort) || sort)
     std::sort(files.begin(), files.end(), reverse);
   return buildlist(files);
 }
@@ -498,7 +498,7 @@ lisp_t expand(lisp_t wild)
   check(wild, type::String, type::Symbol);
   auto wstr = extilde(wild->getstr());
   if(!wstr)
-    return NIL;
+    return nil;
   return expandfiles(*wstr, false);
 }
 

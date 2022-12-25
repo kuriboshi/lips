@@ -51,14 +51,14 @@ TEST_CASE("file: functions")
     {
       auto f = open(mkstring(test.file), C_READ);
       auto r = read(f);
-      CHECK(is_NIL(r));
+      CHECK(is_nil(r));
       CHECK(is_T(close(f)));
     }
 
     {
       auto f = open(mkstring(test.file), C_READ);
       auto r = read(f);
-      CHECK(is_NIL(r));
+      CHECK(is_nil(r));
       CHECK(is_T(close(f)));
     }
   }
@@ -104,10 +104,10 @@ TEST_CASE("file: functions")
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
-    REQUIRE(r1 != NIL);
+    REQUIRE(r1 != nil);
     CHECK(r1->getstr() == "\"hello\"");
     auto r2 = getline(f1);
-    REQUIRE(r2 != NIL);
+    REQUIRE(r2 != nil);
     CHECK(r2->getstr() == "\"world\"");
     std::filesystem::remove(test_file);
   }
@@ -123,7 +123,7 @@ TEST_CASE("file: functions")
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = read(f1);
-    REQUIRE(r1 != NIL);
+    REQUIRE(r1 != nil);
     CHECK(type_of(r1) == type::String);
     CHECK(r1->getstr() == "hello\n\nworld");
     std::filesystem::remove(test_file);
@@ -138,7 +138,7 @@ TEST_CASE("file: functions")
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
-    REQUIRE(r1 != NIL);
+    REQUIRE(r1 != nil);
     CHECK(r1->getstr() == "hello \"world\"");
     std::filesystem::remove(test_file);
   }
@@ -151,7 +151,7 @@ TEST_CASE("file: functions")
     close(f0);
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = getline(f1);
-    REQUIRE(r1 != NIL);
+    REQUIRE(r1 != nil);
     // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
     // versions print/prin1/princ.
     CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
@@ -168,7 +168,7 @@ TEST_CASE("file: functions")
       close(f0);
       auto f1 = open(mkstring(test_file), C_READ);
       auto r1 = getline(f1);
-      REQUIRE(r1 != NIL);
+      REQUIRE(r1 != nil);
       CHECK(r1->getstr() == "(a &)");
     }
     {
@@ -178,7 +178,7 @@ TEST_CASE("file: functions")
       close(f0);
       auto f1 = open(mkstring(test_file), C_READ);
       auto r1 = getline(f1);
-      REQUIRE(r1 != NIL);
+      REQUIRE(r1 != nil);
       CHECK(r1->getstr() == "(a (b &))");
       std::filesystem::remove(test_file);
     }
@@ -202,7 +202,7 @@ TEST_CASE("file: functions")
   {
     lisp_t f = details::alloc::getobject(ref_file_t::create(R"((a b c))"));
     auto sexpr = read(f);
-    CHECK(!is_NIL(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
+    CHECK(!is_nil(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
   }
 
   SECTION("spaces")
@@ -210,14 +210,14 @@ TEST_CASE("file: functions")
     {
       std::ostringstream cout;
       auto old = ctx.primout(ref_file_t::create(cout));
-      spaces(8_l, NIL);
+      spaces(8_l, nil);
       CHECK(cout.str() == "        ");
       ctx.primout(old);
     }
     {
       std::ostringstream cout;
       auto old = ctx.primout(ref_file_t::create(cout));
-      spaces(8_l, NIL);
+      spaces(8_l, nil);
       CHECK(cout.str() == "        ");
       ctx.primout(old);
     }
@@ -279,7 +279,7 @@ TEST_CASE("file: open error conditions")
     CHECK_THROWS(open(mkstring(test.file), C_CONS));
   }
 
-  SECTION("open non-existing file") { CHECK_THROWS(open(mkstring("/etc/xyzzy"), NIL)); }
+  SECTION("open non-existing file") { CHECK_THROWS(open(mkstring("/etc/xyzzy"), nil)); }
 }
 
 } // namespace lisp

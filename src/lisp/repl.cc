@@ -45,7 +45,7 @@ lisp_t repl::operator()(lisp_t exp)
       if(result != C_ERROR)
         print(result);
     }
-    return NIL;
+    return nil;
   }
   while(true)
   {
@@ -79,7 +79,7 @@ lisp_t repl::operator()(lisp_t exp)
       continue;
     }
     if(com->car() == C_RETURN)
-      return is_NIL(com->cdr()) ? NIL : com->cdr()->car();
+      return is_nil(com->cdr()) ? nil : com->cdr()->car();
   }
 }
 

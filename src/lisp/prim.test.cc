@@ -96,46 +96,46 @@ TEST_CASE("prim: primary functions")
     }
   }
 
-  SECTION("C.R, C..R, C...R should return NIL for non-CONS types")
+  SECTION("C.R, C..R, C...R should return nil for non-CONS types")
   {
     auto sym = mkatom("a");
-    CHECK(car(sym) == NIL);
-    CHECK(cdr(sym) == NIL);
+    CHECK(car(sym) == nil);
+    CHECK(cdr(sym) == nil);
 
-    CHECK(caar(sym) == NIL);
-    CHECK(cadr(sym) == NIL);
-    CHECK(cdar(sym) == NIL);
-    CHECK(cddr(sym) == NIL);
+    CHECK(caar(sym) == nil);
+    CHECK(cadr(sym) == nil);
+    CHECK(cdar(sym) == nil);
+    CHECK(cddr(sym) == nil);
 
-    CHECK(caaar(sym) == NIL);
-    CHECK(caadr(sym) == NIL);
-    CHECK(cadar(sym) == NIL);
-    CHECK(caddr(sym) == NIL);
-    CHECK(cdaar(sym) == NIL);
-    CHECK(cdadr(sym) == NIL);
-    CHECK(cddar(sym) == NIL);
-    CHECK(cdddr(sym) == NIL);
+    CHECK(caaar(sym) == nil);
+    CHECK(caadr(sym) == nil);
+    CHECK(cadar(sym) == nil);
+    CHECK(caddr(sym) == nil);
+    CHECK(cdaar(sym) == nil);
+    CHECK(cdadr(sym) == nil);
+    CHECK(cddar(sym) == nil);
+    CHECK(cdddr(sym) == nil);
   }
 
   SECTION("atom")
   {
     auto sym = mkatom("sym");
-    CHECK(!is_NIL(atom(sym)));
-    CHECK(!is_NIL(atom(sym)));
+    CHECK(!is_nil(atom(sym)));
+    CHECK(!is_nil(atom(sym)));
   }
 
   SECTION("append")
   {
     auto list0 = mklist(1_l, 2_l);
     auto list1 = mklist(3_l);
-    auto list = append(cons(list0, cons(list1, NIL)));
+    auto list = append(cons(list0, cons(list1, nil)));
     // Original list is unchanged
     auto r0 = iplus(list0);
     CHECK(r0->intval() == 3);
     auto r1 = iplus(list);
     CHECK(r1->intval() == 6);
     auto list2 = mklist(4_l);
-    list = append(cons(list, cons(list2, NIL)));
+    list = append(cons(list, cons(list2, nil)));
     auto r2 = iplus(list);
     CHECK(r2->intval() == 10);
   }
@@ -144,14 +144,14 @@ TEST_CASE("prim: primary functions")
   {
     auto list0 = mklist(1_l, 2_l);
     auto list1 = mklist(3_l);
-    auto list = nconc(cons(list0, cons(list1, NIL)));
+    auto list = nconc(cons(list0, cons(list1, nil)));
     // Original list changes
     auto r0 = iplus(list0);
     CHECK(r0->intval() == 6);
     auto r1 = iplus(list);
     CHECK(r1->intval() == 6);
     auto list2 = mklist(4_l);
-    list = nconc(cons(list, cons(list2, NIL)));
+    list = nconc(cons(list, cons(list2, nil)));
     // Original list changes
     auto r2 = iplus(list0);
     CHECK(r2->intval() == 10);
@@ -162,14 +162,14 @@ TEST_CASE("prim: primary functions")
   SECTION("tconc")
   {
     // This example is from the Interlisp manual page 6.2.
-    auto foo = tconc(NIL, 1_l);
+    auto foo = tconc(nil, 1_l);
     tconc(foo, 4_l);
     tconc(foo, 3_l);
     tconc(foo, 2_l);
     tconc(foo, 1_l);
     CHECK(equal(car(foo), mklist(1_l, 4_l, 3_l, 2_l, 1_l)));
     // Another example from the Interlisp manual
-    foo = cons(NIL, NIL);
+    foo = cons(nil, nil);
     tconc(foo, 5_l);
     tconc(foo, 4_l);
     tconc(foo, 3_l);
@@ -207,10 +207,10 @@ TEST_CASE("prim: primary functions")
 
   SECTION("null")
   {
-    CHECK(!is_NIL(null(NIL)));
-    CHECK(!is_NIL(null(NIL)));
-    CHECK(is_NIL(null(0_l)));
-    CHECK(is_NIL(null(0_l)));
+    CHECK(!is_nil(null(nil)));
+    CHECK(!is_nil(null(nil)));
+    CHECK(is_nil(null(0_l)));
+    CHECK(is_nil(null(0_l)));
   }
 
   SECTION("list")

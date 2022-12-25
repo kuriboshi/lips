@@ -26,7 +26,7 @@ lisp_t evaltrace(context& ctx, lisp_t state)
 {
   auto i = ctx.vm().trace();
 
-  if(!is_NIL(state))
+  if(!is_nil(state))
   {
     check(state, type::Integer);
     ctx.vm().trace(state->intval());

@@ -55,7 +55,7 @@ lisp_t length(context&, lisp_t);
 lisp_t closure(context&, lisp_t, lisp_t);
 
 /// @brief Return the N'th element in the list LIST.  If N is greater than
-/// the length of LIST, return NIL.
+/// the length of LIST, return nil.
 ///
 lisp_t nth(context&, lisp_t, lisp_t);
 lisp_t error(context&, lisp_t);

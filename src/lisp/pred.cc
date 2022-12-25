@@ -30,7 +30,7 @@ lisp_t numberp(context&, lisp_t a)
     case type::Float:
       return a;
     default:
-      return NIL;
+      return nil;
   }
 }
 
@@ -38,24 +38,24 @@ lisp_t listp(context&, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return a;
-  return NIL;
+  return nil;
 }
 
 lisp_t memb(context&, lisp_t x, lisp_t ls)
 {
-  while(!eq(ls, NIL))
+  while(!eq(ls, nil))
   {
     if(eq(x, ls->car()))
       return ls;
     ls = ls->cdr();
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
 {
   if(type_of(l1) != type_of(l2))
-    return NIL;
+    return nil;
   if(l1 == l2)
     return T;
   switch(type_of(l1))
@@ -63,52 +63,52 @@ lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
     case type::Cons:
       while(type_of(l1) == type_of(l2))
       {
-        if(pred::equal(ctx, l1->car(), l2->car()) != NIL)
+        if(pred::equal(ctx, l1->car(), l2->car()) != nil)
           return pred::equal(ctx, l1->cdr(), l2->cdr());
-        return NIL;
+        return nil;
       }
     case type::String:
-      return (l1->string() == l2->string()) ? T : NIL;
+      return (l1->string() == l2->string()) ? T : nil;
     case type::Lambda:
       return user::funeq(ctx, l1, l2);
     case type::Integer:
-      return (l1->intval() == l2->intval() ? T : NIL);
+      return (l1->intval() == l2->intval() ? T : nil);
     default:
       break;
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t nlistp(context&, lisp_t a)
 {
-  if(a == NIL)
+  if(a == nil)
     return T;
   if(type_of(a) != type::Cons)
     return a;
-  return NIL;
+  return nil;
 }
 
 lisp_t neq(context&, lisp_t a, lisp_t b)
 {
   if(a != b)
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t boundp(context&, lisp_t a)
 {
   if(type_of(a) != type::Symbol)
-    return NIL;
+    return nil;
   if(type_of(a->value()) != type::Unbound)
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t litatom(context&, lisp_t a)
 {
   if(type_of(a) == type::Symbol || type_of(a) == type::T)
     return T;
-  return NIL;
+  return nil;
 }
 
 lisp_t xtypeof(context&, lisp_t a)
@@ -152,7 +152,7 @@ lisp_t xtypeof(context&, lisp_t a)
     case type::Cvariable:
       return C_CVARIABLE;
     case type::Nil:
-      return NIL;
+      return nil;
   }
   // Never reached since all cases are handled in the switch statement.
 }

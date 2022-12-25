@@ -42,7 +42,7 @@ using lisp_t = ref_ptr<object>;
 
 enum class type
 {
-  Nil = 0,  // so that nullptr also becomes NIL
+  Nil = 0,  // so that nullptr also becomes nil
   T,        // the truth object
   Symbol,   // an atomic symbol
   Integer,  // 24 bit integer in same word
@@ -61,7 +61,7 @@ enum class type
   Cvariable // is a pointer to c-variable
 };
 
-inline constexpr auto NIL = nullptr;
+inline constexpr auto nil = nullptr;
 
 /// @brief The cons cell.
 ///
@@ -70,8 +70,8 @@ inline constexpr auto NIL = nullptr;
 ///
 struct cons_t
 {
-  lisp_t car = NIL;
-  lisp_t cdr = NIL;
+  lisp_t car = nil;
+  lisp_t cdr = nil;
 };
 
 /// @brief Structure describing a built-in function.
@@ -157,9 +157,9 @@ struct subr_t
 struct lambda_t
 {
   /// @brief The S-expression representation of the lambda function.
-  lisp_t body = NIL;
+  lisp_t body = nil;
   /// @brief The list of arguments.
-  lisp_t args = NIL;
+  lisp_t args = nil;
   /// @brief The number of arguments.
   std::int8_t count = 0;
   /// @brief True if arguments are evaluated, false if not (nlambda).
@@ -174,9 +174,9 @@ public:
   closure_t() = default;
   ~closure_t() = default;
 
-  lisp_t cfunction = NIL;
-  lisp_t closed = NIL;
-  lisp_t cvalues = NIL;
+  lisp_t cfunction = nil;
+  lisp_t closed = nil;
+  lisp_t cvalues = nil;
   std::uint8_t count = 0;
 
   static void* operator new(std::size_t) { return _pool.allocate(); }
@@ -468,7 +468,7 @@ extern lisp_t C_CVARIABLE;
 inline type type_of(lisp_t a) { return a == nullptr ? type::Nil : a->gettype(); }
 inline type type_of(object& a) { return a.gettype(); }
 inline bool is_T(lisp_t x) { return type_of(x) == type::T; }
-inline bool is_NIL(lisp_t x) { return type_of(x) == type::Nil; }
+inline bool is_nil(lisp_t x) { return type_of(x) == type::Nil; }
 
 } // namespace lisp
 

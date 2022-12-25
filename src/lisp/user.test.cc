@@ -43,34 +43,34 @@ TEST_CASE("user: User defined functions")
     auto r1 = defineq(f0);
     REQUIRE(type_of(r1) == type::Cons);
     CHECK(equal(r1, mklist(mkatom("f0"), mkatom("f1"))));
-    auto r2 = defineq(NIL);
-    CHECK(is_NIL(r2));
+    auto r2 = defineq(nil);
+    CHECK(is_nil(r2));
   }
 
   SECTION("getrep")
   {
-    auto nil0 = getrep(NIL);
-    CHECK(is_NIL(nil0));
+    auto nil0 = getrep(nil);
+    CHECK(is_nil(nil0));
     auto f0 = lambda("(a)"_l, "((cons a nil))"_l);
     auto rep0 = getrep(f0);
     std::string s("(lambda (a) (cons a nil))\n");
     auto expected = lispread(s);
-    CHECK(!is_NIL(equal(rep0, expected)));
+    CHECK(!is_nil(equal(rep0, expected)));
     auto rep1 = getrep(f0);
-    CHECK(!is_NIL(equal(rep0, rep1)));
+    CHECK(!is_nil(equal(rep0, rep1)));
     auto r0 = apply(f0, mklist(0_l));
-    CHECK(!is_NIL(equal(r0, cons(0_l, NIL))));
+    CHECK(!is_nil(equal(r0, cons(0_l, nil))));
     auto f2 = nlambda("a"_a, "(a)"_l);
     auto rep2 = getrep(f2);
-    CHECK(!is_NIL(equal(rep2, "(nlambda a a)"_l)));
+    CHECK(!is_nil(equal(rep2, "(nlambda a a)"_l)));
     auto f3 = lambda("(a b . c)"_l, "((cons a b))"_l);
     auto rep3 = getrep(f3);
-    CHECK(!is_NIL(equal(rep3, "(lambda (a b . c) (cons a b))"_l)));
+    CHECK(!is_nil(equal(rep3, "(lambda (a b . c) (cons a b))"_l)));
   }
 
   SECTION("Verbose flag")
   {
-    CHECK(is_NIL(ctx.verbose()));
+    CHECK(is_nil(ctx.verbose()));
     eval("(setq verbose t)");
     CHECK(is_T(ctx.verbose()));
   }
@@ -81,13 +81,13 @@ TEST_CASE("user: User defined functions")
     set(mkatom("f"), C_UNBOUND);
     auto f0 = define(mkatom("f"), lambda(mklist(mkatom("a")), mklist(mkatom("a"))));
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
-    CHECK(is_NIL(redef0));
+    CHECK(is_nil(redef0));
     std::ostringstream cout;
     auto old = ctx.primout(ref_file_t::create(cout));
     eval("(setq verbose t)");
     auto f1 = define(mkatom("f"), lambda(mklist(mkatom("b")), mklist(mkatom("b"))));
     auto redef1 = getprop(mkatom("f"), mkatom("olddef"));
-    CHECK(!is_NIL(redef1));
+    CHECK(!is_nil(redef1));
     CHECK(cout.str() == "(f redefined)\n");
     ctx.primout(old);
   }

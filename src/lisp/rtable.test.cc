@@ -67,7 +67,7 @@ TEST_CASE("rtable: rmgetenv")
   {
     lisp_t in = details::alloc::getobject(ref_file_t::create(R"(DOES_NOT_EXIST)"));
     auto none = rtable::rmgetenv(context::current(), in);
-    CHECK(none == NIL);
+    CHECK(none == nil);
   }
 }
 

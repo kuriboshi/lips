@@ -103,11 +103,11 @@ TEST_CASE("eval: eval functions")
 TEST_CASE("eval: closure")
 {
   auto a = setq(mkatom("a"), mknumber(1));
-  auto clos = closure(lambda(NIL, cons(mkatom("a"), NIL)), cons(mkatom("a"), NIL));
-  auto r0 = eval(cons(clos, NIL));
+  auto clos = closure(lambda(nil, cons(mkatom("a"), nil)), cons(mkatom("a"), nil));
+  auto r0 = eval(cons(clos, nil));
   a = setq(mkatom("a"), mknumber(2));
-  auto r1 = eval(apply(clos, NIL));
-  CHECK(equal(r0, r1) != NIL);
+  auto r1 = eval(apply(clos, nil));
+  CHECK(equal(r0, r1) != nil);
 }
 
 TEST_CASE("eval: topofstack")
@@ -118,9 +118,9 @@ TEST_CASE("eval: topofstack")
          (f1 (lambda (a) (f0 a))))
 )");
   auto r0 = eval("(f0 101)");
-  CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 88_l)), r0)));
+  CHECK(!is_nil(equal(mklist(1_l, cons(mkatom("a"), 88_l)), r0)));
   auto r1 = eval("(f1 99)");
-  CHECK(!is_NIL(equal(mklist(1_l, cons(mkatom("a"), 99_l)), r1)));
+  CHECK(!is_nil(equal(mklist(1_l, cons(mkatom("a"), 99_l)), r1)));
 }
 
 TEST_CASE("eval: control limits")
@@ -275,11 +275,11 @@ TEST_CASE("eval: backtrace")
 TEST_CASE("eval: backtrace, topofstack, destblock")
 {
   auto b = backtrace();
-  CHECK(b == NIL);
+  CHECK(b == nil);
   auto t = topofstack();
   CHECK(type_of(t) == type::Environ);
   auto d = destblock(t);
-  CHECK(d == NIL);
+  CHECK(d == nil);
 }
 
 template<class T>

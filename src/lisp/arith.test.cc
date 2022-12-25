@@ -368,14 +368,14 @@ TEST_CASE("arith: arithmetic functions")
   SECTION("greaterp")
   {
     CHECK(is_T(greaterp(mknumber(2), mknumber(1))));
-    CHECK(is_NIL(greaterp(mknumber(1), mknumber(2))));
+    CHECK(is_nil(greaterp(mknumber(1), mknumber(2))));
     CHECK(is_T(greaterp(mkfloat(2.0), mknumber(1))));
-    CHECK(is_NIL(greaterp(mkfloat(1.0), mknumber(2))));
+    CHECK(is_nil(greaterp(mkfloat(1.0), mknumber(2))));
     CHECK(is_T(greaterp(mknumber(2), mkfloat(1.0))));
-    CHECK(is_NIL(greaterp(mknumber(1), mkfloat(2.0))));
+    CHECK(is_nil(greaterp(mknumber(1), mkfloat(2.0))));
     CHECK(is_T(greaterp(mkfloat(2.0), mkfloat(1.0))));
-    CHECK(is_NIL(greaterp(mkfloat(1.0), mkfloat(2.0))));
-    CHECK(is_NIL(greaterp(mkfloat(1.0), mkfloat(2.0))));
+    CHECK(is_nil(greaterp(mkfloat(1.0), mkfloat(2.0))));
+    CHECK(is_nil(greaterp(mkfloat(1.0), mkfloat(2.0))));
     CHECK_THROWS_WITH(greaterp("a"_s, 1.0_l), "Illegal argument");
     CHECK_THROWS_WITH(greaterp(1.0_l, "b"_s), "Illegal argument");
     CHECK_THROWS_WITH(greaterp("a"_s, 1.0_l), "Illegal argument");
@@ -384,13 +384,13 @@ TEST_CASE("arith: arithmetic functions")
 
   SECTION("lessp")
   {
-    CHECK(is_NIL(lessp(mknumber(2), mknumber(1))));
+    CHECK(is_nil(lessp(mknumber(2), mknumber(1))));
     CHECK(is_T(lessp(mknumber(1), mknumber(2))));
-    CHECK(is_NIL(lessp(mkfloat(2.0), mknumber(1))));
+    CHECK(is_nil(lessp(mkfloat(2.0), mknumber(1))));
     CHECK(is_T(lessp(mkfloat(1.0), mknumber(2))));
-    CHECK(is_NIL(lessp(mknumber(2), mkfloat(1.0))));
+    CHECK(is_nil(lessp(mknumber(2), mkfloat(1.0))));
     CHECK(is_T(lessp(mknumber(1), mkfloat(2.0))));
-    CHECK(is_NIL(lessp(mkfloat(2.0), mkfloat(1.0))));
+    CHECK(is_nil(lessp(mkfloat(2.0), mkfloat(1.0))));
     CHECK(is_T(lessp(mkfloat(1.0), mkfloat(2.0))));
     CHECK(is_T(lessp(mkfloat(1.0), mkfloat(2.0))));
     CHECK_THROWS_WITH(lessp("a"_s, 1_l), "Illegal argument");
@@ -399,14 +399,14 @@ TEST_CASE("arith: arithmetic functions")
 
   SECTION("eqp")
   {
-    CHECK(is_NIL(eqp(mknumber(2), mknumber(1))));
-    CHECK(is_NIL(eqp(mknumber(1), mknumber(2))));
-    CHECK(is_NIL(eqp(mkfloat(2.0), mknumber(1))));
-    CHECK(is_NIL(eqp(mkfloat(1.0), mknumber(2))));
-    CHECK(is_NIL(eqp(mknumber(2), mkfloat(1.0))));
-    CHECK(is_NIL(eqp(mknumber(1), mkfloat(2.0))));
-    CHECK(is_NIL(eqp(mkfloat(2.0), mkfloat(1.0))));
-    CHECK(is_NIL(eqp(mkfloat(1.0), mkfloat(2.0))));
+    CHECK(is_nil(eqp(mknumber(2), mknumber(1))));
+    CHECK(is_nil(eqp(mknumber(1), mknumber(2))));
+    CHECK(is_nil(eqp(mkfloat(2.0), mknumber(1))));
+    CHECK(is_nil(eqp(mkfloat(1.0), mknumber(2))));
+    CHECK(is_nil(eqp(mknumber(2), mkfloat(1.0))));
+    CHECK(is_nil(eqp(mknumber(1), mkfloat(2.0))));
+    CHECK(is_nil(eqp(mkfloat(2.0), mkfloat(1.0))));
+    CHECK(is_nil(eqp(mkfloat(1.0), mkfloat(2.0))));
     CHECK(is_T(eqp(mknumber(1), mknumber(1))));
     CHECK(is_T(eqp(mknumber(1), mknumber(1))));
     CHECK_THROWS_WITH(eqp("a"_s, 1_l), "Illegal argument");
@@ -416,13 +416,13 @@ TEST_CASE("arith: arithmetic functions")
   SECTION("geq")
   {
     CHECK(is_T(geq(mknumber(2), mknumber(1))));
-    CHECK(is_NIL(geq(mknumber(1), mknumber(2))));
+    CHECK(is_nil(geq(mknumber(1), mknumber(2))));
     CHECK(is_T(geq(mkfloat(2.0), mknumber(1))));
-    CHECK(is_NIL(geq(mkfloat(1.0), mknumber(2))));
+    CHECK(is_nil(geq(mkfloat(1.0), mknumber(2))));
     CHECK(is_T(geq(mknumber(2), mkfloat(1.0))));
-    CHECK(is_NIL(geq(mknumber(1), mkfloat(2.0))));
+    CHECK(is_nil(geq(mknumber(1), mkfloat(2.0))));
     CHECK(is_T(geq(mkfloat(2.0), mkfloat(1.0))));
-    CHECK(is_NIL(geq(mkfloat(1.0), mkfloat(2.0))));
+    CHECK(is_nil(geq(mkfloat(1.0), mkfloat(2.0))));
     CHECK(is_T(geq(mknumber(1), mknumber(1))));
     CHECK(is_T(geq(mknumber(1), mknumber(1))));
     CHECK_THROWS_WITH(geq("a"_s, 1_l), "Illegal argument");
@@ -431,13 +431,13 @@ TEST_CASE("arith: arithmetic functions")
 
   SECTION("leq")
   {
-    CHECK(is_NIL(leq(mknumber(2), mknumber(1))));
+    CHECK(is_nil(leq(mknumber(2), mknumber(1))));
     CHECK(is_T(leq(mknumber(1), mknumber(2))));
-    CHECK(is_NIL(leq(mkfloat(2.0), mknumber(1))));
+    CHECK(is_nil(leq(mkfloat(2.0), mknumber(1))));
     CHECK(is_T(leq(mkfloat(1.0), mknumber(2))));
-    CHECK(is_NIL(leq(mknumber(2), mkfloat(1.0))));
+    CHECK(is_nil(leq(mknumber(2), mkfloat(1.0))));
     CHECK(is_T(leq(mknumber(1), mkfloat(2.0))));
-    CHECK(is_NIL(leq(mkfloat(2.0), mkfloat(1.0))));
+    CHECK(is_nil(leq(mkfloat(2.0), mkfloat(1.0))));
     CHECK(is_T(leq(mkfloat(1.0), mkfloat(2.0))));
     CHECK(is_T(leq(mknumber(1), mknumber(1))));
     CHECK(is_T(leq(mknumber(1), mknumber(1))));
@@ -455,8 +455,8 @@ TEST_CASE("arith: arithmetic functions")
     CHECK(is_T(neqp(mknumber(1), mkfloat(2.0))));
     CHECK(is_T(neqp(mkfloat(2.0), mkfloat(1.0))));
     CHECK(is_T(neqp(mkfloat(1.0), mkfloat(2.0))));
-    CHECK(is_NIL(neqp(mknumber(1), mknumber(1))));
-    CHECK(is_NIL(neqp(mknumber(1), mknumber(1))));
+    CHECK(is_nil(neqp(mknumber(1), mknumber(1))));
+    CHECK(is_nil(neqp(mknumber(1), mknumber(1))));
     CHECK_THROWS(neqp("a"_s, 1_l), "Illegal argument");
     CHECK_THROWS(neqp(1_l, "b"_s), "Illegal argument");
   }
@@ -464,15 +464,15 @@ TEST_CASE("arith: arithmetic functions")
   SECTION("zerop")
   {
     CHECK(is_T(zerop(0_l)));
-    CHECK(is_NIL(zerop(1_l)));
+    CHECK(is_nil(zerop(1_l)));
   }
 
   SECTION("minusp")
   {
     CHECK(is_T(minusp(mknumber(-5))));
-    CHECK(is_NIL(minusp(5_l)));
+    CHECK(is_nil(minusp(5_l)));
     CHECK(is_T(minusp(mkfloat(-1.0))));
-    CHECK(is_NIL(minusp(1.0_l)));
+    CHECK(is_nil(minusp(1.0_l)));
     CHECK_THROWS_WITH(minusp("string"_s), "Illegal argument");
   }
 }

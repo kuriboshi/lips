@@ -27,7 +27,7 @@ namespace lisp::details::user
 {
 lisp_t getargs(context& ctx, lisp_t al)
 {
-  if(is_NIL(al->cdr()))
+  if(is_nil(al->cdr()))
     return al->car();
   return cons(al->car(), getargs(ctx, al->cdr()));
 }
@@ -37,7 +37,7 @@ lisp_t getrep(context& ctx, lisp_t fun)
   lisp_t args;
 
   if(type_of(fun) != type::Lambda)
-    return NIL;
+    return nil;
   auto& x = fun->lambda();
   if(x.count == -1)
     args = x.args->car();
@@ -59,16 +59,16 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
     lisp_t t1 = f1->lambda().args;
     lisp_t t2 = f2->lambda().args;
     lisp_t tmp = equal(t1, t2);
-    if(!is_NIL(tmp))
+    if(!is_nil(tmp))
     {
       t1 = f1->lambda().body;
       t2 = f2->lambda().body;
       tmp = equal(t1, t2);
-      if(!is_NIL(tmp))
+      if(!is_nil(tmp))
         return T;
     }
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
@@ -77,14 +77,14 @@ lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
     if(type_of(name->value()) == type::Lambda)
     {
       lisp_t t = user::funeq(ctx, name->value(), lam);
-      if(is_NIL(t))
+      if(is_nil(t))
       {
         putprop(name, C_OLDDEF, name->value());
-        if(!is_NIL(ctx.verbose()))
-          print(cons(name, cons(C_REDEFINED, NIL)));
+        if(!is_nil(ctx.verbose()))
+          print(cons(name, cons(C_REDEFINED, nil)));
       }
     }
-  return NIL;
+  return nil;
 }
 
 lisp_t define(context& ctx, lisp_t name, lisp_t lam)
@@ -98,15 +98,15 @@ lisp_t define(context& ctx, lisp_t name, lisp_t lam)
 
 lisp_t defineq(context& ctx, lisp_t defs)
 {
-  if(is_NIL(defs))
-    return NIL;
-  auto result = cons(NIL, NIL);
+  if(is_nil(defs))
+    return nil;
+  auto result = cons(nil, nil);
   auto r = result;
   for(auto d: defs)
   {
     auto name = car(d);
     auto lam = eval(cadr(d));
-    auto def = cons(user::define(ctx, name, lam), NIL);
+    auto def = cons(user::define(ctx, name, lam), nil);
     rplacd(r, def);
     r = def;
   }

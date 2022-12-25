@@ -27,15 +27,15 @@ lisp_t parser::parse_object()
   if(!next())
     return C_EOF;
   if(_token.is_special('\''))
-    return cons(mkatom("quote"), cons(parse_object(), NIL));
+    return cons(mkatom("quote"), cons(parse_object(), nil));
   if(_token.is_special('('))
     return parse_list('(');
   if(_token.is_special('['))
     return parse_list('[');
   if(_token.is_special(')'))
-    return NIL;
+    return nil;
   if(_token.is_special(']'))
-    return NIL;
+    return nil;
   if(_token.type == token_t::type::MACRO)
     return _lexer.macro(_token);
   return create(_token);
@@ -52,7 +52,7 @@ lisp_t parser::parse_list(char c)
 
     if(c == '[' && _token.is_special(')'))
     {
-      head = cons(head, NIL);
+      head = cons(head, nil);
       tail = head;
       continue;
     }
@@ -68,12 +68,12 @@ lisp_t parser::parse_list(char c)
 
     auto object = parse_tail();
 
-    if(head == NIL)
+    if(head == nil)
       tail = head = object;
     else
       tail = cdr(rplacd(tail, object));
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t parser::parse_tail()
@@ -82,12 +82,12 @@ lisp_t parser::parse_tail()
   {
     auto object = parse_list('(');
     _lexer.unread(_token);
-    if(listp(object) && cdr(object) == NIL)
+    if(listp(object) && cdr(object) == nil)
       return car(object);
     return cons(make_symbol("."), object);
   }
   _lexer.unread(_token);
   auto object = parse_object();
-  return cons(object, NIL);
+  return cons(object, nil);
 }
 } // namespace lisp

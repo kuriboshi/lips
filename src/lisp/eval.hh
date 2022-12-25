@@ -55,7 +55,7 @@ private:
   std::variant<control_block, var_val_pair> u;
 
 public:
-  void reset() { u = var_val_pair{NIL, NIL}; }
+  void reset() { u = var_val_pair{nil, nil}; }
 
   void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
   int size() const { return std::get<control_block>(u).size; }

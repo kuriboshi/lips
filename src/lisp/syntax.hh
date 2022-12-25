@@ -119,7 +119,7 @@ public:
 
 private:
   std::array<type, 256> _table = {type::OTHER};
-  std::array<lisp_t, 256> _macro = {NIL};
+  std::array<lisp_t, 256> _macro = {nil};
 };
 
 } // namespace lisp

@@ -30,18 +30,18 @@ namespace lisp::details::map
 /// @param fn1 The function to apply on each tail of obj.
 /// @param fn2 Function to apply to get the next element of the list (default is CDR).
 ///
-/// @returns NIL
+/// @returns nil
 lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == type::Cons)
   {
-    apply(fn1, cons(obj, NIL));
-    if(is_NIL(fn2))
+    apply(fn1, cons(obj, nil));
+    if(is_nil(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, cons(obj, NIL));
+      obj = apply(fn2, cons(obj, nil));
   }
-  return NIL;
+  return nil;
 }
 
 /// @brief Apply function on each CAR of a list.
@@ -51,18 +51,18 @@ lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @param fn1 The function to apply on each CAR of the list.
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
-/// @returns NIL
+/// @returns nil
 lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == type::Cons)
   {
-    apply(fn1, cons(obj->car(), NIL));
-    if(is_NIL(fn2))
+    apply(fn1, cons(obj->car(), nil));
+    if(is_nil(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, cons(obj, NIL));
+      obj = apply(fn2, cons(obj, nil));
   }
-  return NIL;
+  return nil;
 }
 
 /// @brief Apply FN1 on each consecutive tail of OBJ.
@@ -75,21 +75,21 @@ lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @returns A list of the result of applying FN1 on each element in the list.
 lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  lisp_t tmp = NIL;
+  lisp_t tmp = nil;
   if(type_of(obj) == type::Cons)
   {
-    tmp = cons(apply(fn1, cons(obj, NIL)), NIL);
+    tmp = cons(apply(fn1, cons(obj, nil)), nil);
     obj = obj->cdr();
   }
   lisp_t rval = tmp;
   while(type_of(obj) == type::Cons)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj, NIL)), NIL));
+    rplacd(tmp, cons(apply(fn1, cons(obj, nil)), nil));
     tmp = tmp->cdr();
-    if(is_NIL(fn2))
+    if(is_nil(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, cons(obj, NIL));
+      obj = apply(fn2, cons(obj, nil));
   }
   return rval;
 }
@@ -104,21 +104,21 @@ lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @returns A list of the result of applying FN1 on each element in the list.
 lisp_t mapcar(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  lisp_t tmp = NIL;
+  lisp_t tmp = nil;
   if(type_of(obj) == type::Cons)
   {
-    tmp = cons(apply(fn1, cons(obj->car(), NIL)), NIL);
+    tmp = cons(apply(fn1, cons(obj->car(), nil)), nil);
     obj = obj->cdr();
   }
   lisp_t rval = tmp;
   while(type_of(obj) == type::Cons)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj->car(), NIL)), NIL));
+    rplacd(tmp, cons(apply(fn1, cons(obj->car(), nil)), nil));
     tmp = tmp->cdr();
-    if(is_NIL(fn2))
+    if(is_nil(fn2))
       obj = obj->cdr();
     else
-      obj = apply(fn2, cons(obj, NIL));
+      obj = apply(fn2, cons(obj, nil));
   }
   return rval;
 }

@@ -30,12 +30,12 @@ namespace lisp
 inline int run(context& ctx, std::ostream& out = std::cout)
 {
   repl repl(ctx);
-  ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(NIL); };
+  ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
   while(true)
   {
     try
     {
-      ctx.repl(NIL);
+      ctx.repl(nil);
       // If we return normally from repl we exit the program
       return 0;
     }

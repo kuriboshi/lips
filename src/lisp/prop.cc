@@ -39,7 +39,7 @@ lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
-  for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->symbol().plist; !is_nil(pl); pl = pl->cdr()->cdr())
     if(pl->car() == p)
     {
       rplaca(pl->cdr(), v);
@@ -53,27 +53,27 @@ lisp_t getprop(context&, lisp_t x, lisp_t p)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
-  for(auto pl = x->symbol().plist; !is_NIL(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->symbol().plist; !is_nil(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
       return pl->cdr()->car();
   }
-  return NIL;
+  return nil;
 }
 
 lisp_t remprop(context&, lisp_t x, lisp_t p)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
-  lisp_t r = NIL;
+  lisp_t r = nil;
   auto pl = x->symbol().plist;
-  lisp_t pl2 = NIL;
-  for(; !is_NIL(pl); pl = pl->cdr()->cdr())
+  lisp_t pl2 = nil;
+  for(; !is_nil(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
     {
       r = pl->cdr()->car();
-      if(is_NIL(pl2))
+      if(is_nil(pl2))
         x->symbol().plist = pl->cdr()->cdr();
       else
         rplacd(pl2, pl->cdr()->cdr());

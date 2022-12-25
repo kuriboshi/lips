@@ -63,9 +63,9 @@ public:
       case token_t::type::SPECIAL:
         return mkatom(token.token);
       case token_t::type::SYMBOL:
-        // Consider the token 'nil' to be NIL even in unevaluated contexts.
+        // Consider the token 'nil' to be nil even in unevaluated contexts.
         if(token.token == "nil")
-          return NIL;
+          return nil;
         return mkatom(token.token);
       case token_t::type::STRING:
         return mkstring(token.token);
@@ -74,7 +74,7 @@ public:
       case token_t::type::FLOAT:
         return mkfloat(std::stod(token.token));
       default:
-        return NIL;
+        return nil;
     }
     return C_EOF;
   }
