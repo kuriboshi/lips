@@ -26,6 +26,9 @@ release: release.config
 coverage: debug.config
 	cmake --build --preset debug --target ccov
 
+format: debug.config
+	cmake --build --preset debug --target format
+
 test: debug
 	ctest --preset default
 
