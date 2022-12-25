@@ -52,11 +52,11 @@ public:
   {}
   /// @brief Parse the sequence of tokens supplied by the lexer.
   /// @return The return value is the SEXPR.
-  LISPT parse() { return parse_object(); }
+  lisp_t parse() { return parse_object(); }
 
-  /// @brief Creates an appropriate LISPT object of the correct type based on
+  /// @brief Creates an appropriate lisp_t object of the correct type based on
   /// the token.
-  LISPT create(const token_t& token) const
+  lisp_t create(const token_t& token) const
   {
     switch(token.type)
     {
@@ -91,15 +91,15 @@ private:
 
   /// @brief Parse an object.
   /// @return Either the object or nothing if there is a parse error.
-  LISPT parse_object();
+  lisp_t parse_object();
   /// @brief Parse a list of objects.
   /// @return A list of objects or nothing if there is a parse error. This can
   /// happen if the input source ends before a complete list has been read.
-  LISPT parse_list(char);
+  lisp_t parse_list(char);
   /// @brief Parse the tail of a list.
-  LISPT parse_tail();
+  lisp_t parse_tail();
   /// @brief Make a symbol from a string.
-  LISPT make_symbol(const std::string& symbol) const { return mkatom(symbol); }
+  lisp_t make_symbol(const std::string& symbol) const { return mkatom(symbol); }
 
   /// @brief Holds the lexer object.
   lexer& _lexer;

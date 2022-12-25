@@ -50,7 +50,7 @@ namespace lisp::details::low
 ///       (t r3))
 /// @endcode
 ///
-LISPT cond(context& ctx, LISPT args)
+lisp_t cond(context& ctx, lisp_t args)
 {
   while(!is_NIL(args))
   {
@@ -68,9 +68,9 @@ LISPT cond(context& ctx, LISPT args)
   return NIL;
 }
 
-LISPT prog1(context&, LISPT a1, LISPT) { return a1; }
+lisp_t prog1(context&, lisp_t a1, lisp_t) { return a1; }
 
-LISPT progn(context&, LISPT lexp)
+lisp_t progn(context&, lisp_t lexp)
 {
   if(is_NIL(lexp))
     return NIL;
@@ -82,7 +82,7 @@ LISPT progn(context&, LISPT lexp)
   return eval(lexp->car());
 }
 
-LISPT set(context& ctx, LISPT var, LISPT val)
+lisp_t set(context& ctx, lisp_t var, lisp_t val)
 {
   check(var, type::Symbol);
   if(var->symbol().constant)
@@ -100,11 +100,11 @@ LISPT set(context& ctx, LISPT var, LISPT val)
   return val;
 }
 
-LISPT setq(context& ctx, LISPT var, LISPT val) { return low::set(ctx, var, eval(val)); }
+lisp_t setq(context& ctx, lisp_t var, lisp_t val) { return low::set(ctx, var, eval(val)); }
 
-LISPT xwhile(context& ctx, LISPT pred, LISPT exp)
+lisp_t xwhile(context& ctx, lisp_t pred, lisp_t exp)
 {
-  LISPT res = eval(pred);
+  lisp_t res = eval(pred);
   while(!is_NIL(res))
   {
     low::progn(ctx, exp);

@@ -30,7 +30,7 @@ repl::repl(context& ctx)
   ctx.vm().interactive(true);
 }
 
-LISPT repl::operator()(LISPT exp)
+lisp_t repl::operator()(lisp_t exp)
 {
   level begin(*this);
   if(_level == 1)

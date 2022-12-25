@@ -57,9 +57,9 @@ private:
   void retype(int);
   char* mkexstr();
   void fillrest(const char*);
-  bool checkchar(lisp::LISPT words, std::size_t pos, char* c);
-  void complete(lisp::LISPT words);
-  lisp::LISPT strip(lisp::LISPT files, const char* prefix, const char* suffix);
+  bool checkchar(lisp::lisp_t words, std::size_t pos, char* c);
+  void complete(lisp::lisp_t words);
+  lisp::lisp_t strip(lisp::lisp_t files, const char* prefix, const char* suffix);
   void scan(int begin);
   void nput(const char* str, int ntim);
   void blink();

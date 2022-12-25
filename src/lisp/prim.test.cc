@@ -44,7 +44,7 @@ TEST_CASE("prim: primary functions")
     CHECK(type_of(r0) == type::Integer);
     CHECK(type_of(3_l) == type::Integer);
     // TODO: Can't do this because Catch2 goes into an infinite loop when
-    // converting a LISPT to a string.
+    // converting a lisp_t to a string.
     // CHECK(r0 == 3_l);
     CHECK(r0->intval() == 3_l->intval());
   }

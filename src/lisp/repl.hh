@@ -43,13 +43,13 @@ public:
     repl& _repl;
   };
 
-  LISPT operator()(LISPT);
+  lisp_t operator()(lisp_t);
 
 private:
   context& _ctx;
   int _level = 0;
-  LISPT _prompt;
-  LISPT _break_prompt;
+  lisp_t _prompt;
+  lisp_t _break_prompt;
 };
 
 } // namespace lisp

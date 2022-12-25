@@ -317,9 +317,9 @@ void term_source::fillrest(const char* word)
   }
 }
 
-bool term_source::checkchar(LISPT words, std::size_t pos, char* c)
+bool term_source::checkchar(lisp_t words, std::size_t pos, char* c)
 {
-  LISPT w = words;
+  lisp_t w = words;
   *c = (w->car()->getstr())[pos];
   for(; !is_NIL(w); w = w->cdr())
   {
@@ -329,7 +329,7 @@ bool term_source::checkchar(LISPT words, std::size_t pos, char* c)
   return true;
 }
 
-void term_source::complete(LISPT words)
+void term_source::complete(lisp_t words)
 {
   char c = 1;
 
@@ -341,9 +341,9 @@ void term_source::complete(LISPT words)
   }
 }
 
-LISPT term_source::strip(LISPT files, const char* prefix, const char* suffix)
+lisp_t term_source::strip(lisp_t files, const char* prefix, const char* suffix)
 {
-  LISPT stripped;
+  lisp_t stripped;
 
   if(strncmp(files->car()->getstr().c_str(), prefix, strlen(prefix) - 1) != 0)
     return files;

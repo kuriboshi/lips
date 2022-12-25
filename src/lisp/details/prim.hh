@@ -24,44 +24,44 @@ namespace lisp::details::prim
 {
 void init();
 
-LISPT car(context&, LISPT);
-LISPT cdr(context&, LISPT);
-LISPT cadr(context&, LISPT);
-LISPT cdar(context&, LISPT);
-LISPT caar(context&, LISPT);
-LISPT cddr(context&, LISPT);
-LISPT cdddr(context&, LISPT);
-LISPT caddr(context&, LISPT);
-LISPT cdadr(context&, LISPT);
-LISPT caadr(context&, LISPT);
-LISPT cddar(context&, LISPT);
-LISPT cadar(context&, LISPT);
-LISPT cdaar(context&, LISPT);
-LISPT caaar(context&, LISPT);
-LISPT rplaca(context&, LISPT, LISPT);
-LISPT rplacd(context&, LISPT, LISPT);
-LISPT eq(context&, LISPT, LISPT);
-LISPT atom(context&, LISPT);
-LISPT nconc(context&, LISPT);
-LISPT tconc(context&, LISPT, LISPT);
-LISPT attach(context&, LISPT, LISPT);
-LISPT append(context&, LISPT);
-LISPT null(context&, LISPT);
-LISPT quote(context&, LISPT);
-LISPT lambda(context&, LISPT, LISPT);
-LISPT nlambda(context&, LISPT, LISPT);
-LISPT list(context&, LISPT);
-LISPT length(context&, LISPT);
-LISPT closure(context&, LISPT, LISPT);
+lisp_t car(context&, lisp_t);
+lisp_t cdr(context&, lisp_t);
+lisp_t cadr(context&, lisp_t);
+lisp_t cdar(context&, lisp_t);
+lisp_t caar(context&, lisp_t);
+lisp_t cddr(context&, lisp_t);
+lisp_t cdddr(context&, lisp_t);
+lisp_t caddr(context&, lisp_t);
+lisp_t cdadr(context&, lisp_t);
+lisp_t caadr(context&, lisp_t);
+lisp_t cddar(context&, lisp_t);
+lisp_t cadar(context&, lisp_t);
+lisp_t cdaar(context&, lisp_t);
+lisp_t caaar(context&, lisp_t);
+lisp_t rplaca(context&, lisp_t, lisp_t);
+lisp_t rplacd(context&, lisp_t, lisp_t);
+lisp_t eq(context&, lisp_t, lisp_t);
+lisp_t atom(context&, lisp_t);
+lisp_t nconc(context&, lisp_t);
+lisp_t tconc(context&, lisp_t, lisp_t);
+lisp_t attach(context&, lisp_t, lisp_t);
+lisp_t append(context&, lisp_t);
+lisp_t null(context&, lisp_t);
+lisp_t quote(context&, lisp_t);
+lisp_t lambda(context&, lisp_t, lisp_t);
+lisp_t nlambda(context&, lisp_t, lisp_t);
+lisp_t list(context&, lisp_t);
+lisp_t length(context&, lisp_t);
+lisp_t closure(context&, lisp_t, lisp_t);
 
 /// @brief Return the N'th element in the list LIST.  If N is greater than
 /// the length of LIST, return NIL.
 ///
-LISPT nth(context&, LISPT, LISPT);
-LISPT error(context&, LISPT);
-LISPT exit(context&, LISPT);
+lisp_t nth(context&, lisp_t, lisp_t);
+lisp_t error(context&, lisp_t);
+lisp_t exit(context&, lisp_t);
 
-LISPT closobj(context&, LISPT);
+lisp_t closobj(context&, lisp_t);
 } // namespace lisp::details::prim
 
 #endif

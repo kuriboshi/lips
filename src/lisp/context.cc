@@ -200,31 +200,31 @@ ref_file_t context::stderr() const { return _pimpl->_stderr; }
 
 ref_file_t context::stdin() const { return _pimpl->_stdin; }
 
-LISPT context::perror(std::error_code error)
+lisp_t context::perror(std::error_code error)
 {
   primerr()->format("{} ", error.message());
   return NIL;
 }
 
-LISPT context::perror(std::error_code error, LISPT arg)
+lisp_t context::perror(std::error_code error, lisp_t arg)
 {
   primerr()->format("{} ", error.message());
   prin2(arg, T);
   return NIL;
 }
 
-LISPT context::error(std::error_code error, LISPT arg)
+lisp_t context::error(std::error_code error, lisp_t arg)
 {
   perror(error, arg);
   throw lisp_error(error.message());
 }
 
-LISPT context::break0(LISPT exp) const { return repl(exp); }
+lisp_t context::break0(lisp_t exp) const { return repl(exp); }
 
 cvariable_t& context::currentbase() { return _pimpl->_currentbase; }
 cvariable_t& context::verbose() { return _pimpl->_verbose; }
 cvariable_t& context::loadpath() { return _pimpl->_loadpath; }
-void context::loadpath(LISPT newpath) { _pimpl->_loadpath = newpath; }
+void context::loadpath(lisp_t newpath) { _pimpl->_loadpath = newpath; }
 
 context* context::_current = nullptr;
 

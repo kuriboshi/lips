@@ -22,7 +22,7 @@
 
 namespace lisp::details::debug
 {
-LISPT evaltrace(context& ctx, LISPT state)
+lisp_t evaltrace(context& ctx, lisp_t state)
 {
   auto i = ctx.vm().trace();
 

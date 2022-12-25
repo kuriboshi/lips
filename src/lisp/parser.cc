@@ -22,7 +22,7 @@
 
 namespace lisp
 {
-LISPT parser::parse_object()
+lisp_t parser::parse_object()
 {
   if(!next())
     return C_EOF;
@@ -41,10 +41,10 @@ LISPT parser::parse_object()
   return create(_token);
 }
 
-LISPT parser::parse_list(char c)
+lisp_t parser::parse_list(char c)
 {
-  LISPT head;
-  LISPT tail;
+  lisp_t head;
+  lisp_t tail;
   while(true)
   {
     if(!next())
@@ -76,7 +76,7 @@ LISPT parser::parse_list(char c)
   return NIL;
 }
 
-LISPT parser::parse_tail()
+lisp_t parser::parse_tail()
 {
   if(_token.is_special('.'))
   {

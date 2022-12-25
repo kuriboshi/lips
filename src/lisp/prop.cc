@@ -22,20 +22,20 @@
 
 namespace lisp::details::prop
 {
-LISPT setplist(context&, LISPT x, LISPT pl)
+lisp_t setplist(context&, lisp_t x, lisp_t pl)
 {
   check(x, type::Symbol);
   x->symbol().plist = pl;
   return pl;
 }
 
-LISPT getplist(context&, LISPT x)
+lisp_t getplist(context&, lisp_t x)
 {
   check(x, type::Symbol);
   return x->symbol().plist;
 }
 
-LISPT putprop(context&, LISPT x, LISPT p, LISPT v)
+lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
@@ -49,7 +49,7 @@ LISPT putprop(context&, LISPT x, LISPT p, LISPT v)
   return v;
 }
 
-LISPT getprop(context&, LISPT x, LISPT p)
+lisp_t getprop(context&, lisp_t x, lisp_t p)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
@@ -61,13 +61,13 @@ LISPT getprop(context&, LISPT x, LISPT p)
   return NIL;
 }
 
-LISPT remprop(context&, LISPT x, LISPT p)
+lisp_t remprop(context&, lisp_t x, lisp_t p)
 {
   check(x, type::Symbol);
   check(p, type::Symbol);
-  LISPT r = NIL;
+  lisp_t r = NIL;
   auto pl = x->symbol().plist;
-  LISPT pl2 = NIL;
+  lisp_t pl2 = NIL;
   for(; !is_NIL(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)

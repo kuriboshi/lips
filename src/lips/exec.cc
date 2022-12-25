@@ -46,7 +46,7 @@ using namespace std::literals;
 #if defined(__APPLE__) || defined(__FreeBSD__)
 extern char** environ;
 #endif
-LISPT p_setenv(LISPT, LISPT);
+lisp_t p_setenv(lisp_t, lisp_t);
 
 bool insidefork = false; // Is nonzero in the child after a fork
 
@@ -58,7 +58,7 @@ struct job_t
   int procid = 0;          // Process id
   int status = 0;          // Return value
   std::string wdir;        // Working directory
-  LISPT exp;               // Job expression
+  lisp_t exp;              // Job expression
   bool background = false; // true means job runs in bg
   bool running = false;    // true if running
 };
@@ -235,7 +235,7 @@ std::pair<bool, std::string> check_meta(const std::string& s)
   return {meta, result};
 }
 
-std::optional<std::vector<std::string>> process_one(LISPT arg)
+std::optional<std::vector<std::string>> process_one(lisp_t arg)
 {
   std::vector<std::string> args;
   if(type_of(arg) == type::Symbol)
@@ -286,7 +286,7 @@ std::optional<std::vector<std::string>> process_one(LISPT arg)
  *             execve. Returns nullptr if some error occured, like a no match
  *             for wild cards. Returns pointers to globbed arguments.
  */
-std::optional<std::vector<std::string>> make_exec(LISPT command)
+std::optional<std::vector<std::string>> make_exec(lisp_t command)
 {
   std::vector<std::string> args;
 
@@ -337,7 +337,7 @@ int waitfork(pid_t pid)
  *           waitfork). Exec either returns T or ERROR depending success or
  *           failure for some reason.
  */
-LISPT execute(const std::string& name, LISPT command)
+lisp_t execute(const std::string& name, lisp_t command)
 {
   auto args = make_exec(command);
   if(!args)
@@ -417,7 +417,7 @@ namespace lisp::exec
  *               the path, 1 if the command was successively run and -1 if 
  *               there was some error.
  */
-int execcommand(LISPT exp, LISPT* res)
+int execcommand(lisp_t exp, lisp_t* res)
 {
   *res = T;
   auto command = glob::extilde(exp->car()->getstr());
@@ -455,7 +455,7 @@ int execcommand(LISPT exp, LISPT* res)
 
 /* Primitives */
 
-LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed)
+lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -491,7 +491,7 @@ LISPT redir_to(context& ctx, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_append(context& ctx, LISPT cmd, LISPT file, LISPT filed)
+lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -527,7 +527,7 @@ LISPT redir_append(context& ctx, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed)
+lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -563,7 +563,7 @@ LISPT redir_from(context& ctx, LISPT cmd, LISPT file, LISPT filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT pipecmd(context& ctx, LISPT cmds)
+lisp_t pipecmd(context& ctx, lisp_t cmds)
 {
   print(cmds);
 
@@ -611,7 +611,7 @@ LISPT pipecmd(context& ctx, LISPT cmds)
   return mknumber(WEXITSTATUS(status));
 }
 
-LISPT back(context& ctx, LISPT x)
+lisp_t back(context& ctx, lisp_t x)
 {
   int pid = 0;
 
@@ -630,13 +630,13 @@ LISPT back(context& ctx, LISPT x)
   return mknumber(pid);
 }
 
-LISPT stop(context& ctx)
+lisp_t stop(context& ctx)
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-LISPT rehash(context&)
+lisp_t rehash(context&)
 {
   do_rehash();
   return NIL;
@@ -658,14 +658,14 @@ void do_rehash()
   }
 }
 
-LISPT jobs(context&)
+lisp_t jobs(context&)
 {
   for(const auto& job: joblist)
     printjob(job);
   return NIL;
 }
 
-LISPT fg(context& ctx, LISPT job)
+lisp_t fg(context& ctx, lisp_t job)
 {
   job_t* current = nullptr;
 
@@ -709,7 +709,7 @@ LISPT fg(context& ctx, LISPT job)
   return ctx.error(lips_errc::no_such_job, job);
 }
 
-LISPT bg(context& ctx, LISPT job)
+lisp_t bg(context& ctx, lisp_t job)
 {
   job_t* current = nullptr;
 
@@ -752,7 +752,7 @@ LISPT bg(context& ctx, LISPT job)
   return ctx.error(lips_errc::no_such_job, job);
 }
 
-LISPT setenv(context&, LISPT var, LISPT val)
+lisp_t setenv(context&, lisp_t var, lisp_t val)
 {
   check(var, type::String, type::Symbol);
   check(val, type::String, type::Symbol);
@@ -760,7 +760,7 @@ LISPT setenv(context&, LISPT var, LISPT val)
   return var;
 }
 
-LISPT getenviron(context&, LISPT var)
+lisp_t getenviron(context&, lisp_t var)
 {
   check(var, type::String, type::Symbol);
   char* s = getenv(var->getstr().c_str());
@@ -769,9 +769,9 @@ LISPT getenviron(context&, LISPT var)
   return mkstring(s);
 }
 
-LISPT cd(context& ctx, LISPT dir, LISPT emess)
+lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
 {
-  LISPT ndir;
+  lisp_t ndir;
 
   if(is_NIL(dir))
     ndir = environment->home;
@@ -798,9 +798,9 @@ LISPT cd(context& ctx, LISPT dir, LISPT emess)
   return T;
 }
 
-LISPT doexec(context& ctx, LISPT cmd)
+lisp_t doexec(context& ctx, lisp_t cmd)
 {
-  LISPT res;
+  lisp_t res;
 
   insidefork = true; /* Prevent exec from forking */
   switch(execcommand(cmd, &res))

@@ -25,33 +25,33 @@ namespace lisp::details::arith
 
 void init();
 
-LISPT abs(context&, LISPT);
-LISPT add1(context&, LISPT);
-LISPT difference(context&, LISPT, LISPT);
-LISPT divide(context&, LISPT, LISPT);
-LISPT eqp(context&, LISPT, LISPT);
-LISPT fdifference(context&, LISPT, LISPT);
-LISPT fdivide(context&, LISPT, LISPT);
-LISPT fplus(context&, LISPT);
-LISPT ftimes(context&, LISPT);
-LISPT geq(context&, LISPT, LISPT);
-LISPT greaterp(context&, LISPT, LISPT);
-LISPT idifference(context&, LISPT, LISPT);
-LISPT iminus(context&, LISPT);
-LISPT iplus(context&, LISPT);
-LISPT iquotient(context&, LISPT, LISPT);
-LISPT iremainder(context&, LISPT, LISPT);
-LISPT itimes(context&, LISPT);
-LISPT itof(context&, LISPT);
-LISPT leq(context&, LISPT, LISPT);
-LISPT lessp(context&, LISPT, LISPT);
-LISPT ltimes(context&, LISPT);
-LISPT minus(context&, LISPT);
-LISPT minusp(context&, LISPT);
-LISPT neqp(context&, LISPT, LISPT);
-LISPT plus(context&, LISPT);
-LISPT sub1(context&, LISPT);
-LISPT zerop(context&, LISPT);
+lisp_t abs(context&, lisp_t);
+lisp_t add1(context&, lisp_t);
+lisp_t difference(context&, lisp_t, lisp_t);
+lisp_t divide(context&, lisp_t, lisp_t);
+lisp_t eqp(context&, lisp_t, lisp_t);
+lisp_t fdifference(context&, lisp_t, lisp_t);
+lisp_t fdivide(context&, lisp_t, lisp_t);
+lisp_t fplus(context&, lisp_t);
+lisp_t ftimes(context&, lisp_t);
+lisp_t geq(context&, lisp_t, lisp_t);
+lisp_t greaterp(context&, lisp_t, lisp_t);
+lisp_t idifference(context&, lisp_t, lisp_t);
+lisp_t iminus(context&, lisp_t);
+lisp_t iplus(context&, lisp_t);
+lisp_t iquotient(context&, lisp_t, lisp_t);
+lisp_t iremainder(context&, lisp_t, lisp_t);
+lisp_t itimes(context&, lisp_t);
+lisp_t itof(context&, lisp_t);
+lisp_t leq(context&, lisp_t, lisp_t);
+lisp_t lessp(context&, lisp_t, lisp_t);
+lisp_t ltimes(context&, lisp_t);
+lisp_t minus(context&, lisp_t);
+lisp_t minusp(context&, lisp_t);
+lisp_t neqp(context&, lisp_t, lisp_t);
+lisp_t plus(context&, lisp_t);
+lisp_t sub1(context&, lisp_t);
+lisp_t zerop(context&, lisp_t);
 
 } // namespace lisp::details::arith
 

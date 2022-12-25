@@ -32,33 +32,33 @@ symbol::symbol_store_t& global_symbols()
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-LISPT cons(context&, LISPT a, LISPT b)
+lisp_t cons(context&, lisp_t a, lisp_t b)
 {
   return getobject(cons_t{a, b});
 }
 
-LISPT obarray(context&)
+lisp_t obarray(context&)
 {
-  LISPT o = NIL;
+  lisp_t o = NIL;
   for(auto i: global_symbols())
     o = cons(i.self, o);
   return o;
 }
 
-LISPT mkstring(const std::string& str)
+lisp_t mkstring(const std::string& str)
 {
   return getobject(str);
 }
 
 /// @brief Creates an integer number.
-LISPT mknumber(int number)
+lisp_t mknumber(int number)
 {
   return getobject(number);
 }
 
 /// @brief Create a double.
 ///
-LISPT mkfloat(double number)
+lisp_t mkfloat(double number)
 {
   return getobject(number);
 }
@@ -75,7 +75,7 @@ LISPT mkfloat(double number)
 /// Negative for nospread and halfspread.
 ///
 /// @return A straight list of arguments.
-LISPT mkarglist(LISPT alist, std::int8_t& count)
+lisp_t mkarglist(lisp_t alist, std::int8_t& count)
 {
   if(type_of(alist) == type::Cons)
   {
@@ -102,7 +102,7 @@ LISPT mkarglist(LISPT alist, std::int8_t& count)
 /// @param eval True means lambda while false means nlambda.
 ///
 /// @returns A lambda function.
-LISPT mklambda(LISPT args, LISPT def, bool eval)
+lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {
   lambda_t lambda;
   lambda.body = def;
@@ -119,7 +119,7 @@ LISPT mklambda(LISPT args, LISPT def, bool eval)
 ///
 /// @param pname Name of the symbol.
 /// @returns The symbol as a LISP object.
-LISPT intern(const std::string& pname)
+lisp_t intern(const std::string& pname)
 {
   auto& glob = global_symbols();
   auto& sym = glob.get(pname);
@@ -136,7 +136,7 @@ LISPT intern(const std::string& pname)
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.
-LISPT mkatom(const std::string& str)
+lisp_t mkatom(const std::string& str)
 {
   if(global_symbols().exists(str))
     return global_symbols().get(str).self;

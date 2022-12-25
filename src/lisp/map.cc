@@ -31,7 +31,7 @@ namespace lisp::details::map
 /// @param fn2 Function to apply to get the next element of the list (default is CDR).
 ///
 /// @returns NIL
-LISPT map(context&, LISPT obj, LISPT fn1, LISPT fn2)
+lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == type::Cons)
   {
@@ -52,7 +52,7 @@ LISPT map(context&, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns NIL
-LISPT mapc(context&, LISPT obj, LISPT fn1, LISPT fn2)
+lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == type::Cons)
   {
@@ -73,15 +73,15 @@ LISPT mapc(context&, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-LISPT maplist(context&, LISPT obj, LISPT fn1, LISPT fn2)
+lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  LISPT tmp = NIL;
+  lisp_t tmp = NIL;
   if(type_of(obj) == type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj, NIL)), NIL);
     obj = obj->cdr();
   }
-  LISPT rval = tmp;
+  lisp_t rval = tmp;
   while(type_of(obj) == type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj, NIL)), NIL));
@@ -102,15 +102,15 @@ LISPT maplist(context&, LISPT obj, LISPT fn1, LISPT fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-LISPT mapcar(context&, LISPT obj, LISPT fn1, LISPT fn2)
+lisp_t mapcar(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  LISPT tmp = NIL;
+  lisp_t tmp = NIL;
   if(type_of(obj) == type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj->car(), NIL)), NIL);
     obj = obj->cdr();
   }
-  LISPT rval = tmp;
+  lisp_t rval = tmp;
   while(type_of(obj) == type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj->car(), NIL)), NIL));

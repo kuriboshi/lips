@@ -21,9 +21,9 @@
 
 namespace lisp::details::logic
 {
-LISPT p_and(context&, LISPT x)
+lisp_t p_and(context&, lisp_t x)
 {
-  LISPT foo = T;
+  lisp_t foo = T;
   while(!is_NIL(x))
   {
     foo = eval(x->car());
@@ -34,9 +34,9 @@ LISPT p_and(context&, LISPT x)
   return foo;
 }
 
-LISPT p_or(context&, LISPT x)
+lisp_t p_or(context&, lisp_t x)
 {
-  LISPT foo = NIL;
+  lisp_t foo = NIL;
   while(!is_NIL(x))
   {
     foo = eval(x->car());
@@ -47,16 +47,16 @@ LISPT p_or(context&, LISPT x)
   return foo;
 }
 
-LISPT p_not(context&, LISPT x)
+lisp_t p_not(context&, lisp_t x)
 {
   if(is_NIL(x))
     return T;
   return NIL;
 }
 
-LISPT xif(context&, LISPT pred, LISPT true_expr, LISPT false_expr)
+lisp_t xif(context&, lisp_t pred, lisp_t true_expr, lisp_t false_expr)
 {
-  LISPT foo = eval(pred);
+  lisp_t foo = eval(pred);
   if(is_NIL(foo))
     return progn(false_expr);
   return eval(true_expr);

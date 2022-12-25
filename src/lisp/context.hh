@@ -35,9 +35,9 @@ class cvariable_t;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
 class object;
-using LISPT = ref_ptr<object>;
+using lisp_t = ref_ptr<object>;
 
-extern LISPT C_VERSION;
+extern lisp_t C_VERSION;
 
 class context
 {
@@ -60,9 +60,9 @@ public:
   ref_file_t stderr() const;
   ref_file_t stdin() const;
 
-  LISPT perror(std::error_code);
-  LISPT perror(std::error_code, LISPT);
-  LISPT error(std::error_code, LISPT);
+  lisp_t perror(std::error_code);
+  lisp_t perror(std::error_code, lisp_t);
+  lisp_t error(std::error_code, lisp_t);
 
   void fatal(std::error_code error) { throw lisp_error(error.message()); }
 
@@ -72,7 +72,7 @@ public:
     throw lisp_error(error.message() + ": " + cat(args...));
   }
 
-  LISPT break0(LISPT) const;
+  lisp_t break0(lisp_t) const;
 
   enum class break_return
   {
@@ -80,7 +80,7 @@ public:
     PROCEED, // Proceed with repl
     SKIP,    // Skip eval
   };
-  using repl_fun_t = std::function<LISPT(LISPT)>;
+  using repl_fun_t = std::function<lisp_t(lisp_t)>;
   repl_fun_t repl;
 
   // Used by lisp::io
@@ -95,7 +95,7 @@ public:
   cvariable_t& currentbase();
   cvariable_t& verbose();
   cvariable_t& loadpath();
-  void loadpath(LISPT);
+  void loadpath(lisp_t);
   std::string version() const { return C_VERSION->value()->getstr(); }
 
 private:
@@ -120,9 +120,9 @@ private:
   static context* _current;
 };
 
-inline LISPT perror(std::error_code code, LISPT a) { return context::current().perror(code, a); }
-inline LISPT error(std::error_code code, LISPT a) { return context::current().error(code, a); }
-inline LISPT break0(LISPT a) { return context::current().break0(a); }
+inline lisp_t perror(std::error_code code, lisp_t a) { return context::current().perror(code, a); }
+inline lisp_t error(std::error_code code, lisp_t a) { return context::current().error(code, a); }
+inline lisp_t break0(lisp_t a) { return context::current().break0(a); }
 
 }
 

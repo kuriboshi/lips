@@ -49,8 +49,8 @@ private:
   };
   struct var_val_pair
   {
-    LISPT var;
-    LISPT val;
+    lisp_t var;
+    lisp_t val;
   };
   std::variant<control_block, var_val_pair> u;
 
@@ -68,10 +68,10 @@ public:
       --std::get<control_block>(u).index;
   }
 
-  void var(LISPT x) { std::get<var_val_pair>(u).var = x; }
-  LISPT var() const { return std::get<var_val_pair>(u).var; }
-  void val(LISPT x) { std::get<var_val_pair>(u).val = x; }
-  LISPT val() const { return std::get<var_val_pair>(u).val; }
+  void var(lisp_t x) { std::get<var_val_pair>(u).var = x; }
+  lisp_t var() const { return std::get<var_val_pair>(u).var; }
+  void val(lisp_t x) { std::get<var_val_pair>(u).val = x; }
+  lisp_t val() const { return std::get<var_val_pair>(u).val; }
 };
 
 class vm
@@ -82,13 +82,13 @@ public:
 
   void reset();
 
-  LISPT eval(LISPT);
-  LISPT apply(LISPT, LISPT);
-  LISPT backtrace();
+  lisp_t eval(lisp_t);
+  lisp_t apply(lisp_t, lisp_t);
+  lisp_t backtrace();
   /// @brief Return the current environment.
-  LISPT topofstack();
+  lisp_t topofstack();
   /// @brief Convert an environment to a list.
-  LISPT destblock(LISPT);
+  lisp_t destblock(lisp_t);
 
   void bt();
   void unwind();
@@ -96,7 +96,7 @@ public:
   void trace(int t) { _trace = t; }
   void interactive(bool b) { _interactive = b; }
 
-  using undefhook_t = std::function<int(LISPT, LISPT*)>;
+  using undefhook_t = std::function<int(lisp_t, lisp_t*)>;
   undefhook_t undefhook(undefhook_t fun)
   {
     auto f = _undefhook;
@@ -120,12 +120,12 @@ private:
   // The control stack.
   //
   using continuation_t = bool (vm::*)();
-  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, LISPT>;
+  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, lisp_t>;
   static constexpr int CTRLBLKSIZE = 4000;
   std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
   int _toctrl = 0;                             // Control-stack stack pointer
 
-  // @brief Pushes continuations, destinations, or LISPT objects on the control
+  // @brief Pushes continuations, destinations, or lisp_t objects on the control
   // stack.
   template<typename T>
   void push(T t)
@@ -134,7 +134,7 @@ private:
     if(_toctrl >= CTRLBLKSIZE)
       overflow();
   }
-  // @brief Pops continuations, destinations, or LISPT objects from the control
+  // @brief Pops continuations, destinations, or lisp_t objects from the control
   // stack.
   template<typename T>
   void pop(T& t)
@@ -143,14 +143,14 @@ private:
   }
   void pop_env();
 
-  void xbreak(std::error_code, LISPT fault, continuation_t next);
+  void xbreak(std::error_code, lisp_t fault, continuation_t next);
   destblock_t* mkdestblock(int);
-  void storevar(LISPT v, int i);
-  void send(LISPT a);
-  LISPT receive();
+  void storevar(lisp_t v, int i);
+  void send(lisp_t a);
+  lisp_t receive();
   void next();
-  LISPT call(LISPT fun);
-  bool evalhook(LISPT exp);
+  lisp_t call(lisp_t fun);
+  bool evalhook(lisp_t exp);
   void do_unbound(continuation_t);
   void link();
   void restore_env();
@@ -189,17 +189,17 @@ private:
   bool everr();
   bool lookup();
 
-  LISPT printwhere();
+  lisp_t printwhere();
   void abort(std::error_code);
   void overflow();
-  LISPT destblock(const destblock_t*);
+  lisp_t destblock(const destblock_t*);
 
   context& _ctx;
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
-  LISPT _fun;                     // Store current function being evaluated.
-  LISPT _expression;              // Current expression.
-  LISPT _args;                    // Current arguments.
+  lisp_t _fun;                    // Store current function being evaluated.
+  lisp_t _expression;             // Current expression.
+  lisp_t _args;                   // Current arguments.
   bool _noeval = false;           // Don't evaluate arguments.
   continuation_t _cont = nullptr; // Current continuation.
   destblock_t* _env = nullptr;    // Current environment.
@@ -237,12 +237,12 @@ inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return context::current(
 inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return context::current().vm().undefhook(fun); }
 inline void unwind() { context::current().vm().unwind(); }
 
-inline LISPT eval(LISPT expr) { return details::vm::eval(context::current(), expr); }
-LISPT eval(const std::string& expr);
-inline LISPT apply(LISPT fun, LISPT args) { return details::vm::apply(context::current(), fun, args); }
-inline LISPT backtrace() { return details::vm::backtrace(context::current()); }
-inline LISPT topofstack() { return details::vm::topofstack(context::current()); }
-inline LISPT destblock(LISPT a) { return details::vm::destblock(context::current(), a); }
+inline lisp_t eval(lisp_t expr) { return details::vm::eval(context::current(), expr); }
+lisp_t eval(const std::string& expr);
+inline lisp_t apply(lisp_t fun, lisp_t args) { return details::vm::apply(context::current(), fun, args); }
+inline lisp_t backtrace() { return details::vm::backtrace(context::current()); }
+inline lisp_t topofstack() { return details::vm::topofstack(context::current()); }
+inline lisp_t destblock(lisp_t a) { return details::vm::destblock(context::current(), a); }
 
 } // namespace lisp
 

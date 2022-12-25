@@ -39,21 +39,21 @@ struct options_t
 extern options_t options;
 extern std::unique_ptr<lisp::env> environment;
 
-extern lisp::LISPT C_ALIAS;
-extern lisp::LISPT C_AMPER;
-extern lisp::LISPT C_BACK;
-extern lisp::LISPT C_BAR;
-extern lisp::LISPT C_EXCL;
-extern lisp::LISPT C_EXEC;
-extern lisp::LISPT C_GGT;
-extern lisp::LISPT C_GT;
-extern lisp::LISPT C_LT;
-extern lisp::LISPT C_OLDVAL;
-extern lisp::LISPT C_PIPE;
-extern lisp::LISPT C_PROGN;
-extern lisp::LISPT C_REDIR_APPEND;
-extern lisp::LISPT C_REDIR_FROM;
-extern lisp::LISPT C_REDIR_TO;
-extern lisp::LISPT C_SEMI;
+extern lisp::lisp_t C_ALIAS;
+extern lisp::lisp_t C_AMPER;
+extern lisp::lisp_t C_BACK;
+extern lisp::lisp_t C_BAR;
+extern lisp::lisp_t C_EXCL;
+extern lisp::lisp_t C_EXEC;
+extern lisp::lisp_t C_GGT;
+extern lisp::lisp_t C_GT;
+extern lisp::lisp_t C_LT;
+extern lisp::lisp_t C_OLDVAL;
+extern lisp::lisp_t C_PIPE;
+extern lisp::lisp_t C_PROGN;
+extern lisp::lisp_t C_REDIR_APPEND;
+extern lisp::lisp_t C_REDIR_FROM;
+extern lisp::lisp_t C_REDIR_TO;
+extern lisp::lisp_t C_SEMI;
 
 #endif

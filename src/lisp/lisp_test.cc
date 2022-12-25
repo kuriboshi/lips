@@ -27,7 +27,7 @@
 namespace
 {
 template<typename I>
-lisp::LISPT buildpath(I i, I end)
+lisp::lisp_t buildpath(I i, I end)
 {
   if(i == end)
     return lisp::NIL;

@@ -29,7 +29,7 @@ namespace lisp::details::arith
 // generic function results in a float.
 //
 
-LISPT plus(context& ctx, LISPT x)
+lisp_t plus(context& ctx, lisp_t x)
 {
   double fsum = 0.0;
   int sum = 0;
@@ -65,7 +65,7 @@ LISPT plus(context& ctx, LISPT x)
   return mknumber(sum);
 }
 
-LISPT iplus(context&, LISPT x)
+lisp_t iplus(context&, lisp_t x)
 {
   int sum = 0;
   for(auto i: x)
@@ -76,7 +76,7 @@ LISPT iplus(context&, LISPT x)
   return mknumber(sum);
 }
 
-LISPT fplus(context&, LISPT x)
+lisp_t fplus(context&, lisp_t x)
 {
   check(x->car(), type::Float);
   auto fsum = x->car()->floatval();
@@ -90,7 +90,7 @@ LISPT fplus(context&, LISPT x)
   return mkfloat(fsum);
 }
 
-LISPT difference(context&, LISPT x, LISPT y)
+lisp_t difference(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -105,21 +105,21 @@ LISPT difference(context&, LISPT x, LISPT y)
   return mkfloat(x->floatval() - y->floatval());
 }
 
-LISPT idifference(context&, LISPT x, LISPT y)
+lisp_t idifference(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   return mknumber(x->intval() - y->intval());
 }
 
-LISPT fdifference(context&, LISPT x, LISPT y)
+lisp_t fdifference(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Float);
   check(y, type::Float);
   return mkfloat(x->floatval() - y->floatval());
 }
 
-LISPT ltimes(context& ctx, LISPT x)
+lisp_t ltimes(context& ctx, lisp_t x)
 {
   double fprod = 1.0;
   int prod = 1;
@@ -152,7 +152,7 @@ LISPT ltimes(context& ctx, LISPT x)
   return mknumber(prod);
 }
 
-LISPT itimes(context&, LISPT x)
+lisp_t itimes(context&, lisp_t x)
 {
   check(x->car(), type::Integer);
   auto prod = x->car()->intval();
@@ -166,7 +166,7 @@ LISPT itimes(context&, LISPT x)
   return mknumber(prod);
 }
 
-LISPT ftimes(context&, LISPT x)
+lisp_t ftimes(context&, lisp_t x)
 {
   check(x->car(), type::Float);
   auto prod = x->car()->floatval();
@@ -180,7 +180,7 @@ LISPT ftimes(context&, LISPT x)
   return mkfloat(prod);
 }
 
-LISPT divide(context& ctx, LISPT x, LISPT y)
+lisp_t divide(context& ctx, lisp_t x, lisp_t y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -208,7 +208,7 @@ LISPT divide(context& ctx, LISPT x, LISPT y)
   return mkfloat(x->floatval() / y->floatval());
 }
 
-LISPT iquotient(context& ctx, LISPT x, LISPT y)
+lisp_t iquotient(context& ctx, lisp_t x, lisp_t y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
@@ -217,7 +217,7 @@ LISPT iquotient(context& ctx, LISPT x, LISPT y)
   return mknumber(x->intval() / y->intval());
 }
 
-LISPT iremainder(context& ctx, LISPT x, LISPT y)
+lisp_t iremainder(context& ctx, lisp_t x, lisp_t y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
@@ -226,7 +226,7 @@ LISPT iremainder(context& ctx, LISPT x, LISPT y)
   return mknumber(x->intval() % y->intval());
 }
 
-LISPT fdivide(context& ctx, LISPT x, LISPT y)
+lisp_t fdivide(context& ctx, lisp_t x, lisp_t y)
 {
   check(x, type::Float);
   check(y, type::Float);
@@ -235,7 +235,7 @@ LISPT fdivide(context& ctx, LISPT x, LISPT y)
   return mkfloat(x->floatval() / y->floatval());
 }
 
-LISPT minus(context&, LISPT x)
+lisp_t minus(context&, lisp_t x)
 {
   check(x, type::Float, type::Integer);
   if(type_of(x) == type::Integer)
@@ -243,13 +243,13 @@ LISPT minus(context&, LISPT x)
   return mkfloat(-x->floatval());
 }
 
-LISPT iminus(context&, LISPT x)
+lisp_t iminus(context&, lisp_t x)
 {
   check(x, type::Integer);
   return mknumber(-x->intval());
 }
 
-LISPT abs(context&, LISPT x)
+lisp_t abs(context&, lisp_t x)
 {
   check(x, type::Integer);
   if(x->intval() < 0)
@@ -257,19 +257,19 @@ LISPT abs(context&, LISPT x)
   return mknumber(x->intval());
 }
 
-LISPT itof(context&, LISPT x)
+lisp_t itof(context&, lisp_t x)
 {
   check(x, type::Integer);
   return mkfloat(static_cast<double>(x->intval()));
 }
 
-LISPT add1(context&, LISPT x)
+lisp_t add1(context&, lisp_t x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() + 1);
 }
 
-LISPT sub1(context&, LISPT x)
+lisp_t sub1(context&, lisp_t x)
 {
   check(x, type::Integer);
   return mknumber(x->intval() - 1);
@@ -285,7 +285,7 @@ enum class num_type
   ILLEGAL2 = 5    // Second argument is illegal
 };
 
-inline num_type numtype(LISPT x, LISPT y)
+inline num_type numtype(lisp_t x, lisp_t y)
 {
   if(type_of(x) == type::Float)
   {
@@ -307,17 +307,17 @@ inline num_type numtype(LISPT x, LISPT y)
 }
 
 template<typename Type, typename Comparor>
-inline LISPT docheck(Type x, Type y, Comparor cmp)
+inline lisp_t docheck(Type x, Type y, Comparor cmp)
 {
   if(cmp(x, y))
     return T;
   return NIL;
 }
 
-inline LISPT illegalreturn(context& ctx, LISPT x) { return ctx.error(error_errc::illegal_arg, x); }
+inline lisp_t illegalreturn(context& ctx, lisp_t x) { return ctx.error(error_errc::illegal_arg, x); }
 
 template<template<typename> typename Comparer>
-inline LISPT numcheck(context& ctx, LISPT x, LISPT y)
+inline lisp_t numcheck(context& ctx, lisp_t x, lisp_t y)
 {
   switch(numtype(x, y))
   {
@@ -336,26 +336,26 @@ inline LISPT numcheck(context& ctx, LISPT x, LISPT y)
   }
 }
 
-LISPT greaterp(context& ctx, LISPT x, LISPT y) { return numcheck<std::greater>(ctx, x, y); }
+lisp_t greaterp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::greater>(ctx, x, y); }
 
-LISPT lessp(context& ctx, LISPT x, LISPT y) { return numcheck<std::less>(ctx, x, y); }
+lisp_t lessp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::less>(ctx, x, y); }
 
-LISPT eqp(context& ctx, LISPT x, LISPT y) { return numcheck<std::equal_to>(ctx, x, y); }
+lisp_t eqp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::equal_to>(ctx, x, y); }
 
-LISPT geq(context& ctx, LISPT x, LISPT y) { return numcheck<std::greater_equal>(ctx, x, y); }
+lisp_t geq(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::greater_equal>(ctx, x, y); }
 
-LISPT leq(context& ctx, LISPT x, LISPT y) { return numcheck<std::less_equal>(ctx, x, y); }
+lisp_t leq(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::less_equal>(ctx, x, y); }
 
-LISPT neqp(context& ctx, LISPT x, LISPT y) { return numcheck<std::not_equal_to>(ctx, x, y); }
+lisp_t neqp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::not_equal_to>(ctx, x, y); }
 
-LISPT zerop(context&, LISPT x)
+lisp_t zerop(context&, lisp_t x)
 {
   if(type_of(x) == type::Integer && x->intval() == 0)
     return T;
   return NIL;
 }
 
-LISPT minusp(context& ctx, LISPT x)
+lisp_t minusp(context& ctx, lisp_t x)
 {
   if(type_of(x) == type::Float)
   {

@@ -137,7 +137,7 @@ TEST_CASE("eval: control limits")
 TEST_CASE("eval: undefhook")
 {
   bool called = false;
-  auto f = [&called](LISPT, LISPT*) -> int {
+  auto f = [&called](lisp_t, lisp_t*) -> int {
     called = true;
     return 1;
   };

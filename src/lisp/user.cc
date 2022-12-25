@@ -25,16 +25,16 @@
 
 namespace lisp::details::user
 {
-LISPT getargs(context& ctx, LISPT al)
+lisp_t getargs(context& ctx, lisp_t al)
 {
   if(is_NIL(al->cdr()))
     return al->car();
   return cons(al->car(), getargs(ctx, al->cdr()));
 }
 
-LISPT getrep(context& ctx, LISPT fun)
+lisp_t getrep(context& ctx, lisp_t fun)
 {
-  LISPT args;
+  lisp_t args;
 
   if(type_of(fun) != type::Lambda)
     return NIL;
@@ -50,15 +50,15 @@ LISPT getrep(context& ctx, LISPT fun)
   return cons(C_NLAMBDA, cons(args, x.body));
 }
 
-LISPT funeq(context&, LISPT f1, LISPT f2)
+lisp_t funeq(context&, lisp_t f1, lisp_t f2)
 {
   if(f1 == f2)
     return T;
   if(f1->lambda().count == f2->lambda().count)
   {
-    LISPT t1 = f1->lambda().args;
-    LISPT t2 = f2->lambda().args;
-    LISPT tmp = equal(t1, t2);
+    lisp_t t1 = f1->lambda().args;
+    lisp_t t2 = f2->lambda().args;
+    lisp_t tmp = equal(t1, t2);
     if(!is_NIL(tmp))
     {
       t1 = f1->lambda().body;
@@ -71,12 +71,12 @@ LISPT funeq(context&, LISPT f1, LISPT f2)
   return NIL;
 }
 
-LISPT checkfn(context& ctx, LISPT name, LISPT lam)
+lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
 {
   if(type_of(name->value()) != type::Unbound)
     if(type_of(name->value()) == type::Lambda)
     {
-      LISPT t = user::funeq(ctx, name->value(), lam);
+      lisp_t t = user::funeq(ctx, name->value(), lam);
       if(is_NIL(t))
       {
         putprop(name, C_OLDDEF, name->value());
@@ -87,7 +87,7 @@ LISPT checkfn(context& ctx, LISPT name, LISPT lam)
   return NIL;
 }
 
-LISPT define(context& ctx, LISPT name, LISPT lam)
+lisp_t define(context& ctx, lisp_t name, lisp_t lam)
 {
   check(name, type::Symbol);
   check(lam, type::Lambda);
@@ -96,7 +96,7 @@ LISPT define(context& ctx, LISPT name, LISPT lam)
   return name;
 }
 
-LISPT defineq(context& ctx, LISPT defs)
+lisp_t defineq(context& ctx, lisp_t defs)
 {
   if(is_NIL(defs))
     return NIL;

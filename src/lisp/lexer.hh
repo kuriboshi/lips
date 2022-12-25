@@ -190,8 +190,8 @@ public:
   // Syntax table member functions.
   syntax::type get(std::uint8_t index) const { return _ctx.read_table().get(index); }
   void set(std::uint8_t index, syntax::type value) { _ctx.read_table().set(index, value); }
-  void set(std::uint8_t index, LISPT value) { _ctx.read_table().set(index, value); }
-  LISPT macro(token_t token) { return _ctx.read_table().macro(_ctx, _input, token.token[0]); }
+  void set(std::uint8_t index, lisp_t value) { _ctx.read_table().set(index, value); }
+  lisp_t macro(token_t token) { return _ctx.read_table().macro(_ctx, _input, token.token[0]); }
 
 private:
   context& _ctx;

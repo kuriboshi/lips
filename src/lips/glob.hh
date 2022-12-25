@@ -27,14 +27,14 @@
 namespace glob
 {
 void init();
-using LISPT = lisp::LISPT;
+using lisp_t = lisp::lisp_t;
 
 std::optional<std::string> extilde(const std::string& w);
-LISPT expandfiles(const std::string& wild, bool sort);
-LISPT expand(LISPT wild);
+lisp_t expandfiles(const std::string& wild, bool sort);
+lisp_t expand(lisp_t wild);
 } // namespace glob
 
-inline lisp::LISPT expand(lisp::context&, lisp::LISPT wild) { return glob::expand(wild); }
-inline lisp::LISPT expand(lisp::LISPT wild) { return glob::expand(wild); }
+inline lisp::lisp_t expand(lisp::context&, lisp::lisp_t wild) { return glob::expand(wild); }
+inline lisp::lisp_t expand(lisp::lisp_t wild) { return glob::expand(wild); }
 
 #endif

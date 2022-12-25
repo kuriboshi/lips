@@ -23,11 +23,11 @@
 
 namespace lisp
 {
-inline LISPT getplist(LISPT a) { return details::prop::getplist(context::current(), a); }
-inline LISPT getprop(LISPT a, LISPT b) { return details::prop::getprop(context::current(), a, b); }
-inline LISPT putprop(LISPT a, LISPT b, LISPT c) { return details::prop::putprop(context::current(), a, b, c); }
-inline LISPT remprop(LISPT a, LISPT b) { return details::prop::remprop(context::current(), a, b); }
-inline LISPT setplist(LISPT a, LISPT b) { return details::prop::setplist(context::current(), a, b); }
+inline lisp_t getplist(lisp_t a) { return details::prop::getplist(context::current(), a); }
+inline lisp_t getprop(lisp_t a, lisp_t b) { return details::prop::getprop(context::current(), a, b); }
+inline lisp_t putprop(lisp_t a, lisp_t b, lisp_t c) { return details::prop::putprop(context::current(), a, b, c); }
+inline lisp_t remprop(lisp_t a, lisp_t b) { return details::prop::remprop(context::current(), a, b); }
+inline lisp_t setplist(lisp_t a, lisp_t b) { return details::prop::setplist(context::current(), a, b); }
 } // namespace lisp
 
 #endif

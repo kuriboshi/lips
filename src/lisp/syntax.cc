@@ -20,10 +20,10 @@
 
 namespace lisp
 {
-LISPT syntax::macro(context&, ref_file_t source, std::uint8_t index)
+lisp_t syntax::macro(context&, ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro[index];
-  LISPT f = details::alloc::getobject(source);
+  lisp_t f = details::alloc::getobject(source);
   if(fn != NIL)
     return apply(fn, cons(f, NIL));
   return NIL;

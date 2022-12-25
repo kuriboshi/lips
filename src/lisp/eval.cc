@@ -39,11 +39,11 @@ inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
-LISPT eval(context& ctx, LISPT expr) { return ctx.vm().eval(expr); }
-LISPT apply(context& ctx, LISPT fun, LISPT args) { return ctx.vm().apply(fun, args); }
-LISPT backtrace(context& ctx) { return ctx.vm().backtrace(); }
-LISPT topofstack(context& ctx) { return ctx.vm().topofstack(); }
-LISPT destblock(context& ctx, LISPT a) { return ctx.vm().destblock(a); }
+lisp_t eval(context& ctx, lisp_t expr) { return ctx.vm().eval(expr); }
+lisp_t apply(context& ctx, lisp_t fun, lisp_t args) { return ctx.vm().apply(fun, args); }
+lisp_t backtrace(context& ctx) { return ctx.vm().backtrace(); }
+lisp_t topofstack(context& ctx) { return ctx.vm().topofstack(); }
+lisp_t destblock(context& ctx, lisp_t a) { return ctx.vm().destblock(a); }
 
 void init()
 {
@@ -76,9 +76,9 @@ void vm::reset()
   _env = nullptr;
 }
 
-LISPT vm::printwhere()
+lisp_t vm::printwhere()
 {
-  LISPT foo = NIL;
+  lisp_t foo = NIL;
   int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
@@ -89,7 +89,7 @@ LISPT vm::printwhere()
   {
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::ev0)
     {
-      if(auto* lsp = std::get_if<LISPT>(&_control[i - 1]);
+      if(auto* lsp = std::get_if<lisp_t>(&_control[i - 1]);
          lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
       {
         foo = *lsp;
@@ -118,7 +118,7 @@ void vm::overflow() { abort(error_errc::stack_overflow); }
 
 /// @brief This function prints an error message, and sets up a call to everr
 /// that handles breaks.
-void vm::xbreak(std::error_code code, LISPT fault, continuation_t next)
+void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
 {
   if(code)
   {
@@ -137,7 +137,7 @@ void vm::xbreak(std::error_code code, LISPT fault, continuation_t next)
 /// @brief Creates a new destination block of size 's' and initializes it.
 destblock_t* vm::mkdestblock(int s) { return dalloc(s); }
 
-void vm::storevar(LISPT v, int i) { _dest[i].var(v); }
+void vm::storevar(lisp_t v, int i) { _dest[i].var(v); }
 
 void vm::pop_env()
 {
@@ -145,20 +145,20 @@ void vm::pop_env()
   pop(_env);
 }
 
-void vm::send(LISPT a)
+void vm::send(lisp_t a)
 {
   if(_dest[0].index() > 0)
     _dest[_dest[0].index()].val(a);
 }
 
-LISPT vm::receive() { return _dest[_dest[0].index()].val(); }
+lisp_t vm::receive() { return _dest[_dest[0].index()].val(); }
 
 void vm::next() { _dest[0].decr(); }
 
 /// @brief Make a call to the function in parameter `fun'.
 ///
 /// @details It can handle functions with up to three arguments.
-LISPT vm::call(LISPT fun)
+lisp_t vm::call(lisp_t fun)
 {
   switch(fun->subr().argcount())
   {
@@ -179,7 +179,7 @@ LISPT vm::call(LISPT fun)
 ///
 /// @details The vm allocates a destination slot for the result and
 /// starts munching continuations.
-LISPT vm::eval(LISPT expr)
+lisp_t vm::eval(lisp_t expr)
 {
   //
   // Set the current expression to `expr' and push the current destination onto
@@ -219,7 +219,7 @@ LISPT vm::eval(LISPT expr)
   // Retrieve the result of the evaluation and restore the previous
   // destination.
   //
-  LISPT foo = receive();
+  lisp_t foo = receive();
   pop(_dest);
   // Return the result.
   return foo;
@@ -232,7 +232,7 @@ bool vm::eval0()
   return true;
 }
 
-LISPT vm::apply(LISPT f, LISPT x)
+lisp_t vm::apply(lisp_t f, lisp_t x)
 {
   push(_dest);
   _dest = mkdestblock(1);
@@ -253,7 +253,7 @@ LISPT vm::apply(LISPT f, LISPT x)
     unwind();
     throw;
   }
-  LISPT foo = receive();
+  lisp_t foo = receive();
   pop(_dest);
   return foo;
 }
@@ -319,9 +319,9 @@ bool vm::ev1()
   return false;
 }
 
-bool vm::evalhook(LISPT exp)
+bool vm::evalhook(lisp_t exp)
 {
-  LISPT res;
+  lisp_t res;
 
   if(_undefhook)
     switch(_undefhook(exp, &res))
@@ -345,7 +345,7 @@ void vm::do_unbound(continuation_t continuation)
   // definition from a file. If that doesn't succeed, then the symbol is
   // undefined.
   //
-  LISPT al = getprop(_expression->car(), C_AUTOLOAD);
+  lisp_t al = getprop(_expression->car(), C_AUTOLOAD);
   if(!is_NIL(al))
   {
     push(_expression);
@@ -489,7 +489,7 @@ void vm::bt()
   for(int i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::ev0)
-      print(std::get<LISPT>(_control[i - 1]), T);
+      print(std::get<lisp_t>(_control[i - 1]), T);
   }
   _ctx.printlevel = op;
 }
@@ -601,7 +601,7 @@ bool vm::evlis1()
 
 bool vm::evlis2()
 {
-  LISPT x = cons(receive(), NIL);
+  lisp_t x = cons(receive(), NIL);
   send(x);
   pop(_cont);
   return false;
@@ -620,7 +620,7 @@ bool vm::evlis3()
 
 bool vm::evlis4()
 {
-  LISPT x = receive();
+  lisp_t x = receive();
   dfree(_dest);
   pop(_dest);
   x = cons(receive(), x);
@@ -734,7 +734,7 @@ void vm::link()
   _env = _dest;
   for(auto i = _dest[0].size(); i > 0; i--)
   {
-    LISPT t = _dest[i].var()->value();
+    lisp_t t = _dest[i].var()->value();
     _dest[i].var()->value(_dest[i].val());
     _dest[i].val(t);
   }
@@ -778,7 +778,7 @@ void vm::unwind()
 
 bool vm::lookup()
 {
-  LISPT t = _expression->value();
+  lisp_t t = _expression->value();
   switch(type_of(t))
   {
     case type::Unbound:
@@ -868,11 +868,11 @@ bool vm::evseq3()
   return false;
 }
 
-LISPT vm::destblock(const destblock_t* block)
+lisp_t vm::destblock(const destblock_t* block)
 {
   if(block == nullptr)
     return NIL;
-  LISPT foo = tconc(NIL, mknumber(block->size()));
+  lisp_t foo = tconc(NIL, mknumber(block->size()));
   for(int i = 0; i != block->size(); ++i)
   {
     foo = tconc(foo, cons((block + i + 1)->var(), (block + i + 1)->val()));
@@ -881,7 +881,7 @@ LISPT vm::destblock(const destblock_t* block)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT vm::backtrace()
+lisp_t vm::backtrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
@@ -890,7 +890,7 @@ LISPT vm::backtrace()
       // NOLINTNEXTLINE(readability-function-cognitive-complexity)
       [this](auto&& arg) {
         using ArgType = std::decay_t<decltype(arg)>;
-        if constexpr(std::is_same_v<ArgType, LISPT>)
+        if constexpr(std::is_same_v<ArgType, lisp_t>)
           print(arg, T);
         else if constexpr(std::is_same_v<ArgType, destblock_t*>)
         {
@@ -984,12 +984,12 @@ LISPT vm::backtrace()
   return NIL;
 }
 
-LISPT vm::topofstack()
+lisp_t vm::topofstack()
 {
   return details::alloc::getobject(environment());
 }
 
-LISPT vm::destblock(LISPT e)
+lisp_t vm::destblock(lisp_t e)
 {
   check(e, type::Environ);
   return destblock(e->envval());
@@ -1022,13 +1022,13 @@ void vm::dfree(destblock_t* block) { _destblockused -= block->size() + 1; }
 /// @brief Frees all destination blocks.
 void vm::dzero() { _destblockused = 0; }
 
-LISPT eval(context& ctx, const std::string& expr)
+lisp_t eval(context& ctx, const std::string& expr)
 {
   auto in = ref_file_t::create(expr);
   auto e = lispread(in);
   return details::vm::eval(ctx, e);
 }
 
-LISPT eval(const std::string& expr) { return eval(context::current(), expr); }
+lisp_t eval(const std::string& expr) { return eval(context::current(), expr); }
 
 } // namespace lisp

@@ -23,13 +23,13 @@
 
 namespace lisp
 {
-inline LISPT concat(LISPT x) { return details::string::concat(context::current(), x); }
-inline LISPT strcmp(LISPT x, LISPT y) { return details::string::strcmp(context::current(), x, y); }
-inline LISPT strequal(LISPT x, LISPT y) { return details::string::strequal(context::current(), x, y); }
-inline LISPT stringp(LISPT x) { return details::string::stringp(context::current(), x); }
-inline LISPT strlen(LISPT x) { return details::string::strlen(context::current(), x); }
-inline LISPT substring(LISPT x, LISPT y, LISPT z) { return details::string::substring(context::current(), x, y, z); }
-inline LISPT symstr(LISPT x) { return details::string::symstr(context::current(), x); }
+inline lisp_t concat(lisp_t x) { return details::string::concat(context::current(), x); }
+inline lisp_t strcmp(lisp_t x, lisp_t y) { return details::string::strcmp(context::current(), x, y); }
+inline lisp_t strequal(lisp_t x, lisp_t y) { return details::string::strequal(context::current(), x, y); }
+inline lisp_t stringp(lisp_t x) { return details::string::stringp(context::current(), x); }
+inline lisp_t strlen(lisp_t x) { return details::string::strlen(context::current(), x); }
+inline lisp_t substring(lisp_t x, lisp_t y, lisp_t z) { return details::string::substring(context::current(), x, y, z); }
+inline lisp_t symstr(lisp_t x) { return details::string::symstr(context::current(), x); }
 } // namespace lisp
 
 #endif

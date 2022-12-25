@@ -22,7 +22,7 @@
 
 namespace lisp::details::pred
 {
-LISPT numberp(context&, LISPT a)
+lisp_t numberp(context&, lisp_t a)
 {
   switch(type_of(a))
   {
@@ -34,14 +34,14 @@ LISPT numberp(context&, LISPT a)
   }
 }
 
-LISPT listp(context&, LISPT a)
+lisp_t listp(context&, lisp_t a)
 {
   if(type_of(a) == type::Cons)
     return a;
   return NIL;
 }
 
-LISPT memb(context&, LISPT x, LISPT ls)
+lisp_t memb(context&, lisp_t x, lisp_t ls)
 {
   while(!eq(ls, NIL))
   {
@@ -52,7 +52,7 @@ LISPT memb(context&, LISPT x, LISPT ls)
   return NIL;
 }
 
-LISPT equal(context& ctx, LISPT l1, LISPT l2)
+lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
 {
   if(type_of(l1) != type_of(l2))
     return NIL;
@@ -79,7 +79,7 @@ LISPT equal(context& ctx, LISPT l1, LISPT l2)
   return NIL;
 }
 
-LISPT nlistp(context&, LISPT a)
+lisp_t nlistp(context&, lisp_t a)
 {
   if(a == NIL)
     return T;
@@ -88,14 +88,14 @@ LISPT nlistp(context&, LISPT a)
   return NIL;
 }
 
-LISPT neq(context&, LISPT a, LISPT b)
+lisp_t neq(context&, lisp_t a, lisp_t b)
 {
   if(a != b)
     return T;
   return NIL;
 }
 
-LISPT boundp(context&, LISPT a)
+lisp_t boundp(context&, lisp_t a)
 {
   if(type_of(a) != type::Symbol)
     return NIL;
@@ -104,14 +104,14 @@ LISPT boundp(context&, LISPT a)
   return NIL;
 }
 
-LISPT litatom(context&, LISPT a)
+lisp_t litatom(context&, lisp_t a)
 {
   if(type_of(a) == type::Symbol || type_of(a) == type::T)
     return T;
   return NIL;
 }
 
-LISPT xtypeof(context&, LISPT a)
+lisp_t xtypeof(context&, lisp_t a)
 {
   switch(type_of(a))
   {

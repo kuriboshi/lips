@@ -47,10 +47,10 @@ private:
    * Processes the environment variable PATH and returns a list
    * of all directories in PATH.
    */
-  static LISPT mungepath()
+  static lisp_t mungepath()
   {
     auto pstr = get("PATH");
-    LISPT result = NIL;
+    lisp_t result = NIL;
     auto pos = pstr.size();
     for(;;)
     {

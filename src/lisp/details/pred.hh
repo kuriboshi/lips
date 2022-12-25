@@ -25,15 +25,15 @@ namespace lisp::details::pred
 
 void init();
 
-LISPT numberp(context&, LISPT);
-LISPT listp(context&, LISPT);
-LISPT memb(context&, LISPT, LISPT);
-LISPT equal(context&, LISPT, LISPT);
-LISPT nlistp(context&, LISPT);
-LISPT neq(context&, LISPT, LISPT);
-LISPT boundp(context&, LISPT);
-LISPT litatom(context&, LISPT);
-LISPT xtypeof(context&, LISPT);
+lisp_t numberp(context&, lisp_t);
+lisp_t listp(context&, lisp_t);
+lisp_t memb(context&, lisp_t, lisp_t);
+lisp_t equal(context&, lisp_t, lisp_t);
+lisp_t nlistp(context&, lisp_t);
+lisp_t neq(context&, lisp_t, lisp_t);
+lisp_t boundp(context&, lisp_t);
+lisp_t litatom(context&, lisp_t);
+lisp_t xtypeof(context&, lisp_t);
 
 } // namespace lisp::details::pred
 

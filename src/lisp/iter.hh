@@ -28,12 +28,12 @@ class iterator
 {
 public:
   using iterator_category = std::forward_iterator_tag;
-  using value_type = LISPT;
+  using value_type = lisp_t;
   using difference_type = std::ptrdiff_t;
-  using pointer = LISPT*;
-  using reference = LISPT&;
+  using pointer = lisp_t*;
+  using reference = lisp_t&;
 
-  iterator(LISPT l)
+  iterator(lisp_t l)
     : _car(l)
   {}
   bool operator==(const iterator& x) const { return _car == x._car; }
@@ -52,7 +52,7 @@ public:
     ++(*this);
     return tmp;
   }
-  LISPT operator*() const
+  lisp_t operator*() const
   {
     if(type_of(_car) == type::Cons)
       return _car->car();
@@ -61,11 +61,11 @@ public:
   }
 
 private:
-  LISPT _car;
+  lisp_t _car;
 };
 
-inline iterator begin(LISPT l) { return iterator(l); }
-inline iterator end(LISPT l) { return iterator(nullptr); }
+inline iterator begin(lisp_t l) { return iterator(l); }
+inline iterator end(lisp_t l) { return iterator(nullptr); }
 
 } // namespace lisp
 

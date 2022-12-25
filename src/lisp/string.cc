@@ -24,7 +24,7 @@
 namespace lisp::details::string
 {
 /// @brief Return symbols print name as a string.
-LISPT symstr(context&, LISPT sym)
+lisp_t symstr(context&, lisp_t sym)
 {
   check(sym, type::Symbol, type::T, type::Nil);
   if(type_of(sym) == type::Nil)
@@ -33,7 +33,7 @@ LISPT symstr(context&, LISPT sym)
 }
 
 /// @brief T if s is a string, NIL otherwise.
-LISPT stringp(context&, LISPT s)
+lisp_t stringp(context&, lisp_t s)
 {
   if(type_of(s) == type::String)
     return s;
@@ -41,7 +41,7 @@ LISPT stringp(context&, LISPT s)
 }
 
 /// @brief T if both strings are equal.
-LISPT strequal(context&, LISPT s1, LISPT s2)
+lisp_t strequal(context&, lisp_t s1, lisp_t s2)
 {
   check(s1, type::String);
   check(s2, type::String);
@@ -51,7 +51,7 @@ LISPT strequal(context&, LISPT s1, LISPT s2)
 }
 
 /// @brief Compare two strings.
-LISPT strcmp(context&, LISPT s1, LISPT s2)
+lisp_t strcmp(context&, lisp_t s1, lisp_t s2)
 {
   check(s1, type::String);
   check(s2, type::String);
@@ -59,7 +59,7 @@ LISPT strcmp(context&, LISPT s1, LISPT s2)
 }
 
 /// @brief Concatenate arbitrary many strings to one string.
-LISPT concat(context&, LISPT strlist)
+lisp_t concat(context&, lisp_t strlist)
 {
   std::string result;
   for(auto sl = strlist; !is_NIL(sl); sl = sl->cdr())
@@ -71,7 +71,7 @@ LISPT concat(context&, LISPT strlist)
 }
 
 /// @brief Return string length of s.
-LISPT strlen(context&, LISPT s)
+lisp_t strlen(context&, lisp_t s)
 {
   check(s, type::String);
   return mknumber(static_cast<int>(s->string().length()));
@@ -82,7 +82,7 @@ LISPT strlen(context&, LISPT s)
 /// @details If start or end is out of bounds, return NIL.  If end is one less
 /// than start the zero length string is returned.  End equal to zero if
 /// start is equal to one is accepted.
-LISPT substring(context&, LISPT str, LISPT begin, LISPT end)
+lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
 {
   check(str, type::String);
   check(begin, type::Integer);

@@ -25,19 +25,19 @@ namespace lisp::details::file
 
 void init();
 
-LISPT open(context&, LISPT, LISPT);
-LISPT close(context&, LISPT);
-LISPT ratom(context&, LISPT);
-LISPT readc(context&, LISPT);
-LISPT read(context&, LISPT);
-LISPT print(context&, LISPT, LISPT);
-LISPT load(context&, LISPT);
-LISPT terpri(context&, LISPT);
-LISPT prin1(context&, LISPT, LISPT);
-LISPT prin2(context&, LISPT, LISPT);
-LISPT printlevel(context&, LISPT);
-LISPT spaces(context&, LISPT, LISPT);
-LISPT readline(context&, LISPT);
+lisp_t open(context&, lisp_t, lisp_t);
+lisp_t close(context&, lisp_t);
+lisp_t ratom(context&, lisp_t);
+lisp_t readc(context&, lisp_t);
+lisp_t read(context&, lisp_t);
+lisp_t print(context&, lisp_t, lisp_t);
+lisp_t load(context&, lisp_t);
+lisp_t terpri(context&, lisp_t);
+lisp_t prin1(context&, lisp_t, lisp_t);
+lisp_t prin2(context&, lisp_t, lisp_t);
+lisp_t printlevel(context&, lisp_t);
+lisp_t spaces(context&, lisp_t, lisp_t);
+lisp_t readline(context&, lisp_t);
 
 bool loadfile(context&, const std::string&);
 

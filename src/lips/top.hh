@@ -35,29 +35,29 @@ public:
 
   static void init();
 
-  LISPT operator()(LISPT);
+  lisp_t operator()(lisp_t);
 
-  LISPT transform(LISPT list);
-  LISPT findalias(LISPT exp);
-  static void promptprint(LISPT prompt);
+  lisp_t transform(lisp_t list);
+  lisp_t findalias(lisp_t exp);
+  static void promptprint(lisp_t prompt);
 
   // History functions
-  static LISPT printhist();
-  static LISPT histget(int num, LISPT hlist);
+  static lisp_t printhist();
+  static lisp_t histget(int num, lisp_t hlist);
   static void phist();
-  static void addhist(LISPT);
+  static void addhist(lisp_t);
   static void remhist();
   static void trimhist();
 
   // Read table functions
-  static LISPT rmexcl(context&, LISPT);
+  static lisp_t rmexcl(context&, lisp_t);
 
-  static LISPT input_exp;
-  static std::function<LISPT(context&, LISPT)> transform_hook; // Applied on input if non-nullptr.
+  static lisp_t input_exp;
+  static std::function<lisp_t(context&, lisp_t)> transform_hook; // Applied on input if non-nullptr.
   static std::function<void()> prompt_hook;                    // Called before the prompt is printed.
 
 private:
-  static LISPT alias_expanded; //For checking alias loops.
+  static lisp_t alias_expanded; //For checking alias loops.
 
   class cvariables
   {

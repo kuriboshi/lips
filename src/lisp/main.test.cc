@@ -98,7 +98,7 @@ TEST_CASE("main: reset")
     // Throw a standard exception which will reset the vm.
     mkprim(
       "throw",
-      [](context&, LISPT a) -> LISPT {
+      [](context&, lisp_t a) -> lisp_t {
         check(a, type::String);
         throw std::runtime_error(a->string());
       },
@@ -115,7 +115,7 @@ TEST_CASE("main: reset")
     // Unwind the stack before throwing a standard exception
     mkprim(
       "throw_unwind",
-      [](context&, LISPT a) -> LISPT {
+      [](context&, lisp_t a) -> lisp_t {
         check(a, type::String);
         // The lamda ensure we have an environment at this point.
         CHECK(topofstack()->envval() != NIL);

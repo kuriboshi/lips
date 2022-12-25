@@ -38,7 +38,7 @@ class context;
 class vm;
 class file_t;
 class object;
-using LISPT = ref_ptr<object>;
+using lisp_t = ref_ptr<object>;
 
 enum class type
 {
@@ -70,8 +70,8 @@ inline constexpr auto NIL = nullptr;
 ///
 struct cons_t
 {
-  LISPT car = NIL;
-  LISPT cdr = NIL;
+  lisp_t car = NIL;
+  lisp_t cdr = NIL;
 };
 
 /// @brief Structure describing a built-in function.
@@ -94,10 +94,10 @@ struct subr_t
     NOSPREAD
   };
 
-  using func0_t = std::function<LISPT(context&)>;
-  using func1_t = std::function<LISPT(context&, LISPT)>;
-  using func2_t = std::function<LISPT(context&, LISPT, LISPT)>;
-  using func3_t = std::function<LISPT(context&, LISPT, LISPT, LISPT)>;
+  using func0_t = std::function<lisp_t(context&)>;
+  using func1_t = std::function<lisp_t(context&, lisp_t)>;
+  using func2_t = std::function<lisp_t(context&, lisp_t, lisp_t)>;
+  using func3_t = std::function<lisp_t(context&, lisp_t, lisp_t, lisp_t)>;
 
   subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
     : name(pname),
@@ -125,10 +125,10 @@ struct subr_t
   {}
   constexpr std::size_t argcount() const noexcept { return f.index(); }
 
-  LISPT operator()(context& ctx) const { return std::get<func0_t>(f)(ctx); }
-  LISPT operator()(context& ctx, LISPT a) const { return std::get<func1_t>(f)(ctx, a); }
-  LISPT operator()(context& ctx, LISPT a, LISPT b) const { return std::get<func2_t>(f)(ctx, a, b); }
-  LISPT operator()(context& ctx, LISPT a, LISPT b, LISPT c) const { return std::get<func3_t>(f)(ctx, a, b, c); }
+  lisp_t operator()(context& ctx) const { return std::get<func0_t>(f)(ctx); }
+  lisp_t operator()(context& ctx, lisp_t a) const { return std::get<func1_t>(f)(ctx, a); }
+  lisp_t operator()(context& ctx, lisp_t a, lisp_t b) const { return std::get<func2_t>(f)(ctx, a, b); }
+  lisp_t operator()(context& ctx, lisp_t a, lisp_t b, lisp_t c) const { return std::get<func3_t>(f)(ctx, a, b, c); }
 
   std::string name;
   std::variant<func0_t, func1_t, func2_t, func3_t> f;
@@ -157,9 +157,9 @@ struct subr_t
 struct lambda_t
 {
   /// @brief The S-expression representation of the lambda function.
-  LISPT body = NIL;
+  lisp_t body = NIL;
   /// @brief The list of arguments.
-  LISPT args = NIL;
+  lisp_t args = NIL;
   /// @brief The number of arguments.
   std::int8_t count = 0;
   /// @brief True if arguments are evaluated, false if not (nlambda).
@@ -174,9 +174,9 @@ public:
   closure_t() = default;
   ~closure_t() = default;
 
-  LISPT cfunction = NIL;
-  LISPT closed = NIL;
-  LISPT cvalues = NIL;
+  lisp_t cfunction = NIL;
+  lisp_t closed = NIL;
+  lisp_t cvalues = NIL;
   std::uint8_t count = 0;
 
   static void* operator new(std::size_t) { return _pool.allocate(); }
@@ -204,14 +204,14 @@ struct subr_index
 
 /// @brief A representation of a C++ variable linked to a lisp variable.
 ///
-/// @details Wraps a LISPT value in such a way that the value can be changed
+/// @details Wraps a lisp_t value in such a way that the value can be changed
 /// from either the C++ context of the lisp context and have the value be
 /// reflected to both.
 ///
 class cvariable_t
 {
 public:
-  explicit cvariable_t(LISPT value)
+  explicit cvariable_t(lisp_t value)
     : _value(value)
   {}
   cvariable_t() = delete;
@@ -224,27 +224,27 @@ public:
     return *this;
   }
   cvariable_t& operator=(const cvariable_t& other) = delete;
-  cvariable_t& operator=(LISPT value)
+  cvariable_t& operator=(lisp_t value)
   {
     _value = value;
     return *this;
   }
 
-  /// @brief Automatically convert to the LISPT value in a LISPT context.
-  operator LISPT() const noexcept { return _value; }
-  /// @brief Dereference the wrapped LISPT value.
-  LISPT operator*() const noexcept { return _value; }
-  /// @brief Dereference the wrapped LISPT value.
-  LISPT operator->() const noexcept { return _value; }
+  /// @brief Automatically convert to the lisp_t value in a lisp_t context.
+  operator lisp_t() const noexcept { return _value; }
+  /// @brief Dereference the wrapped lisp_t value.
+  lisp_t operator*() const noexcept { return _value; }
+  /// @brief Dereference the wrapped lisp_t value.
+  lisp_t operator->() const noexcept { return _value; }
 
 private:
-  /// @brief The wrapped LISPT value.
-  LISPT _value;
+  /// @brief The wrapped lisp_t value.
+  lisp_t _value;
 };
 
 struct indirect_t
 {
-  LISPT value;
+  lisp_t value;
 };
 
 class destblock_t;
@@ -274,8 +274,8 @@ public:
   }
 
   /// @brief Get and set the value of a litatom
-  auto value() const -> LISPT { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
-  void value(LISPT x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
+  auto value() const -> lisp_t { return symbol_collection().get(std::get<symbol::symbol_id>(_u)).value; }
+  void value(lisp_t x) { symbol_collection().get(std::get<symbol::symbol_id>(_u)).value = x; }
 
   /// @brief Integer
   auto intval() const -> int { return std::get<int>(_u); }
@@ -293,7 +293,7 @@ public:
     _u = f;
   }
 
-  auto indirectval() const -> LISPT { return std::get<indirect_t>(_u).value; }
+  auto indirectval() const -> lisp_t { return std::get<indirect_t>(_u).value; }
   void set(indirect_t x)
   {
     _type = type::Indirect;
@@ -307,10 +307,10 @@ public:
     _type = type::Cons;
     _u = x;
   }
-  auto car() const -> LISPT { return std::get<cons_t>(_u).car; }
-  void car(LISPT x) { std::get<cons_t>(_u).car = x; }
-  auto cdr() const -> LISPT { return std::get<cons_t>(_u).cdr; }
-  void cdr(LISPT x) { std::get<cons_t>(_u).cdr = x; }
+  auto car() const -> lisp_t { return std::get<cons_t>(_u).car; }
+  void car(lisp_t x) { std::get<cons_t>(_u).car = x; }
+  auto cdr() const -> lisp_t { return std::get<cons_t>(_u).cdr; }
+  void cdr(lisp_t x) { std::get<cons_t>(_u).cdr = x; }
 
   /// @brief Character string
   auto string() const -> const std::string& { return std::get<std::string>(_u); }
@@ -425,44 +425,44 @@ private:
 //
 // All lisp constants used internally.
 //
-extern LISPT T;
-extern LISPT C_AUTOLOAD;
-extern LISPT C_BROKEN;
-extern LISPT C_BT;
-extern LISPT C_CLOSURE;
-extern LISPT C_CONS;
-extern LISPT C_DOT;
-extern LISPT C_ENDOFFILE;
-extern LISPT C_ENVIRON;
-extern LISPT C_EOF;
-extern LISPT C_ERROR;
-extern LISPT C_FILE;
-extern LISPT C_FLOAT;
-extern LISPT C_FSUBR;
-extern LISPT C_GO;
-extern LISPT C_INDIRECT;
-extern LISPT C_INTEGER;
-extern LISPT C_LAMBDA;
-extern LISPT C_NLAMBDA;
-extern LISPT C_OLDDEF;
-extern LISPT C_QUOTE;
-extern LISPT C_REDEFINED;
-extern LISPT C_RESET;
-extern LISPT C_RETURN;
-extern LISPT C_STRING;
-extern LISPT C_SUBR;
-extern LISPT C_SYMBOL;
-extern LISPT C_READ;
-extern LISPT C_WRITE;
-extern LISPT C_APPEND;
-extern LISPT C_CVARIABLE;
+extern lisp_t T;
+extern lisp_t C_AUTOLOAD;
+extern lisp_t C_BROKEN;
+extern lisp_t C_BT;
+extern lisp_t C_CLOSURE;
+extern lisp_t C_CONS;
+extern lisp_t C_DOT;
+extern lisp_t C_ENDOFFILE;
+extern lisp_t C_ENVIRON;
+extern lisp_t C_EOF;
+extern lisp_t C_ERROR;
+extern lisp_t C_FILE;
+extern lisp_t C_FLOAT;
+extern lisp_t C_FSUBR;
+extern lisp_t C_GO;
+extern lisp_t C_INDIRECT;
+extern lisp_t C_INTEGER;
+extern lisp_t C_LAMBDA;
+extern lisp_t C_NLAMBDA;
+extern lisp_t C_OLDDEF;
+extern lisp_t C_QUOTE;
+extern lisp_t C_REDEFINED;
+extern lisp_t C_RESET;
+extern lisp_t C_RETURN;
+extern lisp_t C_STRING;
+extern lisp_t C_SUBR;
+extern lisp_t C_SYMBOL;
+extern lisp_t C_READ;
+extern lisp_t C_WRITE;
+extern lisp_t C_APPEND;
+extern lisp_t C_CVARIABLE;
 
 /// @brief The lisp interpreter.
 ///
-inline type type_of(LISPT a) { return a == nullptr ? type::Nil : a->gettype(); }
+inline type type_of(lisp_t a) { return a == nullptr ? type::Nil : a->gettype(); }
 inline type type_of(object& a) { return a.gettype(); }
-inline bool is_T(LISPT x) { return type_of(x) == type::T; }
-inline bool is_NIL(LISPT x) { return type_of(x) == type::Nil; }
+inline bool is_T(lisp_t x) { return type_of(x) == type::T; }
+inline bool is_NIL(lisp_t x) { return type_of(x) == type::Nil; }
 
 } // namespace lisp
 

@@ -26,7 +26,7 @@ namespace lisp
 {
 
 template<typename T>
-void check(LISPT arg, T type)
+void check(lisp_t arg, T type)
 {
   if(type_of(arg) != type)
   {
@@ -89,7 +89,7 @@ void check(LISPT arg, T type)
 }
 
 template<typename T, typename... Ts>
-void check(LISPT arg, T type, Ts... types)
+void check(lisp_t arg, T type, Ts... types)
 {
   if(type_of(arg) == type)
     return;

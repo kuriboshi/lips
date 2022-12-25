@@ -24,11 +24,11 @@ namespace lisp::details::vm
 {
 void init();
 
-LISPT eval(context&, LISPT);
-LISPT apply(context&, LISPT, LISPT);
-LISPT backtrace(context&);
-LISPT topofstack(context&);
-LISPT destblock(context&, LISPT);
+lisp_t eval(context&, lisp_t);
+lisp_t apply(context&, lisp_t, lisp_t);
+lisp_t backtrace(context&);
+lisp_t topofstack(context&);
+lisp_t destblock(context&, lisp_t);
 
 }
 

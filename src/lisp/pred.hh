@@ -24,15 +24,15 @@
 
 namespace lisp
 {
-inline LISPT numberp(LISPT a) { return details::pred::numberp(context::current(), a); }
-inline LISPT listp(LISPT a) { return details::pred::listp(context::current(), a); }
-inline LISPT memb(LISPT x, LISPT y) { return details::pred::memb(context::current(), x, y); }
-inline LISPT equal(LISPT l1, LISPT l2) { return details::pred::equal(context::current(), l1, l2); }
-inline LISPT nlistp(LISPT a) { return details::pred::nlistp(context::current(), a); }
-inline LISPT neq(LISPT a, LISPT b) { return details::pred::neq(context::current(), a, b); }
-inline LISPT boundp(LISPT a) { return details::pred::boundp(context::current(), a); }
-inline LISPT litatom(LISPT a) { return details::pred::litatom(context::current(), a); }
-inline LISPT xtypeof(LISPT a) { return details::pred::xtypeof(context::current(), a); }
+inline lisp_t numberp(lisp_t a) { return details::pred::numberp(context::current(), a); }
+inline lisp_t listp(lisp_t a) { return details::pred::listp(context::current(), a); }
+inline lisp_t memb(lisp_t x, lisp_t y) { return details::pred::memb(context::current(), x, y); }
+inline lisp_t equal(lisp_t l1, lisp_t l2) { return details::pred::equal(context::current(), l1, l2); }
+inline lisp_t nlistp(lisp_t a) { return details::pred::nlistp(context::current(), a); }
+inline lisp_t neq(lisp_t a, lisp_t b) { return details::pred::neq(context::current(), a, b); }
+inline lisp_t boundp(lisp_t a) { return details::pred::boundp(context::current(), a); }
+inline lisp_t litatom(lisp_t a) { return details::pred::litatom(context::current(), a); }
+inline lisp_t xtypeof(lisp_t a) { return details::pred::xtypeof(context::current(), a); }
 } // namespace lisp
 
 #endif

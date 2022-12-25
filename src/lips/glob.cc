@@ -283,9 +283,9 @@ TEST_CASE("walkfiles")
   }
 }
 
-LISPT buildlist(const std::vector<std::string>& list)
+lisp_t buildlist(const std::vector<std::string>& list)
 {
-  LISPT l = NIL;
+  lisp_t l = NIL;
   for(auto r: list)
     l = cons(mkstring(r), l);
   return l;
@@ -372,7 +372,7 @@ TEST_CASE("extilde")
 // expandfiles - expand file in the current directory matching the glob pattern
 //               in 'wild'.  If SORT is true the result list is sorted.
 //
-LISPT expandfiles(const std::string& wild, bool sort)
+lisp_t expandfiles(const std::string& wild, bool sort)
 {
   if(wild == "/"s)
     return cons(mkstring(wild), NIL);
@@ -443,7 +443,7 @@ TEST_CASE("expandfiles")
 
   SECTION("testdir/*")
   {
-    LISPT wild = mkstring("testdir/*");
+    lisp_t wild = mkstring("testdir/*");
     auto e = expand(wild);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
@@ -459,7 +459,7 @@ TEST_CASE("expandfiles")
 
   SECTION("testd*/*")
   {
-    LISPT wild = mkstring("testd*/*");
+    lisp_t wild = mkstring("testd*/*");
     auto e = expand(wild);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
@@ -493,7 +493,7 @@ TEST_CASE("expandfiles")
 //
 // Lisp function expand.  Expand all files matching wild in directory dir.
 //
-LISPT expand(LISPT wild)
+lisp_t expand(lisp_t wild)
 {
   check(wild, type::String, type::Symbol);
   auto wstr = extilde(wild->getstr());

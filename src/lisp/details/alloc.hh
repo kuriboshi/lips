@@ -25,24 +25,24 @@ namespace lisp::details::alloc
 /// @brief Allocates an object from the list of free objects.
 ///
 /// @details If the free cell list is empty a new block of objects is
-/// allocated.  The LISPT ref_ptr created by this function will have its delete
+/// allocated.  The lisp_t ref_ptr created by this function will have its delete
 /// function overridden with a function which puts the cell back on the free
 /// cell list.
 ///
 /// @return A new empty lisp object.
-inline LISPT getobject() { return {new object}; }
+inline lisp_t getobject() { return {new object}; }
 
-/// @brief Templated version of getobject which returns a LISPT object
+/// @brief Templated version of getobject which returns a lisp_t object
 /// initialized with a typed object object.
 template<typename T>
-LISPT getobject(T x) { return {new object(x)}; }
+lisp_t getobject(T x) { return {new object(x)}; }
 
-LISPT mkstring(const std::string&);
-LISPT mknumber(int);
-LISPT mkfloat(double);
-LISPT cons(context&, LISPT, LISPT);
-LISPT obarray(context&);
-inline LISPT freecount(context&) { return mknumber(static_cast<int>(object::freecount())); }
+lisp_t mkstring(const std::string&);
+lisp_t mknumber(int);
+lisp_t mkfloat(double);
+lisp_t cons(context&, lisp_t, lisp_t);
+lisp_t obarray(context&);
+inline lisp_t freecount(context&) { return mknumber(static_cast<int>(object::freecount())); }
 
 /// @brief Make a lambda object.
 ///
@@ -51,9 +51,9 @@ inline LISPT freecount(context&) { return mknumber(static_cast<int>(object::free
 ///
 /// @return The lambda object.
 ///
-LISPT mklambda(LISPT args, LISPT def, bool eval);
-LISPT intern(const std::string& pname);
-LISPT mkatom(const std::string&);
+lisp_t mklambda(lisp_t args, lisp_t def, bool eval);
+lisp_t intern(const std::string& pname);
+lisp_t mkatom(const std::string&);
 
 /// @brief Register a primitive function.
 ///
@@ -67,11 +67,11 @@ inline void mkprim(subr_t subr)
 {
   auto s = new object;
   s->set(subr_index{subr_t::put(subr)});
-  LISPT f = intern(subr.name);
+  lisp_t f = intern(subr.name);
   f->value(s);
 }
 
-inline cvariable_t& initcvar(const std::string& name, LISPT val)
+inline cvariable_t& initcvar(const std::string& name, lisp_t val)
 {
   auto t = mkatom(name);
   t->symbol().value = new object;

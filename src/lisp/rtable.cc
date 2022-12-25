@@ -28,7 +28,7 @@ namespace lisp::rtable
 //
 // Read macros.
 //
-LISPT rmdquote(context&, LISPT stream)
+lisp_t rmdquote(context&, lisp_t stream)
 {
   check(stream, type::File);
   std::string buffer;
@@ -43,7 +43,7 @@ LISPT rmdquote(context&, LISPT stream)
   return mkstring(buffer);
 }
 
-LISPT rmsquote(context&, LISPT stream)
+lisp_t rmsquote(context&, lisp_t stream)
 {
   check(stream, type::File);
   int c = 0;
@@ -56,7 +56,7 @@ LISPT rmsquote(context&, LISPT stream)
   return cons(C_QUOTE, cons(io::lispread(stream->file()), NIL));
 }
 
-LISPT rmgetenv(context&, LISPT stream)
+lisp_t rmgetenv(context&, lisp_t stream)
 {
   check(stream, type::File);
   auto sym = ratom(stream->file());

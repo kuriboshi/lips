@@ -32,21 +32,21 @@ namespace lisp
 /// @param s The string.
 /// @return A LISP object of type string.
 ///
-inline LISPT mkstring(const std::string& s) { return details::alloc::mkstring(s); }
+inline lisp_t mkstring(const std::string& s) { return details::alloc::mkstring(s); }
 
 /// @brief Create an integer number.
 ///
 /// @param number The integer number.
 /// @return An integer number as a LISP object.
 ///
-inline LISPT mknumber(int i) { return details::alloc::mknumber(i); }
+inline lisp_t mknumber(int i) { return details::alloc::mknumber(i); }
 
 /// @brief Create a floating point number.
 ///
 /// @param number The floating point number.
 /// @return A floating point number as a LISP object.
 ///
-inline LISPT mkfloat(double number) { return details::alloc::mkfloat(number); }
+inline lisp_t mkfloat(double number) { return details::alloc::mkfloat(number); }
 
 /// @brief Builds a cons cell out of the arguments.
 ///
@@ -58,19 +58,19 @@ inline LISPT mkfloat(double number) { return details::alloc::mkfloat(number); }
 ///
 /// @return The cons cell.
 ///
-inline LISPT cons(LISPT a, LISPT b) { return details::alloc::cons(context::current(), a, b); }
+inline lisp_t cons(lisp_t a, lisp_t b) { return details::alloc::cons(context::current(), a, b); }
 
 /// @brief Build a list of symbols in the local symbol table.
 ///
 /// @return Returns a list of local symbols in no particular order.
 ///
-inline LISPT obarray() { return details::alloc::obarray(context::current()); }
+inline lisp_t obarray() { return details::alloc::obarray(context::current()); }
 
 /// @brief Number of free cell in the free cell list.
 ///
 /// @return The number of free cells.
 ///
-inline LISPT freecount() { return details::alloc::freecount(context::current()); }
+inline lisp_t freecount() { return details::alloc::freecount(context::current()); }
 
 /// @brief Create a symbol in the global symbol table, accessable from all
 /// lisp instances.
@@ -79,7 +79,7 @@ inline LISPT freecount() { return details::alloc::freecount(context::current());
 ///
 /// @return The interned symbol.
 ///
-inline LISPT intern(const std::string& s) { return details::alloc::intern(s); }
+inline lisp_t intern(const std::string& s) { return details::alloc::intern(s); }
 
 /// @brief Create a literal atom.
 ///
@@ -88,7 +88,7 @@ inline LISPT intern(const std::string& s) { return details::alloc::intern(s); }
 ///
 /// @return The literal atom.
 ///
-inline LISPT mkatom(const std::string& s) { return details::alloc::mkatom(s); }
+inline lisp_t mkatom(const std::string& s) { return details::alloc::mkatom(s); }
 
 /// @brief Overload of mkprim for a function with zero parameters.
 inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
@@ -120,40 +120,40 @@ inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::s
 /// that changing the value in one domain will be reflected in the other.
 /// The lisp variable will have the print name NAME.  In C++ the type
 /// cvariable_t will work in many contexts which expects a value of type
-/// LISPT.  If assigned to the lisp value changes if the value is set with
+/// lisp_t.  If assigned to the lisp value changes if the value is set with
 /// setq in lisp the C++ value will change.
 ///
 /// @param name The lisp print name.
 /// @param val The initial value.
 ///
-/// @return A reference of type cvariable which wraps the LISPT value.
+/// @return A reference of type cvariable which wraps the lisp_t value.
 ///
-inline cvariable_t& initcvar(const std::string& name, LISPT val) { return details::alloc::initcvar(name, val); }
+inline cvariable_t& initcvar(const std::string& name, lisp_t val) { return details::alloc::initcvar(name, val); }
 
 /// @brief Terminates the list create function.
-inline LISPT mklist(LISPT t) { return cons(t, NIL); }
+inline lisp_t mklist(lisp_t t) { return cons(t, NIL); }
 
 /// @brief Creates a list from a variadic list of items.
 template<typename... Ts>
-LISPT mklist(LISPT t, Ts... ts)
+lisp_t mklist(lisp_t t, Ts... ts)
 {
   return cons(t, mklist(ts...));
 }
 
 /// @brief Creates a lisp string.
-inline LISPT operator"" _s(const char* s, std::size_t) { return details::alloc::mkstring(s); }
+inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc::mkstring(s); }
 
 /// @brief Simpler way to create an atom.
-inline LISPT operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
+inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline LISPT operator"" _l(unsigned long long i) { return details::alloc::mknumber(i); }
+inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(i); }
 
 /// @brief Creates a floating point value.
-inline LISPT operator"" _l(long double d) { return details::alloc::mkfloat(d); }
+inline lisp_t operator"" _l(long double d) { return details::alloc::mkfloat(d); }
 
 /// @brief Evaluates a lisp expression in a string.
-inline LISPT operator"" _e(const char* s, std::size_t) { return eval(s); }
+inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }
 
 } // namespace lisp
 

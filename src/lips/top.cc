@@ -47,7 +47,7 @@ void top::phist()
 /*
  * Add event to history list.
  */
-void top::addhist(LISPT what)
+void top::addhist(lisp_t what)
 {
   variables->history = cons(cons(variables->histnum, what), variables->history);
   variables->histnum = add1(variables->histnum);
@@ -67,7 +67,7 @@ void top::remhist()
  */
 void top::trimhist()
 {
-  LISPT hl = variables->history;
+  lisp_t hl = variables->history;
   for(int i = 0; i < variables->histmax->intval() && !is_NIL(hl); i++, hl = hl->cdr())
     ;
   if(!is_NIL(hl))
@@ -78,7 +78,7 @@ void top::trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-LISPT top::histget(int num, LISPT hlist)
+lisp_t top::histget(int num, lisp_t hlist)
 {
   if(num < 0)
   {
@@ -101,14 +101,14 @@ LISPT top::histget(int num, LISPT hlist)
   return NIL;
 }
 
-LISPT top::printhist()
+lisp_t top::printhist()
 {
   remhist(); /* Removes itself from history. */
   phist();
   return NIL;
 }
 
-LISPT top::transform(LISPT list)
+lisp_t top::transform(lisp_t list)
 {
   if(transform_hook)
     return transform_hook(_ctx, list);
@@ -123,7 +123,7 @@ LISPT top::transform(LISPT list)
  * on the list alias_expanded. One indirection is allowed in order
  * to permit 'alias ls ls -F'.
  */
-LISPT top::findalias(LISPT exp)
+lisp_t top::findalias(lisp_t exp)
 {
   auto rval = exp;
   while(true)
@@ -147,7 +147,7 @@ LISPT top::findalias(LISPT exp)
   return transform(rval);
 }
 
-void top::promptprint(LISPT prompt)
+void top::promptprint(lisp_t prompt)
 {
   current_prompt.clear();
   if(type_of(prompt) != type::String)
@@ -169,7 +169,7 @@ void top::promptprint(LISPT prompt)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT top::operator()(LISPT exp)
+lisp_t top::operator()(lisp_t exp)
 {
   ++_level;
   while(true)
@@ -206,7 +206,7 @@ LISPT top::operator()(LISPT exp)
       primout()->terpri();
     }
     bool printit = false; // If the result will be printed.
-    LISPT topexp = transform(input_exp);
+    lisp_t topexp = transform(input_exp);
     if(type_of(topexp->car()) == type::Cons)
     {
       topexp = topexp->car();
@@ -233,13 +233,13 @@ LISPT top::operator()(LISPT exp)
 ///  !$      - last argument
 ///  !*      - all arguments
 /// others could be added easily.
-LISPT top::rmexcl(context& ctx, LISPT stream)
+lisp_t top::rmexcl(context& ctx, lisp_t stream)
 {
   int c = stream->file()->getch();
   if(std::isspace(c) != 0)
     return C_EXCL;
   ctx.echoline = true;
-  LISPT tmp = histget(0L, variables->history);
+  lisp_t tmp = histget(0L, variables->history);
   switch(c)
   {
     case '!':
@@ -291,12 +291,12 @@ void top::init()
 {
   variables = std::make_unique<cvariables>();
   mkprim(
-    pn::PRINTHIST, [](context&) -> LISPT { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    pn::PRINTHIST, [](context&) -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
-LISPT top::input_exp; // The input expression.
-std::function<LISPT(::lisp::context&, LISPT)> top::transform_hook;
+lisp_t top::input_exp; // The input expression.
+std::function<lisp_t(::lisp::context&, lisp_t)> top::transform_hook;
 std::function<void()> top::prompt_hook;
-LISPT top::alias_expanded;
+lisp_t top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;

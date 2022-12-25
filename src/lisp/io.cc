@@ -54,7 +54,7 @@ namespace lisp::io
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
 ///
-LISPT ratom(ref_file_t file)
+lisp_t ratom(ref_file_t file)
 {
   lexer lexer{file};
   auto token = lexer.read();
@@ -65,13 +65,13 @@ LISPT ratom(ref_file_t file)
 //
 // LISPREAD reads a lisp expression from file FILE.
 //
-LISPT lispread(ref_file_t file)
+lisp_t lispread(ref_file_t file)
 {
   lexer lexer(file);
   return parser(lexer).parse();
 }
 
-LISPT readline(ref_file_t file)
+lisp_t readline(ref_file_t file)
 {
   auto line = file->getline();
   if(line)
@@ -83,7 +83,7 @@ LISPT readline(ref_file_t file)
       return head;
     if(listp(head) || head == NIL)
       return head;
-    LISPT tail;
+    lisp_t tail;
     while(true)
     {
       auto o = parser.parse();
@@ -101,7 +101,7 @@ LISPT readline(ref_file_t file)
   return C_EOF;
 }
 
-LISPT getline(LISPT file)
+lisp_t getline(lisp_t file)
 {
   check(file, type::File);
   auto line = file->file()->getline();
@@ -134,7 +134,7 @@ inline void pf(double d, file_t& file)
 }
 
 // Print pointer type object
-inline void pp(const char* s, file_t& file, LISPT x)
+inline void pp(const char* s, file_t& file, lisp_t x)
 {
   ps(s, file, false);
   ps(" ", file, false);
@@ -142,13 +142,13 @@ inline void pp(const char* s, file_t& file, LISPT x)
   ps(">", file, false);
 }
 
-LISPT patom(LISPT x, file_t& file, bool esc)
+lisp_t patom(lisp_t x, file_t& file, bool esc)
 {
   ps(x->symbol().pname, file, esc);
   return x;
 }
 
-LISPT prinbody(context& ctx, LISPT x, file_t& file, bool esc)
+lisp_t prinbody(context& ctx, lisp_t x, file_t& file, bool esc)
 {
   auto i = x;
   for(;;)
@@ -173,7 +173,7 @@ LISPT prinbody(context& ctx, LISPT x, file_t& file, bool esc)
   return x;
 }
 
-LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
+lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
@@ -254,7 +254,7 @@ LISPT prin0(context& ctx, LISPT x, file_t& file, bool esc)
   return x;
 }
 
-LISPT print(context& ctx, LISPT x, file_t& file)
+lisp_t print(context& ctx, lisp_t x, file_t& file)
 {
   ctx.thisplevel = 0;
   io::prin0(ctx, x, file, true);
@@ -262,7 +262,7 @@ LISPT print(context& ctx, LISPT x, file_t& file)
   return x;
 }
 
-LISPT terpri(file_t& file)
+lisp_t terpri(file_t& file)
 {
   file.putch('\n');
   file.flush();
@@ -293,12 +293,12 @@ LISPT terpri(file_t& file)
 /// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
 /// car of x.
 ///
-LISPT splice(context&, LISPT x, LISPT y, bool tailp)
+lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
 {
   check(x, type::Cons);
   if(is_NIL(y))
     return x;
-  LISPT t = x->cdr();
+  lisp_t t = x->cdr();
   if(type_of(y) != type::Cons)
   {
     if(tailp)
@@ -313,7 +313,7 @@ LISPT splice(context&, LISPT x, LISPT y, bool tailp)
     y = y->cdr();
   }
   rplacd(x, y);
-  LISPT t2 = NIL;
+  lisp_t t2 = NIL;
   for(; type_of(y) == type::Cons; y = y->cdr())
     t2 = y;
   return rplacd(t2, t);

@@ -26,7 +26,7 @@
 
 namespace lisp::details::file
 {
-LISPT open(context& ctx, LISPT filename, LISPT mode)
+lisp_t open(context& ctx, lisp_t filename, lisp_t mode)
 {
   check(filename, type::String, type::Symbol);
   bool readmode = true;
@@ -54,7 +54,7 @@ LISPT open(context& ctx, LISPT filename, LISPT mode)
   return alloc::getobject(ref_file_t(f));
 }
 
-LISPT close(context&, LISPT fildes)
+lisp_t close(context&, lisp_t fildes)
 {
   check(fildes, type::File);
   if(fildes->file()->has_sink())
@@ -63,7 +63,7 @@ LISPT close(context&, LISPT fildes)
   return T;
 }
 
-LISPT ratom(context& ctx, LISPT file)
+lisp_t ratom(context& ctx, lisp_t file)
 {
   if(is_NIL(file))
     return io::ratom(ctx.primin());
@@ -73,7 +73,7 @@ LISPT ratom(context& ctx, LISPT file)
   return io::ratom(file->file());
 }
 
-LISPT readc(context& ctx, LISPT file)
+lisp_t readc(context& ctx, lisp_t file)
 {
   if(is_NIL(file))
     return mknumber(ctx.primin()->getch());
@@ -83,7 +83,7 @@ LISPT readc(context& ctx, LISPT file)
   return mknumber(file->file()->getch());
 }
 
-LISPT read(context& ctx, LISPT file)
+lisp_t read(context& ctx, lisp_t file)
 {
   if(is_NIL(file))
     return lispread(ctx.primin());
@@ -93,7 +93,7 @@ LISPT read(context& ctx, LISPT file)
   return lispread(file->file());
 }
 
-LISPT print(context& ctx, LISPT x, LISPT file)
+lisp_t print(context& ctx, lisp_t x, lisp_t file)
 {
   if(is_NIL(file))
     return io::print(ctx, x, *ctx.primout());
@@ -127,7 +127,7 @@ bool loadfile(context& ctx, const std::string& lf)
   return false;
 }
 
-LISPT load(context& ctx, LISPT f)
+lisp_t load(context& ctx, lisp_t f)
 {
   check(f, type::String, type::Symbol);
   if(!file::loadfile(ctx, f->getstr()))
@@ -135,7 +135,7 @@ LISPT load(context& ctx, LISPT f)
   return f;
 }
 
-LISPT terpri(context& ctx, LISPT file)
+lisp_t terpri(context& ctx, lisp_t file)
 {
   if(is_NIL(file))
     return io::terpri(*ctx.primout());
@@ -145,7 +145,7 @@ LISPT terpri(context& ctx, LISPT file)
   return io::terpri(*file->file());
 }
 
-LISPT prin1(context& ctx, LISPT x, LISPT file)
+lisp_t prin1(context& ctx, lisp_t x, lisp_t file)
 {
   ctx.thisplevel = 0;
   if(is_NIL(file))
@@ -156,7 +156,7 @@ LISPT prin1(context& ctx, LISPT x, LISPT file)
   return prin0(x, *file->file(), false);
 }
 
-LISPT prin2(context& ctx, LISPT x, LISPT file)
+lisp_t prin2(context& ctx, lisp_t x, lisp_t file)
 {
   ctx.thisplevel = 0;
   if(is_NIL(file))
@@ -167,7 +167,7 @@ LISPT prin2(context& ctx, LISPT x, LISPT file)
   return prin0(x, *file->file(), true);
 }
 
-LISPT printlevel(context& ctx, LISPT newl)
+lisp_t printlevel(context& ctx, lisp_t newl)
 {
   auto x = ctx.printlevel;
   if(!is_NIL(newl))
@@ -178,7 +178,7 @@ LISPT printlevel(context& ctx, LISPT newl)
   return mknumber(x);
 }
 
-LISPT spaces(context& ctx, LISPT n, LISPT file)
+lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
 {
   int i = 0;
   ref_file_t f;
@@ -198,7 +198,7 @@ LISPT spaces(context& ctx, LISPT n, LISPT file)
   return NIL;
 }
 
-LISPT readline(context& ctx, LISPT file)
+lisp_t readline(context& ctx, lisp_t file)
 {
   if(is_NIL(file))
     return io::readline(ctx.primin());

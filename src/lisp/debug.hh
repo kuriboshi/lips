@@ -23,7 +23,7 @@
 
 namespace lisp
 {
-inline LISPT evaltrace(LISPT x) { return details::debug::evaltrace(context::current(), x); }
+inline lisp_t evaltrace(lisp_t x) { return details::debug::evaltrace(context::current(), x); }
 } // namespace lisp
 
 #endif

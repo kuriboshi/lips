@@ -59,7 +59,7 @@ void init_all_signals()
   signal(SIGTSTP, onsignal);
 }
 
-LISPT put_end(LISPT list, LISPT obj, bool conc)
+lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
 {
   if(is_NIL(list))
   {
@@ -67,7 +67,7 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
       return obj;
     return cons(obj, NIL);
   }
-  LISPT t;
+  lisp_t t;
   for(t = list; type_of(t->cdr()) == type::Cons; t = t->cdr())
     ;
   if(conc)
@@ -78,10 +78,10 @@ LISPT put_end(LISPT list, LISPT obj, bool conc)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-LISPT transform(::lisp::context& ctx, LISPT list)
+lisp_t transform(::lisp::context& ctx, lisp_t list)
 {
-  LISPT tl = NIL;
-  LISPT res = NIL;
+  lisp_t tl = NIL;
+  lisp_t res = NIL;
   bool conc = false;
   for(auto ll = list; type_of(ll) == type::Cons; ll = ll->cdr())
   {
@@ -220,7 +220,7 @@ void loadinit(const std::string& initfile) { loadfile(initfile); }
 // Greet user who, or if who is nil, $USER. This means loading
 // the user's init file, .lipsrc.
 //
-LISPT greet(LISPT who)
+lisp_t greet(lisp_t who)
 {
   std::string s;
   if(is_NIL(who))
@@ -240,22 +240,22 @@ LISPT greet(LISPT who)
 }
 } // namespace
 
-LISPT C_ALIAS;
-LISPT C_AMPER;
-LISPT C_BACK;
-LISPT C_BAR;
-LISPT C_EXCL;
-LISPT C_EXEC;
-LISPT C_GGT;
-LISPT C_GT;
-LISPT C_LT;
-LISPT C_OLDVAL;
-LISPT C_PIPE;
-LISPT C_PROGN;
-LISPT C_REDIR_APPEND;
-LISPT C_REDIR_FROM;
-LISPT C_REDIR_TO;
-LISPT C_SEMI;
+lisp_t C_ALIAS;
+lisp_t C_AMPER;
+lisp_t C_BACK;
+lisp_t C_BAR;
+lisp_t C_EXCL;
+lisp_t C_EXEC;
+lisp_t C_GGT;
+lisp_t C_GT;
+lisp_t C_LT;
+lisp_t C_OLDVAL;
+lisp_t C_PIPE;
+lisp_t C_PROGN;
+lisp_t C_REDIR_APPEND;
+lisp_t C_REDIR_FROM;
+lisp_t C_REDIR_TO;
+lisp_t C_SEMI;
 
 std::unique_ptr<env> environment;
 
@@ -331,7 +331,7 @@ int main(int argc, char* const* argv)
       if(!options.debug && options.interactive)
         init_all_signals();
       lisp->vm().reset();
-      lisp->repl = [&toploop](LISPT exp) -> LISPT { return toploop(exp); };
+      lisp->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
       lisp->repl(NIL);
       return 0;
     }

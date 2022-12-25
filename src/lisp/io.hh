@@ -32,18 +32,18 @@
 
 namespace lisp::io
 {
-LISPT ratom(ref_file_t);
-LISPT lispread(ref_file_t);
-LISPT readline(ref_file_t);
-LISPT getline(LISPT);
+lisp_t ratom(ref_file_t);
+lisp_t lispread(ref_file_t);
+lisp_t readline(ref_file_t);
+lisp_t getline(lisp_t);
 
-LISPT patom(LISPT, file_t&, bool esc = false);
-LISPT prinbody(context&, LISPT, file_t&, bool esc = false);
-LISPT prin0(context&, LISPT, file_t&, bool esc = false);
-LISPT print(context&, LISPT, file_t&);
-LISPT terpri(file_t&);
+lisp_t patom(lisp_t, file_t&, bool esc = false);
+lisp_t prinbody(context&, lisp_t, file_t&, bool esc = false);
+lisp_t prin0(context&, lisp_t, file_t&, bool esc = false);
+lisp_t print(context&, lisp_t, file_t&);
+lisp_t terpri(file_t&);
 
-LISPT splice(context&, LISPT, LISPT, bool);
+lisp_t splice(context&, lisp_t, lisp_t, bool);
 
 class source
 {
@@ -338,42 +338,42 @@ private:
   }
 };
 
-inline LISPT ratom(ref_file_t f) { return io::ratom(f); }
-inline LISPT lispread(ref_file_t f) { return io::lispread(f); }
-inline LISPT lispread(const std::string& s)
+inline lisp_t ratom(ref_file_t f) { return io::ratom(f); }
+inline lisp_t lispread(ref_file_t f) { return io::lispread(f); }
+inline lisp_t lispread(const std::string& s)
 {
   auto f = ref_file_t::create(s);
   return io::lispread(f);
 }
-inline LISPT readline(ref_file_t f) { return io::readline(f); }
-inline LISPT getline(LISPT f) { return io::getline(f); }
+inline lisp_t readline(ref_file_t f) { return io::readline(f); }
+inline lisp_t getline(lisp_t f) { return io::getline(f); }
 
-inline LISPT patom(LISPT a, file_t& f, bool esc = false) { return io::patom(a, f, esc); }
-inline LISPT patom(LISPT a, bool out = false, bool esc = false)
+inline lisp_t patom(lisp_t a, file_t& f, bool esc = false) { return io::patom(a, f, esc); }
+inline lisp_t patom(lisp_t a, bool out = false, bool esc = false)
 {
   auto& ctx = context::current();
   return io::patom(a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline LISPT terpri(file_t& f) { return io::terpri(f); }
-inline LISPT terpri(bool out = false)
+inline lisp_t terpri(file_t& f) { return io::terpri(f); }
+inline lisp_t terpri(bool out = false)
 {
   auto& ctx = context::current();
   return io::terpri(out ? *ctx.primerr() : *ctx.primout());
 }
-inline LISPT prinbody(LISPT a, file_t& f, bool esc = false) { return io::prinbody(context::current(), a, f, esc); }
-inline LISPT prinbody(LISPT a, bool out = false, bool esc = false)
+inline lisp_t prinbody(lisp_t a, file_t& f, bool esc = false) { return io::prinbody(context::current(), a, f, esc); }
+inline lisp_t prinbody(lisp_t a, bool out = false, bool esc = false)
 {
   auto& ctx = context::current();
   return io::prinbody(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline LISPT prin0(LISPT a, file_t& f, bool esc = false) { return io::prin0(context::current(), a, f, esc); }
-inline LISPT prin0(LISPT a, bool out = false, bool esc = false)
+inline lisp_t prin0(lisp_t a, file_t& f, bool esc = false) { return io::prin0(context::current(), a, f, esc); }
+inline lisp_t prin0(lisp_t a, bool out = false, bool esc = false)
 {
   auto& ctx = context::current();
   return io::prin0(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline LISPT print(LISPT a, file_t& f) { return io::print(context::current(), a, f); }
-inline LISPT print(LISPT a, bool out = false)
+inline lisp_t print(lisp_t a, file_t& f) { return io::print(context::current(), a, f); }
+inline lisp_t print(lisp_t a, bool out = false)
 {
   auto& ctx = context::current();
   return io::print(ctx, a, out ? *ctx.primerr() : *ctx.primout());
@@ -386,7 +386,7 @@ std::string to_string(T& sink)
 }
 
 /// @brief Creates a lisp expression.
-inline LISPT operator"" _l(const char* s, std::size_t)
+inline lisp_t operator"" _l(const char* s, std::size_t)
 {
   auto in = ref_file_t::create(s);
   auto e = lispread(in);
@@ -394,7 +394,7 @@ inline LISPT operator"" _l(const char* s, std::size_t)
 }
 } // namespace lisp
 
-inline std::ostream& operator<<(std::ostream& os, const lisp::LISPT& obj)
+inline std::ostream& operator<<(std::ostream& os, const lisp::lisp_t& obj)
 {
   lisp::file_t out(os);
   prin0(obj, out, true);

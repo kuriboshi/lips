@@ -29,8 +29,8 @@
 namespace lisp
 {
 class object;
-using LISPT = ref_ptr<object>;
-extern LISPT C_UNBOUND;
+using lisp_t = ref_ptr<object>;
+extern lisp_t C_UNBOUND;
 
 namespace symbol
 {
@@ -56,10 +56,10 @@ struct symbol_t
 {
   symbol_id id; // The id of the atom
   std::string pname;
-  LISPT self{};          // The LISPT object for this symbol
-  LISPT value{};         // Value
-  LISPT plist{};         // The property list
-  LISPT topval{};        // Holds top value (not used yet)
+  lisp_t self{};          // The lisp_t object for this symbol
+  lisp_t value{};         // Value
+  lisp_t plist{};         // The property list
+  lisp_t topval{};        // Holds top value (not used yet)
   bool constant = false; // If true this is a constant which can't be set
 };
 

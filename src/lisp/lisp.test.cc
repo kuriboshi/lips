@@ -58,7 +58,7 @@ TEST_CASE("lisp: mkprim")
     std::vector<int> result;
     mkprim(
       "printall",
-      [&result](context&, LISPT a) -> LISPT {
+      [&result](context&, lisp_t a) -> lisp_t {
         for(auto p: a)
         {
           result.push_back(p->intval());
@@ -75,7 +75,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-                        "plus", [](context&) -> LISPT { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+                        "plus", [](context&) -> lisp_t { return NIL; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "redefinition of subr not allowed");
   }
 }
@@ -174,7 +174,7 @@ TEST_CASE("lisp: iter")
     CHECK(i != end(list));
     ++i;
     CHECK(i == end(list));
-    // It's possible to dereference the end marker because it's a LISPT with a
+    // It's possible to dereference the end marker because it's a lisp_t with a
     // nil value.
     CHECK(is_NIL(*end(list)));
   }
@@ -188,7 +188,7 @@ TEST_CASE("lisp: create lisp twice")
 
 TEST_CASE("lisp: new object")
 {
-  LISPT obj{new object(100)};
+  lisp_t obj{new object(100)};
   CHECK(obj->intval() == 100);
 }
 

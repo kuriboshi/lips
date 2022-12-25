@@ -28,7 +28,7 @@ namespace lisp
 {
 
 class object;
-using LISPT = ref_ptr<object>;
+using lisp_t = ref_ptr<object>;
 
 // ^# start of line comment
 // #' Function quote
@@ -79,12 +79,12 @@ public:
   };
   type get(std::uint8_t index) const { return _table[index]; }
   void set(std::uint8_t index, type value) { _table[index] = value; }
-  void set(std::uint8_t index, LISPT value)
+  void set(std::uint8_t index, lisp_t value)
   {
     set(index, type::MACRO);
     _macro[index] = value;
   }
-  LISPT macro(context&, ref_file_t source, std::uint8_t index);
+  lisp_t macro(context&, ref_file_t source, std::uint8_t index);
   /// @brief Reset read table to the defaults.
   void reset()
   {
@@ -119,7 +119,7 @@ public:
 
 private:
   std::array<type, 256> _table = {type::OTHER};
-  std::array<LISPT, 256> _macro = {NIL};
+  std::array<lisp_t, 256> _macro = {NIL};
 };
 
 } // namespace lisp

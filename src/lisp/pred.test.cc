@@ -134,7 +134,7 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(closure(NIL, NIL)) == C_CLOSURE);
     CHECK(xtypeof(eval("unbound")) == C_UNBOUND);
     CHECK(xtypeof(""_l) == C_ENDOFFILE);
-    auto f = LISPT::create(ref_file_t::create(""));
+    auto f = lisp_t::create(ref_file_t::create(""));
     CHECK(xtypeof(f) == C_FILE);
     CHECK(xtypeof(T) == T);
   }
