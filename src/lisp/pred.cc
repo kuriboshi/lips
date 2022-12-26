@@ -152,9 +152,11 @@ lisp_t xtypeof(context&, lisp_t a)
     case type::Cvariable:
       return C_CVARIABLE;
     case type::Nil:
-      return nil;
+      break;
   }
-  // Never reached since all cases are handled in the switch statement.
+  // To avoid warning from gcc that this function doesn't return anything in
+  // spite of handling all switch cases.
+  return nil;
 }
 
 namespace pn
