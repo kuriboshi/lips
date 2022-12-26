@@ -147,7 +147,7 @@ inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc:
 inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(i); }
+inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<int>(i)); }
 
 /// @brief Creates a floating point value.
 inline lisp_t operator"" _l(long double d) { return details::alloc::mkfloat(d); }

@@ -28,16 +28,17 @@ TEST_CASE("debug: debug functions")
 {
   auto& ctx = context::current();
   auto t = ctx.vm().trace();
-  CHECK(t == 0);
-  evaltrace(mknumber(1));
+  CHECK(!t);
+  evaltrace(T);
   t = ctx.vm().trace();
-  CHECK(t == 1);
-  evaltrace(mknumber(0));
+  CHECK(t);
+  evaltrace(nil);
   t = ctx.vm().trace();
-  CHECK(t == 0);
-  auto r = evaltrace(nil);
-  REQUIRE(type_of(r) == type::Integer);
-  CHECK(r->intval() == t);
+  CHECK(!t);
+  auto r = evaltrace(T);
+  CHECK(type_of(r) == type::Nil);
+  r = evaltrace(nil);
+  CHECK(type_of(r) == type::T);
 }
 
 } // namespace lisp

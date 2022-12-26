@@ -104,7 +104,7 @@ lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 /// @returns The symbol as a LISP object.
 lisp_t intern(const std::string& pname)
 {
-  auto sym = symbol::symbol_t::intern(pname);
+  auto* sym = symbol::symbol_t::intern(pname);
   if(sym->self == nil)
     sym->self = getobject(sym);
   return sym->self;

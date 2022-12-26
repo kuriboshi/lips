@@ -155,7 +155,9 @@ void collectjob(int pid, int stat)
     {
       job->running = false;
       job->status = stat;
-      if(!WIFSTOPPED(job->status))
+      if(WIFSTOPPED(job->status))
+        printjob(*job);
+      else
       {
         if(!job->background && WIFSIGNALED(job->status) && WTERMSIG(job->status) != SIGINT)
           printjob(*job);   // Print if not interrupted
@@ -166,8 +168,6 @@ void collectjob(int pid, int stat)
         }
         job = joblist.erase(job);
       }
-      else
-        printjob(*job);
       break;
     }
   }

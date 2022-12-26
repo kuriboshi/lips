@@ -504,14 +504,14 @@ void term_source::blink()
   linebuffer[linepos] = '\0';
   if(ldiff == 0)
   {
-    for(int i = 0; parpos.line_start[i]; i++)
+    for(int i = 0; parpos.line_start[i] != 0; i++)
       pputc(parpos.line_start[i], stdout); // NOLINT
   }
   else
   {
     if(currentpos.line == 0)
       std::cout << current_prompt;
-    for(int i = 0; currentpos.line_start[i]; i++)
+    for(int i = 0; currentpos.line_start[i] != 0; i++)
       pputc(currentpos.line_start[i], stdout); // NOLINT
   }
   fflush(stdout);

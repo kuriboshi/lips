@@ -200,20 +200,20 @@ ref_file_t context::stderr() const { return _pimpl->_stderr; }
 
 ref_file_t context::stdin() const { return _pimpl->_stdin; }
 
-lisp_t context::perror(std::error_code error)
+lisp_t context::perror(std::error_code error) const
 {
   primerr()->format("{} ", error.message());
   return nil;
 }
 
-lisp_t context::perror(std::error_code error, lisp_t arg)
+lisp_t context::perror(std::error_code error, lisp_t arg) const
 {
   primerr()->format("{} ", error.message());
   prin2(arg, T);
   return nil;
 }
 
-lisp_t context::error(std::error_code error, lisp_t arg)
+lisp_t context::error(std::error_code error, lisp_t arg) const
 {
   perror(error, arg);
   throw lisp_error(error.message());

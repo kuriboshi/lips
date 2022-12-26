@@ -36,6 +36,7 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     try
     {
       ctx.repl(nil);
+      ctx.repl = nullptr;
       // If we return normally from repl we exit the program
       return 0;
     }

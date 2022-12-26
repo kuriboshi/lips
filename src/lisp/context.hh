@@ -60,9 +60,9 @@ public:
   ref_file_t stderr() const;
   ref_file_t stdin() const;
 
-  lisp_t perror(std::error_code);
-  lisp_t perror(std::error_code, lisp_t);
-  lisp_t error(std::error_code, lisp_t);
+  lisp_t perror(std::error_code) const;
+  lisp_t perror(std::error_code, lisp_t) const;
+  lisp_t error(std::error_code, lisp_t) const;
 
   void fatal(std::error_code error) { throw lisp_error(error.message()); }
 

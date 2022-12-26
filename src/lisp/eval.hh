@@ -90,7 +90,7 @@ public:
   lisp_t apply(lisp_t, lisp_t);
   lisp_t backtrace();
   /// @brief Return the current environment.
-  lisp_t topofstack();
+  lisp_t topofstack() const;
   /// @brief Convert an environment to a list.
   lisp_t destblock(lisp_t);
 

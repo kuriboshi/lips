@@ -25,13 +25,8 @@ namespace lisp::details::debug
 lisp_t evaltrace(context& ctx, lisp_t state)
 {
   auto i = ctx.vm().trace();
-
-  if(!is_nil(state))
-  {
-    check(state, type::Integer);
-    ctx.vm().trace(state->intval());
-  }
-  return mknumber(i);
+  ctx.vm().trace(!is_nil(state));
+  return i ? T : nil;
 }
 
 namespace pn

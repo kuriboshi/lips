@@ -116,6 +116,14 @@ public:
     if(_ptr)
       _ptr->retain();
   }
+  /// @brief Move constructor
+  ref_ptr(ref_ptr&& x)
+  {
+    if(_ptr)
+      _ptr->release();
+    _ptr = x._ptr;
+    x._ptr = nullptr;
+  }
   /// @brief Create a ref_ptr<T> with a pointer to an object of type T.
   /// @brief Creates an object of type T and takes ownership of it.
   template<typename... Ts>
@@ -137,6 +145,17 @@ public:
       if(_ptr)
         _ptr->release();
       _ptr = x._ptr;
+    }
+    return *this;
+  }
+  ref_ptr& operator=(ref_ptr&& x)
+  {
+    if(this != &x)
+    {
+      if(_ptr)
+        _ptr->release();
+      _ptr = std::move(x._ptr);
+      x._ptr = nullptr;
     }
     return *this;
   }

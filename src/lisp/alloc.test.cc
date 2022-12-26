@@ -120,7 +120,7 @@ TEST_CASE("alloc: c variables")
     CHECK(move1->intval() == 432);
     move0 = std::move(move1);
     CHECK(move0->intval() == 432);
-    CHECK(move1->intval() == 432);
+    REQUIRE(is_nil(move1));
   }
 }
 
