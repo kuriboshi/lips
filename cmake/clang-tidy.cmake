@@ -18,5 +18,6 @@
 
 if(APPLE)
   list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/llvm/bin")
+  list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/llvm/bin")
 endif()
 find_program(LLVM_CLANG_TIDY clang-tidy REQUIRED)
