@@ -156,7 +156,7 @@ context::context()
 
 context::~context() = default;
 
-vm& context::vm()
+class vm& context::vm()
 {
   static class vm vm_(*this);
   return vm_;

@@ -44,7 +44,7 @@ class context
 public:
   context();
   ~context();
-  vm& vm();
+  class vm& vm();
   static context& current();
 
   syntax& read_table();
