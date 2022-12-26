@@ -413,7 +413,6 @@ public:
   static std::size_t freecount() { return _pool.size(); }
 
 private:
-  template<>
   object(pool_test_t)
   {
     throw std::runtime_error("object");
