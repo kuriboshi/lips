@@ -294,11 +294,6 @@ public:
 
   /// @brief Litatom
   auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
-  void set(const symbol::ref_symbol_t sym)
-  {
-    _type = type::Symbol;
-    _u = sym;
-  }
 
   /// @brief Get and set the value of a litatom
   auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
@@ -306,34 +301,14 @@ public:
 
   /// @brief Integer
   auto intval() const -> int { return std::get<int>(_u); }
-  void set(int x)
-  {
-    _type = type::Integer;
-    _u = x;
-  }
 
   /// @brief Floating point (double)
   auto floatval() const -> double { return std::get<double>(_u); }
-  void set(double f)
-  {
-    _type = type::Float;
-    _u = f;
-  }
 
   auto indirectval() const -> lisp_t { return std::get<indirect_t>(_u).value; }
-  void set(indirect_t x)
-  {
-    _type = type::Indirect;
-    _u = x;
-  }
 
   /// @brief Cons cell and car/cdr
   auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
-  void set(cons_t x)
-  {
-    _type = type::Cons;
-    _u = x;
-  }
   auto car() const -> lisp_t { return std::get<cons_t>(_u).car; }
   void car(lisp_t x) { std::get<cons_t>(_u).car = x; }
   auto cdr() const -> lisp_t { return std::get<cons_t>(_u).cdr; }
@@ -341,64 +316,29 @@ public:
 
   /// @brief Character string
   auto string() const -> const std::string& { return std::get<std::string>(_u); }
-  void set(const std::string& s)
-  {
-    _type = type::String;
-    _u = s;
-  }
 
   /// @brief Compiled function (subr)
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
-  void set(subr_index x)
-  {
-    _type = type::Subr;
-    _u = x;
-  }
 
   /// @brief Lambda expression
   auto lambda() -> ref_lambda_t { return std::get<ref_lambda_t>(_u); }
-  void set(ref_lambda_t x)
-  {
-    _type = type::Lambda;
-    _u = x;
-  }
 
   /// @brief Closure
   auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
-  void set(ref_closure_t x)
-  {
-    _type = type::Closure;
-    _u = x;
-  }
 
   /// @brief Destination environment
   auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
-  void set(destblock_t* env)
-  {
-    _type = type::Environ;
-    _u = env;
-  }
 
   /// @brief File reference
   auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
-  void set(ref_file_t f)
-  {
-    _type = type::File;
-    _u = f;
-  }
 
   /// @brief Link to a c/c++ variable
   auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
-  void set(cvariable_t&& x)
-  {
-    _type = type::Cvariable;
-    _u = std::move(x);
-  }
 
   /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const
   {
-    return _type == type::String ? string() : std::get<symbol::ref_symbol_t>(_u)->pname;
+    return _type == type::String ? std::get<std::string>(_u) : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object
@@ -412,7 +352,79 @@ public:
 
   static std::size_t freecount() { return _pool.size(); }
 
+  void set(subr_index x)
+  {
+    _type = type::Subr;
+    _u = x;
+  }
+
+  void set(indirect_t x)
+  {
+    _type = type::Indirect;
+    _u = x;
+  }
+
+  void set(cvariable_t&& x)
+  {
+    _type = type::Cvariable;
+    _u = std::move(x);
+  }
+
 private:
+  void set(const symbol::ref_symbol_t sym)
+  {
+    _type = type::Symbol;
+    _u = sym;
+  }
+
+  void set(int x)
+  {
+    _type = type::Integer;
+    _u = x;
+  }
+
+  void set(double f)
+  {
+    _type = type::Float;
+    _u = f;
+  }
+
+  void set(cons_t x)
+  {
+    _type = type::Cons;
+    _u = x;
+  }
+
+  void set(const std::string& s)
+  {
+    _type = type::String;
+    _u = s;
+  }
+
+  void set(ref_lambda_t x)
+  {
+    _type = type::Lambda;
+    _u = x;
+  }
+
+  void set(ref_closure_t x)
+  {
+    _type = type::Closure;
+    _u = x;
+  }
+
+  void set(destblock_t* env)
+  {
+    _type = type::Environ;
+    _u = env;
+  }
+
+  void set(ref_file_t f)
+  {
+    _type = type::File;
+    _u = f;
+  }
+
   object(pool_test_t)
   {
     throw std::runtime_error("object");

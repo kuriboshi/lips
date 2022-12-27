@@ -34,11 +34,9 @@ TEST_CASE("rtable: rmdquote")
 
 TEST_CASE("rtable: rmsquote")
 {
-  lisp_t in = details::alloc::getobject();
-
   SECTION("quote next atom")
   {
-    in->set(ref_file_t::create(R"(1)"));
+    auto in = details::alloc::getobject(ref_file_t::create(R"(1)"));
     auto q = rtable::rmsquote(context::current(), in);
     CHECK(type_of(q) == type::Cons);
     CHECK(car(q) == C_QUOTE);
@@ -47,7 +45,7 @@ TEST_CASE("rtable: rmsquote")
 
   SECTION("quote before right parenthesis")
   {
-    in->set(ref_file_t::create(R"())"));
+    auto in = details::alloc::getobject(ref_file_t::create(R"())"));
     auto q = rtable::rmsquote(context::current(), in);
     CHECK(type_of(q) == type::Symbol);
     CHECK(q == "'"_a);
