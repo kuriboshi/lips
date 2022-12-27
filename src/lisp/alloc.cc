@@ -102,7 +102,7 @@ lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 ///
 /// @param pname Name of the symbol.
 /// @returns The symbol as a LISP object.
-lisp_t intern(const std::string& pname)
+lisp_t intern(std::string_view pname)
 {
   auto* sym = symbol::symbol_t::intern(pname);
   if(sym->self == nil)
@@ -125,9 +125,9 @@ lisp_t mkatom(const std::string& pname)
 
 namespace pn
 {
-inline constexpr auto CONS = "cons";           // Make a new cons cell
-inline constexpr auto FREECOUNT = "freecount"; // Number of free cells
-inline constexpr auto OBARRAY = "obarray";     // Return list of all atoms
+inline constexpr std::string_view CONS = "cons";           // Make a new cons cell
+inline constexpr std::string_view FREECOUNT = "freecount"; // Number of free cells
+inline constexpr std::string_view OBARRAY = "obarray";     // Return list of all atoms
 } // namespace pn
 
 void init()

@@ -330,38 +330,38 @@ lisp_t exit(context&, lisp_t status)
 
 namespace pn
 {
-inline constexpr auto ATOM = "atom";       // t if atom
-inline constexpr auto CAR = "car";         // car
-inline constexpr auto CDR = "cdr";         // cdr
-inline constexpr auto CADR = "cadr";       // cadr
-inline constexpr auto CDAR = "cdar";       // cdar
-inline constexpr auto CAAR = "caar";       // caar
-inline constexpr auto CDDR = "cddr";       // cddr
-inline constexpr auto CDDDR = "cdddr";     // cdddr
-inline constexpr auto CADDR = "caddr";     // caddr
-inline constexpr auto CDADR = "cdadr";     // cdadr
-inline constexpr auto CAADR = "caadr";     // caadr
-inline constexpr auto CDDAR = "cddar";     // cddar
-inline constexpr auto CADAR = "cadar";     // cadar
-inline constexpr auto CDAAR = "cdaar";     // cdaar
-inline constexpr auto CAAAR = "caaar";     // caaar
-inline constexpr auto CLOSURE = "closure"; // create static environment
-inline constexpr auto EQ = "eq";           // pointer equal
-inline constexpr auto ERROR = "error";     // error
-inline constexpr auto LAMBDA = "lambda";   // create lambda object
-inline constexpr auto LENGTH = "length";   // length of list
-inline constexpr auto LIST = "list";       // make list of args
-inline constexpr auto NCONC = "nconc";     // destructive append
-inline constexpr auto NLAMBDA = "nlambda"; // make nlambda object
-inline constexpr auto NTH = "nth";         // nth car in list
-inline constexpr auto NULL_ = "null";      // t if nil
-inline constexpr auto QUOTE = "quote";     // don't eval arg
-inline constexpr auto RPLACA = "rplaca";   // replace car
-inline constexpr auto RPLACD = "rplacd";   // replace cdr
-inline constexpr auto TCONC = "tconc";     // add to end of list
-inline constexpr auto ATTACH = "attach";   // attach object at front of list
-inline constexpr auto APPEND = "append";   // append lists
-inline constexpr auto EXIT = "exit";       // exit lips
+inline constexpr std::string_view ATOM = "atom";       // t if atom
+inline constexpr std::string_view CAR = "car";         // car
+inline constexpr std::string_view CDR = "cdr";         // cdr
+inline constexpr std::string_view CADR = "cadr";       // cadr
+inline constexpr std::string_view CDAR = "cdar";       // cdar
+inline constexpr std::string_view CAAR = "caar";       // caar
+inline constexpr std::string_view CDDR = "cddr";       // cddr
+inline constexpr std::string_view CDDDR = "cdddr";     // cdddr
+inline constexpr std::string_view CADDR = "caddr";     // caddr
+inline constexpr std::string_view CDADR = "cdadr";     // cdadr
+inline constexpr std::string_view CAADR = "caadr";     // caadr
+inline constexpr std::string_view CDDAR = "cddar";     // cddar
+inline constexpr std::string_view CADAR = "cadar";     // cadar
+inline constexpr std::string_view CDAAR = "cdaar";     // cdaar
+inline constexpr std::string_view CAAAR = "caaar";     // caaar
+inline constexpr std::string_view CLOSURE = "closure"; // create static environment
+inline constexpr std::string_view EQ = "eq";           // pointer equal
+inline constexpr std::string_view ERROR = "error";     // error
+inline constexpr std::string_view LAMBDA = "lambda";   // create lambda object
+inline constexpr std::string_view LENGTH = "length";   // length of list
+inline constexpr std::string_view LIST = "list";       // make list of args
+inline constexpr std::string_view NCONC = "nconc";     // destructive append
+inline constexpr std::string_view NLAMBDA = "nlambda"; // make nlambda object
+inline constexpr std::string_view NTH = "nth";         // nth car in list
+inline constexpr std::string_view NULL_ = "null";      // t if nil
+inline constexpr std::string_view QUOTE = "quote";     // don't eval arg
+inline constexpr std::string_view RPLACA = "rplaca";   // replace car
+inline constexpr std::string_view RPLACD = "rplacd";   // replace cdr
+inline constexpr std::string_view TCONC = "tconc";     // add to end of list
+inline constexpr std::string_view ATTACH = "attach";   // attach object at front of list
+inline constexpr std::string_view APPEND = "append";   // append lists
+inline constexpr std::string_view EXIT = "exit";       // exit lips
 } // namespace pn
 
 void init()

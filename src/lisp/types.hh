@@ -20,8 +20,9 @@
 
 #include <functional>
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
+#include <string_view>
 #include <variant>
 
 #include "error.hh"
@@ -99,25 +100,25 @@ struct subr_t
   using func2_t = std::function<lisp_t(context&, lisp_t, lisp_t)>;
   using func3_t = std::function<lisp_t(context&, lisp_t, lisp_t, lisp_t)>;
 
-  subr_t(const std::string& pname, func0_t fun, enum subr subr, enum spread spread)
+  subr_t(std::string_view pname, func0_t fun, enum subr subr, enum spread spread)
     : name(pname),
       f(fun),
       subr(subr),
       spread(spread)
   {}
-  subr_t(const std::string& pname, func1_t fun, enum subr subr, enum spread spread)
+  subr_t(std::string_view pname, func1_t fun, enum subr subr, enum spread spread)
     : name(pname),
       f(fun),
       subr(subr),
       spread(spread)
   {}
-  subr_t(const std::string& pname, func2_t fun, enum subr subr, enum spread spread)
+  subr_t(std::string_view pname, func2_t fun, enum subr subr, enum spread spread)
     : name(pname),
       f(fun),
       subr(subr),
       spread(spread)
   {}
-  subr_t(const std::string& pname, func3_t fun, enum subr subr, enum spread spread)
+  subr_t(std::string_view pname, func3_t fun, enum subr subr, enum spread spread)
     : name(pname),
       f(fun),
       subr(subr),

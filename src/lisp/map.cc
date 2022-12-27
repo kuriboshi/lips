@@ -125,10 +125,10 @@ lisp_t mapcar(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 
 namespace pn
 {
-inline constexpr auto MAP = "map";         // map
-inline constexpr auto MAPC = "mapc";       // map on car
-inline constexpr auto MAPLIST = "maplist"; // map and build result
-inline constexpr auto MAPCAR = "mapcar";   // mapc and build result
+inline constexpr std::string_view MAP = "map";         // map
+inline constexpr std::string_view MAPC = "mapc";       // map on car
+inline constexpr std::string_view MAPLIST = "maplist"; // map and build result
+inline constexpr std::string_view MAPCAR = "mapcar";   // mapc and build result
 } // namespace pn
 
 void init()

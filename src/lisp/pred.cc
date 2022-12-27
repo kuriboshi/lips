@@ -161,16 +161,16 @@ lisp_t xtypeof(context&, lisp_t a)
 
 namespace pn
 {
-inline constexpr auto LISTP = "listp";     // t if cons
-inline constexpr auto NLISTP = "nlistp";   // not listp
-inline constexpr auto NEQ = "neq";         // not eq
-inline constexpr auto NUMBERP = "numberp"; // integer of float
-inline constexpr auto MEMB = "memb";       // t if a in l
-inline constexpr auto EQUAL = "equal";     // equal
-inline constexpr auto BOUNDP = "boundp";   // t if var bound
-inline constexpr auto LITATOM = "litatom"; // t if is a literal atom (Interlisp)
-inline constexpr auto SYMBOLP = "symbolp"; // t if is a symbol (CL)
-inline constexpr auto TYPEOF = "typeof";   // return type as an atom
+inline constexpr std::string_view LISTP = "listp";     // t if cons
+inline constexpr std::string_view NLISTP = "nlistp";   // not listp
+inline constexpr std::string_view NEQ = "neq";         // not eq
+inline constexpr std::string_view NUMBERP = "numberp"; // integer of float
+inline constexpr std::string_view MEMB = "memb";       // t if a in l
+inline constexpr std::string_view EQUAL = "equal";     // equal
+inline constexpr std::string_view BOUNDP = "boundp";   // t if var bound
+inline constexpr std::string_view LITATOM = "litatom"; // t if is a literal atom (Interlisp)
+inline constexpr std::string_view SYMBOLP = "symbolp"; // t if is a symbol (CL)
+inline constexpr std::string_view TYPEOF = "typeof";   // return type as an atom
 } // namespace pn
 
 void init()

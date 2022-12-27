@@ -115,9 +115,9 @@ lisp_t defineq(context& ctx, lisp_t defs)
 
 namespace pn
 {
-inline constexpr auto DEFINE = "define";   // define function
-inline constexpr auto DEFINEQ = "defineq"; // defineq function
-inline constexpr auto GETREP = "getrep";   // get function representation
+inline constexpr std::string_view DEFINE = "define";   // define function
+inline constexpr std::string_view DEFINEQ = "defineq"; // defineq function
+inline constexpr std::string_view GETREP = "getrep";   // get function representation
 } // namespace pn
 
 void init()

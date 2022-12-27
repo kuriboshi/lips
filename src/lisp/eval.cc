@@ -30,13 +30,13 @@ namespace lisp::details::vm
 
 namespace pn
 {
-inline constexpr auto E = "e";                   // noeval version of eval
-inline constexpr auto EVAL = "eval";             // evaluate exp
-inline constexpr auto APPLY = "apply";           // apply function on args
-inline constexpr auto APPLYSTAR = "apply*";      // apply nospread
-inline constexpr auto BACKTRACE = "backtrace";   // control stack backtrace
-inline constexpr auto TOPOFSTACK = "topofstack"; // return top of value stack
-inline constexpr auto DESTBLOCK = "destblock";   // convert environment to list
+inline constexpr std::string_view E = "e";                   // noeval version of eval
+inline constexpr std::string_view EVAL = "eval";             // evaluate exp
+inline constexpr std::string_view APPLY = "apply";           // apply function on args
+inline constexpr std::string_view APPLYSTAR = "apply*";      // apply nospread
+inline constexpr std::string_view BACKTRACE = "backtrace";   // control stack backtrace
+inline constexpr std::string_view TOPOFSTACK = "topofstack"; // return top of value stack
+inline constexpr std::string_view DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
 lisp_t eval(context& ctx, lisp_t expr) { return ctx.vm().eval(expr); }

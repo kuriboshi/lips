@@ -19,6 +19,7 @@
 #define LISP_ALLOC_HH
 
 #include <string>
+#include <string_view>
 
 #include "eval.hh"
 #include "io.hh"
@@ -89,7 +90,7 @@ inline lisp_t freecount() { return details::alloc::freecount(context::current())
 ///
 /// @return The interned symbol.
 ///
-inline lisp_t intern(const std::string& s) { return details::alloc::intern(s); }
+inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 
 /// @brief Create a literal atom.
 ///
@@ -101,25 +102,25 @@ inline lisp_t intern(const std::string& s) { return details::alloc::intern(s); }
 inline lisp_t mkatom(const std::string& s) { return details::alloc::mkatom(s); }
 
 /// @brief Overload of mkprim for a function with zero parameters.
-inline void mkprim(const std::string& pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+inline void mkprim(std::string_view pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 /// @brief Overload of mkprim for a function with one parameter.
-inline void mkprim(const std::string& pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+inline void mkprim(std::string_view pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 /// @brief Overload of mkprim for a function with two parameters.
-inline void mkprim(const std::string& pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+inline void mkprim(std::string_view pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }
 
 /// @brief Overload of mkprim for a function with three parameters.
-inline void mkprim(const std::string& pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+inline void mkprim(std::string_view pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }

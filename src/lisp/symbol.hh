@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -35,6 +36,26 @@ extern lisp_t C_UNBOUND;
 
 namespace symbol
 {
+struct sv_equal
+{
+  using is_transparent = std::true_type;
+
+  bool operator()(std::string_view l, std::string_view r) const noexcept
+  {
+    return l == r;
+  }
+};
+
+struct sv_hash
+{
+  using is_transparent = std::true_type;
+
+  auto operator()(std::string_view str) const noexcept
+  {
+    return std::hash<std::string_view>()(str);
+  }
+};
+
 class symbol_t: public ref_count<symbol_t>
 {
 public:
@@ -55,7 +76,7 @@ public:
 
   static std::size_t freecount() { return _pool.size(); }
 
-  static symbol_t* intern(const std::string& pname)
+  static symbol_t* intern(std::string_view pname)
   {
     auto p = store().find(pname);
     if(p != store().end())
@@ -67,19 +88,19 @@ public:
     return i.first->second;
   }
 
-  static void unintern(const std::string& pname)
+  static void unintern(std::string_view pname)
   {
     auto p = store().find(pname);
     delete p->second;
     store().erase(p);
   }
 
-  static bool exists(const std::string& pname)
+  static bool exists(std::string_view pname)
   {
     return store().find(pname) != store().end();
   }
 
-  using store_t = std::unordered_map<std::string, symbol_t*>;
+  using store_t = std::unordered_map<std::string, symbol_t*, sv_hash, sv_equal>;
   static store_t& store()
   {
     static store_t _store;

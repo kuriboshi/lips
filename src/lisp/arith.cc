@@ -374,33 +374,33 @@ lisp_t minusp(context& ctx, lisp_t x)
 
 namespace pn
 {
-inline constexpr auto PLUS = "plus";               // addition
-inline constexpr auto DIFFERENCE = "difference";   // subtraction
-inline constexpr auto TIMES = "times";             // multiplication
-inline constexpr auto DIVIDE = "divide";           // division
-inline constexpr auto IPLUS = "iplus";             // integer addition
-inline constexpr auto IDIFFERENCE = "idifference"; // integer subtraction
-inline constexpr auto ITIMES = "itimes";           // integer multiplication
-inline constexpr auto IQUOTIENT = "iquotient";     // integer division
-inline constexpr auto IREMAINDER = "iremainder";   // integer mod
-inline constexpr auto IMINUS = "iminus";           // integer change sign
-inline constexpr auto MINUS = "minus";             // change sign mixed
-inline constexpr auto ADD1 = "add1";               // add one
-inline constexpr auto SUB1 = "sub1";               // subtract one
-inline constexpr auto ABS = "abs";                 // absolute value
-inline constexpr auto FPLUS = "fplus";             // float addition
-inline constexpr auto FDIFFERENCE = "fdifference"; // float subtraction
-inline constexpr auto FTIMES = "ftimes";           // float multiplication
-inline constexpr auto FDIVIDE = "fdivide";         // float division
-inline constexpr auto ITOF = "itof";               // integer to float
-inline constexpr auto GREATERP = "greaterp";       // t if greater than
-inline constexpr auto GEQ = "geq";                 // t if greater or eq
-inline constexpr auto LESSP = "lessp";             // t if less than
-inline constexpr auto LEQ = "leq";                 // t if less or eq
-inline constexpr auto ZEROP = "zerop";             // t if eq to 0
-inline constexpr auto EQP = "eqp";                 // t if eq or numerically equal
-inline constexpr auto NEQP = "neqp";               // not eqp
-inline constexpr auto MINUSP = "minusp";           // t if negative
+inline constexpr std::string_view PLUS = "plus";               // addition
+inline constexpr std::string_view DIFFERENCE = "difference";   // subtraction
+inline constexpr std::string_view TIMES = "times";             // multiplication
+inline constexpr std::string_view DIVIDE = "divide";           // division
+inline constexpr std::string_view IPLUS = "iplus";             // integer addition
+inline constexpr std::string_view IDIFFERENCE = "idifference"; // integer subtraction
+inline constexpr std::string_view ITIMES = "itimes";           // integer multiplication
+inline constexpr std::string_view IQUOTIENT = "iquotient";     // integer division
+inline constexpr std::string_view IREMAINDER = "iremainder";   // integer mod
+inline constexpr std::string_view IMINUS = "iminus";           // integer change sign
+inline constexpr std::string_view MINUS = "minus";             // change sign mixed
+inline constexpr std::string_view ADD1 = "add1";               // add one
+inline constexpr std::string_view SUB1 = "sub1";               // subtract one
+inline constexpr std::string_view ABS = "abs";                 // absolute value
+inline constexpr std::string_view FPLUS = "fplus";             // float addition
+inline constexpr std::string_view FDIFFERENCE = "fdifference"; // float subtraction
+inline constexpr std::string_view FTIMES = "ftimes";           // float multiplication
+inline constexpr std::string_view FDIVIDE = "fdivide";         // float division
+inline constexpr std::string_view ITOF = "itof";               // integer to float
+inline constexpr std::string_view GREATERP = "greaterp";       // t if greater than
+inline constexpr std::string_view GEQ = "geq";                 // t if greater or eq
+inline constexpr std::string_view LESSP = "lessp";             // t if less than
+inline constexpr std::string_view LEQ = "leq";                 // t if less or eq
+inline constexpr std::string_view ZEROP = "zerop";             // t if eq to 0
+inline constexpr std::string_view EQP = "eqp";                 // t if eq or numerically equal
+inline constexpr std::string_view NEQP = "neqp";               // not eqp
+inline constexpr std::string_view MINUSP = "minusp";           // t if negative
 } // namespace pn
 
 void init()

@@ -16,6 +16,7 @@
 //
 
 #include <string>
+#include <string_view>
 
 #include "alloc.hh"
 #include "check.hh"
@@ -117,13 +118,13 @@ lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
 
 namespace pn
 {
-inline constexpr auto STRINGP = "stringp";     // t if string
-inline constexpr auto STREQUAL = "strequal";   // string equal
-inline constexpr auto CONCAT = "concat";       // concatenate strings
-inline constexpr auto STRLEN = "strlen";       // length of string
-inline constexpr auto SUBSTRING = "substring"; // get sub string
-inline constexpr auto SYMSTR = "symstr";       // make symbol a string
-inline constexpr auto STRCMP = "strcmp";       // compare strings
+inline constexpr std::string_view STRINGP = "stringp";     // t if string
+inline constexpr std::string_view STREQUAL = "strequal";   // string equal
+inline constexpr std::string_view CONCAT = "concat";       // concatenate strings
+inline constexpr std::string_view STRLEN = "strlen";       // length of string
+inline constexpr std::string_view SUBSTRING = "substring"; // get sub string
+inline constexpr std::string_view SYMSTR = "symstr";       // make symbol a string
+inline constexpr std::string_view STRCMP = "strcmp";       // compare strings
 } // namespace pn
 
 void init()

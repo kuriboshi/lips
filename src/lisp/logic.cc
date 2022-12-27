@@ -64,10 +64,10 @@ lisp_t xif(context&, lisp_t pred, lisp_t true_expr, lisp_t false_expr)
 
 namespace pn
 {
-inline constexpr auto AND = "and"; // and
-inline constexpr auto OR = "or";   // or
-inline constexpr auto NOT = "not"; // not
-inline constexpr auto IF = "if";   // if a then b else c
+inline constexpr std::string_view AND = "and"; // and
+inline constexpr std::string_view OR = "or";   // or
+inline constexpr std::string_view NOT = "not"; // not
+inline constexpr std::string_view IF = "if";   // if a then b else c
 } // namespace pn
 
 void init()

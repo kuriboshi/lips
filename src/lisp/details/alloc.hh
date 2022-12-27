@@ -37,7 +37,7 @@ inline lisp_t freecount(context&) { return mknumber(static_cast<int>(object::fre
 /// @return The lambda object.
 ///
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval);
-lisp_t intern(const std::string& pname);
+lisp_t intern(std::string_view pname);
 lisp_t mkatom(const std::string&);
 
 /// @brief Register a primitive function.

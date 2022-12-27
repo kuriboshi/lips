@@ -210,19 +210,19 @@ lisp_t readline(context& ctx, lisp_t file)
 
 namespace pn
 {
-inline constexpr auto OPEN = "open";             // open file
-inline constexpr auto CLOSE = "close";           // close file
-inline constexpr auto LOAD = "load";             // load file
-inline constexpr auto PRIN1 = "prin1";           // print without escapes
-inline constexpr auto PRIN2 = "prin2";           // print without new-line
-inline constexpr auto PRINT = "print";           // print
-inline constexpr auto PRINTLEVEL = "printlevel"; // how deep to print
-inline constexpr auto RATOM = "ratom";           // read atom
-inline constexpr auto READ = "read";             // read expression
-inline constexpr auto READC = "readc";           // read characte
-inline constexpr auto READLINE = "readline";     // read a line
-inline constexpr auto SPACES = "spaces";         // print some spaces
-inline constexpr auto TERPRI = "terpri";         // print new-line
+inline constexpr std::string_view OPEN = "open";             // open file
+inline constexpr std::string_view CLOSE = "close";           // close file
+inline constexpr std::string_view LOAD = "load";             // load file
+inline constexpr std::string_view PRIN1 = "prin1";           // print without escapes
+inline constexpr std::string_view PRIN2 = "prin2";           // print without new-line
+inline constexpr std::string_view PRINT = "print";           // print
+inline constexpr std::string_view PRINTLEVEL = "printlevel"; // how deep to print
+inline constexpr std::string_view RATOM = "ratom";           // read atom
+inline constexpr std::string_view READ = "read";             // read expression
+inline constexpr std::string_view READC = "readc";           // read characte
+inline constexpr std::string_view READLINE = "readline";     // read a line
+inline constexpr std::string_view SPACES = "spaces";         // print some spaces
+inline constexpr std::string_view TERPRI = "terpri";         // print new-line
 } // namespace pn
 
 void init()

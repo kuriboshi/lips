@@ -69,9 +69,9 @@ lisp_t rmgetenv(context&, lisp_t stream)
 
 namespace pn
 {
-inline constexpr auto RMDQUOTE = "rmdquote";
-inline constexpr auto RMGETENV = "rmgetenv";
-inline constexpr auto RMSQUOTE = "rmsquote";
+inline constexpr std::string_view RMDQUOTE = "rmdquote";
+inline constexpr std::string_view RMGETENV = "rmgetenv";
+inline constexpr std::string_view RMSQUOTE = "rmsquote";
 } // namespace pn
 
 void init()

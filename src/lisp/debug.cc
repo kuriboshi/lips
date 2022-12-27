@@ -31,7 +31,7 @@ lisp_t evaltrace(context& ctx, lisp_t state)
 
 namespace pn
 {
-inline constexpr auto EVALTRACE = "evaltrace"; // evaltrace
+inline constexpr std::string_view EVALTRACE = "evaltrace"; // evaltrace
 }
 
 void init()

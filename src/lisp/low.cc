@@ -106,13 +106,13 @@ lisp_t xwhile(context& ctx, lisp_t pred, lisp_t exp)
 
 namespace pn
 {
-inline constexpr auto COND = "cond";   // cond
-inline constexpr auto PROG1 = "prog1"; // return first expression
-inline constexpr auto PROGN = "progn"; // return last expression
-inline constexpr auto SET = "set";     // set variable
-inline constexpr auto SETQ = "setq";   // set quoted variable
-inline constexpr auto SETQQ = "setqq"; // noeval set
-inline constexpr auto WHILE = "while"; // while t
+inline constexpr std::string_view COND = "cond";   // cond
+inline constexpr std::string_view PROG1 = "prog1"; // return first expression
+inline constexpr std::string_view PROGN = "progn"; // return last expression
+inline constexpr std::string_view SET = "set";     // set variable
+inline constexpr std::string_view SETQ = "setq";   // set quoted variable
+inline constexpr std::string_view SETQQ = "setqq"; // noeval set
+inline constexpr std::string_view WHILE = "while"; // while t
 } // namespace pn
 
 void init()

@@ -85,11 +85,11 @@ lisp_t remprop(context&, lisp_t x, lisp_t p)
 
 namespace pn
 {
-inline constexpr auto SETPLIST = "setplist"; // set property list
-inline constexpr auto GETPLIST = "getplist"; // get property list
-inline constexpr auto PUTPROP = "putprop";   // put property on atom
-inline constexpr auto GETPROP = "getprop";   // get property value
-inline constexpr auto REMPROP = "remprop";   // remove prop
+inline constexpr std::string_view SETPLIST = "setplist"; // set property list
+inline constexpr std::string_view GETPLIST = "getplist"; // get property list
+inline constexpr std::string_view PUTPROP = "putprop";   // put property on atom
+inline constexpr std::string_view GETPROP = "getprop";   // get property value
+inline constexpr std::string_view REMPROP = "remprop";   // remove prop
 } // namespace pn
 
 void init()
