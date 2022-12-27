@@ -25,6 +25,7 @@
 
 #include "context.hh"
 #include "error.hh"
+#include "io.hh"
 #include "types.hh"
 #include "details/vm.hh"
 
@@ -245,7 +246,7 @@ inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return context::current(
 inline void unwind() { context::current().vm().unwind(); }
 
 inline lisp_t eval(lisp_t expr) { return details::vm::eval(context::current(), expr); }
-lisp_t eval(const std::string& expr);
+inline lisp_t eval(const std::string& expr) { return details::vm::eval(context::current(), lispread(expr)); }
 inline lisp_t apply(lisp_t fun, lisp_t args) { return details::vm::apply(context::current(), fun, args); }
 inline lisp_t backtrace() { return details::vm::backtrace(context::current()); }
 inline lisp_t topofstack() { return details::vm::topofstack(context::current()); }

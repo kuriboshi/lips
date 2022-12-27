@@ -19,7 +19,6 @@
 #include "check.hh"
 #include "eval.hh"
 #include "file.hh"
-#include "io.hh"
 #include "prim.hh"
 #include "prop.hh"
 
@@ -992,13 +991,5 @@ destblock_t* vm::mkdestblock(int size)
 }
 
 void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
-
-lisp_t eval(context& ctx, const std::string& expr)
-{
-  auto e = lispread(expr);
-  return details::vm::eval(ctx, e);
-}
-
-lisp_t eval(const std::string& expr) { return eval(context::current(), expr); }
 
 } // namespace lisp
