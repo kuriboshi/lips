@@ -92,7 +92,7 @@ lisp_t set(context& ctx, lisp_t var, lisp_t val)
   else if(type_of(var->value()) == type::Cvariable)
   {
     auto symval = var->value();
-    auto& cvar = symval->cvarval();
+    auto& cvar = symval->cvariable();
     cvar = val;
   }
   else

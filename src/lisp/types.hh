@@ -305,7 +305,7 @@ public:
   /// @brief Floating point (double)
   auto floatval() const -> double { return std::get<double>(_u); }
 
-  auto indirectval() const -> lisp_t { return std::get<indirect_t>(_u).value; }
+  auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }
 
   /// @brief Cons cell and car/cdr
   auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
@@ -327,13 +327,13 @@ public:
   auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
 
   /// @brief Destination environment
-  auto envval() -> destblock_t* { return std::get<destblock_t*>(_u); }
+  auto environ() -> destblock_t* { return std::get<destblock_t*>(_u); }
 
   /// @brief File reference
   auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
 
   /// @brief Link to a c/c++ variable
-  auto cvarval() -> cvariable_t& { return std::get<cvariable_t>(_u); }
+  auto cvariable() -> cvariable_t& { return std::get<cvariable_t>(_u); }
 
   /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const

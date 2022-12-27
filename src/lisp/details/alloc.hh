@@ -79,7 +79,7 @@ inline cvariable_t& initcvar(const std::string& name, lisp_t val)
   auto t = mkatom(name);
   t->symbol()->value = new object;
   t->value()->set(cvariable_t(val));
-  return t->value()->cvarval();
+  return t->value()->cvariable();
 }
 
 void init();

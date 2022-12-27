@@ -286,7 +286,7 @@ bool vm::peval()
       _cont = &vm::lookup;
       break;
     case type::Indirect:
-      send(_expression->indirectval());
+      send(_expression->indirect());
       pop(_cont);
       break;
     default:
@@ -409,7 +409,7 @@ bool vm::peval1()
           xbreak(error_errc::illegal_function, _fun, &vm::peval1);
         break;
       case type::Cvariable:
-        _fun = _fun->cvarval();
+        _fun = _fun->cvariable();
         break;
       default:
         xbreak(error_errc::illegal_function, _fun, &vm::peval1);
@@ -771,10 +771,10 @@ bool vm::lookup()
       return false;
       break;
     case type::Indirect:
-      send(t->indirectval());
+      send(t->indirect());
       break;
     case type::Cvariable:
-      send(t->cvarval());
+      send(t->cvariable());
       break;
     default:
       send(t);
@@ -974,7 +974,7 @@ lisp_t vm::topofstack() const { return details::alloc::getobject(environment());
 lisp_t vm::destblock(lisp_t e)
 {
   check(e, type::Environ);
-  return destblock(e->envval());
+  return destblock(e->environ());
 }
 
 destblock_t* vm::mkdestblock(int size)

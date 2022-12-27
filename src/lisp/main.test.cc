@@ -118,10 +118,10 @@ TEST_CASE("main: reset")
       [](context&, lisp_t a) -> lisp_t {
         check(a, type::String);
         // The lamda ensure we have an environment at this point.
-        CHECK(topofstack()->envval() != nil);
+        CHECK(topofstack()->environ() != nil);
         // Unwind the stack and check if the stack has been unwound.
         unwind();
-        CHECK(topofstack()->envval() == nil);
+        CHECK(topofstack()->environ() == nil);
         // Returning at this point doesn't work so we bail out with an
         // exception.
         throw std::runtime_error(a->string());
