@@ -50,17 +50,14 @@ lisp_t mkatom(const std::string&);
 ///
 inline void mkprim(subr_t subr)
 {
-  auto s = new object;
-  s->set(subr_index{subr_t::put(subr)});
   lisp_t f = intern(subr.name);
-  f->value(s);
+  f->value(new object(subr_index{subr_t::put(subr)}));
 }
 
 inline cvariable_t& initcvar(const std::string& name, lisp_t val)
 {
   auto t = mkatom(name);
-  t->symbol()->value = new object;
-  t->value()->set(cvariable_t(val));
+  t->value(new object(cvariable_t(val)));
   return t->value()->cvariable();
 }
 

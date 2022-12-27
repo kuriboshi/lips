@@ -283,7 +283,6 @@ class object final: public ref_count<object>
 public:
   object() = default;
   ~object() = default;
-  object(const object&) = delete;
 
   /// @brief Constructor for anything with a defined set function
   template<typename T>
@@ -292,12 +291,40 @@ public:
     set(x);
   }
 
+  /// @brief Construct an object conaining a cvariable_t value.
+  object(cvariable_t&& x)
+  {
+    _u = std::move(x);
+    _type = type::Cvariable;
+  }
+
+  /// @brief Copy consructor
+  object(const object&) = delete;
+  /// @brief Assignment operator
+  object& operator=(const object& x) = delete;
+
+  /// @brief Move constructor
+  object(object&& x) { *this = std::move(x); }
+
+  /// @brief Move assignment operator
+  object& operator=(object&& x) noexcept
+  {
+    if(this != &x)
+    {
+      _u = std::move(x._u);
+      _type = x._type;
+      x._u = std::monostate{};
+      x._type = type::Nil;
+    }
+    return *this;
+  }
+
   /// @brief Litatom
   auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
 
   /// @brief Get and set the value of a litatom
   auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
-  void value(lisp_t x) { std::get<symbol::ref_symbol_t>(_u)->value = x; }
+  void value(lisp_t);
 
   /// @brief Integer
   auto intval() const -> int { return std::get<int>(_u); }
@@ -305,6 +332,7 @@ public:
   /// @brief Floating point (double)
   auto floatval() const -> double { return std::get<double>(_u); }
 
+  /// @brief Get the indirect value
   auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }
 
   /// @brief Cons cell and car/cdr
@@ -345,30 +373,11 @@ public:
   type gettype() const { return _type; }
   void settype(type t) { _type = t; }
 
-  /// @brief The new and delete operators uses the global pool to create objects.
+  /// @brief The new and delete operators uses a memory pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
   static void operator delete(void* x) { _pool.deallocate(x); }
   static void operator delete(object* x, std::destroying_delete_t) { _pool.deallocate(x); }
-
   static std::size_t freecount() { return _pool.size(); }
-
-  void set(subr_index x)
-  {
-    _type = type::Subr;
-    _u = x;
-  }
-
-  void set(indirect_t x)
-  {
-    _type = type::Indirect;
-    _u = x;
-  }
-
-  void set(cvariable_t&& x)
-  {
-    _type = type::Cvariable;
-    _u = std::move(x);
-  }
 
 private:
   void set(const symbol::ref_symbol_t sym)
@@ -389,6 +398,12 @@ private:
     _u = f;
   }
 
+  void set(indirect_t x)
+  {
+    _type = type::Indirect;
+    _u = x;
+  }
+
   void set(cons_t x)
   {
     _type = type::Cons;
@@ -399,6 +414,12 @@ private:
   {
     _type = type::String;
     _u = s;
+  }
+
+  void set(subr_index x)
+  {
+    _type = type::Subr;
+    _u = x;
   }
 
   void set(ref_lambda_t x)
@@ -425,16 +446,13 @@ private:
     _u = f;
   }
 
-  object(pool_test_t)
+  void set(cvariable_t&& x)
   {
-    throw std::runtime_error("object");
+    _type = type::Cvariable;
+    _u = std::move(x);
   }
-  template<class T>
-  friend void pool_test();
 
-  using pool_t = pool<object, 256>;
-  static pool_t _pool;
-
+  /// @brief Type of object stored. Defaults to Nil.
   type _type = type::Nil;
 
   // One entry for each type.  Types that has no, or just one, value are
@@ -455,6 +473,20 @@ private:
     cvariable_t                // Cvariable
     >
     _u;
+
+  /// @brief Used to achieve coverage of operator delete(void*) when an
+  /// exception is thrown in the constructor.
+  object(pool_test_t)
+  {
+    throw std::runtime_error("object");
+  }
+  /// @brief Uses the exception throwing constructor for coverage.
+  template<class T>
+  friend void pool_test();
+
+  /// @brief Memory pool for objects.
+  using pool_t = pool<object, 256>;
+  static pool_t _pool;
 };
 
 //
@@ -498,6 +530,18 @@ inline type type_of(lisp_t a) { return a == nullptr ? type::Nil : a->gettype(); 
 inline type type_of(object& a) { return a.gettype(); }
 inline bool is_T(lisp_t x) { return type_of(x) == type::T; }
 inline bool is_nil(lisp_t x) { return type_of(x) == type::Nil; }
+
+inline void object::value(lisp_t x)
+{
+  auto& var = std::get<symbol::ref_symbol_t>(_u);
+  if(type_of(var->value) == type::Cvariable)
+  {
+    auto& cvar = var->value->cvariable();
+    cvar = x;
+  }
+  else
+    var->value = x;
+}
 
 } // namespace lisp
 
