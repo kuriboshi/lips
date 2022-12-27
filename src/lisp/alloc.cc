@@ -86,7 +86,6 @@ lisp_t mkarglist(lisp_t alist, std::int8_t& count)
 /// @returns A lambda function.
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {
-
   auto lambda = ref_lambda_t::create();
   lambda->body = def;
   std::int8_t count = 0;
@@ -118,10 +117,7 @@ lisp_t intern(std::string_view pname)
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.
-lisp_t mkatom(const std::string& pname)
-{
-  return intern(pname);
-}
+lisp_t mkatom(const std::string& pname) { return intern(pname); }
 
 namespace pn
 {

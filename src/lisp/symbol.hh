@@ -40,20 +40,14 @@ struct sv_equal
 {
   using is_transparent = std::true_type;
 
-  bool operator()(std::string_view l, std::string_view r) const noexcept
-  {
-    return l == r;
-  }
+  bool operator()(std::string_view l, std::string_view r) const noexcept { return l == r; }
 };
 
 struct sv_hash
 {
   using is_transparent = std::true_type;
 
-  auto operator()(std::string_view str) const noexcept
-  {
-    return std::hash<std::string_view>()(str);
-  }
+  auto operator()(std::string_view str) const noexcept { return std::hash<std::string_view>()(str); }
 };
 
 class symbol_t: public ref_count<symbol_t>
@@ -95,10 +89,7 @@ public:
     store().erase(p);
   }
 
-  static bool exists(std::string_view pname)
-  {
-    return store().find(pname) != store().end();
-  }
+  static bool exists(std::string_view pname) { return store().find(pname) != store().end(); }
 
   using store_t = std::unordered_map<std::string, symbol_t*, sv_hash, sv_equal>;
   static store_t& store()

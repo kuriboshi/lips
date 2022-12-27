@@ -178,10 +178,7 @@ public:
   static std::size_t freecount() { return _pool.size(); }
 
 private:
-  lambda_t(pool_test_t)
-  {
-    throw std::runtime_error("lambda_t");
-  }
+  lambda_t(pool_test_t) { throw std::runtime_error("lambda_t"); }
   template<class T>
   friend void pool_test();
 
@@ -477,10 +474,7 @@ private:
 
   /// @brief Used to achieve coverage of operator delete(void*) when an
   /// exception is thrown in the constructor.
-  object(pool_test_t)
-  {
-    throw std::runtime_error("object");
-  }
+  object(pool_test_t) { throw std::runtime_error("object"); }
   /// @brief Uses the exception throwing constructor for coverage.
   template<class T>
   friend void pool_test();
