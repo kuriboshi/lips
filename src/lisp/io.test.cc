@@ -87,8 +87,7 @@ TEST_CASE("io: lispread/readline")
   SECTION("Read from utf-8")
   {
     std::string s_nihongo{"\"日本語\"\n"};
-    auto in = ref_file_t::create(s_nihongo);
-    auto nihongo = lispread(in);
+    auto nihongo = lispread(s_nihongo);
     file_t out(std::make_unique<io::string_sink>());
     print(nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
@@ -99,8 +98,7 @@ TEST_CASE("io: lispread/readline")
     std::string s_nihongo{
       R"((((field "payee") (re "ライゼボツクス") (category "Housing/Storage")) ((field "payee") (re "ビューカード") (category "Transfer/viewcard")) ((field "payee") (re "楽天コミュニケー") (category "Utilities/Phone")))
 )"};
-    auto in = ref_file_t::create(s_nihongo);
-    auto nihongo = lispread(in);
+    auto nihongo = lispread(s_nihongo);
     file_t out(std::make_unique<io::string_sink>());
     print(nihongo, out);
     CHECK(to_string(out.sink()) == s_nihongo);
@@ -126,8 +124,7 @@ TEST_CASE("io: lispread/readline")
 
   SECTION("lispread vs. readline")
   {
-    auto f0 = ref_file_t::create(R"((hello world))");
-    auto result0 = lispread(f0);
+    auto result0 = lispread(R"((hello world))");
     auto f1 = ref_file_t::create(R"(hello world)");
     auto result1 = readline(f1);
     CHECK(equal(result0, result1) != nil);
@@ -142,8 +139,7 @@ TEST_CASE("io: lispread/readline")
   SECTION("lispread & readline")
   {
     std::string s0{"hello"};
-    auto f0 = ref_file_t::create(s0);
-    auto r0 = lispread(f0);
+    auto r0 = lispread(s0);
     CHECK(r0 == "hello"_a);
     auto f1 = ref_file_t::create(s0);
     auto r1 = readline(f1);

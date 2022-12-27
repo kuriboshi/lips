@@ -70,8 +70,7 @@ TEST_CASE("alloc: create lisp objects")
     CHECK(to_string(out1.sink()) == std::string(j->getstr()));
 
     std::string s_hello{"(hello)"};
-    auto in = ref_file_t::create(s_hello);
-    auto hello = lispread(in);
+    auto hello = lispread(s_hello);
     file_t out2(std::make_unique<io::string_sink>());
     prin0(hello, out2);
     CHECK(to_string(out2.sink()) == s_hello);

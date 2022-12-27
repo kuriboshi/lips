@@ -78,13 +78,13 @@ void vm::reset()
 
 lisp_t vm::printwhere()
 {
-  lisp_t foo = nil;
   int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::evlam0)
       break;
   }
+  lisp_t foo;
   for(; i != 0; --i)
   {
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::ev0)
@@ -995,8 +995,7 @@ void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
 lisp_t eval(context& ctx, const std::string& expr)
 {
-  auto in = ref_file_t::create(expr);
-  auto e = lispread(in);
+  auto e = lispread(expr);
   return details::vm::eval(ctx, e);
 }
 
