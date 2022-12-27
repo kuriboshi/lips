@@ -22,24 +22,6 @@
 
 namespace lisp::details::alloc
 {
-/// @brief Allocates an object from the list of free objects.
-///
-/// @details If the free cell list is empty a new block of objects is
-/// allocated.  The lisp_t ref_ptr created by this function will have its delete
-/// function overridden with a function which puts the cell back on the free
-/// cell list.
-///
-/// @return A new empty lisp object.
-inline lisp_t getobject() { return {new object}; }
-
-/// @brief Templated version of getobject which returns a lisp_t object
-/// initialized with a typed object object.
-template<typename T>
-lisp_t getobject(T x)
-{
-  return {new object(x)};
-}
-
 lisp_t mkstring(const std::string&);
 lisp_t mknumber(int);
 lisp_t mkfloat(double);

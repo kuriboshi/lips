@@ -969,7 +969,7 @@ lisp_t vm::backtrace()
   return nil;
 }
 
-lisp_t vm::topofstack() const { return details::alloc::getobject(environment()); }
+lisp_t vm::topofstack() const { return getobject(environment()); }
 
 lisp_t vm::destblock(lisp_t e)
 {

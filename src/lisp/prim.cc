@@ -39,7 +39,7 @@ lisp_t mkindirect(lisp_t obj)
   if(type_of(obj) == type::Indirect)
     return obj;
   // If it's a new object, cons up the storage for it wasting the car part.
-  return alloc::getobject(indirect_t{obj});
+  return getobject(indirect_t{obj});
 }
 
 /// @brief Builds a list of indirect pointers to the values of the symbols in
@@ -292,7 +292,7 @@ lisp_t closure(context& ctx, lisp_t fun, lisp_t vars)
   if(type_of(f) == type::Error)
     return f;
   c->cvalues = f;
-  return alloc::getobject(c);
+  return getobject(c);
 }
 
 inline lisp_t _nth(context&, lisp_t list, int n)

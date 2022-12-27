@@ -51,7 +51,7 @@ lisp_t open(context& ctx, lisp_t filename, lisp_t mode)
       return new file_t(std::make_unique<io::file_source>(filename->getstr()));
     return new file_t(std::make_unique<io::file_sink>(filename->getstr(), appendmode));
   }();
-  return alloc::getobject(ref_file_t(f));
+  return getobject(ref_file_t(f));
 }
 
 lisp_t close(context&, lisp_t fildes)

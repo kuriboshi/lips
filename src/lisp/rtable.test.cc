@@ -26,7 +26,7 @@ namespace lisp
 
 TEST_CASE("rtable: rmdquote")
 {
-  lisp_t in = details::alloc::getobject(ref_file_t::create(R"(he\"llo")"));
+  lisp_t in = getobject(ref_file_t::create(R"(he\"llo")"));
   auto hello = rtable::rmdquote(context::current(), in);
   CHECK(type_of(hello) == type::String);
   CHECK(hello->string() == "he\"llo");
@@ -36,7 +36,7 @@ TEST_CASE("rtable: rmsquote")
 {
   SECTION("quote next atom")
   {
-    auto in = details::alloc::getobject(ref_file_t::create(R"(1)"));
+    auto in = getobject(ref_file_t::create(R"(1)"));
     auto q = rtable::rmsquote(context::current(), in);
     CHECK(type_of(q) == type::Cons);
     CHECK(car(q) == C_QUOTE);
@@ -45,7 +45,7 @@ TEST_CASE("rtable: rmsquote")
 
   SECTION("quote before right parenthesis")
   {
-    auto in = details::alloc::getobject(ref_file_t::create(R"())"));
+    auto in = getobject(ref_file_t::create(R"())"));
     auto q = rtable::rmsquote(context::current(), in);
     CHECK(type_of(q) == type::Symbol);
     CHECK(q == "'"_a);
@@ -56,14 +56,14 @@ TEST_CASE("rtable: rmgetenv")
 {
   SECTION("existing environment variable")
   {
-    lisp_t in = details::alloc::getobject(ref_file_t::create(R"(HOME)"));
+    lisp_t in = getobject(ref_file_t::create(R"(HOME)"));
     auto home = rtable::rmgetenv(context::current(), in);
     CHECK(type_of(home) == type::String);
   }
 
   SECTION("non-existing environment variable")
   {
-    lisp_t in = details::alloc::getobject(ref_file_t::create(R"(DOES_NOT_EXIST)"));
+    lisp_t in = getobject(ref_file_t::create(R"(DOES_NOT_EXIST)"));
     auto none = rtable::rmgetenv(context::current(), in);
     CHECK(none == nil);
   }
