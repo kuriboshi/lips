@@ -117,7 +117,7 @@ lisp_t intern(std::string_view pname)
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.
-lisp_t mkatom(const std::string& pname) { return intern(pname); }
+lisp_t mkatom(std::string_view pname) { return intern(pname); }
 
 namespace pn
 {

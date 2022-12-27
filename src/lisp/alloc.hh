@@ -99,7 +99,7 @@ inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 ///
 /// @return The literal atom.
 ///
-inline lisp_t mkatom(const std::string& s) { return details::alloc::mkatom(s); }
+inline lisp_t mkatom(std::string_view s) { return details::alloc::mkatom(s); }
 
 /// @brief Overload of mkprim for a function with zero parameters.
 inline void mkprim(std::string_view pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
@@ -139,7 +139,7 @@ inline void mkprim(std::string_view pname, subr_t::func3_t fun, enum subr_t::sub
 ///
 /// @return A reference of type cvariable which wraps the lisp_t value.
 ///
-inline cvariable_t& initcvar(const std::string& name, lisp_t val) { return details::alloc::initcvar(name, val); }
+inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details::alloc::initcvar(name, val); }
 
 /// @brief Terminates the list create function.
 inline lisp_t mklist(lisp_t t) { return cons(t, nil); }

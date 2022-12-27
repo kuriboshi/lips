@@ -38,7 +38,7 @@ inline lisp_t freecount(context&) { return mknumber(static_cast<int>(object::fre
 ///
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval);
 lisp_t intern(std::string_view pname);
-lisp_t mkatom(const std::string&);
+lisp_t mkatom(std::string_view);
 
 /// @brief Register a primitive function.
 ///
@@ -54,7 +54,7 @@ inline void mkprim(subr_t subr)
   f->value(new object(subr_index{subr_t::put(subr)}));
 }
 
-inline cvariable_t& initcvar(const std::string& name, lisp_t val)
+inline cvariable_t& initcvar(std::string_view name, lisp_t val)
 {
   auto t = mkatom(name);
   t->value(new object(cvariable_t(val)));
