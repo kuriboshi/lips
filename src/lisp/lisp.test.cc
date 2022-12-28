@@ -192,4 +192,16 @@ TEST_CASE("lisp: new object")
   CHECK(obj->intval() == 100);
 }
 
+TEST_CASE("lisp: object move constructor")
+{
+  object o{123};
+  REQUIRE(type_of(o) == type::Integer);
+  CHECK(o.intval() == 123);
+  auto o1 = std::move(o);
+  CHECK(type_of(o) == type::Nil);
+  CHECK(is_nil(o));
+  REQUIRE(type_of(o1) == type::Integer);
+  CHECK(o1.intval() == 123);
+}
+
 } // namespace lisp

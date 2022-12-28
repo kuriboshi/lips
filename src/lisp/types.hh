@@ -444,12 +444,6 @@ private:
     _u = f;
   }
 
-  void set(cvariable_t&& x)
-  {
-    _type = type::Cvariable;
-    _u = std::move(x);
-  }
-
   /// @brief Type of object stored. Defaults to Nil.
   type _type = type::Nil;
 
@@ -521,10 +515,13 @@ extern lisp_t C_CVARIABLE;
 
 /// @brief The lisp interpreter.
 ///
-inline type type_of(lisp_t a) { return a == nullptr ? type::Nil : a->gettype(); }
-inline type type_of(object& a) { return a.gettype(); }
-inline bool is_T(lisp_t x) { return type_of(x) == type::T; }
-inline bool is_nil(lisp_t x) { return type_of(x) == type::Nil; }
+inline type type_of(const lisp_t& a) { return a == nullptr ? type::Nil : a->gettype(); }
+inline type type_of(const object& a) { return a.gettype(); }
+inline type type_of(const cvariable_t& a) { return *a == nullptr ? type::Nil : a->gettype(); }
+inline bool is_T(const lisp_t& x) { return type_of(x) == type::T; }
+inline bool is_nil(const lisp_t& x) { return type_of(x) == type::Nil; }
+inline bool is_nil(const object& x) { return type_of(x) == type::Nil; }
+inline bool is_nil(const cvariable_t& x) { return type_of(x) == type::Nil; }
 
 inline void object::value(lisp_t x)
 {
