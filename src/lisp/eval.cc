@@ -86,7 +86,7 @@ lisp_t vm::printwhere()
   lisp_t foo;
   for(; i != 0; --i)
   {
-    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::ev0)
+    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::eval_end)
     {
       if(auto* lsp = std::get_if<lisp_t>(&_control[i - 1]);
          lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
@@ -179,12 +179,12 @@ lisp_t vm::eval(lisp_t expr)
   _dest = mkdestblock(1);
   //
   // This how it works in general: Push the function to be called last, and set
-  // the continuation variable `cont' to `peval'. `peval' may push more
+  // the continuation variable `cont' to `eval_expr'. `eval_expr' may push more
   // contiuations onto the stack but eventaully `eval0' is called which returns
   // true, signalling end of evaluation.
   //
   push(&vm::eval0);
-  _cont = &vm::peval;
+  _cont = &vm::eval_expr;
   try
   {
     while(!(this->*_cont)())
@@ -227,7 +227,7 @@ lisp_t vm::apply(lisp_t f, lisp_t x)
   _args = x;
   _expression = cons(f, x);
   push(&vm::apply0);
-  _cont = &vm::peval2;
+  _cont = &vm::eval_apply;
   try
   {
     while(!(this->*_cont)())
@@ -251,26 +251,14 @@ bool vm::apply0()
   return true;
 }
 
-bool vm::ev0()
-{
-  //
-  // Discard the top of stack (it's the previous expression, see comment in
-  // `eval' above) and restore continuation.  The function `ev0' is also used
-  // as a placeholder for the beginning of an eval.
-  //
-  _toctrl -= 1;
-  pop(_cont);
-  return false;
-}
-
-bool vm::peval()
+bool vm::eval_expr()
 {
 #ifdef TRACE
   if(_trace)
     details::file::print(l, expression, T);
 #endif
   push(_expression);
-  push(&vm::ev0);
+  push(&vm::eval_end);
   switch(type_of(_expression))
   {
     case type::Cons:
@@ -279,10 +267,10 @@ bool vm::peval()
       push(_args);
       _args = _expression->cdr();
       push(&vm::ev1);
-      _cont = &vm::peval1;
+      _cont = &vm::eval_func;
       break;
     case type::Symbol:
-      _cont = &vm::lookup;
+      _cont = &vm::eval_lookup;
       break;
     case type::Indirect:
       send(_expression->indirect());
@@ -293,6 +281,18 @@ bool vm::peval()
       pop(_cont);
       break;
   }
+  return false;
+}
+
+bool vm::eval_end()
+{
+  //
+  // Discard the top of stack (it's the previous expression, see comment in
+  // `eval' above) and restore continuation.  The function `eval_end' is also
+  // used as a placeholder for the beginning of an eval.
+  //
+  _toctrl -= 1;
+  pop(_cont);
   return false;
 }
 
@@ -355,22 +355,22 @@ void vm::do_unbound(continuation_t continuation)
   }
 }
 
-bool vm::peval1()
+bool vm::eval_func()
 {
   if(_ctx.brkflg)
-    xbreak(error_errc::kbd_break, _fun, &vm::peval1);
+    xbreak(error_errc::kbd_break, _fun, &vm::eval_func);
   else if(_ctx.interrupt)
     abort(error_errc::no_message);
   else
     switch(type_of(_fun))
     {
       case type::Closure:
-        push(&vm::peval1);
-        _cont = &vm::evclosure;
+        push(&vm::eval_func);
+        _cont = &vm::eval_closure;
         break;
       case type::Subr:
         push(_dest);
-        push(&vm::ev2);
+        push(&vm::eval_prim);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
         _noeval = _fun->subr().subr == subr_t::subr::NOEVAL;
         if(_fun->subr().spread == subr_t::spread::NOSPREAD)
@@ -378,89 +378,89 @@ bool vm::peval1()
           if(!_noeval)
           {
             push(&vm::noevarg);
-            _cont = &vm::evlis;
+            _cont = &vm::eval_list;
           }
           else
             _cont = &vm::spread;
         }
         else
-          _cont = &vm::evalargs;
+          _cont = &vm::eval_args;
         break;
       case type::Lambda:
         _noeval = !_fun->lambda()->eval;
-        _cont = &vm::evlam;
+        _cont = &vm::eval_lambda;
         break;
       case type::Cons:
       case type::Indirect:
         _expression = _fun;
         push(&vm::ev3);
-        _cont = &vm::peval;
+        _cont = &vm::eval_expr;
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &vm::peval1;
+        _cont = &vm::eval_func;
         break;
       case type::Unbound:
-        do_unbound(&vm::peval1);
+        do_unbound(&vm::eval_func);
         break;
       case type::String:
         if(!evalhook(_expression))
-          xbreak(error_errc::illegal_function, _fun, &vm::peval1);
+          xbreak(error_errc::illegal_function, _fun, &vm::eval_func);
         break;
       case type::Cvariable:
         _fun = _fun->cvariable();
         break;
       default:
-        xbreak(error_errc::illegal_function, _fun, &vm::peval1);
+        xbreak(error_errc::illegal_function, _fun, &vm::eval_func);
         break;
     }
   return false;
 }
 
-bool vm::peval2()
+bool vm::eval_apply()
 {
   if(_ctx.brkflg)
-    xbreak(error_errc::kbd_break, _fun, &vm::peval2);
+    xbreak(error_errc::kbd_break, _fun, &vm::eval_apply);
   else
     switch(type_of(_fun))
     {
       case type::Closure:
-        push(&vm::peval2);
-        _cont = &vm::evclosure;
+        push(&vm::eval_apply);
+        _cont = &vm::eval_closure;
         break;
       case type::Subr:
         push(_dest);
-        push(&vm::ev2);
+        push(&vm::eval_prim);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
         _noeval = true;
         if(_fun->subr().spread == subr_t::spread::NOSPREAD)
           _cont = &vm::spread;
         else
-          _cont = &vm::evalargs;
+          _cont = &vm::eval_args;
         break;
       case type::Lambda:
         _noeval = true;
-        _cont = &vm::evlam;
+        _cont = &vm::eval_lambda;
         break;
       case type::Cons:
       case type::Indirect:
         _expression = _fun;
         push(&vm::ev3p);
-        _cont = &vm::peval;
+        _cont = &vm::eval_expr;
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &vm::peval2;
+        _cont = &vm::eval_apply;
         break;
       case type::Unbound:
-        do_unbound(&vm::peval2);
+        do_unbound(&vm::eval_apply);
         break;
       case type::String:
         if(!evalhook(_expression))
-          xbreak(error_errc::illegal_function, _fun, &vm::peval2);
+          xbreak(error_errc::illegal_function, _fun, &vm::eval_apply);
         break;
       default:
-        xbreak(error_errc::illegal_function, _fun, &vm::peval2);
+        xbreak(error_errc::illegal_function, _fun, &vm::eval_apply);
         break;
     }
   return false;
@@ -472,7 +472,7 @@ void vm::bt()
   _ctx.printlevel = 2;
   for(int i = _toctrl - 1; i != 0; i--)
   {
-    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::ev0)
+    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
       print(std::get<lisp_t>(_control[i - 1]), T);
   }
   _ctx.printlevel = op;
@@ -496,47 +496,51 @@ bool vm::noevarg()
   return false;
 }
 
-bool vm::evalargs()
+// Evaluate a sequence of expressions. If there are no arguments then there is
+// nothing to do. Otherwise evaluate the first expression and move to
+// eval_args2.
+bool vm::eval_args()
 {
   if(is_nil(_args))
-  {
     pop(_cont);
-  }
   else
   {
     _expression = _args->car();
     if(_noeval)
-      _cont = &vm::noev9;
+      _cont = &vm::noeval_args1;
     else
-      _cont = &vm::ev9;
+      _cont = &vm::eval_args1;
   }
   return false;
 }
 
-bool vm::ev9()
+// If we're at the end of the list we evaluate the expression and finish.
+bool vm::eval_args1()
 {
   if(is_nil(_args->cdr()))
   {
-    _cont = &vm::peval;
+    _cont = &vm::eval_expr;
   }
   else
   {
-    push(&vm::ev11);
-    _cont = &vm::peval;
+    push(&vm::eval_args2);
+    _cont = &vm::eval_expr;
   }
   return false;
 }
 
-bool vm::ev11()
+// Move to the next expression in the sequence.
+bool vm::eval_args2()
 {
   next();
   _args = _args->cdr();
   _expression = _args->car();
-  _cont = &vm::ev9;
+  _cont = &vm::eval_args1;
   return false;
 }
 
-bool vm::noev9()
+// Process expressions without evaluating them.
+bool vm::noeval_args1()
 {
   while(true)
   {
@@ -554,12 +558,11 @@ bool vm::noev9()
   return false;
 }
 
-bool vm::evlis()
+// Evaluate a list of expressions and collect result in another list
+bool vm::eval_list()
 {
   if(is_nil(_args))
-  {
     pop(_cont);
-  }
   else
   {
     _expression = _args->car();
@@ -572,18 +575,19 @@ bool vm::evlis1()
 {
   if(is_nil(_args->cdr()))
   {
-    push(&vm::evlis2);
-    _cont = &vm::peval;
+    push(&vm::eval_list_end);
+    _cont = &vm::eval_expr;
   }
   else
   {
     push(&vm::evlis3);
-    _cont = &vm::peval;
+    _cont = &vm::eval_expr;
   }
   return false;
 }
 
-bool vm::evlis2()
+// Done with the list of expressions.
+bool vm::eval_list_end()
 {
   lisp_t x = cons(receive(), nil);
   send(x);
@@ -613,7 +617,7 @@ bool vm::evlis4()
   return false;
 }
 
-bool vm::evlam()
+bool vm::eval_lambda()
 {
   push(_expression);
   push(_env);
@@ -637,11 +641,11 @@ bool vm::evlam()
     else
     {
       push(&vm::noevarg);
-      _cont = &vm::evlis;
+      _cont = &vm::eval_list;
     }
   }
   else
-    _cont = &vm::evalargs;
+    _cont = &vm::eval_args;
   return false;
 }
 
@@ -667,7 +671,7 @@ bool vm::spread()
   return false;
 }
 
-bool vm::ev2()
+bool vm::eval_prim()
 {
   try
   {
@@ -683,9 +687,9 @@ bool vm::ev2()
       throw;
     auto foo = printwhere();
     if(is_nil(foo))
-      xbreak({}, nil, &vm::peval1);
+      xbreak({}, nil, &vm::eval_func);
     else
-      xbreak({}, foo->car(), &vm::peval1); /* CAR(_) broken */
+      xbreak({}, foo->car(), &vm::eval_func); /* CAR(_) broken */
   }
   return false;
 }
@@ -694,7 +698,7 @@ bool vm::ev3()
 {
   _fun = receive();
   push(&vm::ev4);
-  _cont = &vm::peval1;
+  _cont = &vm::eval_func;
   return false;
 }
 
@@ -702,7 +706,7 @@ bool vm::ev3p()
 {
   _fun = receive();
   push(&vm::ev4);
-  _cont = &vm::peval2;
+  _cont = &vm::eval_apply;
   return false;
 }
 
@@ -730,7 +734,7 @@ bool vm::evlam1()
   pop(_dest);
   _args = _fun->lambda()->body;
   push(&vm::evlam0);
-  _cont = &vm::evsequence;
+  _cont = &vm::eval_sequence;
   return false;
 }
 
@@ -760,13 +764,13 @@ void vm::unwind()
   reset();
 }
 
-bool vm::lookup()
+bool vm::eval_lookup()
 {
   lisp_t t = _expression->value();
   switch(type_of(t))
   {
     case type::Unbound:
-      xbreak(error_errc::unbound_variable, _expression, &vm::lookup);
+      xbreak(error_errc::unbound_variable, _expression, &vm::eval_lookup);
       return false;
       break;
     case type::Indirect:
@@ -783,7 +787,7 @@ bool vm::lookup()
   return false;
 }
 
-bool vm::evclosure()
+bool vm::eval_closure()
 {
   push(_env);
   push(_dest);
@@ -806,11 +810,11 @@ bool vm::evclosure()
   pop(envir);
   pop(_cont);
   push(envir);
-  push(&vm::evclosure1);
+  push(&vm::eval_closure1);
   return false;
 }
 
-bool vm::evclosure1()
+bool vm::eval_closure1()
 {
   restore_env();
   pop_env();
@@ -818,37 +822,38 @@ bool vm::evclosure1()
   return false;
 }
 
-bool vm::evsequence()
+// Evaluate a sequence of expressions in _args.
+bool vm::eval_sequence()
 {
   if(is_nil(_args))
-  {
     pop(_cont);
-  }
   else
   {
     _expression = _args->car();
-    _cont = &vm::evseq1;
+    _cont = &vm::eval_seq1;
   }
   return false;
 }
 
-bool vm::evseq1()
+// Evaluate current expression and stop if we've reached the end of the list.
+bool vm::eval_seq1()
 {
   if(is_nil(_args->cdr()))
-    _cont = &vm::peval;
+    _cont = &vm::eval_expr;
   else
   {
-    push(&vm::evseq3);
-    _cont = &vm::peval;
+    push(&vm::eval_seq2);
+    _cont = &vm::eval_expr;
   }
   return false;
 }
 
-bool vm::evseq3()
+// Move to the next expression to evaluate and continue with eval_seq1.
+bool vm::eval_seq2()
 {
   _args = _args->cdr();
   _expression = _args->car();
-  _cont = &vm::evseq1;
+  _cont = &vm::eval_seq1;
   return false;
 }
 
@@ -891,20 +896,18 @@ lisp_t vm::backtrace()
         }
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
         {
-          if(arg == &vm::ev0)
-            _ctx.primerr()->format("ev0\n");
-          else if(arg == &vm::peval)
-            _ctx.primerr()->format("peval\n");
-          else if(arg == &vm::peval1)
-            _ctx.primerr()->format("peval1\n");
-          else if(arg == &vm::peval2)
-            _ctx.primerr()->format("peval2\n");
-          else if(arg == &vm::ev0)
-            _ctx.primerr()->format("ev0\n");
+          if(arg == &vm::eval_end)
+            _ctx.primerr()->format("eval_end\n");
+          else if(arg == &vm::eval_expr)
+            _ctx.primerr()->format("eval_expr\n");
+          else if(arg == &vm::eval_func)
+            _ctx.primerr()->format("eval_func");
+          else if(arg == &vm::eval_apply)
+            _ctx.primerr()->format("eval_apply\n");
           else if(arg == &vm::ev1)
             _ctx.primerr()->format("ev1\n");
-          else if(arg == &vm::ev2)
-            _ctx.primerr()->format("ev2\n");
+          else if(arg == &vm::eval_prim)
+            _ctx.primerr()->format("eval_prim\n");
           else if(arg == &vm::ev3)
             _ctx.primerr()->format("ev3\n");
           else if(arg == &vm::ev4)
@@ -913,50 +916,50 @@ lisp_t vm::backtrace()
             _ctx.primerr()->format("evlam0\n");
           else if(arg == &vm::evlam1)
             _ctx.primerr()->format("evlam1\n");
-          else if(arg == &vm::ev9)
-            _ctx.primerr()->format("ev9\n");
-          else if(arg == &vm::ev11)
-            _ctx.primerr()->format("ev11\n");
+          else if(arg == &vm::eval_args1)
+            _ctx.primerr()->format("eval_args1\n");
+          else if(arg == &vm::eval_args2)
+            _ctx.primerr()->format("eval_args2\n");
           else if(arg == &vm::ev3p)
             _ctx.primerr()->format("ev3p\n");
-          else if(arg == &vm::evalargs)
-            _ctx.primerr()->format("evalargs\n");
+          else if(arg == &vm::eval_args)
+            _ctx.primerr()->format("eval_args\n");
           else if(arg == &vm::noevarg)
             _ctx.primerr()->format("noevarg\n");
-          else if(arg == &vm::evlam)
-            _ctx.primerr()->format("evlam\n");
+          else if(arg == &vm::eval_lambda)
+            _ctx.primerr()->format("eval_lambda\n");
           else if(arg == &vm::spread)
             _ctx.primerr()->format("spread\n");
-          else if(arg == &vm::evlis)
-            _ctx.primerr()->format("evlis\n");
+          else if(arg == &vm::eval_list)
+            _ctx.primerr()->format("eval_list\n");
           else if(arg == &vm::evlis1)
             _ctx.primerr()->format("evlis1\n");
-          else if(arg == &vm::evlis2)
-            _ctx.primerr()->format("evlis2\n");
+          else if(arg == &vm::eval_list_end)
+            _ctx.primerr()->format("eval_list_end\n");
           else if(arg == &vm::evlis3)
             _ctx.primerr()->format("evlis3\n");
           else if(arg == &vm::evlis4)
             _ctx.primerr()->format("evlis4\n");
-          else if(arg == &vm::noev9)
-            _ctx.primerr()->format("noev9\n");
-          else if(arg == &vm::evsequence)
-            _ctx.primerr()->format("evsequence\n");
-          else if(arg == &vm::evseq1)
-            _ctx.primerr()->format("evseq1\n");
-          else if(arg == &vm::evseq3)
-            _ctx.primerr()->format("evseq3\n");
-          else if(arg == &vm::evclosure)
-            _ctx.primerr()->format("evclosure\n");
-          else if(arg == &vm::evclosure1)
-            _ctx.primerr()->format("evclosure1\n");
+          else if(arg == &vm::noeval_args1)
+            _ctx.primerr()->format("noeval_args1\n");
+          else if(arg == &vm::eval_sequence)
+            _ctx.primerr()->format("eval_sequence\n");
+          else if(arg == &vm::eval_seq1)
+            _ctx.primerr()->format("eval_seq1\n");
+          else if(arg == &vm::eval_seq2)
+            _ctx.primerr()->format("eval_seq2\n");
+          else if(arg == &vm::eval_closure)
+            _ctx.primerr()->format("eval_closure\n");
+          else if(arg == &vm::eval_closure1)
+            _ctx.primerr()->format("eval_closure1\n");
           else if(arg == &vm::eval0)
             _ctx.primerr()->format("eval0\n");
           else if(arg == &vm::apply0)
             _ctx.primerr()->format("apply0\n");
           else if(arg == &vm::everr)
             _ctx.primerr()->format("everr\n");
-          else if(arg == &vm::lookup)
-            _ctx.primerr()->format("lookup\n");
+          else if(arg == &vm::eval_lookup)
+            _ctx.primerr()->format("eval_lookup\n");
           else
             _ctx.stderr()->format("Unknown control stack element\n");
         }

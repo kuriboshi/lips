@@ -166,38 +166,38 @@ private:
   void restore_env();
 
   // Continuations
-  bool peval();
-  bool peval1();
-  bool peval2();
-  bool ev0();
+  bool eval_expr();
+  bool eval0();
+  bool eval_apply();
+  bool apply0();
+  bool eval_end();
+  bool eval_func();
   bool ev1();
-  bool ev2();
+  bool eval_prim();
   bool ev3();
   bool ev4();
   bool evlam0();
   bool evlam1();
-  bool ev9();
-  bool ev11();
+  bool eval_args1();
+  bool eval_args2();
   bool ev3p();
-  bool evalargs();
+  bool eval_args();
   bool noevarg();
-  bool evlam();
+  bool eval_lambda();
   bool spread();
-  bool evlis();
+  bool eval_list();
   bool evlis1();
-  bool evlis2();
+  bool eval_list_end();
   bool evlis3();
   bool evlis4();
-  bool noev9();
-  bool evsequence();
-  bool evseq1();
-  bool evseq3();
-  bool evclosure();
-  bool evclosure1();
-  bool eval0();
-  bool apply0();
+  bool noeval_args1();
+  bool eval_sequence();
+  bool eval_seq1();
+  bool eval_seq2();
+  bool eval_closure();
+  bool eval_closure1();
   bool everr();
-  bool lookup();
+  bool eval_lookup();
 
   lisp_t printwhere();
   /// @brief Print error message, abort current evaluation, and return to top

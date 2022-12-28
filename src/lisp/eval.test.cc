@@ -240,14 +240,14 @@ TEST_CASE("eval: backtrace")
 )"_e;
   // clang-format off
   const std::vector<std::string> expected{
-    R"(18: ev2)",
+    R"(18: eval_prim)",
     R"(17: destblock_t:\(1 \(nil . #<lambda [0-9a-f]+>\)\))",
     R"(16: ev1)",
     R"(15: \(\(a\) b\))",
     R"(14: #<lambda [0-9a-f]+>)",
-    R"(13: ev0)",
+    R"(13: eval_end)",
     R"(12: \(a\))",
-    R"(11: evseq3)",
+    R"(11: eval_seq2)",
     R"(10: evlam0)",
     R"(9: destblock_t:)",
     R"(8: \(lambda \(a b\) \(a\) b\))",
@@ -255,7 +255,7 @@ TEST_CASE("eval: backtrace")
     R"(6: ev1)",
     R"(5: nil)",
     R"(4: nil)",
-    R"(3: ev0)",
+    R"(3: eval_end)",
     R"(2: \(\(lambda \(a b\) \(a\) b\) backtrace 99\))",
     R"(1: eval0)",
     R"(0: destblock_t:)"
