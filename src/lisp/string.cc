@@ -24,21 +24,24 @@
 
 namespace lisp::details::string
 {
-/// @brief Return symbols print name as a string.
-lisp_t symstr(context&, lisp_t sym)
+/// @brief Concatenate arbitrary many strings to one string.
+lisp_t concat(context&, lisp_t strlist)
 {
-  check(sym, type::Symbol, type::Nil);
-  if(type_of(sym) == type::Nil)
-    return mkstring("nil");
-  return mkstring(sym->symbol()->pname);
+  std::string result;
+  for(auto sl = strlist; !is_nil(sl); sl = sl->cdr())
+  {
+    check(sl->car(), type::String);
+    result += sl->car()->string();
+  }
+  return mkstring(result);
 }
 
-/// @brief T if s is a string, nil otherwise.
-lisp_t stringp(context&, lisp_t s)
+/// @brief Compare two strings.
+lisp_t strcmp(context&, lisp_t s1, lisp_t s2)
 {
-  if(type_of(s) == type::String)
-    return s;
-  return nil;
+  check(s1, type::String);
+  check(s2, type::String);
+  return mknumber(s1->string().compare(s2->string()));
 }
 
 /// @brief T if both strings are equal.
@@ -51,24 +54,12 @@ lisp_t strequal(context&, lisp_t s1, lisp_t s2)
   return nil;
 }
 
-/// @brief Compare two strings.
-lisp_t strcmp(context&, lisp_t s1, lisp_t s2)
+/// @brief T if s is a string, nil otherwise.
+lisp_t stringp(context&, lisp_t s)
 {
-  check(s1, type::String);
-  check(s2, type::String);
-  return mknumber(s1->string().compare(s2->string()));
-}
-
-/// @brief Concatenate arbitrary many strings to one string.
-lisp_t concat(context&, lisp_t strlist)
-{
-  std::string result;
-  for(auto sl = strlist; !is_nil(sl); sl = sl->cdr())
-  {
-    check(sl->car(), type::String);
-    result += sl->car()->string();
-  }
-  return mkstring(result);
+  if(type_of(s) == type::String)
+    return s;
+  return nil;
 }
 
 /// @brief Return string length of s.
@@ -116,27 +107,36 @@ lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
   return mkstring(str->string().substr(b, e));
 }
 
+/// @brief Return symbols print name as a string.
+lisp_t symstr(context&, lisp_t sym)
+{
+  check(sym, type::Symbol, type::T, type::Nil);
+  if(type_of(sym) == type::Nil)
+    return mkstring("nil");
+  return mkstring(sym->symbol()->pname);
+}
+
 namespace pn
 {
-inline constexpr std::string_view STRINGP = "stringp";     // t if string
-inline constexpr std::string_view STREQUAL = "strequal";   // string equal
 inline constexpr std::string_view CONCAT = "concat";       // concatenate strings
+inline constexpr std::string_view STRCMP = "strcmp";       // compare strings
+inline constexpr std::string_view STREQUAL = "strequal";   // string equal
+inline constexpr std::string_view STRINGP = "stringp";     // t if string
 inline constexpr std::string_view STRLEN = "strlen";       // length of string
 inline constexpr std::string_view SUBSTRING = "substring"; // get sub string
 inline constexpr std::string_view SYMSTR = "symstr";       // make symbol a string
-inline constexpr std::string_view STRCMP = "strcmp";       // compare strings
 } // namespace pn
 
 void init()
 {
   // clang-format off
-  mkprim(pn::STRINGP,   stringp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::STREQUAL,  strequal,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::CONCAT,    concat,    subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::STRCMP,    strcmp,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STREQUAL,  strequal,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::STRINGP,   stringp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::STRLEN,    strlen,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::SUBSTRING, substring, subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::SYMSTR,    symstr,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::STRCMP,    strcmp,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }
 

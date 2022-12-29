@@ -26,7 +26,7 @@ namespace lisp::details::alloc
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(cons_t{a, b}); }
+lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
 
 lisp_t obarray(context&)
 {
@@ -36,7 +36,7 @@ lisp_t obarray(context&)
   return o;
 }
 
-lisp_t mkstring(const std::string& str) { return getobject(str); }
+lisp_t mkstring(const std::string& str) { return getobject(new string_t(str)); }
 
 /// @brief Creates an integer number.
 lisp_t mknumber(int number) { return getobject(number); }

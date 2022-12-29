@@ -24,7 +24,9 @@
 
 namespace lisp
 {
+cons_t::pool_t cons_t::_pool;
 lambda_t::pool_t lambda_t::_pool;
+string_t::pool_t string_t::_pool;
 closure_t::pool_t closure_t::_pool;
 object::pool_t object::_pool;
 

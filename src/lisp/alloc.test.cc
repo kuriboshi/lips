@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <catch2/catch_test_macros.hpp>
+#include <fmt/format.h>
 
 #include "alloc.hh"
 #include "low.hh"
@@ -156,22 +157,22 @@ TEST_CASE("alloc: object sizes")
   std::cout << "sizeof object::_u: " << sizeof(o._u) << std::endl;
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
-  std::cout << "symbol::ref_symbol_t: " << sizeof(symbol::ref_symbol_t) << std::endl;
-  std::cout << "int: " << sizeof(int) << std::endl;
-  std::cout << "double: " << sizeof(double) << std::endl;
-  std::cout << "indirect_t: " << sizeof(indirect_t) << std::endl;
-  std::cout << "cons_t: " << sizeof(cons_t) << std::endl;
-  std::cout << "std::string: " << sizeof(std::string) << std::endl;
-  std::cout << "subr_index: " << sizeof(subr_index) << std::endl;
-  std::cout << "ref_lambda_t: " << sizeof(ref_lambda_t) << std::endl;
-  std::cout << "ref_closure_t: " << sizeof(ref_closure_t) << std::endl;
-  std::cout << "destblock_t*: " << sizeof(destblock_t*) << std::endl;
-  std::cout << "ref_file_t: " << sizeof(ref_file_t) << std::endl;
-  std::cout << "cvariable_t: " << sizeof(cvariable_t) << std::endl;
+  std::cout << fmt::format("symbol::ref_symbol_t: {}, {}\n", sizeof(symbol::ref_symbol_t), alignof(symbol::ref_symbol_t));
+  std::cout << fmt::format("int: {}, {}\n", sizeof(int), alignof(int));
+  std::cout << fmt::format("double: {}, {}\n", sizeof(double), alignof(double));
+  std::cout << fmt::format("indirect_t: {}, {}\n", sizeof(indirect_t), alignof(indirect_t));
+  std::cout << fmt::format("ref_cons_t: {}, {}\n", sizeof(ref_cons_t), alignof(ref_cons_t));
+  std::cout << fmt::format("ref_string_t: {}, {}\n", sizeof(ref_string_t), alignof(ref_string_t));
+  std::cout << fmt::format("subr_index: {}, {}\n", sizeof(subr_index), alignof(subr_index));
+  std::cout << fmt::format("ref_lambda_t: {}, {}\n", sizeof(ref_lambda_t), alignof(ref_lambda_t));
+  std::cout << fmt::format("ref_closure_t: {}, {}\n", sizeof(ref_closure_t), alignof(ref_closure_t));
+  std::cout << fmt::format("destblock_t*: {}, {}\n", sizeof(destblock_t*), alignof(destblock_t*));
+  std::cout << fmt::format("ref_file_t: {}, {}\n", sizeof(ref_file_t), alignof(ref_file_t));
+  std::cout << fmt::format("cvariable_t: {}, {}\n", sizeof(cvariable_t), alignof(cvariable_t));
   std::cout << "==========\n";
-  std::cout << "subr_t: " << sizeof(subr_t) << std::endl;
-  std::cout << "symbol::symbol_t: " << sizeof(symbol::symbol_t) << std::endl;
-  std::cout << "closure_t: " << sizeof(closure_t) << std::endl;
+  std::cout << fmt::format("subr_t: {}, {}\n", sizeof(subr_t), alignof(subr_t));
+  std::cout << fmt::format("symbol::symbol_t: {}, {}\n", sizeof(symbol::symbol_t), alignof(symbol::symbol_t));
+  std::cout << fmt::format("closure_t: {}, {}", sizeof(closure_t), alignof(closure_t)) << std::endl;
 }
 #endif
 

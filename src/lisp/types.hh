@@ -41,7 +41,7 @@ class file_t;
 class object;
 using lisp_t = ref_ptr<object>;
 
-enum class type
+enum class type: std::uint8_t
 {
   Nil = 0,  // so that nullptr also becomes nil
   Symbol,   // an atomic symbol
@@ -65,10 +65,30 @@ inline constexpr auto nil = nullptr;
 /// @details A cons cell contains two pieces of data: The head (traditionall
 /// called car) and the tail (traditionally called cdr).
 ///
-struct cons_t
+class cons_t: public ref_count<cons_t>
 {
+public:
+  cons_t() = default;
+  cons_t(lisp_t a, lisp_t d): car(a), cdr(d) {}
+  ~cons_t() = default;
+
   lisp_t car = nil;
   lisp_t cdr = nil;
+
+  /// @brief The new and delete operators uses the global pool to create objects.
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
+  static void operator delete(cons_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+
+  static std::size_t freecount() { return _pool.size(); }
+
+private:
+  cons_t(pool_test_t) { throw std::runtime_error("cons_t"); }
+  template<class T>
+  friend void pool_test();
+
+  using pool_t = pool<cons_t, 256>;
+  static pool_t _pool;
 };
 
 /// @brief Structure describing a built-in function.
@@ -211,9 +231,36 @@ private:
   static pool_t _pool;
 };
 
+class string_t: public ref_count<string_t>
+{
+public:
+  string_t() = default;
+  string_t(const std::string& s) : string(s) {}
+  ~string_t() = default;
+
+  std::string string;
+
+  /// @brief The new and delete operators uses the global pool to create objects.
+  static void* operator new(std::size_t) { return _pool.allocate(); }
+  static void operator delete(void* x) { _pool.deallocate(x); }
+  static void operator delete(string_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+
+  static std::size_t freecount() { return _pool.size(); }
+
+private:
+  string_t(pool_test_t) { throw std::runtime_error("string_t"); }
+  template<class T>
+  friend void pool_test();
+
+  using pool_t = pool<string_t, 256>;
+  static pool_t _pool;
+};
+
+using ref_cons_t = ref_ptr<cons_t>;
+using ref_lambda_t = ref_ptr<lambda_t>;
 using ref_closure_t = ref_ptr<closure_t>;
 using ref_file_t = ref_ptr<file_t>;
-using ref_lambda_t = ref_ptr<lambda_t>;
+using ref_string_t = ref_ptr<string_t>;
 
 struct subr_index
 {
@@ -324,14 +371,14 @@ public:
   auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }
 
   /// @brief Cons cell and car/cdr
-  auto cons() const -> const cons_t& { return std::get<cons_t>(_u); }
-  auto car() const -> lisp_t { return std::get<cons_t>(_u).car; }
-  void car(lisp_t x) { std::get<cons_t>(_u).car = x; }
-  auto cdr() const -> lisp_t { return std::get<cons_t>(_u).cdr; }
-  void cdr(lisp_t x) { std::get<cons_t>(_u).cdr = x; }
+  auto cons() const -> const cons_t& { return *std::get<ref_cons_t>(_u); }
+  auto car() const -> lisp_t { return std::get<ref_cons_t>(_u)->car; }
+  void car(lisp_t x) { std::get<ref_cons_t>(_u)->car = x; }
+  auto cdr() const -> lisp_t { return std::get<ref_cons_t>(_u)->cdr; }
+  void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = x; }
 
   /// @brief Character string
-  auto string() const -> const std::string& { return std::get<std::string>(_u); }
+  auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->string; }
 
   /// @brief Compiled function (subr)
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
@@ -354,7 +401,7 @@ public:
   /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const
   {
-    return gettype() == type::String ? std::get<std::string>(_u) : std::get<symbol::ref_symbol_t>(_u)->pname;
+    return gettype() == type::String ? std::get<ref_string_t>(_u)->string : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object
@@ -375,9 +422,9 @@ private:
 
   void set(indirect_t x) { _u = x; }
 
-  void set(cons_t x) { _u = x; }
+  void set(ref_cons_t x) { _u = x; }
 
-  void set(const std::string& s) { _u = s; }
+  void set(ref_string_t s) { _u = s; }
 
   void set(subr_index x) { _u = x; }
 
@@ -397,16 +444,15 @@ public:
     int,                       // Integer
     double,                    // Float
     indirect_t,                // Indirect
-    cons_t,                    // Cons
-    std::string,               // String
+    ref_cons_t,                // Cons
+    ref_string_t,              // String
     subr_index,                // Subr
     ref_lambda_t,              // Lambda/Nlambda
     ref_closure_t,             // Closure
     destblock_t*,              // Environ
     ref_file_t,                // File
     cvariable_t                // Cvariable
-    >
-    _u;
+    > _u;
 
   /// @brief Used to achieve coverage of operator delete(void*) when an
   /// exception is thrown in the constructor.
