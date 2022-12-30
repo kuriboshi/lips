@@ -57,7 +57,15 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         --format="html"
         --output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
         --ignore-filename-regex=exit.hh
+        --ignore-filename-regex='.*.test.cc'
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+    COMMAND
+      ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
+        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+        --format="text"
+        --ignore-filename-regex=exit.hh
+        --ignore-filename-regex='.*.test.cc'
+        ${CMAKE_CURRENT_SOURCE_DIR}/src > ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
     DEPENDS ccov-preprocessing)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS

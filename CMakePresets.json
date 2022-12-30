@@ -97,20 +97,42 @@
     "testPresets": [
         {
             "name": "default",
-            "configurePreset": "default"
+            "configurePreset": "default",
+            "filter": {
+                "include": {
+                    "name": "test_.*"
+                }
+            }
         },
         {
             "name": "debug",
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "filter": {
+                "include": {
+                    "name": "test_.*"
+                }
+            }
         },
         {
             "name": "make",
-            "configurePreset": "make"
+            "configurePreset": "make",
+            "filter": {
+                "include": {
+                    "name": "test_.*"
+                }
+            }
         },
         {
-            "name": "xcode",
-            "configurePreset": "xcode",
-            "configuration": "Debug"
+            "name": "benchmark",
+            "configurePreset": "release",
+            "filter": {
+                "include": {
+                    "name": "benchmark"
+                }
+            },
+            "output": {
+                "verbosity": "verbose"
+            }
         }
     ]
 }

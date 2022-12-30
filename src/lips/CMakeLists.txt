@@ -51,4 +51,6 @@ endif()
 find_package(Curses REQUIRED)
 target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
 
-add_test(NAME lips_test COMMAND lips -T)
+if(LIPS_ENABLE_TESTS)
+  add_test(NAME test_lips COMMAND lips -T)
+endif()

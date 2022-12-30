@@ -141,6 +141,13 @@ if(LIPS_ENABLE_TESTS)
   endif()
 endif()
 
+if(LIPS_ENABLE_TESTS)
+  add_test(NAME test_lisp
+           COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/../../lisp/test.lisp
+                   --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
+                   --loadpath ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
 if(LIPS_ENABLE_BENCHMARK)
   add_executable(lisp_benchmark)
   target_sources(
@@ -148,4 +155,7 @@ if(LIPS_ENABLE_BENCHMARK)
     PRIVATE lisp_benchmark.cc
             pool.bench.cc)
   target_link_libraries(lisp_benchmark PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
+
+  add_test(NAME benchmark
+           COMMAND lisp_benchmark)
 endif()

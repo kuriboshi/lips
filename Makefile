@@ -32,5 +32,8 @@ format: debug.config
 test: debug
 	ctest --preset default
 
+benchmark: release
+	ctest --preset benchmark
+
 xcode:
 	cmake --preset xcode
