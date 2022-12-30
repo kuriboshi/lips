@@ -19,7 +19,7 @@
 #include <filesystem>
 #include <string>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
 #include "file.hh"

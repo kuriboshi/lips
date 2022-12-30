@@ -21,7 +21,7 @@
 #include <optional>
 #include <string>
 #include <filesystem>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <lisp/lisp.hh>
 
 namespace glob

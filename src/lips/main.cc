@@ -16,7 +16,8 @@
 //
 
 #define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_session.hpp>
 
 #include <sys/types.h>
 #include <sys/select.h>
@@ -28,6 +29,7 @@
 #include <cerrno>
 #include <cctype>
 #include <string>
+#include <iostream>
 
 #include <lisp/lisp.hh>
 #include <lisp/syntax.hh>

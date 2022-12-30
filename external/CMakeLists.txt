@@ -27,8 +27,8 @@ function(make_available _NAME)
 endfunction()
 
 FetchContent_Declare(catch2
-  URL https://github.com/catchorg/Catch2/archive/v2.13.8.tar.gz
-  URL_HASH SHA256=b9b592bd743c09f13ee4bf35fc30eeee2748963184f6bea836b146e6cc2a585a)
+  URL https://github.com/catchorg/Catch2/archive/v3.2.1.tar.gz
+  URL_HASH SHA256=4613d3e8142b672159fcae252a4860d72c8cf8e2df5043b1ae3541db9ef5d73c)
 
 FetchContent_Declare(fmt
   URL https://github.com/fmtlib/fmt/archive/8.1.1.tar.gz

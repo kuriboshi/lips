@@ -15,13 +15,7 @@
 // limitations under the License.
 //
 
-#include <array>
-#include <chrono>
-#include <cstdint>
-#include <iostream>
-#include <string>
-
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "pool.hh"
 
@@ -99,84 +93,6 @@ TEST_CASE("pool: simple")
   CHECK(p.size() == 4);
 }
 
-template<class T>
-auto timing(T t0, T t1) -> decltype(std::chrono::microseconds(0).count())
-{
-  auto time = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-  return time;
-}
-
-class Foo
-{
-public:
-  explicit Foo(bool t = false)
-  {
-    // This is to cover operator delete(void*)
-    if(t)
-      throw std::runtime_error("Test");
-  }
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(Foo* x, std::destroying_delete_t) { _pool.deallocate(x); }
-
-  using pool_t = lisp::pool<Foo, 400>;
-  static const pool_t& pool() { return _pool; }
-
-private:
-  std::string s;
-  static pool_t _pool;
-};
-
-Foo::pool_t Foo::_pool;
-
-class Bar
-{
-public:
-  Bar() = default;
-
-private:
-  std::string s;
-};
-
-template<typename T, std::size_t N>
-auto pool_test() -> decltype(std::chrono::microseconds(0).count())
-{
-  std::array<const T*, N * 2> a;
-  auto t0 = std::chrono::high_resolution_clock::now();
-  for(auto i = 0; i != N; ++i)
-  {
-    a[i] = new T;
-  }
-  for(auto i = 0; i != N; ++i)
-  {
-    delete a[i];
-  }
-  for(auto i = 0; i != N * 2; ++i)
-  {
-    a[i] = new T;
-  }
-  for(auto i = 0; i != N * 2; ++i)
-  {
-    delete a[i];
-  }
-  auto t1 = std::chrono::high_resolution_clock::now();
-  auto t = timing(t0, t1);
-  return t;
-}
-
-template<std::size_t N, std::size_t M = 10>
-std::pair<std::uint64_t, std::uint64_t> do_test()
-{
-  std::uint64_t f{0};
-  std::uint64_t b{0};
-  for(auto i = 0; i != M; ++i)
-  {
-    f += pool_test<Foo, N>();
-    b += pool_test<Bar, N>();
-  }
-  return {f, b};
-}
-
 TEST_CASE("pool: exception thrown in constructor")
 {
   SECTION("Test")
@@ -185,24 +101,6 @@ TEST_CASE("pool: exception thrown in constructor")
     CHECK_THROWS(new Test(true));
     CHECK(c0 == Test::pool().size());
   }
-
-  SECTION("Foo")
-  {
-    auto foo = std::make_unique<Foo>();
-    auto c0 = Foo::pool().size();
-    CHECK_THROWS(new Foo(true));
-    CHECK(c0 == Foo::pool().size());
-  }
-}
-
-TEST_CASE("pool: speed")
-{
-  auto p0 = do_test<100>();
-  CHECK_NOFAIL(p0.first < (p0.second * 1.50));
-  auto p1 = do_test<500>();
-  CHECK_NOFAIL(p1.first < (p1.second * 1.50));
-  auto p2 = do_test<1000>();
-  CHECK_NOFAIL(p2.first < (p2.second * 1.50));
 }
 
 } // namespace lisp

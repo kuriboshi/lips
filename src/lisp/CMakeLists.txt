@@ -140,3 +140,12 @@ if(LIPS_ENABLE_TESTS)
     target_compile_definitions(lisp_test PRIVATE ENABLE_OBJECT_SIZES)
   endif()
 endif()
+
+if(LIPS_ENABLE_BENCHMARK)
+  add_executable(lisp_benchmark)
+  target_sources(
+    lisp_benchmark
+    PRIVATE lisp_benchmark.cc
+            pool.bench.cc)
+  target_link_libraries(lisp_benchmark PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
+endif()

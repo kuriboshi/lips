@@ -18,7 +18,9 @@
 #include <filesystem>
 #include <functional>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
 #include "alloc.hh"
 #include "io.hh"
@@ -133,7 +135,7 @@ TEST_CASE("io: lispread/readline")
   SECTION("floatp")
   {
     auto f0 = lispread("-1.2345E-2");
-    CHECK(f0->floatval() == Approx(-1.2345E-2).epsilon(0.01));
+    CHECK(f0->floatval() == Catch::Approx(-1.2345E-2).epsilon(0.01));
   }
 
   SECTION("lispread & readline")
