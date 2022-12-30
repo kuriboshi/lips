@@ -31,8 +31,8 @@ FetchContent_Declare(catch2
   URL_HASH SHA256=4613d3e8142b672159fcae252a4860d72c8cf8e2df5043b1ae3541db9ef5d73c)
 
 FetchContent_Declare(fmt
-  URL https://github.com/fmtlib/fmt/archive/8.1.1.tar.gz
-  URL_HASH SHA256=3d794d3cf67633b34b2771eb9f073bde87e846e0d395d254df7b211ef1ec7346)
+  URL https://github.com/fmtlib/fmt/archive/9.1.0.tar.gz
+  URL_HASH SHA256=5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2)
 
 make_available(catch2)
 make_available(fmt)
