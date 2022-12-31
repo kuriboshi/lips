@@ -27,7 +27,7 @@ namespace lisp::details::string
 /// @brief Return symbols print name as a string.
 lisp_t symstr(context&, lisp_t sym)
 {
-  check(sym, type::Symbol, type::T, type::Nil);
+  check(sym, type::Symbol, type::Nil);
   if(type_of(sym) == type::Nil)
     return mkstring("nil");
   return mkstring(sym->symbol()->pname);

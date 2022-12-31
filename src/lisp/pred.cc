@@ -106,7 +106,7 @@ lisp_t boundp(context&, lisp_t a)
 
 lisp_t litatom(context&, lisp_t a)
 {
-  if(type_of(a) == type::Symbol || type_of(a) == type::T)
+  if(type_of(a) == type::Symbol || type_of(a) == type::Nil)
     return T;
   return nil;
 }
@@ -141,8 +141,6 @@ lisp_t xtypeof(context&, lisp_t a)
       return C_UNBOUND;
     case type::Environ:
       return C_ENVIRON;
-    case type::T:
-      return T;
     case type::Eof:
       return C_ENDOFFILE;
     case type::Error:

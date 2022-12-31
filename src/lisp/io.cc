@@ -194,9 +194,6 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
     case type::Nil:
       ps("nil", file, false);
       break;
-    case type::T:
-      file.putch('t');
-      break;
     case type::Integer:
       pi(x->intval(), ctx.currentbase()->intval(), file);
       break;

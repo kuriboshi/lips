@@ -44,7 +44,6 @@ using lisp_t = ref_ptr<object>;
 enum class type
 {
   Nil = 0,  // so that nullptr also becomes nil
-  T,        // the truth object
   Symbol,   // an atomic symbol
   Integer,  // 24 bit integer in same word
   Float,    // floating point value
@@ -518,7 +517,7 @@ extern lisp_t C_CVARIABLE;
 inline type type_of(const lisp_t& a) { return a == nullptr ? type::Nil : a->gettype(); }
 inline type type_of(const object& a) { return a.gettype(); }
 inline type type_of(const cvariable_t& a) { return *a == nullptr ? type::Nil : a->gettype(); }
-inline bool is_T(const lisp_t& x) { return type_of(x) == type::T; }
+inline bool is_T(const lisp_t& x) { return x == T; }
 inline bool is_nil(const lisp_t& x) { return type_of(x) == type::Nil; }
 inline bool is_nil(const object& x) { return type_of(x) == type::Nil; }
 inline bool is_nil(const cvariable_t& x) { return type_of(x) == type::Nil; }

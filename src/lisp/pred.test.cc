@@ -136,7 +136,6 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(""_l) == C_ENDOFFILE);
     auto f = lisp_t::create(ref_file_t::create(""));
     CHECK(xtypeof(f) == C_FILE);
-    CHECK(xtypeof(T) == T);
   }
 }
 

@@ -35,9 +35,6 @@ void check(const lisp_t& arg, T type)
       case type::Nil:
         error(type_errc::not_nil, arg);
         break;
-      case type::T:
-        error(type_errc::not_t, arg);
-        break;
       case type::Symbol:
         error(type_errc::not_symbol, arg);
         break;

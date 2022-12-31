@@ -27,7 +27,6 @@ namespace lisp
 TEST_CASE("check: type checking")
 {
   CHECK_THROWS(check(T, type::Nil));
-  CHECK_THROWS(check(nil, type::T));
   CHECK_THROWS(check(nil, type::Symbol));
   CHECK_THROWS(check(nil, type::Integer));
   CHECK_THROWS(check(nil, type::Float));

@@ -38,7 +38,7 @@ TEST_CASE("debug: debug functions")
   auto r = evaltrace(T);
   CHECK(type_of(r) == type::Nil);
   r = evaltrace(nil);
-  CHECK(type_of(r) == type::T);
+  CHECK(is_T(r));
 }
 
 } // namespace lisp

@@ -34,22 +34,21 @@ namespace lisp
 TEST_CASE("lisp: to_underlying")
 {
   CHECK(to_underlying(type::Nil) == 0);
-  CHECK(to_underlying(type::T) == 1);
-  CHECK(to_underlying(type::Symbol) == 2);
-  CHECK(to_underlying(type::Integer) == 3);
-  CHECK(to_underlying(type::Float) == 4);
-  CHECK(to_underlying(type::Indirect) == 5);
-  CHECK(to_underlying(type::Cons) == 6);
-  CHECK(to_underlying(type::String) == 7);
-  CHECK(to_underlying(type::Subr) == 8);
-  CHECK(to_underlying(type::Lambda) == 9);
-  CHECK(to_underlying(type::Closure) == 10);
-  CHECK(to_underlying(type::Unbound) == 11);
-  CHECK(to_underlying(type::Environ) == 12);
-  CHECK(to_underlying(type::File) == 13);
-  CHECK(to_underlying(type::Eof) == 14);
-  CHECK(to_underlying(type::Error) == 15);
-  CHECK(to_underlying(type::Cvariable) == 16);
+  CHECK(to_underlying(type::Symbol) == 1);
+  CHECK(to_underlying(type::Integer) == 2);
+  CHECK(to_underlying(type::Float) == 3);
+  CHECK(to_underlying(type::Indirect) == 4);
+  CHECK(to_underlying(type::Cons) == 5);
+  CHECK(to_underlying(type::String) == 6);
+  CHECK(to_underlying(type::Subr) == 7);
+  CHECK(to_underlying(type::Lambda) == 8);
+  CHECK(to_underlying(type::Closure) == 9);
+  CHECK(to_underlying(type::Unbound) == 10);
+  CHECK(to_underlying(type::Environ) == 11);
+  CHECK(to_underlying(type::File) == 12);
+  CHECK(to_underlying(type::Eof) == 13);
+  CHECK(to_underlying(type::Error) == 14);
+  CHECK(to_underlying(type::Cvariable) == 15);
 }
 
 TEST_CASE("lisp: mkprim")

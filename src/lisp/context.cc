@@ -89,7 +89,6 @@ public:
     auto t = intern("t");
     T = t;
     t->value(T);
-    t->settype(type::T);
     t->symbol()->constant = true;
 
     C_AUTOLOAD = intern("autoload");
