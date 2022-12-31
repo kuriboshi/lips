@@ -45,8 +45,13 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     DEPENDS ${TARGET_NAME})
   add_custom_target(
     ccov-report
-    COMMAND ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
-            --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+    COMMAND
+      ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
+        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+        --format="text"
+        --ignore-filename-regex=exit.hh
+        --ignore-filename-regex='.*.test.cc'
+        ${CMAKE_CURRENT_SOURCE_DIR}/src > ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
     DEPENDS ccov-preprocessing)
   add_custom_target(
     ccov-show
@@ -60,17 +65,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         --ignore-filename-regex='.*.test.cc'
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     DEPENDS ccov-report)
-  add_custom_target(
-    ccov-report
-    COMMAND
-      ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
-        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
-        --format="text"
-        --ignore-filename-regex=exit.hh
-        --ignore-filename-regex='.*.test.cc'
-        ${CMAKE_CURRENT_SOURCE_DIR}/src > ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
-    DEPENDS ccov-report)
-  add_custom_target(coverage DEPENDS ccov-show ccov-report)
+  add_custom_target(coverage DEPENDS ccov-report ccov-show)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   find_program(COVERAGE_GCOV gcov)
   find_program(COVERAGE_LCOV lcov)
