@@ -328,10 +328,7 @@ public:
 
   /// @brief Constructor for anything with a defined set function
   template<typename T>
-  object(T x)
-  {
-    set(x);
-  }
+  explicit object(T x): _u(x) {}
 
   /// @brief Construct an object conaining a cvariable_t value.
   object(cvariable_t&& x) { _u = std::move(x); }
@@ -415,29 +412,6 @@ public:
   static std::size_t freecount() { return _pool.size(); }
 
 private:
-  void set(const symbol::ref_symbol_t sym) { _u = sym; }
-
-  void set(std::int64_t x) { _u = x; }
-
-  void set(double f) { _u = f; }
-
-  void set(indirect_t x) { _u = x; }
-
-  void set(ref_cons_t x) { _u = x; }
-
-  void set(ref_string_t s) { _u = s; }
-
-  void set(subr_index x) { _u = x; }
-
-  void set(ref_lambda_t x) { _u = x; }
-
-  void set(ref_closure_t x) { _u = x; }
-
-  void set(destblock_t* env) { _u = env; }
-
-  void set(ref_file_t f) { _u = f; }
-
-public:
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<std::monostate, // Nil

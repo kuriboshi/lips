@@ -153,8 +153,6 @@ TEST_CASE("alloc: object sizes")
 {
   std::cout << "==========\n";
   std::cout << "sizeof object: " << sizeof(object) << std::endl;
-  object o;
-  std::cout << "sizeof object::_u: " << sizeof(o._u) << std::endl;
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
   std::cout << fmt::format("symbol::ref_symbol_t: {}, {}\n", sizeof(symbol::ref_symbol_t), alignof(symbol::ref_symbol_t));
