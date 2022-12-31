@@ -436,7 +436,7 @@ int execcommand(lisp_t exp, lisp_t* res)
   for(auto cdir: environment->path)
   {
     if(is_nil(cdir) || cdir->getstr() == ".")
-      comdir = ".";
+      comdir = "."s;
     else if(cmd != exechash.end() && *command == cmd->first)
       comdir = cdir->getstr();
     else
