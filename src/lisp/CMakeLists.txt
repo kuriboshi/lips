@@ -153,6 +153,7 @@ if(LIPS_ENABLE_BENCHMARK)
   target_sources(
     lisp_benchmark
     PRIVATE lisp_benchmark.cc
+            alloc.bench.cc
             pool.bench.cc)
   target_link_libraries(lisp_benchmark PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
 
