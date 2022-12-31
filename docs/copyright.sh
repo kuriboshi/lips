@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Copyright 2022 Krister Joas
+# Copyright 2022-2023 Krister Joas
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ function output_years(first, last) {
       add_year(b[ix])
     }
   }
-  while(("git log --format=\"%ai %H\" --follow " FILENAME " | grep -v -f " exclude " | sed '\''1!G;h;$!d'\''" | getline) > 0) {
+  while(("git log --format=\"%ai %H %s\" --follow " FILENAME " | grep -v -f " exclude " | grep -v \"copyright:\" | sed '\''1!G;h;$!d'\''" | getline) > 0) {
     split($0, d, "-")
     add_year(d[1])
   }
