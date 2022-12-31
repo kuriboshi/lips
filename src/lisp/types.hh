@@ -53,7 +53,6 @@ enum class type
   Subr,     // primitive function
   Lambda,   // lambda function
   Closure,  // static binding object
-  Unbound,  // unbound indicator
   Environ,  // environment stack type for gc use
   File,     // file pointer
   Cvariable // is a pointer to c-variable

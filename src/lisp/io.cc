@@ -228,9 +228,6 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
       else
         pp("#<fsubr", file, x);
       break;
-    case type::Unbound:
-      ps("#<unbound>", file, false);
-      break;
     case type::Environ:
       pp("#<environ", file, x);
       break;

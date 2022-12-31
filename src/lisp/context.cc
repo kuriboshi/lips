@@ -80,8 +80,8 @@ public:
     // Must be early since it's used by symbol_store_t to initialize new
     // symbols.
     C_UNBOUND = intern("unbound");
+    C_UNBOUND->value(C_UNBOUND);
     C_UNBOUND->symbol()->constant = true;
-    C_UNBOUND->settype(type::Unbound);
 
     auto nil = intern("nil");
     nil->value(nil);

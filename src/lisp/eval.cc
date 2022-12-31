@@ -340,7 +340,7 @@ void vm::do_unbound(continuation_t continuation)
     pop(_dest);
     pop(_expression);
     _fun = _expression->car()->value();
-    if(type_of(_fun) == type::Unbound)
+    if(_fun == C_UNBOUND)
     {
       if(!evalhook(_expression))
         xbreak(error_errc::undef_function, _expression->car(), continuation);
@@ -398,10 +398,10 @@ bool vm::eval_func()
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &vm::eval_func;
-        break;
-      case type::Unbound:
-        do_unbound(&vm::eval_func);
+        if(_fun == C_UNBOUND)
+          do_unbound(&vm::eval_func);
+        else
+          _cont = &vm::eval_func;
         break;
       case type::String:
         if(!evalhook(_expression))
@@ -450,10 +450,10 @@ bool vm::eval_apply()
         break;
       case type::Symbol:
         _fun = _fun->value();
-        _cont = &vm::eval_apply;
-        break;
-      case type::Unbound:
-        do_unbound(&vm::eval_apply);
+        if(_fun == C_UNBOUND)
+          do_unbound(&vm::eval_apply);
+        else
+          _cont = &vm::eval_apply;
         break;
       case type::String:
         if(!evalhook(_expression))
@@ -769,10 +769,6 @@ bool vm::eval_lookup()
   lisp_t t = _expression->value();
   switch(type_of(t))
   {
-    case type::Unbound:
-      xbreak(error_errc::unbound_variable, _expression, &vm::eval_lookup);
-      return false;
-      break;
     case type::Indirect:
       send(t->indirect());
       break;
@@ -780,6 +776,11 @@ bool vm::eval_lookup()
       send(t->cvariable());
       break;
     default:
+      if(t == C_UNBOUND)
+      {
+        xbreak(error_errc::unbound_variable, _expression, &vm::eval_lookup);
+        return false;
+      }
       send(t);
       break;
   }

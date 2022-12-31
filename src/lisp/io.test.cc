@@ -447,7 +447,7 @@ TEST_CASE("io: prin0")
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(C_UNBOUND, *f);
-    CHECK(os.str() == "#<unbound>");
+    CHECK(os.str() == "unbound");
   }
   {
     std::ostringstream os;

@@ -220,11 +220,15 @@ TEST_CASE("eval: indirect and cvariable")
 
 TEST_CASE("eval: illegal apply")
 {
-  SECTION("apply string") { CHECK_NOTHROW(R"((apply "string" nil))"_e); }
+  SECTION("apply string") { CHECK_NOTHROW(R"((apply "string"))"_e); }
 
-  SECTION("apply unbound") { CHECK_THROWS(R"((apply unbound nil))"_e); }
+  SECTION("apply unbound")
+  {
+    auto r = R"((apply unbound))"_e;
+    CHECK(r == C_ERROR);
+  }
 
-  SECTION("apply int") { CHECK_NOTHROW(R"((apply 100 nil))"_e); }
+  SECTION("apply int") { CHECK_NOTHROW(R"((apply 100))"_e); }
 }
 
 TEST_CASE("eval: backtrace")

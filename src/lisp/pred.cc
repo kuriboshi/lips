@@ -99,7 +99,7 @@ lisp_t boundp(context&, lisp_t a)
 {
   if(type_of(a) != type::Symbol)
     return nil;
-  if(type_of(a->value()) != type::Unbound)
+  if(a->value() != C_UNBOUND)
     return T;
   return nil;
 }
@@ -137,8 +137,6 @@ lisp_t xtypeof(context&, lisp_t a)
       return C_NLAMBDA;
     case type::Closure:
       return C_CLOSURE;
-    case type::Unbound:
-      return C_UNBOUND;
     case type::Environ:
       return C_ENVIRON;
     case type::File:

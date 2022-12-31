@@ -73,7 +73,7 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
 
 lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
 {
-  if(type_of(name->value()) != type::Unbound)
+  if(name->value() != C_UNBOUND)
     if(type_of(name->value()) == type::Lambda)
     {
       lisp_t t = user::funeq(ctx, name->value(), lam);

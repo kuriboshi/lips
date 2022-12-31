@@ -132,7 +132,6 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(lambda(nil, nil)) == C_LAMBDA);
     CHECK(xtypeof(nlambda(nil, nil)) == C_NLAMBDA);
     CHECK(xtypeof(closure(nil, nil)) == C_CLOSURE);
-    CHECK(xtypeof(eval("unbound")) == C_UNBOUND);
     auto l = ""_l;
     CHECK(l == C_EOF);
     auto e = xtypeof(l);

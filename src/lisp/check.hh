@@ -62,9 +62,6 @@ void check(const lisp_t& arg, T type)
       case type::Closure:
         error(type_errc::not_closure, arg);
         break;
-      case type::Unbound:
-        error(type_errc::not_unbound, arg);
-        break;
       case type::Environ:
         error(type_errc::not_environ, arg);
         break;

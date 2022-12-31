@@ -43,10 +43,9 @@ TEST_CASE("lisp: to_underlying")
   CHECK(to_underlying(type::Subr) == 7);
   CHECK(to_underlying(type::Lambda) == 8);
   CHECK(to_underlying(type::Closure) == 9);
-  CHECK(to_underlying(type::Unbound) == 10);
-  CHECK(to_underlying(type::Environ) == 11);
-  CHECK(to_underlying(type::File) == 12);
-  CHECK(to_underlying(type::Cvariable) == 13);
+  CHECK(to_underlying(type::Environ) == 10);
+  CHECK(to_underlying(type::File) == 11);
+  CHECK(to_underlying(type::Cvariable) == 12);
 }
 
 TEST_CASE("lisp: mkprim")

@@ -36,7 +36,6 @@ TEST_CASE("check: type checking")
   CHECK_THROWS(check(nil, type::Subr));
   CHECK_THROWS(check(nil, type::Lambda));
   CHECK_THROWS(check(nil, type::Closure));
-  CHECK_THROWS(check(nil, type::Unbound));
   CHECK_THROWS(check(nil, type::Environ));
   CHECK_THROWS(check(nil, type::File));
   CHECK_THROWS(check(nil, type::Cvariable));
