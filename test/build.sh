@@ -15,7 +15,7 @@ cmake --preset docker -B "$1" &&
     {
         if $test
         then
-            (cd "$1"; ctest -V)
+            (cd "$1"; ctest -V -R 'test_.*')
         else
             true
         fi
