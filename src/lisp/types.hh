@@ -18,6 +18,7 @@
 #ifndef LISP_TYPES_HH
 #define LISP_TYPES_HH
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <sstream>
@@ -362,7 +363,7 @@ public:
   void value(lisp_t);
 
   /// @brief Integer
-  auto intval() const -> int { return std::get<int>(_u); }
+  auto intval() const -> std::int64_t { return std::get<std::int64_t>(_u); }
 
   /// @brief Floating point (double)
   auto floatval() const -> double { return std::get<double>(_u); }
@@ -416,7 +417,7 @@ public:
 private:
   void set(const symbol::ref_symbol_t sym) { _u = sym; }
 
-  void set(int x) { _u = x; }
+  void set(std::int64_t x) { _u = x; }
 
   void set(double f) { _u = f; }
 
@@ -441,7 +442,7 @@ public:
   // indicated by a comment.
   std::variant<std::monostate, // Nil
     symbol::ref_symbol_t,      // Symbol
-    int,                       // Integer
+    std::int64_t,              // Integer
     double,                    // Float
     indirect_t,                // Indirect
     ref_cons_t,                // Cons

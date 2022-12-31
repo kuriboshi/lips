@@ -50,7 +50,7 @@ inline lisp_t mkstring(const std::string& s) { return details::alloc::mkstring(s
 /// @param number The integer number.
 /// @return An integer number as a LISP object.
 ///
-inline lisp_t mknumber(int i) { return details::alloc::mknumber(i); }
+inline lisp_t mknumber(std::int64_t i) { return details::alloc::mknumber(i); }
 
 /// @brief Create a floating point number.
 ///
@@ -158,7 +158,7 @@ inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc:
 inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<int>(i)); }
+inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<std::int64_t>(i)); }
 
 /// @brief Creates a floating point value.
 inline lisp_t operator"" _l(long double d) { return details::alloc::mkfloat(d); }

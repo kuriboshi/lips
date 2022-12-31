@@ -32,7 +32,7 @@ namespace lisp::details::arith
 lisp_t plus(context& ctx, lisp_t x)
 {
   double fsum = 0.0;
-  int sum = 0;
+  std::int64_t sum = 0;
   bool f = false;
 
   while(type_of(x) == type::Cons)
@@ -122,12 +122,12 @@ lisp_t fdifference(context&, lisp_t x, lisp_t y)
 lisp_t ltimes(context& ctx, lisp_t x)
 {
   double fprod = 1.0;
-  int prod = 1;
-  int f = 0;
+  std::int64_t prod = 1;
+  bool f = false;
 
   while(type_of(x) == type::Cons)
   {
-    if(f != 0)
+    if(f)
     {
       if(type_of(x->car()) == type::Integer)
         fprod *= (double)x->car()->intval();
@@ -140,14 +140,14 @@ lisp_t ltimes(context& ctx, lisp_t x)
       prod *= x->car()->intval();
     else if(type_of(x->car()) == type::Float)
     {
-      f = 1;
+      f = true;
       fprod = x->car()->floatval() * (double)prod;
     }
     else
       ctx.error(error_errc::illegal_arg, x->car());
     x = x->cdr();
   }
-  if(f != 0)
+  if(f)
     return mkfloat(fprod);
   return mknumber(prod);
 }

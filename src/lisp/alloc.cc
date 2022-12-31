@@ -39,7 +39,7 @@ lisp_t obarray(context&)
 lisp_t mkstring(const std::string& str) { return getobject(new string_t(str)); }
 
 /// @brief Creates an integer number.
-lisp_t mknumber(int number) { return getobject(number); }
+lisp_t mknumber(std::int64_t number) { return getobject(number); }
 
 /// @brief Create a double.
 ///
