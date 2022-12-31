@@ -286,11 +286,7 @@ public:
   }
 
   /// @brief Construct an object conaining a cvariable_t value.
-  object(cvariable_t&& x)
-  {
-    _u = std::move(x);
-    _type = type::Cvariable;
-  }
+  object(cvariable_t&& x) { _u = std::move(x); }
 
   /// @brief Copy consructor
   object(const object&) = delete;
@@ -306,9 +302,7 @@ public:
     if(this != &x)
     {
       _u = std::move(x._u);
-      _type = x._type;
       x._u = std::monostate{};
-      x._type = type::Nil;
     }
     return *this;
   }
@@ -360,12 +354,11 @@ public:
   /// @brief Get the string if the object holds a litatom or a proper string
   const std::string& getstr() const
   {
-    return _type == type::String ? std::get<std::string>(_u) : std::get<symbol::ref_symbol_t>(_u)->pname;
+    return gettype() == type::String ? std::get<std::string>(_u) : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object
-  type gettype() const { return _type; }
-  void settype(type t) { _type = t; }
+  type gettype() const { return static_cast<type>(_u.index()); }
 
   /// @brief The new and delete operators uses a memory pool to create objects.
   static void* operator new(std::size_t) { return _pool.allocate(); }
@@ -374,75 +367,29 @@ public:
   static std::size_t freecount() { return _pool.size(); }
 
 private:
-  void set(const symbol::ref_symbol_t sym)
-  {
-    _type = type::Symbol;
-    _u = sym;
-  }
+  void set(const symbol::ref_symbol_t sym) { _u = sym; }
 
-  void set(int x)
-  {
-    _type = type::Integer;
-    _u = x;
-  }
+  void set(int x) { _u = x; }
 
-  void set(double f)
-  {
-    _type = type::Float;
-    _u = f;
-  }
+  void set(double f) { _u = f; }
 
-  void set(indirect_t x)
-  {
-    _type = type::Indirect;
-    _u = x;
-  }
+  void set(indirect_t x) { _u = x; }
 
-  void set(cons_t x)
-  {
-    _type = type::Cons;
-    _u = x;
-  }
+  void set(cons_t x) { _u = x; }
 
-  void set(const std::string& s)
-  {
-    _type = type::String;
-    _u = s;
-  }
+  void set(const std::string& s) { _u = s; }
 
-  void set(subr_index x)
-  {
-    _type = type::Subr;
-    _u = x;
-  }
+  void set(subr_index x) { _u = x; }
 
-  void set(ref_lambda_t x)
-  {
-    _type = type::Lambda;
-    _u = x;
-  }
+  void set(ref_lambda_t x) { _u = x; }
 
-  void set(ref_closure_t x)
-  {
-    _type = type::Closure;
-    _u = x;
-  }
+  void set(ref_closure_t x) { _u = x; }
 
-  void set(destblock_t* env)
-  {
-    _type = type::Environ;
-    _u = env;
-  }
+  void set(destblock_t* env) { _u = env; }
 
-  void set(ref_file_t f)
-  {
-    _type = type::File;
-    _u = f;
-  }
+  void set(ref_file_t f) { _u = f; }
 
-  /// @brief Type of object stored. Defaults to Nil.
-  type _type = type::Nil;
-
+public:
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<std::monostate, // Nil

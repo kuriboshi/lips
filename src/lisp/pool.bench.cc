@@ -94,35 +94,17 @@ auto pool_test() -> decltype(std::chrono::microseconds(0).count())
 
 TEST_CASE("pool: speed")
 {
-  BENCHMARK("pool: speed(Foo, 100)")
-  {
-    return pool_test<Foo, 100>();
-  };
+  BENCHMARK("pool: speed(Foo, 100)") { return pool_test<Foo, 100>(); };
 
-  BENCHMARK("pool: speed(Bar, 100)")
-  {
-    return pool_test<Bar, 100>();
-  };
+  BENCHMARK("pool: speed(Bar, 100)") { return pool_test<Bar, 100>(); };
 
-  BENCHMARK("pool: speed(Foo, 500)")
-  {
-    return pool_test<Foo, 500>();
-  };
+  BENCHMARK("pool: speed(Foo, 500)") { return pool_test<Foo, 500>(); };
 
-  BENCHMARK("pool: speed(Bar, 500)")
-  {
-    return pool_test<Bar, 500>();
-  };
+  BENCHMARK("pool: speed(Bar, 500)") { return pool_test<Bar, 500>(); };
 
-  BENCHMARK("pool: speed(Foo, 1000)")
-  {
-    return pool_test<Foo, 1000>();
-  };
+  BENCHMARK("pool: speed(Foo, 1000)") { return pool_test<Foo, 1000>(); };
 
-  BENCHMARK("pool: speed(Bar, 1000)")
-  {
-    return pool_test<Bar, 1000>();
-  };
+  BENCHMARK("pool: speed(Bar, 1000)") { return pool_test<Bar, 1000>(); };
 }
 
 } // namespace lisp

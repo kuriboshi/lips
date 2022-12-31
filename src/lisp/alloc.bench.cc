@@ -39,10 +39,7 @@ public:
 
 TEST_CASE("alloc: cons")
 {
-  BENCHMARK("alloc: cons(500)")
-  {
-    return cons_test<500>();
-  };
+  BENCHMARK("alloc: cons(500)") { return cons_test<500>(); };
 }
 
 } // namespace lisp
