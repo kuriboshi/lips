@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+set(TARGET_NAME lisp_test)
 if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
    OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
   if(APPLE)
@@ -29,7 +30,6 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
   set(CMAKE_CXX_FLAGS
       "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 
-  set(TARGET_NAME lisp_test)
   add_custom_target(
     ccov-preprocessing
     COMMAND
@@ -49,7 +49,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
             --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
     DEPENDS ccov-preprocessing)
   add_custom_target(
-    ccov
+    ccov-show
     COMMAND
       ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
         --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
@@ -59,6 +59,9 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         --ignore-filename-regex=exit.hh
         --ignore-filename-regex='.*.test.cc'
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+    DEPENDS ccov-report)
+  add_custom_target(
+    ccov-report
     COMMAND
       ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
         --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
@@ -66,12 +69,52 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         --ignore-filename-regex=exit.hh
         --ignore-filename-regex='.*.test.cc'
         ${CMAKE_CURRENT_SOURCE_DIR}/src > ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
-    DEPENDS ccov-preprocessing)
+    DEPENDS ccov-report)
+  add_custom_target(coverage DEPENDS ccov-show ccov-report)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
+  find_program(COVERAGE_GCOV gcov)
+  find_program(COVERAGE_LCOV lcov)
+  find_program(COVERAGE_GENHTML genhtml)
   set(CMAKE_C_FLAGS
       "${CMAKE_C_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS
       "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
+  add_custom_target(
+    ccov-preprocessing
+    COMMAND
+      GCOV_PROFILE_DIR=${CMAKE_CURRENT_BINARY_DIR}/
+        $<TARGET_FILE:${TARGET_NAME}>
+        --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
+        --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
+        --loadpath ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS ${TARGET_NAME})
+  add_custom_target(
+    lcov-capture
+    COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/output.info
+    COMMAND
+      lcov --capture
+           --exclude='*test.cc'
+           --directory ${CMAKE_CURRENT_BINARY_DIR}/src/lisp
+           -o ${CMAKE_CURRENT_BINARY_DIR}/output.info
+    DEPENDS ccov-preprocessing)
+  add_custom_target(
+    lcov-remove
+    COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+    COMMAND
+      lcov --remove
+           ${CMAKE_CURRENT_BINARY_DIR}/output.info
+           '/usr/include/*'
+           '${CMAKE_CURRENT_BINARY_DIR}/_deps/*'
+           -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+    DEPENDS lcov-capture)
+  add_custom_target(
+    lcov-genhtml
+    COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/html
+    COMMAND
+      genhtml ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+      -o ${CMAKE_CURRENT_BINARY_DIR}/html
+    DEPENDS lcov-remove)
+  add_custom_target(coverage DEPENDS lcov-genhtml)
 else()
   message(FATAL_ERROR "Code coverage requires Clang or GCC")
 endif()
