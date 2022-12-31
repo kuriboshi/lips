@@ -182,7 +182,7 @@ lisp_t top::operator()(lisp_t exp)
     //
     if(_options.interactive)
     {
-      if(type_of(eval(variables->promptform)) == type::Error)
+      if(eval(variables->promptform) == C_ERROR)
       {
         print(mkstring("Error in promptform, reset to nil"), T);
         variables->promptform = nil;
@@ -193,7 +193,7 @@ lisp_t top::operator()(lisp_t exp)
         promptprint(variables->topprompt);
     }
     input_exp = readline(_file);
-    if(type_of(input_exp) == type::Eof)
+    if(input_exp == C_EOF)
       return nil;
     if(is_nil(input_exp))
       continue;

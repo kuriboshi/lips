@@ -453,13 +453,13 @@ TEST_CASE("io: prin0")
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(C_EOF, *f);
-    CHECK(os.str().starts_with("#<endoffile"));
+    CHECK(os.str() == "eof");
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
     prin0(C_ERROR, *f);
-    CHECK(os.str().starts_with("#<error"));
+    CHECK(os.str() == "error");
   }
   {
     std::ostringstream os;

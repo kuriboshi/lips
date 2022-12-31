@@ -133,7 +133,10 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(nlambda(nil, nil)) == C_NLAMBDA);
     CHECK(xtypeof(closure(nil, nil)) == C_CLOSURE);
     CHECK(xtypeof(eval("unbound")) == C_UNBOUND);
-    CHECK(xtypeof(""_l) == C_ENDOFFILE);
+    auto l = ""_l;
+    CHECK(l == C_EOF);
+    auto e = xtypeof(l);
+    CHECK(e == C_SYMBOL);
     auto f = lisp_t::create(ref_file_t::create(""));
     CHECK(xtypeof(f) == C_FILE);
   }

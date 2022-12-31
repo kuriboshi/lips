@@ -84,6 +84,7 @@ public:
     C_UNBOUND->settype(type::Unbound);
 
     auto nil = intern("nil");
+    nil->value(nil);
     nil->symbol()->constant = true;
 
     auto t = intern("t");
@@ -100,7 +101,6 @@ public:
     C_ENDOFFILE = intern("endoffile");
     C_ENVIRON = intern("environ");
     C_EOF = intern("eof");
-    C_EOF->settype(type::Eof);
     C_FILE = intern("file");
     C_FLOAT = intern("float");
     C_FSUBR = intern("fsubr");

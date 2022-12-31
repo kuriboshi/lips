@@ -289,7 +289,7 @@ lisp_t closure(context& ctx, lisp_t fun, lisp_t vars)
   auto f = prim::length(ctx, vars);
   c->count = f->intval();
   f = closobj(ctx, vars);
-  if(type_of(f) == type::Error)
+  if(f == C_ERROR)
     return f;
   c->cvalues = f;
   return getobject(c);
@@ -367,7 +367,6 @@ inline constexpr std::string_view EXIT = "exit";       // exit lips
 void init()
 {
   C_ERROR = intern(pn::ERROR);
-  C_ERROR->settype(type::Error);
   C_LAMBDA = intern(pn::LAMBDA);
   C_NLAMBDA = intern(pn::NLAMBDA);
   C_QUOTE = intern(pn::QUOTE);

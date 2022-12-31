@@ -39,8 +39,6 @@ TEST_CASE("check: type checking")
   CHECK_THROWS(check(nil, type::Unbound));
   CHECK_THROWS(check(nil, type::Environ));
   CHECK_THROWS(check(nil, type::File));
-  CHECK_THROWS(check(nil, type::Eof));
-  CHECK_THROWS(check(nil, type::Error));
   CHECK_THROWS(check(nil, type::Cvariable));
 }
 

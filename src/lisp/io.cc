@@ -79,7 +79,7 @@ lisp_t readline(ref_file_t file)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(head && type_of(head) == type::Eof)
+    if(head && head == C_EOF)
       return head;
     if(listp(head) || head == nil)
       return head;
@@ -87,7 +87,7 @@ lisp_t readline(ref_file_t file)
     while(true)
     {
       auto o = parser.parse();
-      if(o && type_of(o) == type::Eof)
+      if(o && o == C_EOF)
         break;
       if(tail == nil)
         tail = cdr(head = cons(head, cons(o, nil)));
@@ -234,14 +234,8 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
     case type::Environ:
       pp("#<environ", file, x);
       break;
-    case type::Eof:
-      pp("#<endoffile", file, x);
-      break;
     case type::File:
       pp("#<file", file, x);
-      break;
-    case type::Error:
-      pp("#<error", file, x);
       break;
     default:
       ps("#<illegal type_of:", file, false);

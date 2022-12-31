@@ -71,12 +71,6 @@ void check(const lisp_t& arg, T type)
       case type::File:
         error(type_errc::not_filet, arg);
         break;
-      case type::Eof:
-        error(type_errc::not_endoffile, arg);
-        break;
-      case type::Error:
-        error(type_errc::not_error, arg);
-        break;
       case type::Cvariable:
         error(type_errc::not_cvariable, arg);
         break;

@@ -141,10 +141,6 @@ lisp_t xtypeof(context&, lisp_t a)
       return C_UNBOUND;
     case type::Environ:
       return C_ENVIRON;
-    case type::Eof:
-      return C_ENDOFFILE;
-    case type::Error:
-      return C_ERROR;
     case type::File:
       return C_FILE;
     case type::Cvariable:

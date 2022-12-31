@@ -56,8 +56,6 @@ enum class type
   Unbound,  // unbound indicator
   Environ,  // environment stack type for gc use
   File,     // file pointer
-  Eof,      // returned from read at end of file
-  Error,    // returned from primitive when an error occured
   Cvariable // is a pointer to c-variable
 };
 
