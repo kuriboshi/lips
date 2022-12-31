@@ -446,7 +446,6 @@ private:
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<std::monostate, // Nil
-    std::nullptr_t,            // Empty
     symbol::ref_symbol_t,      // Symbol
     int,                       // Integer
     double,                    // Float
