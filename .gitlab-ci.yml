@@ -1,0 +1,40 @@
+default:
+    image: ubuntu:22.10
+
+stages:
+  - build
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - make debug
+  artifacts:
+    paths:
+      - build/
+
+unit-test-job:
+  stage: test
+  script:
+    - make test
+  dependencies:
+    - build-job
+  artifacts:
+    paths:
+      - build/
+
+coverage-test-job:
+  stage: test
+  script:
+    - make coverage
+  dependencies:
+    - build-job
+  artifacts:
+    paths:
+      - build/
+
+deploy-job:
+  stage: deploy
+  script:
+    - make release
