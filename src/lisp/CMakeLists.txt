@@ -136,9 +136,6 @@ if(LIPS_ENABLE_TESTS)
             syntax.test.cc
             user.test.cc)
   target_link_libraries(lisp_test PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
-  if(LIPS_ENABLE_OBJECT_SIZES)
-    target_compile_definitions(lisp_test PRIVATE ENABLE_OBJECT_SIZES)
-  endif()
 endif()
 
 if(LIPS_ENABLE_TESTS)

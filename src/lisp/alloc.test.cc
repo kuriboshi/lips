@@ -148,8 +148,7 @@ TEST_CASE("alloc: freecount")
   CHECK(free != nil);
 }
 
-#ifdef ENABLE_OBJECT_SIZES
-TEST_CASE("alloc: object sizes")
+TEST_CASE("alloc: object sizes", "[.object sizes]")
 {
   std::cout << "==========\n";
   std::cout << "sizeof object: " << sizeof(object) << std::endl;
@@ -172,6 +171,5 @@ TEST_CASE("alloc: object sizes")
   std::cout << fmt::format("symbol::symbol_t: {}, {}\n", sizeof(symbol::symbol_t), alignof(symbol::symbol_t));
   std::cout << fmt::format("closure_t: {}, {}", sizeof(closure_t), alignof(closure_t)) << std::endl;
 }
-#endif
 
 } // namespace lisp

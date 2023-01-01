@@ -66,7 +66,6 @@ There are a number of options available to customize the build.
 | `LIPS_ENABLE_TRACE`         | Enable tracing               | `ON`          |
 | `LIPS_ENABLE_CODE_COVERAGE` | Enable code coverage         | `ON`          |
 | `LIPS_ENABLE_TESTS`         | Enable building test code    | `ON`          |
-| `LIPS_ENABLE_OBJECT_SIZES`  | Enable printing object sizes | `OFF`         |
 | `LIPS_USE_SSHFS`            | Use sshfs on macOS podman    | `OFF`         |
 
 Turn them on by adding `-D` options to the `cmake` command.

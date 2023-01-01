@@ -37,12 +37,10 @@ TEST_CASE("symbol: new symbol store")
   CHECK(!symbol_t::exists("world0"));
 }
 
-TEST_CASE("symbol: print sizes")
+TEST_CASE("symbol: print sizes", "[.object sizes]")
 {
-#ifdef ENABLE_OBJECT_SIZES
   std::cout << "==========\n";
   std::cout << "sizeof symbol_t: " << sizeof(symbol_t) << std::endl;
-#endif
 }
 
 template<class T>
