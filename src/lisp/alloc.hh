@@ -69,7 +69,7 @@ inline lisp_t mkfloat(double number) { return details::alloc::mkfloat(number); }
 ///
 /// @return The cons cell.
 ///
-inline lisp_t cons(lisp_t a, lisp_t b) { return details::alloc::cons(context::current(), a, b); }
+inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
 
 /// @brief Build a list of symbols in the local symbol table.
 ///

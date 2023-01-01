@@ -28,7 +28,7 @@ TEST_CASE("rtable: rmdquote")
 {
   lisp_t in = getobject(ref_file_t::create(R"(he\"llo")"));
   auto hello = rtable::rmdquote(context::current(), in);
-  CHECK(type_of(hello) == type::String);
+  CHECK(type_of(hello) == object::type::String);
   CHECK(hello->string() == "he\"llo");
 }
 
@@ -38,7 +38,7 @@ TEST_CASE("rtable: rmsquote")
   {
     auto in = getobject(ref_file_t::create(R"(1)"));
     auto q = rtable::rmsquote(context::current(), in);
-    CHECK(type_of(q) == type::Cons);
+    CHECK(type_of(q) == object::type::Cons);
     CHECK(car(q) == C_QUOTE);
     CHECK(eq(cadr(q), 1_l) == T);
   }
@@ -47,7 +47,7 @@ TEST_CASE("rtable: rmsquote")
   {
     auto in = getobject(ref_file_t::create(R"())"));
     auto q = rtable::rmsquote(context::current(), in);
-    CHECK(type_of(q) == type::Symbol);
+    CHECK(type_of(q) == object::type::Symbol);
     CHECK(q == "'"_a);
   }
 }
@@ -58,7 +58,7 @@ TEST_CASE("rtable: rmgetenv")
   {
     lisp_t in = getobject(ref_file_t::create(R"(HOME)"));
     auto home = rtable::rmgetenv(context::current(), in);
-    CHECK(type_of(home) == type::String);
+    CHECK(type_of(home) == object::type::String);
   }
 
   SECTION("non-existing environment variable")

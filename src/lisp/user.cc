@@ -36,7 +36,7 @@ lisp_t getrep(context&, lisp_t fun)
 {
   lisp_t args;
 
-  if(type_of(fun) != type::Lambda)
+  if(type_of(fun) != object::type::Lambda)
     return nil;
   auto& x = *fun->lambda();
   if(x.count == -1)
@@ -74,7 +74,7 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
 inline lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
 {
   if(name->value() != C_UNBOUND)
-    if(type_of(name->value()) == type::Lambda)
+    if(type_of(name->value()) == object::type::Lambda)
     {
       lisp_t t = user::funeq(ctx, name->value(), lam);
       if(is_nil(t))
@@ -89,8 +89,8 @@ inline lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
 
 lisp_t define(context& ctx, lisp_t name, lisp_t lam)
 {
-  check(name, type::Symbol);
-  check(lam, type::Lambda);
+  check(name, object::type::Symbol);
+  check(lam, object::type::Lambda);
   checkfn(ctx, name, lam);
   name->value(lam);
   return name;

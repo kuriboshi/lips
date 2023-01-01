@@ -55,7 +55,7 @@ lisp_t cond(context& ctx, lisp_t args)
   while(!is_nil(args))
   {
     auto alt = args->car();
-    check(alt, type::Cons);
+    check(alt, object::type::Cons);
     auto res = eval(alt->car());
     if(!is_nil(res))
     {
@@ -84,7 +84,7 @@ lisp_t progn(context&, lisp_t lexp)
 
 lisp_t set(context&, lisp_t var, lisp_t val)
 {
-  check(var, type::Symbol);
+  check(var, object::type::Symbol);
   if(var->symbol()->constant)
     error(error_errc::attempt_to_clobber, var);
   var->value(val);

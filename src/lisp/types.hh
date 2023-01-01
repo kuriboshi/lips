@@ -40,23 +40,6 @@ class file_t;
 class object;
 using lisp_t = ref_ptr<object>;
 
-enum class type: std::uint8_t
-{
-  Nil = 0,  // so that nullptr also becomes nil
-  Symbol,   // an atomic symbol
-  Integer,  // 24 bit integer in same word
-  Float,    // floating point value
-  Indirect, // used when a value is stored in a closure
-  Cons,     // a pair
-  String,   // character strings
-  Subr,     // primitive function
-  Lambda,   // lambda function
-  Closure,  // static binding object
-  Environ,  // environment stack type for gc use
-  File,     // file pointer
-  Cvariable // is a pointer to c-variable
-};
-
 inline constexpr auto nil = nullptr;
 
 /// @brief The cons cell.
@@ -144,17 +127,34 @@ public:
 class subr_t
 {
 public:
+  /// @brief Indicates if the arguments are to be evaluated or not.
   enum class subr
   {
     EVAL,
     NOEVAL
   };
+  /// @brief Indicates if the function is a spread or no spread function.
+  ///
+  /// @details With a spread function the arguments are bound to individual
+  /// parameters and in the case of a no spread function the arguments are
+  /// passed to the function as a single list parameter.
   enum class spread
   {
     SPREAD,
     NOSPREAD
   };
 
+  /// @brief Constructor of a primitive function.
+  ///
+  /// @details A primitive function is made up of it's print name, the function
+  /// to call, an indicator to tell if the arguments are to be evaluated or
+  /// not, and the spread/no spread indicator.
+  ///
+  /// @param pname The print name.
+  /// @param fun The function which can take zero, one, two, or three
+  /// parameters.
+  /// @param subr The eval/noeval indicator (subr or fsubr (special form)).
+  /// @param spread Spread/no spread.
   template<typename Fun>
   subr_t(std::string_view pname, Fun fun, enum subr subr, enum spread spread)
     : name(pname),
@@ -162,18 +162,33 @@ public:
       spread(spread),
       _fun(fun)
   {}
+  /// @brief Number of arguments.
+  ///
+  /// @details The function may optinally take a context parameter in addition
+  /// to the zero to three lisp_t arguments. The return value of this function
+  /// will be one of 0 - 3 regardless of whether there is a context parameter.
+  ///
+  /// @return The argument count 0 - 3.
   constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
 
+  /// @brief Call the function passing the context parameter if required. The
+  /// rest of the lisp_t arguments are taken from the destination block.
   lisp_t operator()(context& ctx, destblock_t* dest) const;
 
   using subr_vector = std::vector<subr_t>;
   using subr_index = subr_vector::size_type;
 
+  /// @brief Register a primitive function (subr).
+  /// @return The index to uniquely identify the function.
   static subr_index put(const subr_t& subr);
+  /// @brief Retrieve a primitive function given its index.
   static const subr_t& get(subr_index index) { return subr_store[index]; }
 
+  /// @brief The print name.
   std::string name;
+  /// @brief Eval or no eval.
   enum subr subr = subr::EVAL;
+  /// @brief Spread or no spread.
   enum spread spread = spread::SPREAD;
 
 private:
@@ -189,7 +204,10 @@ private:
 
   std::variant<func0_t, func1_t, func2_t, func3_t, func10_t, func11_t, func12_t, func13_t> _fun;
 
+  /// @brief Maps a print name to the subr index.
   static std::unordered_map<std::string, subr_index> subr_map;
+  /// @brief Each primitive function is stored in a vector and the subr_index
+  /// is the index into this vector.
   static subr_vector subr_store;
 };
 
@@ -407,6 +425,28 @@ public:
     return *this;
   }
 
+  /// @brief This enum class indicates the type of value stored in the object.
+  ///
+  /// @details Each of the values in the enum maps one to one directly to the
+  /// type stored in the variant. The enum exists to make the value type more
+  /// readable.
+  enum class type: std::uint8_t
+  {
+    Nil = 0,  // so that nullptr also becomes nil
+    Symbol,   // an atomic symbol
+    Integer,  // 24 bit integer in same word
+    Float,    // floating point value
+    Indirect, // used when a value is stored in a closure
+    Cons,     // a pair
+    String,   // character strings
+    Subr,     // primitive function
+    Lambda,   // lambda function
+    Closure,  // static binding object
+    Environ,  // environment stack type for gc use
+    File,     // file pointer
+    Cvariable // is a pointer to c-variable
+  };
+
   /// @brief Litatom
   auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
 
@@ -533,18 +573,18 @@ extern lisp_t C_CVARIABLE;
 
 /// @brief The lisp interpreter.
 ///
-inline type type_of(const lisp_t& a) { return a == nullptr ? type::Nil : a->gettype(); }
-inline type type_of(const object& a) { return a.gettype(); }
-inline type type_of(const cvariable_t& a) { return *a == nullptr ? type::Nil : a->gettype(); }
+inline object::type type_of(const lisp_t& a) { return a == nullptr ? object::type::Nil : a->gettype(); }
+inline object::type type_of(const object& a) { return a.gettype(); }
+inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? object::type::Nil : a->gettype(); }
 inline bool is_T(const lisp_t& x) { return x == T; }
-inline bool is_nil(const lisp_t& x) { return type_of(x) == type::Nil; }
-inline bool is_nil(const object& x) { return type_of(x) == type::Nil; }
-inline bool is_nil(const cvariable_t& x) { return type_of(x) == type::Nil; }
+inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
+inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
+inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
 
 inline void object::value(lisp_t x)
 {
   auto& var = std::get<symbol::ref_symbol_t>(_u);
-  if(type_of(var->value) == type::Cvariable)
+  if(type_of(var->value) == object::type::Cvariable)
   {
     auto& cvar = var->value->cvariable();
     cvar = x;

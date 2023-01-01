@@ -30,7 +30,7 @@ lisp_t concat(context&, lisp_t strlist)
   std::string result;
   for(auto sl = strlist; !is_nil(sl); sl = sl->cdr())
   {
-    check(sl->car(), type::String);
+    check(sl->car(), object::type::String);
     result += sl->car()->string();
   }
   return mkstring(result);
@@ -39,16 +39,16 @@ lisp_t concat(context&, lisp_t strlist)
 /// @brief Compare two strings.
 lisp_t strcmp(context&, lisp_t s1, lisp_t s2)
 {
-  check(s1, type::String);
-  check(s2, type::String);
+  check(s1, object::type::String);
+  check(s2, object::type::String);
   return mknumber(s1->string().compare(s2->string()));
 }
 
 /// @brief T if both strings are equal.
 lisp_t strequal(context&, lisp_t s1, lisp_t s2)
 {
-  check(s1, type::String);
-  check(s2, type::String);
+  check(s1, object::type::String);
+  check(s2, object::type::String);
   if(s1->string() == s2->string())
     return T;
   return nil;
@@ -57,7 +57,7 @@ lisp_t strequal(context&, lisp_t s1, lisp_t s2)
 /// @brief T if s is a string, nil otherwise.
 lisp_t stringp(context&, lisp_t s)
 {
-  if(type_of(s) == type::String)
+  if(type_of(s) == object::type::String)
     return s;
   return nil;
 }
@@ -65,7 +65,7 @@ lisp_t stringp(context&, lisp_t s)
 /// @brief Return string length of s.
 lisp_t strlen(context&, lisp_t s)
 {
-  check(s, type::String);
+  check(s, object::type::String);
   return mknumber(static_cast<int>(s->string().length()));
 }
 
@@ -76,9 +76,9 @@ lisp_t strlen(context&, lisp_t s)
 /// start is equal to one is accepted.
 lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
 {
-  check(str, type::String);
-  check(begin, type::Integer);
-  check(end, type::Integer, type::Nil);
+  check(str, object::type::String);
+  check(begin, object::type::Integer);
+  check(end, object::type::Integer, object::type::Nil);
   const auto& s = str->string();
   auto i = begin->intval();
   if(i == 0)
@@ -89,7 +89,7 @@ lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
     return i - 1;
   }();
   std::string::size_type e{0};
-  if(type_of(end) == type::Integer)
+  if(type_of(end) == object::type::Integer)
   {
     auto j = end->intval();
     if(j == 0)
@@ -110,8 +110,8 @@ lisp_t substring(context&, lisp_t str, lisp_t begin, lisp_t end)
 /// @brief Return symbols print name as a string.
 lisp_t symstr(context&, lisp_t sym)
 {
-  check(sym, type::Symbol, type::Nil);
-  if(type_of(sym) == type::Nil)
+  check(sym, object::type::Symbol, object::type::Nil);
+  if(type_of(sym) == object::type::Nil)
     return mkstring("nil");
   return mkstring(sym->symbol()->pname);
 }

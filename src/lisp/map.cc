@@ -33,7 +33,7 @@ namespace lisp::details::map
 /// @returns nil
 lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  while(type_of(obj) == type::Cons)
+  while(type_of(obj) == object::type::Cons)
   {
     apply(fn1, cons(obj, nil));
     if(is_nil(fn2))
@@ -54,7 +54,7 @@ lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @returns nil
 lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
-  while(type_of(obj) == type::Cons)
+  while(type_of(obj) == object::type::Cons)
   {
     apply(fn1, cons(obj->car(), nil));
     if(is_nil(fn2))
@@ -76,13 +76,13 @@ lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
-  if(type_of(obj) == type::Cons)
+  if(type_of(obj) == object::type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj, nil)), nil);
     obj = obj->cdr();
   }
   lisp_t rval = tmp;
-  while(type_of(obj) == type::Cons)
+  while(type_of(obj) == object::type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj, nil)), nil));
     tmp = tmp->cdr();
@@ -105,13 +105,13 @@ lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 lisp_t mapcar(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
-  if(type_of(obj) == type::Cons)
+  if(type_of(obj) == object::type::Cons)
   {
     tmp = cons(apply(fn1, cons(obj->car(), nil)), nil);
     obj = obj->cdr();
   }
   lisp_t rval = tmp;
-  while(type_of(obj) == type::Cons)
+  while(type_of(obj) == object::type::Cons)
   {
     rplacd(tmp, cons(apply(fn1, cons(obj->car(), nil)), nil));
     tmp = tmp->cdr();

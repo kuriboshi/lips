@@ -103,7 +103,7 @@ lisp_t readline(ref_file_t file)
 
 lisp_t getline(lisp_t file)
 {
-  check(file, type::File);
+  check(file, object::type::File);
   auto line = file->file()->getline();
   if(line)
     return mkstring(*line);
@@ -156,7 +156,7 @@ lisp_t prinbody(context& ctx, lisp_t x, file_t& file, bool esc)
     io::prin0(ctx, i->car(), file, esc);
     if(is_nil(i->cdr()))
       break;
-    if(type_of(i->cdr()) == type::Cons)
+    if(type_of(i->cdr()) == object::type::Cons)
     {
       file.putch(' ');
       i = i->cdr();
@@ -177,7 +177,7 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
-    case type::Cons:
+    case object::type::Cons:
       ctx.thisplevel++;
       if(ctx.thisplevel <= ctx.printlevel || ctx.printlevel <= 0)
       {
@@ -189,18 +189,18 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
         file.putch('&');
       ctx.thisplevel--;
       break;
-    case type::Symbol:
+    case object::type::Symbol:
       return io::patom(x, file, esc);
-    case type::Nil:
+    case object::type::Nil:
       ps("nil", file, false);
       break;
-    case type::Integer:
+    case object::type::Integer:
       pi(x->intval(), ctx.currentbase()->intval(), file);
       break;
-    case type::Float:
+    case object::type::Float:
       pf(x->floatval(), file);
       break;
-    case type::String:
+    case object::type::String:
       if(esc)
       {
         file.putch('"');
@@ -210,28 +210,28 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
       else
         ps(x->string(), file, false);
       break;
-    case type::Closure:
+    case object::type::Closure:
       pp("#<closure", file, x);
       break;
-    case type::Lambda:
+    case object::type::Lambda:
       if(x->lambda()->eval)
         pp("#<lambda", file, x);
       else
         pp("#<nlambda", file, x);
       break;
-    case type::Indirect:
+    case object::type::Indirect:
       pp("#<indirect", file, x);
       break;
-    case type::Subr:
+    case object::type::Subr:
       if(x->subr().subr == subr_t::subr::EVAL)
         pp("#<subr", file, x);
       else
         pp("#<fsubr", file, x);
       break;
-    case type::Environ:
+    case object::type::Environ:
       pp("#<environ", file, x);
       break;
-    case type::File:
+    case object::type::File:
       pp("#<file", file, x);
       break;
     default:
@@ -283,11 +283,11 @@ lisp_t terpri(file_t& file)
 ///
 lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
 {
-  check(x, type::Cons);
+  check(x, object::type::Cons);
   if(is_nil(y))
     return x;
   lisp_t t = x->cdr();
-  if(type_of(y) != type::Cons)
+  if(type_of(y) != object::type::Cons)
   {
     if(tailp)
       rplacd(x, cons(y, t));
@@ -302,7 +302,7 @@ lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
   }
   rplacd(x, y);
   lisp_t t2 = nil;
-  for(; type_of(y) == type::Cons; y = y->cdr())
+  for(; type_of(y) == object::type::Cons; y = y->cdr())
     t2 = y;
   return rplacd(t2, t);
 }

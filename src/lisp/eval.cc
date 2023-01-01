@@ -89,7 +89,7 @@ lisp_t vm::printwhere()
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::eval_end)
     {
       if(auto* lsp = std::get_if<lisp_t>(&_control[i - 1]);
-         lsp != nullptr && (type_of(*lsp) == type::Cons && type_of((*lsp)->car()) != type::Cons))
+         lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
         _ctx.primerr()->format("[in ");
@@ -249,7 +249,7 @@ bool vm::eval_expr()
   push(&vm::eval_end);
   switch(type_of(_expression))
   {
-    case type::Cons:
+    case object::type::Cons:
       push(_fun);
       _fun = _expression->car();
       push(_args);
@@ -257,10 +257,10 @@ bool vm::eval_expr()
       push(&vm::ev1);
       _cont = &vm::eval_func;
       break;
-    case type::Symbol:
+    case object::type::Symbol:
       _cont = &vm::eval_lookup;
       break;
-    case type::Indirect:
+    case object::type::Indirect:
       send(_expression->indirect());
       pop(_cont);
       break;
@@ -352,11 +352,11 @@ bool vm::eval_func()
   else
     switch(type_of(_fun))
     {
-      case type::Closure:
+      case object::type::Closure:
         push(&vm::eval_func);
         _cont = &vm::eval_closure;
         break;
-      case type::Subr:
+      case object::type::Subr:
         push(_dest);
         push(&vm::eval_prim);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
@@ -374,28 +374,28 @@ bool vm::eval_func()
         else
           _cont = &vm::eval_args;
         break;
-      case type::Lambda:
+      case object::type::Lambda:
         _noeval = !_fun->lambda()->eval;
         _cont = &vm::eval_lambda;
         break;
-      case type::Cons:
-      case type::Indirect:
+      case object::type::Cons:
+      case object::type::Indirect:
         _expression = _fun;
         push(&vm::ev3);
         _cont = &vm::eval_expr;
         break;
-      case type::Symbol:
+      case object::type::Symbol:
         _fun = _fun->value();
         if(_fun == C_UNBOUND)
           do_unbound(&vm::eval_func);
         else
           _cont = &vm::eval_func;
         break;
-      case type::String:
+      case object::type::String:
         if(!evalhook(_expression))
           xbreak(error_errc::illegal_function, _fun, &vm::eval_func);
         break;
-      case type::Cvariable:
+      case object::type::Cvariable:
         _fun = _fun->cvariable();
         break;
       default:
@@ -412,11 +412,11 @@ bool vm::eval_apply()
   else
     switch(type_of(_fun))
     {
-      case type::Closure:
+      case object::type::Closure:
         push(&vm::eval_apply);
         _cont = &vm::eval_closure;
         break;
-      case type::Subr:
+      case object::type::Subr:
         push(_dest);
         push(&vm::eval_prim);
         _dest = mkdestblock(static_cast<int>(_fun->subr().argcount()));
@@ -426,24 +426,24 @@ bool vm::eval_apply()
         else
           _cont = &vm::eval_args;
         break;
-      case type::Lambda:
+      case object::type::Lambda:
         _noeval = true;
         _cont = &vm::eval_lambda;
         break;
-      case type::Cons:
-      case type::Indirect:
+      case object::type::Cons:
+      case object::type::Indirect:
         _expression = _fun;
         push(&vm::ev3p);
         _cont = &vm::eval_expr;
         break;
-      case type::Symbol:
+      case object::type::Symbol:
         _fun = _fun->value();
         if(_fun == C_UNBOUND)
           do_unbound(&vm::eval_apply);
         else
           _cont = &vm::eval_apply;
         break;
-      case type::String:
+      case object::type::String:
         if(!evalhook(_expression))
           xbreak(error_errc::illegal_function, _fun, &vm::eval_apply);
         break;
@@ -757,10 +757,10 @@ bool vm::eval_lookup()
   lisp_t t = _expression->value();
   switch(type_of(t))
   {
-    case type::Indirect:
+    case object::type::Indirect:
       send(t->indirect());
       break;
-    case type::Cvariable:
+    case object::type::Cvariable:
       send(t->cvariable());
       break;
     default:
@@ -964,7 +964,7 @@ lisp_t vm::topofstack() const { return getobject(environment()); }
 
 lisp_t vm::destblock(lisp_t e)
 {
-  check(e, type::Environ);
+  check(e, object::type::Environ);
   return destblock(e->environ());
 }
 

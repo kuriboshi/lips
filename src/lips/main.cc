@@ -70,7 +70,7 @@ lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
     return cons(obj, nil);
   }
   lisp_t t;
-  for(t = list; type_of(t->cdr()) == type::Cons; t = t->cdr())
+  for(t = list; type_of(t->cdr()) == object::type::Cons; t = t->cdr())
     ;
   if(conc)
     rplacd(t, obj);
@@ -85,9 +85,9 @@ lisp_t transform(::lisp::context& ctx, lisp_t list)
   lisp_t tl = nil;
   lisp_t res = nil;
   bool conc = false;
-  for(auto ll = list; type_of(ll) == type::Cons; ll = ll->cdr())
+  for(auto ll = list; type_of(ll) == object::type::Cons; ll = ll->cdr())
   {
-    if(type_of(ll->car()) == type::Cons)
+    if(type_of(ll->car()) == object::type::Cons)
       tl = put_end(tl, transform(ctx, ll->car()), conc);
     else if(ll->car() == C_BAR)
     {

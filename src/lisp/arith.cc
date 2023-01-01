@@ -35,22 +35,22 @@ lisp_t plus(context&, lisp_t x)
   std::int64_t sum = 0;
   bool f = false;
 
-  while(type_of(x) == type::Cons)
+  while(type_of(x) == object::type::Cons)
   {
     if(f)
     {
-      if(type_of(x->car()) == type::Integer)
+      if(type_of(x->car()) == object::type::Integer)
         fsum += static_cast<double>(x->car()->intval());
-      else if(type_of(x->car()) == type::Float)
+      else if(type_of(x->car()) == object::type::Float)
         fsum += x->car()->floatval();
       else
         error(error_errc::illegal_arg, x->car());
     }
     else
     {
-      if(type_of(x->car()) == type::Integer)
+      if(type_of(x->car()) == object::type::Integer)
         sum += x->car()->intval();
-      else if(type_of(x->car()) == type::Float)
+      else if(type_of(x->car()) == object::type::Float)
       {
         f = true;
         fsum = x->car()->floatval() + static_cast<double>(sum);
@@ -70,7 +70,7 @@ lisp_t iplus(context&, lisp_t x)
   int sum = 0;
   for(auto i: x)
   {
-    check(i, type::Integer);
+    check(i, object::type::Integer);
     sum += i->intval();
   }
   return mknumber(sum);
@@ -78,12 +78,12 @@ lisp_t iplus(context&, lisp_t x)
 
 lisp_t fplus(context&, lisp_t x)
 {
-  check(x->car(), type::Float);
+  check(x->car(), object::type::Float);
   auto fsum = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == type::Cons)
+  while(type_of(x) == object::type::Cons)
   {
-    check(x->car(), type::Float);
+    check(x->car(), object::type::Float);
     fsum = fsum + x->car()->floatval();
     x = x->cdr();
   }
@@ -92,30 +92,30 @@ lisp_t fplus(context&, lisp_t x)
 
 lisp_t difference(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Integer, type::Float);
-  check(y, type::Integer, type::Float);
-  if(type_of(x) == type::Integer)
+  check(x, object::type::Integer, object::type::Float);
+  check(y, object::type::Integer, object::type::Float);
+  if(type_of(x) == object::type::Integer)
   {
-    if(type_of(y) == type::Integer)
+    if(type_of(y) == object::type::Integer)
       return mknumber(x->intval() - y->intval());
     return mkfloat(static_cast<double>(x->intval()) - y->floatval());
   }
-  if(type_of(y) == type::Integer)
+  if(type_of(y) == object::type::Integer)
     return mkfloat(x->floatval() - static_cast<double>(y->intval()));
   return mkfloat(x->floatval() - y->floatval());
 }
 
 lisp_t idifference(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Integer);
-  check(y, type::Integer);
+  check(x, object::type::Integer);
+  check(y, object::type::Integer);
   return mknumber(x->intval() - y->intval());
 }
 
 lisp_t fdifference(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Float);
-  check(y, type::Float);
+  check(x, object::type::Float);
+  check(y, object::type::Float);
   return mkfloat(x->floatval() - y->floatval());
 }
 
@@ -125,20 +125,20 @@ lisp_t ltimes(context&, lisp_t x)
   std::int64_t prod = 1;
   bool f = false;
 
-  while(type_of(x) == type::Cons)
+  while(type_of(x) == object::type::Cons)
   {
     if(f)
     {
-      if(type_of(x->car()) == type::Integer)
+      if(type_of(x->car()) == object::type::Integer)
         fprod *= (double)x->car()->intval();
-      else if(type_of(x->car()) == type::Float)
+      else if(type_of(x->car()) == object::type::Float)
         fprod *= x->car()->floatval();
       else
         error(error_errc::illegal_arg, x->car());
     }
-    else if(type_of(x->car()) == type::Integer)
+    else if(type_of(x->car()) == object::type::Integer)
       prod *= x->car()->intval();
-    else if(type_of(x->car()) == type::Float)
+    else if(type_of(x->car()) == object::type::Float)
     {
       f = true;
       fprod = x->car()->floatval() * (double)prod;
@@ -154,12 +154,12 @@ lisp_t ltimes(context&, lisp_t x)
 
 lisp_t itimes(context&, lisp_t x)
 {
-  check(x->car(), type::Integer);
+  check(x->car(), object::type::Integer);
   auto prod = x->car()->intval();
   x = x->cdr();
-  while(type_of(x) == type::Cons)
+  while(type_of(x) == object::type::Cons)
   {
-    check(x->car(), type::Integer);
+    check(x->car(), object::type::Integer);
     prod = prod * x->car()->intval();
     x = x->cdr();
   }
@@ -168,12 +168,12 @@ lisp_t itimes(context&, lisp_t x)
 
 lisp_t ftimes(context&, lisp_t x)
 {
-  check(x->car(), type::Float);
+  check(x->car(), object::type::Float);
   auto prod = x->car()->floatval();
   x = x->cdr();
-  while(type_of(x) == type::Cons)
+  while(type_of(x) == object::type::Cons)
   {
-    check(x->car(), type::Float);
+    check(x->car(), object::type::Float);
     prod = prod * x->car()->floatval();
     x = x->cdr();
   }
@@ -182,10 +182,10 @@ lisp_t ftimes(context&, lisp_t x)
 
 lisp_t divide(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Integer, type::Float);
-  check(y, type::Integer, type::Float);
-  if(type_of(x) == type::Integer)
-    if(type_of(y) == type::Integer)
+  check(x, object::type::Integer, object::type::Float);
+  check(y, object::type::Integer, object::type::Float);
+  if(type_of(x) == object::type::Integer)
+    if(type_of(y) == object::type::Integer)
     {
       if(y->intval() == 0)
         error(error_errc::divide_by_zero, nil);
@@ -197,7 +197,7 @@ lisp_t divide(context&, lisp_t x, lisp_t y)
         error(error_errc::divide_by_zero, nil);
       return mkfloat((double)x->intval() / y->floatval());
     }
-  else if(type_of(y) == type::Integer)
+  else if(type_of(y) == object::type::Integer)
   {
     if(y->intval() == 0)
       error(error_errc::divide_by_zero, nil);
@@ -210,8 +210,8 @@ lisp_t divide(context&, lisp_t x, lisp_t y)
 
 lisp_t iquotient(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Integer);
-  check(y, type::Integer);
+  check(x, object::type::Integer);
+  check(y, object::type::Integer);
   if(y->intval() == 0)
     error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() / y->intval());
@@ -219,8 +219,8 @@ lisp_t iquotient(context&, lisp_t x, lisp_t y)
 
 lisp_t iremainder(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Integer);
-  check(y, type::Integer);
+  check(x, object::type::Integer);
+  check(y, object::type::Integer);
   if(y->intval() == 0)
     error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() % y->intval());
@@ -228,8 +228,8 @@ lisp_t iremainder(context&, lisp_t x, lisp_t y)
 
 lisp_t fdivide(context&, lisp_t x, lisp_t y)
 {
-  check(x, type::Float);
-  check(y, type::Float);
+  check(x, object::type::Float);
+  check(y, object::type::Float);
   if(y->floatval() == 0.0)
     error(error_errc::divide_by_zero, nil);
   return mkfloat(x->floatval() / y->floatval());
@@ -237,21 +237,21 @@ lisp_t fdivide(context&, lisp_t x, lisp_t y)
 
 lisp_t minus(context&, lisp_t x)
 {
-  check(x, type::Float, type::Integer);
-  if(type_of(x) == type::Integer)
+  check(x, object::type::Float, object::type::Integer);
+  if(type_of(x) == object::type::Integer)
     return mknumber(-x->intval());
   return mkfloat(-x->floatval());
 }
 
 lisp_t iminus(context&, lisp_t x)
 {
-  check(x, type::Integer);
+  check(x, object::type::Integer);
   return mknumber(-x->intval());
 }
 
 lisp_t abs(context&, lisp_t x)
 {
-  check(x, type::Integer);
+  check(x, object::type::Integer);
   if(x->intval() < 0)
     return mknumber(-x->intval());
   return mknumber(x->intval());
@@ -259,19 +259,19 @@ lisp_t abs(context&, lisp_t x)
 
 lisp_t itof(context&, lisp_t x)
 {
-  check(x, type::Integer);
+  check(x, object::type::Integer);
   return mkfloat(static_cast<double>(x->intval()));
 }
 
 lisp_t add1(context&, lisp_t x)
 {
-  check(x, type::Integer);
+  check(x, object::type::Integer);
   return mknumber(x->intval() + 1);
 }
 
 lisp_t sub1(context&, lisp_t x)
 {
-  check(x, type::Integer);
+  check(x, object::type::Integer);
   return mknumber(x->intval() - 1);
 }
 
@@ -287,19 +287,19 @@ enum class num_type
 
 inline num_type numtype(lisp_t x, lisp_t y)
 {
-  if(type_of(x) == type::Float)
+  if(type_of(x) == object::type::Float)
   {
-    if(type_of(y) == type::Float)
+    if(type_of(y) == object::type::Float)
       return num_type::FLOATFLOAT;
-    if(type_of(y) == type::Integer)
+    if(type_of(y) == object::type::Integer)
       return num_type::FLOATINT;
     return num_type::ILLEGAL2;
   }
-  if(type_of(x) == type::Integer)
+  if(type_of(x) == object::type::Integer)
   {
-    if(type_of(y) == type::Float)
+    if(type_of(y) == object::type::Float)
       return num_type::INTFLOAT;
-    if(type_of(y) == type::Integer)
+    if(type_of(y) == object::type::Integer)
       return num_type::INTINT;
     return num_type::ILLEGAL2;
   }
@@ -350,20 +350,20 @@ lisp_t neqp(context&, lisp_t x, lisp_t y) { return numcheck<std::not_equal_to>(x
 
 lisp_t zerop(context&, lisp_t x)
 {
-  if(type_of(x) == type::Integer && x->intval() == 0)
+  if(type_of(x) == object::type::Integer && x->intval() == 0)
     return T;
   return nil;
 }
 
 lisp_t minusp(context&, lisp_t x)
 {
-  if(type_of(x) == type::Float)
+  if(type_of(x) == object::type::Float)
   {
     if(x->floatval() < 0.0)
       return T;
     return nil;
   }
-  if(type_of(x) == type::Integer)
+  if(type_of(x) == object::type::Integer)
   {
     if(x->intval() < 0)
       return T;

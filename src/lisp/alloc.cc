@@ -26,7 +26,7 @@ namespace lisp::details::alloc
 /// @param a The car of the pair.
 /// @param b The cdr of the pair.
 /// @returns The cons pair.
-lisp_t cons(context&, lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
+// lisp_t cons(lisp_t a, lisp_t b) { ; }
 
 lisp_t obarray(context&)
 {
@@ -59,7 +59,7 @@ lisp_t mkfloat(double number) { return getobject(number); }
 /// @return A straight list of arguments.
 lisp_t mkarglist(lisp_t alist, std::int8_t& count)
 {
-  if(type_of(alist) == type::Cons)
+  if(type_of(alist) == object::type::Cons)
   {
     ++count;
     return cons(alist->car(), mkarglist(alist->cdr(), count));

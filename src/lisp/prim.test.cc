@@ -41,8 +41,8 @@ TEST_CASE("prim: primary functions")
     set("a"_a, 1_l);
     auto f0 = lambda("(a)"_l, "((plus a 1))"_l);
     auto r0 = apply(f0, mklist(2_l));
-    CHECK(type_of(r0) == type::Integer);
-    CHECK(type_of(3_l) == type::Integer);
+    CHECK(type_of(r0) == object::type::Integer);
+    CHECK(type_of(3_l) == object::type::Integer);
     // TODO: Can't do this because Catch2 goes into an infinite loop when
     // converting a lisp_t to a string.
     // CHECK(r0 == 3_l);
@@ -216,7 +216,7 @@ TEST_CASE("prim: primary functions")
   SECTION("list")
   {
     auto l = list(mklist(1_l, 2_l));
-    CHECK(type_of(l) == type::Cons);
+    CHECK(type_of(l) == object::type::Cons);
     CHECK(length(l)->intval() == 2);
   }
 

@@ -30,7 +30,7 @@ namespace lisp::rtable
 //
 lisp_t rmdquote(context&, lisp_t stream)
 {
-  check(stream, type::File);
+  check(stream, object::type::File);
   std::string buffer;
   auto c = stream->file()->getch();
   while(c != '"')
@@ -45,7 +45,7 @@ lisp_t rmdquote(context&, lisp_t stream)
 
 lisp_t rmsquote(context&, lisp_t stream)
 {
-  check(stream, type::File);
+  check(stream, object::type::File);
   int c = 0;
   if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
   {
@@ -58,9 +58,9 @@ lisp_t rmsquote(context&, lisp_t stream)
 
 lisp_t rmgetenv(context&, lisp_t stream)
 {
-  check(stream, type::File);
+  check(stream, object::type::File);
   auto sym = ratom(stream->file());
-  check(sym, type::Symbol, type::String);
+  check(sym, object::type::Symbol, object::type::String);
   auto* val = std::getenv(sym->getstr().c_str());
   if(val == nullptr)
     return nil;

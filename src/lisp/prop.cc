@@ -24,21 +24,21 @@ namespace lisp::details::prop
 {
 lisp_t setplist(context&, lisp_t x, lisp_t pl)
 {
-  check(x, type::Symbol);
+  check(x, object::type::Symbol);
   x->symbol()->plist = pl;
   return pl;
 }
 
 lisp_t getplist(context&, lisp_t x)
 {
-  check(x, type::Symbol);
+  check(x, object::type::Symbol);
   return x->symbol()->plist;
 }
 
 lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
 {
-  check(x, type::Symbol);
-  check(p, type::Symbol);
+  check(x, object::type::Symbol);
+  check(p, object::type::Symbol);
   for(auto pl = x->symbol()->plist; !is_nil(pl); pl = pl->cdr()->cdr())
     if(pl->car() == p)
     {
@@ -51,8 +51,8 @@ lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
 
 lisp_t getprop(context&, lisp_t x, lisp_t p)
 {
-  check(x, type::Symbol);
-  check(p, type::Symbol);
+  check(x, object::type::Symbol);
+  check(p, object::type::Symbol);
   for(auto pl = x->symbol()->plist; !is_nil(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
@@ -63,8 +63,8 @@ lisp_t getprop(context&, lisp_t x, lisp_t p)
 
 lisp_t remprop(context&, lisp_t x, lisp_t p)
 {
-  check(x, type::Symbol);
-  check(p, type::Symbol);
+  check(x, object::type::Symbol);
+  check(p, object::type::Symbol);
   lisp_t r = nil;
   auto pl = x->symbol()->plist;
   lisp_t pl2 = nil;

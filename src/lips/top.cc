@@ -82,7 +82,7 @@ lisp_t top::histget(int num, lisp_t hlist)
 {
   if(num < 0)
   {
-    for(; type_of(hlist) == type::Cons && num < 0; hlist = hlist->cdr(), num++)
+    for(; type_of(hlist) == object::type::Cons && num < 0; hlist = hlist->cdr(), num++)
       ;
     if(is_nil(hlist))
       return nil;
@@ -90,7 +90,7 @@ lisp_t top::histget(int num, lisp_t hlist)
   }
   if(num > 0)
   {
-    for(; type_of(hlist) == type::Cons && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
+    for(; type_of(hlist) == object::type::Cons && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
       ;
     if(is_nil(hlist))
       return nil;
@@ -128,7 +128,7 @@ lisp_t top::findalias(lisp_t exp)
   auto rval = exp;
   while(true)
   {
-    if(type_of(rval) == type::Cons && type_of(rval->car()) == type::Symbol)
+    if(type_of(rval) == object::type::Cons && type_of(rval->car()) == object::type::Symbol)
     {
       auto alias = getprop(rval->car(), C_ALIAS);
       if(!is_nil(alias) && (is_nil(alias_expanded) || rval->car() != alias_expanded->car()))
@@ -150,7 +150,7 @@ lisp_t top::findalias(lisp_t exp)
 void top::promptprint(lisp_t prompt)
 {
   current_prompt.clear();
-  if(type_of(prompt) != type::String)
+  if(type_of(prompt) != object::type::String)
     return;
   auto s = prompt->getstr();
   for(auto c: s)
@@ -207,7 +207,7 @@ lisp_t top::operator()(lisp_t exp)
     }
     bool printit = false; // If the result will be printed.
     lisp_t topexp = transform(input_exp);
-    if(type_of(topexp->car()) == type::Cons)
+    if(type_of(topexp->car()) == object::type::Cons)
     {
       topexp = topexp->car();
       printit = true;
@@ -246,7 +246,7 @@ lisp_t top::rmexcl(context& ctx, lisp_t stream)
       return tmp;
       break;
     case '$':
-      while(type_of(tmp->cdr()) == type::Cons)
+      while(type_of(tmp->cdr()) == object::type::Cons)
         tmp = tmp->cdr();
       return tmp;
       break;
@@ -260,12 +260,12 @@ lisp_t top::rmexcl(context& ctx, lisp_t stream)
     default:
       stream->file()->ungetch(c);
       auto at = io::ratom(stream->file());
-      if(type_of(at) == type::Integer)
+      if(type_of(at) == object::type::Integer)
       {
         tmp = histget(at->intval(), variables->history);
         return tmp;
       }
-      if(type_of(at) == type::Symbol)
+      if(type_of(at) == object::type::Symbol)
       {
         for(auto h: variables->history)
         {

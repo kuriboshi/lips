@@ -32,43 +32,43 @@ void check(const lisp_t& arg, T type)
   {
     switch(type)
     {
-      case type::Nil:
+      case object::type::Nil:
         error(type_errc::not_nil, arg);
         break;
-      case type::Symbol:
+      case object::type::Symbol:
         error(type_errc::not_symbol, arg);
         break;
-      case type::Integer:
+      case object::type::Integer:
         error(type_errc::not_integer, arg);
         break;
-      case type::Float:
+      case object::type::Float:
         error(type_errc::not_float, arg);
         break;
-      case type::Indirect:
+      case object::type::Indirect:
         error(type_errc::not_indirect, arg);
         break;
-      case type::Cons:
+      case object::type::Cons:
         error(type_errc::not_cons, arg);
         break;
-      case type::String:
+      case object::type::String:
         error(type_errc::not_string, arg);
         break;
-      case type::Subr:
+      case object::type::Subr:
         error(type_errc::not_subr, arg);
         break;
-      case type::Lambda:
+      case object::type::Lambda:
         error(type_errc::not_lambda, arg);
         break;
-      case type::Closure:
+      case object::type::Closure:
         error(type_errc::not_closure, arg);
         break;
-      case type::Environ:
+      case object::type::Environ:
         error(type_errc::not_environ, arg);
         break;
-      case type::File:
+      case object::type::File:
         error(type_errc::not_filet, arg);
         break;
-      case type::Cvariable:
+      case object::type::Cvariable:
         error(type_errc::not_cvariable, arg);
         break;
     }

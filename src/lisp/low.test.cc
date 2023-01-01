@@ -65,11 +65,11 @@ TEST_CASE("low: low level functions")
   {
     // In C++ there is no real difference between 'set' and 'setqq'.
     auto r = setqq("a"_a, "b"_a);
-    REQUIRE(type_of(r) == type::Symbol);
+    REQUIRE(type_of(r) == object::type::Symbol);
     CHECK(r->symbol()->pname == "b");
     // In lisp, however, it matters so test it by evaluating a lisp expression.
     r = "(progn (setqq a b) a)"_e;
-    REQUIRE(type_of(r) == type::Symbol);
+    REQUIRE(type_of(r) == object::type::Symbol);
     CHECK(r->symbol()->pname == "b");
   }
 

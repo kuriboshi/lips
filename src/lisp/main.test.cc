@@ -99,7 +99,7 @@ TEST_CASE("main: reset")
     mkprim(
       "throw",
       [](context&, lisp_t a) -> lisp_t {
-        check(a, type::String);
+        check(a, object::type::String);
         throw std::runtime_error(a->string());
       },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
@@ -116,7 +116,7 @@ TEST_CASE("main: reset")
     mkprim(
       "throw_unwind",
       [](context&, lisp_t a) -> lisp_t {
-        check(a, type::String);
+        check(a, object::type::String);
         // The lamda ensure we have an environment at this point.
         CHECK(topofstack()->environ() != nil);
         // Unwind the stack and check if the stack has been unwound.

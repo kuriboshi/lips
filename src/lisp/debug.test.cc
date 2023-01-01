@@ -36,7 +36,7 @@ TEST_CASE("debug: debug functions")
   t = ctx.vm().trace();
   CHECK(!t);
   auto r = evaltrace(T);
-  CHECK(type_of(r) == type::Nil);
+  CHECK(type_of(r) == object::type::Nil);
   r = evaltrace(nil);
   CHECK(is_T(r));
 }

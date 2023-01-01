@@ -26,19 +26,19 @@ namespace lisp
 
 TEST_CASE("check: type checking")
 {
-  CHECK_THROWS(check(T, type::Nil));
-  CHECK_THROWS(check(nil, type::Symbol));
-  CHECK_THROWS(check(nil, type::Integer));
-  CHECK_THROWS(check(nil, type::Float));
-  CHECK_THROWS(check(nil, type::Indirect));
-  CHECK_THROWS(check(nil, type::Cons));
-  CHECK_THROWS(check(nil, type::String));
-  CHECK_THROWS(check(nil, type::Subr));
-  CHECK_THROWS(check(nil, type::Lambda));
-  CHECK_THROWS(check(nil, type::Closure));
-  CHECK_THROWS(check(nil, type::Environ));
-  CHECK_THROWS(check(nil, type::File));
-  CHECK_THROWS(check(nil, type::Cvariable));
+  CHECK_THROWS(check(T, object::type::Nil));
+  CHECK_THROWS(check(nil, object::type::Symbol));
+  CHECK_THROWS(check(nil, object::type::Integer));
+  CHECK_THROWS(check(nil, object::type::Float));
+  CHECK_THROWS(check(nil, object::type::Indirect));
+  CHECK_THROWS(check(nil, object::type::Cons));
+  CHECK_THROWS(check(nil, object::type::String));
+  CHECK_THROWS(check(nil, object::type::Subr));
+  CHECK_THROWS(check(nil, object::type::Lambda));
+  CHECK_THROWS(check(nil, object::type::Closure));
+  CHECK_THROWS(check(nil, object::type::Environ));
+  CHECK_THROWS(check(nil, object::type::File));
+  CHECK_THROWS(check(nil, object::type::Cvariable));
 }
 
 } // namespace lisp

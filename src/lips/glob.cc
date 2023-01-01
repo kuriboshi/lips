@@ -495,7 +495,7 @@ TEST_CASE("expandfiles")
 //
 lisp_t expand(lisp_t wild)
 {
-  check(wild, type::String, type::Symbol);
+  check(wild, object::type::String, object::type::Symbol);
   auto wstr = extilde(wild->getstr());
   if(!wstr)
     return nil;

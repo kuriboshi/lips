@@ -34,7 +34,7 @@ TEST_CASE("syntax: macro")
     stx.set('^', f);
     auto r = stx.macro(context::current(), f0, '^');
     REQUIRE(r != nil);
-    REQUIRE(type_of(r) == type::Symbol);
+    REQUIRE(type_of(r) == object::type::Symbol);
     REQUIRE(r->symbol()->pname == "hello");
   }
 

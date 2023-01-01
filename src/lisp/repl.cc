@@ -54,7 +54,7 @@ lisp_t repl::operator()(lisp_t exp)
     if(com == C_EOF)
       return C_EOF;
     /* OK, EVAL, ^, ... */
-    if(type_of(com) != type::Cons)
+    if(type_of(com) != object::type::Cons)
     {
       prin0("(go) continue"_s);
       terpri();

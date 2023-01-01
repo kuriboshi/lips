@@ -42,39 +42,39 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
   {
     auto a = eval("(setq f (lambda () \"hello\"))");
     auto b = eval("(f)");
-    CHECK(type_of(b) == type::String);
+    CHECK(type_of(b) == object::type::String);
     CHECK(b->string() == "hello");
   }
   SECTION("LAMBDA - one argument")
   {
     auto a = eval("(setq f (lambda (x) (cons x nil)))");
     auto b = eval("(f 10)");
-    CHECK(type_of(b) == type::Cons);
-    CHECK(type_of(b->car()) == type::Integer);
+    CHECK(type_of(b) == object::type::Cons);
+    CHECK(type_of(b->car()) == object::type::Integer);
     CHECK(b->car()->intval() == 10);
   }
   SECTION("LAMBDA - spread case")
   {
     auto a = eval("(setq f (lambda x (cadr x)))");
     auto b = eval("(f 1 2)");
-    CHECK(type_of(b) == type::Integer);
+    CHECK(type_of(b) == object::type::Integer);
     CHECK(b->intval() == 2);
   }
   SECTION("LAMBDA - half spread")
   {
     auto a = eval("(setq f (lambda (a . x) (list a (cadr x))))");
     auto b = eval("(f 0 1 2)");
-    CHECK(type_of(b) == type::Cons);
-    CHECK(type_of(b->car()) == type::Integer);
+    CHECK(type_of(b) == object::type::Cons);
+    CHECK(type_of(b->car()) == object::type::Integer);
     CHECK(b->car()->intval() == 0);
-    CHECK(type_of(b->cdr()->car()) == type::Integer);
+    CHECK(type_of(b->cdr()->car()) == object::type::Integer);
     CHECK(b->cdr()->car()->intval() == 2);
   }
   SECTION("NLAMBDA - basic case")
   {
     auto a = eval("(setq f (nlambda (a) a))");
     auto b = eval("(f x)");
-    CHECK(type_of(b) == type::Symbol);
+    CHECK(type_of(b) == object::type::Symbol);
     CHECK(b->symbol()->pname == "x");
   }
 }
@@ -180,7 +180,7 @@ TEST_CASE("eval: autoload")
   }
   putprop("auto"_a, "autoload"_a, "autoload.lisp"_a);
   auto result = "(auto)"_e;
-  CHECK(type_of(result) == type::Integer);
+  CHECK(type_of(result) == object::type::Integer);
   CHECK(result->intval() == 123);
   putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
   CHECK_NOTHROW("(noauto)"_e);
@@ -205,7 +205,7 @@ TEST_CASE("eval: indirect and cvariable")
   {
     auto& cvar = initcvar("f0", "(lambda () 99)"_l);
     auto result = "(f0)"_e;
-    REQUIRE(type_of(result) == type::Integer);
+    REQUIRE(type_of(result) == object::type::Integer);
     CHECK(result->intval() == 99);
   }
 
@@ -213,7 +213,7 @@ TEST_CASE("eval: indirect and cvariable")
   {
     auto& cvar = initcvar("c0", 123_l);
     auto result = "(plus c0)"_e;
-    REQUIRE(type_of(result) == type::Integer);
+    REQUIRE(type_of(result) == object::type::Integer);
     CHECK(result->intval() == 123);
   }
 }
@@ -282,7 +282,7 @@ TEST_CASE("eval: backtrace, topofstack, destblock")
   auto b = backtrace();
   CHECK(b == nil);
   auto t = topofstack();
-  CHECK(type_of(t) == type::Environ);
+  CHECK(type_of(t) == object::type::Environ);
   auto d = destblock(t);
   CHECK(d == nil);
 }

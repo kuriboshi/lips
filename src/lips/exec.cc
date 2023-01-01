@@ -238,7 +238,7 @@ std::pair<bool, std::string> check_meta(const std::string& s)
 std::optional<std::vector<std::string>> process_one(lisp_t arg)
 {
   std::vector<std::string> args;
-  if(type_of(arg) == type::Symbol)
+  if(type_of(arg) == object::type::Symbol)
   {
     auto c = glob::extilde(arg->getstr());
     if(!c)
@@ -249,7 +249,7 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
     else
     {
       auto files = glob::expandfiles(*c, true);
-      if(type_of(files) == type::Cons)
+      if(type_of(files) == object::type::Cons)
       {
         for(auto f: files)
           args.push_back(f->getstr());
@@ -261,11 +261,11 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
       }
     }
   }
-  else if(type_of(arg) == type::Integer)
+  else if(type_of(arg) == object::type::Integer)
     args.push_back(std::to_string(arg->intval()));
-  else if(type_of(arg) == type::String)
+  else if(type_of(arg) == object::type::String)
     args.push_back(arg->getstr());
-  else if(type_of(arg) == type::Cons)
+  else if(type_of(arg) == object::type::Cons)
   {
     auto result = process_one(eval(arg));
     if(!result)
@@ -464,12 +464,12 @@ lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 
   if(is_nil(cmd))
     return nil;
-  check(file, type::String, type::Symbol);
+  check(file, object::type::String, object::type::Symbol);
   if(is_nil(filed))
     oldfd = 1;
   else
   {
-    check(filed, type::Integer);
+    check(filed, object::type::Integer);
     oldfd = filed->intval();
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
@@ -500,12 +500,12 @@ lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 
   if(is_nil(cmd))
     return nil;
-  check(file, type::String, type::Symbol);
+  check(file, object::type::String, object::type::Symbol);
   if(is_nil(filed))
     oldfd = 1;
   else
   {
-    check(filed, type::Integer);
+    check(filed, object::type::Integer);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
@@ -536,12 +536,12 @@ lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 
   if(is_nil(cmd))
     return nil;
-  check(file, type::String, type::Symbol);
+  check(file, object::type::String, object::type::Symbol);
   if(is_nil(filed))
     oldfd = 0;
   else
   {
-    check(filed, type::Integer);
+    check(filed, object::type::Integer);
     oldfd = filed->intval();
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
@@ -650,7 +650,7 @@ void do_rehash()
   {
     if(is_nil(p))
       continue;
-    check(p, type::String, type::Symbol);
+    check(p, object::type::String, object::type::Symbol);
     std::error_code ec;
     for(const auto& odir:
       std::filesystem::directory_iterator(p->getstr(), std::filesystem::directory_options::skip_permission_denied, ec))
@@ -682,7 +682,7 @@ lisp_t fg(context& ctx, lisp_t job)
   }
   else
   {
-    check(job, type::Integer);
+    check(job, object::type::Integer);
     for(auto& j: joblist)
     {
       if(j.jobnum == job->intval())
@@ -726,7 +726,7 @@ lisp_t bg(context& ctx, lisp_t job)
   }
   else
   {
-    check(job, type::Integer);
+    check(job, object::type::Integer);
     for(auto& j: joblist)
     {
       if(j.jobnum == job->intval())
@@ -754,15 +754,15 @@ lisp_t bg(context& ctx, lisp_t job)
 
 lisp_t setenv(context&, lisp_t var, lisp_t val)
 {
-  check(var, type::String, type::Symbol);
-  check(val, type::String, type::Symbol);
+  check(var, object::type::String, object::type::Symbol);
+  check(val, object::type::String, object::type::Symbol);
   ::setenv(var->getstr().c_str(), val->getstr().c_str(), 1);
   return var;
 }
 
 lisp_t getenviron(context&, lisp_t var)
 {
-  check(var, type::String, type::Symbol);
+  check(var, object::type::String, object::type::Symbol);
   char* s = getenv(var->getstr().c_str());
   if(s == nullptr)
     return nil;
@@ -778,7 +778,7 @@ lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
   else
   {
     ndir = expand(ctx, dir);
-    if(type_of(ndir) == type::Cons)
+    if(type_of(ndir) == object::type::Cons)
       ndir = ndir->car();
   }
   if(is_nil(ndir))

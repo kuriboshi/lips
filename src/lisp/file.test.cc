@@ -69,13 +69,13 @@ TEST_CASE("file: functions")
     {
       auto in0 = open(mkstring(test.file), C_READ);
       auto e0 = ratom(in0);
-      REQUIRE(type_of(e0) == type::Symbol);
+      REQUIRE(type_of(e0) == object::type::Symbol);
       CHECK(e0->getstr() == "atom");
     }
     {
       auto in0 = open(mkstring(test.file), C_READ);
       auto e0 = ratom(in0);
-      REQUIRE(type_of(e0) == type::Symbol);
+      REQUIRE(type_of(e0) == object::type::Symbol);
       CHECK(e0->getstr() == "atom");
     }
   }
@@ -124,7 +124,7 @@ TEST_CASE("file: functions")
     auto f1 = open(mkstring(test_file), C_READ);
     auto r1 = read(f1);
     REQUIRE(r1 != nil);
-    CHECK(type_of(r1) == type::String);
+    CHECK(type_of(r1) == object::type::String);
     CHECK(r1->getstr() == "hello\n\nworld");
     std::filesystem::remove(test_file);
   }
@@ -229,7 +229,7 @@ TEST_CASE("file: functions")
     {
       lisp_t f = getobject(ref_file_t::create(R"(test)"));
       auto r = readline(f);
-      CHECK(type_of(r) == type::Cons);
+      CHECK(type_of(r) == object::type::Cons);
       auto expected = mklist("test"_a);
       CHECK(equal(r, expected));
     }
@@ -237,7 +237,7 @@ TEST_CASE("file: functions")
     {
       lisp_t f = getobject(ref_file_t::create(R"(test test)"));
       auto r = readline(f);
-      CHECK(type_of(r) == type::Cons);
+      CHECK(type_of(r) == object::type::Cons);
       auto expected = mklist("test"_a, "test"_a);
       CHECK(equal(r, expected));
     }
@@ -266,7 +266,7 @@ TEST_CASE("file: functions")
     close(f);
     context::current().loadpath(mklist(C_DOT));
     auto e = load(mkstring(test.file));
-    REQUIRE(type_of("a"_a->value()) == type::Integer);
+    REQUIRE(type_of("a"_a->value()) == object::type::Integer);
     CHECK("a"_a->value()->intval() == 999);
   }
 }

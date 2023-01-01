@@ -26,8 +26,8 @@ lisp_t numberp(context&, lisp_t a)
 {
   switch(type_of(a))
   {
-    case type::Integer:
-    case type::Float:
+    case object::type::Integer:
+    case object::type::Float:
       return a;
     default:
       return nil;
@@ -36,7 +36,7 @@ lisp_t numberp(context&, lisp_t a)
 
 lisp_t listp(context&, lisp_t a)
 {
-  if(type_of(a) == type::Cons)
+  if(type_of(a) == object::type::Cons)
     return a;
   return nil;
 }
@@ -60,18 +60,18 @@ lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
     return T;
   switch(type_of(l1))
   {
-    case type::Cons:
+    case object::type::Cons:
       while(type_of(l1) == type_of(l2))
       {
         if(pred::equal(ctx, l1->car(), l2->car()) != nil)
           return pred::equal(ctx, l1->cdr(), l2->cdr());
         return nil;
       }
-    case type::String:
+    case object::type::String:
       return (l1->string() == l2->string()) ? T : nil;
-    case type::Lambda:
+    case object::type::Lambda:
       return user::funeq(ctx, l1, l2);
-    case type::Integer:
+    case object::type::Integer:
       return (l1->intval() == l2->intval() ? T : nil);
     default:
       break;
@@ -83,7 +83,7 @@ lisp_t nlistp(context&, lisp_t a)
 {
   if(a == nil)
     return T;
-  if(type_of(a) != type::Cons)
+  if(type_of(a) != object::type::Cons)
     return a;
   return nil;
 }
@@ -97,7 +97,7 @@ lisp_t neq(context&, lisp_t a, lisp_t b)
 
 lisp_t boundp(context&, lisp_t a)
 {
-  if(type_of(a) != type::Symbol)
+  if(type_of(a) != object::type::Symbol)
     return nil;
   if(a->value() != C_UNBOUND)
     return T;
@@ -106,7 +106,7 @@ lisp_t boundp(context&, lisp_t a)
 
 lisp_t litatom(context&, lisp_t a)
 {
-  if(type_of(a) == type::Symbol || type_of(a) == type::Nil)
+  if(type_of(a) == object::type::Symbol || type_of(a) == object::type::Nil)
     return T;
   return nil;
 }
@@ -115,35 +115,35 @@ lisp_t xtypeof(context&, lisp_t a)
 {
   switch(type_of(a))
   {
-    case type::Symbol:
+    case object::type::Symbol:
       return C_SYMBOL;
-    case type::Integer:
+    case object::type::Integer:
       return C_INTEGER;
-    case type::Float:
+    case object::type::Float:
       return C_FLOAT;
-    case type::Indirect:
+    case object::type::Indirect:
       return C_INDIRECT;
-    case type::Cons:
+    case object::type::Cons:
       return C_CONS;
-    case type::String:
+    case object::type::String:
       return C_STRING;
-    case type::Subr:
+    case object::type::Subr:
       if(a->subr().subr == subr_t::subr::EVAL)
         return C_SUBR;
       return C_FSUBR;
-    case type::Lambda:
+    case object::type::Lambda:
       if(a->lambda()->eval)
         return C_LAMBDA;
       return C_NLAMBDA;
-    case type::Closure:
+    case object::type::Closure:
       return C_CLOSURE;
-    case type::Environ:
+    case object::type::Environ:
       return C_ENVIRON;
-    case type::File:
+    case object::type::File:
       return C_FILE;
-    case type::Cvariable:
+    case object::type::Cvariable:
       return C_CVARIABLE;
-    case type::Nil:
+    case object::type::Nil:
       break;
   }
   // To avoid warning from gcc that this function doesn't return anything in
