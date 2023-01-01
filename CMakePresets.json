@@ -42,7 +42,7 @@
             "name": "make",
             "inherits": "debug",
             "displayName": "Makefile preset",
-            "description": "Default build using make",
+            "description": "Debug build using make",
             "generator": "Unix Makefiles",
             "cacheVariables": {
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
@@ -107,20 +107,12 @@
         {
             "name": "debug",
             "configurePreset": "debug",
-            "filter": {
-                "include": {
-                    "name": "test_.*"
-                }
-            }
+            "inherits": "default"
         },
         {
             "name": "make",
             "configurePreset": "make",
-            "filter": {
-                "include": {
-                    "name": "test_.*"
-                }
-            }
+            "inherits": "default"
         },
         {
             "name": "benchmark",
