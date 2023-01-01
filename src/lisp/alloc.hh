@@ -101,26 +101,9 @@ inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 ///
 inline lisp_t mkatom(std::string_view s) { return details::alloc::mkatom(s); }
 
-/// @brief Overload of mkprim for a function with zero parameters.
-inline void mkprim(std::string_view pname, subr_t::func0_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-/// @brief Overload of mkprim for a function with one parameter.
-inline void mkprim(std::string_view pname, subr_t::func1_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-/// @brief Overload of mkprim for a function with two parameters.
-inline void mkprim(std::string_view pname, subr_t::func2_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
-{
-  details::alloc::mkprim(subr_t(pname, fun, subr, spread));
-}
-
-/// @brief Overload of mkprim for a function with three parameters.
-inline void mkprim(std::string_view pname, subr_t::func3_t fun, enum subr_t::subr subr, enum subr_t::spread spread)
+/// @brief Templated function which registers a primary function.
+template<typename Fun>
+void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
   details::alloc::mkprim(subr_t(pname, fun, subr, spread));
 }

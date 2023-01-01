@@ -31,50 +31,6 @@
 
 namespace lisp
 {
-/// @brief Destination block is used to collect the parameters to a function.
-///
-/// @details The destblock_t is used to store variables and their values.  Each
-/// block of variable/value pairs is proceeded by a control block which
-/// contains the following pieces of information: The size of the block, the
-/// index of the variable/value pair currently being set, and a link to another
-/// destblock_t in a chain of blocks.
-///
-class destblock_t
-{
-private:
-  struct control_block
-  {
-    std::int8_t size;
-    std::int8_t index;
-    destblock_t* link;
-  };
-  struct var_val_pair
-  {
-    lisp_t var;
-    lisp_t val;
-  };
-  std::variant<control_block, var_val_pair> u;
-
-public:
-  void reset() { u = var_val_pair{nil, nil}; }
-
-  void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
-  int size() const { return std::get<control_block>(u).size; }
-  int index() const { return std::get<control_block>(u).index; }
-  destblock_t* link() const { return std::get<control_block>(u).link; }
-  void link(destblock_t* dest) { std::get<control_block>(u).link = dest; }
-  void decr()
-  {
-    if(std::get<control_block>(u).index > 0)
-      --std::get<control_block>(u).index;
-  }
-
-  void var(lisp_t x) { std::get<var_val_pair>(u).var = x; }
-  lisp_t var() const { return std::get<var_val_pair>(u).var; }
-  void val(lisp_t x) { std::get<var_val_pair>(u).val = x; }
-  lisp_t val() const { return std::get<var_val_pair>(u).val; }
-};
-
 class vm
 {
 public:

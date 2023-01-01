@@ -35,9 +35,7 @@
 namespace lisp
 {
 
-class syntax;
 class context;
-class vm;
 class file_t;
 class object;
 using lisp_t = ref_ptr<object>;
@@ -92,6 +90,50 @@ private:
   static pool_t _pool;
 };
 
+/// @brief Destination block is used to collect the parameters to a function.
+///
+/// @details The destblock_t is used to store variables and their values.  Each
+/// block of variable/value pairs is proceeded by a control block which
+/// contains the following pieces of information: The size of the block, the
+/// index of the variable/value pair currently being set, and a link to another
+/// destblock_t in a chain of blocks.
+///
+class destblock_t
+{
+private:
+  struct control_block
+  {
+    std::int8_t size;
+    std::int8_t index;
+    destblock_t* link;
+  };
+  struct var_val_pair
+  {
+    lisp_t var;
+    lisp_t val;
+  };
+  std::variant<control_block, var_val_pair> u;
+
+public:
+  void reset() { u = var_val_pair{nil, nil}; }
+
+  void num(std::int8_t size) { u = control_block{size, size, nullptr}; }
+  int size() const { return std::get<control_block>(u).size; }
+  int index() const { return std::get<control_block>(u).index; }
+  destblock_t* link() const { return std::get<control_block>(u).link; }
+  void link(destblock_t* dest) { std::get<control_block>(u).link = dest; }
+  void decr()
+  {
+    if(std::get<control_block>(u).index > 0)
+      --std::get<control_block>(u).index;
+  }
+
+  void var(lisp_t x) { std::get<var_val_pair>(u).var = x; }
+  lisp_t var() const { return std::get<var_val_pair>(u).var; }
+  void val(lisp_t x) { std::get<var_val_pair>(u).val = x; }
+  lisp_t val() const { return std::get<var_val_pair>(u).val; }
+};
+
 /// @brief Structure describing a built-in function.
 ///
 /// @details Built-in function can have zero, one, two, or three parameters.
@@ -99,8 +141,9 @@ private:
 /// can be either spread (fixed number of arguments) or nospread (variable
 /// number of arguments).
 ///
-struct subr_t
+class subr_t
 {
+public:
   enum class subr
   {
     EVAL,
@@ -112,63 +155,77 @@ struct subr_t
     NOSPREAD
   };
 
+  template<typename Fun>
+  subr_t(std::string_view pname, Fun fun, enum subr subr, enum spread spread)
+    : name(pname),
+      subr(subr),
+      spread(spread),
+      _fun(fun)
+  {}
+  constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
+
+  lisp_t operator()(context& ctx, destblock_t* dest) const;
+
+  using subr_vector = std::vector<subr_t>;
+  using subr_index = subr_vector::size_type;
+
+  static subr_index put(const subr_t& subr);
+  static const subr_t& get(subr_index index) { return subr_store[index]; }
+
+  std::string name;
+  enum subr subr = subr::EVAL;
+  enum spread spread = spread::SPREAD;
+
+private:
   using func0_t = std::function<lisp_t(context&)>;
   using func1_t = std::function<lisp_t(context&, lisp_t)>;
   using func2_t = std::function<lisp_t(context&, lisp_t, lisp_t)>;
   using func3_t = std::function<lisp_t(context&, lisp_t, lisp_t, lisp_t)>;
 
-  subr_t(std::string_view pname, func0_t fun, enum subr subr, enum spread spread)
-    : name(pname),
-      f(fun),
-      subr(subr),
-      spread(spread)
-  {}
-  subr_t(std::string_view pname, func1_t fun, enum subr subr, enum spread spread)
-    : name(pname),
-      f(fun),
-      subr(subr),
-      spread(spread)
-  {}
-  subr_t(std::string_view pname, func2_t fun, enum subr subr, enum spread spread)
-    : name(pname),
-      f(fun),
-      subr(subr),
-      spread(spread)
-  {}
-  subr_t(std::string_view pname, func3_t fun, enum subr subr, enum spread spread)
-    : name(pname),
-      f(fun),
-      subr(subr),
-      spread(spread)
-  {}
-  constexpr std::size_t argcount() const noexcept { return f.index(); }
+  using func10_t = std::function<lisp_t()>;
+  using func11_t = std::function<lisp_t(lisp_t)>;
+  using func12_t = std::function<lisp_t(lisp_t, lisp_t)>;
+  using func13_t = std::function<lisp_t(lisp_t, lisp_t, lisp_t)>;
 
-  lisp_t operator()(context& ctx) const { return std::get<func0_t>(f)(ctx); }
-  lisp_t operator()(context& ctx, lisp_t a) const { return std::get<func1_t>(f)(ctx, a); }
-  lisp_t operator()(context& ctx, lisp_t a, lisp_t b) const { return std::get<func2_t>(f)(ctx, a, b); }
-  lisp_t operator()(context& ctx, lisp_t a, lisp_t b, lisp_t c) const { return std::get<func3_t>(f)(ctx, a, b, c); }
+  std::variant<func0_t, func1_t, func2_t, func3_t, func10_t, func11_t, func12_t, func13_t> _fun;
 
-  std::string name;
-  std::variant<func0_t, func1_t, func2_t, func3_t> f;
-  enum subr subr = subr::EVAL;
-  enum spread spread = spread::SPREAD;
-
-  using subr_vector = std::vector<subr_t>;
-  using subr_index = subr_vector::size_type;
   static std::unordered_map<std::string, subr_index> subr_map;
   static subr_vector subr_store;
-  static const subr_t& get(subr_index index) { return subr_store[index]; }
-  static subr_index put(const subr_t& subr)
-  {
-    auto p = subr_map.find(subr.name);
-    if(p != subr_map.end())
-      throw lisp_error("redefinition of subr not allowed");
-    auto index = subr_store.size();
-    subr_store.push_back(subr);
-    subr_map.insert(std::pair(subr.name, index));
-    return index;
-  }
 };
+
+inline subr_t::subr_index subr_t::put(const subr_t& subr)
+{
+  auto p = subr_map.find(subr.name);
+  if(p != subr_map.end())
+    throw lisp_error("redefinition of subr not allowed");
+  auto index = subr_store.size();
+  subr_store.push_back(subr);
+  subr_map.insert(std::pair(subr.name, index));
+  return index;
+}
+
+inline lisp_t subr_t::operator()(context& ctx, destblock_t* dest) const
+{
+  return std::visit([&ctx, &dest, this](auto&& arg) -> lisp_t {
+    using T = std::decay_t<decltype(arg)>;
+    if constexpr(std::is_same_v<T, func0_t>)
+      return std::get<func0_t>(_fun)(ctx);
+    else if constexpr(std::is_same_v<T, func1_t>)
+      return std::get<func1_t>(_fun)(ctx, dest[1].val());
+    else if constexpr(std::is_same_v<T, func2_t>)
+      return std::get<func2_t>(_fun)(ctx, dest[2].val(), dest[1].val());
+    else if constexpr(std::is_same_v<T, func3_t>)
+      return std::get<func3_t>(_fun)(ctx, dest[3].val(), dest[2].val(), dest[1].val());
+    else if constexpr(std::is_same_v<T, func10_t>)
+      return std::get<func10_t>(_fun)();
+    else if constexpr(std::is_same_v<T, func11_t>)
+      return std::get<func11_t>(_fun)(dest[1].val());
+    else if constexpr(std::is_same_v<T, func12_t>)
+      return std::get<func12_t>(_fun)(dest[2].val(), dest[1].val());
+    else if constexpr(std::is_same_v<T, func13_t>)
+      return std::get<func13_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
+  }, _fun);
+}
 
 /// @brief Lambda representation.
 ///
@@ -257,12 +314,6 @@ private:
   static pool_t _pool;
 };
 
-using ref_cons_t = ref_ptr<cons_t>;
-using ref_lambda_t = ref_ptr<lambda_t>;
-using ref_closure_t = ref_ptr<closure_t>;
-using ref_file_t = ref_ptr<file_t>;
-using ref_string_t = ref_ptr<string_t>;
-
 struct subr_index
 {
   subr_t::subr_index index;
@@ -313,7 +364,11 @@ struct indirect_t
   lisp_t value;
 };
 
-class destblock_t;
+using ref_closure_t = ref_ptr<closure_t>;
+using ref_cons_t = ref_ptr<cons_t>;
+using ref_file_t = ref_ptr<file_t>;
+using ref_lambda_t = ref_ptr<lambda_t>;
+using ref_string_t = ref_ptr<string_t>;
 
 /// @brief A class able to hold a value of any lisp type
 ///

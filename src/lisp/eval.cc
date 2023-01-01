@@ -149,19 +149,7 @@ void vm::next() { _dest[0].decr(); }
 
 lisp_t vm::call(lisp_t fun)
 {
-  switch(fun->subr().argcount())
-  {
-    default:
-      // argcount can only be 0, 1, 2, or 3. In order to nudge closer to 100%
-      // test coverage treat 0 and >= 4 the same.
-      return fun->subr()(_ctx);
-    case 1:
-      return fun->subr()(_ctx, _dest[1].val());
-    case 2:
-      return fun->subr()(_ctx, _dest[2].val(), _dest[1].val());
-    case 3:
-      return fun->subr()(_ctx, _dest[3].val(), _dest[2].val(), _dest[1].val());
-  }
+  return fun->subr()(_ctx, _dest);
 }
 
 lisp_t vm::eval(lisp_t expr)
