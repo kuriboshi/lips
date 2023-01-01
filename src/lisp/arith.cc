@@ -29,7 +29,7 @@ namespace lisp::details::arith
 // generic function results in a float.
 //
 
-lisp_t plus(context& ctx, lisp_t x)
+lisp_t plus(context&, lisp_t x)
 {
   double fsum = 0.0;
   std::int64_t sum = 0;
@@ -44,7 +44,7 @@ lisp_t plus(context& ctx, lisp_t x)
       else if(type_of(x->car()) == type::Float)
         fsum += x->car()->floatval();
       else
-        ctx.error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, x->car());
     }
     else
     {
@@ -56,7 +56,7 @@ lisp_t plus(context& ctx, lisp_t x)
         fsum = x->car()->floatval() + static_cast<double>(sum);
       }
       else
-        ctx.error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, x->car());
     }
     x = x->cdr();
   }
@@ -119,7 +119,7 @@ lisp_t fdifference(context&, lisp_t x, lisp_t y)
   return mkfloat(x->floatval() - y->floatval());
 }
 
-lisp_t ltimes(context& ctx, lisp_t x)
+lisp_t ltimes(context&, lisp_t x)
 {
   double fprod = 1.0;
   std::int64_t prod = 1;
@@ -134,7 +134,7 @@ lisp_t ltimes(context& ctx, lisp_t x)
       else if(type_of(x->car()) == type::Float)
         fprod *= x->car()->floatval();
       else
-        ctx.error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, x->car());
     }
     else if(type_of(x->car()) == type::Integer)
       prod *= x->car()->intval();
@@ -144,7 +144,7 @@ lisp_t ltimes(context& ctx, lisp_t x)
       fprod = x->car()->floatval() * (double)prod;
     }
     else
-      ctx.error(error_errc::illegal_arg, x->car());
+      error(error_errc::illegal_arg, x->car());
     x = x->cdr();
   }
   if(f)
@@ -180,7 +180,7 @@ lisp_t ftimes(context&, lisp_t x)
   return mkfloat(prod);
 }
 
-lisp_t divide(context& ctx, lisp_t x, lisp_t y)
+lisp_t divide(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Integer, type::Float);
   check(y, type::Integer, type::Float);
@@ -188,50 +188,50 @@ lisp_t divide(context& ctx, lisp_t x, lisp_t y)
     if(type_of(y) == type::Integer)
     {
       if(y->intval() == 0)
-        ctx.error(error_errc::divide_by_zero, nil);
+        error(error_errc::divide_by_zero, nil);
       return mknumber(x->intval() / y->intval());
     }
     else
     {
       if(y->floatval() == 0.0)
-        ctx.error(error_errc::divide_by_zero, nil);
+        error(error_errc::divide_by_zero, nil);
       return mkfloat((double)x->intval() / y->floatval());
     }
   else if(type_of(y) == type::Integer)
   {
     if(y->intval() == 0)
-      ctx.error(error_errc::divide_by_zero, nil);
+      error(error_errc::divide_by_zero, nil);
     return mkfloat(x->floatval() / static_cast<double>(y->intval()));
   }
   if(y->floatval() == 0.0)
-    ctx.error(error_errc::divide_by_zero, nil);
+    error(error_errc::divide_by_zero, nil);
   return mkfloat(x->floatval() / y->floatval());
 }
 
-lisp_t iquotient(context& ctx, lisp_t x, lisp_t y)
+lisp_t iquotient(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    ctx.error(error_errc::divide_by_zero, nil);
+    error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() / y->intval());
 }
 
-lisp_t iremainder(context& ctx, lisp_t x, lisp_t y)
+lisp_t iremainder(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Integer);
   check(y, type::Integer);
   if(y->intval() == 0)
-    ctx.error(error_errc::divide_by_zero, nil);
+    error(error_errc::divide_by_zero, nil);
   return mknumber(x->intval() % y->intval());
 }
 
-lisp_t fdivide(context& ctx, lisp_t x, lisp_t y)
+lisp_t fdivide(context&, lisp_t x, lisp_t y)
 {
   check(x, type::Float);
   check(y, type::Float);
   if(y->floatval() == 0.0)
-    ctx.error(error_errc::divide_by_zero, nil);
+    error(error_errc::divide_by_zero, nil);
   return mkfloat(x->floatval() / y->floatval());
 }
 
@@ -314,10 +314,10 @@ inline lisp_t docheck(Type x, Type y, Comparor cmp)
   return nil;
 }
 
-inline lisp_t illegalreturn(context& ctx, lisp_t x) { return ctx.error(error_errc::illegal_arg, x); }
+inline lisp_t illegalreturn(lisp_t x) { return error(error_errc::illegal_arg, x); }
 
 template<template<typename> typename Comparer>
-inline lisp_t numcheck(context& ctx, lisp_t x, lisp_t y)
+inline lisp_t numcheck(lisp_t x, lisp_t y)
 {
   switch(numtype(x, y))
   {
@@ -330,23 +330,23 @@ inline lisp_t numcheck(context& ctx, lisp_t x, lisp_t y)
     case num_type::INTINT:
       return docheck(x->intval(), y->intval(), Comparer<int>());
     case num_type::ILLEGAL1:
-      return illegalreturn(ctx, x);
+      return illegalreturn(x);
     default:
-      return illegalreturn(ctx, y);
+      return illegalreturn(y);
   }
 }
 
-lisp_t greaterp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::greater>(ctx, x, y); }
+lisp_t greaterp(context&, lisp_t x, lisp_t y) { return numcheck<std::greater>(x, y); }
 
-lisp_t lessp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::less>(ctx, x, y); }
+lisp_t lessp(context&, lisp_t x, lisp_t y) { return numcheck<std::less>(x, y); }
 
-lisp_t eqp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::equal_to>(ctx, x, y); }
+lisp_t eqp(context&, lisp_t x, lisp_t y) { return numcheck<std::equal_to>(x, y); }
 
-lisp_t geq(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::greater_equal>(ctx, x, y); }
+lisp_t geq(context&, lisp_t x, lisp_t y) { return numcheck<std::greater_equal>(x, y); }
 
-lisp_t leq(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::less_equal>(ctx, x, y); }
+lisp_t leq(context&, lisp_t x, lisp_t y) { return numcheck<std::less_equal>(x, y); }
 
-lisp_t neqp(context& ctx, lisp_t x, lisp_t y) { return numcheck<std::not_equal_to>(ctx, x, y); }
+lisp_t neqp(context&, lisp_t x, lisp_t y) { return numcheck<std::not_equal_to>(x, y); }
 
 lisp_t zerop(context&, lisp_t x)
 {
@@ -355,7 +355,7 @@ lisp_t zerop(context&, lisp_t x)
   return nil;
 }
 
-lisp_t minusp(context& ctx, lisp_t x)
+lisp_t minusp(context&, lisp_t x)
 {
   if(type_of(x) == type::Float)
   {
@@ -369,7 +369,7 @@ lisp_t minusp(context& ctx, lisp_t x)
       return T;
     return nil;
   }
-  return ctx.error(error_errc::illegal_arg, x);
+  return error(error_errc::illegal_arg, x);
 }
 
 namespace pn

@@ -25,14 +25,14 @@
 
 namespace lisp::details::user
 {
-lisp_t getargs(context& ctx, lisp_t al)
+inline lisp_t getargs(lisp_t al)
 {
   if(is_nil(al->cdr()))
     return al->car();
-  return cons(al->car(), getargs(ctx, al->cdr()));
+  return cons(al->car(), getargs(al->cdr()));
 }
 
-lisp_t getrep(context& ctx, lisp_t fun)
+lisp_t getrep(context&, lisp_t fun)
 {
   lisp_t args;
 
@@ -42,7 +42,7 @@ lisp_t getrep(context& ctx, lisp_t fun)
   if(x.count == -1)
     args = x.args->car();
   else if(x.count < 0)
-    args = getargs(ctx, x.args);
+    args = getargs(x.args);
   else
     args = x.args;
   if(x.eval)
@@ -71,7 +71,7 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
   return nil;
 }
 
-lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
+inline lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
 {
   if(name->value() != C_UNBOUND)
     if(type_of(name->value()) == type::Lambda)

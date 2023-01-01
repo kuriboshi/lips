@@ -26,7 +26,7 @@
 
 namespace lisp::details::file
 {
-lisp_t open(context& ctx, lisp_t filename, lisp_t mode)
+lisp_t open(context&, lisp_t filename, lisp_t mode)
 {
   check(filename, type::String, type::Symbol);
   bool readmode = true;
@@ -44,7 +44,7 @@ lisp_t open(context& ctx, lisp_t filename, lisp_t mode)
       appendmode = true;
     }
     else
-      return ctx.error(error_errc::unknown_request, mode);
+      return error(error_errc::unknown_request, mode);
   }
   auto* f = [&]() {
     if(readmode)
@@ -131,7 +131,7 @@ lisp_t load(context& ctx, lisp_t f)
 {
   check(f, type::String, type::Symbol);
   if(!file::loadfile(ctx, f->getstr()))
-    ctx.fatal(error_errc::cant_load, f->getstr());
+    fatal(error_errc::cant_load, f->getstr());
   return f;
 }
 

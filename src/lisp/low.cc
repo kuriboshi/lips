@@ -82,11 +82,11 @@ lisp_t progn(context&, lisp_t lexp)
   return eval(lexp->car());
 }
 
-lisp_t set(context& ctx, lisp_t var, lisp_t val)
+lisp_t set(context&, lisp_t var, lisp_t val)
 {
   check(var, type::Symbol);
   if(var->symbol()->constant)
-    ctx.error(error_errc::attempt_to_clobber, var);
+    error(error_errc::attempt_to_clobber, var);
   var->value(val);
   return val;
 }
