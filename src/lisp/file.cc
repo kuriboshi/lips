@@ -26,7 +26,7 @@
 
 namespace lisp::details::file
 {
-lisp_t open(context&, lisp_t filename, lisp_t mode)
+lisp_t open(lisp_t filename, lisp_t mode)
 {
   check(filename, object::type::String, object::type::Symbol);
   bool readmode = true;
@@ -54,7 +54,7 @@ lisp_t open(context&, lisp_t filename, lisp_t mode)
   return getobject(ref_file_t(f));
 }
 
-lisp_t close(context&, lisp_t fildes)
+lisp_t close(lisp_t fildes)
 {
   check(fildes, object::type::File);
   if(fildes->file()->has_sink())

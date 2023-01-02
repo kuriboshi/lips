@@ -25,8 +25,8 @@ namespace lisp::details::file
 
 void init();
 
-lisp_t open(context&, lisp_t, lisp_t);
-lisp_t close(context&, lisp_t);
+lisp_t open(lisp_t, lisp_t);
+lisp_t close(lisp_t);
 lisp_t ratom(context&, lisp_t);
 lisp_t readc(context&, lisp_t);
 lisp_t read(context&, lisp_t);

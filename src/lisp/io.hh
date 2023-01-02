@@ -43,7 +43,7 @@ lisp_t prin0(context&, lisp_t, file_t&, bool esc = false);
 lisp_t print(context&, lisp_t, file_t&);
 lisp_t terpri(file_t&);
 
-lisp_t splice(context&, lisp_t, lisp_t, bool);
+lisp_t splice(lisp_t, lisp_t, bool);
 
 class source
 {

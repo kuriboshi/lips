@@ -483,39 +483,38 @@ TEST_CASE("io: print")
 
 TEST_CASE("io: splice")
 {
-  auto& ctx = context::current();
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(ctx, x, y, false);
+    auto r = io::splice(x, y, false);
     CHECK(!is_nil(equal(x, "(x y z b c)"_l)));
     CHECK(!is_nil(equal(r, "(z b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(ctx, cdr(x), y, false);
+    auto r = io::splice(cdr(x), y, false);
     CHECK(!is_nil(equal(x, "(a x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(ctx, cdr(x), y, true);
+    auto r = io::splice(cdr(x), y, true);
     CHECK(!is_nil(equal(x, "(a b x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(ctx, x, y, false);
+    auto r = io::splice(x, y, false);
     CHECK(!is_nil(equal(x, "(x b c)"_l)));
     CHECK(!is_nil(equal(r, "(x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(ctx, x, y, true);
+    auto r = io::splice(x, y, true);
     CHECK(!is_nil(equal(x, "(a x b c)"_l)));
     CHECK(!is_nil(equal(r, "(a x b c)"_l)));
   }

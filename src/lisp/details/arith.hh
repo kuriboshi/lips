@@ -25,33 +25,33 @@ namespace lisp::details::arith
 
 void init();
 
-lisp_t abs(context&, lisp_t);
-lisp_t add1(context&, lisp_t);
-lisp_t difference(context&, lisp_t, lisp_t);
-lisp_t divide(context&, lisp_t, lisp_t);
-lisp_t eqp(context&, lisp_t, lisp_t);
-lisp_t fdifference(context&, lisp_t, lisp_t);
-lisp_t fdivide(context&, lisp_t, lisp_t);
-lisp_t fplus(context&, lisp_t);
-lisp_t ftimes(context&, lisp_t);
-lisp_t geq(context&, lisp_t, lisp_t);
-lisp_t greaterp(context&, lisp_t, lisp_t);
-lisp_t idifference(context&, lisp_t, lisp_t);
-lisp_t iminus(context&, lisp_t);
-lisp_t iplus(context&, lisp_t);
-lisp_t iquotient(context&, lisp_t, lisp_t);
-lisp_t iremainder(context&, lisp_t, lisp_t);
-lisp_t itimes(context&, lisp_t);
-lisp_t itof(context&, lisp_t);
-lisp_t leq(context&, lisp_t, lisp_t);
-lisp_t lessp(context&, lisp_t, lisp_t);
-lisp_t ltimes(context&, lisp_t);
-lisp_t minus(context&, lisp_t);
-lisp_t minusp(context&, lisp_t);
-lisp_t neqp(context&, lisp_t, lisp_t);
-lisp_t plus(context&, lisp_t);
-lisp_t sub1(context&, lisp_t);
-lisp_t zerop(context&, lisp_t);
+lisp_t abs(lisp_t);
+lisp_t add1(lisp_t);
+lisp_t difference(lisp_t, lisp_t);
+lisp_t divide(lisp_t, lisp_t);
+lisp_t eqp(lisp_t, lisp_t);
+lisp_t fdifference(lisp_t, lisp_t);
+lisp_t fdivide(lisp_t, lisp_t);
+lisp_t fplus(lisp_t);
+lisp_t ftimes(lisp_t);
+lisp_t geq(lisp_t, lisp_t);
+lisp_t greaterp(lisp_t, lisp_t);
+lisp_t idifference(lisp_t, lisp_t);
+lisp_t iminus(lisp_t);
+lisp_t iplus(lisp_t);
+lisp_t iquotient(lisp_t, lisp_t);
+lisp_t iremainder(lisp_t, lisp_t);
+lisp_t itimes(lisp_t);
+lisp_t itof(lisp_t);
+lisp_t leq(lisp_t, lisp_t);
+lisp_t lessp(lisp_t, lisp_t);
+lisp_t ltimes(lisp_t);
+lisp_t minus(lisp_t);
+lisp_t minusp(lisp_t);
+lisp_t neqp(lisp_t, lisp_t);
+lisp_t plus(lisp_t);
+lisp_t sub1(lisp_t);
+lisp_t zerop(lisp_t);
 
 } // namespace lisp::details::arith
 

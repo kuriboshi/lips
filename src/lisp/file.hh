@@ -24,9 +24,9 @@
 namespace lisp
 {
 
-inline lisp_t close(lisp_t a) { return details::file::close(context::current(), a); }
+inline lisp_t close(lisp_t a) { return details::file::close(a); }
 inline lisp_t load(lisp_t a) { return details::file::load(context::current(), a); }
-inline lisp_t open(lisp_t a, lisp_t b) { return details::file::open(context::current(), a, b); }
+inline lisp_t open(lisp_t a, lisp_t b) { return details::file::open(a, b); }
 inline lisp_t prin1(lisp_t a, lisp_t b) { return details::file::prin1(context::current(), a, b); }
 inline lisp_t prin2(lisp_t a, lisp_t b) { return details::file::prin2(context::current(), a, b); }
 inline lisp_t print(lisp_t a, lisp_t b) { return details::file::print(context::current(), a, b); }

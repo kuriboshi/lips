@@ -22,7 +22,7 @@
 
 namespace lisp::details::pred
 {
-lisp_t numberp(context&, lisp_t a)
+lisp_t numberp(lisp_t a)
 {
   switch(type_of(a))
   {
@@ -34,14 +34,14 @@ lisp_t numberp(context&, lisp_t a)
   }
 }
 
-lisp_t listp(context&, lisp_t a)
+lisp_t listp(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
     return a;
   return nil;
 }
 
-lisp_t memb(context&, lisp_t x, lisp_t ls)
+lisp_t memb(lisp_t x, lisp_t ls)
 {
   while(!eq(ls, nil))
   {
@@ -52,7 +52,7 @@ lisp_t memb(context&, lisp_t x, lisp_t ls)
   return nil;
 }
 
-lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
+lisp_t equal(lisp_t l1, lisp_t l2)
 {
   if(type_of(l1) != type_of(l2))
     return nil;
@@ -63,14 +63,14 @@ lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
     case object::type::Cons:
       while(type_of(l1) == type_of(l2))
       {
-        if(pred::equal(ctx, l1->car(), l2->car()) != nil)
-          return pred::equal(ctx, l1->cdr(), l2->cdr());
+        if(pred::equal(l1->car(), l2->car()) != nil)
+          return pred::equal(l1->cdr(), l2->cdr());
         return nil;
       }
     case object::type::String:
       return (l1->string() == l2->string()) ? T : nil;
     case object::type::Lambda:
-      return user::funeq(ctx, l1, l2);
+      return user::funeq(l1, l2);
     case object::type::Integer:
       return (l1->intval() == l2->intval() ? T : nil);
     default:
@@ -79,7 +79,7 @@ lisp_t equal(context& ctx, lisp_t l1, lisp_t l2)
   return nil;
 }
 
-lisp_t nlistp(context&, lisp_t a)
+lisp_t nlistp(lisp_t a)
 {
   if(a == nil)
     return T;
@@ -88,14 +88,14 @@ lisp_t nlistp(context&, lisp_t a)
   return nil;
 }
 
-lisp_t neq(context&, lisp_t a, lisp_t b)
+lisp_t neq(lisp_t a, lisp_t b)
 {
   if(a != b)
     return T;
   return nil;
 }
 
-lisp_t boundp(context&, lisp_t a)
+lisp_t boundp(lisp_t a)
 {
   if(type_of(a) != object::type::Symbol)
     return nil;
@@ -104,14 +104,14 @@ lisp_t boundp(context&, lisp_t a)
   return nil;
 }
 
-lisp_t litatom(context&, lisp_t a)
+lisp_t litatom(lisp_t a)
 {
   if(type_of(a) == object::type::Symbol || type_of(a) == object::type::Nil)
     return T;
   return nil;
 }
 
-lisp_t xtypeof(context&, lisp_t a)
+lisp_t xtypeof(lisp_t a)
 {
   switch(type_of(a))
   {

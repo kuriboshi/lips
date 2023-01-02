@@ -55,7 +55,7 @@ TEST_CASE("lisp: mkprim")
     std::vector<int> result;
     mkprim(
       "printall",
-      [&result](context&, lisp_t a) -> lisp_t {
+      [&result](lisp_t a) -> lisp_t {
         for(auto p: a)
         {
           result.push_back(p->intval());

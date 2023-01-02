@@ -32,7 +32,7 @@ inline lisp_t getargs(lisp_t al)
   return cons(al->car(), getargs(al->cdr()));
 }
 
-lisp_t getrep(context&, lisp_t fun)
+lisp_t getrep(lisp_t fun)
 {
   lisp_t args;
 
@@ -50,7 +50,7 @@ lisp_t getrep(context&, lisp_t fun)
   return cons(C_NLAMBDA, cons(args, x.body));
 }
 
-lisp_t funeq(context&, lisp_t f1, lisp_t f2)
+lisp_t funeq(lisp_t f1, lisp_t f2)
 {
   if(f1 == f2)
     return T;
@@ -71,32 +71,32 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
   return nil;
 }
 
-inline lisp_t checkfn(context& ctx, lisp_t name, lisp_t lam)
+inline lisp_t checkfn(lisp_t name, lisp_t lam)
 {
   if(name->value() != C_UNBOUND)
     if(type_of(name->value()) == object::type::Lambda)
     {
-      lisp_t t = user::funeq(ctx, name->value(), lam);
+      lisp_t t = user::funeq(name->value(), lam);
       if(is_nil(t))
       {
         putprop(name, C_OLDDEF, name->value());
-        if(!is_nil(ctx.verbose()))
+        if(!is_nil(context::current().verbose()))
           print(cons(name, cons(C_REDEFINED, nil)));
       }
     }
   return nil;
 }
 
-lisp_t define(context& ctx, lisp_t name, lisp_t lam)
+lisp_t define(lisp_t name, lisp_t lam)
 {
   check(name, object::type::Symbol);
   check(lam, object::type::Lambda);
-  checkfn(ctx, name, lam);
+  checkfn(name, lam);
   name->value(lam);
   return name;
 }
 
-lisp_t defineq(context& ctx, lisp_t defs)
+lisp_t defineq(lisp_t defs)
 {
   if(is_nil(defs))
     return nil;
@@ -106,7 +106,7 @@ lisp_t defineq(context& ctx, lisp_t defs)
   {
     auto name = car(d);
     auto lam = eval(cadr(d));
-    auto def = cons(user::define(ctx, name, lam), nil);
+    auto def = cons(user::define(name, lam), nil);
     rplacd(r, def);
     r = def;
   }

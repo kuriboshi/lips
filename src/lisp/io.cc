@@ -281,7 +281,7 @@ lisp_t terpri(file_t& file)
 /// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
 /// car of x.
 ///
-lisp_t splice(context&, lisp_t x, lisp_t y, bool tailp)
+lisp_t splice(lisp_t x, lisp_t y, bool tailp)
 {
   check(x, object::type::Cons);
   if(is_nil(y))
