@@ -45,128 +45,128 @@ lisp_t mkindirect(lisp_t obj)
 /// @brief Builds a list of indirect pointers to the values of the symbols in
 /// the list VARS. Used to construct a closure.
 ///
-lisp_t closobj(context& ctx, lisp_t vars)
+lisp_t closobj(lisp_t vars)
 {
   if(is_nil(vars))
     return nil;
   check(vars, object::type::Cons);
   check(vars->car(), object::type::Symbol);
-  return cons(mkindirect(vars->car()->value()), closobj(ctx, vars->cdr()));
+  return cons(mkindirect(vars->car()->value()), closobj(vars->cdr()));
 }
 
-lisp_t car(context&, lisp_t a)
+lisp_t car(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
     return a->car();
   return nil;
 }
 
-lisp_t cdr(context&, lisp_t a)
+lisp_t cdr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
     return a->cdr();
   return nil;
 }
 
-lisp_t cadr(context& ctx, lisp_t a)
+lisp_t cadr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, a->cdr());
+    return prim::car(a->cdr());
   return nil;
 }
 
-lisp_t cdar(context& ctx, lisp_t a)
+lisp_t cdar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, a->car());
+    return prim::cdr(a->car());
   return nil;
 }
 
-lisp_t caar(context& ctx, lisp_t a)
+lisp_t caar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, a->car());
+    return prim::car(a->car());
   return nil;
 }
 
-lisp_t cddr(context& ctx, lisp_t a)
+lisp_t cddr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, a->cdr());
+    return prim::cdr(a->cdr());
   return nil;
 }
 
-lisp_t cdddr(context& ctx, lisp_t a)
+lisp_t cdddr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, prim::cdr(ctx, a->cdr()));
+    return prim::cdr(prim::cdr(a->cdr()));
   return nil;
 }
 
-lisp_t caddr(context& ctx, lisp_t a)
+lisp_t caddr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, prim::cdr(ctx, a->cdr()));
+    return prim::car(prim::cdr(a->cdr()));
   return nil;
 }
 
-lisp_t cdadr(context& ctx, lisp_t a)
+lisp_t cdadr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, prim::car(ctx, a->cdr()));
+    return prim::cdr(prim::car(a->cdr()));
   return nil;
 }
 
-lisp_t caadr(context& ctx, lisp_t a)
+lisp_t caadr(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, prim::car(ctx, a->cdr()));
+    return prim::car(prim::car(a->cdr()));
   return nil;
 }
 
-lisp_t cddar(context& ctx, lisp_t a)
+lisp_t cddar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, prim::cdr(ctx, a->car()));
+    return prim::cdr(prim::cdr(a->car()));
   return nil;
 }
 
-lisp_t cadar(context& ctx, lisp_t a)
+lisp_t cadar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, prim::cdr(ctx, a->car()));
+    return prim::car(prim::cdr(a->car()));
   return nil;
 }
 
-lisp_t cdaar(context& ctx, lisp_t a)
+lisp_t cdaar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::cdr(ctx, prim::car(ctx, a->car()));
+    return prim::cdr(prim::car(a->car()));
   return nil;
 }
 
-lisp_t caaar(context& ctx, lisp_t a)
+lisp_t caaar(lisp_t a)
 {
   if(type_of(a) == object::type::Cons)
-    return prim::car(ctx, prim::car(ctx, a->car()));
+    return prim::car(prim::car(a->car()));
   return nil;
 }
 
-lisp_t rplaca(context&, lisp_t x, lisp_t y)
+lisp_t rplaca(lisp_t x, lisp_t y)
 {
   check(x, object::type::Cons);
   x->car(y);
   return x;
 }
 
-lisp_t rplacd(context&, lisp_t x, lisp_t y)
+lisp_t rplacd(lisp_t x, lisp_t y)
 {
   check(x, object::type::Cons);
   x->cdr(y);
   return x;
 }
 
-lisp_t eq(context&, lisp_t a, lisp_t b)
+lisp_t eq(lisp_t a, lisp_t b)
 {
   if(a == b)
     return T;
@@ -175,14 +175,14 @@ lisp_t eq(context&, lisp_t a, lisp_t b)
   return nil;
 }
 
-lisp_t atom(context&, lisp_t a)
+lisp_t atom(lisp_t a)
 {
   if(is_nil(a) || is_T(a) || type_of(a) == object::type::Symbol || type_of(a) == object::type::Integer || type_of(a) == object::type::Float)
     return T;
   return nil;
 }
 
-lisp_t nconc(context& ctx, lisp_t x)
+lisp_t nconc(lisp_t x)
 {
   lisp_t cl;
 
@@ -199,7 +199,7 @@ lisp_t nconc(context& ctx, lisp_t x)
         newl = curp;
       }
       else
-        prim::rplacd(ctx, curp, x->car());
+        prim::rplacd(curp, x->car());
       for(cl = x->car(); !is_nil(cl->cdr()); cl = cl->cdr())
         ;
       curp = cl;
@@ -208,33 +208,33 @@ lisp_t nconc(context& ctx, lisp_t x)
   return newl;
 }
 
-lisp_t tconc(context& ctx, lisp_t cell, lisp_t obj)
+lisp_t tconc(lisp_t cell, lisp_t obj)
 {
   if(is_nil(cell))
   {
     cell = cons(cons(obj, nil), nil);
-    return prim::rplacd(ctx, cell, cell->car());
+    return prim::rplacd(cell, cell->car());
   }
   check(cell, object::type::Cons);
   if(type_of(cell->car()) != object::type::Cons)
   {
-    prim::rplacd(ctx, cell, cons(obj, nil));
-    return prim::rplaca(ctx, cell, cell->cdr());
+    prim::rplacd(cell, cons(obj, nil));
+    return prim::rplaca(cell, cell->cdr());
   }
-  prim::rplacd(ctx, cell->cdr(), cons(obj, nil));
-  return prim::rplacd(ctx, cell, cell->cdr()->cdr());
+  prim::rplacd(cell->cdr(), cons(obj, nil));
+  return prim::rplacd(cell, cell->cdr()->cdr());
 }
 
-lisp_t attach(context& ctx, lisp_t obj, lisp_t list)
+lisp_t attach(lisp_t obj, lisp_t list)
 {
   if(is_nil(list))
     return cons(obj, nil);
   check(list, object::type::Cons);
-  prim::rplacd(ctx, list, cons(list->car(), list->cdr()));
-  return prim::rplaca(ctx, list, obj);
+  prim::rplacd(list, cons(list->car(), list->cdr()));
+  return prim::rplaca(list, obj);
 }
 
-lisp_t append(context& ctx, lisp_t x)
+lisp_t append(lisp_t x)
 {
   lisp_t cl;
 
@@ -247,7 +247,7 @@ lisp_t append(context& ctx, lisp_t x)
       check(x->car(), object::type::Cons);
       for(cl = x->car(); !is_nil(cl); cl = cl->cdr())
       {
-        prim::rplacd(ctx, curp, cons(cl->car(), nil));
+        prim::rplacd(curp, cons(cl->car(), nil));
         curp = curp->cdr();
       }
     }
@@ -255,22 +255,22 @@ lisp_t append(context& ctx, lisp_t x)
   return newl->cdr();
 }
 
-lisp_t null(context&, lisp_t a)
+lisp_t null(lisp_t a)
 {
   if(is_nil(a))
     return T;
   return nil;
 }
 
-lisp_t quote(context&, lisp_t x) { return x; }
+lisp_t quote(lisp_t x) { return x; }
 
-lisp_t lambda(context&, lisp_t x, lisp_t f) { return alloc::mklambda(x, f, true); }
+lisp_t lambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, true); }
 
-lisp_t nlambda(context&, lisp_t x, lisp_t f) { return alloc::mklambda(x, f, false); }
+lisp_t nlambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, false); }
 
-lisp_t list(context&, lisp_t x) { return x; }
+lisp_t list(lisp_t x) { return x; }
 
-lisp_t length(context&, lisp_t x)
+lisp_t length(lisp_t x)
 {
   int i = 0;
   while(!is_nil(x) && type_of(x) == object::type::Cons)
@@ -281,21 +281,21 @@ lisp_t length(context&, lisp_t x)
   return mknumber(i);
 }
 
-lisp_t closure(context& ctx, lisp_t fun, lisp_t vars)
+lisp_t closure(lisp_t fun, lisp_t vars)
 {
   auto c = ref_closure_t::create();
   c->cfunction = fun;
   c->closed = vars;
-  auto f = prim::length(ctx, vars);
+  auto f = prim::length(vars);
   c->count = f->intval();
-  f = closobj(ctx, vars);
+  f = closobj(vars);
   if(f == C_ERROR)
     return f;
   c->cvalues = f;
   return getobject(c);
 }
 
-inline lisp_t _nth(context&, lisp_t list, int n)
+inline lisp_t _nth(lisp_t list, int n)
 {
   lisp_t ls;
   for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())
@@ -305,22 +305,22 @@ inline lisp_t _nth(context&, lisp_t list, int n)
   return nil;
 }
 
-lisp_t nth(context& ctx, lisp_t x, lisp_t p)
+lisp_t nth(lisp_t x, lisp_t p)
 {
   check(p, object::type::Integer);
   if(is_nil(x))
     return nil;
   check(x, object::type::Cons);
-  return _nth(ctx, x, p->intval());
+  return _nth(x, p->intval());
 }
 
-lisp_t error(context& ctx, lisp_t mess)
+lisp_t error(lisp_t mess)
 {
   check(mess, object::type::String);
-  return ctx.error(error_errc::user_error, mess);
+  return error(error_errc::user_error, mess);
 }
 
-lisp_t exit(context&, lisp_t status)
+lisp_t exit(lisp_t status)
 {
   if(is_nil(status))
     throw lisp_finish("exit called", 0);

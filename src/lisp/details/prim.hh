@@ -24,44 +24,44 @@ namespace lisp::details::prim
 {
 void init();
 
-lisp_t car(context&, lisp_t);
-lisp_t cdr(context&, lisp_t);
-lisp_t cadr(context&, lisp_t);
-lisp_t cdar(context&, lisp_t);
-lisp_t caar(context&, lisp_t);
-lisp_t cddr(context&, lisp_t);
-lisp_t cdddr(context&, lisp_t);
-lisp_t caddr(context&, lisp_t);
-lisp_t cdadr(context&, lisp_t);
-lisp_t caadr(context&, lisp_t);
-lisp_t cddar(context&, lisp_t);
-lisp_t cadar(context&, lisp_t);
-lisp_t cdaar(context&, lisp_t);
-lisp_t caaar(context&, lisp_t);
-lisp_t rplaca(context&, lisp_t, lisp_t);
-lisp_t rplacd(context&, lisp_t, lisp_t);
-lisp_t eq(context&, lisp_t, lisp_t);
-lisp_t atom(context&, lisp_t);
-lisp_t nconc(context&, lisp_t);
-lisp_t tconc(context&, lisp_t, lisp_t);
-lisp_t attach(context&, lisp_t, lisp_t);
-lisp_t append(context&, lisp_t);
-lisp_t null(context&, lisp_t);
-lisp_t quote(context&, lisp_t);
-lisp_t lambda(context&, lisp_t, lisp_t);
-lisp_t nlambda(context&, lisp_t, lisp_t);
-lisp_t list(context&, lisp_t);
-lisp_t length(context&, lisp_t);
-lisp_t closure(context&, lisp_t, lisp_t);
+lisp_t car(lisp_t);
+lisp_t cdr(lisp_t);
+lisp_t cadr(lisp_t);
+lisp_t cdar(lisp_t);
+lisp_t caar(lisp_t);
+lisp_t cddr(lisp_t);
+lisp_t cdddr(lisp_t);
+lisp_t caddr(lisp_t);
+lisp_t cdadr(lisp_t);
+lisp_t caadr(lisp_t);
+lisp_t cddar(lisp_t);
+lisp_t cadar(lisp_t);
+lisp_t cdaar(lisp_t);
+lisp_t caaar(lisp_t);
+lisp_t rplaca(lisp_t, lisp_t);
+lisp_t rplacd(lisp_t, lisp_t);
+lisp_t eq(lisp_t, lisp_t);
+lisp_t atom(lisp_t);
+lisp_t nconc(lisp_t);
+lisp_t tconc(lisp_t, lisp_t);
+lisp_t attach(lisp_t, lisp_t);
+lisp_t append(lisp_t);
+lisp_t null(lisp_t);
+lisp_t quote(lisp_t);
+lisp_t lambda(lisp_t, lisp_t);
+lisp_t nlambda(lisp_t, lisp_t);
+lisp_t list(lisp_t);
+lisp_t length(lisp_t);
+lisp_t closure(lisp_t, lisp_t);
 
 /// @brief Return the N'th element in the list LIST.  If N is greater than
 /// the length of LIST, return nil.
 ///
-lisp_t nth(context&, lisp_t, lisp_t);
-lisp_t error(context&, lisp_t);
-lisp_t exit(context&, lisp_t);
+lisp_t nth(lisp_t, lisp_t);
+lisp_t error(lisp_t);
+lisp_t exit(lisp_t);
 
-lisp_t closobj(context&, lisp_t);
+lisp_t closobj(lisp_t);
 } // namespace lisp::details::prim
 
 #endif
