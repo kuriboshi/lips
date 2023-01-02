@@ -38,7 +38,7 @@ lisp_t getrep(context&, lisp_t fun)
 
   if(type_of(fun) != object::type::Lambda)
     return nil;
-  auto& x = *fun->lambda();
+  auto& x = fun->lambda();
   if(x.count == -1)
     args = x.args->car();
   else if(x.count < 0)
@@ -54,15 +54,15 @@ lisp_t funeq(context&, lisp_t f1, lisp_t f2)
 {
   if(f1 == f2)
     return T;
-  if(f1->lambda()->count == f2->lambda()->count)
+  if(f1->lambda().count == f2->lambda().count)
   {
-    lisp_t t1 = f1->lambda()->args;
-    lisp_t t2 = f2->lambda()->args;
+    lisp_t t1 = f1->lambda().args;
+    lisp_t t2 = f2->lambda().args;
     lisp_t tmp = equal(t1, t2);
     if(!is_nil(tmp))
     {
-      t1 = f1->lambda()->body;
-      t2 = f2->lambda()->body;
+      t1 = f1->lambda().body;
+      t2 = f2->lambda().body;
       tmp = equal(t1, t2);
       if(!is_nil(tmp))
         return T;

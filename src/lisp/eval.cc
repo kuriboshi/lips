@@ -375,7 +375,7 @@ bool vm::eval_func()
           _cont = &vm::eval_args;
         break;
       case object::type::Lambda:
-        _noeval = !_fun->lambda()->eval;
+        _noeval = !_fun->lambda().eval;
         _cont = &vm::eval_lambda;
         break;
       case object::type::Cons:
@@ -612,14 +612,14 @@ bool vm::eval_lambda()
   push(_dest);
   int ac = 0;
   auto spr = false;
-  if((ac = _fun->lambda()->count) < 0)
+  if((ac = _fun->lambda().count) < 0)
   {
     ac = -ac;
     spr = true;
   }
   _dest = mkdestblock(ac);
   auto i = ac;
-  for(auto foo = _fun->lambda()->args; i != 0; foo = foo->cdr(), i--)
+  for(auto foo = _fun->lambda().args; i != 0; foo = foo->cdr(), i--)
     storevar(foo->car(), i);
   push(&vm::evlam1);
   if(spr)
@@ -720,7 +720,7 @@ bool vm::evlam1()
 {
   link();
   pop(_dest);
-  _args = _fun->lambda()->body;
+  _args = _fun->lambda().body;
   push(&vm::evlam0);
   _cont = &vm::eval_sequence;
   return false;
@@ -780,19 +780,19 @@ bool vm::eval_closure()
 {
   push(_env);
   push(_dest);
-  _dest = mkdestblock(_fun->closure()->count);
+  _dest = mkdestblock(_fun->closure().count);
   {
-    auto foo = _fun->closure()->closed;
-    auto i = _fun->closure()->count;
+    auto foo = _fun->closure().closed;
+    auto i = _fun->closure().count;
     for(; i != 0; foo = foo->cdr(), i--)
       storevar(foo->car(), i);
   }
-  for(auto foo = _fun->closure()->cvalues; !is_nil(foo); foo = foo->cdr())
+  for(auto foo = _fun->closure().cvalues; !is_nil(foo); foo = foo->cdr())
   {
     send(foo->car());
     next();
   }
-  _fun = _fun->closure()->cfunction;
+  _fun = _fun->closure().cfunction;
   link();
   pop(_dest);
   destblock_t* envir = nullptr;

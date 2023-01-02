@@ -340,8 +340,8 @@ struct subr_index
 /// @brief A representation of a C++ variable linked to a lisp variable.
 ///
 /// @details Wraps a lisp_t value in such a way that the value can be changed
-/// from either the C++ context of the lisp context and have the value be
-/// reflected to both.
+/// from either the C++ context or the lisp context and have the value be
+/// reflected in both.
 ///
 class cvariable_t
 {
@@ -477,16 +477,16 @@ public:
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
 
   /// @brief Lambda expression
-  auto lambda() -> ref_lambda_t { return std::get<ref_lambda_t>(_u); }
+  auto lambda() const -> const lambda_t& { return *std::get<ref_lambda_t>(_u); }
 
   /// @brief Closure
-  auto closure() -> ref_closure_t& { return std::get<ref_closure_t>(_u); }
+  auto closure() -> closure_t& { return *std::get<ref_closure_t>(_u); }
 
   /// @brief Destination environment
   auto environ() -> destblock_t* { return std::get<destblock_t*>(_u); }
 
   /// @brief File reference
-  auto file() -> ref_file_t { return std::get<ref_file_t>(_u); }
+  auto file() -> ref_file_t& { return std::get<ref_file_t>(_u); }
 
   /// @brief Link to a c/c++ variable
   auto cvariable() -> cvariable_t& { return std::get<cvariable_t>(_u); }
@@ -571,8 +571,10 @@ extern lisp_t C_WRITE;
 extern lisp_t C_APPEND;
 extern lisp_t C_CVARIABLE;
 
-/// @brief The lisp interpreter.
+/// @brief Return the type of the object or the object inside a lisp_t object.
 ///
+/// @details Since lisp_t may be nullptr, which represents the nil value, it's
+/// not safe to call lisp_t->gettype() directly.
 inline object::type type_of(const lisp_t& a) { return a == nullptr ? object::type::Nil : a->gettype(); }
 inline object::type type_of(const object& a) { return a.gettype(); }
 inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? object::type::Nil : a->gettype(); }
