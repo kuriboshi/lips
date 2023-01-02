@@ -50,7 +50,7 @@ namespace lisp::details::low
 ///       (t r3))
 /// @endcode
 ///
-lisp_t cond(context& ctx, lisp_t args)
+lisp_t cond(lisp_t args)
 {
   while(!is_nil(args))
   {
@@ -61,16 +61,16 @@ lisp_t cond(context& ctx, lisp_t args)
     {
       if(is_nil(alt->cdr()))
         return res;
-      return low::progn(ctx, alt->cdr());
+      return low::progn(alt->cdr());
     }
     args = args->cdr();
   }
   return nil;
 }
 
-lisp_t prog1(context&, lisp_t a1, lisp_t) { return a1; }
+lisp_t prog1(lisp_t a1, lisp_t) { return a1; }
 
-lisp_t progn(context&, lisp_t lexp)
+lisp_t progn(lisp_t lexp)
 {
   if(is_nil(lexp))
     return nil;
@@ -82,7 +82,7 @@ lisp_t progn(context&, lisp_t lexp)
   return eval(lexp->car());
 }
 
-lisp_t set(context&, lisp_t var, lisp_t val)
+lisp_t set(lisp_t var, lisp_t val)
 {
   check(var, object::type::Symbol);
   if(var->symbol()->constant)
@@ -91,14 +91,14 @@ lisp_t set(context&, lisp_t var, lisp_t val)
   return val;
 }
 
-lisp_t setq(context& ctx, lisp_t var, lisp_t val) { return low::set(ctx, var, eval(val)); }
+lisp_t setq(lisp_t var, lisp_t val) { return low::set(var, eval(val)); }
 
-lisp_t xwhile(context& ctx, lisp_t pred, lisp_t exp)
+lisp_t xwhile(lisp_t pred, lisp_t exp)
 {
   lisp_t res = eval(pred);
   while(!is_nil(res))
   {
-    low::progn(ctx, exp);
+    low::progn(exp);
     res = eval(pred);
   }
   return nil;

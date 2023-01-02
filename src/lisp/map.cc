@@ -31,7 +31,7 @@ namespace lisp::details::map
 /// @param fn2 Function to apply to get the next element of the list (default is CDR).
 ///
 /// @returns nil
-lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t map(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == object::type::Cons)
   {
@@ -52,7 +52,7 @@ lisp_t map(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns nil
-lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t mapc(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == object::type::Cons)
   {
@@ -73,7 +73,7 @@ lisp_t mapc(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t maplist(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
   if(type_of(obj) == object::type::Cons)
@@ -102,7 +102,7 @@ lisp_t maplist(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-lisp_t mapcar(context&, lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t mapcar(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
   if(type_of(obj) == object::type::Cons)

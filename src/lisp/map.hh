@@ -23,10 +23,10 @@
 
 namespace lisp
 {
-inline lisp_t map(lisp_t a, lisp_t b, lisp_t c) { return details::map::map(context::current(), a, b, c); }
-inline lisp_t mapc(lisp_t a, lisp_t b, lisp_t c) { return details::map::mapc(context::current(), a, b, c); }
-inline lisp_t maplist(lisp_t a, lisp_t b, lisp_t c) { return details::map::maplist(context::current(), a, b, c); }
-inline lisp_t mapcar(lisp_t a, lisp_t b, lisp_t c) { return details::map::mapcar(context::current(), a, b, c); }
+inline lisp_t map(lisp_t a, lisp_t b, lisp_t c) { return details::map::map(a, b, c); }
+inline lisp_t mapc(lisp_t a, lisp_t b, lisp_t c) { return details::map::mapc(a, b, c); }
+inline lisp_t maplist(lisp_t a, lisp_t b, lisp_t c) { return details::map::maplist(a, b, c); }
+inline lisp_t mapcar(lisp_t a, lisp_t b, lisp_t c) { return details::map::mapcar(a, b, c); }
 } // namespace lisp
 
 #endif

@@ -18,10 +18,11 @@
 #include "alloc.hh"
 #include "logic.hh"
 #include "low.hh"
+#include "details/logic.hh"
 
 namespace lisp::details::logic
 {
-lisp_t p_and(context&, lisp_t x)
+lisp_t p_and(lisp_t x)
 {
   lisp_t foo = T;
   while(!is_nil(x))
@@ -34,7 +35,7 @@ lisp_t p_and(context&, lisp_t x)
   return foo;
 }
 
-lisp_t p_or(context&, lisp_t x)
+lisp_t p_or(lisp_t x)
 {
   lisp_t foo = nil;
   while(!is_nil(x))
@@ -47,14 +48,14 @@ lisp_t p_or(context&, lisp_t x)
   return foo;
 }
 
-lisp_t p_not(context&, lisp_t x)
+lisp_t p_not(lisp_t x)
 {
   if(is_nil(x))
     return T;
   return nil;
 }
 
-lisp_t xif(context&, lisp_t pred, lisp_t true_expr, lisp_t false_expr)
+lisp_t xif(lisp_t pred, lisp_t true_expr, lisp_t false_expr)
 {
   lisp_t foo = eval(pred);
   if(is_nil(foo))
@@ -80,4 +81,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::details::logic
+} // namespace lisp::logic
