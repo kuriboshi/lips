@@ -20,7 +20,7 @@
 
 namespace lisp
 {
-lisp_t syntax::macro(context&, ref_file_t source, std::uint8_t index)
+lisp_t syntax::macro(ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro[index];
   lisp_t f = getobject(source);

@@ -24,9 +24,9 @@ namespace lisp::rtable
 {
 void init();
 
-lisp_t rmdquote(context&, lisp_t);
-lisp_t rmsquote(context&, lisp_t);
-lisp_t rmgetenv(context&, lisp_t);
+lisp_t rmdquote(lisp_t);
+lisp_t rmsquote(lisp_t);
+lisp_t rmgetenv(lisp_t);
 } // namespace lisp::rtable
 
 #endif
