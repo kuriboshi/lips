@@ -21,13 +21,6 @@
 
 namespace lisp::details::alloc
 {
-/// @brief Creates a cons pair.
-///
-/// @param a The car of the pair.
-/// @param b The cdr of the pair.
-/// @returns The cons pair.
-// lisp_t cons(lisp_t a, lisp_t b) { ; }
-
 lisp_t obarray(context&)
 {
   lisp_t o = nil;
