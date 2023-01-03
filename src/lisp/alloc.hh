@@ -75,13 +75,13 @@ inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
 ///
 /// @return Returns a list of local symbols in no particular order.
 ///
-inline lisp_t obarray() { return details::alloc::obarray(context::current()); }
+inline lisp_t obarray() { return details::alloc::obarray(); }
 
 /// @brief Number of free cell in the free cell list.
 ///
 /// @return The number of free cells.
 ///
-inline lisp_t freecount() { return details::alloc::freecount(context::current()); }
+inline lisp_t freecount() { return details::alloc::freecount(); }
 
 /// @brief Create a symbol in the global symbol table, accessable from all
 /// lisp instances.

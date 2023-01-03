@@ -21,7 +21,7 @@
 
 namespace lisp::details::alloc
 {
-lisp_t obarray(context&)
+lisp_t obarray()
 {
   lisp_t o = nil;
   for(auto i: symbol::symbol_t::store())
@@ -60,7 +60,7 @@ lisp_t mkarglist(lisp_t alist, std::int8_t& count)
   if(is_nil(alist))
     return nil;
   ++count;
-  count = static_cast<std::int8_t>(-count);
+  count = -count;
   return cons(alist, nil);
 }
 

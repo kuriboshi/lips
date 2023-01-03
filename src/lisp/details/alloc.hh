@@ -25,8 +25,8 @@ namespace lisp::details::alloc
 lisp_t mkstring(const std::string&);
 lisp_t mknumber(std::int64_t);
 lisp_t mkfloat(double);
-lisp_t obarray(context&);
-inline lisp_t freecount(context&) { return mknumber(static_cast<std::int64_t>(object::freecount())); }
+lisp_t obarray();
+inline lisp_t freecount() { return mknumber(static_cast<std::int64_t>(object::freecount())); }
 
 /// @brief Make a lambda object.
 ///
