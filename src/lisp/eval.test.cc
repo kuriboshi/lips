@@ -304,6 +304,12 @@ TEST_CASE("pool: object and closure_t")
   c0 = lisp::lambda_t::freecount();
   CHECK_THROWS(pool_test<lisp::lambda_t>());
   CHECK(c0 == lisp::lambda_t::freecount());
+  c0 = lisp::cons_t::freecount();
+  CHECK_THROWS(pool_test<lisp::cons_t>());
+  CHECK(c0 == lisp::cons_t::freecount());
+  c0 = lisp::string_t::freecount();
+  CHECK_THROWS(pool_test<lisp::string_t>());
+  CHECK(c0 == lisp::string_t::freecount());
 }
 
 } // namespace lisp
