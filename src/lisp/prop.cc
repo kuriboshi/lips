@@ -22,20 +22,20 @@
 
 namespace lisp::details::prop
 {
-lisp_t setplist(context&, lisp_t x, lisp_t pl)
+lisp_t setplist(lisp_t x, lisp_t pl)
 {
   check(x, object::type::Symbol);
   x->symbol()->plist = pl;
   return pl;
 }
 
-lisp_t getplist(context&, lisp_t x)
+lisp_t getplist(lisp_t x)
 {
   check(x, object::type::Symbol);
   return x->symbol()->plist;
 }
 
-lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
+lisp_t putprop(lisp_t x, lisp_t p, lisp_t v)
 {
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
@@ -49,7 +49,7 @@ lisp_t putprop(context&, lisp_t x, lisp_t p, lisp_t v)
   return v;
 }
 
-lisp_t getprop(context&, lisp_t x, lisp_t p)
+lisp_t getprop(lisp_t x, lisp_t p)
 {
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
@@ -61,7 +61,7 @@ lisp_t getprop(context&, lisp_t x, lisp_t p)
   return nil;
 }
 
-lisp_t remprop(context&, lisp_t x, lisp_t p)
+lisp_t remprop(lisp_t x, lisp_t p)
 {
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
