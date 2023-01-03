@@ -111,7 +111,7 @@ lisp_t top::printhist()
 lisp_t top::transform(lisp_t list)
 {
   if(transform_hook)
-    return transform_hook(_ctx, list);
+    return transform_hook(list);
   return list;
 }
 
@@ -174,7 +174,7 @@ lisp_t top::operator()(lisp_t exp)
   ++_level;
   while(true)
   {
-    _ctx.echoline = false;
+    _echoline = false;
     if(prompt_hook)
       prompt_hook();
     //
@@ -200,7 +200,7 @@ lisp_t top::operator()(lisp_t exp)
     if(is_nil(input_exp->car()))
       continue;
     top::addhist(input_exp);
-    if(context::current().echoline)
+    if(_echoline)
     {
       prinbody(input_exp, *primout(), true);
       primout()->terpri();
@@ -233,12 +233,12 @@ lisp_t top::operator()(lisp_t exp)
 ///  !$      - last argument
 ///  !*      - all arguments
 /// others could be added easily.
-lisp_t top::rmexcl(context& ctx, lisp_t stream)
+lisp_t top::rmexcl(lisp_t stream)
 {
   int c = stream->file()->getch();
   if(std::isspace(c) != 0)
     return C_EXCL;
-  ctx.echoline = true;
+  _echoline = true;
   lisp_t tmp = histget(0L, variables->history);
   switch(c)
   {
@@ -254,7 +254,7 @@ lisp_t top::rmexcl(context& ctx, lisp_t stream)
       return tmp->cdr();
       break;
     case '\n':
-      ctx.echoline = false;
+      _echoline = false;
       return C_EXCL;
       break;
     default:
@@ -275,11 +275,13 @@ lisp_t top::rmexcl(context& ctx, lisp_t stream)
         }
         return nil;
       }
-      ctx.error(lips_errc::event_not_found, at);
+      error(lips_errc::event_not_found, at);
       return nil;
   }
   return nil;
 }
+
+bool top::_echoline = false;
 
 namespace lisp::pn
 {
@@ -291,12 +293,12 @@ void top::init()
 {
   variables = std::make_unique<cvariables>();
   mkprim(
-    pn::PRINTHIST, [](context&) -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    pn::PRINTHIST, []() -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
 lisp_t top::input_exp; // The input expression.
-std::function<lisp_t(::lisp::context&, lisp_t)> top::transform_hook;
+std::function<lisp_t(lisp_t)> top::transform_hook;
 std::function<void()> top::prompt_hook;
 lisp_t top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;

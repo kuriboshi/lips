@@ -630,13 +630,13 @@ lisp_t back(context& ctx, lisp_t x)
   return mknumber(pid);
 }
 
-lisp_t stop(context& ctx)
+lisp_t stop()
 {
   kill(0, SIGSTOP);
   return T;
 }
 
-lisp_t rehash(context&)
+lisp_t rehash()
 {
   do_rehash();
   return nil;
@@ -658,14 +658,14 @@ void do_rehash()
   }
 }
 
-lisp_t jobs(context&)
+lisp_t jobs()
 {
   for(const auto& job: joblist)
     printjob(job);
   return nil;
 }
 
-lisp_t fg(context& ctx, lisp_t job)
+lisp_t fg(lisp_t job)
 {
   job_t* current = nullptr;
 
@@ -706,10 +706,10 @@ lisp_t fg(context& ctx, lisp_t job)
     auto status = waitfork(current->procid);
     return mknumber(WEXITSTATUS(status));
   }
-  return ctx.error(lips_errc::no_such_job, job);
+  return error(lips_errc::no_such_job, job);
 }
 
-lisp_t bg(context& ctx, lisp_t job)
+lisp_t bg(lisp_t job)
 {
   job_t* current = nullptr;
 
@@ -749,10 +749,10 @@ lisp_t bg(context& ctx, lisp_t job)
     current->background = true;
     return T;
   }
-  return ctx.error(lips_errc::no_such_job, job);
+  return error(lips_errc::no_such_job, job);
 }
 
-lisp_t setenv(context&, lisp_t var, lisp_t val)
+lisp_t setenv(lisp_t var, lisp_t val)
 {
   check(var, object::type::String, object::type::Symbol);
   check(val, object::type::String, object::type::Symbol);
@@ -760,7 +760,7 @@ lisp_t setenv(context&, lisp_t var, lisp_t val)
   return var;
 }
 
-lisp_t getenviron(context&, lisp_t var)
+lisp_t getenviron(lisp_t var)
 {
   check(var, object::type::String, object::type::Symbol);
   char* s = getenv(var->getstr().c_str());
@@ -769,7 +769,7 @@ lisp_t getenviron(context&, lisp_t var)
   return mkstring(s);
 }
 
-lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
+lisp_t cd(lisp_t dir, lisp_t emess)
 {
   lisp_t ndir;
 
@@ -777,7 +777,7 @@ lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
     ndir = environment->home;
   else
   {
-    ndir = expand(ctx, dir);
+    ndir = expand(dir);
     if(type_of(ndir) == object::type::Cons)
       ndir = ndir->car();
   }
@@ -798,7 +798,7 @@ lisp_t cd(context& ctx, lisp_t dir, lisp_t emess)
   return T;
 }
 
-lisp_t doexec(context& ctx, lisp_t cmd)
+lisp_t doexec(lisp_t cmd)
 {
   lisp_t res;
 

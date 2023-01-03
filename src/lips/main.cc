@@ -80,7 +80,7 @@ lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-lisp_t transform(::lisp::context& ctx, lisp_t list)
+lisp_t transform(lisp_t list)
 {
   lisp_t tl = nil;
   lisp_t res = nil;
@@ -88,7 +88,7 @@ lisp_t transform(::lisp::context& ctx, lisp_t list)
   for(auto ll = list; type_of(ll) == object::type::Cons; ll = ll->cdr())
   {
     if(type_of(ll->car()) == object::type::Cons)
-      tl = put_end(tl, transform(ctx, ll->car()), conc);
+      tl = put_end(tl, transform(ll->car()), conc);
     else if(ll->car() == C_BAR)
     {
       if(is_nil(res))
@@ -306,7 +306,7 @@ int main(int argc, char* const* argv)
   //
   // Init shell and lisp interpreter.
   //
-  auto lisp = init();
+  auto context = init();
   if(options.test)
   {
     auto result = session.run();
@@ -325,16 +325,16 @@ int main(int argc, char* const* argv)
     }
   }
   ref_file_t terminal{new file_t(std::make_unique<term_source>(options))};
-  top toploop(*lisp, options, terminal);
+  top toploop(options, terminal);
   while(true)
   {
     try
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      lisp->vm().reset();
-      lisp->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
-      lisp->repl(nil);
+      context->vm().reset();
+      context->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
+      context->repl(nil);
       return 0;
     }
     catch(const lisp_reset&)
@@ -348,7 +348,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_finish& fin)
     {
-      lisp->primerr()->format("finish: {}\n", fin.what());
+      context->primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

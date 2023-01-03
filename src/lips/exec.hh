@@ -30,16 +30,16 @@ lisp_t redir_append(context&, lisp_t cmd, lisp_t file, lisp_t filed);
 lisp_t redir_from(context&, lisp_t cmd, lisp_t file, lisp_t filed);
 lisp_t pipecmd(context&, lisp_t cmds);
 lisp_t back(context&, lisp_t x);
-lisp_t stop(context&);
-lisp_t jobs(context&);
-lisp_t fg(context&, lisp_t job);
-lisp_t bg(context&, lisp_t job);
-lisp_t setenv(context&, lisp_t var, lisp_t val);
-lisp_t getenviron(context&, lisp_t var);
-lisp_t cd(context&, lisp_t dir, lisp_t emess);
-lisp_t doexec(context&, lisp_t cmd);
+lisp_t stop();
+lisp_t jobs();
+lisp_t fg(lisp_t job);
+lisp_t bg(lisp_t job);
+lisp_t setenv(lisp_t var, lisp_t val);
+lisp_t getenviron(lisp_t var);
+lisp_t cd(lisp_t dir, lisp_t emess);
+lisp_t doexec(lisp_t cmd);
 
-lisp_t rehash(context&);
+lisp_t rehash();
 void do_rehash();
 } // namespace lisp::exec
 
@@ -59,24 +59,19 @@ inline lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
 }
 inline lisp_t pipecmd(context& ctx, lisp_t cmds) { return exec::pipecmd(ctx, cmds); }
 inline lisp_t back(context& ctx, lisp_t x) { return exec::back(ctx, x); }
-inline lisp_t stop(context& ctx) { return exec::stop(ctx); }
-inline lisp_t rehash(context&)
-{
-  exec::do_rehash();
-  return nil;
-}
+inline lisp_t stop() { return exec::stop(); }
 inline lisp_t rehash()
 {
   exec::do_rehash();
   return nil;
 }
-inline lisp_t jobs(context& ctx) { return exec::jobs(ctx); }
-inline lisp_t fg(context& ctx, lisp_t job) { return exec::fg(ctx, job); }
-inline lisp_t bg(context& ctx, lisp_t job) { return exec::bg(ctx, job); }
-inline lisp_t setenv(context& ctx, lisp_t var, lisp_t val) { return exec::setenv(ctx, var, val); }
-inline lisp_t getenviron(context& ctx, lisp_t var) { return exec::getenviron(ctx, var); }
-inline lisp_t cd(context& ctx, lisp_t dir, lisp_t emess) { return exec::cd(ctx, dir, emess); }
-inline lisp_t doexec(context& ctx, lisp_t cmd) { return exec::doexec(ctx, cmd); }
+inline lisp_t jobs() { return exec::jobs(); }
+inline lisp_t fg(lisp_t job) { return exec::fg(job); }
+inline lisp_t bg(lisp_t job) { return exec::bg(job); }
+inline lisp_t setenv(lisp_t var, lisp_t val) { return exec::setenv(var, val); }
+inline lisp_t getenviron(lisp_t var) { return exec::getenviron(var); }
+inline lisp_t cd(lisp_t dir, lisp_t emess) { return exec::cd(dir, emess); }
+inline lisp_t doexec(lisp_t cmd) { return exec::doexec(cmd); }
 
 namespace pn
 {

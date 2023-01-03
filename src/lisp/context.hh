@@ -86,7 +86,6 @@ public:
   // Used by lisp::io
   int printlevel = 0;
   int thisplevel = 0;
-  bool echoline = false;
 
   // Used by the interpreter
   bool brkflg = false;

@@ -26,9 +26,8 @@ namespace lisp
 class top
 {
 public:
-  top(context& ctx, const options_t& options, ref_file_t file)
-    : _ctx(ctx),
-      _options(options),
+  top(const options_t& options, ref_file_t file)
+    : _options(options),
       _file(file)
   {}
   ~top() = default;
@@ -50,10 +49,10 @@ public:
   static void trimhist();
 
   // Read table functions
-  static lisp_t rmexcl(context&, lisp_t);
+  static lisp_t rmexcl(lisp_t);
 
   static lisp_t input_exp;
-  static std::function<lisp_t(context&, lisp_t)> transform_hook; // Applied on input if non-nullptr.
+  static std::function<lisp_t(lisp_t)> transform_hook;           // Applied on input if non-nullptr.
   static std::function<void()> prompt_hook;                      // Called before the prompt is printed.
 
 private:
@@ -80,7 +79,7 @@ private:
   };
   static std::unique_ptr<cvariables> variables;
 
-  context& _ctx;
+  static bool _echoline;
   const options_t& _options;
   ref_file_t _file;
   int _level = 0;
