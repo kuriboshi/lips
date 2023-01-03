@@ -43,37 +43,7 @@ lisp_t rehash();
 void do_rehash();
 } // namespace lisp::exec
 
-namespace lisp
-{
-inline lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
-{
-  return exec::redir_to(ctx, cmd, file, filed);
-}
-inline lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
-{
-  return exec::redir_append(ctx, cmd, file, filed);
-}
-inline lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
-{
-  return exec::redir_from(ctx, cmd, file, filed);
-}
-inline lisp_t pipecmd(context& ctx, lisp_t cmds) { return exec::pipecmd(ctx, cmds); }
-inline lisp_t back(context& ctx, lisp_t x) { return exec::back(ctx, x); }
-inline lisp_t stop() { return exec::stop(); }
-inline lisp_t rehash()
-{
-  exec::do_rehash();
-  return nil;
-}
-inline lisp_t jobs() { return exec::jobs(); }
-inline lisp_t fg(lisp_t job) { return exec::fg(job); }
-inline lisp_t bg(lisp_t job) { return exec::bg(job); }
-inline lisp_t setenv(lisp_t var, lisp_t val) { return exec::setenv(var, val); }
-inline lisp_t getenviron(lisp_t var) { return exec::getenviron(var); }
-inline lisp_t cd(lisp_t dir, lisp_t emess) { return exec::cd(dir, emess); }
-inline lisp_t doexec(lisp_t cmd) { return exec::doexec(cmd); }
-
-namespace pn
+namespace lisp::pn
 {
 inline constexpr auto CD = "cd";                  // change directory
 inline constexpr auto EXPAND = "expand";          // expand wildcards
@@ -90,9 +60,7 @@ inline constexpr auto BG = "bg";                  // run job in background
 inline constexpr auto SETENV = "setenv";          // set environment variable
 inline constexpr auto GETENV = "getenv";          // get value of variable
 inline constexpr auto EXEC = "exec";              // overlay lips with command
-} // namespace pn
-
-} // namespace lisp
+} // namespace lisp::pn
 
 extern bool insidefork;
 
