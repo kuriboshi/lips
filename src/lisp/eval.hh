@@ -239,7 +239,6 @@ inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args)
 inline lisp_t backtrace() { return vm::get().backtrace(); }
 inline lisp_t topofstack() { return vm::get().topofstack(); }
 inline lisp_t destblock(lisp_t a) { return vm::get().destblock(a); }
-inline lisp_t break0(lisp_t a) { return vm::get().break0(a); }
 
 } // namespace lisp
 
