@@ -34,10 +34,23 @@ namespace lisp
 class vm
 {
 public:
+  vm()
+  {
+    if(_current == nullptr)
+      _current = this;
+    else
+      throw std::runtime_error("vm::vm called twice");
+  }
+  ~vm()
+  {
+    _current = nullptr;
+  }
+
   static vm& get()
   {
-    static vm instance;
-    return instance;
+    if(_current == nullptr)
+      throw std::runtime_error("lisp::vm has not been created");
+    return *_current;
   }
 
   void reset();
@@ -94,9 +107,6 @@ public:
   destblock_t* environment() const { return _env; }
 
 private:
-  vm() = default;
-  ~vm() = default;
-
   destblock_t* _dest = nullptr; // Current destination being built.
 
   //
@@ -215,6 +225,8 @@ private:
   std::array<destblock_t, DESTBLOCKSIZE> _destblock;
   /// @brief Index to last slot in destblock.
   int _destblockused = 0;
+
+  static vm* _current;
 };
 
 inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(fun); }

@@ -172,14 +172,12 @@ void onbreak()
     ::exit(1);
 }
 
-std::unique_ptr<::lisp::context> init()
+void init()
 {
   signal(SIGTTIN, SIG_IGN); // NOLINT
   signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back NOLINT
 
   fixpgrp();
-
-  auto ctx = std::make_unique<::lisp::context>();
 
   C_ALIAS = intern("alias");
   C_AMPER = intern("&");
@@ -208,9 +206,7 @@ std::unique_ptr<::lisp::context> init()
 
   exec::init();
 
-  ctx->read_table().set('!', "rmexcl"_l);
-
-  return ctx;
+  context::current().read_table().set('!', "rmexcl"_l);
 }
 
 //
@@ -306,7 +302,10 @@ int main(int argc, char* const* argv)
   //
   // Init shell and lisp interpreter.
   //
-  auto context = init();
+  lisp::vm vm;
+  lisp::context context;
+  init();
+  // auto context = init();
   if(options.test)
   {
     auto result = session.run();
@@ -348,7 +347,7 @@ int main(int argc, char* const* argv)
     }
     catch(const lisp_finish& fin)
     {
-      context->primerr()->format("finish: {}\n", fin.what());
+      context.primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

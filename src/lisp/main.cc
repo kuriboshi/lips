@@ -25,6 +25,7 @@
 int main(int argc, const char** argv)
 {
   lisp::context ctx;
+  lisp::vm vm;
   std::vector<std::string> args{argv + 1, argv + argc};
   for(auto f: args)
   {
@@ -42,5 +43,5 @@ int main(int argc, const char** argv)
       return 1;
     }
   }
-  return lisp::run(lisp::vm::get());
+  return lisp::run(vm);
 }

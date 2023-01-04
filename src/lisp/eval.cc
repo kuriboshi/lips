@@ -982,4 +982,6 @@ void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
 lisp_t vm::break0(lisp_t exp) const { return repl(exp); }
 
+vm* vm::_current = nullptr;
+
 } // namespace lisp

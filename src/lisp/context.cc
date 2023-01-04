@@ -151,9 +151,17 @@ context::context()
   static init init;
 }
 
-context::~context() = default;
+context::~context()
+{
+  _current = nullptr;
+}
 
-context& context::current() { return *_current; }
+context& context::current()
+{
+  if(_current == nullptr)
+    throw std::runtime_error("lisp::context has not been created");
+  return *_current;
+}
 
 syntax& context::read_table() { return *_pimpl->_syntax; }
 void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
