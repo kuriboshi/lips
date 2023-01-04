@@ -42,7 +42,7 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     }
     catch(const lisp_reset& ex)
     {
-      ctx.vm().reset();
+      vm::get().reset();
     }
     catch(const lisp_error& ex)
     {
@@ -56,7 +56,7 @@ inline int run(context& ctx, std::ostream& out = std::cout)
     {
       // Any standard exception resets the vm.
       out << "exception: " << ex.what() << std::endl;
-      ctx.vm().reset();
+      vm::get().reset();
     }
   }
 }

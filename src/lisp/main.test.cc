@@ -86,10 +86,10 @@ TEST_CASE("main: reset")
     auto old = ctx.primin(ref_file_t::create(R"((plus 1 2))"));
     // This will cause abort to be called and a lisp_error exception to be
     // called.
-    ctx.interrupt = true;
+    vm::get().interrupt = true;
     std::ostringstream os;
     CHECK(run(ctx, os) == 0);
-    ctx.interrupt = false;
+    vm::get().interrupt = false;
     ctx.primin(old);
   }
 

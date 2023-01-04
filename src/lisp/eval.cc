@@ -38,11 +38,11 @@ inline constexpr std::string_view TOPOFSTACK = "topofstack"; // return top of va
 inline constexpr std::string_view DESTBLOCK = "destblock";   // convert environment to list
 } // namespace pn
 
-lisp_t eval(context& ctx, lisp_t expr) { return ctx.vm().eval(expr); }
-lisp_t apply(context& ctx, lisp_t fun, lisp_t args) { return ctx.vm().apply(fun, args); }
-lisp_t backtrace(context& ctx) { return ctx.vm().backtrace(); }
-lisp_t topofstack(context& ctx) { return ctx.vm().topofstack(); }
-lisp_t destblock(context& ctx, lisp_t a) { return ctx.vm().destblock(a); }
+inline lisp_t eval(lisp_t expr) { return lisp::vm::get().eval(expr); }
+inline lisp_t apply(lisp_t fun, lisp_t args) { return lisp::vm::get().apply(fun, args); }
+inline lisp_t backtrace() { return lisp::vm::get().backtrace(); }
+inline lisp_t topofstack() { return lisp::vm::get().topofstack(); }
+inline lisp_t destblock(lisp_t a) { return lisp::vm::get().destblock(a); }
 
 void init()
 {
@@ -61,10 +61,6 @@ void init()
 
 namespace lisp
 {
-vm::vm(context& ctx)
-  : _ctx(ctx)
-{}
-
 void vm::reset()
 {
   _destblockused = 0;
@@ -92,20 +88,20 @@ lisp_t vm::printwhere()
          lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
-        _ctx.primerr()->format("[in ");
+        context::current().primerr()->format("[in ");
         prin2(foo->car(), T);
-        _ctx.primerr()->putch(']');
+        context::current().primerr()->putch(']');
         break;
       }
     }
   }
-  _ctx.primerr()->putch('\n');
+  context::current().primerr()->putch('\n');
   return foo;
 }
 
 void vm::abort(std::error_code error)
 {
-  _ctx.perror(error);
+  context::current().perror(error);
   printwhere();
   unwind();
   throw lisp_error("abort");
@@ -117,7 +113,7 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
 {
   if(code)
   {
-    _ctx.perror(code, fault);
+    context::current().perror(code, fault);
     printwhere();
   }
   if(_breakhook)
@@ -149,7 +145,7 @@ void vm::next() { _dest[0].decr(); }
 
 lisp_t vm::call(lisp_t fun)
 {
-  return fun->subr()(_ctx, _dest);
+  return fun->subr()(context::current(), _dest);
 }
 
 lisp_t vm::eval(lisp_t expr)
@@ -345,9 +341,9 @@ void vm::do_unbound(continuation_t continuation)
 
 bool vm::eval_func()
 {
-  if(_ctx.brkflg)
+  if(brkflg)
     xbreak(error_errc::kbd_break, _fun, &vm::eval_func);
-  else if(_ctx.interrupt)
+  else if(interrupt)
     abort(error_errc::no_message);
   else
     switch(type_of(_fun))
@@ -407,7 +403,7 @@ bool vm::eval_func()
 
 bool vm::eval_apply()
 {
-  if(_ctx.brkflg)
+  if(brkflg)
     xbreak(error_errc::kbd_break, _fun, &vm::eval_apply);
   else
     switch(type_of(_fun))
@@ -456,14 +452,14 @@ bool vm::eval_apply()
 
 void vm::bt()
 {
-  int op = _ctx.printlevel;
-  _ctx.printlevel = 2;
+  int op = context::current().printlevel;
+  context::current().printlevel = 2;
   for(int i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
       print(std::get<lisp_t>(_control[i - 1]), T);
   }
-  _ctx.printlevel = op;
+  context::current().printlevel = op;
 }
 
 bool vm::everr()
@@ -863,7 +859,7 @@ lisp_t vm::backtrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
-    _ctx.primerr()->format("{}: ", i);
+    context::current().primerr()->format("{}: ", i);
     std::visit(
       // NOLINTNEXTLINE(readability-function-cognitive-complexity)
       [this](auto&& arg) {
@@ -886,71 +882,71 @@ lisp_t vm::backtrace()
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
         {
           if(arg == &vm::eval_end)
-            _ctx.primerr()->format("eval_end\n");
+            context::current().primerr()->format("eval_end\n");
           else if(arg == &vm::eval_expr)
-            _ctx.primerr()->format("eval_expr\n");
+            context::current().primerr()->format("eval_expr\n");
           else if(arg == &vm::eval_func)
-            _ctx.primerr()->format("eval_func");
+            context::current().primerr()->format("eval_func");
           else if(arg == &vm::eval_apply)
-            _ctx.primerr()->format("eval_apply\n");
+            context::current().primerr()->format("eval_apply\n");
           else if(arg == &vm::ev1)
-            _ctx.primerr()->format("ev1\n");
+            context::current().primerr()->format("ev1\n");
           else if(arg == &vm::eval_prim)
-            _ctx.primerr()->format("eval_prim\n");
+            context::current().primerr()->format("eval_prim\n");
           else if(arg == &vm::ev3)
-            _ctx.primerr()->format("ev3\n");
+            context::current().primerr()->format("ev3\n");
           else if(arg == &vm::ev4)
-            _ctx.primerr()->format("ev4\n");
+            context::current().primerr()->format("ev4\n");
           else if(arg == &vm::evlam0)
-            _ctx.primerr()->format("evlam0\n");
+            context::current().primerr()->format("evlam0\n");
           else if(arg == &vm::evlam1)
-            _ctx.primerr()->format("evlam1\n");
+            context::current().primerr()->format("evlam1\n");
           else if(arg == &vm::eval_args1)
-            _ctx.primerr()->format("eval_args1\n");
+            context::current().primerr()->format("eval_args1\n");
           else if(arg == &vm::eval_args2)
-            _ctx.primerr()->format("eval_args2\n");
+            context::current().primerr()->format("eval_args2\n");
           else if(arg == &vm::ev3p)
-            _ctx.primerr()->format("ev3p\n");
+            context::current().primerr()->format("ev3p\n");
           else if(arg == &vm::eval_args)
-            _ctx.primerr()->format("eval_args\n");
+            context::current().primerr()->format("eval_args\n");
           else if(arg == &vm::noevarg)
-            _ctx.primerr()->format("noevarg\n");
+            context::current().primerr()->format("noevarg\n");
           else if(arg == &vm::eval_lambda)
-            _ctx.primerr()->format("eval_lambda\n");
+            context::current().primerr()->format("eval_lambda\n");
           else if(arg == &vm::spread)
-            _ctx.primerr()->format("spread\n");
+            context::current().primerr()->format("spread\n");
           else if(arg == &vm::eval_list)
-            _ctx.primerr()->format("eval_list\n");
+            context::current().primerr()->format("eval_list\n");
           else if(arg == &vm::evlis1)
-            _ctx.primerr()->format("evlis1\n");
+            context::current().primerr()->format("evlis1\n");
           else if(arg == &vm::eval_list_end)
-            _ctx.primerr()->format("eval_list_end\n");
+            context::current().primerr()->format("eval_list_end\n");
           else if(arg == &vm::evlis3)
-            _ctx.primerr()->format("evlis3\n");
+            context::current().primerr()->format("evlis3\n");
           else if(arg == &vm::evlis4)
-            _ctx.primerr()->format("evlis4\n");
+            context::current().primerr()->format("evlis4\n");
           else if(arg == &vm::noeval_args1)
-            _ctx.primerr()->format("noeval_args1\n");
+            context::current().primerr()->format("noeval_args1\n");
           else if(arg == &vm::eval_sequence)
-            _ctx.primerr()->format("eval_sequence\n");
+            context::current().primerr()->format("eval_sequence\n");
           else if(arg == &vm::eval_seq1)
-            _ctx.primerr()->format("eval_seq1\n");
+            context::current().primerr()->format("eval_seq1\n");
           else if(arg == &vm::eval_seq2)
-            _ctx.primerr()->format("eval_seq2\n");
+            context::current().primerr()->format("eval_seq2\n");
           else if(arg == &vm::eval_closure)
-            _ctx.primerr()->format("eval_closure\n");
+            context::current().primerr()->format("eval_closure\n");
           else if(arg == &vm::eval_closure1)
-            _ctx.primerr()->format("eval_closure1\n");
+            context::current().primerr()->format("eval_closure1\n");
           else if(arg == &vm::eval0)
-            _ctx.primerr()->format("eval0\n");
+            context::current().primerr()->format("eval0\n");
           else if(arg == &vm::apply0)
-            _ctx.primerr()->format("apply0\n");
+            context::current().primerr()->format("apply0\n");
           else if(arg == &vm::everr)
-            _ctx.primerr()->format("everr\n");
+            context::current().primerr()->format("everr\n");
           else if(arg == &vm::eval_lookup)
-            _ctx.primerr()->format("eval_lookup\n");
+            context::current().primerr()->format("eval_lookup\n");
           else
-            _ctx.stderr()->format("Unknown control stack element\n");
+            context::current().stderr()->format("Unknown control stack element\n");
         }
         else
           ; // Do nothing for monostate

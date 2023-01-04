@@ -332,7 +332,7 @@ int main(int argc, char* const* argv)
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      context->vm().reset();
+      vm::get().reset();
       context->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
       context->repl(nil);
       return 0;

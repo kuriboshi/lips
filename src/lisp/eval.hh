@@ -34,8 +34,11 @@ namespace lisp
 class vm
 {
 public:
-  vm(context&);
-  ~vm() = default;
+  static vm& get()
+  {
+    static vm instance;
+    return instance;
+  }
 
   void reset();
 
@@ -73,9 +76,15 @@ public:
     return f;
   }
 
+  bool brkflg = false;
+  bool interrupt = false;
+
   destblock_t* environment() const { return _env; }
 
 private:
+  vm() = default;
+  ~vm() = default;
+
   destblock_t* _dest = nullptr; // Current destination being built.
 
   //
@@ -177,7 +186,6 @@ private:
   /// @param The destination block to free.
   void free(destblock_t* block);
 
-  context& _ctx;
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
   lisp_t _fun;                    // Store current function being evaluated.
@@ -197,16 +205,17 @@ private:
   int _destblockused = 0;
 };
 
-inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return context::current().vm().breakhook(fun); }
-inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return context::current().vm().undefhook(fun); }
-inline void unwind() { context::current().vm().unwind(); }
+inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(fun); }
+inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefhook(fun); }
+inline void unwind() { vm::get().unwind(); }
 
-inline lisp_t eval(lisp_t expr) { return details::vm::eval(context::current(), expr); }
-inline lisp_t eval(const std::string& expr) { return details::vm::eval(context::current(), lispread(expr)); }
-inline lisp_t apply(lisp_t fun, lisp_t args) { return details::vm::apply(context::current(), fun, args); }
-inline lisp_t backtrace() { return details::vm::backtrace(context::current()); }
-inline lisp_t topofstack() { return details::vm::topofstack(context::current()); }
-inline lisp_t destblock(lisp_t a) { return details::vm::destblock(context::current(), a); }
+inline lisp_t eval(lisp_t expr) { return vm::get().eval(expr); }
+inline lisp_t eval(const std::string& expr) { return vm::get().eval(lispread(expr)); }
+inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args); }
+inline lisp_t backtrace() { return vm::get().backtrace(); }
+inline lisp_t topofstack() { return vm::get().topofstack(); }
+inline lisp_t destblock(lisp_t a) { return vm::get().destblock(a); }
+inline lisp_t break0(lisp_t a) { return context::current().break0(a); }
 
 } // namespace lisp
 

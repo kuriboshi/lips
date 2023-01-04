@@ -23,13 +23,6 @@
 namespace lisp::details::vm
 {
 void init();
-
-lisp_t eval(context&, lisp_t);
-lisp_t apply(context&, lisp_t, lisp_t);
-lisp_t backtrace(context&);
-lisp_t topofstack(context&);
-lisp_t destblock(context&, lisp_t);
-
 } // namespace lisp::details::vm
 
 #endif

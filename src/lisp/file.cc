@@ -115,7 +115,7 @@ bool loadfile(context& ctx, const std::string& lf)
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
         for(auto rval = lispread(foo); rval != C_EOF; rval = lispread(foo))
-          rval = ctx.vm().eval(rval);
+          rval = lisp::vm::get().eval(rval);
         return true;
       }
     }

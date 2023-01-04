@@ -24,8 +24,8 @@ namespace lisp::details::debug
 {
 lisp_t evaltrace(context& ctx, lisp_t state)
 {
-  auto i = ctx.vm().trace();
-  ctx.vm().trace(!is_nil(state));
+  auto i = lisp::vm::get().trace();
+  lisp::vm::get().trace(!is_nil(state));
   return i ? T : nil;
 }
 

@@ -40,9 +40,8 @@ namespace lisp
 class context::impl
 {
 public:
-  impl(class vm& vm)
-    : _vm(vm),
-      _currentbase(initcvar("base", 10_l)),
+  impl()
+    : _currentbase(initcvar("base", 10_l)),
       _verbose(initcvar("verbose", nil)),
       _loadpath(initcvar("loadpath", mklist(mkstring("."))))
   {
@@ -55,7 +54,6 @@ public:
     _stderr = ref_file_t::create(std::cerr);  // NOLINT
     _stdin = ref_file_t::create(std::cin);    // NOLINT
   }
-  class vm& _vm;
   std::unique_ptr<syntax> _syntax;
 
   ref_file_t _primout;
@@ -148,18 +146,12 @@ context::context()
   else
     throw std::runtime_error("context::context called twice");
 
-  _pimpl = std::make_unique<impl>(vm());
+  _pimpl = std::make_unique<impl>();
 
   static init init;
 }
 
 context::~context() = default;
-
-class vm& context::vm()
-{
-  static class vm vm_(*this);
-  return vm_;
-}
 
 context& context::current() { return *_current; }
 

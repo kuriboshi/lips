@@ -44,7 +44,6 @@ class context
 public:
   context();
   ~context();
-  class vm& vm();
   static context& current();
 
   syntax& read_table();
@@ -87,10 +86,6 @@ public:
   int printlevel = 0;
   int thisplevel = 0;
 
-  // Used by the interpreter
-  bool brkflg = false;
-  bool interrupt = false;
-
   cvariable_t& currentbase();
   cvariable_t& verbose();
   cvariable_t& loadpath();
@@ -123,7 +118,6 @@ inline lisp_t perror(std::error_code code, lisp_t a) { return context::current()
 inline lisp_t error(std::error_code code, lisp_t a) { return context::current().error(code, a); }
 template<typename... Ts>
 inline void fatal(std::error_code code, const Ts&... a) { return context::current().fatal(code, a...); }
-inline lisp_t break0(lisp_t a) { return context::current().break0(a); }
 
 } // namespace lisp
 

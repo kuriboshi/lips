@@ -27,7 +27,7 @@ repl::repl(context& ctx)
 {
   _prompt = "> "_s;
   _break_prompt = ": "_s;
-  ctx.vm().interactive(true);
+  vm::get().interactive(true);
 }
 
 lisp_t repl::operator()(lisp_t exp)
@@ -70,12 +70,12 @@ lisp_t repl::operator()(lisp_t exp)
       return print(eval(exp), false);
     if(com->car() == C_RESET)
     {
-      _ctx.vm().unwind();
+      vm::get().unwind();
       throw lisp_reset();
     }
     if(com->car() == C_BT)
     {
-      _ctx.vm().bt();
+      vm::get().bt();
       continue;
     }
     if(com->car() == C_RETURN)
