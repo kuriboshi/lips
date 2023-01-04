@@ -18,6 +18,7 @@
 #ifndef LISP_DEBUG_HH
 #define LISP_DEBUG_HH
 
+#include "context.hh"
 #include "types.hh"
 #include "details/debug.hh"
 

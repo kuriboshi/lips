@@ -15,22 +15,10 @@
 // limitations under the License.
 //
 
-#include "alloc.hh"
-#include "arith.hh"
 #include "context.hh"
-#include "debug.hh"
+#include "alloc.hh"
 #include "file.hh"
-#include "logic.hh"
-#include "low.hh"
-#include "map.hh"
-#include "pred.hh"
-#include "prim.hh"
-#include "prop.hh"
-#include "rtable.hh"
-#include "string.hh"
 #include "syntax.hh"
-#include "user.hh"
-#include "version.hh"
 
 #include <iostream>
 
@@ -68,77 +56,6 @@ public:
   cvariable_t& _loadpath;
 };
 
-class init
-{
-public:
-  init()
-  {
-    auto intern = [this](const auto s) { return details::alloc::intern(s); };
-
-    // Must be early since it's used by symbol_store_t to initialize new
-    // symbols.
-    C_UNBOUND = intern("unbound");
-    C_UNBOUND->value(C_UNBOUND);
-    C_UNBOUND->symbol()->constant = true;
-
-    auto nil = intern("nil");
-    nil->value(nil);
-    nil->symbol()->constant = true;
-
-    auto t = intern("t");
-    T = t;
-    t->value(T);
-    t->symbol()->constant = true;
-
-    C_AUTOLOAD = intern("autoload");
-    C_BROKEN = intern("broken");
-    C_BT = intern("bt");
-    C_CLOSURE = intern("closure");
-    C_CONS = intern("cons");
-    C_DOT = intern(".");
-    C_ENDOFFILE = intern("endoffile");
-    C_ENVIRON = intern("environ");
-    C_EOF = intern("eof");
-    C_FILE = intern("file");
-    C_FLOAT = intern("float");
-    C_FSUBR = intern("fsubr");
-    C_GO = intern("go");
-    C_INDIRECT = intern("indirect");
-    C_INTEGER = intern("integer");
-    C_OLDDEF = intern("olddef");
-    C_REDEFINED = intern("redefined");
-    C_RESET = intern("reset");
-    C_RETURN = intern("return");
-    C_STRING = intern("string");
-    C_SUBR = intern("subr");
-    C_SYMBOL = intern("symbol");
-    C_READ = intern("read");
-    C_WRITE = intern("write");
-    C_APPEND = intern("append");
-    C_CVARIABLE = intern("cvariable");
-
-    C_VERSION = intern("version");
-    C_VERSION->value(mkstring(VERSION));
-    C_VERSION->symbol()->constant = true;
-
-    details::alloc::init();
-    details::arith::init();
-    details::debug::init();
-    details::file::init();
-    details::logic::init();
-    details::low::init();
-    details::map::init();
-    details::pred::init();
-    details::prim::init();
-    details::prop::init();
-    details::string::init();
-    details::user::init();
-    details::vm::init();
-
-    rtable::init();
-  }
-};
-
 context::context()
 {
   if(_current == nullptr)
@@ -147,8 +64,6 @@ context::context()
     throw std::runtime_error("context::context called twice");
 
   _pimpl = std::make_unique<impl>();
-
-  static init init;
 }
 
 context::~context()

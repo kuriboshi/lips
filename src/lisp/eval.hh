@@ -23,28 +23,15 @@
 #include <functional>
 #include <variant>
 
-#include "context.hh"
-#include "error.hh"
-#include "io.hh"
 #include "types.hh"
-#include "details/vm.hh"
 
 namespace lisp
 {
 class vm
 {
 public:
-  vm()
-  {
-    if(_current == nullptr)
-      _current = this;
-    else
-      throw std::runtime_error("vm::vm called twice");
-  }
-  ~vm()
-  {
-    _current = nullptr;
-  }
+  vm();
+  ~vm();
 
   static vm& get()
   {
@@ -53,13 +40,12 @@ public:
     return *_current;
   }
 
-  void reset();
-
   /// @brief This is the LISP vm.
   ///
   /// @details The vm allocates a destination slot for the result and
   /// starts munching continuations.
   lisp_t eval(lisp_t);
+  lisp_t eval(const std::string&);
   lisp_t apply(lisp_t, lisp_t);
   lisp_t backtrace();
   /// @brief Return the current environment.
@@ -69,6 +55,8 @@ public:
 
   /// @brief Prints a backtrace of all expressions on the stack.
   void bt();
+  /// @brief Unwinds the stack, restoring the shallow bindings, and then calls
+  /// reset.
   void unwind();
   bool trace() const { return _trace; }
   void trace(bool t) { _trace = t; }
@@ -190,6 +178,8 @@ private:
   /// @brief Print error message, abort current evaluation, and return to top
   /// level.
   void abort(std::error_code);
+  /// @brief Resets the vm to it's initial state.
+  void reset();
   void overflow();
   lisp_t destblock(const destblock_t*);
 
@@ -234,7 +224,7 @@ inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefho
 inline void unwind() { vm::get().unwind(); }
 
 inline lisp_t eval(lisp_t expr) { return vm::get().eval(expr); }
-inline lisp_t eval(const std::string& expr) { return vm::get().eval(lispread(expr)); }
+inline lisp_t eval(const std::string& expr) { return vm::get().eval(expr); }
 inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args); }
 inline lisp_t backtrace() { return vm::get().backtrace(); }
 inline lisp_t topofstack() { return vm::get().topofstack(); }
