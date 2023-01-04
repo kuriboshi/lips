@@ -333,8 +333,8 @@ int main(int argc, char* const* argv)
       if(!options.debug && options.interactive)
         init_all_signals();
       vm::get().reset();
-      context->repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
-      context->repl(nil);
+      vm::get().repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
+      vm::get().repl(nil);
       return 0;
     }
     catch(const lisp_reset&)

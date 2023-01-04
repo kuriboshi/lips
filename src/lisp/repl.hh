@@ -23,10 +23,12 @@
 namespace lisp
 {
 
+class vm;
+
 class repl
 {
 public:
-  repl(context&);
+  repl(vm&);
   ~repl() = default;
 
   class level
@@ -46,7 +48,7 @@ public:
   lisp_t operator()(lisp_t);
 
 private:
-  context& _ctx;
+  class vm& _vm;
   int _level = 0;
   lisp_t _prompt;
   lisp_t _break_prompt;

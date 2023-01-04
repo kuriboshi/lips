@@ -68,6 +68,7 @@ public:
     _undefhook = fun;
     return f;
   }
+
   using breakhook_t = std::function<void()>;
   breakhook_t breakhook(breakhook_t fun)
   {
@@ -75,6 +76,17 @@ public:
     _breakhook = fun;
     return f;
   }
+
+  lisp_t break0(lisp_t) const;
+
+  enum class break_return
+  {
+    RETURN,  // Return from recursive repl
+    PROCEED, // Proceed with repl
+    SKIP,    // Skip eval
+  };
+  using repl_fun_t = std::function<lisp_t(lisp_t)>;
+  repl_fun_t repl;
 
   bool brkflg = false;
   bool interrupt = false;
@@ -215,7 +227,7 @@ inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args)
 inline lisp_t backtrace() { return vm::get().backtrace(); }
 inline lisp_t topofstack() { return vm::get().topofstack(); }
 inline lisp_t destblock(lisp_t a) { return vm::get().destblock(a); }
-inline lisp_t break0(lisp_t a) { return context::current().break0(a); }
+inline lisp_t break0(lisp_t a) { return vm::get().break0(a); }
 
 } // namespace lisp
 

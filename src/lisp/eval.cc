@@ -980,4 +980,6 @@ destblock_t* vm::mkdestblock(int size)
 
 void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
+lisp_t vm::break0(lisp_t exp) const { return repl(exp); }
+
 } // namespace lisp

@@ -21,6 +21,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "eval.hh"
 #include "io.hh"
 #include "repl.hh"
 
@@ -39,7 +40,7 @@ TEST_CASE("repl: interactive tests")
   SECTION("Simple repl")
   {
     auto old = ctx.primin(ref_file_t::create(R"((print "hello"))"));
-    repl repl(ctx);
+    repl repl(vm::get());
     repl(nil);
     std::string expected = R"(> "hello"
 "hello"
@@ -56,7 +57,7 @@ TEST_CASE("repl: interactive tests")
 a
 )";
     auto old = ctx.primin(ref_file_t::create(is));
-    repl repl(ctx);
+    repl repl(vm::get());
     repl(nil);
     std::string expected = R"(> nil
 > 100
@@ -72,8 +73,8 @@ a
 (reset)
 )";
     auto old = ctx.primin(ref_file_t::create(is));
-    repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     CHECK_NOTHROW(repl(nil));
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
@@ -91,8 +92,8 @@ a
 (reset)
 )";
     auto old = ctx.primin(ref_file_t::create(is));
-    repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     CHECK_NOTHROW(repl(nil));
     // Backtrace sets the print level to 2 which is why the '&' is printed
     // representing a deeper level.
@@ -113,8 +114,8 @@ a
 (return "hello")
 )";
     auto old = ctx.primin(ref_file_t::create(is));
-    repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     repl(nil);
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
@@ -133,8 +134,8 @@ help
 (return nil)
 )";
     auto old = ctx.primin(ref_file_t::create(is));
-    repl repl(ctx);
-    ctx.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     repl(nil);
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)

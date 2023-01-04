@@ -30,7 +30,6 @@ namespace lisp
 
 class syntax;
 class context;
-class vm;
 class cvariable_t;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
@@ -70,17 +69,6 @@ public:
   {
     throw lisp_error(error.message() + ": " + cat(args...));
   }
-
-  lisp_t break0(lisp_t) const;
-
-  enum class break_return
-  {
-    RETURN,  // Return from recursive repl
-    PROCEED, // Proceed with repl
-    SKIP,    // Skip eval
-  };
-  using repl_fun_t = std::function<lisp_t(lisp_t)>;
-  repl_fun_t repl;
 
   // Used by lisp::io
   int printlevel = 0;

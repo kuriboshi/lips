@@ -36,7 +36,7 @@ TEST_CASE("main: incomplete input")
   auto oldout = ctx.primout(ref_file_t::create(cout));
   auto oldin = ctx.primin(ref_file_t::create(R"((print "hello")"));
   std::ostringstream os;
-  run(ctx, os);
+  run(vm::get(), os);
   CHECK(os.str() == "");
   CHECK(cout.str() == R"(> "hello"
 "hello"
@@ -53,13 +53,13 @@ TEST_CASE("main: exit")
   {
     auto old = ctx.primin(ref_file_t::create(R"((exit))"));
     std::ostringstream os;
-    CHECK(run(ctx, os) == 0);
+    CHECK(run(vm::get(), os) == 0);
     ctx.primin(old);
   }
   {
     auto old = ctx.primin(ref_file_t::create(R"((exit 99))"));
     std::ostringstream os;
-    CHECK(run(ctx, os) == 99);
+    CHECK(run(vm::get(), os) == 99);
     ctx.primin(old);
   }
   ctx.primout(old);
@@ -77,7 +77,7 @@ TEST_CASE("main: reset")
     // which is caught by 'run' which returns 0.
     auto old = ctx.primin(ref_file_t::create(R"((foo))"));
     std::ostringstream os;
-    CHECK(run(ctx, os) == 0);
+    CHECK(run(vm::get(), os) == 0);
     ctx.primin(old);
   }
 
@@ -88,7 +88,7 @@ TEST_CASE("main: reset")
     // called.
     vm::get().interrupt = true;
     std::ostringstream os;
-    CHECK(run(ctx, os) == 0);
+    CHECK(run(vm::get(), os) == 0);
     vm::get().interrupt = false;
     ctx.primin(old);
   }
@@ -105,7 +105,7 @@ TEST_CASE("main: reset")
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
     auto old = ctx.primin(ref_file_t::create(R"((throw "exception"))"));
     std::ostringstream os;
-    CHECK(run(ctx, os) == 0);
+    CHECK(run(vm::get(), os) == 0);
     CHECK(os.str() == "exception: exception\n");
     ctx.primin(old);
   }
@@ -130,7 +130,7 @@ TEST_CASE("main: reset")
     // Throw inside a lambda so that we have one environment.
     auto old = ctx.primin(ref_file_t::create(R"(((lambda () (throw_unwind "throw_unwind"))))"));
     std::ostringstream os;
-    CHECK(run(ctx, os) == 0);
+    CHECK(run(vm::get(), os) == 0);
     CHECK(os.str() == "exception: throw_unwind\n");
     ctx.primin(old);
   }

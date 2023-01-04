@@ -42,5 +42,5 @@ int main(int argc, const char** argv)
       return 1;
     }
   }
-  return lisp::run(ctx);
+  return lisp::run(lisp::vm::get());
 }

@@ -210,8 +210,6 @@ lisp_t context::error(std::error_code error, lisp_t arg) const
   throw lisp_error(error.message());
 }
 
-lisp_t context::break0(lisp_t exp) const { return repl(exp); }
-
 cvariable_t& context::currentbase() { return _pimpl->_currentbase; }
 cvariable_t& context::verbose() { return _pimpl->_verbose; }
 cvariable_t& context::loadpath() { return _pimpl->_loadpath; }

@@ -22,12 +22,12 @@
 namespace lisp
 {
 
-repl::repl(context& ctx)
-  : _ctx(ctx)
+repl::repl(class vm& vm)
+  : _vm(vm)
 {
   _prompt = "> "_s;
   _break_prompt = ": "_s;
-  vm::get().interactive(true);
+  _vm.interactive(true);
 }
 
 lisp_t repl::operator()(lisp_t exp)
@@ -38,7 +38,7 @@ lisp_t repl::operator()(lisp_t exp)
     while(true)
     {
       prin0(_prompt);
-      auto expr = lispread(_ctx.primin());
+      auto expr = lispread(context::current().primin());
       if(expr == C_EOF)
         break;
       auto result = eval(expr);
@@ -50,7 +50,7 @@ lisp_t repl::operator()(lisp_t exp)
   while(true)
   {
     prin0(_break_prompt);
-    auto com = lispread(_ctx.primin());
+    auto com = lispread(context::current().primin());
     if(com == C_EOF)
       return C_EOF;
     /* OK, EVAL, ^, ... */
