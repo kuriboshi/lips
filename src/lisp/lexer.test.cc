@@ -55,6 +55,12 @@ TEST_CASE("lexer: symbols")
   SECTION("Symbol a01") { lexer_check("a01", token_t::type::SYMBOL, "a01"); }
 
   SECTION("Symbol sym\\(bol") { lexer_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol"); }
+
+  SECTION("Handling of period")
+  {
+    lexer_check(".;comment", token_t::type::SPECIAL, ".");
+    lexer_check(".(", token_t::type::SPECIAL, ".");
+  }
 }
 
 TEST_CASE("lexer: (a b c)")
@@ -66,6 +72,12 @@ TEST_CASE("lexer: (a b c)")
   lexer_check(lexer, token_t::type::SYMBOL, "c");
   lexer_check(lexer, token_t::type::SPECIAL, ")");
   CHECK(!lexer.read());
+}
+
+TEST_CASE("lexer: a(")
+{
+  lexer lexer{"a("};
+  lexer_check(lexer, token_t::type::SYMBOL, "a");
 }
 
 TEST_CASE("lexer: ( a b c )")
@@ -147,10 +159,12 @@ TEST_CASE("lexer: floats")
   lexer_check("1.23E-2", token_t::type::FLOAT, "1.23E-2");
   lexer_check("+1.234", token_t::type::FLOAT, "+1.234");
   lexer_check("123e-2", token_t::type::FLOAT, "123e-2");
+  lexer_check("123e;comment", token_t::type::FLOAT, "123e");
   lexer_check(".1.234", token_t::type::SYMBOL, ".1.234");
   lexer_check(".1,234", token_t::type::SYMBOL, ".1,234");
   lexer_check("1.23e--2", token_t::type::SYMBOL, "1.23e--2");
   lexer_check("12e2abc", token_t::type::SYMBOL, "12e2abc");
+  lexer_check("1234efg", token_t::type::SYMBOL, "1234efg");
 }
 
 TEST_CASE("lexer: unread")
@@ -172,45 +186,45 @@ TEST_CASE("lexer: comments")
 {
   SECTION("# at start of line")
   {
-    lexer lexer{"# comment\nhello\n# another comment\nworld"};
-    auto token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "hello");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "world");
+    lexer lexer{R"(
+# comment
+hello
+# another comment
+world)"};
+    lexer_check(lexer, token_t::type::SYMBOL, "hello");
+    lexer_check(lexer, token_t::type::SYMBOL, "world");
   }
 
   SECTION("# not at start of line")
   {
-    lexer lexer{" # comment\nhello\n"};
-    auto token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "#");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "comment");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "hello");
+    lexer lexer{R"(
+ # comment
+hello
+ #(
+ #)
+ #[
+ #]
+ #*
+)"};
+    lexer_check(lexer, token_t::type::SYMBOL, "#");
+    lexer_check(lexer, token_t::type::SYMBOL, "comment");
+    lexer_check(lexer, token_t::type::SYMBOL, "hello");
+    lexer_check(lexer, token_t::type::SYMBOL, "#");
+    lexer_check(lexer, token_t::type::SPECIAL, "(");
+    lexer_check(lexer, token_t::type::SYMBOL, "#");
+    lexer_check(lexer, token_t::type::SPECIAL, ")");
+    lexer_check(lexer, token_t::type::SYMBOL, "#");
+    lexer_check(lexer, token_t::type::SPECIAL, "[");
+    lexer_check(lexer, token_t::type::SYMBOL, "#");
+    lexer_check(lexer, token_t::type::SPECIAL, "]");
+    lexer_check(lexer, token_t::type::SYMBOL, "#*");
   }
 
   SECTION("#' token")
   {
     lexer lexer{" #'plus\n"};
-    auto token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "#'");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.type == token_t::type::SYMBOL);
-    CHECK(token.token == "plus");
+    lexer_check(lexer, token_t::type::SYMBOL, "#'");
+    lexer_check(lexer, token_t::type::SYMBOL, "plus");
   }
 
   SECTION("inside s-expr")
@@ -226,19 +240,13 @@ TEST_CASE("lexer: comments")
 
   SECTION("inside s-expr with int")
   {
-    lexer lexer{"(100;comment\n200)"};
-    auto token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.is_special('('));
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.token == "100");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.token == "200");
-    token = lexer.read();
-    REQUIRE(token);
-    CHECK(token.is_special(')'));
+    lexer lexer{"(100;comment\n200)300("};
+    lexer_check(lexer, token_t::type::SPECIAL, "(");
+    lexer_check(lexer, token_t::type::INT, "100");
+    lexer_check(lexer, token_t::type::INT, "200");
+    lexer_check(lexer, token_t::type::SPECIAL, ")");
+    lexer_check(lexer, token_t::type::INT, "300");
+    lexer_check(lexer, token_t::type::SPECIAL, "(");
   }
 
   SECTION("inside s-expr with int")
