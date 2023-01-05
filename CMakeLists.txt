@@ -27,9 +27,9 @@ if(POLICY CMP0135)
 endif()
 
 option(LIPS_ENABLE_TRACE "Enable the ability to trace the interpreter" ON)
-option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" ON)
-option(LIPS_ENABLE_TESTS "Enable compiling test code" ON)
-option(LIPS_ENABLE_BENCHMARK "Enable compiling benchmark program" ON)
+option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" OFF)
+option(LIPS_ENABLE_TESTS "Enable compiling test code" OFF)
+option(LIPS_ENABLE_BENCHMARK "Enable compiling benchmark program" OFF)
 option(LIPS_ENABLE_CLANG_TIDY "Enable checking with clang-tidy" OFF)
 option(LIPS_USE_SSHFS "Turn this ON if using sshfs on macOS (see README.md)"
        OFF)

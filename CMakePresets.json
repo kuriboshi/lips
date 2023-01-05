@@ -15,7 +15,9 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "LIPS_ENABLE_TESTS": "ON"
+                "LIPS_ENABLE_TESTS": "ON",
+                "LIPS_ENABLE_CODE_COVERAGE": "ON",
+                "LIPS_ENABLE_BENCHMARK": "ON"
             }
         },
         {
