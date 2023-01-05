@@ -1,12 +1,13 @@
 # Lips — lisp shell
 
-Copyright 1988-1989, 1992, 2020-2022 Krister Joas <krister@joas.jp>
+Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
 
 ![Ubuntu 18.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-18.04.yml/badge.svg)
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
+![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 1.0.3
+Version 2.0.0
 
 ## What is it?
 
@@ -44,15 +45,16 @@ The code requires C++20 and CMake 3.21 or newer.
 
 ## Platforms
 
-The project is developed on macOS 12 (Monterey) using the Apple clang
-version 13.1.6 (clang-1316.0.21.2) compiler.  It may work on older
-releases of macOS if you install a newer compiler.  It's also
-regularly tested on FreeBSD 13 as well as Ubuntu 22.04, 20.04, and
-18.04. On Ubuntu testing is done using gcc 11.x and clang 12.x.
+The project is developed primarily on macOS 13 (Ventura) using the
+Apple clang version 14.0.0 (clang-1400.0.29.202) compiler.  It may
+work on older releases of macOS if you install a newer compiler.  It's
+tested regulartly on Ubuntu 22.04, 20.04, and 18.04. On Ubuntu testing
+is done using gcc 11.x, gcc 12.x and clang 14.x.
 
 ## Building
 
-Configure and build using `cmake`. The `default` preset uses `ninja` to build.
+Configure and build using `cmake`. The `default` preset uses `ninja`
+to build.
 
 ```
 cmake --preset default
@@ -61,14 +63,29 @@ cmake --build --preset default
 
 There are a number of options available to customize the build.
 
-| Option                      | Description                  | Default value |
-| --------------------------- | ---------------------------- | ------------- |
-| `LIPS_ENABLE_TRACE`         | Enable tracing               | `ON`          |
-| `LIPS_ENABLE_CODE_COVERAGE` | Enable code coverage         | `ON`          |
-| `LIPS_ENABLE_TESTS`         | Enable building test code    | `ON`          |
-| `LIPS_USE_SSHFS`            | Use sshfs on macOS podman    | `OFF`         |
+| Option                      | Description                     | Default value |
+| --------------------------- | ------------------------------- | ------------- |
+| `LIPS_ENABLE_TRACE`         | Enable tracing                  | `ON`          |
+| `LIPS_ENABLE_CODE_COVERAGE` | Enable code coverage            | `OFF`         |
+| `LIPS_ENABLE_TESTS`         | Enable building test code       | `OFF`         |
+| `LIPS_ENABLE_BENCHMARK`     | Enable building benchmark code  | `OFF`         |
+| `LIPS_ENABLE_CLANG_TIDY`    | Enable checking with clang-tidy | `OFF`         |
+| `LIPS_USE_SSHFS`            | Use sshfs on macOS podman       | `OFF`         |
 
 Turn them on by adding `-D` options to the `cmake` command.
+
+There is a Makefile in the top directory which runs cmake and ctest
+for some common scenerios.
+
+## External dependencies
+
+Lips depends on two external libraries.
+
+- Catch2 (version 3.2.1)
+- fmt (version 9.1.0)
+
+These dependencies are downloaded and included in the build
+automatically.
 
 ## Testing
 
