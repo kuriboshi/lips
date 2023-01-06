@@ -48,7 +48,7 @@ lisp_t parser::parse_list(char c)
   while(true)
   {
     if(!next())
-      return head;
+      break;
 
     if(c == '[' && _token.is_special(')'))
     {
@@ -57,14 +57,14 @@ lisp_t parser::parse_list(char c)
       continue;
     }
     if(c == '(' && _token.is_special(')'))
-      return head;
+      break;
     if(c == '(' && _token.is_special(']'))
     {
       _lexer.unread(_token);
-      return head;
+      break;
     }
     if(c == '[' && _token.is_special(']'))
-      return head;
+      break;
 
     auto object = parse_tail();
 
@@ -73,7 +73,7 @@ lisp_t parser::parse_list(char c)
     else
       tail = cdr(rplacd(tail, object));
   }
-  return nil;
+  return head;
 }
 
 lisp_t parser::parse_tail()

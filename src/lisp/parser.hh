@@ -74,9 +74,9 @@ public:
       case token_t::type::FLOAT:
         return mkfloat(std::stod(token.token));
       default:
-        return nil;
+        break;
     }
-    return C_EOF;
+    return nil;
   }
 
 private:

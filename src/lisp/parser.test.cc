@@ -215,4 +215,14 @@ TEST_CASE("parser: syntax table")
   CHECK(t->car() == C_QUOTE);
 }
 
+TEST_CASE("parser: empty token")
+{
+  // For coverage
+  lexer lexer{""};
+  parser parser{lexer};
+  token_t token;
+  auto empty = parser.create(token);
+  CHECK(empty == nil);
+}
+
 } // namespace lisp
