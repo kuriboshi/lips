@@ -79,15 +79,13 @@ lisp_t readline(ref_file_t file)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(head && head == C_EOF)
-      return head;
     if(listp(head) || head == nil)
       return head;
     lisp_t tail;
     while(true)
     {
       auto o = parser.parse();
-      if(o && o == C_EOF)
+      if(o == C_EOF)
         break;
       if(tail == nil)
         tail = cdr(head = cons(head, cons(o, nil)));
