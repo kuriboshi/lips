@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <string>
@@ -66,17 +67,31 @@ TEST_CASE("file: functions")
   SECTION("ratom")
   {
     create_test_file test("atom\n");
+    SECTION("from file")
     {
       auto in0 = open(mkstring(test.file), C_READ);
       auto e0 = ratom(in0);
       REQUIRE(type_of(e0) == object::type::Symbol);
       CHECK(e0->getstr() == "atom");
     }
+
+    SECTION("from primin")
     {
-      auto in0 = open(mkstring(test.file), C_READ);
-      auto e0 = ratom(in0);
-      REQUIRE(type_of(e0) == object::type::Symbol);
-      CHECK(e0->getstr() == "atom");
+      auto in = ref_file_t::create("atom");
+      auto old = context::current().primin(in);
+      auto r = ratom(lisp_t());
+      REQUIRE(type_of(r) == object::type::Symbol);
+      CHECK(r->getstr() == "atom");
+      context::current().primin(old);
+    }
+
+    SECTION("from stdin")
+    {
+      std::istringstream stream("nil");
+      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto r = ratom(T);
+      CHECK(r == nil);
+      std::cin.rdbuf(buf);
     }
   }
 
@@ -187,15 +202,38 @@ TEST_CASE("file: functions")
 
   SECTION("readc")
   {
-    lisp_t f = getobject(ref_file_t::create(R"(test)"));
-    auto ch0 = readc(f);
-    CHECK(ch0->intval() == 't');
-    auto ch1 = readc(f);
-    CHECK(ch1->intval() == 'e');
-    auto ch2 = readc(f);
-    CHECK(ch2->intval() == 's');
-    auto ch3 = readc(f);
-    CHECK(ch3->intval() == 't');
+    SECTION("basic")
+    {
+      lisp_t f = getobject(ref_file_t::create(R"(test)"));
+      auto ch0 = readc(f);
+      CHECK(ch0->intval() == 't');
+      auto ch1 = readc(f);
+      CHECK(ch1->intval() == 'e');
+      auto ch2 = readc(f);
+      CHECK(ch2->intval() == 's');
+      auto ch3 = readc(f);
+      CHECK(ch3->intval() == 't');
+    }
+
+    SECTION("from primin")
+    {
+      auto in = ref_file_t::create("a");
+      auto old = context::current().primin(in);
+      auto r = readc(nil);
+      REQUIRE(type_of(r) == object::type::Integer);
+      CHECK(r->intval() == 'a');
+      context::current().primin(old);
+    }
+
+    SECTION("from stdin")
+    {
+      std::istringstream stream("a");
+      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto r = readc(T);
+      REQUIRE(type_of(r) == object::type::Integer);
+      CHECK(r->intval() == 'a');
+      std::cin.rdbuf(buf);
+    }
   }
 
   SECTION("read")
@@ -207,6 +245,7 @@ TEST_CASE("file: functions")
 
   SECTION("spaces")
   {
+    SECTION("primout")
     {
       std::ostringstream cout;
       auto old = ctx.primout(ref_file_t::create(cout));
@@ -214,12 +253,14 @@ TEST_CASE("file: functions")
       CHECK(cout.str() == "        ");
       ctx.primout(old);
     }
+
+    SECTION("primerr")
     {
       std::ostringstream cout;
-      auto old = ctx.primout(ref_file_t::create(cout));
-      spaces(8_l, nil);
+      auto old = ctx.primerr(ref_file_t::create(cout));
+      spaces(8_l, T);
       CHECK(cout.str() == "        ");
-      ctx.primout(old);
+      ctx.primerr(old);
     }
   }
 
@@ -233,6 +274,7 @@ TEST_CASE("file: functions")
       auto expected = mklist("test"_a);
       CHECK(equal(r, expected));
     }
+
     SECTION("Two atoms")
     {
       lisp_t f = getobject(ref_file_t::create(R"(test test)"));
