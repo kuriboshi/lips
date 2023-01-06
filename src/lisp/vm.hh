@@ -15,8 +15,8 @@
 // limitations under the License.
 //
 
-#ifndef LISP_EVAL_HH
-#define LISP_EVAL_HH
+#ifndef LISP_VM_HH
+#define LISP_VM_HH
 
 #include <array>
 #include <cstdint>
