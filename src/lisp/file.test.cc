@@ -283,6 +283,14 @@ TEST_CASE("file: functions")
       auto expected = mklist("test"_a, "test"_a);
       CHECK(equal(r, expected));
     }
+
+    SECTION("readline eof")
+    {
+      create_test_file test{""};
+      auto in = open(mkstring(test.file), C_READ);
+      auto r = readline(in);
+      CHECK(r == C_EOF);
+    }
   }
 
   SECTION("loadfile")

@@ -147,6 +147,24 @@ TEST_CASE("io: lispread/readline")
     auto r1 = readline(f1);
     CHECK(r0 == "hello"_a);
   }
+
+  SECTION("readline eof")
+  {
+    auto r0 = readline(ref_file_t::create(""));
+    CHECK(r0 == C_EOF);
+  }
+
+  SECTION("readline expression")
+  {
+    auto r = readline(ref_file_t::create("(a b c)"));
+    CHECK(listp(r) != nil);
+  }
+
+  SECTION("readline three expressions")
+  {
+    auto r = readline(ref_file_t::create("a b c"));
+    CHECK(eq(length(r), 3_l));
+  }
 }
 
 TEST_CASE("io: source/sink")
