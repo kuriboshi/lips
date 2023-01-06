@@ -70,7 +70,7 @@ function output_years(first, last) {
       add_year(b[ix])
     }
   }
-  while(("git log --format=\"%ai %H %s\" --follow " FILENAME " | grep -v -f " exclude " | grep -v \"copyright:\" | sed '\''1!G;h;$!d'\''" | getline) > 0) {
+  while(("git log --format=\"%ai %H %s\" --follow -M8 " FILENAME " | grep -v -f " exclude " | grep -v \"copyright:\" | sed '\''1!G;h;$!d'\''" | getline) > 0) {
     split($0, d, "-")
     add_year(d[1])
   }
