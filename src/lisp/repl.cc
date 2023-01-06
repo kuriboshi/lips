@@ -70,12 +70,12 @@ lisp_t repl::operator()(lisp_t exp)
       return print(eval(exp), false);
     if(com->car() == C_RESET)
     {
-      vm::get().unwind();
+      _vm.unwind();
       throw lisp_reset();
     }
     if(com->car() == C_BT)
     {
-      vm::get().bt();
+      _vm.bt();
       continue;
     }
     if(com->car() == C_RETURN)
