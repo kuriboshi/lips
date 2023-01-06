@@ -49,6 +49,6 @@ benchmark: release
 .PHONY: package_test
 
 package_test:
-	(cd test; cmake -B build .)
+	(cd test; cmake -G Ninja -B build .)
 	(cd test; cmake --build build)
 	(cd test/build; ./package_test)

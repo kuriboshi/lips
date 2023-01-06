@@ -21,8 +21,8 @@
 
 TEST_CASE("package_test")
 {
-  lisp::vm vm;
   lisp::context context;
+  lisp::vm vm(context);
   auto result = vm.eval("(plus 1 2 3)");
   REQUIRE(lisp::type_of(result) == lisp::object::type::Integer);
   CHECK(result->intval() == 6);
