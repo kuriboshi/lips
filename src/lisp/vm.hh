@@ -30,7 +30,15 @@ namespace lisp
 class vm
 {
 public:
-  vm();
+  /// @brief Lisp virtual machine constructor.
+  ///
+  /// @details The lisp virtual machine doesn't store the context. The
+  /// parameter is only there to ensure that the context is created since it's
+  /// used implicitly by the virtual machine.
+  ///
+  /// @param ctx The context object.
+  vm(context& ctx);
+  /// @brief The destructor.
   ~vm();
 
   static vm& get()

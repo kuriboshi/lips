@@ -143,7 +143,7 @@ public:
   }
 };
 
-vm::vm()
+vm::vm(context&)
 {
   if(_current == nullptr)
     _current = this;

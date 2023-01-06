@@ -48,8 +48,8 @@ int main(int argc, const char** argv)
       | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
     session.cli(cli);
     session.applyCommandLine(argc, argv);
-    lisp::vm vm;
     lisp::context ctx;
+    lisp::vm vm(ctx);
     std::ostringstream os;
     auto quiet = lisp::ref_file_t::create(os);
     ctx.primerr(quiet);

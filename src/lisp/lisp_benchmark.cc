@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 2022 Krister Joas
+// Copyright 2022-2023 Krister Joas
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,18 +24,6 @@
 
 #include "lisp.hh"
 
-namespace
-{
-template<typename I>
-lisp::lisp_t buildpath(I i, I end)
-{
-  if(i == end)
-    return lisp::nil;
-  auto s = lisp::mkstring(*i);
-  return lisp::cons(s, buildpath(++i, end));
-}
-} // namespace
-
 int main(int argc, const char** argv)
 {
   try
@@ -43,22 +31,9 @@ int main(int argc, const char** argv)
     Catch::Session session;
     std::vector<std::string> load;
     std::vector<std::string> loadpath;
-    using namespace Catch::Clara;
-    auto cli = session.cli() | Opt(load, "load")["--load"]("Load a LISP file")
-      | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
-    session.cli(cli);
     session.applyCommandLine(argc, argv);
     lisp::context ctx;
-    std::ostringstream os;
-    auto quiet = lisp::ref_file_t::create(os);
-    ctx.primerr(quiet);
-    if(!loadpath.empty())
-    {
-      auto path = buildpath(loadpath.begin(), loadpath.end());
-      ctx.loadpath(path);
-    }
-    for(auto i: load)
-      lisp::loadfile(i);
+    lisp::vm vm(ctx);
     auto result = session.run();
     return result;
   }

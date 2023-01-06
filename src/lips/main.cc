@@ -302,8 +302,8 @@ int main(int argc, char* const* argv)
   //
   // Init shell and lisp interpreter.
   //
-  lisp::vm vm;
   lisp::context context;
+  lisp::vm vm(context);
   init();
   // auto context = init();
   if(options.test)
