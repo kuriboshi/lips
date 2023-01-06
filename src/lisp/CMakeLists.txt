@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-configure_file(version.cc.in version.cc)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.cc.in ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
 
 target_sources(
   liblisp
