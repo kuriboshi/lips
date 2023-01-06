@@ -21,7 +21,6 @@
 #include <system_error>
 #include <memory>
 
-#include "except.hh"
 #include "ref_ptr.hh"
 #include "types.hh"
 
@@ -29,12 +28,8 @@ namespace lisp
 {
 
 class syntax;
-class context;
-class cvariable_t;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
-class object;
-using lisp_t = ref_ptr<object>;
 
 extern lisp_t C_VERSION;
 

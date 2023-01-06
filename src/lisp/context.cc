@@ -16,11 +16,12 @@
 //
 
 #include "context.hh"
+
+#include <iostream>
+
 #include "alloc.hh"
 #include "file.hh"
 #include "syntax.hh"
-
-#include <iostream>
 
 namespace lisp
 {
