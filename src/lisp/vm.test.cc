@@ -26,12 +26,12 @@
 using Catch::Matchers::Matches;
 
 #include "alloc.hh"
-#include "eval.hh"
 #include "file.hh"
 #include "low.hh"
 #include "pred.hh"
 #include "prim.hh"
 #include "prop.hh"
+#include "vm.hh"
 
 namespace lisp
 {

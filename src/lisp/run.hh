@@ -20,9 +20,9 @@
 
 #include <iostream>
 
-#include "eval.hh"
-#include "types.hh"
 #include "repl.hh"
+#include "types.hh"
+#include "vm.hh"
 
 namespace lisp
 {

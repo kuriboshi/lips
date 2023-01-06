@@ -16,8 +16,8 @@
 //
 
 #include "alloc.hh"
-#include "eval.hh"
 #include "repl.hh"
+#include "vm.hh"
 
 namespace lisp
 {

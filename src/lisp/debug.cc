@@ -18,7 +18,7 @@
 #include "alloc.hh"
 #include "check.hh"
 #include "debug.hh"
-#include "eval.hh"
+#include "vm.hh"
 
 namespace lisp::details::debug
 {

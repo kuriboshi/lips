@@ -19,7 +19,7 @@
 
 #include "alloc.hh"
 #include "debug.hh"
-#include "eval.hh"
+#include "vm.hh"
 
 namespace lisp
 {

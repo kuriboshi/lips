@@ -23,7 +23,6 @@
 #include "check.hh"
 #include "context.hh"
 #include "debug.hh"
-#include "eval.hh"
 #include "file.hh"
 #include "io.hh"
 #include "iter.hh"
@@ -38,5 +37,6 @@
 #include "string.hh"
 #include "user.hh"
 #include "version.hh"
+#include "vm.hh"
 
 #endif

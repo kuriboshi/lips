@@ -19,10 +19,10 @@
 
 #include "alloc.hh"
 #include "check.hh"
-#include "eval.hh"
 #include "file.hh"
 #include "io.hh"
 #include "iter.hh"
+#include "vm.hh"
 
 namespace lisp::details::file
 {

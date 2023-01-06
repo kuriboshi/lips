@@ -21,9 +21,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "eval.hh"
 #include "io.hh"
 #include "repl.hh"
+#include "vm.hh"
 
 namespace lisp
 {

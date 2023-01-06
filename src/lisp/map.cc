@@ -16,9 +16,9 @@
 //
 
 #include "alloc.hh"
-#include "eval.hh"
 #include "map.hh"
 #include "prim.hh"
+#include "vm.hh"
 
 namespace lisp::details::map
 {

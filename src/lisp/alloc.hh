@@ -21,10 +21,10 @@
 #include <string>
 #include <string_view>
 
-#include "eval.hh"
+#include "details/alloc.hh"
 #include "io.hh"
 #include "types.hh"
-#include "details/alloc.hh"
+#include "vm.hh"
 
 namespace lisp
 {

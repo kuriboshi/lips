@@ -22,7 +22,7 @@ target_sources(
   PRIVATE alloc.cc
           arith.cc
           context.cc
-          eval.cc
+          vm.cc
           file.cc
           io.cc
           lexer.cc
@@ -49,7 +49,7 @@ set(_liblisp_source
           check.hh
           context.hh
           error.hh
-          eval.hh
+          vm.hh
           except.hh
           exit.hh
           file.hh
@@ -115,7 +115,7 @@ if(LIPS_ENABLE_TESTS)
             context.test.cc
             debug.test.cc
             error.test.cc
-            eval.test.cc
+            vm.test.cc
             file.test.cc
             io.test.cc
             lexer.test.cc

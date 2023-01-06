@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "eval.hh"
+#include "vm.hh"
 
 #include <string_view>
 
