@@ -16,8 +16,7 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "LIPS_ENABLE_TESTS": "ON",
-                "LIPS_ENABLE_CODE_COVERAGE": "ON",
-                "LIPS_ENABLE_BENCHMARK": "ON"
+                "LIPS_ENABLE_CODE_COVERAGE": "ON"
             }
         },
         {
@@ -31,14 +30,18 @@
             "binaryDir": "${sourceDir}/build/release",
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "LIPS_ENABLE_BENCHMARK": "ON"
             }
         },
         {
             "name": "xcode",
             "displayName": "XCode preset",
             "generator": "Xcode",
-            "binaryDir": "${sourceDir}/build/xcode"
+            "binaryDir": "${sourceDir}/build/xcode",
+            "cacheVariables": {
+                "LIPS_ENABLE_TESTS": "ON"
+            }
         },
         {
             "name": "make",
