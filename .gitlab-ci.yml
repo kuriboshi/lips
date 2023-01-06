@@ -38,11 +38,6 @@ package-test-job:
   stage: test
   script:
     - make package_test
-  dependencies:
-    - build-job
-  artifacts:
-    paths:
-      - build/
 
 deploy-job:
   stage: deploy
