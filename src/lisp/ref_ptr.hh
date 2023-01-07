@@ -119,8 +119,6 @@ public:
   /// @brief Move constructor
   ref_ptr(ref_ptr&& x)
   {
-    if(_ptr)
-      _ptr->release();
     _ptr = x._ptr;
     x._ptr = nullptr;
   }
