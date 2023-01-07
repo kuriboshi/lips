@@ -161,16 +161,28 @@ TEST_CASE("file: functions")
   SECTION("prin2")
   {
     constexpr const char* test_file = "test_prin2.lisp";
-    auto f0 = open(mkstring(test_file), C_WRITE);
-    prin2(mkstring("hello \"world\""), f0);
-    close(f0);
-    auto f1 = open(mkstring(test_file), C_READ);
-    auto r1 = getline(f1);
-    REQUIRE(r1 != nil);
-    // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
-    // versions print/prin1/princ.
-    CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
-    std::filesystem::remove(test_file);
+    SECTION("basic")
+    {
+      auto f0 = open(mkstring(test_file), C_WRITE);
+      prin2(mkstring("hello \"world\""), f0);
+      close(f0);
+      auto f1 = open(mkstring(test_file), C_READ);
+      auto r1 = getline(f1);
+      REQUIRE(r1 != nil);
+      // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
+      // versions print/prin1/princ.
+      CHECK(r1->getstr() == "\"hello \\\"world\\\"\"");
+      std::filesystem::remove(test_file);
+    }
+
+    SECTION("to primout")
+    {
+      std::ostringstream cout;
+      auto old = ctx.primout(ref_file_t::create(cout));
+      prin2(mkstring("hello \"world\""), nil);
+      CHECK(cout.str() == "\"hello \\\"world\\\"\"");
+      ctx.primout(old);
+    }
   }
 
   SECTION("printlevel")
@@ -238,14 +250,50 @@ TEST_CASE("file: functions")
 
   SECTION("read")
   {
-    lisp_t f = getobject(ref_file_t::create(R"((a b c))"));
-    auto sexpr = read(f);
-    CHECK(!is_nil(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
+    SECTION("basic")
+    {
+      lisp_t f = getobject(ref_file_t::create(R"((a b c))"));
+      auto sexpr = read(f);
+      CHECK(!is_nil(equal(sexpr, mklist("a"_a, "b"_a, "c"_a))));
+    }
+
+    SECTION("from primin")
+    {
+      auto in = ref_file_t::create(R"((a b c))");
+      auto old = context::current().primin(in);
+      auto r = read(nil);
+      REQUIRE(type_of(r) == object::type::Cons);
+      CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
+      context::current().primin(old);
+    }
+
+    SECTION("from stdin")
+    {
+      std::istringstream stream(R"((a b c))");
+      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto r = read(T);
+      REQUIRE(type_of(r) == object::type::Cons);
+      CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
+      std::cin.rdbuf(buf);
+    }
   }
 
   SECTION("spaces")
   {
-    SECTION("primout")
+    SECTION("basic")
+    {
+      constexpr const char* test_file{"test_spaces.txt"};
+      auto f0 = open(mkstring(test_file), C_WRITE);
+      spaces(8_l, f0);
+      close(f0);
+      std::ifstream in{test_file};
+      std::string line;
+      std::getline(in, line);
+      CHECK(line == "        ");
+      std::filesystem::remove(test_file);
+    }
+
+    SECTION("to primout")
     {
       std::ostringstream cout;
       auto old = ctx.primout(ref_file_t::create(cout));
@@ -254,7 +302,7 @@ TEST_CASE("file: functions")
       ctx.primout(old);
     }
 
-    SECTION("primerr")
+    SECTION("to primerr")
     {
       std::ostringstream cout;
       auto old = ctx.primerr(ref_file_t::create(cout));
@@ -284,12 +332,33 @@ TEST_CASE("file: functions")
       CHECK(equal(r, expected));
     }
 
-    SECTION("readline eof")
+    SECTION("eof")
     {
       create_test_file test{""};
       auto in = open(mkstring(test.file), C_READ);
       auto r = readline(in);
       CHECK(r == C_EOF);
+    }
+
+    SECTION("from primin")
+    {
+      auto in = ref_file_t::create(R"((a b c))");
+      auto old = context::current().primin(in);
+      auto r = readline(lisp_t(nil));
+      REQUIRE(type_of(r) == object::type::Cons);
+      CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
+      context::current().primin(old);
+    }
+
+    SECTION("from stdin")
+    {
+      std::istringstream stream("a");
+      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto r = readline(T);
+      REQUIRE(type_of(r) == object::type::Cons);
+      REQUIRE(type_of(r->car()) == object::type::Symbol);
+      CHECK(r->car()->symbol()->pname == "a");
+      std::cin.rdbuf(buf);
     }
   }
 
@@ -319,6 +388,19 @@ TEST_CASE("file: functions")
     REQUIRE(type_of("a"_a->value()) == object::type::Integer);
     CHECK("a"_a->value()->intval() == 999);
   }
+}
+
+TEST_CASE("file: error reading file")
+{
+  create_test_file test("(error)");
+  auto file = mkstring(test.file);
+  CHECK_THROWS(load(file));
+}
+
+TEST_CASE("file: try to read non-existing file")
+{
+  auto file = mkstring("/does-not-exist.lisp");
+  CHECK_THROWS(load(file));
 }
 
 TEST_CASE("file: open error conditions")
