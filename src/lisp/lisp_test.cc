@@ -48,6 +48,19 @@ int main(int argc, const char** argv)
       | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
     session.cli(cli);
     session.applyCommandLine(argc, argv);
+    try
+    {
+      lisp::context::current();
+      // This exception is never thrown
+      throw std::runtime_error("lisp::context didn't throw an exception");
+    }
+    catch(const std::runtime_error& ex)
+    {
+      std::string s0{ex.what()};
+      std::string s1{"lisp::context has not been created"};
+      if(s0 != s1)
+        throw;
+    }
     lisp::context ctx;
     lisp::vm vm(ctx);
     std::ostringstream os;
