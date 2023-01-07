@@ -92,11 +92,13 @@ token_t lexer::read()
             next();
             return token;
           case syntax::type::SPLICE:
+            // TODO: Not yet implemented
             token.type = token_t::type::SPLICE;
             token.token.push_back(*_pos);
             next();
             return token;
           case syntax::type::INFIX:
+            // TODO: Not yet implemented
             token.type = token_t::type::INFIX;
             token.token.push_back(*_pos);
             next();
@@ -291,9 +293,6 @@ token_t lexer::read()
             token.type = token_t::type::SYMBOL;
             continue;
         }
-        break;
-      default:
-        break;
     }
     next();
   }

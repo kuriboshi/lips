@@ -52,12 +52,25 @@ int main(int argc, const char** argv)
     {
       lisp::context::current();
       // This exception is never thrown
-      throw std::runtime_error("lisp::context didn't throw an exception");
+      throw std::runtime_error("lisp::context::current didn't throw an exception");
     }
     catch(const std::runtime_error& ex)
     {
       std::string s0{ex.what()};
       std::string s1{"lisp::context has not been created"};
+      if(s0 != s1)
+        throw;
+    }
+    try
+    {
+      lisp::vm::get();
+      // This exception is never thrown
+      throw std::runtime_error("lisp::vm::get didn't throw an exception");
+    }
+    catch(const std::runtime_error& ex)
+    {
+      std::string s0{ex.what()};
+      std::string s1{"lisp::vm has not been created"};
       if(s0 != s1)
         throw;
     }

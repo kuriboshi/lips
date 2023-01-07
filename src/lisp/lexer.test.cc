@@ -56,6 +56,8 @@ TEST_CASE("lexer: symbols")
 
   SECTION("Symbol sym\\(bol") { lexer_check("sym\\(bol", token_t::type::SYMBOL, "sym(bol"); }
 
+  SECTION("Escape at end of file") { lexer_check("sym\\", token_t::type::SYMBOL, "sym"); }
+
   SECTION("Handling of period")
   {
     lexer_check(".;comment", token_t::type::SPECIAL, ".");
@@ -428,6 +430,26 @@ TEST_CASE("lexer: macro")
 {
   lexer lexer{"$HOME"};
   lexer.set('$', "rmgetenv"_l);
+  auto t = lexer.read();
+  REQUIRE(t);
+  CHECK(t.token == "$");
+}
+
+TEST_CASE("lexer: splice")
+{
+  lexer lexer{"$HOME"};
+  lexer.set('$', "rmgetenv"_l);
+  lexer.set('$', syntax::type::INFIX);
+  auto t = lexer.read();
+  REQUIRE(t);
+  CHECK(t.token == "$");
+}
+
+TEST_CASE("lexer: infix")
+{
+  lexer lexer{"$HOME"};
+  lexer.set('$', "rmgetenv"_l);
+  lexer.set('$', syntax::type::SPLICE);
   auto t = lexer.read();
   REQUIRE(t);
   CHECK(t.token == "$");
