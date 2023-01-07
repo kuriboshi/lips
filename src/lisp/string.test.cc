@@ -68,20 +68,59 @@ TEST_CASE("string: string functions")
 
   SECTION("string: substring")
   {
-    auto s0 = mkstring("hello world");
-    auto s1 = substring(s0, mknumber(1), mknumber(5));
-    REQUIRE(s1 != nil);
-    CHECK(s1->string() == "hello");
-    auto s2 = substring(s0, mknumber(7), mknumber(11));
-    REQUIRE(s2 != nil);
-    CHECK(s2->string() == "world");
-    auto s3 = substring(s0, mknumber(-1), mknumber(5));
-    REQUIRE(s3 != nil);
-    CHECK(s3->string() == "d");
-    auto s4 = substring(s0, mknumber(0), mknumber(15));
-    CHECK(s4 == nil);
-    auto s5 = substring(s0, mknumber(0), mknumber(-1));
-    CHECK(s5 == nil);
+    auto s = mkstring("hello world");
+
+    SECTION("substring(s, 1, 5)")
+    {
+      auto r = substring(s, mknumber(1), mknumber(5));
+      REQUIRE(type_of(r) == object::type::String);
+      CHECK(r->string() == "hello");
+    }
+
+    SECTION("substring(s, 7, 11)")
+    {
+      auto r = substring(s, mknumber(7), mknumber(11));
+      REQUIRE(type_of(r) == object::type::String);
+      CHECK(r->string() == "world");
+    }
+
+    SECTION("substring(s, -1, 5)")
+    {
+      auto r = substring(s, mknumber(-1), mknumber(5));
+      REQUIRE(type_of(r) == object::type::String);
+      CHECK(r->string() == "d");
+    }
+
+    SECTION("substring(s, 0, 15)")
+    {
+      auto r = substring(s, mknumber(0), mknumber(15));
+      CHECK(r == nil);
+    }
+
+    SECTION("substring(s, 0, -1)")
+    {
+      auto r = substring(s, mknumber(0), mknumber(-1));
+      CHECK(r == nil);
+    }
+
+    SECTION("substring(s, 7, nil)")
+    {
+      auto r = substring(s, mknumber(7), nil);
+      REQUIRE(type_of(r) == object::type::String);
+      CHECK(r->string() == "world");
+    }
+
+    SECTION("substring(s, 7, 6)")
+    {
+      auto r = substring(s, mknumber(7), mknumber(6));
+      CHECK(r == nil);
+    }
+
+    SECTION("substring(s, 20, nil)")
+    {
+      auto r = substring(s, mknumber(20), nil);
+      CHECK(r == nil);
+    }
   }
 
   SECTION("string: symstr")
@@ -93,6 +132,9 @@ TEST_CASE("string: string functions")
     auto r1 = symstr(p0);
     CHECK(type_of(r1) == object::type::String);
     CHECK(r1->string() == p0->getstr());
+    auto r2 = symstr(nil);
+    CHECK(type_of(r2) == object::type::String);
+    CHECK(r2->string() == "nil");
   }
 
   SECTION("string: strcmp")

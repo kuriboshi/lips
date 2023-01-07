@@ -97,8 +97,6 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
     if(i > j)
       return nil;
     e = j - b;
-    if(e == 0)
-      return nil;
   }
   else
     e = std::string::npos;
