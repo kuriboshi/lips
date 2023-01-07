@@ -543,9 +543,9 @@ bool vm::eval_apply()
 
 void vm::bt()
 {
-  int op = context::current().printlevel;
+  auto op = context::current().printlevel;
   context::current().printlevel = 2;
-  for(int i = _toctrl - 1; i != 0; i--)
+  for(auto i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
       print(std::get<lisp_t>(_control[i - 1]), T);

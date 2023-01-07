@@ -328,7 +328,7 @@ inline lisp_t numcheck(lisp_t x, lisp_t y)
     case num_type::INTFLOAT:
       return docheck(static_cast<double>(x->intval()), y->floatval(), Comparer<double>());
     case num_type::INTINT:
-      return docheck(x->intval(), y->intval(), Comparer<int>());
+      return docheck(x->intval(), y->intval(), Comparer<std::int64_t>());
     case num_type::ILLEGAL1:
       return illegalreturn(x);
     default:

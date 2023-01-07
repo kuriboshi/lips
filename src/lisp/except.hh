@@ -42,11 +42,11 @@ public:
 class lisp_finish: public std::runtime_error
 {
 public:
-  lisp_finish(const std::string& message, int code)
+  lisp_finish(const std::string& message, std::int64_t code)
     : std::runtime_error(message),
       exit_code(code)
   {}
-  int exit_code;
+  std::int64_t exit_code;
 };
 
 } // namespace lisp

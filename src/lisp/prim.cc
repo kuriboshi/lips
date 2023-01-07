@@ -295,7 +295,7 @@ lisp_t closure(lisp_t fun, lisp_t vars)
   return getobject(c);
 }
 
-inline lisp_t _nth(lisp_t list, int n)
+inline lisp_t _nth(lisp_t list, std::int64_t n)
 {
   lisp_t ls;
   for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())

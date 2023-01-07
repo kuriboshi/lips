@@ -66,8 +66,8 @@ public:
   }
 
   // Used by lisp::io
-  int printlevel = 0;
-  int thisplevel = 0;
+  std::int64_t printlevel = 0;
+  std::int64_t thisplevel = 0;
 
   cvariable_t& currentbase();
   cvariable_t& verbose();

@@ -115,10 +115,10 @@ inline void ps(const std::string& s, file_t& file, bool esc)
     file.putch(c, esc);
 }
 
-inline void pi(std::int64_t i, int base, file_t& file)
+inline void pi(std::int64_t i, std::int64_t base, file_t& file)
 {
   std::array<char, 33> ss{};
-  if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, base); ec == std::errc())
+  if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, static_cast<int>(base)); ec == std::errc())
   {
     *ptr = '\0';
     ps(ss.data(), file, false);

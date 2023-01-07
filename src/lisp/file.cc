@@ -180,10 +180,8 @@ lisp_t printlevel(context& ctx, lisp_t newl)
 
 lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
 {
-  int i = 0;
-  ref_file_t f;
-
   check(n, object::type::Integer);
+  ref_file_t f;
   if(is_nil(file))
     f = ctx.primout();
   else if(is_T(file))
@@ -193,7 +191,7 @@ lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
     check(file, object::type::File);
     f = file->file();
   }
-  for(i = n->intval(); i > 0; i--)
+  for(auto i = n->intval(); i > 0; i--)
     f->putch(' ');
   return nil;
 }
