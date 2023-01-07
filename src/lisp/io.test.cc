@@ -61,19 +61,14 @@ TEST_CASE("io: ratom")
     auto r = ratom(in);
     CHECK(type_of(r) == object::type::Integer);
   }
+
   SECTION("symbol")
   {
-    {
-      auto in = ref_file_t::create("124abc");
-      auto r = ratom(in);
-      CHECK(type_of(r) == object::type::Symbol);
-    }
-    {
-      auto in = ref_file_t::create("124abc");
-      auto r = ratom(in);
-      CHECK(type_of(r) == object::type::Symbol);
-    }
+    auto in = ref_file_t::create("124abc");
+    auto r = ratom(in);
+    CHECK(type_of(r) == object::type::Symbol);
   }
+
   SECTION("string")
   {
     // This does not match the behaviour of Interlisp which would return the
