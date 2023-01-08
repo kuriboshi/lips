@@ -71,8 +71,6 @@ protected:
       return {};
     return buf;
   }
-
-  int _curc = 0;
 };
 
 class file_source: public source
