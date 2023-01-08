@@ -756,6 +756,11 @@ bool vm::eval_prim()
     send(foo);
     pop(_cont);
   }
+  catch(const lisp_reset& ex)
+  {
+    unwind();
+    throw;
+  }
   catch(const lisp_error& ex)
   {
     if(!_interactive)

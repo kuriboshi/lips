@@ -40,13 +40,10 @@ inline int run(vm& vm, std::ostream& out = std::cout)
       // If we return normally from repl we exit the program
       return 0;
     }
-    catch(const lisp_reset& ex)
-    {
-      vm.unwind();
-    }
     catch(const lisp_error& ex)
     {
-      out << ex.what() << std::endl;
+      out << "lisp_error: " << ex.what() << std::endl;
+      vm.unwind();
     }
     catch(const lisp_finish& ex)
     {
