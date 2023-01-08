@@ -57,8 +57,6 @@ lisp_t open(lisp_t filename, lisp_t mode)
 lisp_t close(lisp_t fildes)
 {
   check(fildes, object::type::File);
-  if(fildes->file()->has_sink())
-    fildes->file()->flush();
   fildes->file()->close();
   return T;
 }

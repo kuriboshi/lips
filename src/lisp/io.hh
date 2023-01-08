@@ -184,7 +184,7 @@ public:
   void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
   void terpri() override { _file->put('\n'); }
   void flush() override { _file->flush(); }
-  void close() override { _file->close(); }
+  void close() override { _file->flush(); _file->close(); }
 
 private:
   std::unique_ptr<std::ofstream> _file;
@@ -309,6 +309,8 @@ public:
   void close()
   {
     _source.release();
+    if(_sink)
+      _sink->flush();
     _sink.release();
   }
 
