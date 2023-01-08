@@ -537,6 +537,11 @@ TEST_CASE("io: splice")
     CHECK(!is_nil(equal(x, "(a x b c)"_l)));
     CHECK(!is_nil(equal(r, "(a x b c)"_l)));
   }
+  {
+    auto x = "(a b c)"_l;
+    auto r = io::splice(x, nil, true);
+    CHECK(!is_nil(equal(r, x)));
+  }
 }
 
 } // namespace lisp
