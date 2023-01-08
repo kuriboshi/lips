@@ -270,6 +270,12 @@ TEST_CASE("io: source")
       auto g = f.getline();
       CHECK(!g);
     }
+    {
+      std::ifstream is{"/dev/null"};
+      auto f = getobject(ref_file_t::create(is));
+      auto g = getline(f);
+      CHECK(!g);
+    }
   }
 
   SECTION("io::string_source")
