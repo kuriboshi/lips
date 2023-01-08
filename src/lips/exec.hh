@@ -25,11 +25,11 @@ namespace lisp::exec
 {
 void init();
 
-lisp_t redir_to(context&, lisp_t cmd, lisp_t file, lisp_t filed);
-lisp_t redir_append(context&, lisp_t cmd, lisp_t file, lisp_t filed);
-lisp_t redir_from(context&, lisp_t cmd, lisp_t file, lisp_t filed);
-lisp_t pipecmd(context&, lisp_t cmds);
-lisp_t back(context&, lisp_t x);
+lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed);
+lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed);
+lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed);
+lisp_t pipecmd(lisp_t cmds);
+lisp_t back(lisp_t x);
 lisp_t stop();
 lisp_t jobs();
 lisp_t fg(lisp_t job);

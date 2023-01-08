@@ -455,7 +455,7 @@ int execcommand(lisp_t exp, lisp_t* res)
 
 /* Primitives */
 
-lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
+lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -478,7 +478,7 @@ lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -491,7 +491,7 @@ lisp_t redir_to(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
+lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -514,7 +514,7 @@ lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -527,7 +527,7 @@ lisp_t redir_append(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
+lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
 {
   int fd = 0;
   int pid = 0;
@@ -550,7 +550,7 @@ lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -563,7 +563,7 @@ lisp_t redir_from(context& ctx, lisp_t cmd, lisp_t file, lisp_t filed)
   return mknumber(WEXITSTATUS(status));
 }
 
-lisp_t pipecmd(context& ctx, lisp_t cmds)
+lisp_t pipecmd(lisp_t cmds)
 {
   print(cmds);
 
@@ -578,7 +578,7 @@ lisp_t pipecmd(context& ctx, lisp_t cmds)
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1) // NOLINT
     {
-      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     if((pid = mfork()) == 0)
@@ -586,7 +586,7 @@ lisp_t pipecmd(context& ctx, lisp_t cmds)
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+        context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
         ::exit(1);
       }
       eval(cmds->car());
@@ -598,7 +598,7 @@ lisp_t pipecmd(context& ctx, lisp_t cmds)
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      ctx.stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmds->car());
@@ -611,7 +611,7 @@ lisp_t pipecmd(context& ctx, lisp_t cmds)
   return mknumber(WEXITSTATUS(status));
 }
 
-lisp_t back(context& ctx, lisp_t x)
+lisp_t back(lisp_t x)
 {
   int pid = 0;
 

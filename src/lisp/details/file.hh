@@ -27,19 +27,19 @@ void init();
 
 lisp_t open(lisp_t, lisp_t);
 lisp_t close(lisp_t);
-lisp_t ratom(context&, lisp_t);
-lisp_t readc(context&, lisp_t);
-lisp_t read(context&, lisp_t);
-lisp_t print(context&, lisp_t, lisp_t);
-lisp_t load(context&, lisp_t);
-lisp_t terpri(context&, lisp_t);
-lisp_t prin1(context&, lisp_t, lisp_t);
-lisp_t prin2(context&, lisp_t, lisp_t);
-lisp_t printlevel(context&, lisp_t);
-lisp_t spaces(context&, lisp_t, lisp_t);
-lisp_t readline(context&, lisp_t);
+lisp_t ratom(lisp_t);
+lisp_t readc(lisp_t);
+lisp_t read(lisp_t);
+lisp_t print(lisp_t, lisp_t);
+lisp_t load(lisp_t);
+lisp_t terpri(lisp_t);
+lisp_t prin1(lisp_t, lisp_t);
+lisp_t prin2(lisp_t, lisp_t);
+lisp_t printlevel(lisp_t);
+lisp_t spaces(lisp_t, lisp_t);
+lisp_t readline(lisp_t);
 
-bool loadfile(context&, const std::string&);
+bool loadfile(const std::string&);
 
 } // namespace lisp::details::file
 

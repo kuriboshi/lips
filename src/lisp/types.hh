@@ -173,7 +173,7 @@ public:
 
   /// @brief Call the function passing the context parameter if required. The
   /// rest of the lisp_t arguments are taken from the destination block.
-  lisp_t operator()(context& ctx, destblock_t* dest) const;
+  lisp_t operator()(destblock_t* dest) const;
 
   using subr_vector = std::vector<subr_t>;
   using subr_index = subr_vector::size_type;
@@ -192,17 +192,12 @@ public:
   enum spread spread = spread::SPREAD;
 
 private:
-  using func0_t = std::function<lisp_t(context&)>;
-  using func1_t = std::function<lisp_t(context&, lisp_t)>;
-  using func2_t = std::function<lisp_t(context&, lisp_t, lisp_t)>;
-  using func3_t = std::function<lisp_t(context&, lisp_t, lisp_t, lisp_t)>;
+  using func0_t = std::function<lisp_t()>;
+  using func1_t = std::function<lisp_t(lisp_t)>;
+  using func2_t = std::function<lisp_t(lisp_t, lisp_t)>;
+  using func3_t = std::function<lisp_t(lisp_t, lisp_t, lisp_t)>;
 
-  using func10_t = std::function<lisp_t()>;
-  using func11_t = std::function<lisp_t(lisp_t)>;
-  using func12_t = std::function<lisp_t(lisp_t, lisp_t)>;
-  using func13_t = std::function<lisp_t(lisp_t, lisp_t, lisp_t)>;
-
-  std::variant<func0_t, func1_t, func2_t, func3_t, func10_t, func11_t, func12_t, func13_t> _fun;
+  std::variant<func0_t, func1_t, func2_t, func3_t> _fun;
 
   /// @brief Maps a print name to the subr index.
   static std::unordered_map<std::string, subr_index> subr_map;
@@ -222,26 +217,18 @@ inline subr_t::subr_index subr_t::put(const subr_t& subr)
   return index;
 }
 
-inline lisp_t subr_t::operator()(context& ctx, destblock_t* dest) const
+inline lisp_t subr_t::operator()(destblock_t* dest) const
 {
-  return std::visit([&ctx, &dest, this](auto&& arg) -> lisp_t {
+  return std::visit([&dest, this](auto&& arg) -> lisp_t {
     using T = std::decay_t<decltype(arg)>;
     if constexpr(std::is_same_v<T, func0_t>)
-      return std::get<func0_t>(_fun)(ctx);
+      return std::get<func0_t>(_fun)();
     else if constexpr(std::is_same_v<T, func1_t>)
-      return std::get<func1_t>(_fun)(ctx, dest[1].val());
+      return std::get<func1_t>(_fun)(dest[1].val());
     else if constexpr(std::is_same_v<T, func2_t>)
-      return std::get<func2_t>(_fun)(ctx, dest[2].val(), dest[1].val());
+      return std::get<func2_t>(_fun)(dest[2].val(), dest[1].val());
     else if constexpr(std::is_same_v<T, func3_t>)
-      return std::get<func3_t>(_fun)(ctx, dest[3].val(), dest[2].val(), dest[1].val());
-    else if constexpr(std::is_same_v<T, func10_t>)
-      return std::get<func10_t>(_fun)();
-    else if constexpr(std::is_same_v<T, func11_t>)
-      return std::get<func11_t>(_fun)(dest[1].val());
-    else if constexpr(std::is_same_v<T, func12_t>)
-      return std::get<func12_t>(_fun)(dest[2].val(), dest[1].val());
-    else if constexpr(std::is_same_v<T, func13_t>)
-      return std::get<func13_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
+      return std::get<func3_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
   }, _fun);
 }
 

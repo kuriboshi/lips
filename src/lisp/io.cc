@@ -146,12 +146,12 @@ lisp_t patom(lisp_t x, file_t& file, bool esc)
   return x;
 }
 
-lisp_t prinbody(context& ctx, lisp_t x, file_t& file, bool esc)
+lisp_t prinbody(lisp_t x, file_t& file, bool esc)
 {
   auto i = x;
   for(;;)
   {
-    io::prin0(ctx, i->car(), file, esc);
+    io::prin0(i->car(), file, esc);
     if(is_nil(i->cdr()))
       break;
     if(type_of(i->cdr()) == object::type::Cons)
@@ -164,28 +164,28 @@ lisp_t prinbody(context& ctx, lisp_t x, file_t& file, bool esc)
       file.putch(' ');
       file.putch('.');
       file.putch(' ');
-      io::prin0(ctx, i->cdr(), file, esc);
+      io::prin0(i->cdr(), file, esc);
       break;
     }
   }
   return x;
 }
 
-lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
+lisp_t prin0(lisp_t x, file_t& file, bool esc)
 {
   switch(type_of(x))
   {
     case object::type::Cons:
-      ctx.thisplevel++;
-      if(ctx.thisplevel <= ctx.printlevel || ctx.printlevel <= 0)
+      context::current().thisplevel++;
+      if(context::current().thisplevel <= context::current().printlevel || context::current().printlevel <= 0)
       {
         file.putch('(');
-        io::prinbody(ctx, x, file, esc);
+        io::prinbody(x, file, esc);
         file.putch(')');
       }
       else
         file.putch('&');
-      ctx.thisplevel--;
+      context::current().thisplevel--;
       break;
     case object::type::Symbol:
       return io::patom(x, file, esc);
@@ -193,7 +193,7 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
       ps("nil", file, false);
       break;
     case object::type::Integer:
-      pi(x->intval(), ctx.currentbase()->intval(), file);
+      pi(x->intval(), context::current().currentbase()->intval(), file);
       break;
     case object::type::Float:
       pf(x->floatval(), file);
@@ -234,16 +234,16 @@ lisp_t prin0(context& ctx, lisp_t x, file_t& file, bool esc)
       break;
     default:
       ps("#<illegal type_of:", file, false);
-      pi(to_underlying(type_of(x)), ctx.currentbase()->intval(), file);
+      pi(to_underlying(type_of(x)), context::current().currentbase()->intval(), file);
       pp("", file, x);
   }
   return x;
 }
 
-lisp_t print(context& ctx, lisp_t x, file_t& file)
+lisp_t print(lisp_t x, file_t& file)
 {
-  ctx.thisplevel = 0;
-  io::prin0(ctx, x, file, true);
+  context::current().thisplevel = 0;
+  io::prin0(x, file, true);
   io::terpri(file);
   return x;
 }

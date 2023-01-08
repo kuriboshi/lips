@@ -231,7 +231,7 @@ void vm::next() { _dest[0].decr(); }
 
 lisp_t vm::call(lisp_t fun)
 {
-  return fun->subr()(context::current(), _dest);
+  return fun->subr()(_dest);
 }
 
 lisp_t vm::eval(lisp_t expr)

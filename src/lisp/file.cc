@@ -61,51 +61,51 @@ lisp_t close(lisp_t fildes)
   return T;
 }
 
-lisp_t ratom(context& ctx, lisp_t file)
+lisp_t ratom(lisp_t file)
 {
   if(is_nil(file))
-    return io::ratom(ctx.primin());
+    return io::ratom(context::current().primin());
   if(is_T(file))
-    return io::ratom(ctx.stdin());
+    return io::ratom(context::current().stdin());
   check(file, object::type::File);
   return io::ratom(file->file());
 }
 
-lisp_t readc(context& ctx, lisp_t file)
+lisp_t readc(lisp_t file)
 {
   if(is_nil(file))
-    return mknumber(ctx.primin()->getch());
+    return mknumber(context::current().primin()->getch());
   if(is_T(file))
-    return mknumber(ctx.stdin()->getch());
+    return mknumber(context::current().stdin()->getch());
   check(file, object::type::File);
   return mknumber(file->file()->getch());
 }
 
-lisp_t read(context& ctx, lisp_t file)
+lisp_t read(lisp_t file)
 {
   if(is_nil(file))
-    return lispread(ctx.primin());
+    return lispread(context::current().primin());
   if(is_T(file))
-    return lispread(ctx.stdin());
+    return lispread(context::current().stdin());
   check(file, object::type::File);
   return lispread(file->file());
 }
 
-lisp_t print(context& ctx, lisp_t x, lisp_t file)
+lisp_t print(lisp_t x, lisp_t file)
 {
   if(is_nil(file))
-    return io::print(ctx, x, *ctx.primout());
+    return io::print(x, *context::current().primout());
   if(is_T(file))
-    return io::print(ctx, x, *ctx.primerr());
+    return io::print(x, *context::current().primerr());
   check(file, object::type::File);
-  return io::print(ctx, x, *file->file());
+  return io::print(x, *file->file());
 }
 
-bool loadfile(context& ctx, const std::string& lf)
+bool loadfile(const std::string& lf)
 {
   try
   {
-    for(auto i: *ctx.loadpath())
+    for(auto i: *context::current().loadpath())
     {
       std::filesystem::path base{i->getstr()};
       base /= lf;
@@ -125,65 +125,65 @@ bool loadfile(context& ctx, const std::string& lf)
   return false;
 }
 
-lisp_t load(context& ctx, lisp_t f)
+lisp_t load(lisp_t f)
 {
   check(f, object::type::String, object::type::Symbol);
-  if(!file::loadfile(ctx, f->getstr()))
+  if(!file::loadfile(f->getstr()))
     fatal(error_errc::cant_load, f->getstr());
   return f;
 }
 
-lisp_t terpri(context& ctx, lisp_t file)
+lisp_t terpri(lisp_t file)
 {
   if(is_nil(file))
-    return io::terpri(*ctx.primout());
+    return io::terpri(*context::current().primout());
   if(is_T(file))
-    return io::terpri(*ctx.primerr());
+    return io::terpri(*context::current().primerr());
   check(file, object::type::File);
   return io::terpri(*file->file());
 }
 
-lisp_t prin1(context& ctx, lisp_t x, lisp_t file)
+lisp_t prin1(lisp_t x, lisp_t file)
 {
-  ctx.thisplevel = 0;
+  context::current().thisplevel = 0;
   if(is_nil(file))
-    return prin0(x, *ctx.primout(), false);
+    return prin0(x, *context::current().primout(), false);
   if(is_T(file))
-    return prin0(x, *ctx.primerr(), false);
+    return prin0(x, *context::current().primerr(), false);
   check(file, object::type::File);
   return prin0(x, *file->file(), false);
 }
 
-lisp_t prin2(context& ctx, lisp_t x, lisp_t file)
+lisp_t prin2(lisp_t x, lisp_t file)
 {
-  ctx.thisplevel = 0;
+  context::current().thisplevel = 0;
   if(is_nil(file))
-    return prin0(x, *ctx.primout(), true);
+    return prin0(x, *context::current().primout(), true);
   if(is_T(file))
-    return prin0(x, *ctx.primerr(), true);
+    return prin0(x, *context::current().primerr(), true);
   check(file, object::type::File);
   return prin0(x, *file->file(), true);
 }
 
-lisp_t printlevel(context& ctx, lisp_t newl)
+lisp_t printlevel(lisp_t newl)
 {
-  auto x = ctx.printlevel;
+  auto x = context::current().printlevel;
   if(!is_nil(newl))
   {
     check(newl, object::type::Integer);
-    ctx.printlevel = newl->intval();
+    context::current().printlevel = newl->intval();
   }
   return mknumber(x);
 }
 
-lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
+lisp_t spaces(lisp_t n, lisp_t file)
 {
   check(n, object::type::Integer);
   ref_file_t f;
   if(is_nil(file))
-    f = ctx.primout();
+    f = context::current().primout();
   else if(is_T(file))
-    f = ctx.primerr();
+    f = context::current().primerr();
   else
   {
     check(file, object::type::File);
@@ -194,12 +194,12 @@ lisp_t spaces(context& ctx, lisp_t n, lisp_t file)
   return nil;
 }
 
-lisp_t readline(context& ctx, lisp_t file)
+lisp_t readline(lisp_t file)
 {
   if(is_nil(file))
-    return io::readline(ctx.primin());
+    return io::readline(context::current().primin());
   if(is_T(file))
-    return io::readline(ctx.stdin());
+    return io::readline(context::current().stdin());
   check(file, object::type::File);
   return io::readline(file->file());
 }

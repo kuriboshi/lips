@@ -38,9 +38,9 @@ lisp_t readline(ref_file_t);
 lisp_t getline(lisp_t);
 
 lisp_t patom(lisp_t, file_t&, bool esc = false);
-lisp_t prinbody(context&, lisp_t, file_t&, bool esc = false);
-lisp_t prin0(context&, lisp_t, file_t&, bool esc = false);
-lisp_t print(context&, lisp_t, file_t&);
+lisp_t prinbody(lisp_t, file_t&, bool esc = false);
+lisp_t prin0(lisp_t, file_t&, bool esc = false);
+lisp_t print(lisp_t, file_t&);
 lisp_t terpri(file_t&);
 
 lisp_t splice(lisp_t, lisp_t, bool);
@@ -351,23 +351,23 @@ inline lisp_t terpri(bool out = false)
   auto& ctx = context::current();
   return io::terpri(out ? *ctx.primerr() : *ctx.primout());
 }
-inline lisp_t prinbody(lisp_t a, file_t& f, bool esc = false) { return io::prinbody(context::current(), a, f, esc); }
+inline lisp_t prinbody(lisp_t a, file_t& f, bool esc = false) { return io::prinbody(a, f, esc); }
 inline lisp_t prinbody(lisp_t a, bool out = false, bool esc = false)
 {
   auto& ctx = context::current();
-  return io::prinbody(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
+  return io::prinbody(a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline lisp_t prin0(lisp_t a, file_t& f, bool esc = false) { return io::prin0(context::current(), a, f, esc); }
+inline lisp_t prin0(lisp_t a, file_t& f, bool esc = false) { return io::prin0(a, f, esc); }
 inline lisp_t prin0(lisp_t a, bool out = false, bool esc = false)
 {
   auto& ctx = context::current();
-  return io::prin0(ctx, a, out ? *ctx.primerr() : *ctx.primout(), esc);
+  return io::prin0(a, out ? *ctx.primerr() : *ctx.primout(), esc);
 }
-inline lisp_t print(lisp_t a, file_t& f) { return io::print(context::current(), a, f); }
+inline lisp_t print(lisp_t a, file_t& f) { return io::print(a, f); }
 inline lisp_t print(lisp_t a, bool out = false)
 {
   auto& ctx = context::current();
-  return io::print(ctx, a, out ? *ctx.primerr() : *ctx.primout());
+  return io::print(a, out ? *ctx.primerr() : *ctx.primout());
 }
 
 template<typename T>
