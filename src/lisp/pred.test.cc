@@ -132,12 +132,18 @@ TEST_CASE("pred: predicate functions")
     CHECK(xtypeof(lambda(nil, nil)) == C_LAMBDA);
     CHECK(xtypeof(nlambda(nil, nil)) == C_NLAMBDA);
     CHECK(xtypeof(closure(nil, nil)) == C_CLOSURE);
+    auto c = closure(nil, mklist("a"_a));
+    CHECK(xtypeof(c->closure().cvalues->car()) == C_INDIRECT);
+    auto a = eval("((lambda () (typeof (topofstack))))");
+    CHECK(a == C_ENVIRON);
     auto l = ""_l;
     CHECK(l == C_EOF);
     auto e = xtypeof(l);
     CHECK(e == C_SYMBOL);
     auto f = lisp_t::create(ref_file_t::create(""));
     CHECK(xtypeof(f) == C_FILE);
+    auto& cvar = initcvar("typeof_test", 1_l);
+    CHECK(xtypeof("typeof_test"_a->value()) == C_CVARIABLE);
   }
 }
 
