@@ -56,7 +56,7 @@ public:
     switch(static_cast<type_errc>(condition))
     {
       case type_errc::not_nil:
-        return "Not nil";
+        break;
       case type_errc::not_t:
         return "Not T";
       case type_errc::not_symbol:
@@ -92,7 +92,7 @@ public:
       case type_errc::not_cvariable:
         return "Not a c-variable";
     }
-    return "";
+    return "Not nil";
   }
   static const std::error_category& category()
   {
@@ -164,9 +164,9 @@ public:
       case error_errc::unknown_request:
         return "Unknown request";
       case error_errc::user_error:
-        return "User error";
+        break;
     }
-    return "";
+    return "User error";
   }
   static const std::error_category& category()
   {

@@ -72,7 +72,6 @@ void check(const lisp_t& arg, T type)
         error(type_errc::not_cvariable, arg);
         break;
     }
-    error(error_errc::illegal_arg, arg);
   }
 }
 
