@@ -167,11 +167,11 @@ TEST_CASE("io: source/sink")
   file_t f0(std::make_unique<io::string_source>("(a)"));
   CHECK(f0.has_source());
   CHECK(!f0.has_sink());
-  CHECK_THROWS_WITH(f0.terpri(), "file_t: No sink");
+  CHECK_THROWS_WITH(f0.terpri(), "No sink");
   file_t f1(std::make_unique<io::string_sink>());
   CHECK(!f1.has_source());
   CHECK(f1.has_sink());
-  CHECK_THROWS_WITH(f1.getline(), "file_t: No source");
+  CHECK_THROWS_WITH(f1.getline(), "No source");
 }
 
 TEST_CASE("io: file_t functions")

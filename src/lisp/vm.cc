@@ -190,7 +190,7 @@ void vm::abort(std::error_code error)
   context::current().perror(error);
   printwhere();
   unwind();
-  throw lisp_error("abort");
+  throw lisp_error(error_errc::abort);
 }
 
 void vm::overflow() { abort(error_errc::stack_overflow); }

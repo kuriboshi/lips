@@ -29,7 +29,9 @@ enum class lips_errc
   event_not_found = 1,
   illegal_arg,
   no_match,
-  no_such_job
+  no_such_job,
+  alias_loop,
+  error
 };
 
 class lips_category: public std::error_category
@@ -48,6 +50,10 @@ public:
         return "No match for";
       case lips_errc::no_such_job:
         return "No such job";
+      case lips_errc::alias_loop:
+        return "Alias loop";
+      case lips_errc::error:
+        return "Error";
     }
     return "";
   }

@@ -131,7 +131,7 @@ lisp_t context::perror(std::error_code error, lisp_t arg) const
 lisp_t context::error(std::error_code error, lisp_t arg) const
 {
   perror(error, arg);
-  throw lisp_error(error.message());
+  throw lisp_error(error);
 }
 
 cvariable_t& context::currentbase() { return _pimpl->_currentbase; }

@@ -125,7 +125,12 @@ enum class error_errc
   stack_overflow,
   unbound_variable,
   undef_function,
+  redefinition_of_subr,
   unknown_request,
+  no_source,
+  no_sink,
+  abort,
+  reset,
   user_error
 };
 
@@ -161,8 +166,18 @@ public:
         return "Unbound variable";
       case error_errc::undef_function:
         return "Undefined function";
+      case error_errc::redefinition_of_subr:
+        return "Redefinition of subr not allowed";
       case error_errc::unknown_request:
         return "Unknown request";
+      case error_errc::no_source:
+        return "No source";
+      case error_errc::no_sink:
+        return "No sink";
+      case error_errc::abort:
+        return "Abort";
+      case error_errc::reset:
+        return "Reset";
       case error_errc::user_error:
         break;
     }

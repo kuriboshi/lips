@@ -319,7 +319,7 @@ int waitfork(pid_t pid)
       if(WIFSIGNALED(stat))
       {
         unwind();
-        throw lisp_error("waitfork");
+        throw lisp_error(lips_errc::error, "waitfor");
       }
       collectjob(wpid, stat);
       break;

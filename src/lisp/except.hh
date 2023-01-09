@@ -26,16 +26,20 @@ namespace lisp
 class lisp_error: public std::runtime_error
 {
 public:
-  lisp_error(const std::string& error)
-    : std::runtime_error(error)
+  lisp_error(std::error_code ec)
+    : std::runtime_error(ec.message())
   {}
+  lisp_error(std::error_code ec, const std::string& error)
+    : std::runtime_error(ec.message() + ": " + error), error_code(ec)
+  {}
+  std::error_code error_code;
 };
 
 class lisp_reset: public lisp_error
 {
 public:
   lisp_reset()
-    : lisp_error("reset")
+    : lisp_error(error_errc::reset)
   {}
 };
 

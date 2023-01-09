@@ -210,7 +210,7 @@ inline subr_t::subr_index subr_t::put(const subr_t& subr)
 {
   auto p = subr_map.find(subr.name);
   if(p != subr_map.end())
-    throw lisp_error("redefinition of subr not allowed");
+    throw lisp_error(error_errc::redefinition_of_subr, subr.name);
   auto index = subr_store.size();
   subr_store.push_back(subr);
   subr_map.insert(std::pair(subr.name, index));

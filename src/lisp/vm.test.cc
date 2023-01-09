@@ -130,7 +130,7 @@ TEST_CASE("eval: control limits")
   std::ostringstream err;
   auto old = ctx.primerr(ref_file_t::create(err));
   "(defineq (f (lambda () (f))))"_e;
-  CHECK_THROWS_WITH("(f)"_e, "abort");
+  CHECK_THROWS_WITH("(f)"_e, "Abort");
   CHECK(err.str() == "Stack overflow [in f]\n");
   ctx.primerr(old);
 }

@@ -134,7 +134,7 @@ lisp_t top::findalias(lisp_t exp)
       if(!is_nil(alias) && (is_nil(alias_expanded) || rval->car() != alias_expanded->car()))
       {
         if(!is_nil(memb(rval->car(), alias_expanded)))
-          throw lisp_error("Alias loop");
+          throw lisp_error(lips_errc::alias_loop);
         alias_expanded = cons(rval->car(), alias_expanded);
         rval = append(cons(alias, cons(rval->cdr(), nil)));
       }

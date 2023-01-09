@@ -319,13 +319,13 @@ private:
   void ptrcheck(const std::unique_ptr<io::source>&) const
   {
     if(!_source)
-      throw lisp_error("file_t: No source");
+      throw lisp_error(error_errc::no_source);
   }
 
   void ptrcheck(const std::unique_ptr<io::sink>&) const
   {
     if(!_sink)
-      throw lisp_error("file_t: No sink");
+      throw lisp_error(error_errc::no_sink);
   }
 };
 

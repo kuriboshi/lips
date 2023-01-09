@@ -57,12 +57,12 @@ public:
   lisp_t perror(std::error_code, lisp_t) const;
   lisp_t error(std::error_code, lisp_t) const;
 
-  void fatal(std::error_code error) { throw lisp_error(error.message()); }
+  void fatal(std::error_code error) { throw lisp_error(error); }
 
   template<typename... Ts>
   void fatal(std::error_code error, const Ts&... args)
   {
-    throw lisp_error(error.message() + ": " + cat(args...));
+    throw lisp_error(error, cat(args...));
   }
 
   // Used by lisp::io
