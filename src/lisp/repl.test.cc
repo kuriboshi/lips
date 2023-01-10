@@ -79,7 +79,7 @@ a
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
-    std::string expected_out = R"(> 1: )";
+    std::string expected_out = R"(> 1: > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
@@ -102,7 +102,7 @@ a
 (xyzzy)
 ((lambda nil &))
 )";
-    std::string expected_out = R"(> 1: 1: )";
+    std::string expected_out = R"(> 1: 1: > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
