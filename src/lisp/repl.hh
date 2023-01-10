@@ -49,9 +49,7 @@ public:
 
 private:
   class vm& _vm;
-  int _level = 0;
-  lisp_t _prompt;
-  lisp_t _break_prompt;
+  int _level = -1;
 };
 
 } // namespace lisp

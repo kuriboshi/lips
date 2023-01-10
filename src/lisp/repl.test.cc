@@ -79,7 +79,7 @@ a
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
-    std::string expected_out = R"(> : > )";
+    std::string expected_out = R"(> 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
@@ -102,7 +102,7 @@ a
 (xyzzy)
 ((lambda nil &))
 )";
-    std::string expected_out = R"(> : : > )";
+    std::string expected_out = R"(> 1: 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
@@ -120,7 +120,7 @@ a
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
-    std::string expected_out = R"(> : "hello"
+    std::string expected_out = R"(> 1: "hello"
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
@@ -140,11 +140,11 @@ help
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
-    std::string expected_out = R"(> : (go) continue
+    std::string expected_out = R"(> 1: (go) continue
 (reset) back to top loop
 (bt) print backtrace
 (return exp) return expression
-: nil
+1: nil
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);

@@ -30,7 +30,7 @@ namespace lisp
 inline int run(vm& vm, std::ostream& out = std::cout)
 {
   repl repl(vm);
-  vm.repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+  vm.repl = [&repl](lisp_t exp) -> lisp_t { return repl(exp); };
   while(true)
   {
     try

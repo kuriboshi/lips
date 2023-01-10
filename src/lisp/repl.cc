@@ -25,19 +25,17 @@ namespace lisp
 repl::repl(class vm& vm)
   : _vm(vm)
 {
-  _prompt = "> "_s;
-  _break_prompt = ": "_s;
   _vm.interactive(true);
 }
 
 lisp_t repl::operator()(lisp_t exp)
 {
   level begin(*this);
-  if(_level == 1)
+  if(_level == 0)
   {
     while(true)
     {
-      prin0(_prompt);
+      context::current().primout()->format("> ");
       auto expr = lispread(context::current().primin());
       if(expr == C_EOF)
         break;
@@ -49,12 +47,12 @@ lisp_t repl::operator()(lisp_t exp)
   }
   while(true)
   {
-    prin0(_break_prompt);
+    context::current().primout()->format("{}: ", _level);
     auto com = lispread(context::current().primin());
     if(com == C_EOF)
-      return C_EOF;
+      break;
     /* OK, EVAL, ^, ... */
-    if(type_of(com) != object::type::Cons)
+    if(type_of(com) == object::type::Symbol && com->symbol()->pname == "help")
     {
       prin0("(go) continue"_s);
       terpri();
@@ -66,21 +64,28 @@ lisp_t repl::operator()(lisp_t exp)
       terpri();
       continue;
     }
-    if(com->car() == C_GO)
-      return print(eval(exp), false);
-    if(com->car() == C_RESET)
+    if(type_of(com) == object::type::Cons)
     {
-      _vm.unwind();
-      throw lisp_reset();
+      if(com->car() == C_GO)
+        return eval(exp);
+      if(com->car() == C_RESET)
+      {
+        _vm.unwind();
+        throw lisp_reset();
+      }
+      if(com->car() == C_BT)
+      {
+        _vm.bt();
+        continue;
+      }
+      if(com->car() == C_RETURN)
+        return is_nil(com->cdr()) ? nil : com->cdr()->car();
     }
-    if(com->car() == C_BT)
-    {
-      _vm.bt();
-      continue;
-    }
-    if(com->car() == C_RETURN)
-      return is_nil(com->cdr()) ? nil : com->cdr()->car();
+    auto result = eval(com);
+    if(result != C_ERROR)
+      print(result);
   }
+  return nil;
 }
 
 } // namespace lisp
