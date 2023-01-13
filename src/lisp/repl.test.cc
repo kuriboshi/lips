@@ -75,11 +75,11 @@ a
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
-    CHECK_NOTHROW(repl(nil));
+    CHECK_THROWS(repl(nil));
     std::string expected_err = R"(Undefined function xyzzy
 (xyzzy broken)
 )";
-    std::string expected_out = R"(> 1: > )";
+    std::string expected_out = R"(> 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);
@@ -94,7 +94,7 @@ a
     auto old = ctx.primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
-    CHECK_NOTHROW(repl(nil));
+    CHECK_THROWS(repl(nil));
     // Backtrace sets the print level to 2 which is why the '&' is printed
     // representing a deeper level.
     std::string expected_err = R"(Undefined function xyzzy
@@ -102,7 +102,7 @@ a
 (xyzzy)
 ((lambda nil &))
 )";
-    std::string expected_out = R"(> 1: 1: > )";
+    std::string expected_out = R"(> 1: 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
     ctx.primin(old);

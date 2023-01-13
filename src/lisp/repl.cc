@@ -40,8 +40,7 @@ lisp_t repl::operator()(lisp_t exp)
       if(expr == C_EOF)
         break;
       auto result = eval(expr);
-      if(result != C_ERROR)
-        print(result);
+      print(result);
     }
     return nil;
   }
@@ -69,10 +68,7 @@ lisp_t repl::operator()(lisp_t exp)
       if(com->car() == C_GO)
         return eval(exp);
       if(com->car() == C_RESET)
-      {
-        _vm.unwind();
         throw lisp_reset();
-      }
       if(com->car() == C_BT)
       {
         _vm.bt();
@@ -82,8 +78,7 @@ lisp_t repl::operator()(lisp_t exp)
         return is_nil(com->cdr()) ? nil : com->cdr()->car();
     }
     auto result = eval(com);
-    if(result != C_ERROR)
-      print(result);
+    print(result);
   }
   return nil;
 }

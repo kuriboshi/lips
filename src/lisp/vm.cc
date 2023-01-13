@@ -260,15 +260,10 @@ lisp_t vm::eval(lisp_t expr)
     while(!(this->*_cont)())
       ;
   }
-  catch(const lisp_finish& ex)
-  {
-    unwind();
-    throw;
-  }
   catch(const lisp_reset& ex)
   {
     unwind();
-    return C_ERROR;
+    throw;
   }
   //
   // Retrieve the result of the evaluation and restore the previous
@@ -308,7 +303,7 @@ lisp_t vm::apply(lisp_t f, lisp_t x)
     while(!(this->*_cont)())
       ;
   }
-  catch(const lisp_finish& ex)
+  catch(const lisp_reset& ex)
   {
     unwind();
     throw;
@@ -366,7 +361,7 @@ bool vm::eval_end()
   // `eval' above) and restore continuation.  The function `eval_end' is also
   // used as a placeholder for the beginning of an eval.
   //
-  _toctrl -= 1;
+  --_toctrl;
   pop(_cont);
   return false;
 }
@@ -758,7 +753,6 @@ bool vm::eval_prim()
   }
   catch(const lisp_reset& ex)
   {
-    unwind();
     throw;
   }
   catch(const lisp_error& ex)

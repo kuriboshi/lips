@@ -153,7 +153,7 @@ TEST_CASE("eval: breakhook")
   bool called = false;
   auto f = [&called]() { called = true; };
   auto hook = breakhook(f);
-  CHECK_NOTHROW("(undefined)"_e);
+  CHECK_THROWS("(undefined)"_e);
   CHECK(called);
   std::ignore = breakhook(hook);
 }
@@ -183,20 +183,20 @@ TEST_CASE("eval: autoload")
   CHECK(type_of(result) == object::type::Integer);
   CHECK(result->intval() == 123);
   putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
-  CHECK_NOTHROW("(noauto)"_e);
+  CHECK_THROWS("(noauto)"_e);
   std::filesystem::remove("autoload.lisp");
 }
 
 TEST_CASE("eval: string function")
 {
   auto fun = R"(("fun"))";
-  CHECK_NOTHROW(eval(fun));
+  CHECK_THROWS(eval(fun));
 }
 
 TEST_CASE("eval: illegal function")
 {
   auto fun = R"((1))";
-  CHECK_NOTHROW(eval(fun));
+  CHECK_THROWS(eval(fun));
 }
 
 TEST_CASE("eval: indirect and cvariable")
@@ -220,15 +220,14 @@ TEST_CASE("eval: indirect and cvariable")
 
 TEST_CASE("eval: illegal apply")
 {
-  SECTION("apply string") { CHECK_NOTHROW(R"((apply "string"))"_e); }
+  SECTION("apply string") { CHECK_THROWS(R"((apply "string"))"_e); }
 
   SECTION("apply unbound")
   {
-    auto r = R"((apply unbound))"_e;
-    CHECK(r == C_ERROR);
+    CHECK_THROWS(R"((apply unbound))"_e);
   }
 
-  SECTION("apply int") { CHECK_NOTHROW(R"((apply 100))"_e); }
+  SECTION("apply int") { CHECK_THROWS(R"((apply 100))"_e); }
 }
 
 TEST_CASE("eval: backtrace")
