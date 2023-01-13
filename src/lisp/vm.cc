@@ -250,7 +250,7 @@ lisp_t vm::eval(lisp_t expr)
   //
   // This how it works in general: Push the function to be called last, and set
   // the continuation variable `cont' to `eval_expr'. `eval_expr' may push more
-  // contiuations onto the stack but eventaully `eval0' is called which returns
+  // contiuations onto the stack but eventually `eval0' is called which returns
   // true, signalling end of evaluation.
   //
   push(&vm::eval0);
