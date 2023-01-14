@@ -948,106 +948,121 @@ lisp_t vm::destblock(const destblock_t* block)
     return nil;
   lisp_t foo = tconc(nil, mknumber(block->size()));
   for(int i = 0; i != block->size(); ++i)
-  {
     foo = tconc(foo, cons((block + i + 1)->var(), (block + i + 1)->val()));
-  }
   return car(foo);
 }
 
+std::string vm::to_string(const destblock_t* block)
+{
+  std::ostringstream s;
+  if(block != nullptr)
+  {
+    s << block->size() << ' ';
+    for(int i = 0; i != block->size(); ++i)
+    {
+      s << '(';
+      if((block + i + 1)->var() == nil)
+        s << "nil";
+      else
+        s << (block + i + 1)->var()->symbol()->pname;
+      s << " . ";
+      auto o = ref_file_t::create(s);
+      prin0((block + i + 1)->val(), *o);
+      s << ')';
+    }
+  }
+  else
+    s << "nil";
+  return s.str();
+}
+
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
+std::string vm::to_string(continuation_t cont)
+{
+  if(cont == &vm::eval_end)
+    return "eval_end";
+  if(cont == &vm::eval_expr)
+    return "eval_expr";
+  if(cont == &vm::eval_func)
+    return "eval_func";
+  if(cont == &vm::eval_apply)
+    return "eval_apply";
+  if(cont == &vm::ev1)
+    return "ev1";
+  if(cont == &vm::eval_prim)
+    return "eval_prim";
+  if(cont == &vm::ev3)
+    return "ev3";
+  if(cont == &vm::ev4)
+    return "ev4";
+  if(cont == &vm::evlam0)
+    return "evlam0";
+  if(cont == &vm::evlam1)
+    return "evlam1";
+  if(cont == &vm::eval_args1)
+    return "eval_args1";
+  if(cont == &vm::eval_args2)
+    return "eval_args2";
+  if(cont == &vm::ev3p)
+    return "ev3p";
+  if(cont == &vm::eval_args)
+    return "eval_args";
+  if(cont == &vm::noevarg)
+    return "noevarg";
+  if(cont == &vm::eval_lambda)
+    return "eval_lambda";
+  if(cont == &vm::spread)
+    return "spread";
+  if(cont == &vm::eval_list)
+    return "eval_list";
+  if(cont == &vm::evlis1)
+    return "evlis1";
+  if(cont == &vm::eval_list_end)
+    return "eval_list_end";
+  if(cont == &vm::evlis3)
+    return "evlis3";
+  if(cont == &vm::evlis4)
+    return "evlis4";
+  if(cont == &vm::noeval_args1)
+    return "noeval_args1";
+  if(cont == &vm::eval_sequence)
+    return "eval_sequence";
+  if(cont == &vm::eval_seq1)
+    return "eval_seq1";
+  if(cont == &vm::eval_seq2)
+    return "eval_seq2";
+  if(cont == &vm::eval_closure)
+    return "eval_closure";
+  if(cont == &vm::eval_closure1)
+    return "eval_closure1";
+  if(cont == &vm::eval0)
+    return "eval0";
+  if(cont == &vm::apply0)
+    return "apply0";
+  if(cont == &vm::everr)
+    return "everr";
+  if(cont == &vm::eval_lookup)
+    return "eval_lookup";
+  return "Unknown control stack element";
+}
+
 lisp_t vm::backtrace()
 {
   for(int i = _toctrl; i >= 0; i--)
   {
     context::current().primerr()->format("{}: ", i);
     std::visit(
-      // NOLINTNEXTLINE(readability-function-cognitive-complexity)
       [this](auto&& arg) {
         using ArgType = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<ArgType, lisp_t>)
+        {
+          context::current().primerr()->puts("lisp_t: ");
           print(arg, T);
+        }
         else if constexpr(std::is_same_v<ArgType, destblock_t*>)
-        {
-          if(arg != nullptr)
-          {
-            prin1("destblock_t: "_l, T);
-            print(destblock(arg), T);
-          }
-          else
-          {
-            prin1("destblock_t: nullptr"_l, T);
-            terpri(T);
-          }
-        }
+          context::current().primerr()->format("destblock_t: {}\n", to_string(arg));
         else if constexpr(std::is_same_v<ArgType, continuation_t>)
-        {
-          if(arg == &vm::eval_end)
-            context::current().primerr()->format("eval_end\n");
-          else if(arg == &vm::eval_expr)
-            context::current().primerr()->format("eval_expr\n");
-          else if(arg == &vm::eval_func)
-            context::current().primerr()->format("eval_func");
-          else if(arg == &vm::eval_apply)
-            context::current().primerr()->format("eval_apply\n");
-          else if(arg == &vm::ev1)
-            context::current().primerr()->format("ev1\n");
-          else if(arg == &vm::eval_prim)
-            context::current().primerr()->format("eval_prim\n");
-          else if(arg == &vm::ev3)
-            context::current().primerr()->format("ev3\n");
-          else if(arg == &vm::ev4)
-            context::current().primerr()->format("ev4\n");
-          else if(arg == &vm::evlam0)
-            context::current().primerr()->format("evlam0\n");
-          else if(arg == &vm::evlam1)
-            context::current().primerr()->format("evlam1\n");
-          else if(arg == &vm::eval_args1)
-            context::current().primerr()->format("eval_args1\n");
-          else if(arg == &vm::eval_args2)
-            context::current().primerr()->format("eval_args2\n");
-          else if(arg == &vm::ev3p)
-            context::current().primerr()->format("ev3p\n");
-          else if(arg == &vm::eval_args)
-            context::current().primerr()->format("eval_args\n");
-          else if(arg == &vm::noevarg)
-            context::current().primerr()->format("noevarg\n");
-          else if(arg == &vm::eval_lambda)
-            context::current().primerr()->format("eval_lambda\n");
-          else if(arg == &vm::spread)
-            context::current().primerr()->format("spread\n");
-          else if(arg == &vm::eval_list)
-            context::current().primerr()->format("eval_list\n");
-          else if(arg == &vm::evlis1)
-            context::current().primerr()->format("evlis1\n");
-          else if(arg == &vm::eval_list_end)
-            context::current().primerr()->format("eval_list_end\n");
-          else if(arg == &vm::evlis3)
-            context::current().primerr()->format("evlis3\n");
-          else if(arg == &vm::evlis4)
-            context::current().primerr()->format("evlis4\n");
-          else if(arg == &vm::noeval_args1)
-            context::current().primerr()->format("noeval_args1\n");
-          else if(arg == &vm::eval_sequence)
-            context::current().primerr()->format("eval_sequence\n");
-          else if(arg == &vm::eval_seq1)
-            context::current().primerr()->format("eval_seq1\n");
-          else if(arg == &vm::eval_seq2)
-            context::current().primerr()->format("eval_seq2\n");
-          else if(arg == &vm::eval_closure)
-            context::current().primerr()->format("eval_closure\n");
-          else if(arg == &vm::eval_closure1)
-            context::current().primerr()->format("eval_closure1\n");
-          else if(arg == &vm::eval0)
-            context::current().primerr()->format("eval0\n");
-          else if(arg == &vm::apply0)
-            context::current().primerr()->format("apply0\n");
-          else if(arg == &vm::everr)
-            context::current().primerr()->format("everr\n");
-          else if(arg == &vm::eval_lookup)
-            context::current().primerr()->format("eval_lookup\n");
-          else
-            context::current().stderr()->format("Unknown control stack element\n");
-        }
+          context::current().primerr()->format("cont: {}\n", to_string(arg));
         else
           ; // Do nothing for monostate
       },

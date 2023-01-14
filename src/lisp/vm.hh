@@ -147,6 +147,10 @@ private:
   void do_unbound(continuation_t);
   void link();
   void restore_env();
+  /// @brief Translate a destblock_t to a string
+  std::string to_string(const destblock_t*);
+  /// @brief Translate a continuation member function pointer to a string
+  std::string to_string(continuation_t);
 
   // Continuations
   bool eval_expr();
