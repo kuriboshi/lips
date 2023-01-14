@@ -140,6 +140,14 @@ inline void pp(const char* s, file_t& file, lisp_t x)
   ps(">", file, false);
 }
 
+inline void psubr(const char* s, file_t& file, lisp_t x)
+{
+  ps(s, file, false);
+  ps(" ", file, false);
+  ps(x->subr().name, file, false);
+  ps(">", file, false);
+}
+
 lisp_t patom(lisp_t x, file_t& file, bool esc)
 {
   ps(x->symbol()->pname, file, esc);
@@ -222,9 +230,9 @@ lisp_t prin0(lisp_t x, file_t& file, bool esc)
       break;
     case object::type::Subr:
       if(x->subr().subr == subr_t::subr::EVAL)
-        pp("#<subr", file, x);
+        psubr("#<subr", file, x);
       else
-        pp("#<fsubr", file, x);
+        psubr("#<fsubr", file, x);
       break;
     case object::type::Environ:
       pp("#<environ", file, x);
