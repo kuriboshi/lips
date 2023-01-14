@@ -31,6 +31,11 @@ public:
   repl(vm&);
   ~repl() = default;
 
+  lisp_t operator()(lisp_t);
+
+private:
+  void main_loop();
+
   class level
   {
   public:
@@ -45,9 +50,6 @@ public:
     repl& _repl;
   };
 
-  lisp_t operator()(lisp_t);
-
-private:
   class vm& _vm;
   int _level = -1;
 };

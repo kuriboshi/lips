@@ -35,7 +35,7 @@ int main(int argc, const char** argv)
     }
     catch(const lisp::lisp_finish& ex)
     {
-      return ex.exit_code;
+      return static_cast<int>(ex.exit_code);
     }
     catch(const std::exception& ex)
     {

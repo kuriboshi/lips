@@ -106,14 +106,14 @@ public:
   ref_ptr(T* p)
     : _ptr(p)
   {
-    if(_ptr)
+    if(_ptr != nullptr)
       _ptr->retain();
   }
   /// @brief Copy constructor will increase the reference count.
   ref_ptr(const ref_ptr& x)
     : _ptr(x._ptr)
   {
-    if(_ptr)
+    if(_ptr != nullptr)
       _ptr->retain();
   }
   /// @brief Move constructor
@@ -138,9 +138,9 @@ public:
   {
     if(this != &x)
     {
-      if(x._ptr)
+      if(x._ptr != nullptr)
         x._ptr->retain();
-      if(_ptr)
+      if(_ptr != nullptr)
         _ptr->release();
       _ptr = x._ptr;
     }
@@ -150,7 +150,7 @@ public:
   {
     if(this != &x)
     {
-      if(_ptr)
+      if(_ptr != nullptr)
         _ptr->release();
       _ptr = std::move(x._ptr);
       x._ptr = nullptr;
@@ -159,7 +159,7 @@ public:
   }
   ref_ptr& operator=(std::nullptr_t)
   {
-    if(_ptr)
+    if(_ptr != nullptr)
       _ptr->release();
     _ptr = nullptr;
     return *this;
@@ -178,7 +178,7 @@ public:
   /// @brief Decrease the reference counter.
   ~ref_ptr()
   {
-    if(_ptr)
+    if(_ptr != nullptr)
       _ptr->release();
   }
   /// @brief Smart pointer access operator.

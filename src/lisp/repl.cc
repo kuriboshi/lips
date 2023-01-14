@@ -28,20 +28,25 @@ repl::repl(class vm& vm)
   _vm.interactive(true);
 }
 
+void repl::main_loop()
+{
+  while(true)
+  {
+    context::current().primout()->format("> ");
+    auto expr = lispread(context::current().primin());
+    if(expr == C_EOF)
+      break;
+    auto result = eval(expr);
+    print(result);
+  }
+}
+
 lisp_t repl::operator()(lisp_t exp)
 {
   level begin(*this);
   if(_level == 0)
   {
-    while(true)
-    {
-      context::current().primout()->format("> ");
-      auto expr = lispread(context::current().primin());
-      if(expr == C_EOF)
-        break;
-      auto result = eval(expr);
-      print(result);
-    }
+    main_loop();
     return nil;
   }
   while(true)

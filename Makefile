@@ -5,6 +5,7 @@ all: debug
 .PHONY: release.config
 .PHONY: release
 .PHONY: xcode
+.PHONY: tidy.config
 
 debug.config: build/debug/CMakeCache.txt
 
@@ -25,8 +26,14 @@ release: release.config
 xcode:
 	cmake --preset xcode
 
+tidy.config: build/clang-tidy/CMakeCache.txt
+
+build/clang-tidy/CMakeCache.txt:
+	cmake --preset clang-tidy
+
 .PHONY: coverage
 .PHONY: format
+.PHONY: tidy
 .PHONE: test-linux
 .PHONE: test
 .PHONY: benchmark
@@ -36,6 +43,9 @@ coverage: debug.config
 
 format: debug.config
 	cmake --build --preset debug --target format
+
+tidy: tidy.config
+	cmake --build --preset clang-tidy
 
 test-linux:
 	cmake --build --preset debug --target test-linux

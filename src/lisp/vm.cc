@@ -77,7 +77,7 @@ class init
 public:
   init()
   {
-    auto intern = [this](const auto s) { return details::alloc::intern(s); };
+    auto intern = [](const auto s) { return details::alloc::intern(s); };
 
     // Must be early since it's used by symbol_store_t to initialize new
     // symbols.
@@ -145,10 +145,9 @@ public:
 
 vm::vm(context&)
 {
-  if(_current == nullptr)
-    _current = this;
-  else
+  if(_current != nullptr)
     throw std::runtime_error("vm::vm called twice");
+  _current = this;
   static init init;
 }
 
