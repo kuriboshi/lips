@@ -61,7 +61,7 @@ add_subdirectory(src)
 
 if(LIPS_ENABLE_TRACE)
   # Enable ability to trace calls to peval.
-  target_compile_definitions(lisp PRIVATE TRACE)
+  target_compile_definitions(liblisp PRIVATE LIPS_ENABLE_TRACE)
 endif()
 
 install(

@@ -169,8 +169,8 @@ lisp_t vm::printwhere()
   {
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::eval_end)
     {
-      if(auto* lsp = std::get_if<lisp_t>(&_control[i - 1]);
-         lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
+      if(auto* lsp = std::get_if<expr_t>(&_control[i - 1]);
+        lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
         context::current().primerr()->format("[in ");
@@ -322,9 +322,9 @@ bool vm::apply0()
 
 bool vm::eval_expr()
 {
-#ifdef TRACE
+#ifdef LIPS_ENABLE_TRACE
   if(_trace)
-    details::file::print(l, expression, T);
+    print(_expression, T);
 #endif
   push(_expression);
   push(&vm::eval_end);
@@ -542,7 +542,14 @@ void vm::bt()
   for(auto i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
-      print(std::get<lisp_t>(_control[i - 1]), T);
+    {
+      if(auto* e = std::get_if<expr_t>(&_control[i - 1]))
+        print(*e, T);
+      else if(auto* f = std::get_if<fun_t>(&_control[i - 1]))
+        print(*f, T);
+      else if(auto* a = std::get_if<args_t>(&_control[i - 1]))
+        print(*f, T);
+    }
   }
   context::current().printlevel = op;
 }
@@ -951,6 +958,13 @@ lisp_t vm::destblock(const destblock_t* block)
   return car(foo);
 }
 
+std::string vm::to_string(const lisp_t& item)
+{
+  std::ostringstream os;
+  os << item;
+  return os.str();
+}
+
 std::string vm::to_string(const destblock_t* block)
 {
   std::ostringstream s;
@@ -1052,18 +1066,15 @@ lisp_t vm::backtrace()
     context::current().primerr()->format("{}: ", i);
     std::visit(
       [this](auto&& arg) {
-        using ArgType = std::decay_t<decltype(arg)>;
-        if constexpr(std::is_same_v<ArgType, lisp_t>)
-        {
-          context::current().primerr()->puts("lisp_t: ");
-          print(arg, T);
-        }
-        else if constexpr(std::is_same_v<ArgType, destblock_t*>)
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr(std::is_same_v<T, std::monostate>)
+          ; // Do nothing for monostate
+        else if constexpr(std::is_same_v<T, destblock_t*>)
           context::current().primerr()->format("destblock_t: {}\n", to_string(arg));
-        else if constexpr(std::is_same_v<ArgType, continuation_t>)
+        else if constexpr(std::is_same_v<T, continuation_t>)
           context::current().primerr()->format("cont: {}\n", to_string(arg));
         else
-          ; // Do nothing for monostate
+          context::current().primerr()->format("{}\n", to_string(arg));
       },
       _control[i]);
   }

@@ -18,6 +18,9 @@
 #ifndef LISP_VM_HH
 #define LISP_VM_HH
 
+#include <iostream>
+#include <fmt/format.h>
+
 #include <array>
 #include <cstdint>
 #include <functional>
@@ -103,23 +106,81 @@ public:
   destblock_t* environment() const { return _env; }
 
 private:
-  destblock_t* _dest = nullptr; // Current destination being built.
-
   //
   // The control stack.
   //
+  destblock_t* _dest = nullptr; // Current destination being built.
   using continuation_t = bool (vm::*)();
-  using control_t = std::variant<std::monostate, continuation_t, destblock_t*, lisp_t>;
+  struct expr_t
+  {
+    lisp_t value;
+    operator lisp_t() const noexcept { return value; }
+    lisp_t operator->() const noexcept { return value; }
+    lisp_t operator=(lisp_t v)
+    {
+      value = v;
+#ifdef LIPS_ENABLE_TRACE
+      if(vm::get()._trace)
+        std::cerr << fmt::format("set {}\n", vm::to_string(*this));
+#endif
+      return *this;
+    }
+  };
+  struct fun_t
+  {
+    lisp_t value;
+    operator lisp_t() const noexcept { return value; }
+    lisp_t operator->() const noexcept { return value; }
+    lisp_t operator=(lisp_t v)
+    {
+      value = v;
+#ifdef LIPS_ENABLE_TRACE
+      if(vm::get()._trace)
+        std::cerr << fmt::format("set {}\n", vm::to_string(*this));
+#endif
+      return *this;
+    }
+  };
+  struct args_t
+  {
+    lisp_t value;
+    operator lisp_t() const noexcept { return value; }
+    lisp_t operator->() const noexcept { return value; }
+    lisp_t operator=(lisp_t v)
+    {
+      value = v;
+#ifdef LIPS_ENABLE_TRACE
+      if(vm::get()._trace)
+        std::cerr << fmt::format("set {}\n", vm::to_string(*this));
+#endif
+      return *this;
+    }
+  };
+  using control_t = std::variant<std::monostate, destblock_t*, continuation_t, expr_t, fun_t, args_t>;
   static constexpr int CTRLBLKSIZE = 4000;
   std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
   int _toctrl = 0;                             // Control-stack stack pointer
+
+  template<typename T>
+  void set(T& t, lisp_t value)
+  {
+    t.value = value;
+#ifdef LIPS_ENABLE_TRACE
+    if(_trace)
+      std::cerr << fmt::format("set {}\n", to_string(t));
+#endif
+  }
 
   // @brief Pushes continuations, destinations, or lisp_t objects on the control
   // stack.
   template<typename T>
   void push(T t)
   {
-    _control[_toctrl++] = t;
+#ifdef LIPS_ENABLE_TRACE
+    if(_trace)
+      std::cerr << fmt::format("push({}): {}\n", _toctrl, to_string(t));
+#endif
+    _control[_toctrl++] = std::move(t);
     if(_toctrl >= CTRLBLKSIZE)
       overflow();
   }
@@ -128,7 +189,19 @@ private:
   template<typename T>
   void pop(T& t)
   {
-    t = std::get<T>(_control[--_toctrl]);
+    try
+    {
+      t = std::move(std::get<T>(_control[--_toctrl]));
+#ifdef LIPS_ENABLE_TRACE
+      if(_trace)
+        std::cerr << fmt::format("pop ({}): {}\n", _toctrl, to_string(t));
+#endif
+    }
+    catch(const std::bad_variant_access& ex)
+    {
+      std::cerr << ex.what() << std::endl;
+      throw;
+    }
   }
   void pop_env();
 
@@ -147,10 +220,15 @@ private:
   void do_unbound(continuation_t);
   void link();
   void restore_env();
+  static std::string to_string(const expr_t& v) { return "expr: " + to_string(v.value); }
+  static std::string to_string(const args_t& v) { return "args: " + to_string(v.value); }
+  static std::string to_string(const fun_t& v) { return "fun: " + to_string(v.value); }
+  /// @brief Translate a lisp_t object to a string
+  static std::string to_string(const lisp_t&);
   /// @brief Translate a destblock_t to a string
-  std::string to_string(const destblock_t*);
+  static std::string to_string(const destblock_t*);
   /// @brief Translate a continuation member function pointer to a string
-  std::string to_string(continuation_t);
+  static std::string to_string(continuation_t);
 
   // Continuations
   bool eval_expr();
@@ -212,12 +290,13 @@ private:
 
   undefhook_t _undefhook;         // Called in case of undefined function.
   breakhook_t _breakhook;         // Called before going into break.
-  lisp_t _fun;                    // Store current function being evaluated.
-  lisp_t _expression;             // Current expression.
-  lisp_t _args;                   // Current arguments.
+  expr_t _expression;             // Stores urrent expression being evaluated.
+  fun_t _fun;                     // Current function.
+  args_t _args;                   // Current arguments.
   bool _noeval = false;           // Don't evaluate arguments.
   continuation_t _cont = nullptr; // Current continuation.
   destblock_t* _env = nullptr;    // Current environment.
+
   bool _trace = false;
   bool _interactive = false;
 
