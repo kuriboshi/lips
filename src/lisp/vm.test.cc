@@ -286,6 +286,35 @@ TEST_CASE("eval: backtrace, topofstack, destblock")
   CHECK(d == nil);
 }
 
+
+TEST_CASE("vm: trace")
+{
+  std::ostringstream os;
+  class redirect
+  {
+  public:
+    redirect(std::ostream& stream, std::ostream& output)
+      : _stream(stream),
+        _buf(_stream.rdbuf(output.rdbuf()))
+    {}
+    ~redirect() { _stream.rdbuf(_buf); }
+  private:
+    std::ostream& _stream;
+    decltype(_stream.rdbuf()) _buf;
+  } rdbuf{std::cerr, os};
+  class trace
+  {
+  public:
+    trace() : _old(vm::get().trace(true)) {}
+    ~trace() { vm::get().trace(_old); }
+  private:
+    bool _old;
+  } t;
+  auto r = eval(R"((plus 1 2 3))");
+  REQUIRE(type_of(r) == object::type::Integer);
+  CHECK(r->intval() == 6);
+}
+
 template<class T>
 void pool_test()
 {

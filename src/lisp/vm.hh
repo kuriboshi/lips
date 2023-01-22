@@ -70,7 +70,7 @@ public:
   /// reset.
   void unwind();
   bool trace() const { return _trace; }
-  void trace(bool t) { _trace = t; }
+  bool trace(bool t) { bool old = _trace; _trace = t; return old; }
   void interactive(bool b) { _interactive = b; }
 
   using undefhook_t = std::function<int(lisp_t, lisp_t*)>;
@@ -189,19 +189,11 @@ private:
   template<typename T>
   void pop(T& t)
   {
-    try
-    {
-      t = std::move(std::get<T>(_control[--_toctrl]));
+    t = std::move(std::get<T>(_control[--_toctrl]));
 #ifdef LIPS_ENABLE_TRACE
-      if(_trace)
-        std::cerr << fmt::format("pop ({}): {}\n", _toctrl, to_string(t));
+    if(_trace)
+      std::cerr << fmt::format("pop ({}): {}\n", _toctrl, to_string(t));
 #endif
-    }
-    catch(const std::bad_variant_access& ex)
-    {
-      std::cerr << ex.what() << std::endl;
-      throw;
-    }
   }
   void pop_env();
 
