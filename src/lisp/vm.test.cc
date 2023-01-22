@@ -244,7 +244,6 @@ TEST_CASE("eval: backtrace")
 )"_e;
   // clang-format off
   const std::vector<std::string> expected{
-    R"(18: cont: eval_prim)",
     R"(17: destblock_t: 1 \(nil . #<lambda [0-9a-f]+>\))",
     R"(16: cont: ev1)",
     R"(15: args: \(\(a\) b\))",

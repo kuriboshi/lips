@@ -1061,7 +1061,7 @@ std::string vm::to_string(continuation_t cont)
 
 lisp_t vm::backtrace()
 {
-  for(int i = _toctrl; i >= 0; i--)
+  for(int i = _toctrl - 1; i >= 0; i--)
   {
     context::current().primerr()->format("{}: ", i);
     std::visit(
