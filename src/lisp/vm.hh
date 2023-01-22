@@ -161,16 +161,6 @@ private:
   std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
   int _toctrl = 0;                             // Control-stack stack pointer
 
-  template<typename T>
-  void set(T& t, lisp_t value)
-  {
-    t.value = value;
-#ifdef LIPS_ENABLE_TRACE
-    if(_trace)
-      std::cerr << fmt::format("set {}\n", to_string(t));
-#endif
-  }
-
   // @brief Pushes continuations, destinations, or lisp_t objects on the control
   // stack.
   template<typename T>
