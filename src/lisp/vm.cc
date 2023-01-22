@@ -970,18 +970,15 @@ std::string vm::to_string(const destblock_t* block)
   std::ostringstream s;
   if(block != nullptr)
   {
-    s << block->size() << ' ';
+    s << block->size();
     for(int i = 0; i != block->size(); ++i)
     {
-      s << '(';
+      s << " (";
       if((block + i + 1)->var() == nil)
         s << "nil";
       else
         s << (block + i + 1)->var()->symbol()->pname;
-      s << " . ";
-      auto o = ref_file_t::create(s);
-      prin0((block + i + 1)->val(), *o);
-      s << ')';
+      s << " . " << (block + i + 1)->val() << ')';
     }
   }
   else
