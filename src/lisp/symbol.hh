@@ -50,7 +50,7 @@ struct sv_hash
   auto operator()(std::string_view str) const noexcept { return std::hash<std::string_view>()(str); }
 };
 
-class symbol_t: public ref_count<symbol_t>
+class symbol_t final: public ref_count<symbol_t>
 {
 public:
   symbol_t() = default;

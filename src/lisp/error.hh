@@ -47,7 +47,7 @@ enum class type_errc
   not_cvariable
 };
 
-class type_category: public std::error_category
+class type_category final: public std::error_category
 {
 public:
   const char* name() const noexcept override { return "type"; }
@@ -134,7 +134,7 @@ enum class error_errc
   user_error
 };
 
-class error_category: public std::error_category
+class error_category final: public std::error_category
 {
 public:
   const char* name() const noexcept override { return "error"; }

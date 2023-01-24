@@ -33,7 +33,7 @@ using ref_file_t = ref_ptr<file_t>;
 
 extern lisp_t C_VERSION;
 
-class context
+class context final
 {
 public:
   context();

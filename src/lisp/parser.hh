@@ -40,7 +40,7 @@ class lexer;
 ///
 /// @details The main attraction.
 ///
-class parser
+class parser final
 {
 public:
   /// @brief Constructor.

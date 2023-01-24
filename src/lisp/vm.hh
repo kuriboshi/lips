@@ -30,7 +30,7 @@
 
 namespace lisp
 {
-class vm
+class vm final
 {
 public:
   /// @brief Lisp virtual machine constructor.

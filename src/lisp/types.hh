@@ -47,7 +47,7 @@ inline constexpr auto nil = nullptr;
 /// @details A cons cell contains two pieces of data: The head (traditionall
 /// called car) and the tail (traditionally called cdr).
 ///
-class cons_t: public ref_count<cons_t>
+class cons_t final: public ref_count<cons_t>
 {
 public:
   cons_t() = default;
@@ -81,7 +81,7 @@ private:
 /// index of the variable/value pair currently being set, and a link to another
 /// destblock_t in a chain of blocks.
 ///
-class destblock_t
+class destblock_t final
 {
 private:
   struct control_block
@@ -124,7 +124,7 @@ public:
 /// can be either spread (fixed number of arguments) or nospread (variable
 /// number of arguments).
 ///
-class subr_t
+class subr_t final
 {
 public:
   /// @brief Indicates if the arguments are to be evaluated or not.
@@ -234,7 +234,7 @@ inline lisp_t subr_t::operator()(destblock_t* dest) const
 
 /// @brief Lambda representation.
 ///
-class lambda_t: public ref_count<lambda_t>
+class lambda_t final: public ref_count<lambda_t>
 {
 public:
   lambda_t() = default;
@@ -267,7 +267,7 @@ private:
 
 /// @brief A closure (static binding).
 ///
-class closure_t: public ref_count<closure_t>
+class closure_t final: public ref_count<closure_t>
 {
 public:
   closure_t() = default;
@@ -294,7 +294,7 @@ private:
   static pool_t _pool;
 };
 
-class string_t: public ref_count<string_t>
+class string_t final: public ref_count<string_t>
 {
 public:
   string_t() = default;
@@ -330,7 +330,7 @@ struct subr_index
 /// from either the C++ context or the lisp context and have the value be
 /// reflected in both.
 ///
-class cvariable_t
+class cvariable_t final
 {
 public:
   explicit cvariable_t(lisp_t value)

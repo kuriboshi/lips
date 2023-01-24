@@ -171,7 +171,7 @@ inline std::ostream& operator<<(std::ostream& os, const token_t& t)
 }
 
 /// @brief A lexer of a string input.
-class lexer
+class lexer final
 {
 public:
   lexer(ref_file_t input)

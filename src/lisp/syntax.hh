@@ -46,7 +46,7 @@ using lisp_t = ref_ptr<object>;
 // ,@
 // ;
 
-class syntax
+class syntax final
 {
 public:
   syntax() { reset(); }

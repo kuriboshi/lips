@@ -26,7 +26,7 @@
 namespace lisp
 {
 
-class context::impl
+class context::impl final
 {
 public:
   impl()
