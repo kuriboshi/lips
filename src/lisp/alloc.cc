@@ -64,19 +64,6 @@ static lisp_t mkarglist(lisp_t alist, std::int8_t& count)
   return cons(alist, nil);
 }
 
-/// @brief Creates a lambda function.
-///
-/// @details Not meant to be used directly. Call the functions LAMBDA and
-/// NLAMBDA instead.
-///
-/// @param args The parameters of the lambda function. For a spread type
-/// function this is a list of atoms. For a nospread function it's a single
-/// atom. For a half spread function the list should end with a dotted pair.
-/// @param def The definition of the lambda function. The body of the function
-/// should be a list of expressions.
-/// @param eval True means lambda while false means nlambda.
-///
-/// @returns A lambda function.
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {
   auto lambda = ref_lambda_t::create();
@@ -88,12 +75,6 @@ lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
   return getobject(lambda);
 }
 
-/// @brief Make interned symbol in obarray.
-///
-/// @details Create an interned symbol in the global symbol table.
-///
-/// @param pname Name of the symbol.
-/// @returns The symbol as a LISP object.
 lisp_t intern(std::string_view pname)
 {
   auto* sym = symbol::symbol_t::intern(pname);

@@ -28,13 +28,19 @@ lisp_t mkfloat(double);
 lisp_t obarray();
 inline lisp_t freecount() { return mknumber(static_cast<std::int64_t>(object::freecount())); }
 
-/// @brief Make a lambda object.
+/// @brief Creates a lambda function.
 ///
-/// @details Make a lambda object with the argument ARGS and definition DEF
-/// and the type TYPE, which is either LAMBDA or NLAMBDA.
+/// @details Not meant to be used directly. Call the functions LAMBDA and
+/// NLAMBDA instead.
 ///
-/// @return The lambda object.
+/// @param args The parameters of the lambda function. For a spread type
+/// function this is a list of atoms. For a nospread function it's a single
+/// atom. For a half spread function the list should end with a dotted pair.
+/// @param def The definition of the lambda function. The body of the function
+/// should be a list of expressions.
+/// @param eval True means lambda while false means nlambda.
 ///
+/// @returns A lambda function.
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval);
 lisp_t intern(std::string_view pname);
 lisp_t mkatom(std::string_view);

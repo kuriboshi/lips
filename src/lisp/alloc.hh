@@ -83,13 +83,12 @@ inline lisp_t obarray() { return details::alloc::obarray(); }
 ///
 inline lisp_t freecount() { return details::alloc::freecount(); }
 
-/// @brief Create a symbol in the global symbol table, accessable from all
-/// lisp instances.
+/// @brief Make interned symbol in obarray.
 ///
-/// @param pname The print name.
+/// @details Create an interned symbol in the global symbol table.
 ///
-/// @return The interned symbol.
-///
+/// @param pname The print name of the symbol.
+/// @returns The symbol as a LISP object.
 inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 
 /// @brief Create a literal atom.
