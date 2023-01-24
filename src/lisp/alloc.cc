@@ -50,7 +50,7 @@ lisp_t mkfloat(double number) { return getobject(number); }
 /// Negative for nospread and halfspread.
 ///
 /// @return A straight list of arguments.
-lisp_t mkarglist(lisp_t alist, std::int8_t& count)
+static lisp_t mkarglist(lisp_t alist, std::int8_t& count)
 {
   if(type_of(alist) == object::type::Cons)
   {
