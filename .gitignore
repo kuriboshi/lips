@@ -1,6 +1,5 @@
 *.profraw
 *.aux
 *.gz
-*.pdf
 CMakeUserPresets.json
 build/
