@@ -47,7 +47,7 @@ The code requires C++20 and CMake 3.21 or newer.
 The project is developed primarily on macOS 13 (Ventura) using the
 Apple clang version 14.0.0 (clang-1400.0.29.202) compiler.  It may
 work on older releases of macOS if you install a newer compiler.  It's
-tested regulartly on Ubuntu 22.04 and 20.04. On Ubuntu testing is done
+tested regularly on Ubuntu 22.04 and 20.04. On Ubuntu testing is done
 using gcc 11.x, gcc 12.x and clang 14.x.
 
 ## Building
