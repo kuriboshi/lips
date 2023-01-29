@@ -75,7 +75,6 @@ endmacro()
 
 add_custom_target(test-linux)
 set_target_properties(test-linux PROPERTIES FOLDER "Test")
-lips_build_and_test(Ubuntu-18.04 18)
 lips_build_and_test(Ubuntu-20.04 20)
 lips_build_and_test(Ubuntu-22.04 22 tidy)
 lips_build_and_test(Ubuntu-22.04-clang 22-clang)

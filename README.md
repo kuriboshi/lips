@@ -2,7 +2,6 @@
 
 Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
 
-![Ubuntu 18.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-18.04.yml/badge.svg)
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
@@ -48,8 +47,8 @@ The code requires C++20 and CMake 3.21 or newer.
 The project is developed primarily on macOS 13 (Ventura) using the
 Apple clang version 14.0.0 (clang-1400.0.29.202) compiler.  It may
 work on older releases of macOS if you install a newer compiler.  It's
-tested regulartly on Ubuntu 22.04, 20.04, and 18.04. On Ubuntu testing
-is done using gcc 11.x, gcc 12.x and clang 14.x.
+tested regulartly on Ubuntu 22.04 and 20.04. On Ubuntu testing is done
+using gcc 11.x, gcc 12.x and clang 14.x.
 
 ## Building
 
@@ -105,10 +104,9 @@ and 20.
 
 For local testing there are some docker files in the `test` directory
 which can be used for testing on various platforms. Currently there
-are files for Ubuntu 18.04, 20.04, and 22.04. The latter also has a
-variant for clang. For 18.04 and 20.04 the version of gcc is 11 and
-for 22.04 it's gcc 12. For 22.04 and clang the version of clang is
-clang 14.
+are files for Ubuntu 20.04 and 22.04. The latter also has a variant
+for clang. For 20.04 the version of gcc is 11 and for 22.04 it's gcc
+12. For 22.04 and clang the version of clang is clang 14.
 
 Runing the following command builds and tests on all four operating
 systems and compiler combinations.
