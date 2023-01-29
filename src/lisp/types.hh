@@ -51,7 +51,10 @@ class cons_t final: public ref_count<cons_t>
 {
 public:
   cons_t() = default;
-  cons_t(lisp_t a, lisp_t d): car(a), cdr(d) {}
+  cons_t(lisp_t a, lisp_t d)
+    : car(a),
+      cdr(d)
+  {}
   ~cons_t() = default;
 
   lisp_t car = nil;
@@ -219,17 +222,19 @@ inline subr_t::subr_index subr_t::put(const subr_t& subr)
 
 inline lisp_t subr_t::operator()(destblock_t* dest) const
 {
-  return std::visit([&dest, this](auto&& arg) -> lisp_t {
-    using T = std::decay_t<decltype(arg)>;
-    if constexpr(std::is_same_v<T, func0_t>)
-      return std::get<func0_t>(_fun)();
-    else if constexpr(std::is_same_v<T, func1_t>)
-      return std::get<func1_t>(_fun)(dest[1].val());
-    else if constexpr(std::is_same_v<T, func2_t>)
-      return std::get<func2_t>(_fun)(dest[2].val(), dest[1].val());
-    else if constexpr(std::is_same_v<T, func3_t>)
-      return std::get<func3_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
-  }, _fun);
+  return std::visit(
+    [&dest, this](auto&& arg) -> lisp_t {
+      using T = std::decay_t<decltype(arg)>;
+      if constexpr(std::is_same_v<T, func0_t>)
+        return std::get<func0_t>(_fun)();
+      else if constexpr(std::is_same_v<T, func1_t>)
+        return std::get<func1_t>(_fun)(dest[1].val());
+      else if constexpr(std::is_same_v<T, func2_t>)
+        return std::get<func2_t>(_fun)(dest[2].val(), dest[1].val());
+      else if constexpr(std::is_same_v<T, func3_t>)
+        return std::get<func3_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
+    },
+    _fun);
 }
 
 /// @brief Lambda representation.
@@ -298,7 +303,9 @@ class string_t final: public ref_count<string_t>
 {
 public:
   string_t() = default;
-  string_t(const std::string& s) : string(s) {}
+  string_t(const std::string& s)
+    : string(s)
+  {}
   ~string_t() = default;
 
   std::string string;
@@ -388,7 +395,9 @@ public:
 
   /// @brief Constructor for anything with a defined set function
   template<typename T>
-  explicit object(T x): _u(x) {}
+  explicit object(T x)
+    : _u(x)
+  {}
 
   /// @brief Construct an object conaining a cvariable_t value.
   object(cvariable_t&& x) { _u = std::move(x); }
@@ -417,7 +426,7 @@ public:
   /// @details Each of the values in the enum maps one to one directly to the
   /// type stored in the variant. The enum exists to make the value type more
   /// readable.
-  enum class type: std::uint8_t
+  enum class type : std::uint8_t
   {
     Nil = 0,  // so that nullptr also becomes nil
     Symbol,   // an atomic symbol
@@ -509,7 +518,8 @@ private:
     destblock_t*,              // Environ
     ref_file_t,                // File
     cvariable_t                // Cvariable
-    > _u;
+    >
+    _u;
 
   /// @brief Used to achieve coverage of operator delete(void*) when an
   /// exception is thrown in the constructor.

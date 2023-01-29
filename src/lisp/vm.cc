@@ -151,10 +151,7 @@ vm::vm(context&)
   static init init;
 }
 
-vm::~vm()
-{
-  _current = nullptr;
-}
+vm::~vm() { _current = nullptr; }
 
 lisp_t vm::printwhere()
 {
@@ -170,7 +167,7 @@ lisp_t vm::printwhere()
     if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::eval_end)
     {
       if(auto* lsp = std::get_if<expr_t>(&_control[i - 1]);
-        lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
+         lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
         context::current().primerr()->format("[in ");
@@ -228,10 +225,7 @@ lisp_t vm::receive() { return _dest[_dest[0].index()].val(); }
 
 void vm::next() { _dest[0].decr(); }
 
-lisp_t vm::call(lisp_t fun)
-{
-  return fun->subr()(_dest);
-}
+lisp_t vm::call(lisp_t fun) { return fun->subr()(_dest); }
 
 lisp_t vm::eval(lisp_t expr)
 {
@@ -274,10 +268,7 @@ lisp_t vm::eval(lisp_t expr)
   return foo;
 }
 
-lisp_t vm::eval(const std::string& expr)
-{
-  return eval(lispread(expr));
-}
+lisp_t vm::eval(const std::string& expr) { return eval(lispread(expr)); }
 
 bool vm::eval0()
 {

@@ -100,7 +100,10 @@ private:
 inline lisp_t perror(std::error_code code, lisp_t a) { return context::current().perror(code, a); }
 inline lisp_t error(std::error_code code, lisp_t a) { return context::current().error(code, a); }
 template<typename... Ts>
-inline void fatal(std::error_code code, const Ts&... a) { return context::current().fatal(code, a...); }
+inline void fatal(std::error_code code, const Ts&... a)
+{
+  return context::current().fatal(code, a...);
+}
 
 } // namespace lisp
 

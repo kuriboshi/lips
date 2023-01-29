@@ -81,4 +81,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::logic
+} // namespace lisp::details::logic

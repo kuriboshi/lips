@@ -222,10 +222,7 @@ TEST_CASE("eval: illegal apply")
 {
   SECTION("apply string") { CHECK_THROWS(R"((apply "string"))"_e); }
 
-  SECTION("apply unbound")
-  {
-    CHECK_THROWS(R"((apply unbound))"_e);
-  }
+  SECTION("apply unbound") { CHECK_THROWS(R"((apply unbound))"_e); }
 
   SECTION("apply int") { CHECK_THROWS(R"((apply 100))"_e); }
 }
@@ -285,7 +282,6 @@ TEST_CASE("eval: backtrace, topofstack, destblock")
   CHECK(d == nil);
 }
 
-
 TEST_CASE("vm: trace")
 {
   std::ostringstream os;
@@ -297,6 +293,7 @@ TEST_CASE("vm: trace")
         _buf(_stream.rdbuf(output.rdbuf()))
     {}
     ~redirect() { _stream.rdbuf(_buf); }
+
   private:
     std::ostream& _stream;
     decltype(_stream.rdbuf()) _buf;
@@ -304,8 +301,11 @@ TEST_CASE("vm: trace")
   class trace
   {
   public:
-    trace() : _old(vm::get().trace(true)) {}
+    trace()
+      : _old(vm::get().trace(true))
+    {}
     ~trace() { vm::get().trace(_old); }
+
   private:
     bool _old;
   } t;

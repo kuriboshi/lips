@@ -70,7 +70,12 @@ public:
   /// reset.
   void unwind();
   bool trace() const { return _trace; }
-  bool trace(bool t) { bool old = _trace; _trace = t; return old; }
+  bool trace(bool t)
+  {
+    bool old = _trace;
+    _trace = t;
+    return old;
+  }
   void interactive(bool b) { _interactive = b; }
 
   using undefhook_t = std::function<int(lisp_t, lisp_t*)>;

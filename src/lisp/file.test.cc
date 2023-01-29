@@ -88,7 +88,7 @@ TEST_CASE("file: functions")
     SECTION("from stdin")
     {
       std::istringstream stream("nil");
-      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto* buf = std::cin.rdbuf(stream.rdbuf());
       auto r = ratom(T);
       CHECK(r == nil);
       std::cin.rdbuf(buf);
@@ -240,7 +240,7 @@ TEST_CASE("file: functions")
     SECTION("from stdin")
     {
       std::istringstream stream("a");
-      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto* buf = std::cin.rdbuf(stream.rdbuf());
       auto r = readc(T);
       REQUIRE(type_of(r) == object::type::Integer);
       CHECK(r->intval() == 'a');
@@ -270,7 +270,7 @@ TEST_CASE("file: functions")
     SECTION("from stdin")
     {
       std::istringstream stream(R"((a b c))");
-      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto* buf = std::cin.rdbuf(stream.rdbuf());
       auto r = read(T);
       REQUIRE(type_of(r) == object::type::Cons);
       CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
@@ -353,7 +353,7 @@ TEST_CASE("file: functions")
     SECTION("from stdin")
     {
       std::istringstream stream("a");
-      auto* buf = std::cin.rdbuf(stream.rdbuf());  
+      auto* buf = std::cin.rdbuf(stream.rdbuf());
       auto r = readline(T);
       REQUIRE(type_of(r) == object::type::Cons);
       REQUIRE(type_of(r->car()) == object::type::Symbol);

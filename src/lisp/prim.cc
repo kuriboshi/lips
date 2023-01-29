@@ -177,7 +177,8 @@ lisp_t eq(lisp_t a, lisp_t b)
 
 lisp_t atom(lisp_t a)
 {
-  if(is_nil(a) || is_T(a) || type_of(a) == object::type::Symbol || type_of(a) == object::type::Integer || type_of(a) == object::type::Float)
+  if(is_nil(a) || is_T(a) || type_of(a) == object::type::Symbol || type_of(a) == object::type::Integer
+    || type_of(a) == object::type::Float)
     return T;
   return nil;
 }

@@ -72,7 +72,7 @@ TEST_CASE("lisp: mkprim")
   SECTION("Redefine subr")
   {
     CHECK_THROWS_WITH(mkprim(
-      "plus", []() -> lisp_t { return nil; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
+                        "plus", []() -> lisp_t { return nil; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "Redefinition of subr not allowed: plus");
   }
 }

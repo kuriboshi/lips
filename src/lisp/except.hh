@@ -30,7 +30,8 @@ public:
     : std::runtime_error(ec.message())
   {}
   lisp_error(std::error_code ec, const std::string& error)
-    : std::runtime_error(ec.message() + ": " + error), error_code(ec)
+    : std::runtime_error(ec.message() + ": " + error),
+      error_code(ec)
   {}
   std::error_code error_code;
 };

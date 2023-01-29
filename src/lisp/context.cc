@@ -67,10 +67,7 @@ context::context()
   _pimpl = std::make_unique<impl>();
 }
 
-context::~context()
-{
-  _current = nullptr;
-}
+context::~context() { _current = nullptr; }
 
 context& context::current()
 {
