@@ -73,7 +73,7 @@ type results in an exception.
     point value.
   \item \cpp{auto indirect() const -> lisp\_t} Returns the real
     value of the indirect value.
-  \item \cpp{auto cons() const -> const cons\_t&} Returns the cons
+  \item \cpp{auto cons() const -> const cons\_t\&} Returns the cons
     cell.
   \item \cpp{auto car() const -> lisp\_t} Returns the \lisp{car} of
     the cons cell.
@@ -101,7 +101,7 @@ int main()
   lisp::vm vm(ctx);
   // The _l suffix creates a lisp object by parsing
   // the string.
-  lisp::print(lisp::cons("a"_l, "b"_l)); // => (a . b)
+  lisp::print(lisp::cons("a"_a, "b"_a)); // => (a . b)
 }
 \end{lstlisting}
 \subsection{The REPL}
@@ -114,11 +114,13 @@ returns a \cpp{lisp\_t} type object.
 Typical usage.
 
 \begin{lstlisting}[language=c++]
-  lisp::vm vm;
   lisp::context ctx;
+  lisp::vm vm(ctx);
   lisp::repl repl(vm);
-  lisp.repl = [&repl](lisp::lisp\_t) -> lisp::lisp\_t { return
-    repl(lisp::NIL); };
+  lisp.repl = [&repl](lisp::lisp_t) -> lisp::lisp_t
+  {
+    return repl(lisp::NIL);
+  };
   lisp.repl(lisp::NIL);
 \end{lstlisting}
 
