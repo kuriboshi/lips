@@ -9,6 +9,12 @@ stages:
 build-job:
   stage: build
   script:
+    - |
+      which make > /dev/null || (
+        apt-get update
+        apt-get install -y make cmake ninja-build
+        apt-get install -y g++ libncurses-dev
+      )
     - make debug
   artifacts:
     paths:
@@ -17,6 +23,12 @@ build-job:
 unit-test-job:
   stage: test
   script:
+    - |
+      which make > /dev/null || (
+        apt-get update
+        apt-get install -y make cmake ninja-build
+        apt-get install -y g++ libncurses-dev
+      )
     - make test
   dependencies:
     - build-job
@@ -27,6 +39,13 @@ unit-test-job:
 coverage-test-job:
   stage: test
   script:
+    - |
+      which make > /dev/null || (
+        apt-get update
+        apt-get install -y make cmake ninja-build
+        apt-get install -y g++ libncurses-dev
+        apt-get install -y lcov
+      )
     - make coverage
   dependencies:
     - build-job
@@ -37,9 +56,22 @@ coverage-test-job:
 package-test-job:
   stage: test
   script:
+    - |
+      which make > /dev/null || (
+        apt-get update
+        apt-get install -y make cmake ninja-build
+        apt-get install -y g++ libncurses-dev
+        apt-get install -y git
+      )
     - make package_test
 
 deploy-job:
   stage: deploy
   script:
+    - |
+      which make > /dev/null || (
+        apt-get update
+        apt-get install -y make cmake ninja-build
+        apt-get install -y g++ libncurses-dev
+      )
     - make release
