@@ -24,6 +24,14 @@
 
 namespace lisp
 {
+/// @brief Iterates over a list
+///
+/// @details Usage:
+/// @code{.cc}
+///   auto list{"(a b c)"_l}
+///   for(auto i: list)
+///     f(i); // Call 'f' on each element in 'list' (i.e. a, b, and c)
+/// @endcode
 class iterator
 {
 public:
@@ -56,8 +64,7 @@ public:
   {
     if(type_of(_car) == object::type::Cons)
       return _car->car();
-    else
-      return nullptr;
+    return nullptr;
   }
 
 private:
