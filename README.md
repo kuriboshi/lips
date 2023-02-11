@@ -163,6 +163,55 @@ cmake --preset default -D LIPS_USE_SSHFS=ON
 
 From then on the target `test-linux` should work automatically.
 
+## Implementation notes
+
+Lips does not use a garbage collector. Instead it uses reference
+counting implemented by an intrusive pointer. The reference counter is
+in the reference counted object itself by deriving from
+`lisp::ref_count`. The intrusive smart pointer controlling the
+reference counted object (let's say T) derive from `lisp::ref_ptr<T>`.
+
+The `lisp::object` class represents the type which can store a value
+of any type. It's implemented using `std::variant` which is not the
+most efficient solution. The overhead is more than just a tag.
+
+Most types stored in the `lisp::object` class are implemented using
+pointers to instances which are allocated using a memory
+pool. Benchmarks shows allocation is almost 10 times faster than not
+using a memory pool for an optimized build. Here is an example of a
+test run on a Mac mini (2018). Benchmarks are run using `make
+benchmark.`
+
+```
+1: benchmark name           samples       iterations    estimated
+1:                          mean          low mean      high mean
+1:                          std dev       low std dev   high std dev
+1: ------------------------------------------------------------------
+1: pool: speed(Foo, 100)              100            27     4.5117 ms
+1:                             1.63464 us     1.6339 us    1.63637 us
+1:                             5.39377 ns    1.87873 ns     9.6492 ns
+1:
+1: pool: speed(Bar, 100)              100             4     5.5724 ms
+1:                              13.815 us    13.6444 us    14.4859 us
+1:                             1.48375 us    324.523 ns    3.43163 us
+1:
+1: pool: speed(Foo, 500)              100             6      4.836 ms
+1:                             8.10305 us    8.08126 us    8.16919 us
+1:                             175.717 ns    66.6933 ns    382.204 ns
+1:
+1: pool: speed(Bar, 500)              100             1     7.2249 ms
+1:                             72.5547 us     72.499 us    72.6542 us
+1:                             368.012 ns    239.182 ns    676.828 ns
+1:
+1: pool: speed(Foo, 1000)             100             3     5.0205 ms
+1:                             17.0331 us    17.0165 us    17.0757 us
+1:                             121.435 ns    21.1429 ns    242.825 ns
+1:
+1: pool: speed(Bar, 1000)             100             1    15.2096 ms
+1:                             149.443 us     147.86 us    153.676 us
+1:                             11.5088 us    1.29109 us    23.4167 us
+```
+
 ## References
 
 [1] _Interlisp Reference Manual_, Xerox, 1983.<br>
