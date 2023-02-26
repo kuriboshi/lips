@@ -20,21 +20,12 @@ if(APPLE)
   set(LIPS_CONTAINER_APP "podman")
   set(LIPS_CONTAINER_USER_ID "0")
   set(LIPS_CONTAINER_GROUP_ID "0")
-  if(LIPS_USE_SSHFS)
-    set(LIPS_CONTAINER_TEST "-t")
-    set(LIPS_CONTAINER_PREFIX "/mnt/")
-  else()
-    set(LIPS_CONTAINER_TEST "")
-    set(LIPS_CONTAINER_PREFIX "")
-  endif()
 else()
   set(LIPS_CONTAINER_APP "docker")
   execute_process(COMMAND id -u OUTPUT_VARIABLE LIPS_CONTAINER_USER_ID)
   string(STRIP ${LIPS_CONTAINER_USER_ID} LIPS_CONTAINER_USER_ID)
   execute_process(COMMAND id -g OUTPUT_VARIABLE LIPS_CONTAINER_GROUP_ID)
   string(STRIP ${LIPS_CONTAINER_GROUP_ID} LIPS_CONTAINER_GROUP_ID)
-  set(LIPS_CONTAINER_TEST "-t")
-  set(LIPS_CONTAINER_PREFIX "")
 endif()
 
 macro(lips_build_and_test dockerfile container_tag)
@@ -49,9 +40,9 @@ macro(lips_build_and_test dockerfile container_tag)
     COMMAND
       "${LIPS_CONTAINER_APP}" run --rm
       -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
-      -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
+      -v "${CMAKE_CURRENT_SOURCE_DIR}:/project"
       ${container_tag} bash -c
-      "test/build.sh ${LIPS_CONTAINER_TEST} build/${container_tag}")
+      "test/build.sh build/${container_tag}")
   set_target_properties(ubuntu${container_tag} PROPERTIES FOLDER "Test")
   add_dependencies(test-linux ubuntu${container_tag})
   if("${ARGV2}" STREQUAL "tidy")
@@ -66,7 +57,7 @@ macro(lips_build_and_test dockerfile container_tag)
       COMMAND
         "${LIPS_CONTAINER_APP}" run --rm
         -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
-        -v "${LIPS_CONTAINER_PREFIX}${CMAKE_CURRENT_SOURCE_DIR}:/project"
+        -v "${CMAKE_CURRENT_SOURCE_DIR}:/project"
         "${container_tag}" bash -c "test/tidy.sh build/${container_tag}")
     set_target_properties(ubuntu${container_tag}-tidy PROPERTIES FOLDER "Test")
     add_dependencies(test-linux ubuntu${container_tag}-tidy)

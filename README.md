@@ -69,7 +69,6 @@ There are a number of options available to customize the build.
 | `LIPS_ENABLE_TESTS`         | Enable building test code       | `OFF`         |
 | `LIPS_ENABLE_BENCHMARK`     | Enable building benchmark code  | `OFF`         |
 | `LIPS_ENABLE_CLANG_TIDY`    | Enable checking with clang-tidy | `OFF`         |
-| `LIPS_USE_SSHFS`            | Use sshfs on macOS podman       | `OFF`         |
 
 Turn them on by adding `-D` options to the `cmake` command.
 
@@ -115,53 +114,9 @@ systems and compiler combinations.
 cmake --preset default --target test-linux
 ```
 
-On macOS it's currently a little more involved. Instead of `docker` it
-uses `podman`. Building using this method works but there is a bug in
-`qemu` which prevents running the tests
-([see this `qemu` bug report](https://gitlab.com/qemu-project/qemu/-/issues/1010)).
-
-You can work around this by using `sshfs` instead by following the
-steps in [this
-post](https://dalethestirling.github.io/Macos-volumes-with-Podman/).
-
-To summarize what you need to do to use `sshfs`. Get the port where
-the `podman` VM listens to `ssh`.
-
-```
-podman machine --log-level=debug ssh -- exit 2>&1 | grep Executing | awk {'print $8'}
-```
-
-Replace `<PORT>` with the port printed by the previous
-command. Replace <USERNAME> with your username on the Mac.
-
-```
-# Connect to the host.
-ssh -i ~/.ssh/podman-machine-default -R 10000:$(hostname):22 -p <PORT> core@localhost
-
-# Generate an SSH key and share it back to the macOS host.
-ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-ssh-copy-id -p 10000 <USERNAME>@127.0.0.1
-
-# Create mount point for the host filesystem. This needs to match the
-# path to where the source code is kept, without the /mnt/ part.
-sudo mkdir -p /mnt/Users
-sudo chown core:core /mnt/Users
-```
-
-Run the `sshfs` command. Again, <USERNAME> is the username of the Mac
-user.
-
-```
-sshfs -p 10000 <USERNAME>@127.0.0.1:/Users /mnt/Users
-```
-
-After this is done configure the build with
-
-```
-cmake --preset default -D LIPS_USE_SSHFS=ON
-```
-
-From then on the target `test-linux` should work automatically.
+On macOS `podman` is used instead of `docker`. Install `podman` and
+start the VM. From then on the target `test-linux` should work the
+same as for `docker`.
 
 ## Implementation notes
 

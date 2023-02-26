@@ -31,8 +31,6 @@ option(LIPS_ENABLE_CODE_COVERAGE "Enable code coverage support" OFF)
 option(LIPS_ENABLE_TESTS "Enable compiling test code" OFF)
 option(LIPS_ENABLE_BENCHMARK "Enable compiling benchmark program" OFF)
 option(LIPS_ENABLE_CLANG_TIDY "Enable checking with clang-tidy" OFF)
-option(LIPS_USE_SSHFS "Turn this ON if using sshfs on macOS (see README.md)"
-       OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
