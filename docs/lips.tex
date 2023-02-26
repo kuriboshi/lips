@@ -52,9 +52,12 @@
 
 \title{\textsc{Lips} Reference Manual}
 \author{Krister Joas}
-\date{Version 2.0.0\\January, 2023}
+\date{Version 2.0.0\\February, 2023}
 \begin{document}
 \maketitle
+
+\newpage
+
 Copyright \copyright 1988-1989, 1992, 2020-2023 Krister Joas
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -71,50 +74,41 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied.  See the License for the specific language governing
 permissions and limitations under the License.
 
+\newpage
+
 \section{Introduction}
-\lips\ is a embeddable lisp interpreter written in \textsf{C++-20}.
-In addition to a set of typical lisp functions, \lips\ offers
-functionality to make it work as a command shell.  It includes
-functions for program composition with pipes and input/output
-redirection.  \lips\ makes use of read macros and transformation of
-the input to make the input syntax resemble the standard shells.
 
-\lips\ can be used as a lisp interpreter which can be linked with
-other applications.  The \lips\ shell is an example of such an
-application.
-
+\lips\ is an embeddable lisp interpreter written in \textsf{C++-20}.
 \lips\ is inspired by \textsc{Interlisp} and functions are usually
 named as they are named in \textsc{Interlisp}.  Functions tend to
 behave in the same way as they do in \textsc{Interlisp}.  There are
 exceptions and \lips\ is not a faithful implementation of
 \textsc{Interlisp} by any stretch.
 
-This document is a reference manual for \lips\ and should be adequate
-for getting started.  See section \ref{functions} page
-\pageref{functions} for a complete list of lisp functions provided.
+\lips\ can be used as a stand alone lisp interpreter or as a library
+linked with other applications.  Two such applicatins are includes as
+examples.  One is a simple program containing a read-eval-print loop
+which, after reading and evaluating the expressions in any file given
+as arguments, prints a prompt, reads expressions, evaluates them, and
+prints the result.
 
-When \lips\ is started it reads and evaluates expressions in a central
-initialization file.  This file is called \texttt{lipsrc}, and is
-located in some public directory, typically
-\texttt{/usr/local/share/lips}.  After reading this file \lips\ looks
-for the file \texttt{.lipsrc} in the users home directory.  If it is
-found, the expressions in it are read and evaluated. \lips\ then reads
-expressions from any file given on the command line.
+\lips\ also includes a proof of concept implementation of a command
+shell.  The shell adds functions for program composition with pipes
+and input/output redirection.  Read macros are used to transform the
+input to make the input syntax resemble the standard shells.
 
-When the startup process is done, \lips\ prompts with the current
-history number followed by an underscore.  All commands are saved on a
-history list, and may be recalled at any time.  However, a maximum
-number of events saved on the history list is limited to the value of
-the variable \lisp{histmax}.  This variable may be set by the user to
-any value.
+This document is a reference manual for \lips\.  See section
+\ref{functions} page \pageref{functions} for a complete list of lisp
+functions provided.
 
 \section{Lips Input Syntax}
+
 The types of objects recognized by the lisp reader are integers,
 floats, literal atoms, lists, and strings.  All objects except lists
 and dotted pairs are called atoms.
 
 Strings start and end with a double quote, `\lisp{"}'.  To enter a
-double quote in a string preceed it by a backslash, `\lisp{\char`\\}'.
+double quote in a string precede it with a backslash, `\lisp{\char`\\}'.
 For instance, \lisp{"Foo bar"} is a string and so is \lisp{"I like
   \char`\\"lips\char`\\""} which contains two double quotes.  Newlines
 may be embedded inside strings without escaping them.
@@ -141,9 +135,9 @@ arbitrary depth.
 
 \lips\ supports super parenthesis. Super parenthesis are square
 brackets and when an opening square bracket is closed by a matching
-closing square bracket any missing round parenthesis is added. A final
-closing square bracket closes any open round parenthesis and finishes
-the expression. Here are some examples:
+closing square bracket any missing right round parenthesis is added. A
+final closing square bracket closes any open round parenthesis and
+finishes the expression. Here are some examples:
 
 \begin{examples}
   \ex{(cond [(null nil) "hello"] (t "world"))}{"hello"}
