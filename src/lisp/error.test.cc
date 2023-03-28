@@ -25,7 +25,6 @@ namespace lisp
 TEST_CASE("error: type error messages")
 {
   CHECK(make_error_code(type_errc::not_nil).message() == "Not nil");
-  CHECK(make_error_code(type_errc::not_t).message() == "Not T");
   CHECK(make_error_code(type_errc::not_symbol).message() == "Not a symbol");
   CHECK(make_error_code(type_errc::not_integer).message() == "Not an integer");
   CHECK(make_error_code(type_errc::not_float).message() == "Not a float");
@@ -38,9 +37,6 @@ TEST_CASE("error: type error messages")
   CHECK(make_error_code(type_errc::not_unbound).message() == "Not unbound");
   CHECK(make_error_code(type_errc::not_environ).message() == "Not an environment");
   CHECK(make_error_code(type_errc::not_filet).message() == "Not a file pointer");
-  CHECK(make_error_code(type_errc::not_free).message() == "Not free");
-  CHECK(make_error_code(type_errc::not_endoffile).message() == "Not EOF");
-  CHECK(make_error_code(type_errc::not_error).message() == "Not an ERROR");
   CHECK(make_error_code(type_errc::not_cvariable).message() == "Not a c-variable");
 }
 

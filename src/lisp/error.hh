@@ -28,7 +28,6 @@ namespace lisp
 enum class type_errc
 {
   not_nil = 1,
-  not_t,
   not_symbol,
   not_integer,
   not_float,
@@ -41,9 +40,6 @@ enum class type_errc
   not_unbound,
   not_environ,
   not_filet,
-  not_free,
-  not_endoffile,
-  not_error,
   not_cvariable
 };
 
@@ -57,8 +53,6 @@ public:
     {
       case type_errc::not_nil:
         break;
-      case type_errc::not_t:
-        return "Not T";
       case type_errc::not_symbol:
         return "Not a symbol";
       case type_errc::not_integer:
@@ -83,12 +77,6 @@ public:
         return "Not an environment";
       case type_errc::not_filet:
         return "Not a file pointer";
-      case type_errc::not_free:
-        return "Not free";
-      case type_errc::not_endoffile:
-        return "Not EOF";
-      case type_errc::not_error:
-        return "Not an ERROR";
       case type_errc::not_cvariable:
         return "Not a c-variable";
     }
