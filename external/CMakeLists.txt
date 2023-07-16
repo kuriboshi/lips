@@ -15,24 +15,12 @@
 # limitations under the License.
 #
 
-include(FetchContent)
+include(cmake-external)
 
-function(make_available _NAME)
-  FetchContent_GetProperties(${_NAME})
-  string(TOLOWER ${_NAME} _name)
-  if(NOT ${_name}_POPULATED)
-    FetchContent_Populate(${_NAME})
-    add_subdirectory(${${_name}_SOURCE_DIR} ${${_name}_BINARY_DIR} EXCLUDE_FROM_ALL)
-  endif()
-endfunction()
-
-FetchContent_Declare(catch2
+cmake_external(NAME catch2
   URL https://github.com/catchorg/Catch2/archive/v3.3.2.tar.gz
-  URL_HASH SHA256=8361907f4d9bff3ae7c1edb027f813659f793053c99b67837a0c0375f065bae2)
+  SHA256 8361907f4d9bff3ae7c1edb027f813659f793053c99b67837a0c0375f065bae2)
 
-FetchContent_Declare(fmt
+cmake_external(NAME fmt
   URL https://github.com/fmtlib/fmt/archive/9.1.0.tar.gz
-  URL_HASH SHA256=5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2)
-
-make_available(catch2)
-make_available(fmt)
+  SHA256 5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2)

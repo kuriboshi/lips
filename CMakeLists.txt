@@ -53,8 +53,10 @@ set(LIPS_SOURCE_LOCATION
     CACHE STRING "Where to install source code for cpprint")
 
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/install")
-add_subdirectory(external)
 
+add_subdirectory(external)
+find_package(catch2 REQUIRED)
+find_package(fmt REQUIRED)
 add_subdirectory(src)
 
 if(LIPS_ENABLE_TRACE)
