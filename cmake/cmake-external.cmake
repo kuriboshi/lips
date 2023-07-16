@@ -100,13 +100,16 @@ cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 project(${NAME}.download NONE)
 
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
 include(ExternalProject)
 
 ExternalProject_Add(${NAME}.external
   URL ${EXTERNAL_URL}
   ${SHA256}
   ${NETRC}
-  DOWNLOAD_EXTRACT_TIMESTAMP ON
   SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${NAME}/src
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${NAME}/build
   INSTALL_DIR ${PROJECT_BINARY_DIR}/install
