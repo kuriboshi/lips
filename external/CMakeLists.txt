@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+file(DOWNLOAD
+  https://raw.githubusercontent.com/kuriboshi/cmake-external/v1.0.0/cmake-external.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake-external.cmake
+  EXPECTED_HASH SHA256=182480136960726df31ba9b6fb7b7d2fde48825c3ee5b5426ccdb57a1223df68
+)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR}/cmake)
+
 include(cmake-external)
 
 cmake_external(catch2
