@@ -16,39 +16,47 @@
 
 # Configure and build an external library.
 #
+# cmake_external(<name> <options>...)
+#
 # Options:
-#   NAME                Name of the external library
-#   URL                 URL from where to download the source code
-#   SHA256              The SHA256 checksum of the library (optional
-#                       but a warning will be issued)
-#   BUILD_COMMAND       The build command if different from the default
-#   INSTALL_COMMAND     The install command if different from the default
+#   NETRC                     Require the use of NETRC when downloading files (used
+#                             if any of the URL's refer to a private repository).
+#   URL <url>                 URL from where to download the source code.
+#   SHA256 <sha256>           The SHA256 checksum of the library (optional but a
+#                             warning will be issued).
+#   BUILD_COMMAND <command>   The build command if different from the default.
+#   INSTALL_COMMAND <command> The install command if different from the default.
 #
-# For the last two the default build and install command uses cmake
-# with the Release configuration.
+# For the last two the default build and install command uses
+# "cmake --build ." and "cmake --install ." respectively.
 #
-function(cmake_external)
-  set(oneValueArgs NAME URL SHA256 BUILD_COMMAND INSTALL_COMMAND)
-  set(multiValueArgs DEFINE)
-  cmake_parse_arguments(EXTERNAL "" "${oneValueArgs}" "${multiValueArgs}"
-                        ${ARGN})
+function(cmake_external name)
 
-  # NAME is mandatory.
-  if(NOT EXTERNAL_NAME)
-    message(FATAL_ERROR "cmake_external: Missing NAME")
-  endif()
+  set(options NETRC)
+  set(single_value_args URL SHA256 BUILD_COMMAND INSTALL_COMMAND)
+  set(multi_value_args DEFINE)
+  cmake_parse_arguments(EXTERNAL
+    "${options}" "${single_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(NAME ${name})
 
   # URL is mandatory.
   if(NOT EXTERNAL_URL)
-    message(FATAL_ERROR "cmake_external: Missing URL for ${EXTERNAL_NAME}")
+    message(FATAL_ERROR "cmake_external: Missing URL for ${NAME}")
   endif()
 
   # SHA256 is optional but recommended.
   if(EXTERNAL_SHA256)
     set(SHA256 "URL_HASH SHA256=${EXTERNAL_SHA256}")
   else()
-    message(WARNING "cmake_external: Missing SHA256 for ${EXTERNAL_NAME}")
+    message(WARNING "cmake_external: Missing SHA256 for ${NAME}")
     set(SHA256 "")
+  endif()
+
+  if(EXTERNAL_NETRC)
+    set(NETRC "NETRC REQUIRED")
+  else()
+    set(NETRC)
   endif()
 
   # Build the list of cmake definitions passed on to the configuration
@@ -86,20 +94,21 @@ function(cmake_external)
   # Generate the cmake configuration file, configure, and install the
   # external library to a location within the build hierarchy.
   file(
-    WRITE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/download/CMakeLists.txt.in"
+    WRITE "${CMAKE_CURRENT_BINARY_DIR}/${NAME}/download/CMakeLists.txt.in"
     [[
 cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
-project(${EXTERNAL_NAME}.download NONE)
+project(${NAME}.download NONE)
 
 include(ExternalProject)
 
-ExternalProject_Add(${EXTERNAL_NAME}.external
+ExternalProject_Add(${NAME}.external
   URL ${EXTERNAL_URL}
   ${SHA256}
+  ${NETRC}
   DOWNLOAD_EXTRACT_TIMESTAMP ON
-  SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/src
-  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/build
+  SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${NAME}/src
+  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${NAME}/build
   INSTALL_DIR ${PROJECT_BINARY_DIR}/install
   CONFIGURE_COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}"
     ${DEFS}
@@ -112,12 +121,12 @@ ExternalProject_Add(${EXTERNAL_NAME}.external
   )
 ]])
 
-  configure_file("${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/download/CMakeLists.txt.in"
-                 "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/download/CMakeLists.txt")
+  configure_file("${CMAKE_CURRENT_BINARY_DIR}/${NAME}/download/CMakeLists.txt.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/${NAME}/download/CMakeLists.txt")
 
   execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/download")
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${NAME}/download")
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_NAME}/download")
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${NAME}/download")
 
 endfunction()

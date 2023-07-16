@@ -17,10 +17,13 @@
 
 include(cmake-external)
 
-cmake_external(NAME catch2
+cmake_external(catch2
   URL https://github.com/catchorg/Catch2/archive/v3.3.2.tar.gz
-  SHA256 8361907f4d9bff3ae7c1edb027f813659f793053c99b67837a0c0375f065bae2)
+  SHA256 8361907f4d9bff3ae7c1edb027f813659f793053c99b67837a0c0375f065bae2
+)
 
-cmake_external(NAME fmt
+cmake_external(fmt
   URL https://github.com/fmtlib/fmt/archive/9.1.0.tar.gz
-  SHA256 5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2)
+  SHA256 5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2
+  DEFINE FMT_DOC=OFF FMT_TEST=OFF
+)
