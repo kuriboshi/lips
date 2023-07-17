@@ -32,7 +32,6 @@ FetchContent_Declare(lips
 )
 
 FetchContent_MakeAvailable(lips)
-find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 
 add_executable(package_test)
