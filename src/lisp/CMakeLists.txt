@@ -98,7 +98,7 @@ target_sources(liblisp PRIVATE ${_liblisp_source} ${_liblisp_details})
 
 add_executable(lisp)
 target_sources(lisp PRIVATE main.cc)
-target_link_libraries(lisp lips::lisp fmt::fmt)
+target_link_libraries(lisp lips::lisp)
 
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lisp PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
@@ -135,7 +135,7 @@ if(LIPS_ENABLE_TESTS)
             symbol.test.cc
             syntax.test.cc
             user.test.cc)
-  target_link_libraries(lisp_test PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
+  target_link_libraries(lisp_test PUBLIC lips::lisp Catch2::Catch2)
 endif()
 
 if(LIPS_ENABLE_TESTS)
@@ -152,7 +152,7 @@ if(LIPS_ENABLE_BENCHMARK)
     PRIVATE lisp_benchmark.cc
             alloc.bench.cc
             pool.bench.cc)
-  target_link_libraries(lisp_benchmark PUBLIC lips::lisp fmt::fmt Catch2::Catch2)
+  target_link_libraries(lisp_benchmark PUBLIC lips::lisp Catch2::Catch2)
 
   add_test(NAME benchmark
            COMMAND lisp_benchmark)

@@ -22,11 +22,7 @@ target_include_directories(
   liblisp PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                  $<INSTALL_INTERFACE:include>)
 
-# We only need to know where the header files for fmt are to be able
-# to build the library. Any executable need to add fmt::fmt as a
-# dependency themselves.
-get_target_property(_fmt_include_directories fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
-target_include_directories(liblisp PRIVATE ${_fmt_include_directories})
+target_link_libraries(liblisp PUBLIC fmt::fmt)
 
 # Since there is both an executable and a library called 'lisp' we use
 # the target 'liblisp' for the library. In order for the name of the
