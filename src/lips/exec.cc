@@ -470,7 +470,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = filed->intval();
+    oldfd = static_cast<int>(filed->intval());
   }
   if((fd = creat(file->getstr().c_str(), 0644)) == -1)
     return error(std::error_code(errno, std::system_category()), file);
@@ -506,7 +506,7 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = filed->intval();
+    oldfd = static_cast<int>(filed->intval());
   }
   if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
     return error(std::error_code(errno, std::system_category()), file);
@@ -542,7 +542,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = filed->intval();
+    oldfd = static_cast<int>(filed->intval());
   }
   if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
     return error(std::error_code(errno, std::system_category()), file);

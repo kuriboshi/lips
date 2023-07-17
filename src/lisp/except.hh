@@ -49,9 +49,9 @@ class lisp_finish: public std::runtime_error
 public:
   lisp_finish(const std::string& message, std::int64_t code)
     : std::runtime_error(message),
-      exit_code(code)
+      exit_code(static_cast<int>(code))
   {}
-  std::int64_t exit_code;
+  int exit_code;
 };
 
 } // namespace lisp

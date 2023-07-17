@@ -38,7 +38,7 @@ lisp_t getrep(lisp_t fun)
 
   if(type_of(fun) != object::type::Lambda)
     return nil;
-  auto& x = fun->lambda();
+  const auto& x = fun->lambda();
   if(x.count == -1)
     args = x.args->car();
   else if(x.count < 0)

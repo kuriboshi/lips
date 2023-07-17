@@ -67,7 +67,7 @@ lisp_t plus(lisp_t x)
 
 lisp_t iplus(lisp_t x)
 {
-  int sum = 0;
+  std::int64_t sum = 0;
   for(auto i: x)
   {
     check(i, object::type::Integer);

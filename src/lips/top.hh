@@ -42,7 +42,7 @@ public:
 
   // History functions
   static lisp_t printhist();
-  static lisp_t histget(int num, lisp_t hlist);
+  static lisp_t histget(std::int64_t num, lisp_t hlist);
   static void phist();
   static void addhist(lisp_t);
   static void remhist();

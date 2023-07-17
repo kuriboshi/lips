@@ -29,7 +29,7 @@ lisp_t obarray()
   return o;
 }
 
-lisp_t mkstring(const std::string& str) { return getobject(new string_t(str)); }
+lisp_t mkstring(const std::string& str) { return getobject(ref_string_t::create(str)); }
 
 /// @brief Creates an integer number.
 lisp_t mknumber(std::int64_t number) { return getobject(number); }
@@ -60,7 +60,7 @@ static lisp_t mkarglist(lisp_t alist, std::int8_t& count)
   if(is_nil(alist))
     return nil;
   ++count;
-  count = -count;
+  count = static_cast<std::int8_t>(-count);
   return cons(alist, nil);
 }
 

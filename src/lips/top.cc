@@ -78,7 +78,7 @@ void top::trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-lisp_t top::histget(int num, lisp_t hlist)
+lisp_t top::histget(std::int64_t num, lisp_t hlist)
 {
   if(num < 0)
   {
@@ -239,7 +239,7 @@ lisp_t top::rmexcl(lisp_t stream)
   if(std::isspace(c) != 0)
     return C_EXCL;
   _echoline = true;
-  lisp_t tmp = histget(0L, variables->history);
+  lisp_t tmp = histget(0, variables->history);
   switch(c)
   {
     case '!':
