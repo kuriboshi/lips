@@ -16,9 +16,9 @@
 #
 
 file(DOWNLOAD
-  https://raw.githubusercontent.com/kuriboshi/cmake-external/v1.0.0/cmake-external.cmake
+  https://raw.githubusercontent.com/kuriboshi/cmake-external/v1.0.1/cmake-external.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake-external.cmake
-  EXPECTED_HASH SHA256=182480136960726df31ba9b6fb7b7d2fde48825c3ee5b5426ccdb57a1223df68
+  EXPECTED_HASH SHA256=eb85f6bfd601ad472160a1d9d2880ac57a96ce635132a4162c1a5a13d9ab9152
 )
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR}/cmake)
 
