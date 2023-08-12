@@ -79,12 +79,13 @@ public:
   {
     auto intern = [](const auto s) { return details::alloc::intern(s); };
 
-    // Must be early since it's used by symbol_store_t to initialize new
-    // symbols.
+    // Must be early (first) since it's used by symbol_store_t to initialize
+    // new symbols. The value of "unbound" itself is initialized to nil because
+    // the "unbound" symbol is not yet fully defined.
     C_UNBOUND = intern("unbound");
-    C_UNBOUND->value(C_UNBOUND);
     C_UNBOUND->symbol()->constant = true;
 
+    // Both nil and t evaluate to themselves.
     auto nil = intern("nil");
     nil->value(nil);
     nil->symbol()->constant = true;
