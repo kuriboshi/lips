@@ -30,9 +30,9 @@ class context::impl final
 {
 public:
   impl()
-    : _currentbase(initcvar("base", 10_l)),
-      _verbose(initcvar("verbose", nil)),
-      _loadpath(initcvar("loadpath", mklist(mkstring("."))))
+    : _currentbase(makecvar("base", 10_l)),
+      _verbose(makecvar("verbose", nil)),
+      _loadpath(makecvar("loadpath", mklist(mkstring("."))))
   {
     _syntax = std::make_unique<syntax>();
 
@@ -52,9 +52,9 @@ public:
   ref_file_t _stderr;
   ref_file_t _stdin;
 
-  cvariable_t& _currentbase;
-  cvariable_t& _verbose;
-  cvariable_t& _loadpath;
+  lisp_t _currentbase;
+  lisp_t _verbose;
+  lisp_t _loadpath;
 };
 
 context::context()
@@ -131,10 +131,10 @@ lisp_t context::error(std::error_code error, lisp_t arg) const
   throw lisp_error(error);
 }
 
-cvariable_t& context::currentbase() { return _pimpl->_currentbase; }
-cvariable_t& context::verbose() { return _pimpl->_verbose; }
-cvariable_t& context::loadpath() { return _pimpl->_loadpath; }
-void context::loadpath(lisp_t newpath) { _pimpl->_loadpath = newpath; }
+const cvariable_t& context::currentbase() const { return _pimpl->_currentbase->cvariable(); }
+const cvariable_t& context::verbose() const { return _pimpl->_verbose->cvariable(); }
+const cvariable_t& context::loadpath() const { return _pimpl->_loadpath->cvariable(); }
+void context::loadpath(lisp_t newpath) { _pimpl->_loadpath->cvariable() = newpath; }
 
 context* context::_current = nullptr;
 

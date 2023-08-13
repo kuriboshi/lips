@@ -66,6 +66,13 @@ inline cvariable_t& initcvar(std::string_view name, lisp_t val)
   return t->value()->cvariable();
 }
 
+inline lisp_t makecvar(std::string_view name, lisp_t val)
+{
+  auto t = mkatom(name);
+  t->value(new object(cvariable_t(val)));
+  return t->value();
+}
+
 void init();
 
 } // namespace lisp::details::alloc

@@ -123,6 +123,17 @@ void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t
 ///
 inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details::alloc::initcvar(name, val); }
 
+/// @brief Creates a lisp_t object containing a cvariable_t.
+///
+/// @details Similar to initcvar but returns a lisp_t object instead.
+///
+/// @param name The lisp print name.
+/// @param val The initial value.
+///
+/// @return A lisp_t object containing a cvariable_t value.
+///
+inline lisp_t makecvar(std::string_view name, lisp_t val) { return details::alloc::makecvar(name, val); }
+
 /// @brief Terminates the list create function.
 inline lisp_t mklist(lisp_t t) { return cons(t, nil); }
 

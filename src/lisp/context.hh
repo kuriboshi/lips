@@ -69,9 +69,9 @@ public:
   std::int64_t printlevel = 0;
   std::int64_t thisplevel = 0;
 
-  cvariable_t& currentbase();
-  cvariable_t& verbose();
-  cvariable_t& loadpath();
+  const cvariable_t& currentbase() const;
+  const cvariable_t& verbose() const;
+  const cvariable_t& loadpath() const;
   void loadpath(lisp_t);
   std::string version() const { return C_VERSION->value()->getstr(); }
 
