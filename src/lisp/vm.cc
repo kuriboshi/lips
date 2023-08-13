@@ -690,9 +690,9 @@ bool vm::eval_lambda()
   push(_expression);
   push(_env);
   push(_dest);
-  int ac = 0;
+  int ac = _fun->lambda().count;
   auto spr = false;
-  if((ac = _fun->lambda().count) < 0)
+  if(ac < 0)
   {
     ac = -ac;
     spr = true;

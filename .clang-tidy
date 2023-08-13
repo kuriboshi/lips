@@ -1,5 +1,6 @@
 ---
 Checks:          "\
+  bugprone-*,\
   clang-diagnostic-*,\
   clang-analyzer-*,\
   cppcoreguidelines-*,\
@@ -55,4 +56,6 @@ CheckOptions:
     value:           'false'
   - key:             google-readability-function-size.StatementThreshold
     value:           '800'
+  - key:             bugprone-easily-swappable-parameters.IgnoredParameterTypeSuffixes
+    value:           'lisp_t'
 ...

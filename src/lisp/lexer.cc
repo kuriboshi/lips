@@ -116,7 +116,6 @@ token_t lexer::read()
         switch(get(*_pos))
         {
           case syntax::type::COMMENT:
-            return token;
           case syntax::type::LEFT_PAREN:
           case syntax::type::RIGHT_PAREN:
           case syntax::type::LEFT_BRACKET:

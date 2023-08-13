@@ -47,7 +47,7 @@ lisp_t rmsquote(lisp_t stream)
 {
   check(stream, object::type::File);
   int c = 0;
-  if((c = stream->file()->getch()) == ')' /*|| is_sepr(l, c)*/)
+  if(c = stream->file()->getch(); c == ')')
   {
     stream->file()->ungetch(c);
     return "'"_a;
