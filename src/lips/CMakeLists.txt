@@ -30,6 +30,7 @@ target_sources(
   PRIVATE env.hh
           exec.hh
           glob.hh
+          job.hh
           main.hh
           lips_error.hh
           os.hh

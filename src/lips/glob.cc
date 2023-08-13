@@ -49,7 +49,7 @@ namespace
 /// @returns True if the glob ends with multiple stars or a slash and the
 /// original file is a directory or if wild is empty.
 ///
-bool dircheck(const std::string& wild, const std::string& original)
+bool dircheck(const std::string& wild, const std::string& original) // NOLINT: easily-swappable-parameters
 {
   auto wbegin = wild.begin();
   if(*wbegin == '/')
@@ -336,21 +336,21 @@ TEST_CASE("extilde")
   {
     auto dir = extilde("~");
     REQUIRE(dir);
-    CHECK(home == *dir);
+    CHECK(home == *dir); // NOLINT
   }
   SECTION("~/ == HOME/")
   {
     auto dir = extilde("~/");
     REQUIRE(dir);
     home.push_back('/');
-    CHECK(home == *dir);
+    CHECK(home == *dir); // NOLINT
   }
   SECTION("~/hello/ == HOME/")
   {
     auto dir = extilde("~/hello/");
     REQUIRE(dir);
     home += "/hello/";
-    CHECK(home == *dir);
+    CHECK(home == *dir); // NOLINT
   }
   SECTION("~USER == HOME")
   {
@@ -358,7 +358,7 @@ TEST_CASE("extilde")
     auto tilde_user = "~" + user;
     auto dir = extilde(tilde_user);
     REQUIRE(dir);
-    CHECK(home == *dir);
+    CHECK(home == *dir); // NOLINT
   }
   SECTION("~UNKNOWN != ")
   {

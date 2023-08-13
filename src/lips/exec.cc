@@ -33,6 +33,7 @@
 #include <csignal>
 
 #include <lisp/lisp.hh>
+#include "job.hh"
 #include "glob.hh"
 #include "main.hh"
 #include "top.hh"
@@ -51,17 +52,6 @@ lisp_t p_setenv(lisp_t, lisp_t);
 bool insidefork = false; // Is nonzero in the child after a fork
 
 static int pgrp; // Process group of current job
-
-struct job_t
-{
-  int jobnum = 0;          // Job number
-  int procid = 0;          // Process id
-  int status = 0;          // Return value
-  std::string wdir;        // Working directory
-  lisp_t exp;              // Job expression
-  bool background = false; // true means job runs in bg
-  bool running = false;    // true if running
-};
 
 static std::list<job_t> joblist;  // List of jobs
 static std::list<job_t> cjoblist; // List of collected jobs
@@ -206,7 +196,7 @@ int mfork()
 {
   int pid = 0;
 
-  if((pid = fork()) == 0)
+  if(pid = fork(); pid == 0)
   {
     pgrp = getpid();
     if(!insidefork)
@@ -320,7 +310,7 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
 ///
 /// @return Vector with command and arguments.
 ///
-std::optional<std::vector<std::string>> make_exec(lisp_t command)
+std::vector<std::string> make_exec(lisp_t command)
 {
   std::vector<std::string> args;
 
@@ -384,10 +374,8 @@ int waitfork(pid_t pid)
 lisp_t execute(const std::string& name, lisp_t command)
 {
   auto args = make_exec(command);
-  if(!args)
-    return C_ERROR;
   std::vector<char*> argv;
-  for(auto& a: *args)
+  for(auto& a: args)
     argv.push_back(a.data());
   argv.push_back(nullptr);
   if(insidefork)
@@ -521,9 +509,9 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
     check(filed, object::type::Integer);
     oldfd = static_cast<int>(filed->intval());
   }
-  if((fd = creat(file->getstr().c_str(), 0644)) == -1)
+  if(fd = creat(file->getstr().c_str(), 0644); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
-  if((pid = mfork()) == 0)
+  if(pid = mfork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -557,9 +545,9 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
     check(filed, object::type::Integer);
     oldfd = static_cast<int>(filed->intval());
   }
-  if((fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1) // NOLINT
+  if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644); fd == -1) // NOLINT
     return error(std::error_code(errno, std::system_category()), file);
-  if((pid = mfork()) == 0)
+  if(pid = mfork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -593,9 +581,9 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
     check(filed, object::type::Integer);
     oldfd = static_cast<int>(filed->intval());
   }
-  if((fd = ::open(file->getstr().c_str(), O_RDONLY)) == -1) // NOLINT
+  if(fd = ::open(file->getstr().c_str(), O_RDONLY); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
-  if((pid = mfork()) == 0)
+  if(pid = mfork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -622,7 +610,7 @@ lisp_t pipecmd(lisp_t cmds)
     return eval(cmds->car());
 
   int pid = 0;
-  if((pid = mfork()) == 0)
+  if(pid = mfork(); pid == 0)
   {
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1) // NOLINT
@@ -630,7 +618,7 @@ lisp_t pipecmd(lisp_t cmds)
       context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
-    if((pid = mfork()) == 0)
+    if(pid = mfork(); pid == 0)
     {
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
@@ -664,7 +652,7 @@ lisp_t back(lisp_t x)
 {
   int pid = 0;
 
-  if((pid = fork()) == 0)
+  if(pid = fork(); pid == 0)
   {
     pgrp = getpid();
     insidefork = true;
@@ -926,9 +914,8 @@ TEST_CASE("exec.cc: make_exec")
   SECTION("(make_exec (a b c)) -> a b c")
   {
     auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), nil))));
-    REQUIRE(result);
-    CHECK(result->size() == 3);
-    auto i = result->begin();
+    CHECK(result.size() == 3);
+    auto i = result.begin();
     CHECK(*i++ == "a");
     CHECK(*i++ == "b");
     CHECK(*i++ == "c");
@@ -936,30 +923,26 @@ TEST_CASE("exec.cc: make_exec")
   SECTION("(make_exec (100)) -> 100")
   {
     auto result = make_exec(cons(mknumber(100), nil));
-    REQUIRE(result);
-    CHECK(result->at(0) == "100"s);
+    CHECK(result.at(0) == "100"s);
   }
   SECTION("(make_exec (plus 1 2)) -> 3")
   {
     auto expr = lispread("((plus 1 2))");
     auto result = make_exec(expr);
-    REQUIRE(result);
-    CHECK(result->at(0) == "3"s);
+    CHECK(result.at(0) == "3"s);
   }
   SECTION("(make_exec (/b*)) -> /bin")
   {
     auto expr = lispread("(/b*)");
     auto result = make_exec(expr);
-    REQUIRE(result);
-    REQUIRE(!result->empty());
-    CHECK(result->at(0) == "/bin"s);
+    REQUIRE(!result.empty());
+    CHECK(result.at(0) == "/bin"s);
   }
   SECTION("(make_exec (/a*)) -> <empty>")
   {
     auto expr = lispread("(/a*)");
     auto result = make_exec(expr);
-    REQUIRE(result);
-    REQUIRE(result->empty());
+    REQUIRE(result.empty());
   }
 }
 

@@ -374,7 +374,7 @@ void term_source::scan(int begin)
   currentpos = {0, 0, nullptr};
   for(int pos = begin; pos >= 0; --pos)
   {
-    int cur = linebuffer[pos];
+    auto cur = linebuffer[pos];
     ++cpos;
     int escape = 0;
     if(cur == '"' && state == paren_blink::INSTRING)
@@ -558,7 +558,7 @@ std::optional<std::string> term_source::getline()
       end_term();
       return {};
     }
-    switch(key_tab[static_cast<int>(c)])
+    switch(key_tab[static_cast<unsigned char>(c)])
     {
       case term_fun::T_EOF:
         if(linepos == 0)
