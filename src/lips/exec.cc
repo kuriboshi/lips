@@ -70,10 +70,12 @@ static std::unordered_map<std::string, std::string> exechash;
 
 namespace
 {
-/* 
- * preparefork - Sets the processgroup to the group currently beeing built. 
- *               Resets signals to their default value.
- */
+///
+/// @brief preparefork Prepares a provess after fork.
+///
+/// @details Sets the processgroup to the group currently beeing built.  Resets
+/// signals to their default value.
+///
 void preparefork()
 {
   signal(SIGHUP, SIG_DFL);
@@ -87,18 +89,26 @@ void preparefork()
   signal(SIGTTOU, SIG_DFL);
 }
 
-/* 
- * Routines for managing the jobs. Jobs are saved on a linked list 
- * JOBLIST. When a job exits, storage associated with it are released 
- * unless it was run in background in which case it is saved on another 
- * list, CJOBLIST. This list is freed when a background job exits, 
- * signaling its parent with a SIGCHLD.
- */
-/* 
- * printjob - print the job pointed to by JOB in the following format:
- *            [n]   Status (other info)  (command line)
- *            Status is Done if job has exited.
- */
+// Routines for managing jobs. Jobs are saved on a linked list joblist. When a
+// job exits, storage associated with it are released unless it was run in
+// background in which case it is saved on another list, cjoblist. This list is
+// freed when a background job exits, signaling its parent with a SIGCHLD.
+
+///
+/// @brief printjob Print the job information.
+///
+/// @details Prints the job information pointed to by JOB in the following format:
+/// [n]   Status (other info)  (command line)
+/// Where 'n' is the job number.
+/// Status is either
+/// - Running if the job is still running.
+/// - Done if job has exited.
+/// - The signal name if the job is stopped or received a signal.
+/// If the job produced a core dump that information is printed.
+/// Finally, the command or expression is printed.
+///
+/// @param job The job.
+///
 void printjob(const job_t& job)
 {
   std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
@@ -119,15 +129,21 @@ void printjob(const job_t& job)
   print(job.exp, false);
 }
 
-/* 
- * recordjob - register job with process id PID in the linked list of jobs. If 
- *             BG is non-zero, job is registered as running in background.
- *             Returns true if all went well, false otherwise.
- */
+///
+/// @brief recordjob Register a job.
+///
+/// @details Register a job with process id PID in the linked list of jobs. If
+/// BG is true, job is registered as running in background.
+///
+/// @param pid Process id.
+/// @param bg True if registering a background process.
+///
+/// @return True if all went well, false otherwise.
+///
 bool recordjob(int pid, bool bg)
 {
   if(insidefork)
-    return true; /* Skip this if in a fork. */
+    return true; // Skip this if in a fork.
   job_t job;
   if(!joblist.empty())
     job.jobnum = joblist.front().jobnum + 1;
@@ -143,10 +159,14 @@ bool recordjob(int pid, bool bg)
   return true;
 }
 
-/* 
- * collectjob - updates job list with PID as process id, and STAT as exit 
- *              status.
- */
+///
+/// @brief collectjob Update job list with exit status.
+///
+/// @details Updates job list with PID as process id, and STAT as exit status.
+///
+/// @param pid Process id.
+/// @param stat Exit status.
+///
 void collectjob(int pid, int stat)
 {
   for(auto job = joblist.begin(); job != joblist.end(); ++job)
@@ -173,12 +193,15 @@ void collectjob(int pid, int stat)
   }
 }
 
-/* 
- * mfork - Forks and initializes the child. If the process hasn't 
- *         previously been forked, its pid is used as process group id. It 
- *         also grabs the tty for the new process group. Mfork returns the 
- *         pid returned by fork.
- */
+///
+/// @brief mfork Forks and initializes the child.
+///
+/// @details Forks and initializes the child. If the process hasn't previously
+/// been forked, its pid is used as process group id. It also grabs the tty for
+/// the new process group.
+///
+/// @return The pid of the new process.
+///
 int mfork()
 {
   int pid = 0;
@@ -207,11 +230,19 @@ int mfork()
   return pid;
 }
 
-/*
- * check_meta - checks the string S if it contains any non-quoted meta
- *              characters in which case it returns true.  It also strips off
- *              all quote-characters (backslash).
- */
+///
+/// @brief check_meta Checks for meta characters.
+///
+/// @details Checks the string S if it contains any non-quoted meta characters
+/// in which case it returns true. It also strips off all quote-characters
+/// (backslash).
+///
+/// @param s String to check.
+///
+/// @return Pair of bool and string. The bool is true if string contains any
+/// meta characters otherwise false. The string is the input string stripped of
+/// any quote characters.
+///
 std::pair<bool, std::string> check_meta(const std::string& s)
 {
   std::string result;
@@ -281,11 +312,14 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
   return args;
 }
 
-/* 
- * make_exec - Parse command line and build argument vector suitable for
- *             execve. Returns nullptr if some error occured, like a no match
- *             for wild cards. Returns pointers to globbed arguments.
- */
+///
+/// @brief make_exec Builds a command line for execve.
+///
+/// @details Parses command line expression and builds argument vector suitable
+/// for execve.
+///
+/// @return Vector with command and arguments.
+///
 std::optional<std::vector<std::string>> make_exec(lisp_t command)
 {
   std::vector<std::string> args;
@@ -297,14 +331,20 @@ std::optional<std::vector<std::string>> make_exec(lisp_t command)
       for(auto j: *p)
         args.push_back(j);
   }
+
   return args;
 }
 
-/* 
- * waitfork - If there is a fork with pid PID, wait for it and return its 
- *            status. If PID is 0 it means to wait for the first process 
- *            to exit.
- */
+///
+/// @brief waitfork Wait for a process.
+///
+/// @details Wait for specific process or the first one if PID is zero.
+///
+/// @param pid The process id to wait for. Zero mean wait for the first process
+/// to change its status.
+///
+/// @return The status.
+///
 int waitfork(pid_t pid)
 {
   int stat = 0;
@@ -330,13 +370,17 @@ int waitfork(pid_t pid)
   return stat;
 }
 
-/* 
- * execute - Forks (if not already in a fork, in which case it works as execve,
- *           overlaying the current process), and execs NAME with original
- *           command in COMMAND. It then waits for the process to return (using
- *           waitfork). Exec either returns T or ERROR depending success or
- *           failure for some reason.
- */
+///
+/// @brief execute Execute a process.
+///
+/// @details Fork a new process, if not already in a fork, and calls execve.
+/// Wait for the process to return (using waitfork).
+///
+/// @param name Name of the program.
+/// @param command List of command arguments.
+///
+/// @return C_ERROR if there is an error or the exit status of the process.
+///
 lisp_t execute(const std::string& name, lisp_t command)
 {
   auto args = make_exec(command);
@@ -353,7 +397,7 @@ lisp_t execute(const std::string& name, lisp_t command)
       execvp(name.c_str(), argv.data());
     std::cerr << std::error_code(errno, std::system_category()).message() << '\n';
     ::exit(1);
-    /* No return */
+    // No return
   }
   auto pid = mfork();
   if(pid == 0)
@@ -370,9 +414,14 @@ lisp_t execute(const std::string& name, lisp_t command)
   return mknumber(WEXITSTATUS(status));
 }
 
-/* 
- * ifexec - Returns true if directory DIR contains a NAME that is executable.
- */
+///
+/// @brief ifexec Check if file is executable.
+///
+/// @param dir Directory to check.
+/// @param name Name of file to check.
+///
+/// @return True if directory DIR contains a NAME that is executable.
+///
 bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 {
   auto path = dir / name;
@@ -388,7 +437,7 @@ bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 
 } // namespace
 
-/* printdone - Sweeps CJOBLIST and prints each job it frees. */
+/// @brief printdone Sweeps CJOBLIST and prints each job it frees.
 void printdone()
 {
   for(const auto& job: cjoblist)
@@ -411,12 +460,12 @@ void checkfork()
 
 namespace lisp::exec
 {
-/* 
- * execcommand - Tries to execute the lisp expression exp as a command. 
- *               execcomand returns 0 if there is no executable file in 
- *               the path, 1 if the command was successively run and -1 if 
- *               there was some error.
- */
+///
+/// @brief execcommand - Tries to execute the lisp expression exp as a command.
+///
+/// @details Execcomand returns 0 if there is no executable file in the path, 1
+/// if the command was successively run and -1 if there was some error.
+///
 int execcommand(lisp_t exp, lisp_t* res)
 {
   *res = T;
@@ -453,7 +502,7 @@ int execcommand(lisp_t exp, lisp_t* res)
   return 0;
 }
 
-/* Primitives */
+// Primitives
 
 lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
 {
@@ -802,14 +851,14 @@ lisp_t doexec(lisp_t cmd)
 {
   lisp_t res;
 
-  insidefork = true; /* Prevent exec from forking */
+  insidefork = true; // Prevent exec from forking
   switch(execcommand(cmd, &res))
   {
     case -1:
       return C_ERROR;
       break;
     default:
-      break; /* Never reached */
+      break; // Never reached
   }
   return nil;
 }
