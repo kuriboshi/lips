@@ -540,7 +540,7 @@ void vm::bt()
       else if(auto* f = std::get_if<fun_t>(&_control[i - 1]))
         print(*f, T);
       else if(auto* a = std::get_if<args_t>(&_control[i - 1]))
-        print(*f, T);
+        print(*a, T);
     }
   }
   context::current().printlevel = op;
