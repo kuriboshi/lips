@@ -19,6 +19,11 @@
 
 #include <lisp/lisp.hh>
 
+namespace lisp::job
+{
+
+struct stat_t { int stat; };
+
 struct job_t
 {
   int jobnum = 0;          // Job number
@@ -29,3 +34,13 @@ struct job_t
   bool background = false; // true means job runs in bg
   bool running = false;    // true if running
 };
+
+void printjob(const job_t& job);
+job_t createjob(int pid);
+void recordjob(job_t job, bool bg);
+void collectjob(int pid, stat_t stat);
+void printdone();
+void printjobs();
+job_t* findjob(std::function<bool(const job_t&)> f);
+
+}

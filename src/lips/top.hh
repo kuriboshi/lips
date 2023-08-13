@@ -21,6 +21,8 @@
 #include <functional>
 #include <lisp/lisp.hh>
 
+#include "main.hh"
+
 namespace lisp
 {
 class top

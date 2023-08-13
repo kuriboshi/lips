@@ -47,14 +47,8 @@ using namespace std::literals;
 #if defined(__APPLE__) || defined(__FreeBSD__)
 extern char** environ;
 #endif
-lisp_t p_setenv(lisp_t, lisp_t);
 
 bool insidefork = false; // Is nonzero in the child after a fork
-
-static int pgrp; // Process group of current job
-
-static std::list<job_t> joblist;  // List of jobs
-static std::list<job_t> cjoblist; // List of collected jobs
 
 static std::unordered_map<std::string, std::string> exechash;
 
@@ -79,110 +73,6 @@ void preparefork()
   signal(SIGTTOU, SIG_DFL);
 }
 
-// Routines for managing jobs. Jobs are saved on a linked list joblist. When a
-// job exits, storage associated with it are released unless it was run in
-// background in which case it is saved on another list, cjoblist. This list is
-// freed when a background job exits, signaling its parent with a SIGCHLD.
-
-///
-/// @brief printjob Print the job information.
-///
-/// @details Prints the job information pointed to by JOB in the following format:
-/// [n]   Status (other info)  (command line)
-/// Where 'n' is the job number.
-/// Status is either
-/// - Running if the job is still running.
-/// - Done if job has exited.
-/// - The signal name if the job is stopped or received a signal.
-/// If the job produced a core dump that information is printed.
-/// Finally, the command or expression is printed.
-///
-/// @param job The job.
-///
-void printjob(const job_t& job)
-{
-  std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
-  if(job.running)
-    buffer += "Running";
-  else if(WIFEXITED(job.status)) // NOLINT
-    buffer += "Done";
-  else if(WIFSTOPPED(job.status))              // NOLINT
-    buffer += strsignal(WSTOPSIG(job.status)); // NOLINT
-  else
-  {
-    buffer += strsignal(WTERMSIG(job.status)); // NOLINT
-    if(WCOREDUMP(job.status))                  // NOLINT
-      buffer += " (core dumped)";
-  }
-  buffer += "\t";
-  primout()->format(buffer);
-  print(job.exp, false);
-}
-
-///
-/// @brief recordjob Register a job.
-///
-/// @details Register a job with process id PID in the linked list of jobs. If
-/// BG is true, job is registered as running in background.
-///
-/// @param pid Process id.
-/// @param bg True if registering a background process.
-///
-/// @return True if all went well, false otherwise.
-///
-bool recordjob(int pid, bool bg)
-{
-  if(insidefork)
-    return true; // Skip this if in a fork.
-  job_t job;
-  if(!joblist.empty())
-    job.jobnum = joblist.front().jobnum + 1;
-  else
-    job.jobnum = 1;
-  job.procid = pid;
-  job.status = 0;
-  job.wdir = std::filesystem::current_path().string();
-  job.exp = top::input_exp;
-  job.background = bg;
-  job.running = true;
-  joblist.push_front(job);
-  return true;
-}
-
-///
-/// @brief collectjob Update job list with exit status.
-///
-/// @details Updates job list with PID as process id, and STAT as exit status.
-///
-/// @param pid Process id.
-/// @param stat Exit status.
-///
-void collectjob(int pid, int stat)
-{
-  for(auto job = joblist.begin(); job != joblist.end(); ++job)
-  {
-    if(job->procid == pid)
-    {
-      job->running = false;
-      job->status = stat;
-      if(WIFSTOPPED(job->status))
-        printjob(*job);
-      else
-      {
-        if(!job->background && WIFSIGNALED(job->status) && WTERMSIG(job->status) != SIGINT)
-          printjob(*job);   // Print if not interrupted
-        if(job->background) // When running in background, save on another list to be
-        {
-          // Collected when signaled with SIGCHLD
-          cjoblist.push_front(*job);
-        }
-        job = joblist.erase(job);
-      }
-      break;
-    }
-  }
-}
-
 ///
 /// @brief mfork Forks and initializes the child.
 ///
@@ -198,7 +88,7 @@ int mfork()
 
   if(pid = fork(); pid == 0)
   {
-    pgrp = getpid();
+    auto pgrp = getpid();
     if(!insidefork)
     {
       setpgid(1, pgrp);
@@ -216,7 +106,8 @@ int mfork()
       context::current().primerr()->format("{}\n", std::error_code(errno, std::system_category()).message());
     return pid;
   }
-  recordjob(pid, false);
+  if(!insidefork)
+    job::recordjob(job::createjob(pid), false);
   return pid;
 }
 
@@ -335,27 +226,27 @@ std::vector<std::string> make_exec(lisp_t command)
 ///
 /// @return The status.
 ///
-int waitfork(pid_t pid)
+job::stat_t waitfork(pid_t pid)
 {
-  int stat = 0;
+  job::stat_t stat{0};
 
   while(true)
   {
-    auto wpid = waitpid(pid, &stat, WUNTRACED);
+    auto wpid = waitpid(pid, &stat.stat, WUNTRACED);
     if(wpid == -1 && errno == EINTR)
       continue;
     if(wpid == pid)
     {
-      if(WIFSIGNALED(stat))
+      if(WIFSIGNALED(stat.stat))
       {
         unwind();
         throw lisp_error(lips_errc::error, "waitfor");
       }
-      collectjob(wpid, stat);
+      job::collectjob(wpid, stat);
       break;
     }
     if(wpid != -1 && !insidefork)
-      collectjob(wpid, stat);
+      job::collectjob(wpid, stat);
   }
   return stat;
 }
@@ -399,7 +290,7 @@ lisp_t execute(const std::string& name, lisp_t command)
   else if(pid < 0)
     return C_ERROR;
   auto status = waitfork(pid);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status.stat));
 }
 
 ///
@@ -425,22 +316,14 @@ bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 
 } // namespace
 
-/// @brief printdone Sweeps CJOBLIST and prints each job it frees.
-void printdone()
-{
-  for(const auto& job: cjoblist)
-    printjob(job);
-  cjoblist.clear();
-}
-
 void checkfork()
 {
   while(true)
   {
-    int wstat = 0;
-    auto wpid = waitpid(-1, &wstat, WUNTRACED | WNOHANG);
+    job::stat_t wstat{0};
+    auto wpid = waitpid(-1, &wstat.stat, WUNTRACED | WNOHANG);
     if(wpid > 0)
-      collectjob(wpid, wstat);
+      job::collectjob(wpid, wstat);
     else
       break;
   }
@@ -497,7 +380,6 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   int fd = 0;
   int pid = 0;
   int oldfd = 0;
-  int status = 0;
 
   if(is_nil(cmd))
     return nil;
@@ -523,9 +405,9 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  status = waitfork(pid);
+  auto status = waitfork(pid);
   ::close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status.stat));
 }
 
 lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
@@ -533,7 +415,6 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   int fd = 0;
   int pid = 0;
   int oldfd = 0;
-  int status = 0;
 
   if(is_nil(cmd))
     return nil;
@@ -559,9 +440,9 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  status = waitfork(pid);
+  auto status = waitfork(pid);
   ::close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status.stat));
 }
 
 lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
@@ -569,7 +450,6 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   int fd = 0;
   int pid = 0;
   int oldfd = 0;
-  int status = 0;
 
   if(is_nil(cmd))
     return nil;
@@ -581,7 +461,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
     check(filed, object::type::Integer);
     oldfd = static_cast<int>(filed->intval());
   }
-  if(fd = ::open(file->getstr().c_str(), O_RDONLY); fd == -1)
+  if(fd = ::open(file->getstr().c_str(), O_RDONLY); fd == -1) // NOLINT
     return error(std::error_code(errno, std::system_category()), file);
   if(pid = mfork(); pid == 0)
   {
@@ -595,9 +475,9 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  status = waitfork(pid);
+  auto status = waitfork(pid);
   ::close(fd);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status.stat));
 }
 
 lisp_t pipecmd(lisp_t cmds)
@@ -640,12 +520,12 @@ lisp_t pipecmd(lisp_t cmds)
     }
     eval(cmds->car());
     auto status = waitfork(pid);
-    ::exit(WEXITSTATUS(status));
+    ::exit(WEXITSTATUS(status.stat));
   }
   else if(pid < 0)
     return C_ERROR;
   auto status = waitfork(pid);
-  return mknumber(WEXITSTATUS(status));
+  return mknumber(WEXITSTATUS(status.stat));
 }
 
 lisp_t back(lisp_t x)
@@ -654,7 +534,6 @@ lisp_t back(lisp_t x)
 
   if(pid = fork(); pid == 0)
   {
-    pgrp = getpid();
     insidefork = true;
     preparefork();
     eval(x);
@@ -662,8 +541,11 @@ lisp_t back(lisp_t x)
   }
   else if(pid < 0)
     return C_ERROR;
-  recordjob(pid, true);
-  std::cout << fmt::format("[{}] {}\n", joblist.front().jobnum, pid);
+  if(!insidefork)
+    job::recordjob(job::createjob(pid), true);
+  if(auto* currentjob = job::findjob([](const auto&) { return true; });
+    currentjob != nullptr)
+    std::cout << fmt::format("[{}] {}\n", currentjob->jobnum, currentjob->procid);
   return mknumber(pid);
 }
 
@@ -697,43 +579,26 @@ void do_rehash()
 
 lisp_t jobs()
 {
-  for(const auto& job: joblist)
-    printjob(job);
+  job::printjobs();
   return nil;
 }
 
 lisp_t fg(lisp_t job)
 {
-  job_t* current = nullptr;
+  job::job_t* current = nullptr;
 
   if(is_nil(job))
-  {
-    for(auto& j: joblist)
-    {
-      if(WIFSTOPPED(j.status))
-      {
-        current = &j;
-        break;
-      }
-    }
-  }
+    current = job::findjob([](const auto& j) { return WIFSTOPPED(j.status); });
   else
   {
     check(job, object::type::Integer);
-    for(auto& j: joblist)
-    {
-      if(j.jobnum == job->intval())
-      {
-        current = &j;
-        break;
-      }
-    }
+    current = job::findjob([&job](const auto& j) { return j.jobnum == job->intval(); });
   }
   if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
     current->running = true;
-    printjob(*current);
+    job::printjob(*current);
     tcsetpgrp(1, pgrp);
     if(WIFSTOPPED(current->status))
       if(killpg(pgrp, SIGCONT) < 0)
@@ -741,44 +606,28 @@ lisp_t fg(lisp_t job)
     current->status = 0;
     current->background = false;
     auto status = waitfork(current->procid);
-    return mknumber(WEXITSTATUS(status));
+    return mknumber(WEXITSTATUS(status.stat));
   }
   return error(lips_errc::no_such_job, job);
 }
 
 lisp_t bg(lisp_t job)
 {
-  job_t* current = nullptr;
+  job::job_t* current = nullptr;
 
   if(is_nil(job))
-  {
-    for(auto& j: joblist)
-    {
-      if(!j.background)
-      {
-        current = &j;
-        break;
-      }
-    }
-  }
+    current = job::findjob([](const auto& j) { return !j.background; });
   else
   {
     check(job, object::type::Integer);
-    for(auto& j: joblist)
-    {
-      if(j.jobnum == job->intval())
-      {
-        current = &j;
-        break;
-      }
-    }
+    current = job::findjob([&job](const auto& j) { return j.jobnum == job->intval(); });
   }
   if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
     current->status = 0;
     current->running = true;
-    printjob(*current);
+    job::printjob(*current);
     tcsetpgrp(1, pgrp);
     if(!current->background)
       if(killpg(pgrp, SIGCONT) < 0)

@@ -21,6 +21,7 @@ target_sources(
   PRIVATE env.cc
           exec.cc
           glob.cc
+          job.cc
           main.cc
           os.cc
           term.cc

@@ -36,6 +36,7 @@
 #include "main.hh"
 #include "env.hh"
 #include "exec.hh"
+#include "job.hh"
 #include "top.hh"
 #include "term.hh"
 
@@ -163,7 +164,7 @@ void promptfun()
   // Check for jobs that are finished and print them.
   //
   checkfork();
-  printdone();
+  job::printdone();
 }
 
 void onbreak()
