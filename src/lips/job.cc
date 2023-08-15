@@ -1,6 +1,9 @@
 #include <list>
+#include <filesystem>
+#include <sys/wait.h>
+#include <csignal>
+#include <cstdlib>
 #include <fmt/format.h>
-
 #include <lisp/lisp.hh>
 
 #include "job.hh"
