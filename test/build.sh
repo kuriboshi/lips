@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cmake --preset docker -B "$1" &&
-    cmake --build "$1" &&
-    (cd "$1"; ctest -V -R 'test_.*')
+cmake --preset "$1" -B /project/build -S /project/lips &&
+    cmake --build /project/build &&
+    (cd /project/build; ctest --verbose -R 'test_.*')

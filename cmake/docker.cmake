@@ -16,56 +16,48 @@
 # limitations under the License.
 #
 
+# Choose either `podman` or `docker` depending on the platform.
 if(APPLE)
   set(LIPS_CONTAINER_APP "podman")
-  set(LIPS_CONTAINER_USER_ID "0")
-  set(LIPS_CONTAINER_GROUP_ID "0")
 else()
   set(LIPS_CONTAINER_APP "docker")
-  execute_process(COMMAND id -u OUTPUT_VARIABLE LIPS_CONTAINER_USER_ID)
-  string(STRIP ${LIPS_CONTAINER_USER_ID} LIPS_CONTAINER_USER_ID)
-  execute_process(COMMAND id -g OUTPUT_VARIABLE LIPS_CONTAINER_GROUP_ID)
-  string(STRIP ${LIPS_CONTAINER_GROUP_ID} LIPS_CONTAINER_GROUP_ID)
 endif()
 
-macro(lips_build_and_test dockerfile container_tag)
+#
+# @brief Add a custom target building on Linux according to parameters.
+#
+# @details Adds a custom target which builds a docker image based on
+# *dockerfile*. The custom target is tagged with *container_tag*. The
+# lips source code is mounted read-only under `/project/lips` and the
+# ephemeral result of the build is in `/project/build`. The
+# *build_type* is the CMake preset used to configure and build the
+# project.
+#
+# @param dockerfile The dockerfile used to build the image.
+# @param container_tag The tag used to tag the docker image.
+# @param build_type The CMake preset used to configure and build the
+#   project.
+#
+function(lips_build_and_test dockerfile container_tag build_type)
   add_custom_target(
-    ubuntu${container_tag}
+    ${container_tag}
     USES_TERMINAL
+    COMMENT "Build for ${dockerfile}/${container_tag}/${build_type}"
     COMMAND
-      "${LIPS_CONTAINER_APP}" build --build-arg
-      USER_ID="${LIPS_CONTAINER_USER_ID}" --build-arg
-      GROUP_ID="${LIPS_CONTAINER_GROUP_ID}" -t ${container_tag} -f
-      "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
+      "${LIPS_CONTAINER_APP}" build -t "${container_tag}"
+      -f "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
     COMMAND
       "${LIPS_CONTAINER_APP}" run --rm
-      -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
-      -v "${CMAKE_CURRENT_SOURCE_DIR}:/project"
-      ${container_tag} bash -c
-      "test/build.sh build/${container_tag}")
-  set_target_properties(ubuntu${container_tag} PROPERTIES FOLDER "Test")
-  add_dependencies(test-linux ubuntu${container_tag})
-  if("${ARGV2}" STREQUAL "tidy")
-    add_custom_target(
-      ubuntu${container_tag}-tidy
-      USES_TERMINAL
-      COMMAND
-        "${LIPS_CONTAINER_APP}" build --build-arg
-        USER_ID="${LIPS_CONTAINER_USER_ID}" --build-arg
-        GROUP_ID="${LIPS_CONTAINER_GROUP_ID}" -t ${container_tag} -f
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
-      COMMAND
-        "${LIPS_CONTAINER_APP}" run --rm
-        -u "${LIPS_CONTAINER_USER_ID}:${LIPS_CONTAINER_GROUP_ID}"
-        -v "${CMAKE_CURRENT_SOURCE_DIR}:/project"
-        "${container_tag}" bash -c "test/tidy.sh build/${container_tag}")
-    set_target_properties(ubuntu${container_tag}-tidy PROPERTIES FOLDER "Test")
-    add_dependencies(test-linux ubuntu${container_tag}-tidy)
-  endif()
-endmacro()
+      -v "${CMAKE_CURRENT_SOURCE_DIR}:/project/lips:ro"
+      "${container_tag}"
+      bash -c "/project/lips/test/build.sh ${build_type}")
+  set_target_properties("${container_tag}" PROPERTIES FOLDER "Test")
+  add_dependencies(test-linux "${container_tag}")
+endfunction()
 
 add_custom_target(test-linux)
 set_target_properties(test-linux PROPERTIES FOLDER "Test")
-lips_build_and_test(Ubuntu-20.04 20)
-lips_build_and_test(Ubuntu-22.04 22 tidy)
-lips_build_and_test(Ubuntu-22.04-clang 22-clang)
+lips_build_and_test(Ubuntu-20.04 ubuntu20 docker)
+lips_build_and_test(Ubuntu-22.04 ubuntu22 docker)
+lips_build_and_test(Ubuntu-22.04 ubuntu22-tidy tidy)
+lips_build_and_test(Ubuntu-22.04 ubuntu22-clang clang)

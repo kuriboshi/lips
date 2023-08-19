@@ -1,24 +1,29 @@
+# -*- dockerfile -*-
 FROM ubuntu:20.04
 
-ARG USER_ID
-ARG GROUP_ID
+# To avoid interactively asking for the timezone. Just set it to UTC
+# since it doesn't really matter what the time zone is.
+RUN ln -snf /usr/share/zoneinfo/UTC /etc/localtime; echo UTC > /etc/timezone
 
+# Install required packages.
 RUN apt-get -y update && apt-get -y install software-properties-common
+RUN apt-get -y update && apt-get -y install ca-certificates
 RUN apt-get -y update && apt-get -y install gpg
 RUN apt-get -y update && apt-get -y install wget
+
+# We need to get the latest version of cmake directly from kitware.
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | \
     gpg --dearmor - | \
     tee /usr/share/keyrings/kitware-archive-keyring.gpg > /dev/null
 RUN echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ bionic main' | \
     tee /etc/apt/sources.list.d/kitware.list > /dev/null
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
-RUN apt-get -y update && apt-get -y install ninja-build
 RUN apt-get -y update && apt-get -y install cmake
+
+# Install packages needed to build the project.
+RUN apt-get -y update && apt-get -y install ninja-build
 RUN apt-get -y update && apt-get -y install libncurses-dev
 RUN apt-get -y update && apt-get -y install g++-11
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 90 --slave /usr/bin/c++ c++ /usr/bin/g++-11
 
-ENV USER=root
-ENV HOME=/root
-USER ${USER_ID}:${GROUP_ID}
 WORKDIR /project

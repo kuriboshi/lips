@@ -63,13 +63,25 @@
             }
         },
         {
-            "name": "clang-tidy",
+            "name": "tidy",
             "inherits": "debug",
             "displayName": "Run clang-tidy",
             "description": "Run clang-tidy on the source code",
-            "binaryDir": "${sourceDir}/build/clang-tidy",
+            "binaryDir": "${sourceDir}/build/tidy",
             "cacheVariables": {
                 "LIPS_ENABLE_CLANG_TIDY": "ON"
+            }
+        },
+        {
+            "name": "clang",
+            "inherits": "debug",
+            "displayName": "Build with clang",
+            "description": "Build with the clang compiler",
+            "binaryDir": "${sourceDir}/build/clang",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
         }
     ],
@@ -95,8 +107,12 @@
             "configurePreset": "xcode"
         },
         {
-            "name": "clang-tidy",
-            "configurePreset": "clang-tidy"
+            "name": "tidy",
+            "configurePreset": "tidy"
+        },
+        {
+            "name": "clang",
+            "configurePreset": "clang"
         }
     ],
     "testPresets": [
@@ -117,6 +133,16 @@
         {
             "name": "make",
             "configurePreset": "make",
+            "inherits": "default"
+        },
+        {
+            "name": "tidy",
+            "configurePreset": "tidy",
+            "inherits": "default"
+        },
+        {
+            "name": "clang",
+            "configurePreset": "clang",
             "inherits": "default"
         },
         {

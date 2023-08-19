@@ -27,7 +27,7 @@ if(POLICY CMP0135)
 endif()
 
 FetchContent_Declare(lips
-  GIT_REPOSITORY file://${CMAKE_CURRENT_SOURCE_DIR}/..
+  GIT_REPOSITORY "file://${CMAKE_CURRENT_SOURCE_DIR}/.."
   GIT_TAG HEAD
 )
 
