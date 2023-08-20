@@ -1,5 +1,26 @@
 # Release notes
 
+## 2.0.3
+
+- Turn on some more clang-tidy warnings and fix them
+- Upgrade cmake-external to v1.1.0
+- Build on local filesystem for the test-linux target
+- Separate job related code in exec.cc into job.[cc,hh]
+
+## 2.0.2
+
+Minor release to fix some build issues
+
+- build: Fix issues on macOS using the Xcode generator
+- tidy: Fix issues raised by clang-tidy
+- build: Fix building on gitlab
+
+## 2.0.1
+
+- build: Use cmake-external for external dependencies (downloaded from external repo)
+- Upgrade Catch2 to version 3.3.2
+- test: Remove the use of sshfs on macOS
+
 ## 2.0.0
 
 Major refactoring and reorganization of the source code.

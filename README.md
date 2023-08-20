@@ -6,7 +6,7 @@ Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 2.0.0
+Version 2.0.3
 
 ## What is it?
 
@@ -45,10 +45,10 @@ The code requires C++20 and CMake 3.21 or newer.
 ## Platforms
 
 The project is developed primarily on macOS 13 (Ventura) using the
-Apple clang version 14.0.0 (clang-1400.0.29.202) compiler.  It may
-work on older releases of macOS if you install a newer compiler.  It's
-tested regularly on Ubuntu 22.04 and 20.04. On Ubuntu testing is done
-using gcc 11.x, gcc 12.x and clang 14.x.
+Apple clang version 14 compiler.  It may work on older releases of
+macOS if you install a newer compiler.  It's tested regularly on
+Ubuntu 20.04 and 22.04. Testing on Ubuntu is done using gcc 11.x, gcc
+12.x and clang 14.x.
 
 ## Building
 
@@ -72,20 +72,20 @@ There are a number of options available to customize the build.
 
 Turn them on by adding `-D` options to the `cmake` command.
 
-There is a Makefile in the top directory which runs cmake and ctest
-for some common scenerios.
+There is a `Makefile` in the top directory which runs `cmake` and
+`ctest` for some common scenerios.
 
-## External dependencies
+## External Dependencies
 
 Lips depends on two external libraries.
 
-- Catch2 (version 3.2.1)
+- Catch2 (version 3.3.2)
 - fmt (version 9.1.0)
 
 These dependencies are downloaded and included in the build
 automatically.
 
-## Testing
+## Unit Testing
 
 Native testing on the host is triggered by the `ctest` command. For example
 
@@ -96,19 +96,19 @@ ctest --preset default
 ### GitHub workflows
 
 Builds and tests using GitHub actions are included in the
-`.github/workflows` directory. There are workflows for both Ubuntu 18
-and 20.
+`.github/workflows` directory. There are workflows for both Ubuntu 20
+and 22.
 
 ### Local testing
 
 For local testing there are some docker files in the `test` directory
 which can be used for testing on various platforms. Currently there
-are files for Ubuntu 20.04 and 22.04. The latter also has a variant
-for clang. For 20.04 the version of gcc is 11 and for 22.04 it's gcc
-12. For 22.04 and clang the version of clang is clang 14.
+are files for Ubuntu 20.04 and 22.04. For 20.04 the version of gcc is
+11 and for 22.04 it's gcc 12. The 22.04 version also installs clang
+14.
 
-Runing the following command builds and tests on all four operating
-systems and compiler combinations.
+Runing the following command builds and tests on all the above
+operating systems and compiler combinations.
 
 ```
 cmake --preset default --target test-linux
@@ -118,7 +118,7 @@ On macOS `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
 same as for `docker`.
 
-## Implementation notes
+## Implementation Notes
 
 Lips does not use a garbage collector. Instead it uses reference
 counting implemented by an intrusive pointer. The reference counter is
@@ -132,7 +132,7 @@ most efficient solution. The overhead is more than just a tag.
 
 Most types stored in the `lisp::object` class are implemented using
 pointers to instances which are allocated using a memory
-pool. Benchmarks shows allocation is almost 10 times faster than not
+pool. Benchmarks show allocation is almost 10 times faster than not
 using a memory pool for an optimized build. Here is an example of a
 test run on a Mac mini (2018). Benchmarks are run using `make
 benchmark.`

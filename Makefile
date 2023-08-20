@@ -1,15 +1,8 @@
 all: debug
 
+# Default debug build.
 .PHONY: debug.config
 .PHONY: debug
-.PHONY: release.config
-.PHONY: release
-.PHONY: clang.config
-.PHONY: clang
-.PHONY: tidy.config
-.PHONY: tidy
-.PHONY: xcode
-
 debug.config: build/debug/CMakeCache.txt
 
 build/debug/CMakeCache.txt:
@@ -18,6 +11,9 @@ build/debug/CMakeCache.txt:
 debug: debug.config
 	cmake --build --preset debug
 
+# Optimized build.
+.PHONY: release.config
+.PHONY: release
 release.config: build/release/CMakeCache.txt
 
 build/release/CMakeCache.txt:
@@ -26,6 +22,9 @@ build/release/CMakeCache.txt:
 release: release.config
 	cmake --build --preset release
 
+# Build with the clang compiler.
+.PHONY: clang.config
+.PHONY: clang
 clang.config: build/clang/CMakeCache.txt
 
 build/clang/CMakeCache.txt:
@@ -34,6 +33,10 @@ build/clang/CMakeCache.txt:
 clang: clang.config
 	cmake --build --preset clang
 
+
+# Build using clang-tidy to analyse the code.
+.PHONY: tidy.config
+.PHONY: tidy
 tidy.config: build/tidy/CMakeCache.txt
 
 build/tidy/CMakeCache.txt:
@@ -42,6 +45,8 @@ build/tidy/CMakeCache.txt:
 tidy: tidy.config
 	cmake --build --preset tidy
 
+# Create a configuration suitable to use with Xcode.
+.PHONY: xcode
 xcode:
 	cmake --preset xcode
 
@@ -65,6 +70,7 @@ format: debug.config
 test-linux:
 	cmake --build --preset debug --target test-linux
 
+# Run the unit tests.
 .PHONE: test
 test: debug
 	ctest --preset default
