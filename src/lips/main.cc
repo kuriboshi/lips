@@ -361,7 +361,6 @@ int main(int argc, char* const* argv)
     std::cerr << "unknown exception: " << ex.what() << std::endl;
   }
   catch(...)
-  {
-  }
+  {}
   return 1;
 }

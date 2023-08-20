@@ -151,4 +151,4 @@ job_t* findjob(std::function<bool(const job_t&)> f)
   return nullptr;
 }
 
-}
+} // namespace lisp::job

@@ -543,8 +543,7 @@ lisp_t back(lisp_t x)
     return C_ERROR;
   if(!insidefork)
     job::recordjob(job::createjob(pid), true);
-  if(auto* currentjob = job::findjob([](const auto&) { return true; });
-    currentjob != nullptr)
+  if(auto* currentjob = job::findjob([](const auto&) { return true; }); currentjob != nullptr)
     std::cout << fmt::format("[{}] {}\n", currentjob->jobnum, currentjob->procid);
   return mknumber(pid);
 }

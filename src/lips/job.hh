@@ -22,7 +22,10 @@
 namespace lisp::job
 {
 
-struct stat_t { int stat; };
+struct stat_t
+{
+  int stat;
+};
 
 struct job_t
 {
@@ -43,4 +46,4 @@ void printdone();
 void printjobs();
 job_t* findjob(std::function<bool(const job_t&)> f);
 
-}
+} // namespace lisp::job

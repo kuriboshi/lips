@@ -53,7 +53,6 @@ int main(int argc, const char** argv)
     std::cout << fmt::format("unknown exception: {}\n", ex.what());
   }
   catch(...)
-  {
-  }
+  {}
   return 1;
 }
