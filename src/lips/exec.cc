@@ -391,7 +391,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
     check(filed, object::type::Integer);
     oldfd = static_cast<int>(filed->intval());
   }
-  if(fd = creat(file->getstr().c_str(), 0644); fd == -1)
+  if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
   if(pid = mfork(); pid == 0)
   {
@@ -770,7 +770,7 @@ TEST_CASE("exec.cc: make_exec")
   }
   SECTION("(make_exec (100)) -> 100")
   {
-    auto result = make_exec(cons(mknumber(100), nil));
+    auto result = make_exec(cons(mknumber(100), nil)); // NOLINT: Test code
     CHECK(result.at(0) == "100"s);
   }
   SECTION("(make_exec (plus 1 2)) -> 3")

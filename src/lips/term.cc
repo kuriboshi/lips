@@ -89,8 +89,8 @@ void term_source::init_term()
     char* termc = static_cast<char*>(tcap);
     if(auto* term = getenv("TERM"); term != nullptr)
     {
-      std::array<char, 1024> bp{};
-      if(tgetent(bp.data(), term) == 1)
+      // std::array<char, 1024> bp{};
+      if(tgetent(nullptr, term) == 1)
       {
         clear = tgetstr(const_cast<char*>("cl"), &termc); // NOLINT
         curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
@@ -117,10 +117,12 @@ void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
  */
 void term_source::pputc(int c, FILE* file)
 {
-  if(c < 0x20 && c != '\n' && c != '\t')
+  auto is_control = [](auto c){return std::iscntrl(c) != 0 && c != '\n' && c != '\t';};
+  // if(std::iscntrl(c) != 0 && c != '\n' && c != '\t')
+  if(is_control(c))
   {
     putc('^', file);
-    putc(c + 0x40, file);
+    putc(c + at_char, file);
   }
   else
     putc(c, file);
@@ -186,7 +188,7 @@ void term_source::delonechar()
   putc('\b', stdout);
   putc(' ', stdout);
   putc('\b', stdout);
-  if(linebuffer[linepos] < 0x20)
+  if(is_control(linebuffer[linepos]))
   {
     putc('\b', stdout);
     putc(' ', stdout);
@@ -499,7 +501,7 @@ void term_source::blink()
 
   // Blink for 1s or until key pressed
   struct pollfd pfd = {1, POLLIN, 0};
-  poll(&pfd, 1, 1000);
+  poll(&pfd, 1, blink_time);
 
   linebuffer[linepos] = '\0';
   if(ldiff == 0)

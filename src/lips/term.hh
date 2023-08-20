@@ -67,8 +67,15 @@ private:
   std::array<char, BUFSIZ> word{};
   char* last = nullptr;
 
-  static inline constexpr int NUM_KEYS = 256;
-  static inline constexpr char BELL = '\007';
+  static constexpr int NUM_KEYS = 256;
+  static constexpr char BELL = '\007';
+  static constexpr int blink_time = 1000;
+  static constexpr char at_char = '@';
+
+  bool is_control(auto c) const
+  {
+    return std::iscntrl(c) != 0 && c != '\n' && c != '\t';
+  }
 
   //
   // Routines for paren blinking.

@@ -117,7 +117,8 @@ inline void ps(const std::string& s, file_t& file, bool esc)
 
 inline void pi(std::int64_t i, std::int64_t base, file_t& file)
 {
-  std::array<char, 33> ss{};
+  static const constexpr std::size_t buffer_size = 33;
+  std::array<char, buffer_size> ss{};
   if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, static_cast<int>(base)); ec == std::errc())
   {
     *ptr = '\0';

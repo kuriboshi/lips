@@ -30,7 +30,7 @@ class context::impl final
 {
 public:
   impl()
-    : _currentbase(makecvar("base", 10_l)),
+    : _currentbase(makecvar("base", mknumber(default_base))),
       _verbose(makecvar("verbose", nil)),
       _loadpath(makecvar("loadpath", mklist(mkstring("."))))
   {

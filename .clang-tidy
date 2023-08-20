@@ -8,54 +8,59 @@ Checks:          "\
   -cppcoreguidelines-pro-bounds-constant-array-index,\
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,\
   -cppcoreguidelines-avoid-non-const-global-variables,\
+  modernize-*,\
+  -modernize-use-trailing-return-type,\
   readability-*,\
   -readability-braces-around-statements,\
   -readability-convert-member-functions-to-static,\
   -readability-identifier-length,\
-  -readability-magic-numbers,\
   -readability-named-parameter,\
-  modernize-*,\
-  -modernize-use-trailing-return-type,\
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 CheckOptions:
-  - key:             llvm-else-after-return.WarnOnConditionVariables
-    value:           'false'
-  - key:             modernize-loop-convert.MinConfidence
-    value:           reasonable
-  - key:             modernize-replace-auto-ptr.IncludeStyle
-    value:           llvm
-  - key:             cert-str34-c.DiagnoseSignedUnsignedCharComparisons
-    value:           'false'
-  - key:             google-readability-namespace-comments.ShortNamespaceLines
-    value:           '10'
-  - key:             cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
-    value:           'false'
-  - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
-    value:           'true'
+  - key:             bugprone-easily-swappable-parameters.IgnoredParameterTypeSuffixes
+    value:           'lisp_t'
   - key:             cert-dcl16-c.NewSuffixes
     value:           'L;LL;LU;LLU'
-  - key:             google-readability-braces-around-statements.ShortStatementLines
-    value:           '1'
-  - key:             modernize-pass-by-value.IncludeStyle
-    value:           llvm
-  - key:             google-readability-namespace-comments.SpacesBeforeComments
-    value:           '2'
-  - key:             modernize-loop-convert.MaxCopySize
-    value:           '16'
+  - key:             cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
+    value:           'false'
+  - key:             cert-str34-c.DiagnoseSignedUnsignedCharComparisons
+    value:           'false'
   - key:             cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
     value:           'true'
-  - key:             modernize-use-nullptr.NullMacros
-    value:           'NULL'
-  - key:             llvm-qualified-auto.AddConstToQualified
+  - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value:           'true'
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '1'
+  - key:             google-readability-function-size.StatementThreshold
+    value:           '800'
+  - key:             google-readability-namespace-comments.ShortNamespaceLines
+    value:           '10'
+  - key:             google-readability-namespace-comments.SpacesBeforeComments
+    value:           '2'
+  - key:             llvm-else-after-return.WarnOnConditionVariables
     value:           'false'
   - key:             llvm-else-after-return.WarnOnUnfixable
     value:           'false'
-  - key:             google-readability-function-size.StatementThreshold
-    value:           '800'
-  - key:             bugprone-easily-swappable-parameters.IgnoredParameterTypeSuffixes
-    value:           'lisp_t'
+  - key:             llvm-qualified-auto.AddConstToQualified
+    value:           'false'
+  - key:             modernize-loop-convert.MinConfidence
+    value:           reasonable
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             modernize-pass-by-value.IncludeStyle
+    value:           llvm
+  - key:             modernize-replace-auto-ptr.IncludeStyle
+    value:           llvm
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             readability-identifier-naming.ClassMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ClassMemberPrefix
+    value:           ''
+  - key:             readability-identifier-naming.PrivateMethodPrefix
+    value:           '_'
 ...

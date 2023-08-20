@@ -95,6 +95,8 @@ private:
   class impl;
   std::unique_ptr<impl> _pimpl;
   static context* _current;
+
+  static const constexpr std::int64_t default_base = 10;
 };
 
 inline lisp_t perror(std::error_code code, lisp_t a) { return context::current().perror(code, a); }
