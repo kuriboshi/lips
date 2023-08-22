@@ -48,7 +48,7 @@ lisp_t splice(lisp_t, lisp_t, bool);
 class source
 {
 public:
-  source() {}
+  source() = default;
   virtual ~source() = default;
 
   virtual int getch() = 0;
@@ -137,7 +137,7 @@ private:
 class sink
 {
 public:
-  sink() {}
+  sink() = default;
   virtual ~sink() = default;
 
   virtual void putch(int, bool esc = false) = 0;
@@ -215,7 +215,7 @@ private:
 class string_sink final: public sink
 {
 public:
-  string_sink() {}
+  string_sink() = default;
 
   using sink::putch;
 
@@ -255,7 +255,7 @@ public:
     : _source(std::move(file._source)),
       _sink(std::move(file._sink))
   {}
-  ~file_t() {}
+  ~file_t() = default;
 
   bool has_source() { return !!_source; }
   bool has_sink() { return !!_sink; }
