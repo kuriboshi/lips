@@ -141,7 +141,7 @@ public:
   virtual ~sink() = default;
 
   virtual void putch(int, bool esc = false) = 0;
-  virtual void puts(const std::string_view) = 0;
+  virtual void puts(std::string_view) = 0;
   virtual void terpri() = 0;
   virtual void flush() = 0;
   virtual void close() {}
@@ -179,7 +179,7 @@ public:
   using sink::putch;
 
   void putch(int c, bool esc) override { putch(c, *_file, esc); }
-  void puts(const std::string_view s) override { _file->write(s.data(), s.size()); }
+  void puts(std::string_view s) override { _file->write(s.data(), s.size()); }
   void terpri() override { _file->put('\n'); }
   void flush() override { _file->flush(); }
   void close() override
@@ -203,7 +203,7 @@ public:
   using sink::putch;
 
   void putch(int c, bool esc) override { putch(c, _stream, esc); }
-  void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  void puts(std::string_view s) override { _stream.write(s.data(), s.size()); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
   void close() override { _stream.flush(); }
@@ -222,7 +222,7 @@ public:
   std::string string() const { return _stream.str(); }
 
   void putch(int c, bool esc) override { putch(c, _stream, esc); }
-  void puts(const std::string_view s) override { _stream.write(s.data(), s.size()); }
+  void puts(std::string_view s) override { _stream.write(s.data(), s.size()); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
 
@@ -285,7 +285,7 @@ public:
     ptrcheck<io::sink>();
     _sink->putch(c, esc);
   }
-  void puts(const std::string_view s)
+  void puts(std::string_view s)
   {
     ptrcheck<io::sink>();
     _sink->puts(s);
