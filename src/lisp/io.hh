@@ -264,17 +264,17 @@ public:
   io::source& source() { return *_source; }
   int getch()
   {
-    ptrcheck(_source);
+    ptrcheck<io::source>();
     return _source->getch();
   }
   void ungetch(int c)
   {
-    ptrcheck(_source);
+    ptrcheck<io::source>();
     _source->ungetch(c);
   }
   std::optional<std::string> getline()
   {
-    ptrcheck(_source);
+    ptrcheck<io::source>();
     return _source->getline();
   }
 
@@ -282,22 +282,22 @@ public:
   io::sink& sink() { return *_sink; }
   void putch(char c, bool esc = false)
   {
-    ptrcheck(_sink);
+    ptrcheck<io::sink>();
     _sink->putch(c, esc);
   }
   void puts(const std::string_view s)
   {
-    ptrcheck(_sink);
+    ptrcheck<io::sink>();
     _sink->puts(s);
   }
   void terpri()
   {
-    ptrcheck(_sink);
+    ptrcheck<io::sink>();
     _sink->terpri();
   }
   void flush()
   {
-    ptrcheck(_sink);
+    ptrcheck<io::sink>();
     _sink->flush();
   }
 
@@ -320,16 +320,19 @@ private:
   std::unique_ptr<io::source> _source;
   std::unique_ptr<io::sink> _sink;
 
-  void ptrcheck(const std::unique_ptr<io::source>&) const
+  template<typename S>
+  void ptrcheck() const
   {
-    if(!_source)
-      throw lisp_error(error_errc::no_source);
-  }
-
-  void ptrcheck(const std::unique_ptr<io::sink>&) const
-  {
-    if(!_sink)
-      throw lisp_error(error_errc::no_sink);
+    if constexpr(std::is_same_v<S, io::source>)
+    {
+      if(!_source)
+        throw lisp_error(error_errc::no_source);
+    }
+    else if constexpr(std::is_same_v<S, io::sink>)
+    {
+      if(!_sink)
+        throw lisp_error(error_errc::no_sink);
+    }
   }
 };
 
