@@ -59,7 +59,7 @@ lisp_t ratom(ref_file_t file)
   lexer lexer{file};
   auto token = lexer.read();
   parser parser{lexer};
-  return parser.create(token);
+  return parser::create(token);
 }
 
 //

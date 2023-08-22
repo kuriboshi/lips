@@ -47,8 +47,8 @@ public:
 private:
   void init_keymap();
   void init_term();
-  void pputc(int c, FILE* file);
-  void putch(int c, FILE* file, bool esc);
+  static void pputc(int c, FILE* file);
+  static void putch(int c, FILE* file, bool esc);
   bool firstnotlp();
   void delonechar();
   bool onlyblanks();
@@ -56,11 +56,11 @@ private:
   void retype(int);
   char* mkexstr();
   void fillrest(const char*);
-  bool checkchar(lisp::lisp_t words, std::size_t pos, char* c);
+  static bool checkchar(lisp::lisp_t words, std::size_t pos, char* c);
   void complete(lisp::lisp_t words);
-  lisp::lisp_t strip(lisp::lisp_t files, const char* prefix, const char* suffix);
+  static lisp::lisp_t strip(lisp::lisp_t files, const char* prefix, const char* suffix);
   void scan(int begin);
-  void nput(const char* str, int ntim);
+  static void nput(const char* str, int ntim);
   void blink();
   void clearscr();
 

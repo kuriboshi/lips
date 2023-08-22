@@ -34,7 +34,7 @@ public:
   lisp_t operator()(lisp_t);
 
 private:
-  void main_loop();
+  static void main_loop();
 
   class level
   {

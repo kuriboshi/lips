@@ -258,7 +258,7 @@ private:
   /// @brief Resets the vm to it's initial state.
   void reset();
   void overflow();
-  lisp_t destblock(const destblock_t*);
+  static lisp_t destblock(const destblock_t*);
 
   ///
   /// @brief Allocates a destination block of size size.

@@ -38,8 +38,8 @@ public:
 
   lisp_t operator()(lisp_t);
 
-  lisp_t transform(lisp_t list);
-  lisp_t findalias(lisp_t exp);
+  static lisp_t transform(lisp_t list);
+  static lisp_t findalias(lisp_t exp);
   static void promptprint(lisp_t prompt);
 
   // History functions

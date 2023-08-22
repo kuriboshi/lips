@@ -56,7 +56,7 @@ public:
 
   /// @brief Creates an appropriate lisp_t object of the correct type based on
   /// the token.
-  lisp_t create(const token_t& token) const
+  static lisp_t create(const token_t& token)
   {
     switch(token.type)
     {
@@ -99,7 +99,7 @@ private:
   /// @brief Parse the tail of a list.
   lisp_t parse_tail();
   /// @brief Make a symbol from a string.
-  lisp_t make_symbol(const std::string& symbol) const { return mkatom(symbol); }
+  static lisp_t make_symbol(const std::string& symbol) { return mkatom(symbol); }
 
   /// @brief Holds the lexer object.
   lexer& _lexer;

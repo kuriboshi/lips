@@ -58,12 +58,12 @@ public:
 
   using iterator = std::istreambuf_iterator<char>;
   virtual iterator begin() = 0;
-  iterator end() { return {}; }
+  iterator end() { return {}; } // NOLINT
 
 protected:
-  int getch(std::istream& stream) { return stream.get(); }
+  static int getch(std::istream& stream) { return stream.get(); }
 
-  std::optional<std::string> getline(std::istream& stream)
+  static std::optional<std::string> getline(std::istream& stream)
   {
     std::string buf;
     std::getline(stream, buf);
@@ -150,7 +150,7 @@ protected:
   //
   // Put a character c, on stream file, escaping enabled if esc is true.
   //
-  void putch(int c, std::ostream& file, bool esc)
+  static void putch(int c, std::ostream& file, bool esc)
   {
     if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
       pputc('\\', file);
@@ -159,7 +159,7 @@ protected:
 
   // Put a character on stdout prefixing it with a ^ if it's a control
   // character.
-  void pputc(int c, std::ostream& file)
+  static void pputc(int c, std::ostream& file)
   {
     if(c >= 0 && c < 0x20 && c != '\n' && c != '\r' && c != '\t' && c != '\a')
     {

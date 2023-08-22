@@ -57,7 +57,7 @@ public:
   lisp_t perror(std::error_code, lisp_t) const;
   lisp_t error(std::error_code, lisp_t) const;
 
-  void fatal(std::error_code error) { throw lisp_error(error); }
+  static void fatal(std::error_code error) { throw lisp_error(error); }
 
   template<typename... Ts>
   void fatal(std::error_code error, const Ts&... args)
@@ -73,7 +73,7 @@ public:
   const cvariable_t& verbose() const;
   const cvariable_t& loadpath() const;
   void loadpath(lisp_t);
-  std::string version() const { return C_VERSION->value()->getstr(); }
+  static std::string version() { return C_VERSION->value()->getstr(); }
 
 private:
   template<typename T>
