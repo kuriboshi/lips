@@ -32,7 +32,6 @@ Checks: "\
   -modernize-avoid-c-arrays,\
   readability-*,\
   -readability-braces-around-statements,\
-  readability-convert-member-functions-to-static,\
   -readability-identifier-length,\
   -readability-named-parameter,\
   -readability-identifier-naming,\
