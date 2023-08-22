@@ -62,7 +62,7 @@ public:
   /// @brief Return the current environment.
   lisp_t topofstack() const;
   /// @brief Convert an environment to a list.
-  lisp_t destblock(lisp_t);
+  static lisp_t destblock(lisp_t);
 
   /// @brief Prints a backtrace of all expressions on the stack.
   void bt();
