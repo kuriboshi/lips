@@ -35,7 +35,7 @@ public:
 
   static std::string get(const std::string& pstr)
   {
-    auto e = getenv(pstr.c_str());
+    auto* e = getenv(pstr.c_str());
     std::string result;
     if(e != nullptr)
       result = e;
