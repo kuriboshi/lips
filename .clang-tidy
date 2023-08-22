@@ -1,6 +1,9 @@
 ---
-Checks:          "\
+Checks: "\
   bugprone-*,\
+  -bugprone-narrowing-conversions,\
+  -bugprone-exception-escape,\
+  -bugprone-unused-return-value,\
   clang-diagnostic-*,\
   clang-analyzer-*,\
   cppcoreguidelines-*,\
@@ -8,16 +11,39 @@ Checks:          "\
   -cppcoreguidelines-pro-bounds-constant-array-index,\
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,\
   -cppcoreguidelines-avoid-non-const-global-variables,\
+  -cppcoreguidelines-non-private-member-variables-in-classes,\
+  -cppcoreguidelines-avoid-const-or-ref-data-members,\
+  -cppcoreguidelines-narrowing-conversions,\
+  -cppcoreguidelines-special-member-functions,\
+  -cppcoreguidelines-owning-memory,\
+  -cppcoreguidelines-prefer-member-initializer,\
+  -cppcoreguidelines-no-malloc,\
+  -cppcoreguidelines-pro-type-reinterpret-cast,\
+  -cppcoreguidelines-c-copy-assignment-signature,\
+  -cppcoreguidelines-pro-type-member-init,\
+  -cppcoreguidelines-avoid-c-arrays,\
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
   modernize-*,\
   -modernize-use-trailing-return-type,\
+  -modernize-use-nodiscard,\
+  -modernize-pass-by-value,\
+  -modernize-return-braced-init-list,\
+  -modernize-use-equals-default,\
+  -modernize-use-override,\
+  -modernize-avoid-c-arrays,\
   readability-*,\
   -readability-braces-around-statements,\
   -readability-convert-member-functions-to-static,\
   -readability-identifier-length,\
   -readability-named-parameter,\
+  -readability-identifier-naming,\
+  -readability-magic-numbers,\
+  -readability-avoid-const-params-in-decls,\
+  -readability-redundant-declaration,\
+  -readability-qualified-auto,\
 "
 WarningsAsErrors: ''
-HeaderFilterRegex: ''
+HeaderFilterRegex: '\.hh$'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 CheckOptions:
@@ -61,6 +87,18 @@ CheckOptions:
     value:           lower_case
   - key:             readability-identifier-naming.ClassMemberPrefix
     value:           ''
-  - key:             readability-identifier-naming.PrivateMethodPrefix
+  - key:             readability-identifier-naming.ClassConstantCase
+    value:           'UPPER_CASE'
+  - key:             readability-identifier-naming.PrivateMemberPrefix
     value:           '_'
+  - key:             readability-identifier-naming.PrivateMemberCase
+    value:           'lower_case'
+  - key:             readability-identifier-naming.PublicMemberCase
+    value:           'lower_case'
+  - key:             readability-identifier-naming.PublicMemberPrefix
+    value:           ''
+  - key:             readability-identifier-naming.ClassMethodPrefix
+    value:           ''
+  - key:             readability-identifier-naming.TemplateParameterCase
+    value:           'CamelCase'
 ...
