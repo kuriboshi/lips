@@ -53,7 +53,7 @@ inline lisp_t eval(lisp_t expr) { return lisp::vm::get().eval(expr); }
 inline lisp_t apply(lisp_t fun, lisp_t args) { return lisp::vm::get().apply(fun, args); }
 inline lisp_t backtrace() { return lisp::vm::get().backtrace(); }
 inline lisp_t topofstack() { return lisp::vm::get().topofstack(); }
-inline lisp_t destblock(lisp_t a) { return lisp::vm::get().destblock(a); }
+inline lisp_t destblock(lisp_t a) { return lisp::vm::destblock(a); }
 
 void init()
 {
