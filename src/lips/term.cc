@@ -115,7 +115,7 @@ void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
  * Put a character on stdout prefixing it with a ^ if it's
  * a control character.
  */
-void term_source::pputc(int c, FILE* file)
+void term_source::pputc(char c, FILE* file)
 {
   auto is_control = [](auto c){return std::iscntrl(c) != 0 && c != '\n' && c != '\t';};
   // if(std::iscntrl(c) != 0 && c != '\n' && c != '\t')
@@ -131,7 +131,7 @@ void term_source::pputc(int c, FILE* file)
 /*
  * Put a character c, on stream file, escaping enabled if esc != 0.
  */
-void term_source::putch(int c, FILE* file, bool esc)
+void term_source::putch(char c, FILE* file, bool esc)
 {
   if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -142,7 +142,7 @@ void term_source::putch(int c, FILE* file, bool esc)
  * Get a character.  Buffer input with procedure getline, and get characters
  * from linebuffer.
  */
-int term_source::getch()
+char term_source::getch()
 {
   while(true)
   {
@@ -160,7 +160,7 @@ int term_source::getch()
  * Unget a character.  If reading from a terminal, just push it back in the
  * buffer, if not, do an ungetc.
  */
-void term_source::ungetch(int)
+void term_source::ungetch(char)
 {
   if(position > 0)
     --position;

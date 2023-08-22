@@ -18,6 +18,7 @@
 #ifndef LISP_ALLOC_HH
 #define LISP_ALLOC_HH
 
+#include <limits>
 #include <string>
 #include <string_view>
 
@@ -154,7 +155,20 @@ inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc:
 inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<std::int64_t>(i)); }
 
 /// @brief Creates a floating point value.
-inline lisp_t operator"" _l(long double d) { return details::alloc::mkfloat(d); }
+inline lisp_t operator"" _l(long double d)
+{
+  constexpr auto max_double{std::numeric_limits<double>::max()};
+  constexpr auto max_long_double{std::numeric_limits<long double>::max()};
+  if constexpr(max_long_double > max_double)
+  {
+    if(d > max_double)
+    {
+      lisp_t err{mkstring(fmt::format("{} too large", d))};
+      error(error_errc::illegal_arg, err);
+    }
+  }
+  return details::alloc::mkfloat(static_cast<double>(d));
+}
 
 /// @brief Evaluates a lisp expression in a string.
 inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }

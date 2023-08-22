@@ -31,8 +31,8 @@ public:
   ~term_source() override;
 
   // io::source
-  int getch() override;
-  void ungetch(int) override;
+  char getch() override;
+  void ungetch(char) override;
   std::optional<std::string> getline() override;
 
   static void end_term();
@@ -47,8 +47,8 @@ public:
 private:
   void init_keymap();
   void init_term();
-  static void pputc(int c, FILE* file);
-  static void putch(int c, FILE* file, bool esc);
+  static void pputc(char c, FILE* file);
+  static void putch(char c, FILE* file, bool esc);
   bool firstnotlp();
   void delonechar();
   bool onlyblanks();

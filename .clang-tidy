@@ -1,7 +1,6 @@
 ---
 Checks: "\
   bugprone-*,\
-  -bugprone-narrowing-conversions,\
   -bugprone-exception-escape,\
   -bugprone-unused-return-value,\
   clang-diagnostic-*,\

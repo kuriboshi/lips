@@ -235,7 +235,7 @@ lisp_t top::operator()(lisp_t exp)
 /// others could be added easily.
 lisp_t top::rmexcl(lisp_t stream)
 {
-  int c = stream->file()->getch();
+  auto c = stream->file()->getch();
   if(std::isspace(c) != 0)
     return C_EXCL;
   _echoline = true;
