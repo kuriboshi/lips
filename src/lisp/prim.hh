@@ -23,11 +23,6 @@
 
 namespace lisp
 {
-extern lisp_t C_ERROR;
-extern lisp_t C_LAMBDA;
-extern lisp_t C_NLAMBDA;
-extern lisp_t C_QUOTE;
-
 inline lisp_t car(lisp_t a) { return details::prim::car(a); }
 inline lisp_t cdr(lisp_t a) { return details::prim::cdr(a); }
 inline lisp_t cadr(lisp_t a) { return details::prim::cadr(a); }
