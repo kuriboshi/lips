@@ -58,7 +58,7 @@ public:
 
   using iterator = std::istreambuf_iterator<char>;
   virtual iterator begin() = 0;
-  iterator end() { return iterator(); }
+  iterator end() { return {}; }
 
 protected:
   int getch(std::istream& stream) { return stream.get(); }
@@ -87,7 +87,7 @@ public:
   void close() override { _file->close(); }
   std::optional<std::string> getline() override { return getline(*_file); }
 
-  iterator begin() override { return iterator(*_file); }
+  iterator begin() override { return {*_file}; }
 
 private:
   std::unique_ptr<std::ifstream> _file;
@@ -108,7 +108,7 @@ public:
   void ungetch(int c) override { _stream.putback(c); }
   std::optional<std::string> getline() override { return getline(_stream); }
 
-  iterator begin() override { return iterator(_stream); }
+  iterator begin() override { return {_stream}; }
 
 private:
   std::istream& _stream;
@@ -128,7 +128,7 @@ public:
   void ungetch(int c) override { _string.putback(c); }
   std::optional<std::string> getline() override { return getline(_string); }
 
-  iterator begin() override { return iterator(_string); }
+  iterator begin() override { return {_string}; }
 
 private:
   std::istringstream _string;

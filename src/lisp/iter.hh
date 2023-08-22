@@ -71,8 +71,8 @@ private:
   lisp_t _car;
 };
 
-inline iterator begin(lisp_t l) { return iterator(l); }
-inline iterator end(lisp_t l) { return iterator(nullptr); }
+inline iterator begin(lisp_t l) { return {l}; }
+inline iterator end(lisp_t l) { return {nullptr}; }
 
 } // namespace lisp
 

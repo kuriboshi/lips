@@ -41,7 +41,7 @@ public:
   iterator begin() override
   {
     is.seekg(0);
-    return iterator(is);
+    return {is};
   }
 
 private:
