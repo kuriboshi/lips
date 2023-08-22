@@ -77,7 +77,7 @@ class file_source: public source
 {
 public:
   file_source(const std::string& filename);
-  ~file_source() = default;
+  ~file_source() override = default;
 
   using source::getch;
   using source::getline;
@@ -99,7 +99,7 @@ public:
   stream_source(std::istream& stream)
     : _stream(stream)
   {}
-  ~stream_source() = default;
+  ~stream_source() override = default;
 
   using source::getch;
   using source::getline;
@@ -198,7 +198,7 @@ public:
   stream_sink(std::ostream& stream)
     : _stream(stream)
   {}
-  ~stream_sink() = default;
+  ~stream_sink() override = default;
 
   using sink::putch;
 
