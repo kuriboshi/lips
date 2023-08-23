@@ -12,7 +12,6 @@ Checks: "\
   -cppcoreguidelines-avoid-non-const-global-variables,\
   -cppcoreguidelines-non-private-member-variables-in-classes,\
   -cppcoreguidelines-avoid-const-or-ref-data-members,\
-  -cppcoreguidelines-narrowing-conversions,\
   -cppcoreguidelines-special-member-functions,\
   -cppcoreguidelines-owning-memory,\
   -cppcoreguidelines-prefer-member-initializer,\
