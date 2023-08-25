@@ -29,10 +29,6 @@ class env
 public:
   env();
 
-  cvariable_t& path; // Search path for executables.
-  cvariable_t& home; // Home directory.
-  cvariable_t& globsort;
-
   static std::string get(const std::string& pstr)
   {
     auto* e = getenv(pstr.c_str());
@@ -41,6 +37,10 @@ public:
       result = e;
     return result;
   }
+
+  const cvariable_t& home() const { return _home->cvariable(); }
+  const cvariable_t& path() const { return _path->cvariable(); }
+  const cvariable_t& globsort() const { return _globsort->cvariable(); }
 
 private:
   /*
@@ -71,6 +71,10 @@ private:
     }
     return result;
   }
+
+  lisp_t _path;                 // Search path for executables.
+  lisp_t _home;                 // Home directory.
+  lisp_t _globsort;
 };
 
 } // namespace lisp

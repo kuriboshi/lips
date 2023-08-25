@@ -102,7 +102,7 @@ private:
   static lisp_t make_symbol(const std::string& symbol) { return mkatom(symbol); }
 
   /// @brief Holds the lexer object.
-  lexer& _lexer;
+  lexer& _lexer; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   /// @brief The current input token.
   token_t _token;
 };

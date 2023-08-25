@@ -307,7 +307,7 @@ std::optional<std::string> extilde(const std::string& w)
   std::string s;
   if(p == w.end() || *p == '/')
   {
-    s = environment->home->getstr();
+    s = environment->home()->getstr();
     std::copy(p, w.end(), std::back_inserter(s));
   }
   else
@@ -383,7 +383,7 @@ lisp_t expandfiles(const std::string& wild, bool sort)
   {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }
   } reverse;
-  if(!is_nil(environment->globsort) || sort)
+  if(!is_nil(environment->globsort()) || sort)
     std::sort(files.begin(), files.end(), reverse);
   return buildlist(files);
 }

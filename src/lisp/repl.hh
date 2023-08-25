@@ -47,10 +47,10 @@ private:
     ~level() { --_repl._level; }
 
   private:
-    repl& _repl;
+    repl& _repl; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   };
 
-  class vm& _vm;
+  class vm& _vm; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   int _level = -1;
 };
 

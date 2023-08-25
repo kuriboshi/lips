@@ -24,7 +24,7 @@
 class term_source: public lisp::io::source
 {
 public:
-  term_source(const options_t& options)
+  term_source(options_t options)
     : is(linebuffer),
       options(options)
   {}
@@ -133,7 +133,7 @@ private:
   int position = 0;                // Current position in line buffer.
   enum term_fun key_tab[NUM_KEYS]; // Table specifying key functions.
 
-  const options_t& options;
+  options_t options;
 
   char tcap[128]; // Buffer for terminal capabilties.
   const char* curup = nullptr;

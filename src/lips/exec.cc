@@ -353,7 +353,7 @@ int execcommand(lisp_t exp, lisp_t* res)
   auto cmd = exechash.find(*command);
 
   std::string comdir;
-  for(auto cdir: environment->path)
+  for(auto cdir: environment->path())
   {
     if(is_nil(cdir) || cdir->getstr() == ".")
       comdir = "."s;
@@ -564,7 +564,7 @@ void do_rehash()
 {
   exechash.clear();
 
-  for(auto p: environment->path)
+  for(auto p: environment->path())
   {
     if(is_nil(p))
       continue;
@@ -659,7 +659,7 @@ lisp_t cd(lisp_t dir, lisp_t emess)
   lisp_t ndir;
 
   if(is_nil(dir))
-    ndir = environment->home;
+    ndir = environment->home();
   else
   {
     ndir = expand(dir);

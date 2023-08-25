@@ -111,7 +111,7 @@ public:
   iterator begin() override { return {_stream}; }
 
 private:
-  std::istream& _stream;
+  std::istream& _stream; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 class string_source: public source
@@ -209,7 +209,7 @@ public:
   void close() override { _stream.flush(); }
 
 private:
-  std::ostream& _stream;
+  std::ostream& _stream; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 class string_sink final: public sink

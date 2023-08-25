@@ -36,7 +36,7 @@ std::string current_prompt;
  */
 void top::phist()
 {
-  for(auto hl: variables->history)
+  for(auto hl: variables->history())
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
     prinbody(hl->cdr(), *context::current().stdout(), true);
@@ -49,8 +49,8 @@ void top::phist()
  */
 void top::addhist(lisp_t what)
 {
-  variables->history = cons(cons(variables->histnum, what), variables->history);
-  variables->histnum = add1(variables->histnum);
+  variables->history() = cons(cons(variables->histnum(), what), variables->history());
+  variables->histnum() = add1(variables->histnum());
 }
 
 /*
@@ -58,8 +58,8 @@ void top::addhist(lisp_t what)
  */
 void top::remhist()
 {
-  variables->history = variables->history->cdr();
-  variables->histnum = sub1(variables->histnum);
+  variables->history() = variables->history()->cdr();
+  variables->histnum() = sub1(variables->histnum());
 }
 
 /*
@@ -67,8 +67,8 @@ void top::remhist()
  */
 void top::trimhist()
 {
-  lisp_t hl = variables->history;
-  for(int i = 0; i < variables->histmax->intval() && !is_nil(hl); i++, hl = hl->cdr())
+  lisp_t hl = variables->history();
+  for(int i = 0; i < variables->histmax()->intval() && !is_nil(hl); i++, hl = hl->cdr())
     ;
   if(!is_nil(hl))
     rplacd(hl, nil);
@@ -157,7 +157,7 @@ void top::promptprint(lisp_t prompt)
   {
     if(c == '!')
     {
-      current_prompt += std::to_string(top::variables->histnum->intval());
+      current_prompt += std::to_string(top::variables->histnum()->intval());
       continue;
     }
     if(c == '\\')
@@ -182,15 +182,15 @@ lisp_t top::operator()(lisp_t exp)
     //
     if(_options.interactive)
     {
-      if(eval(variables->promptform) == C_ERROR)
+      if(eval(variables->promptform()) == C_ERROR)
       {
         print(mkstring("Error in promptform, reset to nil"), T);
-        variables->promptform = nil;
+        variables->promptform() = nil;
       }
       if(_level > 1)
-        promptprint(variables->brkprompt);
+        promptprint(variables->brkprompt());
       else
-        promptprint(variables->topprompt);
+        promptprint(variables->topprompt());
     }
     input_exp = readline(_file);
     if(input_exp == C_EOF)
@@ -239,7 +239,7 @@ lisp_t top::rmexcl(lisp_t stream)
   if(std::isspace(c) != 0)
     return C_EXCL;
   _echoline = true;
-  lisp_t tmp = histget(0, variables->history);
+  lisp_t tmp = histget(0, variables->history());
   switch(c)
   {
     case '!':
@@ -262,12 +262,12 @@ lisp_t top::rmexcl(lisp_t stream)
       auto at = io::ratom(stream->file());
       if(type_of(at) == object::type::Integer)
       {
-        tmp = histget(at->intval(), variables->history);
+        tmp = histget(at->intval(), variables->history());
         return tmp;
       }
       if(type_of(at) == object::type::Symbol)
       {
-        for(auto h: variables->history)
+        for(auto h: variables->history())
         {
           tmp = h->cdr();
           if(strncmp(tmp->car()->getstr().c_str(), at->getstr().c_str(), std::strlen(at->getstr().c_str())) == 0)

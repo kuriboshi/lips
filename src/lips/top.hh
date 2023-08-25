@@ -28,7 +28,7 @@ namespace lisp
 class top
 {
 public:
-  top(const options_t& options, ref_file_t file)
+  top(options_t options, ref_file_t file)
     : _options(options),
       _file(file)
   {}
@@ -64,25 +64,33 @@ private:
   {
   public:
     cvariables()
-      : history(initcvar("history", nil)),
-        histnum(initcvar("histnum", mknumber(1L))),
-        histmax(initcvar("histmax", mknumber(100L))),
-        topprompt(initcvar("prompt", mkstring("!_"))),
-        brkprompt(initcvar("brkprompt", mkstring("!:"))),
-        promptform(initcvar("promptform", nil))
+      : _history(makecvar("history", nil)),
+        _histnum(makecvar("histnum", mknumber(1L))),
+        _histmax(makecvar("histmax", mknumber(100L))),
+        _topprompt(makecvar("prompt", mkstring("!_"))),
+        _brkprompt(makecvar("brkprompt", mkstring("!:"))),
+        _promptform(makecvar("promptform", nil))
     {}
 
-    cvariable_t& history; // Holds the history list.
-    cvariable_t& histnum; // Current event number.
-    cvariable_t& histmax; // Maximum number of events to save.
-    cvariable_t& topprompt;
-    cvariable_t& brkprompt;
-    cvariable_t& promptform; // Evaluated before printing the prompt.
+    cvariable_t& history() const { return _history->cvariable(); }
+    cvariable_t& histnum() const { return _histnum->cvariable(); }
+    const cvariable_t& histmax() const { return _histmax->cvariable(); }
+    const cvariable_t& topprompt() const { return _topprompt->cvariable(); }
+    const cvariable_t& brkprompt() const { return _brkprompt->cvariable(); }
+    cvariable_t& promptform() const { return _promptform->cvariable(); }
+
+  private:
+    lisp_t _history;            // Holds the history list.
+    lisp_t _histnum;            // Current event number.
+    lisp_t _histmax;            // Maximum number of events to save.
+    lisp_t _topprompt;
+    lisp_t _brkprompt;
+    lisp_t _promptform;         // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables;
 
   static bool _echoline;
-  const options_t& _options;
+  options_t _options;
   ref_file_t _file;
   int _level = 0;
 };

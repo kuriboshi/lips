@@ -21,9 +21,9 @@ namespace lisp
 {
 
 env::env()
-  : path(initcvar("path", mungepath())),
-    home(initcvar("home", mkstring(get("HOME")))),
-    globsort(initcvar("globsort", T))
+  : _path(makecvar("path", mungepath())),
+    _home(makecvar("home", mkstring(get("HOME")))),
+    _globsort(makecvar("globsort", T))
 {}
 
 } // namespace lisp

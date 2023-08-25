@@ -194,7 +194,7 @@ public:
   lisp_t macro(token_t token) { return _ctx.read_table().macro(_input, token.token[0]); }
 
 private:
-  context& _ctx;
+  context& _ctx; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   ref_file_t _input;
   typename io::source::iterator _pos;
   token_t _token;
