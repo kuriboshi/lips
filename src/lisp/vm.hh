@@ -121,7 +121,7 @@ private:
     lisp_t value;
     operator lisp_t() const noexcept { return value; }
     lisp_t operator->() const noexcept { return value; }
-    lisp_t operator=(lisp_t v)
+    expr_t& operator=(lisp_t v)
     {
       value = v;
 #ifdef LIPS_ENABLE_TRACE
@@ -136,7 +136,7 @@ private:
     lisp_t value;
     operator lisp_t() const noexcept { return value; }
     lisp_t operator->() const noexcept { return value; }
-    lisp_t operator=(lisp_t v)
+    fun_t& operator=(lisp_t v)
     {
       value = v;
 #ifdef LIPS_ENABLE_TRACE
@@ -151,7 +151,7 @@ private:
     lisp_t value;
     operator lisp_t() const noexcept { return value; }
     lisp_t operator->() const noexcept { return value; }
-    lisp_t operator=(lisp_t v)
+    args_t& operator=(lisp_t v)
     {
       value = v;
 #ifdef LIPS_ENABLE_TRACE
