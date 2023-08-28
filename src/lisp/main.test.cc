@@ -31,66 +31,63 @@ TEST_CASE("main: incomplete input")
 {
   // An incomplete input expression is treated as ending with a super
   // parenthesis so there should be no error message in this case.
-  auto& ctx = context::current();
   std::ostringstream cout;
-  auto oldout = ctx.primout(ref_file_t::create(cout));
-  auto oldin = ctx.primin(ref_file_t::create(R"((print "hello")"));
+  auto oldout = vm::primout(ref_file_t::create(cout));
+  auto oldin = vm::primin(ref_file_t::create(R"((print "hello")"));
   std::ostringstream os;
   run(vm::get(), os);
   CHECK(os.str() == "");
   CHECK(cout.str() == R"(> "hello"
 "hello"
 > )");
-  ctx.primin(oldin);
-  ctx.primout(oldout);
+  vm::primin(oldin);
+  vm::primout(oldout);
 }
 
 TEST_CASE("main: exit")
 {
-  auto& ctx = context::current();
   std::ostringstream cout;
-  auto old = ctx.primout(ref_file_t::create(cout));
+  auto old = vm::primout(ref_file_t::create(cout));
   {
-    auto old = ctx.primin(ref_file_t::create(R"((exit))"));
+    auto old = vm::primin(ref_file_t::create(R"((exit))"));
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 0);
-    ctx.primin(old);
+    vm::primin(old);
   }
   {
-    auto old = ctx.primin(ref_file_t::create(R"((exit 99))"));
+    auto old = vm::primin(ref_file_t::create(R"((exit 99))"));
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 99);
-    ctx.primin(old);
+    vm::primin(old);
   }
-  ctx.primout(old);
+  vm::primout(old);
 }
 
 TEST_CASE("main: reset")
 {
-  auto& ctx = context::current();
   std::ostringstream cout;
-  auto old = ctx.primout(ref_file_t::create(cout));
+  auto old = vm::primout(ref_file_t::create(cout));
 
   SECTION("throw lisp_reset")
   {
     // The symbol 'foo' is undefined so this will throw a lisp_reset exception
     // which is caught by 'run' which returns 0.
-    auto old = ctx.primin(ref_file_t::create(R"((foo))"));
+    auto old = vm::primin(ref_file_t::create(R"((foo))"));
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 0);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("context interrupt")
   {
-    auto old = ctx.primin(ref_file_t::create(R"((plus 1 2))"));
+    auto old = vm::primin(ref_file_t::create(R"((plus 1 2))"));
     // This will cause abort to be called and a lisp_error exception to be
     // called.
     vm::get().interrupt = true;
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 0);
     vm::get().interrupt = false;
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("std::exception")
@@ -103,11 +100,11 @@ TEST_CASE("main: reset")
         throw std::runtime_error(a->string());
       },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-    auto old = ctx.primin(ref_file_t::create(R"((throw "exception"))"));
+    auto old = vm::primin(ref_file_t::create(R"((throw "exception"))"));
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 0);
     CHECK(os.str() == "exception: exception\n");
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("unwind")
@@ -128,14 +125,14 @@ TEST_CASE("main: reset")
       },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
     // Throw inside a lambda so that we have one environment.
-    auto old = ctx.primin(ref_file_t::create(R"(((lambda () (throw_unwind "throw_unwind"))))"));
+    auto old = vm::primin(ref_file_t::create(R"(((lambda () (throw_unwind "throw_unwind"))))"));
     std::ostringstream os;
     CHECK(run(vm::get(), os) == 0);
     CHECK(os.str() == "exception: throw_unwind\n");
-    ctx.primin(old);
+    vm::primin(old);
   }
 
-  ctx.primout(old);
+  vm::primout(old);
 }
 
 } // namespace lisp

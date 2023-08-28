@@ -45,12 +45,13 @@ using namespace lisp;
 using namespace std::literals;
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
-extern char** environ;
+extern char** environ; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 #endif
 
-bool insidefork = false; // Is nonzero in the child after a fork
+// Is nonzero in the child after a fork
+bool insidefork = false; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-static std::unordered_map<std::string, std::string> exechash;
+static std::unordered_map<std::string, std::string> exechash; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 namespace
 {
@@ -103,7 +104,7 @@ int mfork()
     if(insidefork)
       std::cerr << fmt::format("{}\n", std::error_code(errno, std::system_category()).message());
     else
-      context::current().primerr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::primerr()->format("{}\n", std::error_code(errno, std::system_category()).message());
     return pid;
   }
   if(!insidefork)
@@ -397,7 +398,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -432,7 +433,7 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -467,7 +468,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   {
     if(dup2(fd, oldfd) < 0)
     {
-      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmd);
@@ -495,7 +496,7 @@ lisp_t pipecmd(lisp_t cmds)
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1) // NOLINT
     {
-      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     if(pid = mfork(); pid == 0)
@@ -503,7 +504,7 @@ lisp_t pipecmd(lisp_t cmds)
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
       {
-        context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+        vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
         ::exit(1);
       }
       eval(cmds->car());
@@ -515,7 +516,7 @@ lisp_t pipecmd(lisp_t cmds)
     ::close(pd[1]);
     if(dup2(pd[0], 0) < 0)
     {
-      context::current().stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
+      vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
     eval(cmds->car());

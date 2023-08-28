@@ -62,7 +62,7 @@ inline constexpr auto GETENV = "getenv";          // get value of variable
 inline constexpr auto EXEC = "exec";              // overlay lips with command
 } // namespace lisp::pn
 
-extern bool insidefork;
+extern bool insidefork; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 extern void printdone();
 extern void checkfork();

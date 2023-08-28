@@ -26,7 +26,7 @@
 
 using namespace lisp;
 
-std::string current_prompt;
+std::string current_prompt; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 /*
  * History functions.
@@ -39,7 +39,7 @@ void top::phist()
   for(auto hl: variables->history())
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
-    prinbody(hl->cdr(), *context::current().stdout(), true);
+    io::prinbody(hl->cdr(), *vm::stdout(), io::escape::YES);
     primout()->terpri();
   }
 }
@@ -202,7 +202,7 @@ lisp_t top::operator()(lisp_t exp)
     top::addhist(input_exp);
     if(_echoline)
     {
-      prinbody(input_exp, *primout(), true);
+      io::prinbody(input_exp, *primout(), io::escape::YES);
       primout()->terpri();
     }
     bool printit = false; // If the result will be printed.
@@ -281,7 +281,7 @@ lisp_t top::rmexcl(lisp_t stream)
   return nil;
 }
 
-bool top::_echoline = false;
+bool top::_echoline = false; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 namespace lisp::pn
 {
@@ -297,8 +297,10 @@ void top::init()
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
 lisp_t top::input_exp; // The input expression.
 std::function<lisp_t(lisp_t)> top::transform_hook;
 std::function<void()> top::prompt_hook;
 lisp_t top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)

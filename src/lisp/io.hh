@@ -27,8 +27,8 @@
 
 #include <fmt/format.h>
 
-#include "context.hh"
 #include "types.hh"
+#include "vm.hh"
 
 namespace lisp::io
 {
@@ -37,9 +37,21 @@ lisp_t lispread(ref_file_t);
 lisp_t readline(ref_file_t);
 lisp_t getline(lisp_t);
 
-lisp_t patom(lisp_t, file_t&, bool esc = false);
-lisp_t prinbody(lisp_t, file_t&, bool esc = false);
-lisp_t prin0(lisp_t, file_t&, bool esc = false);
+enum class output
+{
+  PRIMARY,
+  ERROR
+};
+
+enum class escape
+{
+  YES,
+  NO
+};
+
+lisp_t patom(lisp_t, file_t&, enum escape esc = escape::NO);
+lisp_t prinbody(lisp_t, file_t&, enum escape esc = escape::NO, std::int64_t = 0);
+lisp_t prin0(lisp_t, file_t&, enum escape esc = escape::NO, std::int64_t = 0);
 lisp_t print(lisp_t, file_t&);
 lisp_t terpri(file_t&);
 
@@ -140,7 +152,7 @@ public:
   sink() = default;
   virtual ~sink() = default;
 
-  virtual void putch(char, bool esc = false) = 0;
+  virtual void putch(char, enum escape esc) = 0;
   virtual void puts(std::string_view) = 0;
   virtual void terpri() = 0;
   virtual void flush() = 0;
@@ -150,9 +162,9 @@ protected:
   //
   // Put a character c, on stream file, escaping enabled if esc is true.
   //
-  static void putch(char c, std::ostream& file, bool esc)
+  static void putch(char c, std::ostream& file, enum escape esc)
   {
-    if(esc && (c == '(' || c == '"' || c == ')' || c == '\\'))
+    if(esc == escape::YES && (c == '(' || c == '"' || c == ')' || c == '\\'))
       pputc('\\', file);
     pputc(c, file);
   }
@@ -178,7 +190,7 @@ public:
 
   using sink::putch;
 
-  void putch(char c, bool esc) override { putch(c, *_file, esc); }
+  void putch(char c, enum escape esc) override { putch(c, *_file, esc); }
   void puts(std::string_view s) override { _file->write(s.data(), static_cast<std::streamsize>(s.size())); }
   void terpri() override { _file->put('\n'); }
   void flush() override { _file->flush(); }
@@ -202,7 +214,7 @@ public:
 
   using sink::putch;
 
-  void putch(char c, bool esc) override { putch(c, _stream, esc); }
+  void putch(char c, enum escape esc) override { putch(c, _stream, esc); }
   void puts(std::string_view s) override { _stream.write(s.data(), static_cast<std::streamsize>(s.size())); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
@@ -221,7 +233,7 @@ public:
 
   std::string string() const { return _stream.str(); }
 
-  void putch(char c, bool esc) override { putch(c, _stream, esc); }
+  void putch(char c, enum escape esc) override { putch(c, _stream, esc); }
   void puts(std::string_view s) override { _stream.write(s.data(), static_cast<std::streamsize>(s.size())); }
   void terpri() override { _stream.put('\n'); }
   void flush() override { _stream.flush(); }
@@ -280,7 +292,7 @@ public:
 
   // sink
   io::sink& sink() { return *_sink; }
-  void putch(char c, bool esc = false)
+  void putch(char c, io::escape esc = io::escape::NO)
   {
     ptrcheck<io::sink>();
     _sink->putch(c, esc);
@@ -346,35 +358,30 @@ inline lisp_t lispread(const std::string& s)
 inline lisp_t readline(ref_file_t f) { return io::readline(f); }
 inline lisp_t getline(lisp_t f) { return io::getline(f); }
 
-inline lisp_t patom(lisp_t a, file_t& f, bool esc = false) { return io::patom(a, f, esc); }
-inline lisp_t patom(lisp_t a, bool out = false, bool esc = false)
+inline lisp_t patom(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::patom(a, f, esc); }
+inline lisp_t patom(lisp_t a, io::output out, enum io::escape esc = io::escape::NO)
 {
-  auto& ctx = context::current();
-  return io::patom(a, out ? *ctx.primerr() : *ctx.primout(), esc);
+  return io::patom(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
 inline lisp_t terpri(file_t& f) { return io::terpri(f); }
-inline lisp_t terpri(bool out = false)
+inline lisp_t terpri(io::output out = io::output::PRIMARY)
 {
-  auto& ctx = context::current();
-  return io::terpri(out ? *ctx.primerr() : *ctx.primout());
+  return io::terpri(out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
 }
-inline lisp_t prinbody(lisp_t a, file_t& f, bool esc = false) { return io::prinbody(a, f, esc); }
-inline lisp_t prinbody(lisp_t a, bool out = false, bool esc = false)
+inline lisp_t prinbody(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::prinbody(a, f, esc); }
+inline lisp_t prinbody(lisp_t a, io::output out, io::escape esc = io::escape::NO)
 {
-  auto& ctx = context::current();
-  return io::prinbody(a, out ? *ctx.primerr() : *ctx.primout(), esc);
+  return io::prinbody(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
-inline lisp_t prin0(lisp_t a, file_t& f, bool esc = false) { return io::prin0(a, f, esc); }
-inline lisp_t prin0(lisp_t a, bool out = false, bool esc = false)
+inline lisp_t prin0(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::prin0(a, f, esc); }
+inline lisp_t prin0(lisp_t a, io::output out = io::output::PRIMARY, enum io::escape esc = io::escape::NO)
 {
-  auto& ctx = context::current();
-  return io::prin0(a, out ? *ctx.primerr() : *ctx.primout(), esc);
+  return io::prin0(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
 inline lisp_t print(lisp_t a, file_t& f) { return io::print(a, f); }
-inline lisp_t print(lisp_t a, bool out = false)
+inline lisp_t print(lisp_t a, io::output out = io::output::PRIMARY)
 {
-  auto& ctx = context::current();
-  return io::print(a, out ? *ctx.primerr() : *ctx.primout());
+  return io::print(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
 }
 
 template<typename T>
@@ -395,7 +402,7 @@ inline lisp_t operator"" _l(const char* s, std::size_t)
 inline std::ostream& operator<<(std::ostream& os, const lisp::lisp_t& obj)
 {
   lisp::file_t out(os);
-  prin0(obj, out, true);
+  lisp::prin0(obj, out, lisp::io::escape::YES);
   return os;
 }
 

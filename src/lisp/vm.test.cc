@@ -126,13 +126,12 @@ TEST_CASE("eval: topofstack")
 
 TEST_CASE("eval: control limits")
 {
-  auto& ctx = context::current();
   std::ostringstream err;
-  auto old = ctx.primerr(ref_file_t::create(err));
+  auto old = vm::primerr(ref_file_t::create(err));
   "(defineq (f (lambda () (f))))"_e;
   CHECK_THROWS_WITH("(f)"_e, "Abort");
   CHECK(err.str() == "Stack overflow [in f]\n");
-  ctx.primerr(old);
+  vm::primerr(old);
 }
 
 TEST_CASE("eval: undefhook")
@@ -229,9 +228,8 @@ TEST_CASE("eval: illegal apply")
 
 TEST_CASE("eval: backtrace")
 {
-  auto& ctx = context::current();
   std::ostringstream err;
-  auto old = ctx.primerr(ref_file_t::create(err));
+  auto old = vm::primerr(ref_file_t::create(err));
   auto result = R"(
 ((lambda (a b)
   (a)
@@ -269,7 +267,7 @@ TEST_CASE("eval: backtrace")
     CHECK(std::getline(is, line));
     CHECK_THAT(line, Matches(e));
   }
-  ctx.primerr(old);
+  vm::primerr(old);
 }
 
 TEST_CASE("eval: backtrace, topofstack, destblock")

@@ -18,7 +18,7 @@
 #ifndef LISP_CHECK_HH
 #define LISP_CHECK_HH
 
-#include "context.hh"
+#include "vm.hh"
 #include "error.hh"
 #include "types.hh"
 

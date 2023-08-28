@@ -32,7 +32,7 @@ namespace lisp
 {
 class object;
 using lisp_t = ref_ptr<object>;
-extern lisp_t C_UNBOUND;
+extern const lisp_t C_UNBOUND;
 
 namespace symbol
 {
@@ -64,11 +64,11 @@ public:
   bool constant = false; // If true this is a constant which can't be set
 
   /// @brief The new and delete operators uses the global pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(symbol_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(symbol_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
-  static std::size_t freecount() { return _pool.size(); }
+  static std::size_t freecount() { return pool().size(); }
 
   static symbol_t* intern(std::string_view pname)
   {
@@ -104,7 +104,11 @@ private:
   friend void pool_test();
 
   using pool_t = pool<symbol_t, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
 
 using ref_symbol_t = ref_ptr<symbol_t>;

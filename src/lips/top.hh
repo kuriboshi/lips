@@ -53,12 +53,15 @@ public:
   // Read table functions
   static lisp_t rmexcl(lisp_t);
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
   static lisp_t input_exp;
   static std::function<lisp_t(lisp_t)> transform_hook; // Applied on input if non-nullptr.
   static std::function<void()> prompt_hook;            // Called before the prompt is printed.
+  // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 private:
-  static lisp_t alias_expanded; //For checking alias loops.
+  // @brief For checking alias loops.
+  static lisp_t alias_expanded; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
   class cvariables
   {
@@ -87,9 +90,9 @@ private:
     lisp_t _brkprompt;
     lisp_t _promptform;         // Evaluated before printing the prompt.
   };
-  static std::unique_ptr<cvariables> variables;
+  static std::unique_ptr<cvariables> variables; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-  static bool _echoline;
+  static bool _echoline; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
   options_t _options;
   ref_file_t _file;
   int _level = 0;
@@ -97,6 +100,6 @@ private:
 
 } // namespace lisp
 
-extern std::string current_prompt;
+extern std::string current_prompt; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 #endif

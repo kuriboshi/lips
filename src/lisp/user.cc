@@ -80,7 +80,7 @@ inline lisp_t checkfn(lisp_t name, lisp_t lam)
       if(is_nil(t))
       {
         putprop(name, C_OLDDEF, name->value());
-        if(!is_nil(context::current().verbose()))
+        if(!is_nil(vm::verbose()))
           print(cons(name, cons(C_REDEFINED, nil)));
       }
     }

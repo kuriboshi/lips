@@ -48,9 +48,10 @@ int main(int argc, const char** argv)
       | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
     session.cli(cli);
     session.applyCommandLine(argc, argv);
+#if 0
     try
     {
-      lisp::context::current();
+      lisp::vm::get().context();
       // This exception is never thrown
       throw std::runtime_error("lisp::context::current didn't throw an exception");
     }
@@ -61,6 +62,7 @@ int main(int argc, const char** argv)
       if(s0 != s1)
         throw;
     }
+#endif
     try
     {
       lisp::vm::get();
@@ -74,15 +76,15 @@ int main(int argc, const char** argv)
       if(s0 != s1)
         throw;
     }
-    lisp::context ctx;
-    lisp::vm vm(ctx);
+    auto context = std::make_shared<lisp::context_t>();
+    lisp::vm_t vm(context);
     std::ostringstream os;
     auto quiet = lisp::ref_file_t::create(os);
-    ctx.primerr(quiet);
+    context->primerr(quiet);
     if(!loadpath.empty())
     {
       auto path = buildpath(loadpath.begin(), loadpath.end());
-      ctx.loadpath(path);
+      context->loadpath(path);
     }
     for(auto i: load)
       lisp::loadfile(i);

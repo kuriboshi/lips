@@ -26,30 +26,46 @@
 #include <functional>
 #include <variant>
 
+#include "context.hh"
+#include "syntax.hh"
 #include "types.hh"
 
 namespace lisp
 {
-class vm final
+class vm
 {
 public:
-  /// @brief Lisp virtual machine constructor.
-  ///
-  /// @details The lisp virtual machine doesn't store the context. The
-  /// parameter is only there to ensure that the context is created since it's
-  /// used implicitly by the virtual machine.
-  ///
-  /// @param ctx The context object.
-  vm(context& ctx);
-  /// @brief The destructor.
-  ~vm();
+  vm() = default;
+  virtual ~vm() = default;
 
-  static vm& get()
-  {
-    if(_current == nullptr)
-      throw std::runtime_error("lisp::vm has not been created");
-    return *_current;
-  }
+  static ref_file_t primout() { return get().do_primout(); }
+  static ref_file_t primerr() { return get().do_primerr(); }
+  static ref_file_t primin() { return get().do_primin(); }
+  static ref_file_t primout(ref_file_t f) { return get().do_primout(f); }
+  static ref_file_t primerr(ref_file_t f) { return get().do_primerr(f); }
+  static ref_file_t primin(ref_file_t f) { return get().do_primin(f); }
+  static ref_file_t stdout() { return get().do_stdout(); }
+  static ref_file_t stderr() { return get().do_stderr(); }
+  static ref_file_t stdin() { return get().do_stdin(); }
+
+  static syntax& read_table() { return get().do_read_table(); }
+  static void read_table(std::unique_ptr<syntax> syntax) { get().do_read_table(std::move(syntax)); }
+
+  static lisp_t perror(std::error_code code) { return get().do_perror(code); }
+  static lisp_t perror(std::error_code code, lisp_t a) { return get().do_perror(code, a); }
+  static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, a); }
+  static void fatal(std::error_code code) { get().do_fatal(code); }
+  template<typename... Ts>
+  static void fatal(std::error_code code, const Ts&... a) { get().do_fatal(code, cat(a...)); }
+
+  static const cvariable_t& currentbase() { return get().do_currentbase(); }
+  static const cvariable_t& verbose() { return get().do_verbose(); }
+  static const cvariable_t& loadpath() { return get().do_loadpath(); }
+  static void loadpath(lisp_t path) { get().do_loadpath(path); }
+  static std::string version() { return C_VERSION->value()->getstr(); }
+
+  static std::int64_t printlevel() { return get().do_printlevel(); }
+  static void printlevel(std::int64_t pl) { get().do_printlevel(pl); }
 
   /// @brief This is the LISP vm.
   ///
@@ -110,7 +126,60 @@ public:
 
   destblock_t* environment() const { return _env; }
 
+  static vm& get()
+  {
+    if(set(nullptr) == nullptr)
+      throw std::runtime_error("lisp::vm has not been created");
+    return *set(nullptr);
+  }
+
+protected:
+  static vm* set(vm* ptr);
+
+  virtual ref_file_t do_primout() = 0;
+  virtual ref_file_t do_primerr() = 0;
+  virtual ref_file_t do_primin() = 0;
+  virtual ref_file_t do_primout(ref_file_t f) = 0;
+  virtual ref_file_t do_primerr(ref_file_t f) = 0;
+  virtual ref_file_t do_primin(ref_file_t f) = 0;
+  virtual ref_file_t do_stdout() = 0;
+  virtual ref_file_t do_stderr() = 0;
+  virtual ref_file_t do_stdin() = 0;
+
+  virtual syntax& do_read_table() = 0;
+  virtual void do_read_table(std::unique_ptr<syntax> syntax) = 0;
+
+  virtual lisp_t do_perror(std::error_code code) = 0;
+  virtual lisp_t do_perror(std::error_code code, lisp_t a) = 0;
+  virtual lisp_t do_error(std::error_code code, lisp_t a) = 0;
+  virtual void do_fatal(std::error_code code) = 0;
+  virtual void do_fatal(std::error_code code, const std::string& a) = 0;
+
+  virtual const cvariable_t& do_currentbase() = 0;
+  virtual const cvariable_t& do_verbose() = 0;
+  virtual const cvariable_t& do_loadpath() = 0;
+  virtual void do_loadpath(lisp_t path) = 0;
+
+  virtual std::int64_t do_printlevel() const = 0;
+  virtual void do_printlevel(std::int64_t) = 0;
+
 private:
+  template<typename T>
+  static std::string cat(const T& arg)
+  {
+    std::ostringstream os;
+    os << arg;
+    return os.str();
+  }
+
+  template<typename T, typename... Ts>
+  static std::string cat(const T& first, const Ts&... args)
+  {
+    std::ostringstream os;
+    os << first << " " << cat(args...);
+    return os.str();
+  }
+
   //
   // The control stack.
   //
@@ -293,8 +362,60 @@ private:
   std::array<destblock_t, DESTBLOCKSIZE> _destblock;
   /// @brief Index to last slot in destblock.
   int _destblockused = 0;
+};
 
-  static vm* _current;
+template<typename Context>
+class vm_t final : public vm
+{
+public:
+  // using type = vm_t<Context>;
+  // using Context = context_t;
+  /// @brief Lisp virtual machine constructor.
+  ///
+  /// @param context The context object.
+  explicit vm_t(std::shared_ptr<Context> context)
+    : _context(context)
+  {
+    vm::set(this);
+  }
+
+  /// @brief The destructor.
+  ~vm_t() override = default;
+
+  std::shared_ptr<Context> context() const { return _context; }
+
+private:
+  ref_file_t do_primout() override { return _context->primout(); }
+  ref_file_t do_primerr() override { return _context->primerr(); }
+  ref_file_t do_primin() override { return _context->primin(); }
+  ref_file_t do_primout(ref_file_t f) override { return _context->primout(f); }
+  ref_file_t do_primerr(ref_file_t f) override { return _context->primerr(f); }
+  ref_file_t do_primin(ref_file_t f) override { return _context->primin(f); }
+  ref_file_t do_stdout() override { return _context->stdout(); }
+  ref_file_t do_stderr() override { return _context->stderr(); }
+  ref_file_t do_stdin() override { return _context->stdin(); }
+
+  syntax& do_read_table() override { return _context->read_table(); }
+  void do_read_table(std::unique_ptr<syntax> syntax) override { _context->read_table(std::move(syntax)); }
+
+  lisp_t do_perror(std::error_code code) override { return _context->perror(code); }
+  lisp_t do_perror(std::error_code code, lisp_t a) override { return _context->perror(code, a); }
+  lisp_t do_error(std::error_code code, lisp_t a) override { return _context->error(code, a); }
+  void do_fatal(std::error_code code) override { _context->fatal(code); }
+  void do_fatal(std::error_code code, const std::string& a) override
+  {
+    _context->fatal(code, a);
+  }
+
+  const cvariable_t& do_currentbase() override { return _context->currentbase(); }
+  const cvariable_t& do_verbose() override { return _context->verbose(); }
+  const cvariable_t& do_loadpath() override { return _context->loadpath(); }
+  void do_loadpath(lisp_t path) override { _context->loadpath(path); }
+
+  std::int64_t do_printlevel() const override { return _context->printlevel(); }
+  void do_printlevel(std::int64_t pl) override { _context->printlevel(pl); }
+
+  std::shared_ptr<Context> _context;
 };
 
 inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(fun); }
@@ -307,6 +428,14 @@ inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args)
 inline lisp_t backtrace() { return vm::get().backtrace(); }
 inline lisp_t topofstack() { return vm::get().topofstack(); }
 inline lisp_t destblock(lisp_t a) { return vm::destblock(a); }
+
+inline lisp_t perror(std::error_code code, lisp_t a) { return vm::perror(code, a); }
+inline lisp_t error(std::error_code code, lisp_t a) { return vm::error(code, a); }
+template<typename... Ts>
+inline void fatal(std::error_code code, const Ts&... a)
+{
+  return vm::fatal(code, a...);
+}
 
 } // namespace lisp
 

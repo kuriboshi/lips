@@ -68,8 +68,6 @@ void term_source::init_keymap()
   key_tab[static_cast<int>('"')] = term_fun::T_STRING;
 }
 
-struct termios term_source::oldterm;
-
 /* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
 {

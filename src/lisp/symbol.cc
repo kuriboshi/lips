@@ -19,5 +19,4 @@
 
 namespace lisp::symbol
 {
-symbol_t::pool_t symbol_t::_pool;
 }

@@ -46,11 +46,10 @@ namespace lisp
 
 TEST_CASE("io: basic i/o")
 {
-  auto& ctx = context::current();
-  auto old = ctx.primout(ref_file_t::create(std::make_unique<io::string_sink>()));
-  ctx.primout()->format("hello world {}", 123);
-  CHECK(to_string(ctx.primout()->sink()) == std::string("hello world 123"));
-  ctx.primout(old);
+  auto old = vm::primout(ref_file_t::create(std::make_unique<io::string_sink>()));
+  vm::primout()->format("hello world {}", 123);
+  CHECK(to_string(vm::primout()->sink()) == std::string("hello world 123"));
+  vm::primout(old);
 }
 
 TEST_CASE("io: ratom")
@@ -322,7 +321,7 @@ TEST_CASE("io: sink")
   SECTION("io::string_sink")
   {
     io::string_sink ss;
-    ss.putch('\03', false);
+    ss.putch('\03', io::escape::NO);
     ss.terpri();
     ss.close();
     CHECK(ss.string() == "^C\n");
@@ -331,44 +330,42 @@ TEST_CASE("io: sink")
 
 TEST_CASE("io: patom primout/primerr")
 {
-  auto& ctx = context::current();
   {
     std::ostringstream out;
-    auto old = ctx.primout(ref_file_t::create(out));
-    patom("foo"_a, false);
-    terpri(false);
+    auto old = vm::primout(ref_file_t::create(out));
+    patom("foo"_a, io::output::PRIMARY);
+    terpri(io::output::PRIMARY);
     CHECK(out.str() == "foo\n");
-    ctx.primout(old);
+    vm::primout(old);
   }
   {
     std::ostringstream err;
-    auto old = ctx.primerr(ref_file_t::create(err));
-    patom("bar"_a, true);
-    terpri(true);
+    auto old = vm::primerr(ref_file_t::create(err));
+    patom("bar"_a, io::output::ERROR);
+    terpri(io::output::ERROR);
     CHECK(err.str() == "bar\n");
-    ctx.primerr(old);
+    vm::primerr(old);
   }
   {
     std::ostringstream out;
-    auto old = ctx.primout(ref_file_t::create(out));
-    patom("foo"_a, false);
-    terpri(false);
+    auto old = vm::primout(ref_file_t::create(out));
+    patom("foo"_a, io::output::PRIMARY);
+    terpri(io::output::PRIMARY);
     CHECK(out.str() == "foo\n");
-    ctx.primout(old);
+    vm::primout(old);
   }
   {
     std::ostringstream err;
-    auto old = ctx.primerr(ref_file_t::create(err));
-    patom("bar"_a, true);
-    terpri(true);
+    auto old = vm::primerr(ref_file_t::create(err));
+    patom("bar"_a, io::output::ERROR);
+    terpri(io::output::ERROR);
     CHECK(err.str() == "bar\n");
-    ctx.primerr(old);
+    vm::primerr(old);
   }
 }
 
 TEST_CASE("io: prinbody")
 {
-  auto& ctx = context::current();
   auto list = "(a b c . d)"_l;
   {
     std::ostringstream os;
@@ -384,31 +381,31 @@ TEST_CASE("io: prinbody")
   }
   {
     std::ostringstream os;
-    auto old = ctx.primout(ref_file_t::create(os));
-    prinbody(list, false);
+    auto old = vm::primout(ref_file_t::create(os));
+    prinbody(list, io::output::PRIMARY);
     CHECK(os.str() == "a b c . d");
-    ctx.primout(old);
+    vm::primout(old);
   }
   {
     std::ostringstream os;
-    auto old = ctx.primerr(ref_file_t::create(os));
-    prinbody(list, true);
+    auto old = vm::primerr(ref_file_t::create(os));
+    prinbody(list, io::output::ERROR);
     CHECK(os.str() == "a b c . d");
-    ctx.primerr(old);
+    vm::primerr(old);
   }
   {
     std::ostringstream os;
-    auto old = ctx.primout(ref_file_t::create(os));
-    prinbody(list, false);
+    auto old = vm::primout(ref_file_t::create(os));
+    prinbody(list, io::output::PRIMARY);
     CHECK(os.str() == "a b c . d");
-    ctx.primout(old);
+    vm::primout(old);
   }
   {
     std::ostringstream os;
-    auto old = ctx.primerr(ref_file_t::create(os));
-    prinbody(list, true);
+    auto old = vm::primerr(ref_file_t::create(os));
+    prinbody(list, io::output::ERROR);
     CHECK(os.str() == "a b c . d");
-    ctx.primerr(old);
+    vm::primerr(old);
   }
 }
 
@@ -483,10 +480,10 @@ TEST_CASE("io: prin0")
   {
     std::ostringstream os;
     auto out = ref_file_t::create(os);
-    auto old = context::current().primerr(out);
-    prin0(nil, true);
+    auto old = vm::primerr(out);
+    prin0(nil, io::output::ERROR);
     CHECK(os.str() == "nil");
-    context::current().primerr(old);
+    vm::primerr(old);
   }
 }
 
@@ -494,10 +491,10 @@ TEST_CASE("io: print")
 {
   std::ostringstream os;
   auto out = ref_file_t::create(os);
-  auto old = context::current().primerr(out);
-  print(nil, true);
+  auto old = vm::primerr(out);
+  print(nil, io::output::ERROR);
   CHECK(os.str() == "nil\n");
-  context::current().primerr(old);
+  vm::primerr(old);
 }
 
 TEST_CASE("io: splice")

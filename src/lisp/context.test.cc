@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "context.hh"
 #include "io.hh"
 #include "syntax.hh"
+#include "vm.hh"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -26,8 +26,8 @@ namespace lisp
 
 TEST_CASE("context: fatal error")
 {
-  CHECK_THROWS(context::current().fatal(error_errc::user_error, "user", "error"));
-  CHECK_THROWS(context::current().fatal(error_errc::user_error));
+  CHECK_THROWS(vm::fatal(error_errc::user_error, "user", "error"));
+  CHECK_THROWS(vm::fatal(error_errc::user_error));
   CHECK_THROWS(fatal(error_errc::user_error, "user", "error"));
   CHECK_THROWS(fatal(error_errc::user_error));
   CHECK(perror(error_errc::user_error, nil) == nil);
@@ -35,11 +35,11 @@ TEST_CASE("context: fatal error")
 
 TEST_CASE("context: stdin, stdout, stderr")
 {
-  CHECK(context::current().stdin() != nullptr);
-  CHECK(context::current().stdout() != nullptr);
-  CHECK(context::current().stderr() != nullptr);
+  CHECK(vm::stdin() != nullptr);
+  CHECK(vm::stdout() != nullptr);
+  CHECK(vm::stderr() != nullptr);
 }
 
-TEST_CASE("context: syntax") { context::current().read_table(std::make_unique<syntax>()); }
+TEST_CASE("context: syntax") { vm::read_table(std::make_unique<syntax>()); }
 
 } // namespace lisp

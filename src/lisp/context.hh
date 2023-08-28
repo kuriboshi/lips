@@ -31,14 +31,11 @@ class syntax;
 class file_t;
 using ref_file_t = ref_ptr<file_t>;
 
-extern lisp_t C_VERSION;
-
-class context final
+class context_t final
 {
 public:
-  context();
-  ~context();
-  static context& current();
+  context_t();
+  ~context_t();
 
   syntax& read_table();
   void read_table(std::unique_ptr<syntax>);
@@ -53,59 +50,36 @@ public:
   ref_file_t stderr() const;
   ref_file_t stdin() const;
 
-  lisp_t perror(std::error_code) const;
-  lisp_t perror(std::error_code, lisp_t) const;
-  lisp_t error(std::error_code, lisp_t) const;
-
-  static void fatal(std::error_code error) { throw lisp_error(error); }
-
-  template<typename... Ts>
-  void fatal(std::error_code error, const Ts&... args)
-  {
-    throw lisp_error(error, cat(args...));
-  }
-
   // Used by lisp::io
-  std::int64_t printlevel = 0;
-  std::int64_t thisplevel = 0;
+  std::int64_t printlevel() const { return _printlevel; }
+  void printlevel(std::int64_t pl) { _printlevel = pl; }
 
   const cvariable_t& currentbase() const;
   const cvariable_t& verbose() const;
   const cvariable_t& loadpath() const;
   void loadpath(lisp_t);
-  static std::string version() { return C_VERSION->value()->getstr(); }
+
+  lisp_t perror(std::error_code) const;
+  lisp_t perror(std::error_code, lisp_t) const;
+  lisp_t error(std::error_code, lisp_t) const;
+  static lisp_t fatal(std::error_code error)
+  {
+    throw lisp_error(error);
+  }
+  static lisp_t fatal(std::error_code error, const std::string& a)
+  {
+    throw lisp_error(error, a);
+  }
 
 private:
-  template<typename T>
-  std::string cat(const T& arg)
-  {
-    std::ostringstream os;
-    os << arg;
-    return os.str();
-  }
-
-  template<typename T, typename... Ts>
-  std::string cat(const T& first, const Ts&... args)
-  {
-    std::ostringstream os;
-    os << first << " " << cat(args...);
-    return os.str();
-  }
-
   class impl;
   std::unique_ptr<impl> _pimpl;
-  static context* _current;
+  std::int64_t _printlevel{0};
 
   static const constexpr std::int64_t default_base = 10;
-};
 
-inline lisp_t perror(std::error_code code, lisp_t a) { return context::current().perror(code, a); }
-inline lisp_t error(std::error_code code, lisp_t a) { return context::current().error(code, a); }
-template<typename... Ts>
-inline void fatal(std::error_code code, const Ts&... a)
-{
-  return context::current().fatal(code, a...);
-}
+  friend class vm;
+};
 
 } // namespace lisp
 

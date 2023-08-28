@@ -30,23 +30,22 @@ namespace lisp
 
 TEST_CASE("repl: interactive tests")
 {
-  auto& ctx = context::current();
   std::ostringstream cout;
-  auto oldout = ctx.primout(ref_file_t::create(cout));
+  auto oldout = vm::primout(ref_file_t::create(cout));
 
   std::ostringstream cerr;
-  auto olderr = ctx.primerr(ref_file_t::create(cerr));
+  auto olderr = vm::primerr(ref_file_t::create(cerr));
 
   SECTION("Simple repl")
   {
-    auto old = ctx.primin(ref_file_t::create(R"((print "hello"))"));
+    auto old = vm::primin(ref_file_t::create(R"((print "hello"))"));
     repl repl(vm::get());
     repl(nil);
     std::string expected = R"(> "hello"
 "hello"
 > )";
     CHECK(cout.str() == expected);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("Example interaction")
@@ -56,7 +55,7 @@ TEST_CASE("repl: interactive tests")
 (setq a 100)
 a
 )";
-    auto old = ctx.primin(ref_file_t::create(is));
+    auto old = vm::primin(ref_file_t::create(is));
     repl repl(vm::get());
     repl(nil);
     std::string expected = R"(> nil
@@ -64,7 +63,7 @@ a
 > 100
 > )";
     CHECK(cout.str() == expected);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("Break repl (reset)")
@@ -72,7 +71,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (reset)
 )";
-    auto old = ctx.primin(ref_file_t::create(is));
+    auto old = vm::primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     CHECK_THROWS(repl(nil));
@@ -82,7 +81,7 @@ a
     std::string expected_out = R"(> 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("Break repl (bt)")
@@ -91,7 +90,7 @@ a
 (bt)
 (reset)
 )";
-    auto old = ctx.primin(ref_file_t::create(is));
+    auto old = vm::primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     CHECK_THROWS(repl(nil));
@@ -105,7 +104,7 @@ a
     std::string expected_out = R"(> 1: 1: )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("Break repl (return)")
@@ -113,7 +112,7 @@ a
     std::string is = R"(((lambda () (xyzzy)))
 (return "hello")
 )";
-    auto old = ctx.primin(ref_file_t::create(is));
+    auto old = vm::primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     repl(nil);
@@ -124,7 +123,7 @@ a
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
   SECTION("help")
@@ -133,7 +132,7 @@ a
 help
 (return nil)
 )";
-    auto old = ctx.primin(ref_file_t::create(is));
+    auto old = vm::primin(ref_file_t::create(is));
     repl repl(vm::get());
     vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
     repl(nil);
@@ -148,11 +147,11 @@ help
 > )";
     CHECK(cout.str() == expected_out);
     CHECK(cerr.str() == expected_err);
-    ctx.primin(old);
+    vm::primin(old);
   }
 
-  ctx.primerr(olderr);
-  ctx.primout(oldout);
+  vm::primerr(olderr);
+  vm::primout(oldout);
 }
 
 } // namespace lisp

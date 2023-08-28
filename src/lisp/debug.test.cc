@@ -26,7 +26,6 @@ namespace lisp
 
 TEST_CASE("debug: debug functions")
 {
-  auto& ctx = context::current();
   auto t = vm::get().trace();
   CHECK(!t);
   evaltrace(T);

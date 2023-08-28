@@ -32,8 +32,8 @@ void repl::main_loop()
 {
   while(true)
   {
-    context::current().primout()->format("> ");
-    auto expr = lispread(context::current().primin());
+    vm::primout()->format("> ");
+    auto expr = lispread(vm::primin());
     if(expr == C_EOF)
       break;
     auto result = eval(expr);
@@ -51,8 +51,8 @@ lisp_t repl::operator()(lisp_t exp)
   }
   while(true)
   {
-    context::current().primout()->format("{}: ", _level);
-    auto com = lispread(context::current().primin());
+    vm::primout()->format("{}: ", _level);
+    auto com = lispread(vm::primin());
     if(com == C_EOF)
       break;
     /* OK, EVAL, ^, ... */

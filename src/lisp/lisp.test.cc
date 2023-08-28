@@ -93,7 +93,7 @@ TEST_CASE("lisp: type_of")
 
 TEST_CASE("lisp: version")
 {
-  auto version = context::current().version();
+  auto version = vm::version();
   CHECK(version == VERSION);
 }
 
@@ -175,12 +175,6 @@ TEST_CASE("lisp: iter")
     // nil value.
     CHECK(is_nil(*end(list)));
   }
-}
-
-TEST_CASE("lisp: create lisp twice")
-{
-  auto f = []() { context c; };
-  CHECK_THROWS_WITH(f(), "context::context called twice");
 }
 
 TEST_CASE("lisp: new object")

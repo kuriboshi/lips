@@ -61,11 +61,11 @@ public:
   lisp_t cdr = nil;
 
   /// @brief The new and delete operators uses the global pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(cons_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(cons_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
-  static std::size_t freecount() { return _pool.size(); }
+  static std::size_t freecount() { return pool().size(); }
 
 private:
   cons_t(pool_test_t) { throw std::runtime_error("cons_t"); }
@@ -73,7 +73,11 @@ private:
   friend void pool_test();
 
   using pool_t = pool<cons_t, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
 
 /// @brief Destination block is used to collect the parameters to a function.
@@ -202,11 +206,13 @@ private:
 
   std::variant<func0_t, func1_t, func2_t, func3_t> _fun;
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
   /// @brief Maps a print name to the subr index.
   static std::unordered_map<std::string, subr_index> subr_map;
   /// @brief Each primitive function is stored in a vector and the subr_index
   /// is the index into this vector.
   static subr_vector subr_store;
+  // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 };
 
 inline subr_t::subr_index subr_t::put(const subr_t& subr)
@@ -255,11 +261,11 @@ public:
   bool eval = true;
 
   /// @brief The new and delete operators uses the global pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(lambda_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(lambda_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
-  static std::size_t freecount() { return _pool.size(); }
+  static std::size_t freecount() { return pool().size(); }
 
 private:
   lambda_t(pool_test_t) { throw std::runtime_error("lambda_t"); }
@@ -267,7 +273,11 @@ private:
   friend void pool_test();
 
   using pool_t = pool<lambda_t, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
 
 /// @brief A closure (static binding).
@@ -284,11 +294,11 @@ public:
   std::uint8_t count = 0;
 
   /// @brief The new and delete operators uses the global pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(closure_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(closure_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
-  static std::size_t freecount() { return _pool.size(); }
+  static std::size_t freecount() { return pool().size(); }
 
 private:
   closure_t(pool_test_t) { throw std::runtime_error("closure_t"); }
@@ -296,7 +306,11 @@ private:
   friend void pool_test();
 
   using pool_t = pool<closure_t, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
 
 class string_t final: public ref_count<string_t>
@@ -311,11 +325,11 @@ public:
   std::string string;
 
   /// @brief The new and delete operators uses the global pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(string_t* x, std::destroying_delete_t) { _pool.deallocate(x); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(string_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
-  static std::size_t freecount() { return _pool.size(); }
+  static std::size_t freecount() { return pool().size(); }
 
 private:
   string_t(pool_test_t) { throw std::runtime_error("string_t"); }
@@ -323,7 +337,11 @@ private:
   friend void pool_test();
 
   using pool_t = pool<string_t, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
 
 struct subr_index
@@ -497,10 +515,10 @@ public:
   type gettype() const { return static_cast<type>(_u.index()); }
 
   /// @brief The new and delete operators uses a memory pool to create objects.
-  static void* operator new(std::size_t) { return _pool.allocate(); }
-  static void operator delete(void* x) { _pool.deallocate(x); }
-  static void operator delete(object* x, std::destroying_delete_t) { _pool.deallocate(x); }
-  static std::size_t freecount() { return _pool.size(); }
+  static void* operator new(std::size_t) { return pool().allocate(); }
+  static void operator delete(void* x) { pool().deallocate(x); }
+  static void operator delete(object* x, std::destroying_delete_t) { pool().deallocate(x); }
+  static std::size_t freecount() { return pool().size(); }
 
 private:
   // One entry for each type.  Types that has no, or just one, value are
@@ -530,43 +548,12 @@ private:
 
   /// @brief Memory pool for objects.
   using pool_t = pool<object, 256>;
-  static pool_t _pool;
+  static pool_t& pool()
+  {
+    static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    return _pool;
+  }
 };
-
-//
-// All lisp constants used internally.
-//
-extern lisp_t T;
-extern lisp_t C_AUTOLOAD;
-extern lisp_t C_BROKEN;
-extern lisp_t C_BT;
-extern lisp_t C_CLOSURE;
-extern lisp_t C_CONS;
-extern lisp_t C_DOT;
-extern lisp_t C_ENDOFFILE;
-extern lisp_t C_ENVIRON;
-extern lisp_t C_EOF;
-extern lisp_t C_ERROR;
-extern lisp_t C_FILE;
-extern lisp_t C_FLOAT;
-extern lisp_t C_FSUBR;
-extern lisp_t C_GO;
-extern lisp_t C_INDIRECT;
-extern lisp_t C_INTEGER;
-extern lisp_t C_LAMBDA;
-extern lisp_t C_NLAMBDA;
-extern lisp_t C_OLDDEF;
-extern lisp_t C_QUOTE;
-extern lisp_t C_REDEFINED;
-extern lisp_t C_RESET;
-extern lisp_t C_RETURN;
-extern lisp_t C_STRING;
-extern lisp_t C_SUBR;
-extern lisp_t C_SYMBOL;
-extern lisp_t C_READ;
-extern lisp_t C_WRITE;
-extern lisp_t C_APPEND;
-extern lisp_t C_CVARIABLE;
 
 /// @brief Return the type of the object or the object inside a lisp_t object.
 ///
@@ -575,10 +562,6 @@ extern lisp_t C_CVARIABLE;
 inline object::type type_of(const lisp_t& a) { return a == nullptr ? object::type::Nil : a->gettype(); }
 inline object::type type_of(const object& a) { return a.gettype(); }
 inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? object::type::Nil : a->gettype(); }
-inline bool is_T(const lisp_t& x) { return x == T; }
-inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
-inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
-inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
 
 inline void object::value(lisp_t x)
 {
@@ -591,6 +574,41 @@ inline void object::value(lisp_t x)
   else
     var->value = x;
 }
+
+/// @brief Symbols which are used internally
+//extern const lisp_t C_UNBOUND;
+extern const lisp_t T;
+extern const lisp_t C_APPEND;
+extern const lisp_t C_AUTOLOAD;
+extern const lisp_t C_BROKEN;
+extern const lisp_t C_BT;
+extern const lisp_t C_CLOSURE;
+extern const lisp_t C_CONS;
+extern const lisp_t C_CVARIABLE;
+extern const lisp_t C_DOT;
+extern const lisp_t C_ENDOFFILE;
+extern const lisp_t C_ENVIRON;
+extern const lisp_t C_EOF;
+extern const lisp_t C_ERROR;
+extern const lisp_t C_FILE;
+extern const lisp_t C_FLOAT;
+extern const lisp_t C_FSUBR;
+extern const lisp_t C_GO;
+extern const lisp_t C_INDIRECT;
+extern const lisp_t C_INTEGER;
+extern const lisp_t C_LAMBDA;
+extern const lisp_t C_NLAMBDA;
+extern const lisp_t C_OLDDEF;
+extern const lisp_t C_QUOTE;
+extern const lisp_t C_READ;
+extern const lisp_t C_REDEFINED;
+extern const lisp_t C_RESET;
+extern const lisp_t C_RETURN;
+extern const lisp_t C_STRING;
+extern const lisp_t C_SUBR;
+extern const lisp_t C_SYMBOL;
+extern const lisp_t C_VERSION;
+extern const lisp_t C_WRITE;
 
 } // namespace lisp
 

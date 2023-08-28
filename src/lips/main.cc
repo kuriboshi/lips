@@ -44,8 +44,9 @@ using namespace lisp;
 
 namespace
 {
-volatile sig_atomic_t signal_flag;
-int mypgrp; // lips process group
+volatile sig_atomic_t signal_flag; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+// lips process group
+int mypgrp; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 void onsignal(int sig) { signal_flag = sig; }
 
@@ -180,23 +181,6 @@ void init()
 
   fixpgrp();
 
-  C_ALIAS = intern("alias");
-  C_AMPER = intern("&");
-  C_BACK = intern(pn::BACK);
-  C_BAR = intern("|");
-  C_EXCL = intern("!");
-  C_EXEC = intern(pn::EXEC);
-  C_GGT = intern(">>");
-  C_GT = intern(">");
-  C_LT = intern("<");
-  C_OLDVAL = intern("oldval");
-  C_PIPE = intern(pn::PIPECMD);
-  C_PROGN = intern("progn");
-  C_REDIR_APPEND = intern(pn::REDIR_APPEND);
-  C_REDIR_FROM = intern(pn::REDIR_FROM);
-  C_REDIR_TO = intern(pn::REDIR_TO);
-  C_SEMI = intern(";");
-
   top::init();
 
   environment = std::make_unique<env>();
@@ -207,7 +191,7 @@ void init()
 
   exec::init();
 
-  context::current().read_table().set('!', "rmexcl"_l);
+  vm::read_table().set('!', "rmexcl"_l);
 }
 
 //
@@ -239,24 +223,24 @@ lisp_t greet(lisp_t who)
 }
 } // namespace
 
-lisp_t C_ALIAS;
-lisp_t C_AMPER;
-lisp_t C_BACK;
-lisp_t C_BAR;
-lisp_t C_EXCL;
-lisp_t C_EXEC;
-lisp_t C_GGT;
-lisp_t C_GT;
-lisp_t C_LT;
-lisp_t C_OLDVAL;
-lisp_t C_PIPE;
-lisp_t C_PROGN;
-lisp_t C_REDIR_APPEND;
-lisp_t C_REDIR_FROM;
-lisp_t C_REDIR_TO;
-lisp_t C_SEMI;
+const lisp_t C_ALIAS = intern("alias");
+const lisp_t C_AMPER = intern("&");
+const lisp_t C_BACK = intern(pn::BACK);
+const lisp_t C_BAR = intern("|");
+const lisp_t C_EXCL = intern("!");
+const lisp_t C_EXEC = intern(pn::EXEC);
+const lisp_t C_GGT = intern(">>");
+const lisp_t C_GT = intern(">");
+const lisp_t C_LT = intern("<");
+const lisp_t C_OLDVAL = intern("oldval");
+const lisp_t C_PIPE = intern(pn::PIPECMD);
+const lisp_t C_PROGN = intern("progn");
+const lisp_t C_REDIR_APPEND = intern(pn::REDIR_APPEND);
+const lisp_t C_REDIR_FROM = intern(pn::REDIR_FROM);
+const lisp_t C_REDIR_TO = intern(pn::REDIR_TO);
+const lisp_t C_SEMI = intern(";");
 
-std::unique_ptr<env> environment;
+std::unique_ptr<env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 int main(int argc, char* const* argv)
 {
@@ -300,15 +284,14 @@ int main(int argc, char* const* argv)
     if(!options.interactive && !options.command)
       options.interactive = isatty(0) != 0;
     if(options.version)
-      std::cout << VERSION << '\n';
+      std::cout << version() << '\n';
 
     //
     // Init shell and lisp interpreter.
     //
-    lisp::context context;
-    lisp::vm vm(context);
+    auto context = std::make_shared<context_t>();
+    lisp::vm_t vm(context);
     init();
-    // auto context = init();
     if(options.test)
     {
       auto result = session.run();
@@ -350,7 +333,7 @@ int main(int argc, char* const* argv)
       }
       catch(const lisp_finish& fin)
       {
-        context.primerr()->format("finish: {}\n", fin.what());
+        context->primerr()->format("finish: {}\n", fin.what());
         return fin.exit_code;
       }
     }

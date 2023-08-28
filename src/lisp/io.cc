@@ -25,19 +25,7 @@
 #include "parser.hh"
 #include "pred.hh"
 #include "prim.hh"
-
-namespace lisp
-{
-// clang-format off
-static std::array digits{
-  std::to_array<char>({
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-      'u', 'v', 'w', 'x', 'y', 'z'})
-};
-// clang-format on
-} // namespace lisp
+#include "vm.hh"
 
 namespace lisp::io
 {
@@ -109,7 +97,7 @@ lisp_t getline(lisp_t file)
 }
 
 // Print the string s, on stream file
-inline void ps(const std::string& s, file_t& file, bool esc)
+inline void ps(const std::string& s, file_t& file, io::escape esc)
 {
   for(auto c: s)
     file.putch(c, esc);
@@ -122,45 +110,45 @@ inline void pi(std::int64_t i, std::int64_t base, file_t& file)
   if(auto [ptr, ec] = std::to_chars(ss.data(), ss.data() + ss.size(), i, static_cast<int>(base)); ec == std::errc())
   {
     *ptr = '\0';
-    ps(ss.data(), file, false);
+    ps(ss.data(), file, io::escape::NO);
   }
 }
 
 inline void pf(double d, file_t& file)
 {
   auto ss = fmt::format("{:#g}", d);
-  ps(ss, file, false);
+  ps(ss, file, io::escape::NO);
 }
 
 // Print pointer type object
 inline void pp(const char* s, file_t& file, lisp_t x)
 {
-  ps(s, file, false);
-  ps(" ", file, false);
+  ps(s, file, io::escape::NO);
+  ps(" ", file, io::escape::NO);
   pi(reinterpret_cast<std::int64_t>(&*x), 16L, file); // NOLINT
-  ps(">", file, false);
+  ps(">", file, io::escape::NO);
 }
 
 inline void psubr(const char* s, file_t& file, lisp_t x)
 {
-  ps(s, file, false);
-  ps(" ", file, false);
-  ps(x->subr().name, file, false);
-  ps(">", file, false);
+  ps(s, file, io::escape::NO);
+  ps(" ", file, io::escape::NO);
+  ps(x->subr().name, file, io::escape::NO);
+  ps(">", file, io::escape::NO);
 }
 
-lisp_t patom(lisp_t x, file_t& file, bool esc)
+lisp_t patom(lisp_t x, file_t& file, io::escape esc)
 {
   ps(x->symbol()->pname, file, esc);
   return x;
 }
 
-lisp_t prinbody(lisp_t x, file_t& file, bool esc)
+lisp_t prinbody(lisp_t x, file_t& file, io::escape esc, std::int64_t current_printlevel)
 {
   auto i = x;
   for(;;)
   {
-    io::prin0(i->car(), file, esc);
+    io::prin0(i->car(), file, esc, current_printlevel);
     if(is_nil(i->cdr()))
       break;
     if(type_of(i->cdr()) == object::type::Cons)
@@ -173,49 +161,48 @@ lisp_t prinbody(lisp_t x, file_t& file, bool esc)
       file.putch(' ');
       file.putch('.');
       file.putch(' ');
-      io::prin0(i->cdr(), file, esc);
+      io::prin0(i->cdr(), file, esc, current_printlevel);
       break;
     }
   }
   return x;
 }
 
-lisp_t prin0(lisp_t x, file_t& file, bool esc)
+lisp_t prin0(lisp_t x, file_t& file, io::escape esc, std::int64_t current_printlevel)
 {
   switch(type_of(x))
   {
     case object::type::Cons:
-      context::current().thisplevel++;
-      if(context::current().thisplevel <= context::current().printlevel || context::current().printlevel <= 0)
+      ++current_printlevel;
+      if(current_printlevel <= vm::printlevel() || vm::printlevel() <= 0)
       {
         file.putch('(');
-        io::prinbody(x, file, esc);
+        io::prinbody(x, file, esc, current_printlevel);
         file.putch(')');
       }
       else
         file.putch('&');
-      context::current().thisplevel--;
       break;
     case object::type::Symbol:
       return io::patom(x, file, esc);
     case object::type::Nil:
-      ps("nil", file, false);
+      ps("nil", file, io::escape::NO);
       break;
     case object::type::Integer:
-      pi(x->intval(), context::current().currentbase()->intval(), file);
+      pi(x->intval(), vm::currentbase()->intval(), file);
       break;
     case object::type::Float:
       pf(x->floatval(), file);
       break;
     case object::type::String:
-      if(esc)
+      if(esc == io::escape::YES)
       {
         file.putch('"');
         ps(x->string(), file, esc);
         file.putch('"');
       }
       else
-        ps(x->string(), file, false);
+        ps(x->string(), file, io::escape::NO);
       break;
     case object::type::Closure:
       pp("#<closure", file, x);
@@ -242,8 +229,8 @@ lisp_t prin0(lisp_t x, file_t& file, bool esc)
       pp("#<file", file, x);
       break;
     default:
-      ps("#<illegal type_of:", file, false);
-      pi(to_underlying(type_of(x)), context::current().currentbase()->intval(), file);
+      ps("#<illegal type_of:", file, io::escape::NO);
+      pi(to_underlying(type_of(x)), vm::currentbase()->intval(), file);
       pp("", file, x);
   }
   return x;
@@ -251,8 +238,7 @@ lisp_t prin0(lisp_t x, file_t& file, bool esc)
 
 lisp_t print(lisp_t x, file_t& file)
 {
-  context::current().thisplevel = 0;
-  io::prin0(x, file, true);
+  io::prin0(x, file, io::escape::YES, 0);
   io::terpri(file);
   return x;
 }

@@ -72,59 +72,70 @@ void init()
 
 namespace lisp
 {
+static lisp_t make_symbol(std::string_view sym, lisp_t value = nil)
+{
+  auto symbol = details::alloc::intern(sym);
+  symbol->value(value);
+  return symbol;
+}
+
+static lisp_t make_const(std::string_view sym, lisp_t value = nil)
+{
+  auto symbol = details::alloc::intern(sym);
+  symbol->value(value);
+  symbol->symbol()->constant = true;
+  return symbol;
+}
+
+static lisp_t make_t()
+{
+  auto symbol = make_symbol("t");
+  symbol->value(symbol);
+  symbol->symbol()->constant = true;
+  return symbol;
+}
+
+const lisp_t C_UNBOUND = make_const("unbound");
+const lisp_t T = make_t();
+const lisp_t NIL = make_const("nil");
+const lisp_t C_APPEND = make_symbol("append");
+const lisp_t C_AUTOLOAD = make_symbol("autoload");
+const lisp_t C_BROKEN = make_symbol("broken");
+const lisp_t C_BT = make_symbol("bt");
+const lisp_t C_CLOSURE = make_symbol("closure");
+const lisp_t C_CONS = make_symbol("cons");
+const lisp_t C_CVARIABLE = make_symbol("cvariable");
+const lisp_t C_DOT = make_symbol(".");
+const lisp_t C_ENDOFFILE = make_symbol("endoffile");
+const lisp_t C_ENVIRON = make_symbol("environ");
+const lisp_t C_EOF = make_symbol("eof");
+const lisp_t C_ERROR = make_symbol("error");
+const lisp_t C_FILE = make_symbol("file");
+const lisp_t C_FLOAT = make_symbol("float");
+const lisp_t C_FSUBR = make_symbol("fsubr");
+const lisp_t C_GO = make_symbol("go");
+const lisp_t C_INDIRECT = make_symbol("indirect");
+const lisp_t C_INTEGER = make_symbol("integer");
+const lisp_t C_LAMBDA = make_symbol("lambda");
+const lisp_t C_NLAMBDA = make_symbol("nlambda");
+const lisp_t C_OLDDEF = make_symbol("olddef");
+const lisp_t C_QUOTE = make_symbol("quote");
+const lisp_t C_READ = make_symbol("read");
+const lisp_t C_REDEFINED = make_symbol("redefined");
+const lisp_t C_RESET = make_symbol("reset");
+const lisp_t C_RETURN = make_symbol("return");
+const lisp_t C_STRING = make_symbol("string");
+const lisp_t C_SUBR = make_symbol("subr");
+const lisp_t C_SYMBOL = make_symbol("symbol");
+const lisp_t C_VERSION = make_symbol("version", mkstring(VERSION));
+const lisp_t C_WRITE = make_symbol("write");
+
 class init
 {
 public:
   init()
   {
     auto intern = [](const auto s) { return details::alloc::intern(s); };
-
-    // Must be early (first) since it's used by symbol_store_t to initialize
-    // new symbols. The value of "unbound" itself is initialized to nil because
-    // the "unbound" symbol is not yet fully defined.
-    C_UNBOUND = intern("unbound");
-    C_UNBOUND->symbol()->constant = true;
-
-    // Both nil and t evaluate to themselves.
-    auto nil = intern("nil");
-    nil->value(nil);
-    nil->symbol()->constant = true;
-
-    auto t = intern("t");
-    T = t;
-    t->value(T);
-    t->symbol()->constant = true;
-
-    C_AUTOLOAD = intern("autoload");
-    C_BROKEN = intern("broken");
-    C_BT = intern("bt");
-    C_CLOSURE = intern("closure");
-    C_CONS = intern("cons");
-    C_DOT = intern(".");
-    C_ENDOFFILE = intern("endoffile");
-    C_ENVIRON = intern("environ");
-    C_EOF = intern("eof");
-    C_FILE = intern("file");
-    C_FLOAT = intern("float");
-    C_FSUBR = intern("fsubr");
-    C_GO = intern("go");
-    C_INDIRECT = intern("indirect");
-    C_INTEGER = intern("integer");
-    C_OLDDEF = intern("olddef");
-    C_REDEFINED = intern("redefined");
-    C_RESET = intern("reset");
-    C_RETURN = intern("return");
-    C_STRING = intern("string");
-    C_SUBR = intern("subr");
-    C_SYMBOL = intern("symbol");
-    C_READ = intern("read");
-    C_WRITE = intern("write");
-    C_APPEND = intern("append");
-    C_CVARIABLE = intern("cvariable");
-
-    C_VERSION = intern("version");
-    C_VERSION->value(mkstring(VERSION));
-    C_VERSION->symbol()->constant = true;
 
     details::alloc::init();
     details::arith::init();
@@ -144,15 +155,14 @@ public:
   }
 };
 
-vm::vm(context&)
+vm* vm::set(vm* ptr)
 {
-  if(_current != nullptr)
-    throw std::runtime_error("vm::vm called twice");
-  _current = this;
   static init init;
+  static vm* current{nullptr}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+  if(current == nullptr)
+    current = ptr;
+  return current;
 }
-
-vm::~vm() { _current = nullptr; }
 
 lisp_t vm::printwhere()
 {
@@ -171,20 +181,20 @@ lisp_t vm::printwhere()
          lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
-        context::current().primerr()->format("[in ");
+        primerr()->format("[in ");
         prin2(foo->car(), T);
-        context::current().primerr()->putch(']');
+        primerr()->putch(']');
         break;
       }
     }
   }
-  context::current().primerr()->putch('\n');
+  primerr()->putch('\n');
   return foo;
 }
 
 void vm::abort(std::error_code error)
 {
-  context::current().perror(error);
+  perror(error);
   printwhere();
   unwind();
   throw lisp_error(error_errc::abort);
@@ -196,7 +206,7 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
 {
   if(code)
   {
-    context::current().perror(code, fault);
+    perror(code, fault);
     printwhere();
   }
   if(_breakhook)
@@ -529,8 +539,8 @@ bool vm::eval_apply()
 
 void vm::bt()
 {
-  auto op = context::current().printlevel;
-  context::current().printlevel = 2;
+  auto op = printlevel();
+  printlevel(2);
   for(auto i = _toctrl - 1; i != 0; i--)
   {
     if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
@@ -543,7 +553,7 @@ void vm::bt()
         print(*a, T);
     }
   }
-  context::current().printlevel = op;
+  printlevel(op);
 }
 
 bool vm::everr()
@@ -1052,18 +1062,18 @@ lisp_t vm::backtrace()
 {
   for(int i = _toctrl - 1; i >= 0; i--)
   {
-    context::current().primerr()->format("{}: ", i);
+    primerr()->format("{}: ", i);
     std::visit(
       [this](auto&& arg) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr(std::is_same_v<T, std::monostate>)
           ; // Do nothing for monostate
         else if constexpr(std::is_same_v<T, destblock_t*>)
-          context::current().primerr()->format("destblock_t: {}\n", to_string(arg));
+          primerr()->format("destblock_t: {}\n", to_string(arg));
         else if constexpr(std::is_same_v<T, continuation_t>)
-          context::current().primerr()->format("cont: {}\n", to_string(arg));
+          primerr()->format("cont: {}\n", to_string(arg));
         else
-          context::current().primerr()->format("{}\n", to_string(arg));
+          primerr()->format("{}\n", to_string(arg));
       },
       _control[i]);
   }
@@ -1095,7 +1105,5 @@ destblock_t* vm::mkdestblock(int size)
 void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
 lisp_t vm::break0(lisp_t exp) const { return repl(exp); }
-
-vm* vm::_current = nullptr;
 
 } // namespace lisp

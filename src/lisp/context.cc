@@ -26,7 +26,7 @@
 namespace lisp
 {
 
-class context::impl final
+class context_t::impl final
 {
 public:
   impl()
@@ -57,85 +57,71 @@ public:
   lisp_t _loadpath;
 };
 
-context::context()
+context_t::context_t()
 {
-  if(_current == nullptr)
-    _current = this;
-  else
-    throw std::runtime_error("context::context called twice");
-
   _pimpl = std::make_unique<impl>();
 }
 
-context::~context() { _current = nullptr; }
+context_t::~context_t() = default;
 
-context& context::current()
-{
-  if(_current == nullptr)
-    throw std::runtime_error("lisp::context has not been created");
-  return *_current;
-}
+syntax& context_t::read_table() { return *_pimpl->_syntax; }
+void context_t::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
 
-syntax& context::read_table() { return *_pimpl->_syntax; }
-void context::read_table(std::unique_ptr<syntax> syntax) { _pimpl->_syntax = std::move(syntax); }
+ref_file_t context_t::primout() const { return _pimpl->_primout; }
 
-ref_file_t context::primout() const { return _pimpl->_primout; }
+ref_file_t context_t::primerr() const { return _pimpl->_primerr; }
 
-ref_file_t context::primerr() const { return _pimpl->_primerr; }
+ref_file_t context_t::primin() const { return _pimpl->_primin; }
 
-ref_file_t context::primin() const { return _pimpl->_primin; }
-
-ref_file_t context::primout(ref_file_t f)
+ref_file_t context_t::primout(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primout);
   _pimpl->_primout = std::move(f);
   return p;
 }
 
-ref_file_t context::primerr(ref_file_t f)
+ref_file_t context_t::primerr(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primerr);
   _pimpl->_primerr = std::move(f);
   return p;
 }
 
-ref_file_t context::primin(ref_file_t f)
+ref_file_t context_t::primin(ref_file_t f)
 {
   auto p = std::move(_pimpl->_primin);
   _pimpl->_primin = std::move(f);
   return p;
 }
 
-ref_file_t context::stdout() const { return _pimpl->_stdout; }
+ref_file_t context_t::stdout() const { return _pimpl->_stdout; }
 
-ref_file_t context::stderr() const { return _pimpl->_stderr; }
+ref_file_t context_t::stderr() const { return _pimpl->_stderr; }
 
-ref_file_t context::stdin() const { return _pimpl->_stdin; }
+ref_file_t context_t::stdin() const { return _pimpl->_stdin; }
 
-lisp_t context::perror(std::error_code error) const
+lisp_t context_t::perror(std::error_code error) const
 {
-  primerr()->format("{} ", error.message());
+  _pimpl->_primerr->format("{} ", error.message());
   return nil;
 }
 
-lisp_t context::perror(std::error_code error, lisp_t arg) const
+lisp_t context_t::perror(std::error_code error, lisp_t arg) const
 {
-  primerr()->format("{} ", error.message());
+  _pimpl->_primerr->format("{} ", error.message());
   prin2(arg, T);
   return nil;
 }
 
-lisp_t context::error(std::error_code error, lisp_t arg) const
+lisp_t context_t::error(std::error_code error, lisp_t arg) const
 {
   perror(error, arg);
   throw lisp_error(error);
 }
 
-const cvariable_t& context::currentbase() const { return _pimpl->_currentbase->cvariable(); }
-const cvariable_t& context::verbose() const { return _pimpl->_verbose->cvariable(); }
-const cvariable_t& context::loadpath() const { return _pimpl->_loadpath->cvariable(); }
-void context::loadpath(lisp_t newpath) { _pimpl->_loadpath->cvariable() = newpath; }
-
-context* context::_current = nullptr;
+const cvariable_t& context_t::currentbase() const { return _pimpl->_currentbase->cvariable(); }
+const cvariable_t& context_t::verbose() const { return _pimpl->_verbose->cvariable(); }
+const cvariable_t& context_t::loadpath() const { return _pimpl->_loadpath->cvariable(); }
+void context_t::loadpath(lisp_t newpath) { _pimpl->_loadpath->cvariable() = newpath; }
 
 } // namespace lisp

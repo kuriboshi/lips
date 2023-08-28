@@ -25,6 +25,7 @@
 #include "io.hh"
 #include "types.hh"
 #include "syntax.hh"
+#include "vm.hh"
 
 namespace lisp
 {
@@ -175,26 +176,23 @@ class lexer final
 {
 public:
   lexer(ref_file_t input)
-    : _ctx(context::current()),
-      _input(input),
+    : _input(input),
       _pos(_input->source().begin())
   {}
   lexer(std::string s)
-    : _ctx(context::current()),
-      _input(ref_file_t::create(s)),
+    : _input(ref_file_t::create(s)),
       _pos(_input->source().begin())
   {}
   /// @brief Read the next token from the input string.
   token_t read();
   void unread(token_t);
   // Syntax table member functions.
-  syntax::type get(std::uint8_t index) const { return _ctx.read_table().get(index); }
-  void set(std::uint8_t index, syntax::type value) { _ctx.read_table().set(index, value); }
-  void set(std::uint8_t index, lisp_t value) { _ctx.read_table().set(index, value); }
-  lisp_t macro(token_t token) { return _ctx.read_table().macro(_input, token.token[0]); }
+  static syntax::type get(std::uint8_t index) { return vm::read_table().get(index); }
+  static void set(std::uint8_t index, syntax::type value) { vm::read_table().set(index, value); }
+  static void set(std::uint8_t index, lisp_t value) { vm::read_table().set(index, value); }
+  lisp_t macro(token_t token) { return vm::read_table().macro(_input, token.token[0]); }
 
 private:
-  context& _ctx; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   ref_file_t _input;
   typename io::source::iterator _pos;
   token_t _token;
@@ -202,7 +200,7 @@ private:
 
   void next()
   {
-    _start_of_line = _ctx.read_table().get(*_pos) == syntax::type::NEWLINE;
+    _start_of_line = vm::read_table().get(*_pos) == syntax::type::NEWLINE;
     ++_pos;
   }
 

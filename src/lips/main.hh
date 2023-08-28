@@ -22,9 +22,9 @@
 #include <lisp/lisp.hh>
 #include "env.hh"
 
-inline lisp::ref_file_t primout() { return lisp::context::current().primout(); }
-inline lisp::ref_file_t primin() { return lisp::context::current().primin(); }
-inline lisp::ref_file_t primerr() { return lisp::context::current().primerr(); }
+inline lisp::ref_file_t primout() { return lisp::vm::primout(); }
+inline lisp::ref_file_t primin() { return lisp::vm::primin(); }
+inline lisp::ref_file_t primerr() { return lisp::vm::primerr(); }
 
 struct options_t
 {
@@ -36,24 +36,23 @@ struct options_t
   bool test = false;        // Run unit tests
 };
 
-extern options_t options;
-extern std::unique_ptr<lisp::env> environment;
+extern std::unique_ptr<lisp::env> environment; // NOLINT
 
-extern lisp::lisp_t C_ALIAS;
-extern lisp::lisp_t C_AMPER;
-extern lisp::lisp_t C_BACK;
-extern lisp::lisp_t C_BAR;
-extern lisp::lisp_t C_EXCL;
-extern lisp::lisp_t C_EXEC;
-extern lisp::lisp_t C_GGT;
-extern lisp::lisp_t C_GT;
-extern lisp::lisp_t C_LT;
-extern lisp::lisp_t C_OLDVAL;
-extern lisp::lisp_t C_PIPE;
-extern lisp::lisp_t C_PROGN;
-extern lisp::lisp_t C_REDIR_APPEND;
-extern lisp::lisp_t C_REDIR_FROM;
-extern lisp::lisp_t C_REDIR_TO;
-extern lisp::lisp_t C_SEMI;
+extern const lisp::lisp_t C_ALIAS;
+extern const lisp::lisp_t C_AMPER;
+extern const lisp::lisp_t C_BACK;
+extern const lisp::lisp_t C_BAR;
+extern const lisp::lisp_t C_EXCL;
+extern const lisp::lisp_t C_EXEC;
+extern const lisp::lisp_t C_GGT;
+extern const lisp::lisp_t C_GT;
+extern const lisp::lisp_t C_LT;
+extern const lisp::lisp_t C_OLDVAL;
+extern const lisp::lisp_t C_PIPE;
+extern const lisp::lisp_t C_PROGN;
+extern const lisp::lisp_t C_REDIR_APPEND;
+extern const lisp::lisp_t C_REDIR_FROM;
+extern const lisp::lisp_t C_REDIR_TO;
+extern const lisp::lisp_t C_SEMI;
 
 #endif

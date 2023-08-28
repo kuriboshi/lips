@@ -35,7 +35,6 @@ public:
   void ungetch(char) override;
   std::optional<std::string> getline() override;
 
-  static void end_term();
   void clearlbuf();
 
   iterator begin() override
@@ -45,6 +44,7 @@ public:
   }
 
 private:
+  void end_term();
   void init_keymap();
   void init_term();
   static void pputc(char c, FILE* file);
@@ -124,7 +124,7 @@ private:
   // Variables for terminal characteristics, old and new.
   //
   struct termios newterm;
-  static struct termios oldterm;
+  struct termios oldterm;
 
   char linebuffer[BUFSIZ] = {};    // Line buffer for terminal input.
   std::istringstream is;           // For input stream.

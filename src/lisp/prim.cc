@@ -20,14 +20,6 @@
 #include "prim.hh"
 #include "exit.hh"
 
-namespace lisp
-{
-lisp_t C_ERROR;
-lisp_t C_LAMBDA;
-lisp_t C_NLAMBDA;
-lisp_t C_QUOTE;
-} // namespace lisp
-
 namespace lisp::details::prim
 {
 /// @brief Make an indirect pointer to the object OBJ.
@@ -367,11 +359,6 @@ inline constexpr std::string_view EXIT = "exit";       // exit lips
 
 void init()
 {
-  C_ERROR = intern(pn::ERROR);
-  C_LAMBDA = intern(pn::LAMBDA);
-  C_NLAMBDA = intern(pn::NLAMBDA);
-  C_QUOTE = intern(pn::QUOTE);
-
   // clang-format off
   mkprim(pn::ATOM,    atom,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::ATTACH,  attach,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);

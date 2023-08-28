@@ -42,14 +42,13 @@ TEST_CASE("low: low level functions")
 
   SECTION("low: prohibit set on constants")
   {
-    auto& ctx = context::current();
     std::ostringstream os;
-    auto old = ctx.primerr(ref_file_t::create(os));
+    auto old = vm::primerr(ref_file_t::create(os));
     CHECK_THROWS(set(T, nil));
     CHECK_THROWS(set(mkatom("nil"), nil));
     CHECK_THROWS(set(T, nil));
     CHECK_THROWS(set(mkatom("nil"), nil));
-    ctx.primerr(old);
+    vm::primerr(old);
   }
 
   SECTION("low: setq")

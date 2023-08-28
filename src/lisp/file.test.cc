@@ -45,7 +45,6 @@ namespace lisp
 
 TEST_CASE("file: functions")
 {
-  auto& ctx = context::current();
   SECTION("open and close")
   {
     create_test_file test("()");
@@ -78,11 +77,11 @@ TEST_CASE("file: functions")
     SECTION("from primin")
     {
       auto in = ref_file_t::create("atom");
-      auto old = context::current().primin(in);
+      auto old = vm::primin(in);
       auto r = ratom(lisp_t());
       REQUIRE(type_of(r) == object::type::Symbol);
       CHECK(r->getstr() == "atom");
-      context::current().primin(old);
+      vm::primin(old);
     }
 
     SECTION("from stdin")
@@ -97,7 +96,7 @@ TEST_CASE("file: functions")
 
   SECTION("load")
   {
-    context::current().loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(C_DOT));
     {
       create_test_file test("(setq a 1)\n");
       auto e0 = load(mkstring(test.file));
@@ -178,10 +177,10 @@ TEST_CASE("file: functions")
     SECTION("to primout")
     {
       std::ostringstream cout;
-      auto old = ctx.primout(ref_file_t::create(cout));
+      auto old = vm::primout(ref_file_t::create(cout));
       prin2(mkstring("hello \"world\""), nil);
       CHECK(cout.str() == "\"hello \\\"world\\\"\"");
-      ctx.primout(old);
+      vm::primout(old);
     }
   }
 
@@ -230,11 +229,11 @@ TEST_CASE("file: functions")
     SECTION("from primin")
     {
       auto in = ref_file_t::create("a");
-      auto old = context::current().primin(in);
+      auto old = vm::primin(in);
       auto r = readc(nil);
       REQUIRE(type_of(r) == object::type::Integer);
       CHECK(r->intval() == 'a');
-      context::current().primin(old);
+      vm::primin(old);
     }
 
     SECTION("from stdin")
@@ -260,11 +259,11 @@ TEST_CASE("file: functions")
     SECTION("from primin")
     {
       auto in = ref_file_t::create(R"((a b c))");
-      auto old = context::current().primin(in);
+      auto old = vm::primin(in);
       auto r = read(nil);
       REQUIRE(type_of(r) == object::type::Cons);
       CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
-      context::current().primin(old);
+      vm::primin(old);
     }
 
     SECTION("from stdin")
@@ -296,19 +295,19 @@ TEST_CASE("file: functions")
     SECTION("to primout")
     {
       std::ostringstream cout;
-      auto old = ctx.primout(ref_file_t::create(cout));
+      auto old = vm::primout(ref_file_t::create(cout));
       spaces(8_l, nil);
       CHECK(cout.str() == "        ");
-      ctx.primout(old);
+      vm::primout(old);
     }
 
     SECTION("to primerr")
     {
       std::ostringstream cout;
-      auto old = ctx.primerr(ref_file_t::create(cout));
+      auto old = vm::primerr(ref_file_t::create(cout));
       spaces(8_l, T);
       CHECK(cout.str() == "        ");
-      ctx.primerr(old);
+      vm::primerr(old);
     }
   }
 
@@ -343,11 +342,11 @@ TEST_CASE("file: functions")
     SECTION("from primin")
     {
       auto in = ref_file_t::create(R"((a b c))");
-      auto old = context::current().primin(in);
+      auto old = vm::primin(in);
       auto r = readline(lisp_t(nil));
       REQUIRE(type_of(r) == object::type::Cons);
       CHECK(!is_nil(equal(r, mklist("a"_a, "b"_a, "c"_a))));
-      context::current().primin(old);
+      vm::primin(old);
     }
 
     SECTION("from stdin")
@@ -364,7 +363,7 @@ TEST_CASE("file: functions")
 
   SECTION("loadfile")
   {
-    context::current().loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(C_DOT));
     create_test_file test("(setq a \"loadfile\")");
     {
       REQUIRE(loadfile(test.file));
@@ -383,7 +382,7 @@ TEST_CASE("file: functions")
     prin1(" 999)"_s, f);
     terpri(f);
     close(f);
-    context::current().loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(C_DOT));
     auto e = load(mkstring(test.file));
     REQUIRE(type_of("a"_a->value()) == object::type::Integer);
     CHECK("a"_a->value()->intval() == 999);

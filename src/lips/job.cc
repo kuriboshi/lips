@@ -16,8 +16,10 @@
 
 namespace lisp::job
 {
-static std::list<job_t> joblist;  // List of jobs
-static std::list<job_t> cjoblist; // List of collected jobs
+// List of jobs
+static std::list<job_t> joblist; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+// List of collected jobs
+static std::list<job_t> cjoblist; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 ///
 /// @brief printjob Print the job information.
@@ -51,7 +53,7 @@ void printjob(const job_t& job)
   }
   buffer += "\t";
   primout()->format(buffer);
-  print(job.exp, false);
+  print(job.exp, io::output::PRIMARY);
 }
 
 ///

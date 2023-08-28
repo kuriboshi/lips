@@ -64,9 +64,9 @@ lisp_t close(lisp_t fildes)
 lisp_t ratom(lisp_t file)
 {
   if(is_nil(file))
-    return io::ratom(context::current().primin());
+    return io::ratom(vm::primin());
   if(is_T(file))
-    return io::ratom(context::current().stdin());
+    return io::ratom(vm::stdin());
   check(file, object::type::File);
   return io::ratom(file->file());
 }
@@ -74,9 +74,9 @@ lisp_t ratom(lisp_t file)
 lisp_t readc(lisp_t file)
 {
   if(is_nil(file))
-    return mknumber(context::current().primin()->getch());
+    return mknumber(vm::primin()->getch());
   if(is_T(file))
-    return mknumber(context::current().stdin()->getch());
+    return mknumber(vm::stdin()->getch());
   check(file, object::type::File);
   return mknumber(file->file()->getch());
 }
@@ -84,9 +84,9 @@ lisp_t readc(lisp_t file)
 lisp_t read(lisp_t file)
 {
   if(is_nil(file))
-    return lispread(context::current().primin());
+    return lispread(vm::primin());
   if(is_T(file))
-    return lispread(context::current().stdin());
+    return lispread(vm::stdin());
   check(file, object::type::File);
   return lispread(file->file());
 }
@@ -94,9 +94,9 @@ lisp_t read(lisp_t file)
 lisp_t print(lisp_t x, lisp_t file)
 {
   if(is_nil(file))
-    return io::print(x, *context::current().primout());
+    return io::print(x, *vm::primout());
   if(is_T(file))
-    return io::print(x, *context::current().primerr());
+    return io::print(x, *vm::primerr());
   check(file, object::type::File);
   return io::print(x, *file->file());
 }
@@ -105,7 +105,7 @@ bool loadfile(const std::string& lf)
 {
   try
   {
-    for(auto i: *context::current().loadpath())
+    for(auto i: *vm::loadpath())
     {
       std::filesystem::path base{i->getstr()};
       base /= lf;
@@ -136,42 +136,40 @@ lisp_t load(lisp_t f)
 lisp_t terpri(lisp_t file)
 {
   if(is_nil(file))
-    return io::terpri(*context::current().primout());
+    return io::terpri(*vm::primout());
   if(is_T(file))
-    return io::terpri(*context::current().primerr());
+    return io::terpri(*vm::primerr());
   check(file, object::type::File);
   return io::terpri(*file->file());
 }
 
 lisp_t prin1(lisp_t x, lisp_t file)
 {
-  context::current().thisplevel = 0;
   if(is_nil(file))
-    return prin0(x, *context::current().primout(), false);
+    return io::prin0(x, *vm::primout(), io::escape::NO, 0);
   if(is_T(file))
-    return prin0(x, *context::current().primerr(), false);
+    return io::prin0(x, *vm::primerr(), io::escape::NO, 0);
   check(file, object::type::File);
-  return prin0(x, *file->file(), false);
+  return io::prin0(x, *file->file(), io::escape::NO, 0);
 }
 
 lisp_t prin2(lisp_t x, lisp_t file)
 {
-  context::current().thisplevel = 0;
   if(is_nil(file))
-    return prin0(x, *context::current().primout(), true);
+    return io::prin0(x, *vm::primout(), io::escape::YES, 0);
   if(is_T(file))
-    return prin0(x, *context::current().primerr(), true);
+    return io::prin0(x, *vm::primerr(), io::escape::YES, 0);
   check(file, object::type::File);
-  return prin0(x, *file->file(), true);
+  return io::prin0(x, *file->file(), io::escape::YES, 0);
 }
 
 lisp_t printlevel(lisp_t newl)
 {
-  auto x = context::current().printlevel;
+  auto x = vm::printlevel();
   if(!is_nil(newl))
   {
     check(newl, object::type::Integer);
-    context::current().printlevel = newl->intval();
+    vm::printlevel(newl->intval());
   }
   return mknumber(x);
 }
@@ -181,9 +179,9 @@ lisp_t spaces(lisp_t n, lisp_t file)
   check(n, object::type::Integer);
   ref_file_t f;
   if(is_nil(file))
-    f = context::current().primout();
+    f = vm::primout();
   else if(is_T(file))
-    f = context::current().primerr();
+    f = vm::primerr();
   else
   {
     check(file, object::type::File);
@@ -197,9 +195,9 @@ lisp_t spaces(lisp_t n, lisp_t file)
 lisp_t readline(lisp_t file)
 {
   if(is_nil(file))
-    return io::readline(context::current().primin());
+    return io::readline(vm::primin());
   if(is_T(file))
-    return io::readline(context::current().stdin());
+    return io::readline(vm::stdin());
   check(file, object::type::File);
   return io::readline(file->file());
 }
@@ -223,8 +221,6 @@ inline constexpr std::string_view TERPRI = "terpri";         // print new-line
 
 void init()
 {
-  C_READ = intern(pn::READ);
-
   // clang-format off
   mkprim(pn::CLOSE,      close,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::OPEN,       open,       subr_t::subr::EVAL, subr_t::spread::SPREAD);

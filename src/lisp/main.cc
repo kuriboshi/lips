@@ -27,8 +27,8 @@ int main(int argc, const char** argv)
 {
   try
   {
-    lisp::context ctx;
-    lisp::vm vm(ctx);
+    auto ctx = std::make_shared<lisp::context_t>();
+    lisp::vm_t vm(ctx);
     std::vector<std::string> args{argv + 1, argv + argc};
     for(auto f: args)
     {
