@@ -36,7 +36,6 @@
 #include "rtable.hh"
 #include "string.hh"
 #include "user.hh"
-#include "version.hh"
 #include "vm.hh"
 
 #endif

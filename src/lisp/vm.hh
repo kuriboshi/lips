@@ -29,6 +29,7 @@
 #include "context.hh"
 #include "syntax.hh"
 #include "types.hh"
+#include "version.hh"
 
 namespace lisp
 {
@@ -62,7 +63,7 @@ public:
   static const cvariable_t& verbose() { return get().do_verbose(); }
   static const cvariable_t& loadpath() { return get().do_loadpath(); }
   static void loadpath(lisp_t path) { get().do_loadpath(path); }
-  static std::string version() { return C_VERSION->value()->getstr(); }
+  static const char* version() { return lisp::version(); }
 
   static std::int64_t printlevel() { return get().do_printlevel(); }
   static void printlevel(std::int64_t pl) { get().do_printlevel(pl); }

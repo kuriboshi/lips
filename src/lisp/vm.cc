@@ -127,7 +127,7 @@ const lisp_t C_RETURN = make_symbol("return");
 const lisp_t C_STRING = make_symbol("string");
 const lisp_t C_SUBR = make_symbol("subr");
 const lisp_t C_SYMBOL = make_symbol("symbol");
-const lisp_t C_VERSION = make_symbol("version", mkstring(VERSION));
+const lisp_t C_VERSION = make_symbol("version", mkstring(version()));
 const lisp_t C_WRITE = make_symbol("write");
 
 class init

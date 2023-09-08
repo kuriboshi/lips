@@ -20,7 +20,7 @@
 
 namespace lisp
 {
-extern const char* const VERSION;
+extern const char* version();
 }
 
 #endif

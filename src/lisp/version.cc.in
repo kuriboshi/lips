@@ -21,6 +21,10 @@
 
 namespace lisp
 {
-extern const char* const VERSION = "lips @lips_VERSION@ "
-  "Copyright 1988-1989, 1992, 2020-2023 Krister Joas";
+const char* version() {
+  static constexpr const char* VERSION{
+    "lips @lips_VERSION@ Copyright 1988-1989, 1992, 2020-2023 Krister Joas"
+  };
+  return VERSION;
+}
 }

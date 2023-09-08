@@ -94,7 +94,7 @@ TEST_CASE("lisp: type_of")
 TEST_CASE("lisp: version")
 {
   auto version = vm::version();
-  CHECK(version == VERSION);
+  CHECK(version == lisp::version());
 }
 
 TEST_CASE("lisp: literals")
