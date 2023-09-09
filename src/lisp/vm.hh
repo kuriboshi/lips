@@ -245,7 +245,7 @@ private:
     if(_trace)
       std::cerr << fmt::format("push({}): {}\n", _toctrl, to_string(t));
 #endif
-    _control[_toctrl++] = std::move(t);
+    _control.at(_toctrl++) = std::move(t);
     if(_toctrl >= CTRLBLKSIZE)
       overflow();
   }
@@ -254,7 +254,7 @@ private:
   template<typename T>
   void pop(T& t)
   {
-    t = std::move(std::get<T>(_control[--_toctrl]));
+    t = std::move(std::get<T>(_control.at(--_toctrl)));
 #ifdef LIPS_ENABLE_TRACE
     if(_trace)
       std::cerr << fmt::format("pop ({}): {}\n", _toctrl, to_string(t));

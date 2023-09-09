@@ -52,8 +52,7 @@ void term_source::clearlbuf()
  */
 void term_source::init_keymap()
 {
-  for(int i = NUM_KEYS - 1; i != 0; i--)
-    key_tab[i] = term_fun::T_INSERT;
+  key_tab.fill(term_fun::T_INSERT);
   key_tab[CERASE] = term_fun::T_ERASE;
   key_tab[CTRL('H')] = term_fun::T_ERASE;
   key_tab[CRPRNT] = term_fun::T_RETYPE;
@@ -145,7 +144,7 @@ char term_source::getch()
   while(true)
   {
     if(position < linepos)
-      return linebuffer[position++];
+      return linebuffer.at(position++);
     auto line = getline();
     end_term();
     if(line)
@@ -171,9 +170,9 @@ void term_source::ungetch(char)
 bool term_source::firstnotlp()
 {
   int i = 0;
-  for(; i < position && std::isspace(linebuffer[i]) != 0; i++)
+  for(; i < position && std::isspace(linebuffer.at(i)) != 0; i++)
     ;
-  return linebuffer[i] != '(';
+  return linebuffer.at(i) != '(';
 }
 
 /*
@@ -186,7 +185,7 @@ void term_source::delonechar()
   putc('\b', stdout);
   putc(' ', stdout);
   putc('\b', stdout);
-  if(is_control(linebuffer[linepos]))
+  if(is_control(linebuffer.at(linepos)))
   {
     putc('\b', stdout);
     putc(' ', stdout);
@@ -201,7 +200,7 @@ bool term_source::onlyblanks()
 {
   for(int i = linepos; i > 0; --i)
   {
-    if(std::isspace(linebuffer[i]) == 0)
+    if(std::isspace(linebuffer.at(i)) == 0)
       return false;
   }
   return true;
@@ -231,7 +230,7 @@ void term_source::retype(int all)
     int l = 0;
     for(int i = 0; i < linepos; i++)
     {
-      if(linebuffer[i] == '\n')
+      if(linebuffer.at(i) == '\n')
       {
         nl = i;
         ++l;
@@ -255,10 +254,10 @@ void term_source::retype(int all)
     {
       for(int i = nl; i < linepos; i++)
       {
-        if(linebuffer[i] == '\n')
+        if(linebuffer.at(i) == '\n')
           tputs(cleol, 1, outc);
         else
-          pputc(linebuffer[i], stdout);
+          pputc(linebuffer.at(i), stdout);
       }
     }
     tputs(cleol, 1, outc);
@@ -269,12 +268,12 @@ void term_source::retype(int all)
     {
       putc('\r', stdout);
       int i = linepos;
-      for(; i >= 0 && linebuffer[i] != '\n'; --i)
+      for(; i >= 0 && linebuffer.at(i) != '\n'; --i)
         ;
       if(i == 0)
         std::cout << current_prompt;
       for(++i; i < linepos; i++)
-        pputc(linebuffer[i], stdout);
+        pputc(linebuffer.at(i), stdout);
     }
     else if(all == 1)
     {
@@ -282,7 +281,7 @@ void term_source::retype(int all)
       pputc('\n', stdout);
       std::cout << current_prompt;
       for(int i = 0; i < linepos; ++i)
-        pputc(linebuffer[i], stdout);
+        pputc(linebuffer.at(i), stdout);
     }
     else
     {
@@ -303,8 +302,8 @@ char* term_source::mkexstr()
   last = word.data() + BUFSIZ - 1;
   *last-- = '\0';
   *last-- = '*';
-  while(std::isspace(linebuffer[i - 1]) == 0 && i > 0)
-    *last-- = linebuffer[--i];
+  while(std::isspace(linebuffer.at(i - 1)) == 0 && i > 0)
+    *last-- = linebuffer.at(--i);
   return ++last;
 }
 
@@ -313,7 +312,7 @@ void term_source::fillrest(const char* word)
   for(word += strlen(last) - 1; *word != 0; word++)
   {
     pputc(*word, stdout);
-    linebuffer[linepos++] = *word;
+    linebuffer.at(linepos++) = *word;
   }
 }
 
@@ -337,7 +336,7 @@ void term_source::complete(lisp_t words)
   while(c != '\0' && checkchar(words, pos++, &c))
   {
     pputc(c, stdout);
-    linebuffer[linepos++] = c;
+    linebuffer.at(linepos++) = c;
   }
 }
 
@@ -374,7 +373,7 @@ void term_source::scan(int begin)
   currentpos = {0, 0, nullptr};
   for(int pos = begin; pos >= 0; --pos)
   {
-    auto cur = linebuffer[pos];
+    auto cur = linebuffer.at(pos);
     ++cpos;
     int escape = 0;
     if(cur == '"' && state == paren_blink::INSTRING)
@@ -390,14 +389,14 @@ void term_source::scan(int begin)
       if(parpos.line == line)
       {
         parpos.cpos = cpos - parpos.cpos;
-        parpos.line_start = &linebuffer[pos];
+        parpos.line_start = &linebuffer.at(pos);
       }
       if(currentpos.line_start == nullptr)
-        currentpos.line_start = &linebuffer[pos];
+        currentpos.line_start = &linebuffer.at(pos);
       cpos = 0;
       line++;
     }
-    while(linebuffer[pos] == '\\')
+    while(linebuffer.at(pos) == '\\')
     {
       escape++;
       pos--;
@@ -441,7 +440,7 @@ void term_source::scan(int begin)
     }
     if(!pars && parcount == 0)
     {
-      parpos.line_start = &linebuffer[pos];
+      parpos.line_start = &linebuffer.at(pos);
       parpos.cpos = cpos;
       parpos.line = line;
       pars = true;
@@ -501,7 +500,7 @@ void term_source::blink()
   struct pollfd pfd = {1, POLLIN, 0};
   poll(&pfd, 1, blink_time);
 
-  linebuffer[linepos] = '\0';
+  linebuffer.at(linepos) = '\0';
   if(ldiff == 0)
   {
     for(int i = 0; parpos.line_start[i] != 0; i++)
@@ -558,17 +557,17 @@ std::optional<std::string> term_source::getline()
       end_term();
       return {};
     }
-    switch(key_tab[static_cast<unsigned char>(c)])
+    switch(key_tab.at(static_cast<unsigned char>(c)))
     {
       case term_fun::T_EOF:
         if(linepos == 0)
         {
-          linebuffer[linepos++] = EOF;
+          linebuffer.at(linepos++) = EOF;
           end_term();
           return {};
         }
         pputc(c, stdout);
-        linebuffer[linepos++] = EOF;
+        linebuffer.at(linepos++) = EOF;
         break;
       case term_fun::T_KILL:
         retype(2);
@@ -610,7 +609,7 @@ std::optional<std::string> term_source::getline()
       }
       case term_fun::T_ERASE:
         escaped = 0;
-        if(linepos > 0 && linebuffer[linepos - 1] == '\n')
+        if(linepos > 0 && linebuffer.at(linepos - 1) == '\n')
         {
           --linepos;
           retype(0);
@@ -618,27 +617,27 @@ std::optional<std::string> term_source::getline()
         else if(linepos > 0)
         {
           delonechar();
-          if(linebuffer[linepos] == '\\')
+          if(linebuffer.at(linepos) == '\\')
             escaped = 2;
           else
           {
-            if(!instring && linebuffer[linepos] == '(')
+            if(!instring && linebuffer.at(linepos) == '(')
               parcount--;
-            if(!instring && linebuffer[linepos] == ')')
+            if(!instring && linebuffer.at(linepos) == ')')
               parcount++;
-            if(linebuffer[linepos] == '"')
+            if(linebuffer.at(linepos) == '"')
               instring = !instring;
           }
         }
         break;
       case term_fun::T_STRING:
-        linebuffer[linepos++] = c;
+        linebuffer.at(linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           instring = !instring;
         break;
       case term_fun::T_ESCAPE:
-        linebuffer[linepos++] = c;
+        linebuffer.at(linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           escaped = 2;
@@ -647,18 +646,18 @@ std::optional<std::string> term_source::getline()
         if(!instring && escaped == 0)
           parcount++;
         pputc(c, stdout);
-        linebuffer[linepos++] = c;
+        linebuffer.at(linepos++) = c;
         break;
       case term_fun::T_RIGHTPAR:
         if((escaped != 0) || instring)
         {
           pputc(c, stdout);
-          linebuffer[linepos++] = c;
+          linebuffer.at(linepos++) = c;
           break;
         }
         parcount--;
         pputc(c, stdout);
-        linebuffer[linepos++] = c;
+        linebuffer.at(linepos++) = c;
         if(parcount <= 0)
         {
           if(parcount < 0)
@@ -668,10 +667,10 @@ std::optional<std::string> term_source::getline()
           }
           else if(firstnotlp())
             break; /* paren expression not first (for readline) */
-          linebuffer[linepos++] = '\n';
+          linebuffer.at(linepos++) = '\n';
           pputc('\n', stdout);
           end_term();
-          linebuffer[linepos++] = '\0';
+          linebuffer.at(linepos++) = '\0';
           return linebuffer.data();
         }
         blink();
@@ -681,20 +680,20 @@ std::optional<std::string> term_source::getline()
         if(linepos == 0 || onlyblanks())
         {
           linepos = 0;
-          linebuffer[linepos++] = '(';
-          linebuffer[linepos++] = ')';
+          linebuffer.at(linepos++) = '(';
+          linebuffer.at(linepos++) = ')';
         }
-        linebuffer[linepos++] = '\n';
+        linebuffer.at(linepos++) = '\n';
         if(parcount <= 0 && !instring)
         {
           end_term();
-          linebuffer[linepos++] = '\0';
+          linebuffer.at(linepos++) = '\0';
           return linebuffer.data();
         }
         break;
       case term_fun::T_INSERT:
         pputc(c, stdout);
-        linebuffer[linepos++] = c;
+        linebuffer.at(linepos++) = c;
         break;
     }
   }

@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <array>
+#include <numeric>
 
 #include "ref_ptr.hh"
 #include "types.hh"
@@ -77,12 +78,12 @@ public:
     SPLICE,
     INFIX
   };
-  type get(std::uint8_t index) const { return _table[index]; }
-  void set(std::uint8_t index, type value) { _table[index] = value; }
+  type get(std::uint8_t index) const { return _table.at(index); }
+  void set(std::uint8_t index, type value) { _table.at(index) = value; }
   void set(std::uint8_t index, lisp_t value)
   {
     set(index, type::MACRO);
-    _macro[index] = value;
+    _macro.at(index) = value;
   }
   lisp_t macro(ref_file_t source, std::uint8_t index);
   /// @brief Reset read table to the defaults.
@@ -118,8 +119,9 @@ public:
   }
 
 private:
-  std::array<type, 256> _table = {type::OTHER};
-  std::array<lisp_t, 256> _macro = {nil};
+  static constexpr const auto TABLE_SIZE = std::numeric_limits<std::uint8_t>::max() + 1;
+  std::array<type, TABLE_SIZE> _table = {type::OTHER};
+  std::array<lisp_t, TABLE_SIZE> _macro = {nil};
 };
 
 } // namespace lisp

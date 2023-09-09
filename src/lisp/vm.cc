@@ -169,15 +169,15 @@ lisp_t vm::printwhere()
   int i = _toctrl - 1;
   for(; i != 0; --i) // Find latest completed call
   {
-    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::evlam0)
+    if(auto* cont = std::get_if<continuation_t>(&_control.at(i)); (cont != nullptr) && *cont == &vm::evlam0)
       break;
   }
   lisp_t foo;
   for(; i != 0; --i)
   {
-    if(auto* func = std::get_if<continuation_t>(&_control[i]); (func != nullptr) && *func == &vm::eval_end)
+    if(auto* func = std::get_if<continuation_t>(&_control.at(i)); (func != nullptr) && *func == &vm::eval_end)
     {
-      if(auto* lsp = std::get_if<expr_t>(&_control[i - 1]);
+      if(auto* lsp = std::get_if<expr_t>(&_control.at(i - 1));
          lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
@@ -543,13 +543,13 @@ void vm::bt()
   printlevel(2);
   for(auto i = _toctrl - 1; i != 0; i--)
   {
-    if(auto* cont = std::get_if<continuation_t>(&_control[i]); (cont != nullptr) && *cont == &vm::eval_end)
+    if(auto* cont = std::get_if<continuation_t>(&_control.at(i)); (cont != nullptr) && *cont == &vm::eval_end)
     {
-      if(auto* e = std::get_if<expr_t>(&_control[i - 1]))
+      if(auto* e = std::get_if<expr_t>(&_control.at(i - 1)))
         print(*e, T);
-      else if(auto* f = std::get_if<fun_t>(&_control[i - 1]))
+      else if(auto* f = std::get_if<fun_t>(&_control.at(i - 1)))
         print(*f, T);
-      else if(auto* a = std::get_if<args_t>(&_control[i - 1]))
+      else if(auto* a = std::get_if<args_t>(&_control.at(i - 1)))
         print(*a, T);
     }
   }
@@ -1075,7 +1075,7 @@ lisp_t vm::backtrace()
         else
           primerr()->format("{}\n", to_string(arg));
       },
-      _control[i]);
+      _control.at(i));
   }
   return nil;
 }
@@ -1092,11 +1092,11 @@ destblock_t* vm::mkdestblock(int size)
 {
   if(size <= DESTBLOCKSIZE - _destblockused - 1)
   {
-    auto* dest = &_destblock[_destblockused];
+    auto* dest = &_destblock.at(_destblockused);
     _destblockused += size + 1;
     dest->num(static_cast<std::int8_t>(size));
     for(int i = 1; i <= size; ++i)
-      _destblock[_destblockused - i].reset();
+      _destblock.at(_destblockused - i).reset();
     return dest;
   }
   return nullptr;
