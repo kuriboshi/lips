@@ -34,7 +34,7 @@ public:
   /// @brief Stores a block of data to hold the objects of type T.
   struct data final
   {
-    data() { _block = std::malloc(N * sizeof(T)); }
+    data() { _block = new std::byte[N * sizeof(T)]; }
     /// @brief Disallow copying.
     data(const data&) = delete;
     /// @brief Disallow assignment.
@@ -50,8 +50,8 @@ public:
     /// @brief Disallow move assignment.
     data& operator=(data&&) = delete;
     /// @brief Destructor.
-    ~data() { std::free(_block); }
-    void* _block;
+    ~data() { delete[] _block; }
+    std::byte* _block;
     std::size_t _free_items = N;
   };
   /// @brief Returns the number of free items.
