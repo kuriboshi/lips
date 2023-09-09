@@ -18,6 +18,7 @@
 #ifndef LIPS_TERM_HH
 #define LIPS_TERM_HH
 
+#include <array>
 #include <termios.h>
 #include <lisp/io.hh>
 
@@ -25,7 +26,7 @@ class term_source: public lisp::io::source
 {
 public:
   term_source(options_t options)
-    : is(linebuffer),
+    : is(linebuffer.data()),
       options(options)
   {}
   ~term_source() override;
@@ -126,16 +127,16 @@ private:
   struct termios newterm;
   struct termios oldterm;
 
-  char linebuffer[BUFSIZ] = {};    // Line buffer for terminal input.
+  std::array<char, BUFSIZ> linebuffer{}; // Line buffer for terminal input.
   std::istringstream is;           // For input stream.
   int parcount = 0;                // Counts paranthesis.
   int linepos = 0;                 // End of line buffer.
   int position = 0;                // Current position in line buffer.
-  enum term_fun key_tab[NUM_KEYS]; // Table specifying key functions.
+  std::array<enum term_fun, NUM_KEYS> key_tab; // Table specifying key functions.
 
   options_t options;
 
-  char tcap[128]; // Buffer for terminal capabilties.
+  std::array<char, 128> tcap; // Buffer for terminal capabilties.
   const char* curup = nullptr;
   const char* curfwd = nullptr; // Various term cap strings.
   const char* cleol = nullptr;

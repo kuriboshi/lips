@@ -84,7 +84,7 @@ void term_source::init_term()
     newterm.c_cc[VTIME] = 0;
     curup = nullptr;
     curfwd = nullptr;
-    char* termc = static_cast<char*>(tcap);
+    char* termc = tcap.data();
     if(auto* term = getenv("TERM"); term != nullptr)
     {
       // std::array<char, 1024> bp{};
@@ -453,7 +453,7 @@ void term_source::scan(int begin)
   if(line == 0)
   {
     currentpos.cpos += static_cast<int>(current_prompt.length());
-    currentpos.line_start = &linebuffer[0];
+    currentpos.line_start = linebuffer.data();
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)
@@ -672,7 +672,7 @@ std::optional<std::string> term_source::getline()
           pputc('\n', stdout);
           end_term();
           linebuffer[linepos++] = '\0';
-          return linebuffer;
+          return linebuffer.data();
         }
         blink();
         break;
@@ -689,7 +689,7 @@ std::optional<std::string> term_source::getline()
         {
           end_term();
           linebuffer[linepos++] = '\0';
-          return linebuffer;
+          return linebuffer.data();
         }
         break;
       case term_fun::T_INSERT:
