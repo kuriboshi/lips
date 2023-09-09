@@ -118,8 +118,8 @@ public:
   }
   /// @brief Move constructor
   ref_ptr(ref_ptr&& x)
+    : _ptr(x._ptr)
   {
-    _ptr = x._ptr;
     x._ptr = nullptr;
   }
   /// @brief Create a ref_ptr<T> with a pointer to an object of type T.

@@ -34,16 +34,16 @@ public:
   /// @brief Stores a block of data to hold the objects of type T.
   struct data final
   {
-    data() { _block = new std::byte[N * sizeof(T)]; }
+    data() : _block(new std::byte[N * sizeof(T)]) {}
     /// @brief Disallow copying.
     data(const data&) = delete;
     /// @brief Disallow assignment.
     data& operator=(const data&) = delete;
     /// @brief Move constuctor.
     data(data&& d)
+      : _block(d._block),
+        _free_items(d._free_items)
     {
-      _block = d._block;
-      _free_items = d._free_items;
       d._block = nullptr;
       d._free_items = 0;
     }

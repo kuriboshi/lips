@@ -364,7 +364,7 @@ public:
   cvariable_t() = delete;
   ~cvariable_t() = default;
   cvariable_t(const cvariable_t& other) = delete;
-  cvariable_t(cvariable_t&& other) noexcept { _value = std::move(other._value); }
+  cvariable_t(cvariable_t&& other) noexcept : _value(std::move(other._value)) {}
   cvariable_t& operator=(cvariable_t&& other) noexcept
   {
     _value = std::move(other._value);
@@ -418,7 +418,7 @@ public:
   {}
 
   /// @brief Construct an object conaining a cvariable_t value.
-  object(cvariable_t&& x) { _u = std::move(x); }
+  object(cvariable_t&& x) : _u(std::move(x)) {}
 
   /// @brief Copy consructor
   object(const object&) = delete;
