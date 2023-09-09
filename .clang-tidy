@@ -12,7 +12,6 @@ Checks: "\
   -cppcoreguidelines-special-member-functions,\
   -cppcoreguidelines-owning-memory,\
   -cppcoreguidelines-pro-type-reinterpret-cast,\
-  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
   modernize-*,\
   -modernize-use-trailing-return-type,\
   -modernize-use-nodiscard,\
