@@ -23,36 +23,35 @@
 #include "file.hh"
 #include "run.hh"
 
-int main(int argc, const char** argv)
+int main(int argc, const char** argv) try
 {
-  try
+  auto ctx = std::make_shared<lisp::context_t>();
+  lisp::vm_t vm(ctx);
+  std::vector<std::string> args{argv + 1, argv + argc};
+  for(auto f: args)
   {
-    auto ctx = std::make_shared<lisp::context_t>();
-    lisp::vm_t vm(ctx);
-    std::vector<std::string> args{argv + 1, argv + argc};
-    for(auto f: args)
+    try
     {
-      try
-      {
-        lisp::load(lisp::mkstring(f));
-      }
-      catch(const lisp::lisp_finish& ex)
-      {
-        return static_cast<int>(ex.exit_code);
-      }
-      catch(const std::exception& ex)
-      {
-        std::cout << fmt::format("{}: {}\n", f, ex.what());
-        return 1;
-      }
+      lisp::load(lisp::mkstring(f));
     }
-    return lisp::run(vm);
+    catch(const lisp::lisp_finish& ex)
+    {
+      return static_cast<int>(ex.exit_code);
+    }
+    catch(const std::exception& ex)
+    {
+      std::cout << fmt::format("{}: {}\n", f, ex.what());
+      return 1;
+    }
   }
-  catch(const std::exception& ex)
-  {
-    std::cout << fmt::format("unknown exception: {}\n", ex.what());
-  }
-  catch(...)
-  {}
+  return lisp::run(vm);
+}
+catch(const std::exception& ex)
+{
+  std::cout << fmt::format("unknown exception: {}\n", ex.what());
+  return 1;
+}
+catch(...)
+{
   return 1;
 }

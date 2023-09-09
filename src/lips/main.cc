@@ -242,108 +242,107 @@ const lisp_t C_SEMI = intern(";");
 
 std::unique_ptr<env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-int main(int argc, char* const* argv)
+int main(int argc, char* const* argv) try
 {
-  try
-  {
-    Catch::Session session;
+  Catch::Session session;
 
-    signal_flag = 0;
-    int option = 0;
-    options_t options;
-    while((option = getopt(argc, argv, "c:fvidT")) != EOF)
-    {
-      switch(option)
-      {
-        case 'c':
-          options.command = true;
-          // TODO: Read expression from command line and evaluate
-          // loadbuf(optarg);
-          break;
-        case 'f':
-          options.fast = true;
-          break;
-        case 'v':
-          options.version = true;
-          break;
-        case 'i':
-          options.interactive = true;
-          break;
-        case 'd':
-          options.debug = true;
-          break;
-        case 'T':
-          options.test = true;
-          break;
-        default:
-          std::cout << "usage: -fvicT [arguments]\n";
-          ::exit(1);
-          break;
-      }
-    }
-    if(!options.interactive && !options.command)
-      options.interactive = isatty(0) != 0;
-    if(options.version)
-      std::cout << version() << '\n';
-
-    //
-    // Init shell and lisp interpreter.
-    //
-    auto context = std::make_shared<context_t>();
-    lisp::vm_t vm(context);
-    init();
-    if(options.test)
-    {
-      auto result = session.run();
-      return result;
-    }
-    if(!options.fast)
-    {
-      try
-      {
-        loadinit(LIPSRC);
-        greet(nil);
-      }
-      catch(const lisp_error& error)
-      {
-        std::cout << "Error loading rc file: " << error.what() << '\n';
-      }
-    }
-    ref_file_t terminal{new file_t(std::make_unique<term_source>(options))};
-    top toploop(options, terminal);
-    while(true)
-    {
-      try
-      {
-        if(!options.debug && options.interactive)
-          init_all_signals();
-        vm::get().unwind();
-        vm::get().repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
-        vm::get().repl(nil);
-        return 0;
-      }
-      catch(const lisp_reset&)
-      {
-        std::cout << "^C\n";
-      }
-      catch(const lisp_error& error)
-      {
-        dynamic_cast<term_source&>(terminal->source()).clearlbuf();
-        std::cerr << "error: " << error.what() << '\n';
-      }
-      catch(const lisp_finish& fin)
-      {
-        context->primerr()->format("finish: {}\n", fin.what());
-        return fin.exit_code;
-      }
-    }
-    return 0;
-  }
-  catch(const std::exception& ex)
+  signal_flag = 0;
+  int option = 0;
+  options_t options;
+  while((option = getopt(argc, argv, "c:fvidT")) != EOF)
   {
-    std::cerr << "unknown exception: " << ex.what() << std::endl;
+    switch(option)
+    {
+      case 'c':
+        options.command = true;
+        // TODO: Read expression from command line and evaluate
+        // loadbuf(optarg);
+        break;
+      case 'f':
+        options.fast = true;
+        break;
+      case 'v':
+        options.version = true;
+        break;
+      case 'i':
+        options.interactive = true;
+        break;
+      case 'd':
+        options.debug = true;
+        break;
+      case 'T':
+        options.test = true;
+        break;
+      default:
+        std::cout << "usage: -fvicT [arguments]\n";
+        ::exit(1);
+        break;
+    }
   }
-  catch(...)
-  {}
+  if(!options.interactive && !options.command)
+    options.interactive = isatty(0) != 0;
+  if(options.version)
+    std::cout << version() << '\n';
+
+  //
+  // Init shell and lisp interpreter.
+  //
+  auto context = std::make_shared<context_t>();
+  lisp::vm_t vm(context);
+  init();
+  if(options.test)
+  {
+    auto result = session.run();
+    return result;
+  }
+  if(!options.fast)
+  {
+    try
+    {
+      loadinit(LIPSRC);
+      greet(nil);
+    }
+    catch(const lisp_error& error)
+    {
+      std::cout << "Error loading rc file: " << error.what() << '\n';
+    }
+  }
+  ref_file_t terminal{new file_t(std::make_unique<term_source>(options))};
+  top toploop(options, terminal);
+  while(true)
+  {
+    try
+    {
+      if(!options.debug && options.interactive)
+        init_all_signals();
+      vm::get().unwind();
+      vm::get().repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
+      vm::get().repl(nil);
+      return 0;
+    }
+    catch(const lisp_reset&)
+    {
+      std::cout << "^C\n";
+    }
+    catch(const lisp_error& error)
+    {
+      dynamic_cast<term_source&>(terminal->source()).clearlbuf();
+      std::cerr << "error: " << error.what() << '\n';
+    }
+    catch(const lisp_finish& fin)
+    {
+      context->primerr()->format("finish: {}\n", fin.what());
+      return fin.exit_code;
+    }
+  }
+  return 0;
+}
+catch(const std::exception& ex)
+{
+  std::cerr << "unknown exception: " << ex.what() << std::endl;
+  return 1;
+}
+catch(...)
+{
   return 1;
 }

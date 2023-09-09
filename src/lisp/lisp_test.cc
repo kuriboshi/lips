@@ -36,68 +36,50 @@ lisp::lisp_t buildpath(I i, I end)
 }
 } // namespace
 
-int main(int argc, const char** argv)
+int main(int argc, const char** argv) try
 {
+  Catch::Session session;
+  std::vector<std::string> load;
+  std::vector<std::string> loadpath;
+  using namespace Catch::Clara;
+  auto cli = session.cli() | Opt(load, "load")["--load"]("Load a LISP file")
+    | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
+  session.cli(cli);
+  session.applyCommandLine(argc, argv);
   try
   {
-    Catch::Session session;
-    std::vector<std::string> load;
-    std::vector<std::string> loadpath;
-    using namespace Catch::Clara;
-    auto cli = session.cli() | Opt(load, "load")["--load"]("Load a LISP file")
-      | Opt(loadpath, "loadpath")["--loadpath"]("Set load loadpath");
-    session.cli(cli);
-    session.applyCommandLine(argc, argv);
-#if 0
-    try
-    {
-      lisp::vm::get().context();
-      // This exception is never thrown
-      throw std::runtime_error("lisp::context::current didn't throw an exception");
-    }
-    catch(const std::runtime_error& ex)
-    {
-      std::string s0{ex.what()};
-      std::string s1{"lisp::context has not been created"};
-      if(s0 != s1)
-        throw;
-    }
-#endif
-    try
-    {
-      lisp::vm::get();
-      // This exception is never thrown
-      throw std::runtime_error("lisp::vm::get didn't throw an exception");
-    }
-    catch(const std::runtime_error& ex)
-    {
-      std::string s0{ex.what()};
-      std::string s1{"lisp::vm has not been created"};
-      if(s0 != s1)
-        throw;
-    }
-    auto context = std::make_shared<lisp::context_t>();
-    lisp::vm_t vm(context);
-    std::ostringstream os;
-    auto quiet = lisp::ref_file_t::create(os);
-    context->primerr(quiet);
-    if(!loadpath.empty())
-    {
-      auto path = buildpath(loadpath.begin(), loadpath.end());
-      context->loadpath(path);
-    }
-    for(auto i: load)
-      lisp::loadfile(i);
-    auto result = session.run();
-    return result;
+    lisp::vm::get();
+    // This exception is never thrown
+    throw std::runtime_error("lisp::vm::get didn't throw an exception");
   }
-  catch(const lisp::lisp_finish& ex)
+  catch(const std::runtime_error& ex)
   {
-    return ex.exit_code;
+    std::string s0{ex.what()};
+    std::string s1{"lisp::vm has not been created"};
+    if(s0 != s1)
+      throw;
   }
-  catch(const std::exception& ex)
+  auto context = std::make_shared<lisp::context_t>();
+  lisp::vm_t vm(context);
+  std::ostringstream os;
+  auto quiet = lisp::ref_file_t::create(os);
+  context->primerr(quiet);
+  if(!loadpath.empty())
   {
-    std::cerr << ex.what() << std::endl;
-    return 1;
+    auto path = buildpath(loadpath.begin(), loadpath.end());
+    context->loadpath(path);
   }
+  for(auto i: load)
+    lisp::loadfile(i);
+  auto result = session.run();
+  return result;
+}
+catch(const lisp::lisp_finish& ex)
+{
+  return ex.exit_code;
+}
+catch(const std::exception& ex)
+{
+  std::cerr << ex.what() << std::endl;
+  return 1;
 }
