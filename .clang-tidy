@@ -20,7 +20,6 @@ Checks: "\
   -modernize-use-trailing-return-type,\
   -modernize-use-nodiscard,\
   -modernize-pass-by-value,\
-  -modernize-avoid-c-arrays,\
   readability-*,\
   -readability-braces-around-statements,\
   -readability-identifier-length,\
