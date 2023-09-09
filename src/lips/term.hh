@@ -124,19 +124,19 @@ private:
   //
   // Variables for terminal characteristics, old and new.
   //
-  struct termios newterm;
-  struct termios oldterm;
+  struct termios newterm{};
+  struct termios oldterm{};
 
   std::array<char, BUFSIZ> linebuffer{}; // Line buffer for terminal input.
   std::istringstream is;           // For input stream.
   int parcount = 0;                // Counts paranthesis.
   int linepos = 0;                 // End of line buffer.
   int position = 0;                // Current position in line buffer.
-  std::array<enum term_fun, NUM_KEYS> key_tab; // Table specifying key functions.
+  std::array<enum term_fun, NUM_KEYS> key_tab{}; // Table specifying key functions.
 
   options_t options;
 
-  std::array<char, 128> tcap; // Buffer for terminal capabilties.
+  std::array<char, 128> tcap{}; // Buffer for terminal capabilties.
   const char* curup = nullptr;
   const char* curfwd = nullptr; // Various term cap strings.
   const char* cleol = nullptr;
