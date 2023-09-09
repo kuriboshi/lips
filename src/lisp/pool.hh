@@ -96,7 +96,7 @@ private:
     // points to the first available memory in the data block.
     T* object = ::new(_current) T;
     --_storage.front()._free_items;
-    _current = static_cast<char*>(_current) + sizeof(T);
+    _current = _current + sizeof(T);
     return object;
   }
   /// @brief The item struct is used to link objects returned to the pool by
@@ -125,7 +125,7 @@ private:
   /// if there are no objects available in the free list.
   std::list<data> _storage;
   /// @brief Pointer to the next available memory in the data block.
-  void* _current = nullptr;
+  std::byte* _current = nullptr;
 };
 
 struct pool_test_t
