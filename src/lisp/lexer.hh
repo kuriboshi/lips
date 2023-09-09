@@ -68,14 +68,12 @@ struct token_t final
   };
 
   /// @brief Token type.
-  enum type type;
+  enum type type{type::EMPTY};
   /// @brief A string representation of the token.
   std::string token;
 
   /// @brief Default constructor is the empty token.
-  token_t()
-    : type(type::EMPTY)
-  {}
+  token_t() = default;
   /// @brief Construct a token of a certain type but with an empty token
   /// string.
   ///

@@ -51,7 +51,7 @@ private:
   };
 
   class vm& _vm; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
-  int _level = -1;
+  int _level{-1};
 };
 
 } // namespace lisp

@@ -76,9 +76,7 @@ private:
   std::unique_ptr<impl> _pimpl;
   std::int64_t _printlevel{0};
 
-  static const constexpr std::int64_t default_base = 10;
-
-  friend class vm;
+  static const constexpr std::int64_t default_base{10};
 };
 
 } // namespace lisp

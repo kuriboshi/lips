@@ -79,7 +79,7 @@ protected:
 
 private:
   /// @brief The reference counter.
-  mutable Counter _counter = 0;
+  mutable Counter _counter{0};
   /// @brief Only the ref_ptr class is allowed to create objects of type
   /// ref_count.
   template<typename U>
@@ -191,7 +191,7 @@ public:
 
 private:
   /// @brief The pointer to the object being controlled.
-  T* _ptr = nullptr;
+  T* _ptr{nullptr};
   /// @brief Smart pointer comparor for sorting purposes.
   friend bool operator<(const ref_ptr<T>& x, const ref_ptr<T>& y) { return x._ptr < y._ptr; }
   /// @brief Equality operator.

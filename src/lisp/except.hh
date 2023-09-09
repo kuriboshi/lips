@@ -51,7 +51,7 @@ public:
     : std::runtime_error(message),
       exit_code(static_cast<int>(code))
   {}
-  int exit_code;
+  int exit_code{0};
 };
 
 } // namespace lisp

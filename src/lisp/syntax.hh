@@ -89,6 +89,8 @@ public:
   /// @brief Reset read table to the defaults.
   void reset()
   {
+    _table.fill(type::OTHER);
+    _macro.fill(nil);
     set('(', type::LEFT_PAREN);
     set(')', type::RIGHT_PAREN);
     set('[', type::LEFT_BRACKET);
@@ -120,8 +122,8 @@ public:
 
 private:
   static constexpr const auto TABLE_SIZE = std::numeric_limits<std::uint8_t>::max() + 1;
-  std::array<type, TABLE_SIZE> _table = {type::OTHER};
-  std::array<lisp_t, TABLE_SIZE> _macro = {nil};
+  std::array<type, TABLE_SIZE> _table{};
+  std::array<lisp_t, TABLE_SIZE> _macro{};
 };
 
 } // namespace lisp

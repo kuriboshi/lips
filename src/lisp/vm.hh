@@ -184,7 +184,6 @@ private:
   //
   // The control stack.
   //
-  destblock_t* _dest = nullptr; // Current destination being built.
   using continuation_t = bool (vm::*)();
   struct expr_t
   {
@@ -232,9 +231,9 @@ private:
     }
   };
   using control_t = std::variant<std::monostate, destblock_t*, continuation_t, expr_t, fun_t, args_t>;
-  static constexpr int CTRLBLKSIZE = 4000;
+  static constexpr int CTRLBLKSIZE{4000};
   std::array<control_t, CTRLBLKSIZE> _control; // Control-stack
-  int _toctrl = 0;                             // Control-stack stack pointer
+  int _toctrl{0};                              // Control-stack stack pointer
 
   // @brief Pushes continuations, destinations, or lisp_t objects on the control
   // stack.
@@ -350,19 +349,21 @@ private:
   expr_t _expression;             // Stores urrent expression being evaluated.
   fun_t _fun;                     // Current function.
   args_t _args;                   // Current arguments.
-  bool _noeval = false;           // Don't evaluate arguments.
-  continuation_t _cont = nullptr; // Current continuation.
-  destblock_t* _env = nullptr;    // Current environment.
+  bool _noeval{false};            // Don't evaluate arguments.
+  continuation_t _cont{nullptr};  // Current continuation.
+  destblock_t* _env{nullptr};     // Current environment.
 
-  bool _trace = false;
-  bool _interactive = false;
+  bool _trace{false};
+  bool _interactive{false};
 
   /// @brief Size of destination block area
-  static constexpr int DESTBLOCKSIZE = 3000;
+  static constexpr int DESTBLOCKSIZE{3000};
   /// @brief Destination block area.
   std::array<destblock_t, DESTBLOCKSIZE> _destblock;
+  // @brief Current destination being built.
+  destblock_t* _dest{nullptr};
   /// @brief Index to last slot in destblock.
-  int _destblockused = 0;
+  int _destblockused{0};
 };
 
 template<typename Context>

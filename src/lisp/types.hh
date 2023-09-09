@@ -57,8 +57,8 @@ public:
   {}
   ~cons_t() = default;
 
-  lisp_t car = nil;
-  lisp_t cdr = nil;
+  lisp_t car;
+  lisp_t cdr;
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return pool().allocate(); }
@@ -93,9 +93,9 @@ class destblock_t final
 private:
   struct control_block
   {
-    std::int8_t size;
-    std::int8_t index;
-    destblock_t* link;
+    std::int8_t size{0};
+    std::int8_t index{0};
+    destblock_t* link{nullptr};
   };
   struct var_val_pair
   {
@@ -194,9 +194,9 @@ public:
   /// @brief The print name.
   std::string name;
   /// @brief Eval or no eval.
-  enum subr subr = subr::EVAL;
+  enum subr subr{subr::EVAL};
   /// @brief Spread or no spread.
-  enum spread spread = spread::SPREAD;
+  enum spread spread{spread::SPREAD};
 
 private:
   using func0_t = std::function<lisp_t()>;
@@ -252,13 +252,13 @@ public:
   ~lambda_t() = default;
 
   /// @brief The S-expression representation of the lambda function.
-  lisp_t body = nil;
+  lisp_t body;
   /// @brief The list of arguments.
-  lisp_t args = nil;
+  lisp_t args;
   /// @brief The number of arguments.
-  std::int8_t count = 0;
+  std::int8_t count{0};
   /// @brief True if arguments are evaluated, false if not (nlambda).
-  bool eval = true;
+  bool eval{true};
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return pool().allocate(); }
@@ -288,10 +288,10 @@ public:
   closure_t() = default;
   ~closure_t() = default;
 
-  lisp_t cfunction = nil;
-  lisp_t closed = nil;
-  lisp_t cvalues = nil;
-  std::uint8_t count = 0;
+  lisp_t cfunction;
+  lisp_t closed;
+  lisp_t cvalues;
+  std::uint8_t count{0};
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return pool().allocate(); }

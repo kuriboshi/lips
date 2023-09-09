@@ -51,8 +51,8 @@ public:
     data& operator=(data&&) = delete;
     /// @brief Destructor.
     ~data() { delete[] _block; }
-    std::byte* _block;
-    std::size_t _free_items = N;
+    std::byte* _block{nullptr};
+    std::size_t _free_items{N};
   };
   /// @brief Returns the number of free items.
   std::size_t size() const
@@ -103,7 +103,7 @@ private:
   /// deallocate in a linked list.
   struct item
   {
-    item* _next;
+    item* _next{nullptr};
   };
   /// @brief Return an object to the pool.
   void deallocate(void* obj)
@@ -118,14 +118,14 @@ private:
 
   /// @brief Pointer to the head of a list of object previously returned to the
   /// pool by deallocate.
-  item* _free = nullptr;
+  item* _free{nullptr};
   /// @brief Counter of objects returned to the pool.
-  unsigned _free_count = 0;
+  unsigned _free_count{0};
   /// @brief Pointer to the storage block from where new objects are allocated
   /// if there are no objects available in the free list.
   std::list<data> _storage;
   /// @brief Pointer to the next available memory in the data block.
-  std::byte* _current = nullptr;
+  std::byte* _current{nullptr};
 };
 
 struct pool_test_t
