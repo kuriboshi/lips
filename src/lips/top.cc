@@ -169,7 +169,7 @@ void top::promptprint(lisp_t prompt)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-lisp_t top::operator()(lisp_t exp)
+lisp_t top::operator()(lisp_t)
 {
   ++_level;
   while(true)

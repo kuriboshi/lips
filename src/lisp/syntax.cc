@@ -23,7 +23,7 @@ namespace lisp
 lisp_t syntax::macro(ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro.at(index);
-  lisp_t f = getobject(source);
+  const lisp_t f = getobject(source);
   if(fn != nil)
     return apply(fn, cons(f, nil));
   return nil;

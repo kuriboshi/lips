@@ -72,7 +72,7 @@ private:
 };
 
 inline iterator begin(lisp_t l) { return {l}; }
-inline iterator end(lisp_t l) { return {nullptr}; }
+inline iterator end(lisp_t) { return {nullptr}; }
 
 } // namespace lisp
 

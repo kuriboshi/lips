@@ -84,7 +84,7 @@ public:
   }
   static const std::error_category& category()
   {
-    static type_category instance;
+    static const type_category instance;
     return instance;
   }
 };
@@ -173,7 +173,7 @@ public:
   }
   static const std::error_category& category()
   {
-    static error_category instance;
+    static const error_category instance;
     return instance;
   }
 };

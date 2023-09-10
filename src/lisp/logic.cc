@@ -57,7 +57,7 @@ lisp_t p_not(lisp_t x)
 
 lisp_t xif(lisp_t pred, lisp_t true_expr, lisp_t false_expr)
 {
-  lisp_t foo = eval(pred);
+  const lisp_t foo = eval(pred);
   if(is_nil(foo))
     return progn(false_expr);
   return eval(true_expr);

@@ -94,7 +94,7 @@ public:
   bool trace() const { return _trace; }
   bool trace(bool t)
   {
-    bool old = _trace;
+    const bool old = _trace;
     _trace = t;
     return old;
   }
@@ -173,17 +173,13 @@ private:
   template<typename T>
   static std::string cat(const T& arg)
   {
-    std::ostringstream os;
-    os << arg;
-    return os.str();
+    return fmt::format("{}", arg);
   }
 
   template<typename T, typename... Ts>
   static std::string cat(const T& first, const Ts&... args)
   {
-    std::ostringstream os;
-    os << first << " " << cat(args...);
-    return os.str();
+    return fmt::format("{} {}", first, cat(args...));
   }
 
   //

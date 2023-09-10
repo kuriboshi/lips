@@ -15,6 +15,9 @@ Checks: "\
   -cppcoreguidelines-non-private-member-variables-in-classes,\
   -cppcoreguidelines-owning-memory,\
   -cppcoreguidelines-pro-type-reinterpret-cast,\
+  misc-*,\
+  -misc-no-recursion,\
+  -misc-non-private-member-variables-in-classes,\
   modernize-*,\
   -modernize-use-trailing-return-type,\
   -modernize-use-nodiscard,\

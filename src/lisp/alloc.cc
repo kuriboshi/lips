@@ -19,6 +19,35 @@
 
 #include "alloc.hh"
 
+namespace
+{
+/// @brief Builds an argument list.
+///
+/// @details The list is constructed from the ALIST given in a lambda
+/// definition.  This list may end in an atom if the function is halfspread,
+/// or it could be an atom for a nospread function.  COUNT is set to the
+/// number of arguments and is negative if halfspread or nospread.
+///
+/// @param alist [in] The argument list in a lambda definitions.
+/// @param count [in, out] The number of arguments in the argument list.
+/// Negative for nospread and halfspread.
+///
+/// @return A straight list of arguments.
+lisp::lisp_t mkarglist(lisp::lisp_t alist, std::int8_t& count)
+{
+  if(type_of(alist) == lisp::object::type::Cons)
+  {
+    ++count;
+    return cons(alist->car(), mkarglist(alist->cdr(), count));
+  }
+  if(is_nil(alist))
+    return lisp::nil;
+  ++count;
+  count = static_cast<std::int8_t>(-count);
+  return cons(alist, lisp::nil);
+}
+}
+
 namespace lisp::details::alloc
 {
 lisp_t obarray()
@@ -37,32 +66,6 @@ lisp_t mknumber(std::int64_t number) { return getobject(number); }
 /// @brief Create a double.
 ///
 lisp_t mkfloat(double number) { return getobject(number); }
-
-/// @brief Builds an argument list.
-///
-/// @details The list is constructed from the ALIST given in a lambda
-/// definition.  This list may end in an atom if the function is halfspread,
-/// or it could be an atom for a nospread function.  COUNT is set to the
-/// number of arguments and is negative if halfspread or nospread.
-///
-/// @param alist [in] The argument list in a lambda definitions.
-/// @param count [in, out] The number of arguments in the argument list.
-/// Negative for nospread and halfspread.
-///
-/// @return A straight list of arguments.
-static lisp_t mkarglist(lisp_t alist, std::int8_t& count)
-{
-  if(type_of(alist) == object::type::Cons)
-  {
-    ++count;
-    return cons(alist->car(), mkarglist(alist->cdr(), count));
-  }
-  if(is_nil(alist))
-    return nil;
-  ++count;
-  count = static_cast<std::int8_t>(-count);
-  return cons(alist, nil);
-}
 
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {

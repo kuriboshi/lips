@@ -59,7 +59,7 @@ public:
   }
   static const std::error_category& category()
   {
-    static lips_category instance;
+    static const lips_category instance;
     return instance;
   }
 };

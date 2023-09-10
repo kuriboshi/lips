@@ -43,7 +43,7 @@ void repl::main_loop()
 
 lisp_t repl::operator()(lisp_t exp)
 {
-  level begin(*this);
+  const level begin(*this);
   if(_level == 0)
   {
     main_loop();

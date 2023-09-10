@@ -231,7 +231,7 @@ lisp_t append(lisp_t x)
 {
   lisp_t cl;
 
-  lisp_t newl = cons(nil, nil);
+  const lisp_t newl = cons(nil, nil);
   lisp_t curp = newl;
   for(; !is_nil(x); x = x->cdr())
   {

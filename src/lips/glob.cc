@@ -119,7 +119,7 @@ TEST_CASE("match")
   std::filesystem::create_directories("testdir", ec);
   REQUIRE(!ec);
   {
-    std::ofstream of("testfile");
+    const std::ofstream of("testfile");
   }
 
   SECTION("match: dircheck")
@@ -354,7 +354,7 @@ TEST_CASE("extilde")
   }
   SECTION("~USER == HOME")
   {
-    std::string user = env::get("USER");
+    const std::string user = env::get("USER");
     auto tilde_user = "~" + user;
     auto dir = extilde(tilde_user);
     REQUIRE(dir);
@@ -362,7 +362,7 @@ TEST_CASE("extilde")
   }
   SECTION("~UNKNOWN != ")
   {
-    std::string unknown = "~foobar";
+    const std::string unknown = "~foobar";
     auto dir = extilde(unknown);
     REQUIRE(!dir);
   }
@@ -379,7 +379,7 @@ lisp_t expandfiles(const std::string& wild, bool sort)
   auto files = walkfiles(wild);
   if(files.empty())
     return C_ERROR;
-  struct
+  const struct
   {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }
   } reverse;
@@ -392,7 +392,7 @@ lisp_t expandfiles(const std::string& wild, bool sort)
 TEST_CASE("expandfiles")
 {
   std::error_code ec;
-  std::vector<std::string> dirs{"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
+  const std::vector<std::string> dirs{"testdir/a"s, "testdir/bb"s, "testdir/ccc"s};
   for(auto d: dirs)
   {
     std::filesystem::create_directories(d, ec);
@@ -443,7 +443,7 @@ TEST_CASE("expandfiles")
 
   SECTION("testdir/*")
   {
-    lisp_t wild = mkstring("testdir/*");
+    const lisp_t wild = mkstring("testdir/*");
     auto e = expand(wild);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
@@ -459,7 +459,7 @@ TEST_CASE("expandfiles")
 
   SECTION("testd*/*")
   {
-    lisp_t wild = mkstring("testd*/*");
+    const lisp_t wild = mkstring("testd*/*");
     auto e = expand(wild);
     CHECK(length(e)->intval() == 3);
     for(auto i: e)
@@ -475,7 +475,7 @@ TEST_CASE("expandfiles")
 
   SECTION("./testd*")
   {
-    std::string s{"./testd*"};
+    const std::string s{"./testd*"};
     auto e = expandfiles(s, true);
     REQUIRE(length(e)->intval() >= 1);
     CHECK(e->car()->getstr() == "./testdir");

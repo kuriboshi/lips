@@ -51,6 +51,9 @@ public:
     data& operator=(data&&) = delete;
     /// @brief Destructor.
     ~data() { delete[] _block; }
+
+    friend pool;
+  private:
     std::byte* _block{nullptr};
     std::size_t _free_items{N};
   };

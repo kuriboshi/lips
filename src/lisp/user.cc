@@ -76,7 +76,7 @@ inline lisp_t checkfn(lisp_t name, lisp_t lam)
   if(name->value() != C_UNBOUND)
     if(type_of(name->value()) == object::type::Lambda)
     {
-      lisp_t t = user::funeq(name->value(), lam);
+      const lisp_t t = user::funeq(name->value(), lam);
       if(is_nil(t))
       {
         putprop(name, C_OLDDEF, name->value());

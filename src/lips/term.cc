@@ -479,8 +479,8 @@ void term_source::blink()
     return; // Requires termcap and enough capability
   scan(linepos - 1);
 
-  int ldiff = currentpos.line - parpos.line;
-  int cdiff = parpos.cpos - currentpos.cpos;
+  const int ldiff = currentpos.line - parpos.line;
+  const int cdiff = parpos.cpos - currentpos.cpos;
   nput(curup, ldiff);
   if(cdiff < 0)
   {
@@ -546,7 +546,7 @@ std::optional<std::string> term_source::getline()
   }
   position = 0;
   linepos = 0;
-  int origpar = parcount;
+  const int origpar = parcount;
   while(true)
   {
     if(escaped != 0)

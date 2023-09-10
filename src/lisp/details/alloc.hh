@@ -55,7 +55,7 @@ lisp_t mkatom(std::string_view);
 ///
 inline void mkprim(subr_t subr)
 {
-  lisp_t f = intern(subr.name);
+  const lisp_t f = intern(subr.name);
   f->value(new object(subr_index{subr_t::put(subr)}));
 }
 

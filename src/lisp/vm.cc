@@ -35,6 +35,32 @@
 #include "rtable.hh"
 #include "version.hh"
 
+namespace
+{
+lisp::lisp_t make_symbol(std::string_view sym, lisp::lisp_t value = lisp::nil)
+{
+  auto symbol = lisp::details::alloc::intern(sym);
+  symbol->value(value);
+  return symbol;
+}
+
+lisp::lisp_t make_const(std::string_view sym, lisp::lisp_t value = lisp::nil)
+{
+  auto symbol = lisp::details::alloc::intern(sym);
+  symbol->value(value);
+  symbol->symbol()->constant = true;
+  return symbol;
+}
+
+lisp::lisp_t make_t()
+{
+  auto symbol = make_symbol("t");
+  symbol->value(symbol);
+  symbol->symbol()->constant = true;
+  return symbol;
+}
+}
+
 namespace lisp::details::vm
 {
 
@@ -72,29 +98,6 @@ void init()
 
 namespace lisp
 {
-static lisp_t make_symbol(std::string_view sym, lisp_t value = nil)
-{
-  auto symbol = details::alloc::intern(sym);
-  symbol->value(value);
-  return symbol;
-}
-
-static lisp_t make_const(std::string_view sym, lisp_t value = nil)
-{
-  auto symbol = details::alloc::intern(sym);
-  symbol->value(value);
-  symbol->symbol()->constant = true;
-  return symbol;
-}
-
-static lisp_t make_t()
-{
-  auto symbol = make_symbol("t");
-  symbol->value(symbol);
-  symbol->symbol()->constant = true;
-  return symbol;
-}
-
 const lisp_t C_UNBOUND = make_const("unbound");
 const lisp_t T = make_t();
 const lisp_t NIL = make_const("nil");
@@ -157,7 +160,7 @@ public:
 
 vm* vm::set(vm* ptr)
 {
-  static init init;
+  static const init init;
   static vm* current{nullptr}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
   if(current == nullptr)
     current = ptr;
@@ -401,7 +404,7 @@ void vm::do_unbound(continuation_t continuation)
   // definition from a file. If that doesn't succeed, then the symbol is
   // undefined.
   //
-  lisp_t al = getprop(_expression->car(), C_AUTOLOAD);
+  const lisp_t al = getprop(_expression->car(), C_AUTOLOAD);
   if(!is_nil(al))
   {
     push(_expression);
@@ -667,7 +670,7 @@ bool vm::evlis1()
 // Done with the list of expressions.
 bool vm::eval_list_end()
 {
-  lisp_t x = cons(receive(), nil);
+  const lisp_t x = cons(receive(), nil);
   send(x);
   pop(_cont);
   return false;
@@ -804,7 +807,7 @@ void vm::link()
   _env = _dest;
   for(auto i = _dest[0].size(); i > 0; i--)
   {
-    lisp_t t = _dest[i].var()->value();
+    const lisp_t t = _dest[i].var()->value();
     _dest[i].var()->value(_dest[i].val());
     _dest[i].val(t);
   }
@@ -858,7 +861,7 @@ void vm::reset()
 
 bool vm::eval_lookup()
 {
-  lisp_t t = _expression->value();
+  const lisp_t t = _expression->value();
   switch(type_of(t))
   {
     case object::type::Indirect:

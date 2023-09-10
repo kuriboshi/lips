@@ -44,14 +44,19 @@
 using namespace lisp;
 using namespace std::literals;
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
 #if defined(__APPLE__) || defined(__FreeBSD__)
-extern char** environ; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+extern char** environ;
 #endif
 
 // Is nonzero in the child after a fork
-bool insidefork = false; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+bool insidefork = false;
 
-static std::unordered_map<std::string, std::string> exechash; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+namespace
+{
+std::unordered_map<std::string, std::string> exechash;
+}
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 namespace
 {

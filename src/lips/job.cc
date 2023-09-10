@@ -14,13 +14,18 @@
 // background in which case it is saved on another list, cjoblist. This list is
 // freed when a background job exits, signaling its parent with a SIGCHLD.
 
+namespace
+{
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+// List of jobs
+std::list<lisp::job::job_t> joblist;
+// List of collected jobs
+std::list<lisp::job::job_t> cjoblist;
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+}
+
 namespace lisp::job
 {
-// List of jobs
-static std::list<job_t> joblist; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-// List of collected jobs
-static std::list<job_t> cjoblist; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-
 ///
 /// @brief printjob Print the job information.
 ///

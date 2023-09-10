@@ -163,7 +163,7 @@ inline lisp_t operator"" _l(long double d)
   {
     if(d > max_double)
     {
-      lisp_t err{mkstring(fmt::format("{} too large", d))};
+      const lisp_t err{mkstring(fmt::format("{} too large", d))};
       error(error_errc::illegal_arg, err);
     }
   }

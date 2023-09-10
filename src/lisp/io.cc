@@ -46,7 +46,7 @@ lisp_t ratom(ref_file_t file)
 {
   lexer lexer{file};
   auto token = lexer.read();
-  parser parser{lexer};
+  const parser parser{lexer};
   return parser::create(token);
 }
 
@@ -279,7 +279,7 @@ lisp_t splice(lisp_t x, lisp_t y, bool tailp)
   check(x, object::type::Cons);
   if(is_nil(y))
     return x;
-  lisp_t t = x->cdr();
+  const lisp_t t = x->cdr();
   if(type_of(y) != object::type::Cons)
   {
     if(tailp)
