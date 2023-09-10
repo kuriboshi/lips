@@ -3,6 +3,10 @@ Checks: "\
   bugprone-*,\
   -bugprone-exception-escape,\
   -bugprone-unused-return-value,\
+  cert-*,\
+  -cert-dcl21-cpp,\
+  -cert-err58-cpp,\
+  -cert-err33-c,\
   clang-diagnostic-*,\
   clang-analyzer-*,\
   cppcoreguidelines-*,\
