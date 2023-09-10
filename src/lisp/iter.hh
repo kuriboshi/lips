@@ -42,7 +42,7 @@ public:
   using reference = lisp_t&;
 
   iterator(lisp_t l)
-    : _car(l)
+    : _car(std::move(l))
   {}
   bool operator==(const iterator& x) const { return _car == x._car; }
   bool operator!=(const iterator& x) const { return _car != x._car; }

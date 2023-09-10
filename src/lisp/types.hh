@@ -52,8 +52,8 @@ class cons_t final: public ref_count<cons_t>
 public:
   cons_t() = default;
   cons_t(lisp_t a, lisp_t d)
-    : car(a),
-      cdr(d)
+    : car(std::move(a)),
+      cdr(std::move(d))
   {}
 
   lisp_t car;
@@ -314,8 +314,8 @@ class string_t final: public ref_count<string_t>
 {
 public:
   string_t() = default;
-  string_t(const std::string& s)
-    : string(s)
+  string_t(std::string s)
+    : string(std::move(s))
   {}
 
   std::string string;
@@ -355,7 +355,7 @@ class cvariable_t final
 {
 public:
   explicit cvariable_t(lisp_t value)
-    : _value(value)
+    : _value(std::move(value))
   {}
   cvariable_t() = delete;
   ~cvariable_t() = default;

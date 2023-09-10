@@ -381,7 +381,7 @@ public:
   ///
   /// @param context The context object.
   explicit vm_t(std::shared_ptr<Context> context)
-    : _context(context)
+    : _context(std::move(context))
   {
     vm::set(this);
   }

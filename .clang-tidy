@@ -14,7 +14,6 @@ Checks: "\
   modernize-*,\
   -modernize-use-trailing-return-type,\
   -modernize-use-nodiscard,\
-  -modernize-pass-by-value,\
   readability-*,\
   -readability-braces-around-statements,\
   -readability-identifier-length,\

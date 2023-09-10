@@ -86,9 +86,9 @@ struct token_t final
   ///
   /// @param t The type of token.
   /// @param s The token string.
-  token_t(enum type t, const std::string& s)
+  token_t(enum type t, std::string s)
     : type(t),
-      token(s)
+      token(std::move(s))
   {}
   ~token_t() = default;
   /// @brief The operator bool for use in bool contexts.
@@ -180,7 +180,7 @@ class lexer final
 {
 public:
   lexer(ref_file_t input)
-    : _input(input),
+    : _input(std::move(input)),
       _pos(_input->source().begin())
   {}
   lexer(std::string s)

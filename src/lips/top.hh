@@ -29,8 +29,8 @@ class top
 {
 public:
   top(options_t options, ref_file_t file)
-    : _options(options),
-      _file(file)
+    : _options(std::move(options)),
+      _file(std::move(file))
   {}
   ~top() = default;
 
