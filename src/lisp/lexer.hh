@@ -90,7 +90,6 @@ struct token_t final
     : type(t),
       token(s)
   {}
-  /// @brief Default destructor.
   ~token_t() = default;
   /// @brief The operator bool for use in bool contexts.
   ///
@@ -100,9 +99,13 @@ struct token_t final
   /// @brief Default copy constructor.
   token_t(const token_t& t) = default;
   /// @brief Copy and move assignment operator.
-  token_t& operator=(token_t t) noexcept
+  token_t& operator=(const token_t& t) noexcept
   {
-    swap(*this, t);
+    if(this != &t)
+    {
+      type = t.type;
+      token = t.token;
+    }
     return *this;
   }
   /// @brief The move constructor.
@@ -114,6 +117,17 @@ struct token_t final
   {
     t.type = type::EMPTY;
   }
+  /// @brief The move assignment operator
+  token_t& operator=(token_t&& t) noexcept
+  {
+    if(this != &t)
+    {
+      type = t.type;
+      token = std::move(t.token);
+      t.type = type::EMPTY;
+    }
+    return *this;
+  }
 
   /// @brief Checks that the token is of type SPECIAL and the value matches the
   /// character in the argument.
@@ -121,14 +135,6 @@ struct token_t final
   /// @param c The macro character.
   /// @returns True if the SPECIAL character matches the @c c.
   bool is_special(char c) const { return type == type::SPECIAL && !token.empty() && token[0] == c; }
-
-  /// @brief The swap function for use in the assignment operators.
-  friend void swap(token_t& left, token_t& right) noexcept
-  {
-    using std::swap;
-    swap(left.token, right.token);
-    swap(left.type, right.type);
-  }
 };
 
 inline bool operator==(const token_t& l, const token_t& r) { return l.type == r.type && l.token == r.token; }

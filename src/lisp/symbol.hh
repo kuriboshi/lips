@@ -54,7 +54,6 @@ class symbol_t final: public ref_count<symbol_t>
 {
 public:
   symbol_t() = default;
-  ~symbol_t() = default;
 
   std::string pname;
   lisp_t self{};         // The lisp_t object for this symbol

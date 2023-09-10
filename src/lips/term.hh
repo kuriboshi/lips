@@ -31,6 +31,11 @@ public:
   {}
   ~term_source() override;
 
+  term_source(const term_source&) = delete;
+  term_source(term_source&&) = delete;
+  term_source& operator=(const term_source&) = delete;
+  term_source& operator=(term_source&&) = delete;
+
   // io::source
   char getch() override;
   void ungetch(char) override;

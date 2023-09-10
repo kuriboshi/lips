@@ -37,6 +37,11 @@ public:
   context_t();
   ~context_t();
 
+  context_t(const context_t&) = delete;
+  context_t(context_t&&) = delete;
+  context_t& operator=(const context_t&) = delete;
+  context_t& operator=(context_t&&) = delete;
+
   syntax& read_table();
   void read_table(std::unique_ptr<syntax>);
 

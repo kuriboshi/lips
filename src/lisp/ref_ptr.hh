@@ -75,7 +75,6 @@ public:
 protected:
   /// @brief Default constructor protected to not allow creating on the stack.
   ref_count() = default;
-  ~ref_count() = default;
 
 private:
   /// @brief The reference counter.

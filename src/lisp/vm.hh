@@ -39,6 +39,11 @@ public:
   vm() = default;
   virtual ~vm() = default;
 
+  vm(const vm&) = delete;
+  vm(vm&&) = delete;
+  vm& operator=(const vm&) = delete;
+  vm& operator=(vm&&) = delete;
+
   static ref_file_t primout() { return get().do_primout(); }
   static ref_file_t primerr() { return get().do_primerr(); }
   static ref_file_t primin() { return get().do_primin(); }
@@ -380,9 +385,6 @@ public:
   {
     vm::set(this);
   }
-
-  /// @brief The destructor.
-  ~vm_t() override = default;
 
   std::shared_ptr<Context> context() const { return _context; }
 

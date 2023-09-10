@@ -63,6 +63,11 @@ public:
   source() = default;
   virtual ~source() = default;
 
+  source(const source&) = delete;
+  source(source&&) = delete;
+  source& operator=(const source&) = delete;
+  source& operator=(source&&) = delete;
+
   virtual char getch() = 0;
   virtual void ungetch(char) = 0;
   virtual void close() {}
@@ -91,6 +96,11 @@ public:
   file_source(const std::string& filename);
   ~file_source() override = default;
 
+  file_source(const file_source&) = delete;
+  file_source(file_source&&) = delete;
+  file_source& operator=(const file_source&) = delete;
+  file_source& operator=(file_source&&) = delete;
+
   using source::getch;
   using source::getline;
 
@@ -112,6 +122,11 @@ public:
     : _stream(stream)
   {}
   ~stream_source() override = default;
+
+  stream_source(const stream_source&) = delete;
+  stream_source(stream_source&&) = delete;
+  stream_source& operator=(const stream_source&) = delete;
+  stream_source& operator=(stream_source&&) = delete;
 
   using source::getch;
   using source::getline;
@@ -151,6 +166,11 @@ class sink
 public:
   sink() = default;
   virtual ~sink() = default;
+
+  sink(const sink&) = delete;
+  sink(sink&&) = delete;
+  sink& operator=(const sink&) = delete;
+  sink& operator=(sink&&) = delete;
 
   virtual void putch(char, enum escape esc) = 0;
   virtual void puts(std::string_view) = 0;
@@ -212,6 +232,11 @@ public:
   {}
   ~stream_sink() override = default;
 
+  stream_sink(const stream_sink&) = delete;
+  stream_sink(stream_sink&&) = delete;
+  stream_sink& operator=(const stream_sink&) = delete;
+  stream_sink& operator=(stream_sink&&) = delete;
+
   using sink::putch;
 
   void putch(char c, enum escape esc) override { putch(c, _stream, esc); }
@@ -263,10 +288,22 @@ public:
   file_t(const std::string& string)
     : _source(std::make_unique<io::string_source>(string))
   {}
+
+  file_t(const file_t&) = delete;
   file_t(file_t&& file) noexcept
     : _source(std::move(file._source)),
       _sink(std::move(file._sink))
   {}
+  file_t& operator=(const file_t&) = delete;
+  file_t& operator=(file_t&& file) noexcept
+  {
+    if(this != &file)
+    {
+      _source = std::move(file._source);
+      _sink = std::move(file._sink);
+    }
+    return *this;
+  }
   ~file_t() = default;
 
   bool has_source() { return !!_source; }

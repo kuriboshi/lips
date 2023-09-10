@@ -31,6 +31,11 @@ public:
   repl(vm&);
   ~repl() = default;
 
+  repl(const repl&) = delete;
+  repl(repl&&) = delete;
+  repl& operator=(const repl&) = delete;
+  repl& operator=(repl&&) = delete;
+
   lisp_t operator()(lisp_t);
 
 private:
@@ -45,6 +50,11 @@ private:
       ++_repl._level;
     }
     ~level() { --_repl._level; }
+
+    level(const level&) = delete;
+    level(level&&) = delete;
+    level& operator=(const level&) = delete;
+    level& operator=(level&&) = delete;
 
   private:
     repl& _repl; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)

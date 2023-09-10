@@ -55,7 +55,6 @@ public:
     : car(a),
       cdr(d)
   {}
-  ~cons_t() = default;
 
   lisp_t car;
   lisp_t cdr;
@@ -249,7 +248,6 @@ class lambda_t final: public ref_count<lambda_t>
 {
 public:
   lambda_t() = default;
-  ~lambda_t() = default;
 
   /// @brief The S-expression representation of the lambda function.
   lisp_t body;
@@ -286,7 +284,6 @@ class closure_t final: public ref_count<closure_t>
 {
 public:
   closure_t() = default;
-  ~closure_t() = default;
 
   lisp_t cfunction;
   lisp_t closed;
@@ -320,7 +317,6 @@ public:
   string_t(const std::string& s)
     : string(s)
   {}
-  ~string_t() = default;
 
   std::string string;
 

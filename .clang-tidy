@@ -9,7 +9,6 @@ Checks: "\
   -cppcoreguidelines-avoid-magic-numbers,\
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,\
   -cppcoreguidelines-non-private-member-variables-in-classes,\
-  -cppcoreguidelines-special-member-functions,\
   -cppcoreguidelines-owning-memory,\
   -cppcoreguidelines-pro-type-reinterpret-cast,\
   modernize-*,\

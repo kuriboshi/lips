@@ -34,6 +34,11 @@ public:
   {}
   ~top() = default;
 
+  top(const top&) = delete;
+  top(top&&) = delete;
+  top& operator=(const top&) = delete;
+  top& operator=(top&&) = delete;
+
   static void init();
 
   lisp_t operator()(lisp_t);
