@@ -36,7 +36,7 @@ struct options_t
   bool test = false;        // Run unit tests
 };
 
-extern std::unique_ptr<lisp::env> environment; // NOLINT
+extern std::unique_ptr<lisp::env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 extern const lisp::lisp_t C_ALIAS;
 extern const lisp::lisp_t C_AMPER;

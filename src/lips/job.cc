@@ -46,14 +46,14 @@ void printjob(const job_t& job)
   std::string buffer = fmt::format("[{}]  {} ", job.jobnum, job.procid);
   if(job.running)
     buffer += "Running";
-  else if(WIFEXITED(job.status)) // NOLINT
+  else if(WIFEXITED(job.status))
     buffer += "Done";
-  else if(WIFSTOPPED(job.status))              // NOLINT
-    buffer += strsignal(WSTOPSIG(job.status)); // NOLINT
+  else if(WIFSTOPPED(job.status))
+    buffer += strsignal(WSTOPSIG(job.status));
   else
   {
-    buffer += strsignal(WTERMSIG(job.status)); // NOLINT
-    if(WCOREDUMP(job.status))                  // NOLINT
+    buffer += strsignal(WTERMSIG(job.status));
+    if(WCOREDUMP(job.status))
       buffer += " (core dumped)";
   }
   buffer += "\t";

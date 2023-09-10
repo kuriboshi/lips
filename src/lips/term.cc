@@ -41,6 +41,15 @@
 
 using namespace lisp;
 
+namespace
+{
+char* getstr(const char* id, char** area)
+{
+  // The function tgetstr has a bad signature.
+  return tgetstr(const_cast<char*>(id), area); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+}
+}
+
 void term_source::clearlbuf()
 {
   linepos = 0;
@@ -52,19 +61,19 @@ void term_source::clearlbuf()
  */
 void term_source::init_keymap()
 {
-  key_tab.fill(term_fun::T_INSERT);
-  key_tab[CERASE] = term_fun::T_ERASE;
-  key_tab[CTRL('H')] = term_fun::T_ERASE;
-  key_tab[CRPRNT] = term_fun::T_RETYPE;
-  key_tab[CTRL('L')] = term_fun::T_CLEAR;
-  key_tab[CKILL] = term_fun::T_KILL;
-  key_tab[CEOF] = term_fun::T_EOF;
-  key_tab[CTRL('I')] = term_fun::T_TAB;
-  key_tab[static_cast<int>('(')] = term_fun::T_LEFTPAR;
-  key_tab[static_cast<int>(')')] = term_fun::T_RIGHTPAR;
-  key_tab[static_cast<int>('\n')] = term_fun::T_NEWLINE;
-  key_tab[static_cast<int>('\\')] = term_fun::T_ESCAPE;
-  key_tab[static_cast<int>('"')] = term_fun::T_STRING;
+  key_tab.fill(function::T_INSERT);
+  key_tab[CERASE] = function::T_ERASE;
+  key_tab[CTRL('H')] = function::T_ERASE;
+  key_tab[CRPRNT] = function::T_RETYPE;
+  key_tab[CTRL('L')] = function::T_CLEAR;
+  key_tab[CKILL] = function::T_KILL;
+  key_tab[CEOF] = function::T_EOF;
+  key_tab[CTRL('I')] = function::T_TAB;
+  key_tab[static_cast<int>('(')] = function::T_LEFTPAR;
+  key_tab[static_cast<int>(')')] = function::T_RIGHTPAR;
+  key_tab[static_cast<int>('\n')] = function::T_NEWLINE;
+  key_tab[static_cast<int>('\\')] = function::T_ESCAPE;
+  key_tab[static_cast<int>('"')] = function::T_STRING;
 }
 
 /* Init terminal to CBREAK and no ECHO.  */
@@ -89,11 +98,11 @@ void term_source::init_term()
       // std::array<char, 1024> bp{};
       if(tgetent(nullptr, term) == 1)
       {
-        clear = tgetstr(const_cast<char*>("cl"), &termc); // NOLINT
-        curup = tgetstr(const_cast<char*>("up"), &termc); // NOLINT
+        clear = getstr("cl", &termc);
+        curup = getstr("up", &termc);
         curdn = "\n";
-        curfwd = tgetstr(const_cast<char*>("nd"), &termc); // NOLINT
-        cleol = tgetstr(const_cast<char*>("ce"), &termc);  // NOLINT
+        curfwd = getstr("nd", &termc);
+        cleol = getstr("ce", &termc);
         nocap = (curup == nullptr || curdn == nullptr || curfwd == nullptr || cleol == nullptr);
       }
     }
@@ -318,7 +327,7 @@ void term_source::fillrest(const char* word)
 
 bool term_source::checkchar(lisp_t words, std::size_t pos, char* c)
 {
-  lisp_t w = words;
+  auto w = words;
   *c = (w->car()->getstr())[pos];
   for(; !is_nil(w); w = w->cdr())
   {
@@ -364,18 +373,18 @@ lisp_t term_source::strip(lisp_t files, const char* prefix, const char* suffix)
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::scan(int begin)
 {
-  int line = 0;
-  int cpos = 0;
-  paren_blink state = paren_blink::NORMAL;
-  int parcount = 0;
-  bool pars = false;
+  int line{0};
+  int cpos{0};
+  paren_blink state{paren_blink::NORMAL};
+  int parcount{0};
+  bool pars{false};
   parpos = {0, 0, nullptr};
   currentpos = {0, 0, nullptr};
-  for(int pos = begin; pos >= 0; --pos)
+  for(int pos{begin}; pos >= 0; --pos)
   {
     auto cur = linebuffer.at(pos);
     ++cpos;
-    int escape = 0;
+    int escape{0};
     if(cur == '"' && state == paren_blink::INSTRING)
       state = paren_blink::EXITSTRING;
     else if(cur == '"' && state == paren_blink::NORMAL)
@@ -456,7 +465,7 @@ void term_source::scan(int begin)
   }
   parpos.line = line - parpos.line;
   if(parpos.line == 0)
-    parpos.cpos = cpos - parpos.cpos + current_prompt.length(); // NOLINT
+    parpos.cpos = cpos - parpos.cpos + static_cast<int>(current_prompt.length());
 }
 
 /*
@@ -479,8 +488,8 @@ void term_source::blink()
     return; // Requires termcap and enough capability
   scan(linepos - 1);
 
-  const int ldiff = currentpos.line - parpos.line;
-  const int cdiff = parpos.cpos - currentpos.cpos;
+  const auto ldiff = currentpos.line - parpos.line;
+  const auto cdiff = parpos.cpos - currentpos.cpos;
   nput(curup, ldiff);
   if(cdiff < 0)
   {
@@ -504,14 +513,14 @@ void term_source::blink()
   if(ldiff == 0)
   {
     for(int i = 0; parpos.line_start[i] != 0; i++)
-      pputc(parpos.line_start[i], stdout); // NOLINT
+      pputc(parpos.line_start[i], stdout);
   }
   else
   {
     if(currentpos.line == 0)
       std::cout << current_prompt;
     for(int i = 0; currentpos.line_start[i] != 0; i++)
-      pputc(currentpos.line_start[i], stdout); // NOLINT
+      pputc(currentpos.line_start[i], stdout);
   }
   fflush(stdout);
 }
@@ -559,7 +568,7 @@ std::optional<std::string> term_source::getline()
     }
     switch(key_tab.at(static_cast<unsigned char>(c)))
     {
-      case term_fun::T_EOF:
+      case function::T_EOF:
         if(linepos == 0)
         {
           linebuffer.at(linepos++) = EOF;
@@ -569,21 +578,21 @@ std::optional<std::string> term_source::getline()
         pputc(c, stdout);
         linebuffer.at(linepos++) = EOF;
         break;
-      case term_fun::T_KILL:
+      case function::T_KILL:
         retype(2);
         linepos = 0;
         parcount = origpar;
         escaped = 0;
         instring = false;
         break;
-      case term_fun::T_RETYPE:
+      case function::T_RETYPE:
         retype(1);
         break;
-      case term_fun::T_CLEAR:
+      case function::T_CLEAR:
         clearscr();
         retype(1);
         break;
-      case term_fun::T_TAB:
+      case function::T_TAB:
       {
         auto* s = mkexstr();
         auto t = glob::extilde(s);
@@ -607,7 +616,7 @@ std::optional<std::string> term_source::getline()
         }
         break;
       }
-      case term_fun::T_ERASE:
+      case function::T_ERASE:
         escaped = 0;
         if(linepos > 0 && linebuffer.at(linepos - 1) == '\n')
         {
@@ -630,25 +639,25 @@ std::optional<std::string> term_source::getline()
           }
         }
         break;
-      case term_fun::T_STRING:
+      case function::T_STRING:
         linebuffer.at(linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           instring = !instring;
         break;
-      case term_fun::T_ESCAPE:
+      case function::T_ESCAPE:
         linebuffer.at(linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           escaped = 2;
         break;
-      case term_fun::T_LEFTPAR:
+      case function::T_LEFTPAR:
         if(!instring && escaped == 0)
           parcount++;
         pputc(c, stdout);
         linebuffer.at(linepos++) = c;
         break;
-      case term_fun::T_RIGHTPAR:
+      case function::T_RIGHTPAR:
         if((escaped != 0) || instring)
         {
           pputc(c, stdout);
@@ -675,7 +684,7 @@ std::optional<std::string> term_source::getline()
         }
         blink();
         break;
-      case term_fun::T_NEWLINE:
+      case function::T_NEWLINE:
         pputc('\n', stdout);
         if(linepos == 0 || onlyblanks())
         {
@@ -691,7 +700,7 @@ std::optional<std::string> term_source::getline()
           return linebuffer.data();
         }
         break;
-      case term_fun::T_INSERT:
+      case function::T_INSERT:
         pputc(c, stdout);
         linebuffer.at(linepos++) = c;
         break;

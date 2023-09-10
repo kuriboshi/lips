@@ -176,8 +176,8 @@ void onbreak()
 
 void init()
 {
-  signal(SIGTTIN, SIG_IGN); // NOLINT
-  signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back NOLINT
+  signal(SIGTTIN, SIG_IGN);
+  signal(SIGTTOU, SIG_IGN); // Otherwise can't get ctrl tty back
 
   fixpgrp();
 

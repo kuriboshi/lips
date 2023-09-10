@@ -502,7 +502,7 @@ lisp_t pipecmd(lisp_t cmds)
   if(pid = mfork(); pid == 0)
   {
     std::array<int, 2> pd{};
-    if(pipe(pd.data()) == -1) // NOLINT
+    if(pipe(pd.data()) == -1)
     {
       vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);

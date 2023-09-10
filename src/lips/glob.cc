@@ -336,21 +336,21 @@ TEST_CASE("extilde")
   {
     auto dir = extilde("~");
     REQUIRE(dir);
-    CHECK(home == *dir); // NOLINT
+    CHECK(home == *dir); // NOLINT(bugprone-unchecked-optional-access)
   }
   SECTION("~/ == HOME/")
   {
     auto dir = extilde("~/");
     REQUIRE(dir);
     home.push_back('/');
-    CHECK(home == *dir); // NOLINT
+    CHECK(home == *dir); // NOLINT(bugprone-unchecked-optional-access)
   }
   SECTION("~/hello/ == HOME/")
   {
     auto dir = extilde("~/hello/");
     REQUIRE(dir);
     home += "/hello/";
-    CHECK(home == *dir); // NOLINT
+    CHECK(home == *dir); // NOLINT(bugprone-unchecked-optional-access)
   }
   SECTION("~USER == HOME")
   {
@@ -358,7 +358,7 @@ TEST_CASE("extilde")
     auto tilde_user = "~" + user;
     auto dir = extilde(tilde_user);
     REQUIRE(dir);
-    CHECK(home == *dir); // NOLINT
+    CHECK(home == *dir); // NOLINT(bugprone-unchecked-optional-access)
   }
   SECTION("~UNKNOWN != ")
   {

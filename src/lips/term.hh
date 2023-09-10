@@ -98,16 +98,16 @@ private:
 
   struct curpos
   {
-    int cpos = 0;
-    int line = 0;
-    char* line_start = nullptr;
+    int cpos{0};
+    int line{0};
+    char* line_start{nullptr};
   };
 
   //
   // Terminal functions.  Each constant stands for a function provided by the
   // line editor.
   //
-  enum class term_fun
+  enum class function
   {
     T_INSERT = 0,
     T_ERASE,
@@ -137,7 +137,7 @@ private:
   int parcount = 0;                // Counts paranthesis.
   int linepos = 0;                 // End of line buffer.
   int position = 0;                // Current position in line buffer.
-  std::array<enum term_fun, NUM_KEYS> key_tab{}; // Table specifying key functions.
+  std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
 
   options_t options;
 
