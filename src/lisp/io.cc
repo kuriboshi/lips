@@ -125,7 +125,7 @@ inline void pp(const char* s, file_t& file, lisp_t x)
 {
   ps(s, file, io::escape::NO);
   ps(" ", file, io::escape::NO);
-  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file); // NOLINT
+  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file);
   ps(">", file, io::escape::NO);
 }
 

@@ -75,7 +75,7 @@ public:
 
   using iterator = std::istreambuf_iterator<char>;
   virtual iterator begin() = 0;
-  iterator end() { return {}; } // NOLINT
+  iterator end() { return {}; } // NOLINT(readability-convert-member-functions-to-static)
 
 protected:
   static char getch(std::istream& stream) { char ch{0}; stream.get(ch); return ch; }
