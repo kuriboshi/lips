@@ -58,8 +58,8 @@ public:
   static void read_table(std::unique_ptr<syntax> syntax) { get().do_read_table(std::move(syntax)); }
 
   static lisp_t perror(std::error_code code) { return get().do_perror(code); }
-  static lisp_t perror(std::error_code code, lisp_t a) { return get().do_perror(code, a); }
-  static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, a); }
+  static lisp_t perror(std::error_code code, lisp_t a) { return get().do_perror(code, std::move(a)); }
+  static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, std::move(a)); }
   static void fatal(std::error_code code) { get().do_fatal(code); }
   template<typename... Ts>
   static void fatal(std::error_code code, const Ts&... a) { get().do_fatal(code, cat(a...)); }
@@ -67,7 +67,7 @@ public:
   static const cvariable_t& currentbase() { return get().do_currentbase(); }
   static const cvariable_t& verbose() { return get().do_verbose(); }
   static const cvariable_t& loadpath() { return get().do_loadpath(); }
-  static void loadpath(lisp_t path) { get().do_loadpath(path); }
+  static void loadpath(lisp_t path) { get().do_loadpath(std::move(path)); }
   static const char* version() { return lisp::version(); }
 
   static std::int64_t printlevel() { return get().do_printlevel(); }
@@ -104,7 +104,7 @@ public:
   undefhook_t undefhook(undefhook_t fun)
   {
     auto f = _undefhook;
-    _undefhook = fun;
+    _undefhook = std::move(fun);
     return f;
   }
 
@@ -112,7 +112,7 @@ public:
   breakhook_t breakhook(breakhook_t fun)
   {
     auto f = _breakhook;
-    _breakhook = fun;
+    _breakhook = std::move(fun);
     return f;
   }
 
@@ -193,7 +193,7 @@ private:
     lisp_t operator->() const noexcept { return value; }
     expr_t& operator=(lisp_t v)
     {
-      value = v;
+      value = std::move(v);
 #ifdef LIPS_ENABLE_TRACE
       if(vm::get()._trace)
         std::cerr << fmt::format("set {}\n", vm::to_string(*this));
@@ -208,7 +208,7 @@ private:
     lisp_t operator->() const noexcept { return value; }
     fun_t& operator=(lisp_t v)
     {
-      value = v;
+      value = std::move(v);
 #ifdef LIPS_ENABLE_TRACE
       if(vm::get()._trace)
         std::cerr << fmt::format("set {}\n", vm::to_string(*this));
@@ -223,7 +223,7 @@ private:
     lisp_t operator->() const noexcept { return value; }
     args_t& operator=(lisp_t v)
     {
-      value = v;
+      value = std::move(v);
 #ifdef LIPS_ENABLE_TRACE
       if(vm::get()._trace)
         std::cerr << fmt::format("set {}\n", vm::to_string(*this));

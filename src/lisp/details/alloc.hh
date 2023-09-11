@@ -53,7 +53,7 @@ lisp_t mkatom(std::string_view);
 /// number of parameters, whether the function is spread, nospread, or
 /// halfspread, whether the function should evaluate it's arguments or not.
 ///
-inline void mkprim(subr_t subr)
+inline void mkprim(const subr_t& subr)
 {
   const lisp_t f = intern(subr.name);
   f->value(new object(subr_index{subr_t::put(subr)}));
@@ -62,14 +62,14 @@ inline void mkprim(subr_t subr)
 inline cvariable_t& initcvar(std::string_view name, lisp_t val)
 {
   auto t = mkatom(name);
-  t->value(new object(cvariable_t(val)));
+  t->value(new object(cvariable_t(std::move(val))));
   return t->value()->cvariable();
 }
 
 inline lisp_t makecvar(std::string_view name, lisp_t val)
 {
   auto t = mkatom(name);
-  t->value(new object(cvariable_t(val)));
+  t->value(new object(cvariable_t(std::move(val))));
   return t->value();
 }
 

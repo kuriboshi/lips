@@ -71,8 +71,8 @@ private:
   lisp_t _car;
 };
 
-inline iterator begin(lisp_t l) { return {l}; }
-inline iterator end(lisp_t) { return {nullptr}; }
+inline iterator begin(lisp_t l) { return {std::move(l)}; }
+inline iterator end(const lisp_t&) { return {nullptr}; }
 
 } // namespace lisp
 

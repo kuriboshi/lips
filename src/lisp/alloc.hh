@@ -122,7 +122,7 @@ void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t
 ///
 /// @return A reference of type cvariable which wraps the lisp_t value.
 ///
-inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details::alloc::initcvar(name, val); }
+inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details::alloc::initcvar(name, std::move(val)); }
 
 /// @brief Creates a lisp_t object containing a cvariable_t.
 ///
@@ -133,10 +133,10 @@ inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details
 ///
 /// @return A lisp_t object containing a cvariable_t value.
 ///
-inline lisp_t makecvar(std::string_view name, lisp_t val) { return details::alloc::makecvar(name, val); }
+inline lisp_t makecvar(std::string_view name, lisp_t val) { return details::alloc::makecvar(name, std::move(val)); }
 
 /// @brief Terminates the list create function.
-inline lisp_t mklist(lisp_t t) { return cons(t, nil); }
+inline lisp_t mklist(lisp_t t) { return cons(std::move(t), nil); }
 
 /// @brief Creates a list from a variadic list of items.
 template<typename... Ts>

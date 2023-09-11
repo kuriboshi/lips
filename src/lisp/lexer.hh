@@ -111,7 +111,7 @@ struct token_t final
   /// @brief The move constructor.
   ///
   /// @details The moved from token becomes an empty token.
-  token_t(token_t&& t)
+  token_t(token_t&& t) noexcept
     : type(t.type),
       token(std::move(t.token))
   {
@@ -183,7 +183,7 @@ public:
     : _input(std::move(input)),
       _pos(_input->source().begin())
   {}
-  lexer(std::string s)
+  lexer(const std::string& s)
     : _input(ref_file_t::create(s)),
       _pos(_input->source().begin())
   {}
@@ -193,7 +193,7 @@ public:
   // Syntax table member functions.
   static syntax::type get(std::uint8_t index) { return vm::read_table().get(index); }
   static void set(std::uint8_t index, syntax::type value) { vm::read_table().set(index, value); }
-  static void set(std::uint8_t index, lisp_t value) { vm::read_table().set(index, value); }
+  static void set(std::uint8_t index, lisp_t value) { vm::read_table().set(index, std::move(value)); }
   lisp_t macro(token_t token) { return vm::read_table().macro(_input, token.token[0]); }
 
 private:

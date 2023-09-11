@@ -116,7 +116,7 @@ public:
       _ptr->retain();
   }
   /// @brief Move constructor
-  ref_ptr(ref_ptr&& x)
+  ref_ptr(ref_ptr&& x) noexcept
     : _ptr(x._ptr)
   {
     x._ptr = nullptr;
@@ -145,7 +145,7 @@ public:
     }
     return *this;
   }
-  ref_ptr& operator=(ref_ptr&& x)
+  ref_ptr& operator=(ref_ptr&& x) noexcept
   {
     if(this != &x)
     {

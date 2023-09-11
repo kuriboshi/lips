@@ -117,9 +117,9 @@ public:
       --std::get<control_block>(u).index;
   }
 
-  void var(lisp_t x) { std::get<var_val_pair>(u).var = x; }
+  void var(lisp_t x) { std::get<var_val_pair>(u).var = std::move(x); }
   lisp_t var() const { return std::get<var_val_pair>(u).var; }
-  void val(lisp_t x) { std::get<var_val_pair>(u).val = x; }
+  void val(lisp_t x) { std::get<var_val_pair>(u).val = std::move(x); }
   lisp_t val() const { return std::get<var_val_pair>(u).val; }
 };
 
@@ -369,7 +369,7 @@ public:
   cvariable_t& operator=(const cvariable_t& other) = delete;
   cvariable_t& operator=(lisp_t value)
   {
-    _value = value;
+    _value = std::move(value);
     return *this;
   }
 
@@ -422,7 +422,7 @@ public:
   object& operator=(const object& x) = delete;
 
   /// @brief Move constructor
-  object(object&& x) { *this = std::move(x); }
+  object(object&& x) noexcept { *this = std::move(x); }
 
   /// @brief Move assignment operator
   object& operator=(object&& x) noexcept
@@ -462,7 +462,7 @@ public:
 
   /// @brief Get and set the value of a litatom
   auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
-  void value(lisp_t);
+  void value(const lisp_t&);
 
   /// @brief Integer
   auto intval() const -> std::int64_t { return std::get<std::int64_t>(_u); }
@@ -476,9 +476,9 @@ public:
   /// @brief Cons cell and car/cdr
   auto cons() const -> const cons_t& { return *std::get<ref_cons_t>(_u); }
   auto car() const -> lisp_t { return std::get<ref_cons_t>(_u)->car; }
-  void car(lisp_t x) { std::get<ref_cons_t>(_u)->car = x; }
+  void car(lisp_t x) { std::get<ref_cons_t>(_u)->car = std::move(x); }
   auto cdr() const -> lisp_t { return std::get<ref_cons_t>(_u)->cdr; }
-  void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = x; }
+  void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = std::move(x); }
 
   /// @brief Character string
   auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->string; }
@@ -559,7 +559,7 @@ inline object::type type_of(const lisp_t& a) { return a == nullptr ? object::typ
 inline object::type type_of(const object& a) { return a.gettype(); }
 inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? object::type::Nil : a->gettype(); }
 
-inline void object::value(lisp_t x)
+inline void object::value(const lisp_t& x)
 {
   auto& var = std::get<symbol::ref_symbol_t>(_u);
   if(type_of(var->value) == object::type::Cvariable)

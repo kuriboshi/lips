@@ -298,5 +298,5 @@ token_t lexer::read()
   return token;
 }
 
-void lexer::unread(token_t token) { _token = token; }
+void lexer::unread(token_t token) { _token = std::move(token); }
 } // namespace lisp

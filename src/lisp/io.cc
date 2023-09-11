@@ -44,7 +44,7 @@ namespace lisp::io
 ///
 lisp_t ratom(ref_file_t file)
 {
-  lexer lexer{file};
+  lexer lexer{std::move(file)};
   auto token = lexer.read();
   const parser parser{lexer};
   return parser::create(token);
@@ -55,7 +55,7 @@ lisp_t ratom(ref_file_t file)
 //
 lisp_t lispread(ref_file_t file)
 {
-  lexer lexer(file);
+  lexer lexer(std::move(file));
   return parser(lexer).parse();
 }
 
@@ -121,7 +121,7 @@ inline void pf(double d, file_t& file)
 }
 
 // Print pointer type object
-inline void pp(const char* s, file_t& file, lisp_t x)
+inline void pp(const char* s, file_t& file, const lisp_t& x)
 {
   ps(s, file, io::escape::NO);
   ps(" ", file, io::escape::NO);
@@ -129,7 +129,7 @@ inline void pp(const char* s, file_t& file, lisp_t x)
   ps(">", file, io::escape::NO);
 }
 
-inline void psubr(const char* s, file_t& file, lisp_t x)
+inline void psubr(const char* s, file_t& file, const lisp_t& x)
 {
   ps(s, file, io::escape::NO);
   ps(" ", file, io::escape::NO);

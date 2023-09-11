@@ -40,7 +40,7 @@ public:
     /// @brief Disallow assignment.
     data& operator=(const data&) = delete;
     /// @brief Move constuctor.
-    data(data&& d)
+    data(data&& d) noexcept
       : _block(d._block),
         _free_items(d._free_items)
     {

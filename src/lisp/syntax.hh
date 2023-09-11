@@ -83,7 +83,7 @@ public:
   void set(std::uint8_t index, lisp_t value)
   {
     set(index, type::MACRO);
-    _macro.at(index) = value;
+    _macro.at(index) = std::move(value);
   }
   lisp_t macro(ref_file_t source, std::uint8_t index);
   /// @brief Reset read table to the defaults.

@@ -109,19 +109,19 @@ lisp_t context_t::perror(std::error_code error) const
 lisp_t context_t::perror(std::error_code error, lisp_t arg) const
 {
   _pimpl->_primerr->format("{} ", error.message());
-  prin2(arg, T);
+  prin2(std::move(arg), T);
   return nil;
 }
 
 lisp_t context_t::error(std::error_code error, lisp_t arg) const
 {
-  perror(error, arg);
+  perror(error, std::move(arg));
   throw lisp_error(error);
 }
 
 const cvariable_t& context_t::currentbase() const { return _pimpl->_currentbase->cvariable(); }
 const cvariable_t& context_t::verbose() const { return _pimpl->_verbose->cvariable(); }
 const cvariable_t& context_t::loadpath() const { return _pimpl->_loadpath->cvariable(); }
-void context_t::loadpath(lisp_t newpath) { _pimpl->_loadpath->cvariable() = newpath; }
+void context_t::loadpath(lisp_t newpath) { _pimpl->_loadpath->cvariable() = std::move(newpath); }
 
 } // namespace lisp

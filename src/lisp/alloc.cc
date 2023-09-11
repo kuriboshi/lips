@@ -33,7 +33,7 @@ namespace
 /// Negative for nospread and halfspread.
 ///
 /// @return A straight list of arguments.
-lisp::lisp_t mkarglist(lisp::lisp_t alist, std::int8_t& count)
+lisp::lisp_t mkarglist(const lisp::lisp_t& alist, std::int8_t& count)
 {
   if(type_of(alist) == lisp::object::type::Cons)
   {
@@ -53,7 +53,7 @@ namespace lisp::details::alloc
 lisp_t obarray()
 {
   lisp_t o = nil;
-  for(auto i: symbol::symbol_t::store())
+  for(const auto& i: symbol::symbol_t::store())
     o = cons(i.second->self, o);
   return o;
 }
@@ -70,9 +70,9 @@ lisp_t mkfloat(double number) { return getobject(number); }
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {
   auto lambda = ref_lambda_t::create();
-  lambda->body = def;
+  lambda->body = std::move(def);
   std::int8_t count = 0;
-  lambda->args = mkarglist(args, count);
+  lambda->args = mkarglist(std::move(args), count);
   lambda->count = count;
   lambda->eval = eval;
   return getobject(lambda);
