@@ -62,7 +62,7 @@ public:
   static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, std::move(a)); }
   static void fatal(std::error_code code) { get().do_fatal(code); }
   template<typename... Ts>
-  static void fatal(std::error_code code, const Ts&... a) { get().do_fatal(code, cat(a...)); }
+  static void fatal(std::error_code code, const Ts&... a) { get().do_fatal(code, concat(a...)); }
 
   static const cvariable_t& currentbase() { return get().do_currentbase(); }
   static const cvariable_t& verbose() { return get().do_verbose(); }
@@ -170,16 +170,14 @@ protected:
   virtual void do_printlevel(std::int64_t) = 0;
 
 private:
-  template<typename T>
-  static std::string cat(const T& arg)
-  {
-    return fmt::format("{}", arg);
-  }
-
   template<typename T, typename... Ts>
-  static std::string cat(const T& first, const Ts&... args)
+  static std::string concat(const T& first, const Ts&... args)
   {
-    return fmt::format("{} {}", first, cat(args...));
+    if constexpr(sizeof...(Ts) > 0)
+    {
+      return fmt::format("{} {}", first, concat(args...));
+    }
+    return fmt::format("{}", first);
   }
 
   //
