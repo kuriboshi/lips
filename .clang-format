@@ -8,7 +8,6 @@ AlignOperands: false
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: All
