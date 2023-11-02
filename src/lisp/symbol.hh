@@ -102,7 +102,7 @@ private:
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<symbol_t, 256>;
+  using pool_t = lisp::pool<symbol_t, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)

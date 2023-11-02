@@ -71,7 +71,7 @@ private:
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<cons_t, 256>;
+  using pool_t = lisp::pool<cons_t, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -101,7 +101,7 @@ private:
     lisp_t var;
     lisp_t val;
   };
-  std::variant<control_block, var_val_pair> u;
+  std::variant<std::monostate, control_block, var_val_pair> u;
 
 public:
   void reset() { u = var_val_pair{nil, nil}; }
@@ -270,7 +270,7 @@ private:
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<lambda_t, 256>;
+  using pool_t = lisp::pool<lambda_t, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -302,7 +302,7 @@ private:
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<closure_t, 256>;
+  using pool_t = lisp::pool<closure_t, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -332,7 +332,7 @@ private:
   template<class T>
   friend void pool_test();
 
-  using pool_t = pool<string_t, 256>;
+  using pool_t = lisp::pool<string_t, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -543,7 +543,7 @@ private:
   friend void pool_test();
 
   /// @brief Memory pool for objects.
-  using pool_t = pool<object, 256>;
+  using pool_t = lisp::pool<object, 256>;
   static pool_t& pool()
   {
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
