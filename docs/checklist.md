@@ -1,12 +1,12 @@
 [comment]: # (-*- markdown -*-)
 
-Tasks to perform a release
+# Tasks to perform a release
 
-- Run `clang-format`
-- Run `docs/copyright.sh`
-- Run `clang-tidy`
-- Run all unit tests
-- Run `test-linux`
+- Run `make format`
+- Run `make copyright`
+- Run `make tidy`
+- Run all unit tests: `make test`
+- Run `make test-linux`
 - Update `README.md`
   - Update the version number
   - Check if any other updates are needed
@@ -16,7 +16,7 @@ Tasks to perform a release
   - Update the version number in `docs/lips.tex`
   - Update the publish date in `docs/lips.tex`
 - Update `NEWS.md`
-  - Update version number 
+  - Update version number
   - Add summary of the changes
 - Tag the release and push to GitHub
   - `git tag -a -s vm.n.p`

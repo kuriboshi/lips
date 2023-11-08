@@ -6,7 +6,7 @@ Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 2.0.3
+Version 2.1.0
 
 ## What is it?
 

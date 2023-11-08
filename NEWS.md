@@ -1,5 +1,12 @@
 # Release notes
 
+## 2.1.0
+
+This release is almost exclusively for correcting problems identified
+by `clang-tidy`.
+
+- Turn on some more clang-tidy warnings and fix them
+
 ## 2.0.3
 
 - Turn on some more clang-tidy warnings and fix them

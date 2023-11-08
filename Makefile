@@ -60,6 +60,11 @@ coverage: debug.config
 format: debug.config
 	cmake --build --preset debug --target format
 
+# Update copyright notices
+.PHONY: copyright
+copyright:
+	./docs/copyright.sh
+
 # Test different Linux configurations:
 #   OS            Compiler
 #   Ubuntu 20.04  gcc-11
