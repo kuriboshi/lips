@@ -21,8 +21,8 @@
 
 TEST_CASE("package_test")
 {
-  lisp::context context;
-  lisp::vm vm(context);
+  auto ctx = std::make_shared<lisp::context_t>();
+  lisp::vm_t vm(ctx);
   auto result = vm.eval("(plus 1 2 3)");
   REQUIRE(lisp::type_of(result) == lisp::object::type::Integer);
   CHECK(result->intval() == 6);
