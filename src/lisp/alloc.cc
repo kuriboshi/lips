@@ -46,7 +46,7 @@ lisp::lisp_t mkarglist(const lisp::lisp_t& alist, std::int8_t& count)
   count = static_cast<std::int8_t>(-count);
   return cons(alist, lisp::nil);
 }
-}
+} // namespace
 
 namespace lisp::details::alloc
 {

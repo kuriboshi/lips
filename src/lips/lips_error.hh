@@ -64,15 +64,9 @@ public:
   }
 };
 
-inline std::error_code make_error_code(lips_errc e)
-{
-  return {to_underlying(e), lips_category::category()};
-}
+inline std::error_code make_error_code(lips_errc e) { return {to_underlying(e), lips_category::category()}; }
 
-inline std::error_condition make_error_condition(lips_errc e)
-{
-  return {to_underlying(e), lips_category::category()};
-}
+inline std::error_condition make_error_condition(lips_errc e) { return {to_underlying(e), lips_category::category()}; }
 
 } // namespace lisp
 

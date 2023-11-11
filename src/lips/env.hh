@@ -72,8 +72,8 @@ private:
     return result;
   }
 
-  lisp_t _path;                 // Search path for executables.
-  lisp_t _home;                 // Home directory.
+  lisp_t _path; // Search path for executables.
+  lisp_t _home; // Home directory.
   lisp_t _globsort;
 };
 

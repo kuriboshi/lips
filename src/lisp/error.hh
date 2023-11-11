@@ -89,15 +89,9 @@ public:
   }
 };
 
-inline std::error_code make_error_code(type_errc e)
-{
-  return {to_underlying(e), type_category::category()};
-}
+inline std::error_code make_error_code(type_errc e) { return {to_underlying(e), type_category::category()}; }
 
-inline std::error_condition make_error_condition(type_errc e)
-{
-  return {to_underlying(e), type_category::category()};
-}
+inline std::error_condition make_error_condition(type_errc e) { return {to_underlying(e), type_category::category()}; }
 
 enum class error_errc
 {
@@ -178,10 +172,7 @@ public:
   }
 };
 
-inline std::error_code make_error_code(error_errc e)
-{
-  return {to_underlying(e), error_category::category()};
-}
+inline std::error_code make_error_code(error_errc e) { return {to_underlying(e), error_category::category()}; }
 
 inline std::error_condition make_error_condition(error_errc e)
 {

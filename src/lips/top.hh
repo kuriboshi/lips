@@ -88,12 +88,12 @@ private:
     cvariable_t& promptform() const { return _promptform->cvariable(); }
 
   private:
-    lisp_t _history;            // Holds the history list.
-    lisp_t _histnum;            // Current event number.
-    lisp_t _histmax;            // Maximum number of events to save.
+    lisp_t _history; // Holds the history list.
+    lisp_t _histnum; // Current event number.
+    lisp_t _histmax; // Maximum number of events to save.
     lisp_t _topprompt;
     lisp_t _brkprompt;
-    lisp_t _promptform;         // Evaluated before printing the prompt.
+    lisp_t _promptform; // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 

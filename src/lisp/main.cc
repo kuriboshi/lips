@@ -23,7 +23,8 @@
 #include "file.hh"
 #include "run.hh"
 
-int main(int argc, const char** argv) try
+int main(int argc, const char** argv)
+try
 {
   auto ctx = std::make_shared<lisp::context_t>();
   lisp::vm_t vm(ctx);

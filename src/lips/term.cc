@@ -48,7 +48,7 @@ char* getstr(const char* id, char** area)
   // The function tgetstr has a bad signature.
   return tgetstr(const_cast<char*>(id), area); // NOLINT(cppcoreguidelines-pro-type-const-cast)
 }
-}
+} // namespace
 
 void term_source::clearlbuf()
 {
@@ -123,7 +123,7 @@ void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
  */
 void term_source::pputc(char c, FILE* file)
 {
-  auto is_control = [](auto c){return std::iscntrl(c) != 0 && c != '\n' && c != '\t';};
+  auto is_control = [](auto c) { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; };
   // if(std::iscntrl(c) != 0 && c != '\n' && c != '\t')
   if(is_control(c))
   {

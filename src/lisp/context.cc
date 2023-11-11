@@ -57,10 +57,7 @@ public:
   lisp_t _loadpath;
 };
 
-context_t::context_t()
-{
-  _pimpl = std::make_unique<impl>();
-}
+context_t::context_t() { _pimpl = std::make_unique<impl>(); }
 
 context_t::~context_t() = default;
 

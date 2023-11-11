@@ -242,7 +242,8 @@ const lisp_t C_SEMI = intern(";");
 
 std::unique_ptr<env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-int main(int argc, char* const* argv) try
+int main(int argc, char* const* argv)
+try
 {
   Catch::Session session;
 

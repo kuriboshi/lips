@@ -22,7 +22,7 @@ std::list<lisp::job::job_t> joblist;
 // List of collected jobs
 std::list<lisp::job::job_t> cjoblist;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-}
+} // namespace
 
 namespace lisp::job
 {

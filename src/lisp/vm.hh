@@ -62,7 +62,10 @@ public:
   static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, std::move(a)); }
   static void fatal(std::error_code code) { get().do_fatal(code); }
   template<typename... Ts>
-  static void fatal(std::error_code code, const Ts&... a) { get().do_fatal(code, concat(a...)); }
+  static void fatal(std::error_code code, const Ts&... a)
+  {
+    get().do_fatal(code, concat(a...));
+  }
 
   static const cvariable_t& currentbase() { return get().do_currentbase(); }
   static const cvariable_t& verbose() { return get().do_verbose(); }
@@ -343,14 +346,14 @@ private:
   /// @param The destination block to free.
   void free(destblock_t* block);
 
-  undefhook_t _undefhook;         // Called in case of undefined function.
-  breakhook_t _breakhook;         // Called before going into break.
-  expr_t _expression;             // Stores urrent expression being evaluated.
-  fun_t _fun;                     // Current function.
-  args_t _args;                   // Current arguments.
-  bool _noeval{false};            // Don't evaluate arguments.
-  continuation_t _cont{nullptr};  // Current continuation.
-  destblock_t* _env{nullptr};     // Current environment.
+  undefhook_t _undefhook;        // Called in case of undefined function.
+  breakhook_t _breakhook;        // Called before going into break.
+  expr_t _expression;            // Stores urrent expression being evaluated.
+  fun_t _fun;                    // Current function.
+  args_t _args;                  // Current arguments.
+  bool _noeval{false};           // Don't evaluate arguments.
+  continuation_t _cont{nullptr}; // Current continuation.
+  destblock_t* _env{nullptr};    // Current environment.
 
   bool _trace{false};
   bool _interactive{false};
@@ -366,7 +369,7 @@ private:
 };
 
 template<typename Context>
-class vm_t final : public vm
+class vm_t final: public vm
 {
 public:
   // using type = vm_t<Context>;
@@ -400,10 +403,7 @@ private:
   lisp_t do_perror(std::error_code code, lisp_t a) override { return _context->perror(code, a); }
   lisp_t do_error(std::error_code code, lisp_t a) override { return _context->error(code, a); }
   void do_fatal(std::error_code code) override { _context->fatal(code); }
-  void do_fatal(std::error_code code, const std::string& a) override
-  {
-    _context->fatal(code, a);
-  }
+  void do_fatal(std::error_code code, const std::string& a) override { _context->fatal(code, a); }
 
   const cvariable_t& do_currentbase() override { return _context->currentbase(); }
   const cvariable_t& do_verbose() override { return _context->verbose(); }

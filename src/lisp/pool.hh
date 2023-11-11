@@ -34,7 +34,9 @@ public:
   /// @brief Stores a block of data to hold the objects of type T.
   struct data final
   {
-    data() : _block(new std::byte[N * sizeof(T)]) {}
+    data()
+      : _block(new std::byte[N * sizeof(T)])
+    {}
     /// @brief Disallow copying.
     data(const data&) = delete;
     /// @brief Disallow assignment.
@@ -53,6 +55,7 @@ public:
     ~data() { delete[] _block; }
 
     friend pool;
+
   private:
     std::byte* _block{nullptr};
     std::size_t _free_items{N};

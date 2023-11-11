@@ -36,7 +36,8 @@ lisp::lisp_t buildpath(I i, I end)
 }
 } // namespace
 
-int main(int argc, const char** argv) try
+int main(int argc, const char** argv)
+try
 {
   Catch::Session session;
   std::vector<std::string> load;

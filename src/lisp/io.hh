@@ -78,7 +78,12 @@ public:
   iterator end() { return {}; } // NOLINT(readability-convert-member-functions-to-static)
 
 protected:
-  static char getch(std::istream& stream) { char ch{0}; stream.get(ch); return ch; }
+  static char getch(std::istream& stream)
+  {
+    char ch{0};
+    stream.get(ch);
+    return ch;
+  }
 
   static std::optional<std::string> getline(std::istream& stream)
   {

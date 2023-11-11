@@ -59,7 +59,7 @@ lisp::lisp_t make_t()
   symbol->symbol()->constant = true;
   return symbol;
 }
-}
+} // namespace
 
 namespace lisp::details::vm
 {

@@ -68,7 +68,10 @@ struct token_t final
   };
 
   /// @brief Token type.
-  enum type type{type::EMPTY};
+  enum type type
+  {
+    type::EMPTY
+  };
   /// @brief A string representation of the token.
   std::string token;
 

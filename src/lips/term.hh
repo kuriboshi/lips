@@ -78,10 +78,7 @@ private:
   static constexpr int blink_time = 1000;
   static constexpr char at_char = '@';
 
-  bool is_control(auto c) const
-  {
-    return std::iscntrl(c) != 0 && c != '\n' && c != '\t';
-  }
+  bool is_control(auto c) const { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; }
 
   //
   // Routines for paren blinking.
@@ -129,14 +126,16 @@ private:
   //
   // Variables for terminal characteristics, old and new.
   //
-  struct termios newterm{};
-  struct termios oldterm{};
+  struct termios newterm
+  {};
+  struct termios oldterm
+  {};
 
-  std::array<char, BUFSIZ> linebuffer{}; // Line buffer for terminal input.
-  std::istringstream is;           // For input stream.
-  int parcount = 0;                // Counts paranthesis.
-  int linepos = 0;                 // End of line buffer.
-  int position = 0;                // Current position in line buffer.
+  std::array<char, BUFSIZ> linebuffer{};         // Line buffer for terminal input.
+  std::istringstream is;                         // For input stream.
+  int parcount = 0;                              // Counts paranthesis.
+  int linepos = 0;                               // End of line buffer.
+  int position = 0;                              // Current position in line buffer.
   std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
 
   options_t options;

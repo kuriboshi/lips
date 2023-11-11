@@ -122,7 +122,10 @@ void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t
 ///
 /// @return A reference of type cvariable which wraps the lisp_t value.
 ///
-inline cvariable_t& initcvar(std::string_view name, lisp_t val) { return details::alloc::initcvar(name, std::move(val)); }
+inline cvariable_t& initcvar(std::string_view name, lisp_t val)
+{
+  return details::alloc::initcvar(name, std::move(val));
+}
 
 /// @brief Creates a lisp_t object containing a cvariable_t.
 ///

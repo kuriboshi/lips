@@ -193,9 +193,15 @@ public:
   /// @brief The print name.
   std::string name;
   /// @brief Eval or no eval.
-  enum subr subr{subr::EVAL};
+  enum subr subr
+  {
+    subr::EVAL
+  };
   /// @brief Spread or no spread.
-  enum spread spread{spread::SPREAD};
+  enum spread spread
+  {
+    spread::SPREAD
+  };
 
 private:
   using func0_t = std::function<lisp_t()>;
@@ -360,7 +366,9 @@ public:
   cvariable_t() = delete;
   ~cvariable_t() = default;
   cvariable_t(const cvariable_t& other) = delete;
-  cvariable_t(cvariable_t&& other) noexcept : _value(std::move(other._value)) {}
+  cvariable_t(cvariable_t&& other) noexcept
+    : _value(std::move(other._value))
+  {}
   cvariable_t& operator=(cvariable_t&& other) noexcept
   {
     _value = std::move(other._value);
@@ -414,7 +422,9 @@ public:
   {}
 
   /// @brief Construct an object conaining a cvariable_t value.
-  object(cvariable_t&& x) : _u(std::move(x)) {}
+  object(cvariable_t&& x)
+    : _u(std::move(x))
+  {}
 
   /// @brief Copy consructor
   object(const object&) = delete;
