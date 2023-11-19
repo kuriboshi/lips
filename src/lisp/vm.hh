@@ -348,7 +348,7 @@ private:
 
   undefhook_t _undefhook;        // Called in case of undefined function.
   breakhook_t _breakhook;        // Called before going into break.
-  expr_t _expression;            // Stores urrent expression being evaluated.
+  expr_t _expression;            // Stores current expression being evaluated.
   fun_t _fun;                    // Current function.
   args_t _args;                  // Current arguments.
   bool _noeval{false};           // Don't evaluate arguments.

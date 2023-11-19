@@ -735,20 +735,17 @@ bool vm::spread()
   while(true)
   {
     if(is_nil(_args))
-    {
-      pop(_cont);
       break;
-    }
     if(_dest[0].index() == 1)
     {
       send(_args);
-      pop(_cont);
       break;
     }
     send(_args->car());
     next();
     _args = _args->cdr();
   }
+  pop(_cont);
   return false;
 }
 
