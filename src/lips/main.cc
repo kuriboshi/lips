@@ -288,8 +288,8 @@ try
   //
   // Init shell and lisp interpreter.
   //
-  auto context = std::make_shared<context_t>();
-  lisp::vm_t vm(context);
+  auto context = std::make_unique<context_t>();
+  lisp::vm_t vm(std::move(context));
   init();
   if(options.test)
   {
@@ -332,7 +332,7 @@ try
     }
     catch(const lisp_finish& fin)
     {
-      context->primerr()->format("finish: {}\n", fin.what());
+      vm.context().primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

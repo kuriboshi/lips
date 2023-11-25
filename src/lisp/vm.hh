@@ -372,18 +372,16 @@ template<typename Context>
 class vm_t final: public vm
 {
 public:
-  // using type = vm_t<Context>;
-  // using Context = context_t;
   /// @brief Lisp virtual machine constructor.
   ///
   /// @param context The context object.
-  explicit vm_t(std::shared_ptr<Context> context)
+  explicit vm_t(std::unique_ptr<Context> context)
     : _context(std::move(context))
   {
     vm::set(this);
   }
 
-  std::shared_ptr<Context> context() const { return _context; }
+  Context& context() const { return *_context; }
 
 private:
   ref_file_t do_primout() override { return _context->primout(); }
@@ -413,7 +411,7 @@ private:
   std::int64_t do_printlevel() const override { return _context->printlevel(); }
   void do_printlevel(std::int64_t pl) override { _context->printlevel(pl); }
 
-  std::shared_ptr<Context> _context;
+  std::unique_ptr<Context> _context;
 };
 
 inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(fun); }

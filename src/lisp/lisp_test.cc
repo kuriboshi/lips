@@ -60,15 +60,15 @@ try
     if(s0 != s1)
       throw;
   }
-  auto context = std::make_shared<lisp::context_t>();
-  lisp::vm_t vm(context);
+  auto context = std::make_unique<lisp::context_t>();
+  lisp::vm_t vm(std::move(context));
   std::ostringstream os;
   auto quiet = lisp::ref_file_t::create(os);
-  context->primerr(quiet);
+  vm.context().primerr(quiet);
   if(!loadpath.empty())
   {
     auto path = buildpath(loadpath.begin(), loadpath.end());
-    context->loadpath(path);
+    vm.context().loadpath(path);
   }
   for(auto i: load)
     lisp::loadfile(i);
