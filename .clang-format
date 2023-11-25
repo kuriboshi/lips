@@ -50,7 +50,6 @@ DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 # IndentCaseBlocks: true
-IndentCaseLabels: false
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '^<[a-z_]>'
