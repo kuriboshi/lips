@@ -358,7 +358,7 @@ public:
   template<typename... Ts>
   void format(std::string_view f, Ts&&... t)
   {
-    auto ret = fmt::vformat(f, fmt::make_format_args(t...));
+    auto ret = fmt::vformat(f, fmt::make_format_args(std::forward<Ts>(t)...));
     _sink->puts(ret);
   }
 
