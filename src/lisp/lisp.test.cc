@@ -22,6 +22,7 @@
 #include <catch2/matchers/catch_matchers.hpp>
 
 #include "alloc.hh"
+#include "file.hh"
 #include "iter.hh"
 #include "prim.hh"
 #include "types.hh"

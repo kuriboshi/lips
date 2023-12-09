@@ -20,7 +20,7 @@
 
 #include "alloc.hh"
 #include "check.hh"
-#include "io.hh"
+#include "file.hh"
 #include "rtable.hh"
 
 namespace lisp::rtable
@@ -53,7 +53,7 @@ lisp_t rmsquote(lisp_t stream)
     return "'"_a;
   }
   stream->file()->ungetch(c);
-  return cons(C_QUOTE, cons(io::lispread(stream->file()), nil));
+  return cons(C_QUOTE, cons(lispread(stream->file()), nil));
 }
 
 lisp_t rmgetenv(lisp_t stream)

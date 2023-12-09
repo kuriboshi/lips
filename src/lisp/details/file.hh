@@ -39,8 +39,6 @@ lisp_t printlevel(lisp_t);
 lisp_t spaces(lisp_t, lisp_t);
 lisp_t readline(lisp_t);
 
-bool loadfile(const std::string&);
-
 } // namespace lisp::details::file
 
 #endif

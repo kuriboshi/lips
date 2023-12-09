@@ -20,7 +20,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "io.hh"
+#include "file.hh"
 #include "parser.hh"
 #include "pred.hh"
 #include "prim.hh"

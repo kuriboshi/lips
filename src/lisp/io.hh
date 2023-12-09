@@ -32,11 +32,6 @@
 
 namespace lisp::io
 {
-lisp_t ratom(ref_file_t);
-lisp_t lispread(ref_file_t);
-lisp_t readline(ref_file_t);
-lisp_t getline(lisp_t);
-
 enum class output
 {
   PRIMARY,
@@ -48,14 +43,6 @@ enum class escape
   YES,
   NO
 };
-
-lisp_t patom(lisp_t, file_t&, enum escape esc = escape::NO);
-lisp_t prinbody(lisp_t, file_t&, enum escape esc = escape::NO, std::int64_t = 0);
-lisp_t prin0(lisp_t, file_t&, enum escape esc = escape::NO, std::int64_t = 0);
-lisp_t print(lisp_t, file_t&);
-lisp_t terpri(file_t&);
-
-lisp_t splice(lisp_t, lisp_t, bool);
 
 class source
 {
@@ -390,62 +377,12 @@ private:
   }
 };
 
-inline lisp_t ratom(ref_file_t f) { return io::ratom(f); }
-inline lisp_t lispread(ref_file_t f) { return io::lispread(f); }
-inline lisp_t lispread(const std::string& s)
-{
-  auto f = ref_file_t::create(s);
-  return io::lispread(f);
-}
-inline lisp_t readline(ref_file_t f) { return io::readline(f); }
-inline lisp_t getline(lisp_t f) { return io::getline(f); }
-
-inline lisp_t patom(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::patom(a, f, esc); }
-inline lisp_t patom(lisp_t a, io::output out, enum io::escape esc = io::escape::NO)
-{
-  return io::patom(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
-}
-inline lisp_t terpri(file_t& f) { return io::terpri(f); }
-inline lisp_t terpri(io::output out = io::output::PRIMARY)
-{
-  return io::terpri(out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
-}
-inline lisp_t prinbody(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::prinbody(a, f, esc); }
-inline lisp_t prinbody(lisp_t a, io::output out, io::escape esc = io::escape::NO)
-{
-  return io::prinbody(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
-}
-inline lisp_t prin0(lisp_t a, file_t& f, io::escape esc = io::escape::NO) { return io::prin0(a, f, esc); }
-inline lisp_t prin0(lisp_t a, io::output out = io::output::PRIMARY, enum io::escape esc = io::escape::NO)
-{
-  return io::prin0(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
-}
-inline lisp_t print(lisp_t a, file_t& f) { return io::print(a, f); }
-inline lisp_t print(lisp_t a, io::output out = io::output::PRIMARY)
-{
-  return io::print(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
-}
-
 template<typename T>
 std::string to_string(T& sink)
 {
   return dynamic_cast<io::string_sink&>(sink).string();
 }
 
-/// @brief Creates a lisp expression.
-inline lisp_t operator"" _l(const char* s, std::size_t)
-{
-  auto in = ref_file_t::create(s);
-  auto e = lispread(in);
-  return e;
-}
 } // namespace lisp
-
-inline std::ostream& operator<<(std::ostream& os, const lisp::lisp_t& obj)
-{
-  lisp::file_t out(os);
-  lisp::prin0(obj, out, lisp::io::escape::YES);
-  return os;
-}
 
 #endif

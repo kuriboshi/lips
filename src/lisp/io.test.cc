@@ -23,7 +23,7 @@
 #include <catch2/matchers/catch_matchers.hpp>
 
 #include "alloc.hh"
-#include "io.hh"
+#include "file.hh"
 #include "pred.hh"
 #include "prim.hh"
 
@@ -502,41 +502,41 @@ TEST_CASE("io: splice")
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(x, y, false);
+    auto r = splice(x, y, false);
     CHECK(!is_nil(equal(x, "(x y z b c)"_l)));
     CHECK(!is_nil(equal(r, "(z b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(cdr(x), y, false);
+    auto r = splice(cdr(x), y, false);
     CHECK(!is_nil(equal(x, "(a x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = io::splice(cdr(x), y, true);
+    auto r = splice(cdr(x), y, true);
     CHECK(!is_nil(equal(x, "(a b x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(x, y, false);
+    auto r = splice(x, y, false);
     CHECK(!is_nil(equal(x, "(x b c)"_l)));
     CHECK(!is_nil(equal(r, "(x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = io::splice(x, y, true);
+    auto r = splice(x, y, true);
     CHECK(!is_nil(equal(x, "(a x b c)"_l)));
     CHECK(!is_nil(equal(r, "(a x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
-    auto r = io::splice(x, nil, true);
+    auto r = splice(x, nil, true);
     CHECK(!is_nil(equal(r, x)));
   }
 }

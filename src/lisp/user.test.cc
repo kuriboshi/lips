@@ -21,6 +21,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
+#include "file.hh"
 #include "low.hh"
 #include "pred.hh"
 #include "prim.hh"

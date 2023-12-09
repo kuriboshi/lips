@@ -18,6 +18,7 @@
 #include "alloc.hh"
 #include "check.hh"
 #include "iter.hh"
+#include "file.hh"
 #include "pred.hh"
 #include "prim.hh"
 #include "prop.hh"

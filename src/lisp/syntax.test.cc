@@ -16,6 +16,7 @@
 //
 
 #include "alloc.hh"
+#include "file.hh"
 #include "syntax.hh"
 
 #include <catch2/catch_test_macros.hpp>

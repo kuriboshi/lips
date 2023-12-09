@@ -18,6 +18,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
+#include "file.hh"
 #include "map.hh"
 #include "prim.hh"
 

@@ -22,6 +22,7 @@
 #include <fmt/format.h>
 
 #include "alloc.hh"
+#include "file.hh"
 #include "low.hh"
 #include "prim.hh"
 

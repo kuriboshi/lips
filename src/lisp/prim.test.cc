@@ -19,6 +19,7 @@
 
 #include "alloc.hh"
 #include "arith.hh"
+#include "file.hh"
 #include "low.hh"
 #include "pred.hh"
 #include "prim.hh"

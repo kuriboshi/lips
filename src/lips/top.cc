@@ -39,7 +39,7 @@ void top::phist()
   for(auto hl: variables->history())
   {
     std::cout << fmt::format("{}.\t", hl->car()->intval());
-    io::prinbody(hl->cdr(), *vm::stdout(), io::escape::YES);
+    prinbody(hl->cdr(), *vm::stdout(), io::escape::YES);
     primout()->terpri();
   }
 }
@@ -202,7 +202,7 @@ lisp_t top::operator()(lisp_t)
     top::addhist(input_exp);
     if(_echoline)
     {
-      io::prinbody(input_exp, *primout(), io::escape::YES);
+      prinbody(input_exp, *primout(), io::escape::YES);
       primout()->terpri();
     }
     bool printit = false; // If the result will be printed.
@@ -259,7 +259,7 @@ lisp_t top::rmexcl(lisp_t stream)
       break;
     default:
       stream->file()->ungetch(c);
-      auto at = io::ratom(stream->file());
+      auto at = ratom(stream->file());
       if(type_of(at) == object::type::Integer)
       {
         tmp = histget(at->intval(), variables->history());

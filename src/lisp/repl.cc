@@ -16,6 +16,7 @@
 //
 
 #include "alloc.hh"
+#include "file.hh"
 #include "repl.hh"
 #include "vm.hh"
 
