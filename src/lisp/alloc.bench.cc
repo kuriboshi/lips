@@ -20,7 +20,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 
-#include "lisp.hh"
+#include "alloc.hh"
+#include "types.hh"
 
 namespace lisp
 {

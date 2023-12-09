@@ -32,10 +32,9 @@ int main(int argc, const char** argv)
     std::vector<std::string> load;
     std::vector<std::string> loadpath;
     session.applyCommandLine(argc, argv);
-    lisp::context ctx;
-    lisp::vm vm(ctx);
-    auto result = session.run();
-    return result;
+    auto ctx = std::make_unique<lisp::context_t>();
+    lisp::vm_t vm(std::move(ctx));
+    return session.run();
   }
   catch(const lisp::lisp_finish& ex)
   {
