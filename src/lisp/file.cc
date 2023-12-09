@@ -98,14 +98,14 @@ lisp_t getline(lisp_t file)
   return nil;
 }
 
-bool loadfile(const std::string& lf)
+bool loadfile(const std::string& filename)
 {
   try
   {
     for(auto i: *vm::loadpath())
     {
       std::filesystem::path base{i->getstr()};
-      base /= lf;
+      base /= filename;
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
@@ -163,9 +163,9 @@ inline void psubr(const char* s, file_t& file, const lisp_t& x)
   ps(">", file, io::escape::NO);
 }
 
-lisp_t prinbody(lisp_t x, file_t& file, io::escape esc, std::int64_t current_printlevel)
+lisp_t prinbody(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printlevel)
 {
-  auto i = x;
+  auto i = a;
   for(;;)
   {
     prin0(i->car(), file, esc, current_printlevel);
@@ -185,88 +185,88 @@ lisp_t prinbody(lisp_t x, file_t& file, io::escape esc, std::int64_t current_pri
       break;
     }
   }
-  return x;
+  return a;
 }
 
-lisp_t prin0(lisp_t x, file_t& file, io::escape esc, std::int64_t current_printlevel)
+lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printlevel)
 {
-  switch(type_of(x))
+  switch(type_of(a))
   {
     case object::type::Cons:
       ++current_printlevel;
       if(current_printlevel <= vm::printlevel() || vm::printlevel() <= 0)
       {
         file.putch('(');
-        prinbody(x, file, esc, current_printlevel);
+        prinbody(a, file, esc, current_printlevel);
         file.putch(')');
       }
       else
         file.putch('&');
       break;
     case object::type::Symbol:
-      return patom(x, file, esc);
+      return patom(a, file, esc);
     case object::type::Nil:
       ps("nil", file, io::escape::NO);
       break;
     case object::type::Integer:
-      pi(x->intval(), vm::currentbase()->intval(), file);
+      pi(a->intval(), vm::currentbase()->intval(), file);
       break;
     case object::type::Float:
-      pf(x->floatval(), file);
+      pf(a->floatval(), file);
       break;
     case object::type::String:
       if(esc == io::escape::YES)
       {
         file.putch('"');
-        ps(x->string(), file, esc);
+        ps(a->string(), file, esc);
         file.putch('"');
       }
       else
-        ps(x->string(), file, io::escape::NO);
+        ps(a->string(), file, io::escape::NO);
       break;
     case object::type::Closure:
-      pp("#<closure", file, x);
+      pp("#<closure", file, a);
       break;
     case object::type::Lambda:
-      if(x->lambda().eval)
-        pp("#<lambda", file, x);
+      if(a->lambda().eval)
+        pp("#<lambda", file, a);
       else
-        pp("#<nlambda", file, x);
+        pp("#<nlambda", file, a);
       break;
     case object::type::Indirect:
-      pp("#<indirect", file, x);
+      pp("#<indirect", file, a);
       break;
     case object::type::Subr:
-      if(x->subr().subr == subr_t::subr::EVAL)
-        psubr("#<subr", file, x);
+      if(a->subr().subr == subr_t::subr::EVAL)
+        psubr("#<subr", file, a);
       else
-        psubr("#<fsubr", file, x);
+        psubr("#<fsubr", file, a);
       break;
     case object::type::Environ:
-      pp("#<environ", file, x);
+      pp("#<environ", file, a);
       break;
     case object::type::File:
-      pp("#<file", file, x);
+      pp("#<file", file, a);
       break;
     default:
       ps("#<illegal type_of:", file, io::escape::NO);
-      pi(to_underlying(type_of(x)), vm::currentbase()->intval(), file);
-      pp("", file, x);
+      pi(to_underlying(type_of(a)), vm::currentbase()->intval(), file);
+      pp("", file, a);
   }
-  return x;
+  return a;
 }
 
-lisp_t patom(lisp_t x, file_t& file, io::escape esc)
+lisp_t patom(lisp_t a, file_t& file, io::escape esc)
 {
-  ps(x->symbol()->pname, file, esc);
-  return x;
+  ps(a->symbol()->pname, file, esc);
+  return a;
 }
 
-lisp_t print(lisp_t x, file_t& file)
+lisp_t print(lisp_t a, file_t& file)
 {
-  prin0(x, file, io::escape::YES, 0);
+  prin0(a, file, io::escape::YES, 0);
   terpri(file);
-  return x;
+  return a;
 }
 
 lisp::lisp_t terpri(lisp::file_t& file)
