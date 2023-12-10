@@ -69,11 +69,6 @@ lisp_t strlen(lisp_t s)
   return mknumber(static_cast<int>(s->string().length()));
 }
 
-/// @brief Extract a substring from start to end.
-///
-/// @details If start or end is out of bounds, return nil.  If end is one less
-/// than start the zero length string is returned.  End equal to zero if
-/// start is equal to one is accepted.
 lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
 {
   check(str, object::type::String);
@@ -105,7 +100,6 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   return mkstring(str->string().substr(b, e));
 }
 
-/// @brief Return symbols print name as a string.
 lisp_t symstr(lisp_t sym)
 {
   check(sym, object::type::Symbol, object::type::Nil);

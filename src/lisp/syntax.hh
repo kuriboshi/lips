@@ -28,9 +28,6 @@
 namespace lisp
 {
 
-class object;
-using lisp_t = ref_ptr<object>;
-
 // ^# start of line comment
 // #' Function quote
 // ' Quote

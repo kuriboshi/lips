@@ -26,7 +26,7 @@ namespace lisp
 {
 /// @brief Iterates over a list
 ///
-/// @details Usage:
+/// Usage:
 /// @code{.cc}
 ///   auto list{"(a b c)"_l}
 ///   for(auto i: list)

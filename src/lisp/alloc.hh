@@ -62,8 +62,8 @@ inline lisp_t mkfloat(double number) { return details::alloc::mkfloat(number); }
 
 /// @brief Builds a cons cell out of the arguments.
 ///
-/// @details The most basic of lisp functions.  Allocate a cons cell and fill in
-/// the cell's car and cdr parts.
+/// The most basic of lisp functions.  Allocate a cons cell and fill in the
+/// cell's car and cdr parts.
 ///
 /// @param a [in] The value to put in the head (car) of the cons cell.
 /// @param b [in] The value to put in the tail (cdr) of the cons cell.
@@ -86,7 +86,7 @@ inline lisp_t freecount() { return details::alloc::freecount(); }
 
 /// @brief Make interned symbol in obarray.
 ///
-/// @details Create an interned symbol in the global symbol table.
+/// Create an interned symbol in the global symbol table.
 ///
 /// @param pname The print name of the symbol.
 /// @returns The symbol as a LISP object.
@@ -94,8 +94,8 @@ inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 
 /// @brief Create a literal atom.
 ///
-/// @details Currently there is no difference between `intern` and `mkatom` as
-/// they both create a symbol in the global symbol table.
+/// Currently there is no difference between `intern` and `mkatom` as they both
+/// create a symbol in the global symbol table.
 ///
 /// @return The literal atom.
 ///
@@ -110,12 +110,12 @@ void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t
 
 /// @brief Initializes a lisp symbol for use in the C++ program.
 ///
-/// @details This function links a variable in lisp with a variable in C++ so
-/// that changing the value in one domain will be reflected in the other.
-/// The lisp variable will have the print name NAME.  In C++ the type
-/// cvariable_t will work in many contexts which expects a value of type
-/// lisp_t.  If assigned to the lisp value changes if the value is set with
-/// setq in lisp the C++ value will change.
+/// This function links a variable in lisp with a variable in C++ so that
+/// changing the value in one domain will be reflected in the other.  The lisp
+/// variable will have the print name NAME.  In C++ the type cvariable_t will
+/// work in many contexts which expects a value of type lisp_t.  If assigned to
+/// the lisp value changes if the value is set with setq in lisp the C++ value
+/// will change.
 ///
 /// @param name The lisp print name.
 /// @param val The initial value.
@@ -129,7 +129,7 @@ inline cvariable_t& initcvar(std::string_view name, lisp_t val)
 
 /// @brief Creates a lisp_t object containing a cvariable_t.
 ///
-/// @details Similar to initcvar but returns a lisp_t object instead.
+/// Similar to initcvar but returns a lisp_t object instead.
 ///
 /// @param name The lisp print name.
 /// @param val The initial value.

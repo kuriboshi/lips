@@ -23,13 +23,61 @@
 
 namespace lisp
 {
+
+/// @brief Concatenate strings.
 inline lisp_t concat(lisp_t x) { return details::string::concat(x); }
+
+/// @brief Compare two strings.
+///
+/// @param x A string.
+/// @param y A string.
+///
+/// @returns A positive number of x is lexiographically greater than y, a
+/// negative number if x is lexiographically less than y and zero if they are
+/// equal.
 inline lisp_t strcmp(lisp_t x, lisp_t y) { return details::string::strcmp(x, y); }
+
+/// @brief Compare if to strings are equal.
+///
+/// @param x A string.
+/// @param y A string.
+///
+/// @returns T if x is equal to y, nil otherwise.
 inline lisp_t strequal(lisp_t x, lisp_t y) { return details::string::strequal(x, y); }
+
+/// @brief Check if parameter is a string.
+///
+/// @param x
+///
+/// @returns Returns the string if it's a string, nil otherwise.
 inline lisp_t stringp(lisp_t x) { return details::string::stringp(x); }
+
+/// @brief Returns the length of a string.
+///
+/// @param x A string.
+///
+/// @returns Returns the length of the string.
 inline lisp_t strlen(lisp_t x) { return details::string::strlen(x); }
-inline lisp_t substring(lisp_t x, lisp_t y, lisp_t z) { return details::string::substring(x, y, z); }
-inline lisp_t symstr(lisp_t x) { return details::string::symstr(x); }
+
+/// @brief Extract a substring from start to end.
+///
+/// @param str
+/// @param begin
+/// @param end
+///
+/// @returns Returns a substring.  If start or end is out of bounds, return
+/// nil.  If end is one less than start the zero length string is returned.
+/// End equal to zero if start is equal to one is accepted.
+inline lisp_t substring(lisp_t str, lisp_t begin, lisp_t end) { return details::string::substring(str, begin, end); }
+
+/// @brief Return symbol's print name as a string.
+///
+/// @param sym A symbol.
+///
+/// @returns Returns the print name of a symbol as a string. If sym is nil then
+/// returns the string "nil".
+inline lisp_t symstr(lisp_t sym) { return details::string::symstr(sym); }
+
 } // namespace lisp
 
 #endif

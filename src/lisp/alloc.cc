@@ -23,10 +23,10 @@ namespace
 {
 /// @brief Builds an argument list.
 ///
-/// @details The list is constructed from the ALIST given in a lambda
-/// definition.  This list may end in an atom if the function is halfspread,
-/// or it could be an atom for a nospread function.  COUNT is set to the
-/// number of arguments and is negative if halfspread or nospread.
+/// The list is constructed from the ALIST given in a lambda definition.  This
+/// list may end in an atom if the function is halfspread, or it could be an
+/// atom for a nospread function.  COUNT is set to the number of arguments and
+/// is negative if halfspread or nospread.
 ///
 /// @param alist [in] The argument list in a lambda definitions.
 /// @param count [in, out] The number of arguments in the argument list.
@@ -88,9 +88,9 @@ lisp_t intern(std::string_view pname)
 
 /// @brief Get an existing symbol.
 ///
-/// @details Get an existing symbol in either the global symbol table or the
-/// local one. If the symbol doesn't exist then create a new one in the local
-/// symol table.
+/// Get an existing symbol in either the global symbol table or the local
+/// one. If the symbol doesn't exist then create a new one in the local symol
+/// table.
 ///
 /// @param str The name of the symbol.
 /// @returns The symbol as a LISP object.

@@ -23,14 +23,13 @@ namespace lisp::details::low
 {
 /// @brief The cond special form.
 ///
-/// @details The generalized conditional special form. The function takes zero
-/// or more clauses. Each clause has one test followed by zero or more
-/// expressions called consequents. The function evaluates each test in
-/// sequence until one of them is evaluated to true (not @c nil). It then
-/// evaluates each consequent in order and returns the value of the last
-/// consequent. If there are no consequents the result is the value of the test
-/// expression. The degenerate @c cond expression with no clauses at all
-/// evaluates to @c nil.
+/// The generalized conditional special form. The function takes zero or more
+/// clauses. Each clause has one test followed by zero or more expressions
+/// called consequents. The function evaluates each test in sequence until one
+/// of them is evaluated to true (not @c nil). It then evaluates each
+/// consequent in order and returns the value of the last consequent. If there
+/// are no consequents the result is the value of the test expression. The
+/// degenerate @c cond expression with no clauses at all evaluates to @c nil.
 ///
 /// In the following example the return value is the value of the expression
 /// @c r0 if @c e0 evaluates to non-nil, @c r2 if @c e1 is evaluated to non-nil,

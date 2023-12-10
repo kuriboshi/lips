@@ -34,7 +34,7 @@ using safe_counter = std::atomic<unsigned>;
 ///
 /// @brief Default deleter simply deletes the object.
 ///
-/// @details Override for a specific type get a different behaviour.
+/// Override for a specific type get a different behaviour.
 ///
 template<typename T>
 inline void ref_deleter(T* p)
@@ -45,10 +45,10 @@ inline void ref_deleter(T* p)
 ///
 /// @brief Derive from this in order to use the ref_ptr class.
 ///
-/// @details This reference counter can be used with or without a mutex
-///   depending on the Counter template argument. If Counter is the
-///   unsafe_counter type then it's not thread safe. If, on the other hand, the
-///   type is safe_counter then the reference counter is thread safe.
+/// This reference counter can be used with or without a mutex depending on the
+/// Counter template argument. If Counter is the unsafe_counter type then it's
+/// not thread safe. If, on the other hand, the type is safe_counter then the
+/// reference counter is thread safe.
 ///
 /// @tparam T This is the type to be reference counted. T should derive from
 ///   ref_count<T>.
@@ -64,8 +64,7 @@ public:
   void retain() { ++_counter; }
   /// @brief Decrease the reference counter.
   ///
-  /// @details Once the counter reaches zero the object is automatically
-  /// deleted.
+  /// Once the counter reaches zero the object is automatically deleted.
   void release()
   {
     if(--_counter == 0)
@@ -88,8 +87,8 @@ private:
 ///
 /// @brief Reference pointer which controls the life cycle of T.
 ///
-/// @details T needs to provide the member functions @c retain and
-/// @c release by, for example, deriving from @c ref_count.
+/// T needs to provide the member functions @c retain and @c release by, for
+/// example, deriving from @c ref_count.
 ///
 template<typename T>
 class ref_ptr final
@@ -130,8 +129,8 @@ public:
   }
   /// @brief Assignment operator.
   ///
-  /// @details The reference counter of the assigned object is incremented. If
-  /// the assignee is not null then the reference counter is decremented before
+  /// The reference counter of the assigned object is incremented. If the
+  /// assignee is not null then the reference counter is decremented before
   /// it's set.
   ref_ptr& operator=(const ref_ptr& x)
   {

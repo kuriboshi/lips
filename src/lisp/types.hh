@@ -45,19 +45,25 @@ inline constexpr auto nil = nullptr;
 
 /// @brief The cons cell.
 ///
-/// @details A cons cell contains two pieces of data: The head (traditionall
-/// called car) and the tail (traditionally called cdr).
+/// A cons cell contains two pieces of data: The head (traditionally called
+/// car) and the tail (traditionally called cdr).
 ///
 class cons_t final: public ref_count<cons_t>
 {
 public:
+  /// @brief Default constructor.
+  ///
+  /// Constructs a cons cell with both car and cdr set to nil.
   cons_t() = default;
+  /// @brief Construct a cons cell with two values.
   cons_t(lisp_t a, lisp_t d)
     : car(std::move(a)),
       cdr(std::move(d))
   {}
 
+  /// @brief The contents of the address register (car).
   lisp_t car;
+  /// @brief The contents of the data register (cdr).
   lisp_t cdr;
 
   /// @brief The new and delete operators uses the global pool to create objects.
@@ -65,6 +71,7 @@ public:
   static void operator delete(void* x) { pool().deallocate(x); }
   static void operator delete(cons_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
+  /// @brief Returns the current number or free cells in the pool.
   static std::size_t freecount() { return pool().size(); }
 
 private:
@@ -82,11 +89,11 @@ private:
 
 /// @brief Destination block is used to collect the parameters to a function.
 ///
-/// @details The destblock_t is used to store variables and their values.  Each
-/// block of variable/value pairs is proceeded by a control block which
-/// contains the following pieces of information: The size of the block, the
-/// index of the variable/value pair currently being set, and a link to another
-/// destblock_t in a chain of blocks.
+/// The destblock_t is used to store variables and their values.  Each block of
+/// variable/value pairs is proceeded by a control block which contains the
+/// following pieces of information: The size of the block, the index of the
+/// variable/value pair currently being set, and a link to another destblock_t
+/// in a chain of blocks.
 ///
 class destblock_t final
 {
@@ -126,10 +133,10 @@ public:
 
 /// @brief Structure describing a built-in function.
 ///
-/// @details Built-in function can have zero, one, two, or three parameters.
-/// They can either evaluate their parameters or not (special forms).  Function
-/// can be either spread (fixed number of arguments) or nospread (variable
-/// number of arguments).
+/// Built-in function can have zero, one, two, or three parameters.  They can
+/// either evaluate their parameters or not (special forms).  Function can be
+/// either spread (fixed number of arguments) or nospread (variable number of
+/// arguments).
 ///
 class subr_t final
 {
@@ -142,9 +149,9 @@ public:
   };
   /// @brief Indicates if the function is a spread or no spread function.
   ///
-  /// @details With a spread function the arguments are bound to individual
-  /// parameters and in the case of a no spread function the arguments are
-  /// passed to the function as a single list parameter.
+  /// With a spread function the arguments are bound to individual parameters
+  /// and in the case of a no spread function the arguments are passed to the
+  /// function as a single list parameter.
   enum class spread
   {
     SPREAD,
@@ -153,9 +160,9 @@ public:
 
   /// @brief Constructor of a primitive function.
   ///
-  /// @details A primitive function is made up of it's print name, the function
-  /// to call, an indicator to tell if the arguments are to be evaluated or
-  /// not, and the spread/no spread indicator.
+  /// A primitive function is made up of it's print name, the function to call,
+  /// an indicator to tell if the arguments are to be evaluated or not, and the
+  /// spread/no spread indicator.
   ///
   /// @param pname The print name.
   /// @param fun The function which can take zero, one, two, or three
@@ -171,9 +178,9 @@ public:
   {}
   /// @brief Number of arguments.
   ///
-  /// @details The function may optinally take a context parameter in addition
-  /// to the zero to three lisp_t arguments. The return value of this function
-  /// will be one of 0 - 3 regardless of whether there is a context parameter.
+  /// The function may optinally take a context parameter in addition to the
+  /// zero to three lisp_t arguments. The return value of this function will be
+  /// one of 0 - 3 regardless of whether there is a context parameter.
   ///
   /// @return The argument count 0 - 3.
   constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
@@ -354,9 +361,9 @@ struct subr_index
 
 /// @brief A representation of a C++ variable linked to a lisp variable.
 ///
-/// @details Wraps a lisp_t value in such a way that the value can be changed
-/// from either the C++ context or the lisp context and have the value be
-/// reflected in both.
+/// Wraps a lisp_t value in such a way that the value can be changed from
+/// either the C++ context or the lisp context and have the value be reflected
+/// in both.
 ///
 class cvariable_t final
 {
@@ -522,9 +529,9 @@ using ref_string_t = ref_ptr<string_t>;
 
 /// @brief A class able to hold a value of any lisp type
 ///
-/// @details The lisp objects are stored in a variant with accessor methods to
-/// set or get the values. There is no checking of the correct type for the
-/// accessor functions so calling them for the wrong type throws an exception.
+/// The lisp objects are stored in a variant with accessor methods to set or
+/// get the values. There is no checking of the correct type for the accessor
+/// functions so calling them for the wrong type throws an exception.
 class object final: public ref_count<object>
 {
 public:
@@ -563,77 +570,81 @@ public:
 
   /// @brief This enum class indicates the type of value stored in the object.
   ///
-  /// @details Each of the values in the enum maps one to one directly to the
-  /// type stored in the variant. The enum exists to make the value type more
+  /// Each of the values in the enum maps one to one directly to the type
+  /// stored in the variant. The enum exists to make the value type more
   /// readable.
   enum class type : std::uint8_t
   {
-    Nil = 0,  // so that nullptr also becomes nil
-    Symbol,   // an atomic symbol
-    Integer,  // 24 bit integer in same word
-    Float,    // floating point value
-    Indirect, // used when a value is stored in a closure
-    Cons,     // a pair
-    String,   // character strings
-    Subr,     // primitive function
-    Lambda,   // lambda function
-    Closure,  // static binding object
-    Environ,  // environment stack type for gc use
-    File,     // file pointer
-    Cvariable // is a pointer to c-variable
+    Nil = 0,  // Mapped to std::monostate
+    Symbol,   // An atomic symbol
+    Integer,  // A 32 bit integer
+    Float,    // A floating point value
+    Indirect, // Used when a value is stored in a closure
+    Cons,     // A pair
+    String,   // A character string
+    Subr,     // A primitive function
+    Lambda,   // A lambda function
+    Closure,  // A static binding object
+    Environ,  // An environment stack type for gc use
+    File,     // A file pointer
+    Cvariable // A pointer to c-variable
   };
 
-  /// @brief Litatom
+  /// @brief The symbol (literal atom).
   auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
 
-  /// @brief Get and set the value of a litatom
+  /// @brief Get and set the value of a symbol.
   auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
   void value(const lisp_t&);
 
-  /// @brief Integer
+  /// @brief The integer value.
   auto intval() const -> std::int64_t { return std::get<std::int64_t>(_u); }
 
-  /// @brief Floating point (double)
+  /// @brief The floating point value (double)
   auto floatval() const -> double { return std::get<double>(_u); }
 
-  /// @brief Get the indirect value
+  /// @brief Get the indirect value.
   auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }
 
-  /// @brief Cons cell and car/cdr
+  /// @brief Cons cell and car/cdr.
   auto cons() const -> const cons_t& { return *std::get<ref_cons_t>(_u); }
+  /// @brief The 'car' of the cons cell, no type checks.
   auto car() const -> lisp_t { return std::get<ref_cons_t>(_u)->car; }
+  /// @brief Set the 'car' of the cons cell, no type checks.
   void car(lisp_t x) { std::get<ref_cons_t>(_u)->car = std::move(x); }
+  /// @brief The 'cdr' of the cons cell, no type checks.
   auto cdr() const -> lisp_t { return std::get<ref_cons_t>(_u)->cdr; }
+  /// @brief Set the 'cdr' of the cons cell, no type checks.
   void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = std::move(x); }
 
-  /// @brief Character string
+  /// @brief Character string.
   auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->string; }
 
-  /// @brief Compiled function (subr)
+  /// @brief Compiled function (subr).
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
 
-  /// @brief Lambda expression
+  /// @brief Lambda expression.
   auto lambda() const -> const lambda_t& { return *std::get<ref_lambda_t>(_u); }
 
-  /// @brief Closure
+  /// @brief Closure.
   auto closure() -> closure_t& { return *std::get<ref_closure_t>(_u); }
 
-  /// @brief Destination environment
+  /// @brief Destination environment.
   auto environ() -> destblock_t* { return std::get<destblock_t*>(_u); }
 
-  /// @brief File reference
+  /// @brief File reference.
   auto file() -> ref_file_t& { return std::get<ref_file_t>(_u); }
 
-  /// @brief Link to a c/c++ variable
+  /// @brief Link to a c/c++ variable.
   auto cvariable() -> cvariable_t& { return std::get<cvariable_t>(_u); }
 
-  /// @brief Get the string if the object holds a litatom or a proper string
+  /// @brief Get the string if the object holds a symbol or a proper string.
   const std::string& getstr() const
   {
     return gettype() == type::String ? std::get<ref_string_t>(_u)->string : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
-  /// @brief Access the type of object
+  /// @brief Access the type of object.
   type gettype() const { return static_cast<type>(_u.index()); }
 
   /// @brief The new and delete operators uses a memory pool to create objects.
@@ -679,8 +690,8 @@ private:
 
 /// @brief Return the type of the object or the object inside a lisp_t object.
 ///
-/// @details Since lisp_t may be nullptr, which represents the nil value, it's
-/// not safe to call lisp_t->gettype() directly.
+/// Since lisp_t may be nullptr, which represents the nil value, it's not safe
+/// to call lisp_t->gettype() directly.
 inline object::type type_of(const lisp_t& a) { return a == nullptr ? object::type::Nil : a->gettype(); }
 inline object::type type_of(const object& a) { return a.gettype(); }
 inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? object::type::Nil : a->gettype(); }

@@ -38,14 +38,16 @@ class lexer;
 
 /// @brief The LISP input parser.
 ///
-/// @details The main attraction.
+/// The main attraction.
 ///
 class parser final
 {
 public:
   /// @brief Constructor.
-  /// @details The parser takes a lexer as the only parameter.  The parser
-  ///   calls the lexer every time it needs the next token.
+  ///
+  /// The parser takes a lexer as the only parameter.  The parser calls the
+  /// lexer every time it needs the next token.
+  ///
   /// @param lexer A lexer object which returns the next token.
   explicit parser(lexer& lexer)
     : _lexer(lexer)

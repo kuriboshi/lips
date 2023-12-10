@@ -25,6 +25,10 @@
 namespace lisp
 {
 
+/// @brief Check if a lisp object is of a given type.
+///
+/// @param arg A lisp_t object.
+/// @tparam T A
 template<typename T>
 void check(const lisp_t& arg, T type)
 {

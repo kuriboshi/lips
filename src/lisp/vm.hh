@@ -78,8 +78,8 @@ public:
 
   /// @brief This is the LISP vm.
   ///
-  /// @details The vm allocates a destination slot for the result and
-  /// starts munching continuations.
+  /// The vm allocates a destination slot for the result and starts munching
+  /// continuations.
   lisp_t eval(lisp_t);
   lisp_t eval(const std::string&);
   lisp_t apply(lisp_t, lisp_t);
@@ -272,7 +272,7 @@ private:
   void next();
   /// @brief Make a call to the function in parameter `fun'.
   ///
-  /// @details It can handle functions with up to three arguments.
+  /// It can handle functions with up to three arguments.
   lisp_t call(lisp_t fun);
   bool evalhook(lisp_t exp);
   void do_unbound(continuation_t);
@@ -328,6 +328,7 @@ private:
   void abort(std::error_code);
   /// @brief Resets the vm to it's initial state.
   void reset();
+  /// @brief Called when the stack overflows.
   void overflow();
   static lisp_t destblock(const destblock_t*);
 
@@ -335,15 +336,16 @@ private:
   /// @brief Allocates a destination block of size size.
   ///
   /// @param size The size of the destination block.
-  /// @returns A destblock or nullptr if no more space available.
+  /// @returns A pointer to a destblock_t or nullptr if no more space
+  /// available.
   destblock_t* mkdestblock(int);
   ///
   /// @brief Free a destination block.
   ///
-  /// @details The destination blocks are freed in the reverse order of their
+  /// The destination blocks are freed in the reverse order of their
   /// allocation.
   ///
-  /// @param The destination block to free.
+  /// @param block The destination block to free.
   void free(destblock_t* block);
 
   undefhook_t _undefhook;        // Called in case of undefined function.

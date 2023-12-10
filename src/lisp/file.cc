@@ -78,8 +78,7 @@ inline void print_subr(const char* s, file_t& file, const lisp_t& x)
 ///
 /// @brief Read an atom from FILE.
 ///
-/// @details Reads one token from the file and creates a lisp object from that
-/// token.
+/// Reads one token from the file and creates a lisp object from that token.
 ///
 /// @param l The lisp interpreter to use.
 /// @param file The source file.
@@ -281,7 +280,7 @@ lisp::lisp_t terpri(lisp::file_t& file)
 
 /// @brief Splice an object into a list.
 ///
-/// @details Splices list y into x keeping cdr of x. For example:
+/// Splices list y into x keeping cdr of x. For example:
 /// @code{.lisp}
 /// (let ((x '(a b c))
 ///       (y '(x y z)))

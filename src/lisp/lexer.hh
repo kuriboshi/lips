@@ -33,7 +33,7 @@ namespace lisp
 ///
 /// @brief Represents one token in a stream of tokens.
 ///
-/// @details Each token can be of one of the following types.
+/// Each token can be of one of the following types.
 ///
 /// @li @c EMPTY An empty token signalling the end of a stream or an error
 ///   tokenizing the stream.
@@ -113,7 +113,7 @@ struct token_t final
   }
   /// @brief The move constructor.
   ///
-  /// @details The moved from token becomes an empty token.
+  /// The moved from token becomes an empty token.
   token_t(token_t&& t) noexcept
     : type(t.type),
       token(std::move(t.token))
