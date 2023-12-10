@@ -73,7 +73,7 @@ inline void print_subr(const char* s, file_t& file, const lisp_t& x)
   print_string(x->subr().name, file, io::escape::NO);
   print_string(">", file, io::escape::NO);
 }
-}
+} // namespace
 
 ///
 /// @brief Read an atom from FILE.
