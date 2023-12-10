@@ -22,7 +22,7 @@
 #include <iostream>
 #include <string>
 
-#include "io.hh"
+#include "file.hh"
 #include "types.hh"
 #include "syntax.hh"
 #include "vm.hh"

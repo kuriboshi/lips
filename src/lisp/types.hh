@@ -26,8 +26,11 @@
 #include <string_view>
 #include <variant>
 
+#include <fmt/format.h>
+
 #include "error.hh"
 #include "except.hh"
+#include "io.hh"
 #include "pool.hh"
 #include "ref_ptr.hh"
 #include "symbol.hh"
@@ -35,8 +38,6 @@
 namespace lisp
 {
 
-class context;
-class file_t;
 class object;
 using lisp_t = ref_ptr<object>;
 
@@ -398,6 +399,121 @@ struct indirect_t
   lisp_t value;
 };
 
+class file_t final: public ref_count<file_t>
+{
+public:
+  file_t(std::unique_ptr<io::source> source)
+    : _source(std::move(source))
+  {}
+  file_t(std::unique_ptr<io::sink> sink)
+    : _sink(std::move(sink))
+  {}
+  file_t(std::istream& stream)
+    : _source(std::make_unique<io::stream_source>(stream))
+  {}
+  file_t(std::ostream& stream)
+    : _sink(std::make_unique<io::stream_sink>(stream))
+  {}
+  file_t(const std::string& string)
+    : _source(std::make_unique<io::string_source>(string))
+  {}
+
+  file_t(const file_t&) = delete;
+  file_t(file_t&& file) noexcept
+    : _source(std::move(file._source)),
+      _sink(std::move(file._sink))
+  {}
+  file_t& operator=(const file_t&) = delete;
+  file_t& operator=(file_t&& file) noexcept
+  {
+    if(this != &file)
+    {
+      _source = std::move(file._source);
+      _sink = std::move(file._sink);
+    }
+    return *this;
+  }
+  ~file_t() = default;
+
+  bool has_source() { return !!_source; }
+  bool has_sink() { return !!_sink; }
+
+  // source
+  io::source& source() { return *_source; }
+  char getch()
+  {
+    ptrcheck<io::source>();
+    return _source->getch();
+  }
+  void ungetch(char c)
+  {
+    ptrcheck<io::source>();
+    _source->ungetch(c);
+  }
+  std::optional<std::string> getline()
+  {
+    ptrcheck<io::source>();
+    return _source->getline();
+  }
+
+  // sink
+  io::sink& sink() { return *_sink; }
+  void putch(char c, io::escape esc = io::escape::NO)
+  {
+    ptrcheck<io::sink>();
+    _sink->putch(c, esc);
+  }
+  void puts(std::string_view s)
+  {
+    ptrcheck<io::sink>();
+    _sink->puts(s);
+  }
+  void terpri()
+  {
+    ptrcheck<io::sink>();
+    _sink->terpri();
+  }
+  void flush()
+  {
+    ptrcheck<io::sink>();
+    _sink->flush();
+  }
+
+  template<typename... Ts>
+  void format(std::string_view f, Ts&&... t)
+  {
+    auto ret = fmt::vformat(f, fmt::make_format_args(std::forward<Ts>(t)...));
+    _sink->puts(ret);
+  }
+
+  void close()
+  {
+    _source.release();
+    if(_sink)
+      _sink->flush();
+    _sink.release();
+  }
+
+private:
+  std::unique_ptr<io::source> _source;
+  std::unique_ptr<io::sink> _sink;
+
+  template<typename S>
+  void ptrcheck() const
+  {
+    if constexpr(std::is_same_v<S, io::source>)
+    {
+      if(!_source)
+        throw lisp_error(error_errc::no_source);
+    }
+    else if constexpr(std::is_same_v<S, io::sink>)
+    {
+      if(!_sink)
+        throw lisp_error(error_errc::no_sink);
+    }
+  }
+};
+
 using ref_closure_t = ref_ptr<closure_t>;
 using ref_cons_t = ref_ptr<cons_t>;
 using ref_file_t = ref_ptr<file_t>;
@@ -582,7 +698,6 @@ inline void object::value(const lisp_t& x)
 }
 
 /// @brief Symbols which are used internally
-//extern const lisp_t C_UNBOUND;
 extern const lisp_t T;
 extern const lisp_t C_APPEND;
 extern const lisp_t C_AUTOLOAD;

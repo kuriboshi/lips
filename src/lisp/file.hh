@@ -20,6 +20,7 @@
 
 #include "types.hh"
 #include "io.hh"
+#include "vm.hh"
 #include "details/file.hh"
 
 namespace lisp
