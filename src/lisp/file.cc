@@ -31,6 +31,50 @@
 
 namespace lisp
 {
+namespace
+{
+// Print the string s, on stream file
+inline void print_string(const std::string& s, file_t& file, io::escape esc)
+{
+  for(auto c: s)
+    file.putch(c, esc);
+}
+
+inline void print_int(std::int64_t i, std::int64_t base, file_t& file)
+{
+  static const constexpr std::size_t buffer_size = 33;
+  std::array<char, buffer_size> ss{};
+  if(auto [ptr, ec] = std::to_chars(ss.begin(), ss.end(), i, static_cast<int>(base)); ec == std::errc())
+  {
+    *ptr = '\0';
+    print_string(ss.data(), file, io::escape::NO);
+  }
+}
+
+inline void print_float(double d, file_t& file)
+{
+  auto ss = fmt::format("{:#g}", d);
+  print_string(ss, file, io::escape::NO);
+}
+
+// Print pointer type object
+inline void print_pointer(const char* s, file_t& file, const lisp_t& x)
+{
+  print_string(s, file, io::escape::NO);
+  print_string(" ", file, io::escape::NO);
+  print_int(reinterpret_cast<std::int64_t>(&*x), 16L, file);
+  print_string(">", file, io::escape::NO);
+}
+
+inline void print_subr(const char* s, file_t& file, const lisp_t& x)
+{
+  print_string(s, file, io::escape::NO);
+  print_string(" ", file, io::escape::NO);
+  print_string(x->subr().name, file, io::escape::NO);
+  print_string(">", file, io::escape::NO);
+}
+}
+
 ///
 /// @brief Read an atom from FILE.
 ///
@@ -122,47 +166,6 @@ bool loadfile(const std::string& filename)
   return false;
 }
 
-// Print the string s, on stream file
-inline void ps(const std::string& s, file_t& file, io::escape esc)
-{
-  for(auto c: s)
-    file.putch(c, esc);
-}
-
-inline void pi(std::int64_t i, std::int64_t base, file_t& file)
-{
-  static const constexpr std::size_t buffer_size = 33;
-  std::array<char, buffer_size> ss{};
-  if(auto [ptr, ec] = std::to_chars(ss.begin(), ss.end(), i, static_cast<int>(base)); ec == std::errc())
-  {
-    *ptr = '\0';
-    ps(ss.data(), file, io::escape::NO);
-  }
-}
-
-inline void pf(double d, file_t& file)
-{
-  auto ss = fmt::format("{:#g}", d);
-  ps(ss, file, io::escape::NO);
-}
-
-// Print pointer type object
-inline void pp(const char* s, file_t& file, const lisp_t& x)
-{
-  ps(s, file, io::escape::NO);
-  ps(" ", file, io::escape::NO);
-  pi(reinterpret_cast<std::int64_t>(&*x), 16L, file);
-  ps(">", file, io::escape::NO);
-}
-
-inline void psubr(const char* s, file_t& file, const lisp_t& x)
-{
-  ps(s, file, io::escape::NO);
-  ps(" ", file, io::escape::NO);
-  ps(x->subr().name, file, io::escape::NO);
-  ps(">", file, io::escape::NO);
-}
-
 lisp_t prinbody(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printlevel)
 {
   auto i = a;
@@ -206,59 +209,59 @@ lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printl
     case object::type::Symbol:
       return patom(a, file, esc);
     case object::type::Nil:
-      ps("nil", file, io::escape::NO);
+      print_string("nil", file, io::escape::NO);
       break;
     case object::type::Integer:
-      pi(a->intval(), vm::currentbase()->intval(), file);
+      print_int(a->intval(), vm::currentbase()->intval(), file);
       break;
     case object::type::Float:
-      pf(a->floatval(), file);
+      print_float(a->floatval(), file);
       break;
     case object::type::String:
       if(esc == io::escape::YES)
       {
         file.putch('"');
-        ps(a->string(), file, esc);
+        print_string(a->string(), file, esc);
         file.putch('"');
       }
       else
-        ps(a->string(), file, io::escape::NO);
+        print_string(a->string(), file, io::escape::NO);
       break;
     case object::type::Closure:
-      pp("#<closure", file, a);
+      print_pointer("#<closure", file, a);
       break;
     case object::type::Lambda:
       if(a->lambda().eval)
-        pp("#<lambda", file, a);
+        print_pointer("#<lambda", file, a);
       else
-        pp("#<nlambda", file, a);
+        print_pointer("#<nlambda", file, a);
       break;
     case object::type::Indirect:
-      pp("#<indirect", file, a);
+      print_pointer("#<indirect", file, a);
       break;
     case object::type::Subr:
       if(a->subr().subr == subr_t::subr::EVAL)
-        psubr("#<subr", file, a);
+        print_subr("#<subr", file, a);
       else
-        psubr("#<fsubr", file, a);
+        print_subr("#<fsubr", file, a);
       break;
     case object::type::Environ:
-      pp("#<environ", file, a);
+      print_pointer("#<environ", file, a);
       break;
     case object::type::File:
-      pp("#<file", file, a);
+      print_pointer("#<file", file, a);
       break;
     default:
-      ps("#<illegal type_of:", file, io::escape::NO);
-      pi(to_underlying(type_of(a)), vm::currentbase()->intval(), file);
-      pp("", file, a);
+      print_string("#<illegal type_of:", file, io::escape::NO);
+      print_int(to_underlying(type_of(a)), vm::currentbase()->intval(), file);
+      print_pointer("", file, a);
   }
   return a;
 }
 
 lisp_t patom(lisp_t a, file_t& file, io::escape esc)
 {
-  ps(a->symbol()->pname, file, esc);
+  print_string(a->symbol()->pname, file, esc);
   return a;
 }
 
