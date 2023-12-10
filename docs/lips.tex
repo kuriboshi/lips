@@ -902,13 +902,13 @@ non-\NIL otherwise.
 
 
 \begin{defun}{Function}{(define $x$)}
-  Functions functions according to $x$. Each element of the list $x$
+  Defines functions according to $x$. Each element of the list $x$
   is a list of the form \lisp{(name args .\ body)}. The list is
   evaluated.
 \end{defun}
 
 \begin{defun}{NLambda NoSpread Function}{(defineq $x$ $\cdots$)}
-  Functions functions according to the list $x$. Each element of the
+  Defines functions according to the list $x$. Each element of the
   list $x$ is of the form \lisp{(name def)} where name is the name of
   the function and the def is a lambda expression.
 
