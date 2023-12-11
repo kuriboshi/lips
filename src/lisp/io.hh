@@ -56,8 +56,6 @@ public:
   virtual std::optional<std::string> getline() = 0;
 
   using iterator = std::istreambuf_iterator<char>;
-  virtual iterator begin() = 0;
-  iterator end() { return {}; } // NOLINT(readability-convert-member-functions-to-static)
 
 protected:
   static char getch(std::istream& stream)
@@ -74,6 +72,19 @@ protected:
     if(stream.fail())
       return {};
     return buf;
+  }
+
+private:
+  virtual iterator begin() = 0;
+
+  friend source::iterator begin(source& src)
+  {
+    return src.begin();
+  }
+
+  friend source::iterator end(source&)
+  {
+    return {};
   }
 };
 
@@ -96,9 +107,9 @@ public:
   void close() override { _file->close(); }
   std::optional<std::string> getline() override { return getline(*_file); }
 
+private:
   iterator begin() override { return {*_file}; }
 
-private:
   std::unique_ptr<std::ifstream> _file;
 };
 
@@ -122,9 +133,9 @@ public:
   void ungetch(char c) override { _stream.putback(c); }
   std::optional<std::string> getline() override { return getline(_stream); }
 
+private:
   iterator begin() override { return {_stream}; }
 
-private:
   std::istream& _stream; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
@@ -142,9 +153,9 @@ public:
   void ungetch(char c) override { _string.putback(c); }
   std::optional<std::string> getline() override { return getline(_string); }
 
+private:
   iterator begin() override { return {_string}; }
 
-private:
   std::istringstream _string;
 };
 

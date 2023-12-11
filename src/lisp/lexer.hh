@@ -184,11 +184,11 @@ class lexer final
 public:
   lexer(ref_file_t input)
     : _input(std::move(input)),
-      _pos(_input->source().begin())
+      _pos(begin(_input->source()))
   {}
   lexer(const std::string& s)
     : _input(ref_file_t::create(s)),
-      _pos(_input->source().begin())
+      _pos(begin(_input->source()))
   {}
   /// @brief Read the next token from the input string.
   token_t read();

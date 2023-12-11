@@ -31,7 +31,7 @@ token_t lexer::read()
   state_t state{state_t::START};
   if(_start_of_line && *_pos == '#')
     state = state_t::IN_COMMENT;
-  while(_pos != _input->source().end())
+  while(_pos != end(_input->source()))
   {
     switch(state)
     {
@@ -125,7 +125,7 @@ token_t lexer::read()
             return token;
           case syntax::type::ESCAPE:
             next();
-            if(_pos == _input->source().end())
+            if(_pos == end(_input->source()))
               return token;
             token.token.push_back(*_pos);
             break;

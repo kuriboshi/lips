@@ -103,14 +103,14 @@ TEST_CASE("io: source")
     {
       std::ifstream is{test.file};
       io::stream_source f{is};
-      auto b = f.begin();
+      auto b = begin(f);
       CHECK(*b == '#');
       ++b;
       CHECK(*b == '!');
       ++b;
       CHECK(*b == '\n');
       ++b;
-      CHECK(b == f.end());
+      CHECK(b == end(f));
     }
     {
       std::ifstream is{"/dev/null"};
