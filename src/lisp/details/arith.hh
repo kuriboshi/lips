@@ -45,7 +45,7 @@ lisp_t itimes(lisp_t);
 lisp_t itof(lisp_t);
 lisp_t leq(lisp_t, lisp_t);
 lisp_t lessp(lisp_t, lisp_t);
-lisp_t ltimes(lisp_t);
+lisp_t times(lisp_t);
 lisp_t minus(lisp_t);
 lisp_t minusp(lisp_t);
 lisp_t neqp(lisp_t, lisp_t);

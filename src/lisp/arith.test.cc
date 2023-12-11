@@ -93,29 +93,29 @@ TEST_CASE("arith: arithmetic functions")
   SECTION("*")
   {
     {
-      auto r0 = ltimes(mklist(5_l, 7_l));
+      auto r0 = times(mklist(5_l, 7_l));
       CHECK(r0->intval() == 35);
-      r0 = ltimes(mklist(5_l, 7_l));
+      r0 = times(mklist(5_l, 7_l));
       CHECK(r0->intval() == 35);
     }
     {
-      auto r0 = ltimes(mklist(5.0_l, 7_l));
+      auto r0 = times(mklist(5.0_l, 7_l));
       REQUIRE(type_of(r0) == object::type::Float);
       CHECK(r0->floatval() == 35.0);
     }
     {
-      auto r0 = ltimes(mklist(5_l, 7.0_l));
+      auto r0 = times(mklist(5_l, 7.0_l));
       REQUIRE(type_of(r0) == object::type::Float);
       CHECK(r0->floatval() == 35.0);
     }
     {
-      auto r0 = ltimes(mklist(5.0_l, 7.0_l));
+      auto r0 = times(mklist(5.0_l, 7.0_l));
       REQUIRE(type_of(r0) == object::type::Float);
       CHECK(r0->floatval() == 35.0);
     }
     {
-      CHECK_THROWS_WITH(ltimes(mklist(5_l, "s"_s)), "Illegal argument");
-      CHECK_THROWS_WITH(ltimes(mklist(5.0_l, "s"_s)), "Illegal argument");
+      CHECK_THROWS_WITH(times(mklist(5_l, "s"_s)), "Illegal argument");
+      CHECK_THROWS_WITH(times(mklist(5.0_l, "s"_s)), "Illegal argument");
     }
   }
 

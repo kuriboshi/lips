@@ -119,7 +119,7 @@ lisp_t fdifference(lisp_t x, lisp_t y)
   return mkfloat(x->floatval() - y->floatval());
 }
 
-lisp_t ltimes(lisp_t x)
+lisp_t times(lisp_t x)
 {
   double fprod = 1.0;
   std::int64_t prod = 1;
@@ -408,7 +408,7 @@ void init()
   // clang-format off
   mkprim(pn::PLUS,        plus,        subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::DIFFERENCE,  difference,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
-  mkprim(pn::TIMES,       ltimes,      subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::TIMES,       times,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::DIVIDE,      divide,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::IPLUS,       iplus,       subr_t::subr::EVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::IDIFFERENCE, idifference, subr_t::subr::EVAL, subr_t::spread::SPREAD);
