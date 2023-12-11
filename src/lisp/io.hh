@@ -117,7 +117,7 @@ class stream_source: public source
 {
 public:
   stream_source(std::istream& stream)
-    : _stream(stream)
+    : _stream(&stream)
   {}
   ~stream_source() override = default;
 
@@ -129,14 +129,14 @@ public:
   using source::getch;
   using source::getline;
 
-  char getch() override { return getch(_stream); }
-  void ungetch(char c) override { _stream.putback(c); }
-  std::optional<std::string> getline() override { return getline(_stream); }
+  char getch() override { return getch(*_stream); }
+  void ungetch(char c) override { _stream->putback(c); }
+  std::optional<std::string> getline() override { return getline(*_stream); }
 
 private:
-  iterator begin() override { return {_stream}; }
+  iterator begin() override { return {*_stream}; }
 
-  std::istream& _stream; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+  std::istream* _stream;
 };
 
 class string_source: public source
@@ -226,7 +226,7 @@ class stream_sink final: public sink
 {
 public:
   stream_sink(std::ostream& stream)
-    : _stream(stream)
+    : _stream(&stream)
   {}
   ~stream_sink() override = default;
 
@@ -237,14 +237,14 @@ public:
 
   using sink::putch;
 
-  void putch(char c, enum escape esc) override { putch(c, _stream, esc); }
-  void puts(std::string_view s) override { _stream.write(s.data(), static_cast<std::streamsize>(s.size())); }
-  void terpri() override { _stream.put('\n'); }
-  void flush() override { _stream.flush(); }
-  void close() override { _stream.flush(); }
+  void putch(char c, enum escape esc) override { putch(c, *_stream, esc); }
+  void puts(std::string_view s) override { _stream->write(s.data(), static_cast<std::streamsize>(s.size())); }
+  void terpri() override { _stream->put('\n'); }
+  void flush() override { _stream->flush(); }
+  void close() override { _stream->flush(); }
 
 private:
-  std::ostream& _stream; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+  std::ostream* _stream;
 };
 
 class string_sink final: public sink
