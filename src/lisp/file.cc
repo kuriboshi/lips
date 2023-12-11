@@ -44,7 +44,7 @@ inline void print_int(std::int64_t i, std::int64_t base, file_t& file)
 {
   static const constexpr std::size_t buffer_size = 33;
   std::array<char, buffer_size> ss{};
-  if(auto [ptr, ec] = std::to_chars(ss.begin(), ss.end(), i, static_cast<int>(base)); ec == std::errc())
+  if(auto [ptr, ec] = std::to_chars(begin(ss), end(ss), i, static_cast<int>(base)); ec == std::errc())
   {
     *ptr = '\0';
     print_string(ss.data(), file, io::escape::NO);

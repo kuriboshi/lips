@@ -67,7 +67,7 @@ try
   vm.context().primerr(quiet);
   if(!loadpath.empty())
   {
-    auto path = buildpath(loadpath.begin(), loadpath.end());
+    auto path = buildpath(begin(loadpath), end(loadpath));
     vm.context().loadpath(path);
   }
   for(auto i: load)
