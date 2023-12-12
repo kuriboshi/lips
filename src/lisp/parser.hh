@@ -50,7 +50,7 @@ public:
   ///
   /// @param lexer A lexer object which returns the next token.
   explicit parser(lexer& lexer)
-    : _lexer(lexer)
+    : _lexer(&lexer)
   {}
   /// @brief Parse the sequence of tokens supplied by the lexer.
   /// @return The return value is the SEXPR.
@@ -87,7 +87,7 @@ private:
   ///   of the input token stream is reached.
   bool next()
   {
-    _token = _lexer.read();
+    _token = _lexer->read();
     return !!_token;
   }
 
@@ -104,7 +104,7 @@ private:
   static lisp_t make_symbol(const std::string& symbol) { return mkatom(symbol); }
 
   /// @brief Holds the lexer object.
-  lexer& _lexer; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+  lexer* _lexer;
   /// @brief The current input token.
   token_t _token;
 };

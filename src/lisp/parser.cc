@@ -37,7 +37,7 @@ lisp_t parser::parse_object()
   if(_token.is_special(']'))
     return nil;
   if(_token.type == token_t::type::MACRO)
-    return _lexer.macro(_token);
+    return _lexer->macro(_token);
   return create(_token);
 }
 
@@ -60,7 +60,7 @@ lisp_t parser::parse_list(char c)
       break;
     if(c == '(' && _token.is_special(']'))
     {
-      _lexer.unread(_token);
+      _lexer->unread(_token);
       break;
     }
     if(c == '[' && _token.is_special(']'))
@@ -81,12 +81,12 @@ lisp_t parser::parse_tail()
   if(_token.is_special('.'))
   {
     auto object = parse_list('(');
-    _lexer.unread(_token);
+    _lexer->unread(_token);
     if(listp(object) && cdr(object) == nil)
       return car(object);
     return cons(make_symbol("."), object);
   }
-  _lexer.unread(_token);
+  _lexer->unread(_token);
   auto object = parse_object();
   return cons(object, nil);
 }
