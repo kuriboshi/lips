@@ -19,6 +19,7 @@
 #define LISP_VM_HH
 
 #include <array>
+#include <concepts>
 #include <cstdint>
 #include <functional>
 #include <iostream>
@@ -415,7 +416,91 @@ private:
   int _destblockused{0};
 };
 
-template<typename Context>
+/// @brief The concept required by the Context parameter to vm_t.
+///
+/// 
+template<typename T>
+concept Context = requires(T v, std::int64_t i, std::error_code code, const std::string& str, lisp_t exp,
+  std::unique_ptr<syntax> syn, ref_file_t file) {
+  {
+    v.read_table()
+  } -> std::same_as<syntax&>;
+  v.read_table(std::move(syn));
+
+  {
+    v.primout()
+  } -> std::same_as<ref_file_t>;
+  {
+    v.primerr()
+  } -> std::same_as<ref_file_t>;
+  {
+    v.primin()
+  } -> std::same_as<ref_file_t>;
+  {
+    v.primout(file)
+  } -> std::same_as<ref_file_t>;
+  {
+    v.primerr(file)
+  } -> std::same_as<ref_file_t>;
+  {
+    v.primin(file)
+  } -> std::same_as<ref_file_t>;
+  {
+    v.stdout()
+  } -> std::same_as<ref_file_t>;
+  {
+    v.stderr()
+  } -> std::same_as<ref_file_t>;
+  {
+    v.stdin()
+  } -> std::same_as<ref_file_t>;
+
+  v.printlevel(i);
+  {
+    v.printlevel()
+  } -> std::same_as<std::int64_t>;
+
+  {
+    v.currentbase()
+  } -> std::same_as<const cvariable_t&>;
+  {
+    v.verbose()
+  } -> std::same_as<const cvariable_t&>;
+  {
+    v.loadpath()
+  } -> std::same_as<const cvariable_t&>;
+  {
+    v.loadpath(exp)
+  };
+
+  {
+    v.perror(code)
+  } -> std::same_as<lisp_t>;
+  {
+    v.perror(code, exp)
+  } -> std::same_as<lisp_t>;
+  {
+    v.error(code, exp)
+  } -> std::same_as<lisp_t>;
+
+  {
+    T::fatal(code)
+  } -> std::same_as<lisp_t>;
+  {
+    T::fatal(code, str)
+  } -> std::same_as<lisp_t>;
+};
+
+/// @brief Templated derived class which implements the virtual functions of
+/// vm.
+///
+/// The vm_t template provides access to some global symbols like the primary
+/// input and output file, the stdin and stdout, and some other global
+/// symbols. It also provides access to the implementation of error functions.
+///
+/// @tparam Context The context holds the actual implementations.
+/// The Context needs to provide the following functions:
+template<Context Context>
 class vm_t final: public vm
 {
 public:
