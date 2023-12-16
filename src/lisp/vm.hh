@@ -36,44 +36,83 @@ namespace lisp
 class vm
 {
 public:
+  /// @brief Default constructor.
   vm() = default;
+  /// @brief Default destructor.
   virtual ~vm() = default;
 
+  /// @brief Disable copy constructor.
   vm(const vm&) = delete;
+  /// @brief Disable move constructor.
   vm(vm&&) = delete;
+  /// @brief Disable assignment operator.
   vm& operator=(const vm&) = delete;
+  /// @brief Disable move assignment operator.
   vm& operator=(vm&&) = delete;
 
+  /// @brief Returns the current primary output file.
   static ref_file_t primout() { return get().do_primout(); }
+  /// @brief Returns the current primary error file.
   static ref_file_t primerr() { return get().do_primerr(); }
+  /// @brief Returns the current primary input file.
   static ref_file_t primin() { return get().do_primin(); }
-  static ref_file_t primout(ref_file_t f) { return get().do_primout(f); }
-  static ref_file_t primerr(ref_file_t f) { return get().do_primerr(f); }
-  static ref_file_t primin(ref_file_t f) { return get().do_primin(f); }
+  /// @brief Sets the primary output file.
+  ///
+  /// @param file Set the primary output file to this file.
+  /// @returns The previous output file.
+  static ref_file_t primout(ref_file_t file) { return get().do_primout(file); }
+  /// @brief Sets the primary output file.
+  ///
+  /// @param file Set the primary output file to this file.
+  /// @returns The previous output file.
+  static ref_file_t primerr(ref_file_t file) { return get().do_primerr(file); }
+  /// @brief Sets the primary output file.
+  ///
+  /// @param file Set the primary output file to this file.
+  /// @returns The previous output file.
+  static ref_file_t primin(ref_file_t file) { return get().do_primin(file); }
+  /// @brief Returns the standard output file.
   static ref_file_t stdout() { return get().do_stdout(); }
+  /// @brief Returns the standard error file.
   static ref_file_t stderr() { return get().do_stderr(); }
+  /// @brief Returns the standard input file.
   static ref_file_t stdin() { return get().do_stdin(); }
 
+  /// @brief Returns the current read table.
   static syntax& read_table() { return get().do_read_table(); }
+  /// @brief Sets the read table.
   static void read_table(std::unique_ptr<syntax> syntax) { get().do_read_table(std::move(syntax)); }
 
+  /// @brief Prints an error associated with the error code.
   static lisp_t perror(std::error_code code) { return get().do_perror(code); }
+  /// @brief Prints an error associated with the error code and the lisp expression.
   static lisp_t perror(std::error_code code, lisp_t a) { return get().do_perror(code, std::move(a)); }
+  /// @brief Prints an error associated with the error code and throw a lisp_error exception.
   static lisp_t error(std::error_code code, lisp_t a) { return get().do_error(code, std::move(a)); }
+  /// @brief Throw a lisp_error exception with the error code.
   static void fatal(std::error_code code) { get().do_fatal(code); }
+  /// @brief Throw a lisp_error exception with the error code and the concatenation of the strings.
   template<typename... Ts>
   static void fatal(std::error_code code, const Ts&... a)
   {
     get().do_fatal(code, concat(a...));
   }
 
+  /// @brief Return the current base used for numeric output as a cvariable.
   static const cvariable_t& currentbase() { return get().do_currentbase(); }
+  /// @brief Return the current setting of the verbose flag as a cvariable.
   static const cvariable_t& verbose() { return get().do_verbose(); }
+  /// @brief Return the current load path as a cvariable.
   static const cvariable_t& loadpath() { return get().do_loadpath(); }
+  /// @brief Sets the load path to the list of strings or symbols.
   static void loadpath(lisp_t path) { get().do_loadpath(std::move(path)); }
+
+  /// @brief Return the program version string.
   static const char* version() { return lisp::version(); }
 
+  /// @brief Return the current print level.
   static std::int64_t printlevel() { return get().do_printlevel(); }
+  /// @brief Set the print level.
   static void printlevel(std::int64_t pl) { get().do_printlevel(pl); }
 
   /// @brief This is the LISP vm.
@@ -81,8 +120,14 @@ public:
   /// The vm allocates a destination slot for the result and starts munching
   /// continuations.
   lisp_t eval(lisp_t);
+  /// @brief Evaluate the string as a lisp expression.
   lisp_t eval(const std::string&);
-  lisp_t apply(lisp_t, lisp_t);
+  /// @brief Apply a function to arguments.
+  ///
+  /// @param fun The function to apply. Can be any type of function.
+  /// @param args A list of arguments.
+  lisp_t apply(lisp_t fun, lisp_t args);
+  /// @brief Print a backtrace of the internal evaluation stack.
   lisp_t backtrace();
   /// @brief Return the current environment.
   lisp_t topofstack() const;
@@ -420,6 +465,11 @@ inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakho
 inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefhook(fun); }
 inline void unwind() { vm::get().unwind(); }
 
+/// @brief Evaluate a lisp expression.
+///
+/// @param expr The lisp expression to evaluate.
+///
+/// @returns Returns the result of the evaluation.
 inline lisp_t eval(lisp_t expr) { return vm::get().eval(expr); }
 inline lisp_t eval(const std::string& expr) { return vm::get().eval(expr); }
 inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args); }
