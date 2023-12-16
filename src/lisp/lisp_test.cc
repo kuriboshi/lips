@@ -64,11 +64,11 @@ try
   lisp::vm_t vm(std::move(context));
   std::ostringstream os;
   auto quiet = lisp::ref_file_t::create(os);
-  vm.context().primerr(quiet);
+  lisp::vm::primerr(quiet);
   if(!loadpath.empty())
   {
     auto path = buildpath(begin(loadpath), end(loadpath));
-    vm.context().loadpath(path);
+    lisp::vm::loadpath(path);
   }
   for(auto i: load)
     lisp::loadfile(i);

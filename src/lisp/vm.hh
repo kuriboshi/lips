@@ -428,8 +428,6 @@ public:
     vm::set(this);
   }
 
-  Context& context() const { return *_context; }
-
 private:
   ref_file_t do_primout() override { return _context->primout(); }
   ref_file_t do_primerr() override { return _context->primerr(); }
