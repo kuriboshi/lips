@@ -77,15 +77,9 @@ protected:
 private:
   virtual iterator begin() = 0;
 
-  friend source::iterator begin(source& src)
-  {
-    return src.begin();
-  }
+  friend source::iterator begin(source& src) { return src.begin(); }
 
-  friend source::iterator end(source&)
-  {
-    return {};
-  }
+  friend source::iterator end(source&) { return {}; }
 };
 
 class file_source: public source

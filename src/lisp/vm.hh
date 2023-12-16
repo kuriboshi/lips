@@ -18,13 +18,13 @@
 #ifndef LISP_VM_HH
 #define LISP_VM_HH
 
-#include <iostream>
-#include <fmt/format.h>
-
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <variant>
+
+#include <fmt/format.h>
 
 #include "context.hh"
 #include "syntax.hh"
