@@ -42,6 +42,14 @@ inline void ref_deleter(T* p)
   delete p;
 }
 
+/// @brief The Counter template argument needs to support the pre increment and
+/// pre decrement operators.
+template<typename T>
+concept Counter = requires(T v) {
+  ++v;
+  --v;
+};
+
 ///
 /// @brief Derive from this in order to use the ref_ptr class.
 ///
@@ -56,7 +64,7 @@ inline void ref_deleter(T* p)
 ///   be one of the predefined unsafe_counter or safe_counter types or any type
 ///   for which the pre-increment and pre-decrement operators are defined.
 ///
-template<typename T, typename Counter = safe_counter>
+template<typename T, Counter Counter = safe_counter>
 class ref_count
 {
 public:
