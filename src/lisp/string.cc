@@ -105,7 +105,7 @@ lisp_t symstr(lisp_t sym)
   check(sym, object::type::Symbol, object::type::Nil);
   if(type_of(sym) == object::type::Nil)
     return mkstring("nil");
-  return mkstring(sym->symbol()->pname);
+  return mkstring(sym->as_symbol()->pname);
 }
 
 namespace pn

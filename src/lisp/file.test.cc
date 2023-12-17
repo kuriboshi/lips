@@ -362,7 +362,7 @@ TEST_CASE("file: functions")
       auto r = readline(T);
       REQUIRE(type_of(r) == object::type::Cons);
       REQUIRE(type_of(r->car()) == object::type::Symbol);
-      CHECK(r->car()->symbol()->pname == "a");
+      CHECK(r->car()->as_symbol()->pname == "a");
       std::cin.rdbuf(buf);
     }
   }

@@ -57,7 +57,7 @@ lisp_t repl::operator()(lisp_t exp)
     if(com == C_EOF)
       break;
     /* OK, EVAL, ^, ... */
-    if(type_of(com) == object::type::Symbol && com->symbol()->pname == "help")
+    if(type_of(com) == object::type::Symbol && com->as_symbol()->pname == "help")
     {
       prin0("(go) continue"_s);
       terpri();

@@ -36,7 +36,7 @@ TEST_CASE("syntax: macro")
     auto r = stx.macro(f0, '^');
     REQUIRE(r != nil);
     REQUIRE(type_of(r) == object::type::Symbol);
-    REQUIRE(r->symbol()->pname == "hello");
+    REQUIRE(r->as_symbol()->pname == "hello");
   }
 
   SECTION("Read macro is nil")

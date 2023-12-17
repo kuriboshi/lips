@@ -260,7 +260,7 @@ lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printl
 
 lisp_t patom(lisp_t a, file_t& file, io::escape esc)
 {
-  print_string(a->symbol()->pname, file, esc);
+  print_string(a->as_symbol()->pname, file, esc);
   return a;
 }
 

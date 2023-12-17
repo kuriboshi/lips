@@ -48,7 +48,7 @@ lisp::lisp_t make_const(std::string_view sym, lisp::lisp_t value = lisp::nil)
 {
   auto symbol = lisp::details::alloc::intern(sym);
   symbol->value(value);
-  symbol->symbol()->constant = true;
+  symbol->as_symbol()->constant = true;
   return symbol;
 }
 
@@ -56,7 +56,7 @@ lisp::lisp_t make_t()
 {
   auto symbol = make_symbol("t");
   symbol->value(symbol);
-  symbol->symbol()->constant = true;
+  symbol->as_symbol()->constant = true;
   return symbol;
 }
 } // namespace
@@ -979,7 +979,7 @@ std::string vm::to_string(const destblock_t* block)
       if((block + i + 1)->var() == nil)
         s << "nil";
       else
-        s << (block + i + 1)->var()->symbol()->pname;
+        s << (block + i + 1)->var()->as_symbol()->pname;
       s << " . " << (block + i + 1)->val() << ')';
     }
   }

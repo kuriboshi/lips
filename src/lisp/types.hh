@@ -640,7 +640,7 @@ public:
   };
 
   /// @brief The symbol (literal atom).
-  auto symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
+  auto as_symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
 
   /// @brief Get and set the value of a symbol.
   auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
