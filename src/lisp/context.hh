@@ -57,8 +57,8 @@ public:
   ref_file_t stdin() const;
 
   // Used by lisp::io
-  std::int64_t printlevel() const { return _printlevel; }
-  void printlevel(std::int64_t pl) { _printlevel = pl; }
+  integer_t::value_type printlevel() const { return _printlevel; }
+  void printlevel(integer_t::value_type pl) { _printlevel = pl; }
 
   const cvariable_t& currentbase() const;
   const cvariable_t& verbose() const;
@@ -74,9 +74,9 @@ public:
 private:
   class impl;
   std::unique_ptr<impl> _pimpl;
-  std::int64_t _printlevel{0};
+  integer_t::value_type _printlevel{0};
 
-  static const constexpr std::int64_t default_base{10};
+  static const constexpr integer_t::value_type default_base{10};
 };
 
 } // namespace lisp

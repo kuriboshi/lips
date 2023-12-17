@@ -45,7 +45,7 @@ lisp_t getobject(T x)
   return {new object(x)};
 }
 
-inline lisp_t getobject(double x)
+inline lisp_t getobject(double_t::value_type x)
 {
   return {new object(x)};
 }
@@ -62,14 +62,14 @@ inline lisp_t mkstring(const std::string& s) { return details::alloc::mkstring(s
 /// @param number The integer number.
 /// @return An integer number as a LISP object.
 ///
-inline lisp_t mknumber(std::int64_t i) { return details::alloc::mknumber(i); }
+inline lisp_t mknumber(integer_t::value_type i) { return details::alloc::mknumber(i); }
 
 /// @brief Create a floating point number.
 ///
 /// @param number The floating point number.
 /// @return A floating point number as a LISP object.
 ///
-inline lisp_t mkfloat(double number) { return details::alloc::mkfloat(number); }
+inline lisp_t mkfloat(double_t::value_type number) { return details::alloc::mkfloat(number); }
 
 /// @brief Builds a cons cell out of the arguments.
 ///
@@ -166,7 +166,7 @@ inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc:
 inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<std::int64_t>(i)); }
+inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<integer_t::value_type>(i)); }
 
 /// @brief Creates a floating point value.
 inline lisp_t operator"" _l(long double d)
@@ -181,7 +181,7 @@ inline lisp_t operator"" _l(long double d)
       error(error_errc::illegal_arg, err);
     }
   }
-  return details::alloc::mkfloat(static_cast<double>(d));
+  return details::alloc::mkfloat(d);
 }
 
 /// @brief Evaluates a lisp expression in a string.

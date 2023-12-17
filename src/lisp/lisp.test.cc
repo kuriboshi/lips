@@ -53,7 +53,7 @@ TEST_CASE("lisp: mkprim")
 {
   SECTION("Define a new function")
   {
-    std::vector<std::int64_t> result;
+    std::vector<integer_t::value_type> result;
     mkprim(
       "printall",
       [&result](lisp_t a) -> lisp_t {

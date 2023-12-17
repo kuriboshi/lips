@@ -78,7 +78,7 @@ void top::trimhist()
  * Return the NUM entry from history list HLIST, or nil if there is
  * no entry.
  */
-lisp_t top::histget(std::int64_t num, lisp_t hlist)
+lisp_t top::histget(integer_t::value_type num, lisp_t hlist)
 {
   if(num < 0)
   {

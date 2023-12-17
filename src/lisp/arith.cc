@@ -31,17 +31,16 @@ namespace lisp::details::arith
 
 lisp_t plus(lisp_t x)
 {
-  double fsum = 0.0;
-  std::int64_t sum = 0;
+  double_t::value_type fsum = 0.0;
+  integer_t::value_type sum = 0;
   bool f = false;
 
   while(type_of(x) == object::type::Cons)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer)
-        fsum += static_cast<double>(x->car()->as_integer());
-      else if(type_of(x->car()) == object::type::Float)
+      if(type_of(x->car()) == object::type::Integer
+        || type_of(x->car()) == object::type::Float)
         fsum += x->car()->as_double();
       else
         error(error_errc::illegal_arg, x->car());
@@ -53,7 +52,7 @@ lisp_t plus(lisp_t x)
       else if(type_of(x->car()) == object::type::Float)
       {
         f = true;
-        fsum = x->car()->as_double() + static_cast<double>(sum);
+        fsum = x->car()->as_double() + static_cast<double_t::value_type>(sum);
       }
       else
         error(error_errc::illegal_arg, x->car());
@@ -67,7 +66,7 @@ lisp_t plus(lisp_t x)
 
 lisp_t iplus(lisp_t x)
 {
-  std::int64_t sum = 0;
+  integer_t::value_type sum = 0;
   for(auto i: x)
   {
     check(i, object::type::Integer);
@@ -98,10 +97,7 @@ lisp_t difference(lisp_t x, lisp_t y)
   {
     if(type_of(y) == object::type::Integer)
       return mknumber(x->as_integer() - y->as_integer());
-    return mkfloat(static_cast<double>(x->as_integer()) - y->as_double());
   }
-  if(type_of(y) == object::type::Integer)
-    return mkfloat(x->as_double() - static_cast<double>(y->as_integer()));
   return mkfloat(x->as_double() - y->as_double());
 }
 
@@ -121,8 +117,8 @@ lisp_t fdifference(lisp_t x, lisp_t y)
 
 lisp_t times(lisp_t x)
 {
-  double fprod = 1.0;
-  std::int64_t prod = 1;
+  double_t::value_type fprod = 1.0;
+  integer_t::value_type prod = 1;
   bool f = false;
 
   while(type_of(x) == object::type::Cons)
@@ -130,7 +126,7 @@ lisp_t times(lisp_t x)
     if(f)
     {
       if(type_of(x->car()) == object::type::Integer)
-        fprod *= (double)x->car()->as_integer();
+        fprod *= x->car()->as_double();
       else if(type_of(x->car()) == object::type::Float)
         fprod *= x->car()->as_double();
       else
@@ -141,7 +137,7 @@ lisp_t times(lisp_t x)
     else if(type_of(x->car()) == object::type::Float)
     {
       f = true;
-      fprod = x->car()->as_double() * (double)prod;
+      fprod = x->car()->as_double() * static_cast<double_t::value_type>(prod);
     }
     else
       error(error_errc::illegal_arg, x->car());
@@ -185,23 +181,13 @@ lisp_t divide(lisp_t x, lisp_t y)
   check(x, object::type::Integer, object::type::Float);
   check(y, object::type::Integer, object::type::Float);
   if(type_of(x) == object::type::Integer)
+  {
     if(type_of(y) == object::type::Integer)
     {
       if(y->as_integer() == 0)
         error(error_errc::divide_by_zero, nil);
       return mknumber(x->as_integer() / y->as_integer());
     }
-    else
-    {
-      if(y->as_double() == 0.0)
-        error(error_errc::divide_by_zero, nil);
-      return mkfloat((double)x->as_integer() / y->as_double());
-    }
-  else if(type_of(y) == object::type::Integer)
-  {
-    if(y->as_integer() == 0)
-      error(error_errc::divide_by_zero, nil);
-    return mkfloat(x->as_double() / static_cast<double>(y->as_integer()));
   }
   if(y->as_double() == 0.0)
     error(error_errc::divide_by_zero, nil);
@@ -260,7 +246,7 @@ lisp_t abs(lisp_t x)
 lisp_t itof(lisp_t x)
 {
   check(x, object::type::Integer);
-  return mkfloat(static_cast<double>(x->as_integer()));
+  return mkfloat(x->as_double());
 }
 
 lisp_t add1(lisp_t x)
@@ -322,11 +308,11 @@ inline lisp_t numcheck(lisp_t x, lisp_t y)
   switch(numtype(x, y))
   {
     case num_type::FLOATFLOAT:
-      return docheck(x->as_double(), y->as_double(), Comparer<double>());
+      return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::FLOATINT:
-      return docheck(x->as_double().value(), static_cast<double>(y->as_integer()), Comparer<double>());
+      return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::INTFLOAT:
-      return docheck(static_cast<double>(x->as_integer()), y->as_double().value(), Comparer<double>());
+      return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::INTINT:
       return docheck(x->as_integer(), y->as_integer(), Comparer<integer_t::value_type>());
     case num_type::ILLEGAL1:

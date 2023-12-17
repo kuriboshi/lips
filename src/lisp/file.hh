@@ -62,12 +62,12 @@ inline lisp_t terpri(io::output out = io::output::PRIMARY)
 {
   return terpri(out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
 }
-lisp_t prinbody(lisp_t a, file_t& file, io::escape esc = io::escape::NO, std::int64_t = 0);
+lisp_t prinbody(lisp_t a, file_t& file, io::escape esc = io::escape::NO, integer_t::value_type = 0);
 inline lisp_t prinbody(lisp_t a, io::output out, io::escape esc = io::escape::NO)
 {
   return prinbody(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
-lisp_t prin0(lisp_t a, file_t& file, io::escape esc = io::escape::NO, std::int64_t = 0);
+lisp_t prin0(lisp_t a, file_t& file, io::escape esc = io::escape::NO, integer_t::value_type = 0);
 inline lisp_t prin0(lisp_t a, io::output out = io::output::PRIMARY, enum io::escape esc = io::escape::NO)
 {
   return prin0(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc, 0);

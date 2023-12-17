@@ -47,7 +47,8 @@ public:
 class lisp_finish: public std::runtime_error
 {
 public:
-  lisp_finish(const std::string& message, std::int64_t code)
+  template<typename Int>
+  lisp_finish(const std::string& message, Int code)
     : std::runtime_error(message),
       exit_code(static_cast<int>(code))
   {}

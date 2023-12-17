@@ -112,9 +112,9 @@ public:
   static const char* version() { return lisp::version(); }
 
   /// @brief Return the current print level.
-  static std::int64_t printlevel() { return get().do_printlevel(); }
+  static integer_t::value_type printlevel() { return get().do_printlevel(); }
   /// @brief Set the print level.
-  static void printlevel(std::int64_t pl) { get().do_printlevel(pl); }
+  static void printlevel(integer_t::value_type pl) { get().do_printlevel(pl); }
 
   /// @brief This is the LISP vm.
   ///
@@ -215,8 +215,8 @@ protected:
   virtual const cvariable_t& do_loadpath() = 0;
   virtual void do_loadpath(lisp_t path) = 0;
 
-  virtual std::int64_t do_printlevel() const = 0;
-  virtual void do_printlevel(std::int64_t) = 0;
+  virtual integer_t::value_type do_printlevel() const = 0;
+  virtual void do_printlevel(integer_t::value_type) = 0;
 
 private:
   template<typename T, typename... Ts>
@@ -420,7 +420,7 @@ private:
 ///
 /// 
 template<typename T>
-concept Context = requires(T v, std::int64_t i, std::error_code code, const std::string& str, lisp_t exp,
+concept Context = requires(T v, integer_t::value_type i, std::error_code code, const std::string& str, lisp_t exp,
   std::unique_ptr<syntax> syn, ref_file_t file) {
   {
     v.read_table()
@@ -458,7 +458,7 @@ concept Context = requires(T v, std::int64_t i, std::error_code code, const std:
   v.printlevel(i);
   {
     v.printlevel()
-  } -> std::same_as<std::int64_t>;
+  } -> std::same_as<integer_t::value_type>;
 
   {
     v.currentbase()
@@ -538,8 +538,8 @@ private:
   const cvariable_t& do_loadpath() override { return _context->loadpath(); }
   void do_loadpath(lisp_t path) override { _context->loadpath(path); }
 
-  std::int64_t do_printlevel() const override { return _context->printlevel(); }
-  void do_printlevel(std::int64_t pl) override { _context->printlevel(pl); }
+  integer_t::value_type do_printlevel() const override { return _context->printlevel(); }
+  void do_printlevel(integer_t::value_type pl) override { _context->printlevel(pl); }
 
   std::unique_ptr<Context> _context;
 };

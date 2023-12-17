@@ -61,11 +61,11 @@ lisp_t obarray()
 lisp_t mkstring(const std::string& str) { return getobject(ref_string_t::create(str)); }
 
 /// @brief Creates an integer number.
-lisp_t mknumber(std::int64_t number) { return getobject(number); }
+lisp_t mknumber(integer_t::value_type number) { return getobject(number); }
 
 /// @brief Create a double.
 ///
-lisp_t mkfloat(double number) { return getobject(number); }
+lisp_t mkfloat(double_t::value_type number) { return getobject(number); }
 
 lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 {

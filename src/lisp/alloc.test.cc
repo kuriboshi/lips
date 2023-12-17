@@ -156,8 +156,8 @@ TEST_CASE("alloc: object sizes", "[.object sizes]")
   std::cout << "==========\n";
   std::cout << "std::monostate: " << sizeof(std::monostate) << std::endl;
   std::cout << fmt::format("ref_symbol_t: {}, {}\n", sizeof(ref_symbol_t), alignof(ref_symbol_t));
-  std::cout << fmt::format("int64_t: {}, {}\n", sizeof(std::int64_t), alignof(std::int64_t));
-  std::cout << fmt::format("double: {}, {}\n", sizeof(double), alignof(double));
+  std::cout << fmt::format("int64_t: {}, {}\n", sizeof(integer_t::value_type), alignof(integer_t::value_type));
+  std::cout << fmt::format("double: {}, {}\n", sizeof(double_t::value_type), alignof(double_t::value_type));
   std::cout << fmt::format("indirect_t: {}, {}\n", sizeof(indirect_t), alignof(indirect_t));
   std::cout << fmt::format("ref_cons_t: {}, {}\n", sizeof(ref_cons_t), alignof(ref_cons_t));
   std::cout << fmt::format("ref_string_t: {}, {}\n", sizeof(ref_string_t), alignof(ref_string_t));

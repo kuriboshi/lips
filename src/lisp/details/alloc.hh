@@ -23,10 +23,10 @@
 namespace lisp::details::alloc
 {
 lisp_t mkstring(const std::string&);
-lisp_t mknumber(std::int64_t);
-lisp_t mkfloat(double);
+lisp_t mknumber(integer_t::value_type);
+lisp_t mkfloat(double_t::value_type);
 lisp_t obarray();
-inline lisp_t freecount() { return mknumber(static_cast<std::int64_t>(object::freecount())); }
+inline lisp_t freecount() { return mknumber(static_cast<integer_t::value_type>(object::freecount())); }
 
 /// @brief Creates a lambda function.
 ///

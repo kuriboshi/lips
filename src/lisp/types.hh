@@ -177,27 +177,6 @@ public:
       spread(spread),
       _fun(fun)
   {}
-  /// @brief Number of arguments.
-  ///
-  /// The function may optinally take a context parameter in addition to the
-  /// zero to three lisp_t arguments. The return value of this function will be
-  /// one of 0 - 3 regardless of whether there is a context parameter.
-  ///
-  /// @return The argument count 0 - 3.
-  constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
-
-  /// @brief Call the function passing the context parameter if required. The
-  /// rest of the lisp_t arguments are taken from the destination block.
-  lisp_t operator()(destblock_t* dest) const;
-
-  using subr_vector = std::vector<subr_t>;
-  using subr_index = subr_vector::size_type;
-
-  /// @brief Register a primitive function (subr).
-  /// @return The index to uniquely identify the function.
-  static subr_index put(const subr_t& subr);
-  /// @brief Retrieve a primitive function given its index.
-  static const subr_t& get(subr_index index) { return subr_store[index]; }
 
   /// @brief The print name.
   std::string name;
@@ -211,6 +190,25 @@ public:
   {
     spread::SPREAD
   };
+
+  /// @brief Number of arguments.
+  ///
+  /// @returns The argument count 0 - 3.
+  constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
+
+  /// @brief Call the stored function. The lisp_t arguments to the function are
+  /// taken from the destination block.
+  lisp_t operator()(destblock_t* dest) const;
+
+  using subr_vector = std::vector<subr_t>;
+  using subr_index = subr_vector::size_type;
+
+  /// @brief Register a primitive function (subr).
+  ///
+  /// @return The index to uniquely identify the function.
+  static subr_index put(const subr_t& subr);
+  /// @brief Retrieve a primitive function given its index.
+  static const subr_t& get(subr_index index) { return subr_store[index]; }
 
 private:
   using func0_t = std::function<lisp_t()>;
@@ -325,6 +323,7 @@ private:
   }
 };
 
+/// @brief Wraps an integer value.
 class integer_t final
 {
 public:
@@ -342,10 +341,12 @@ private:
   value_type _value;
 };
 
+/// @brief Wraps an floating point value.
 class double_t final
 {
 public:
   using value_type = double;
+
   double_t() : _value(0.0) {}
   explicit double_t(value_type d) : _value(d) {}
   operator value_type() const { return _value; }
@@ -589,7 +590,7 @@ public:
 
   /// @brief Specialization for the plain double type.
   template<>
-  explicit object(double d)
+  explicit object(double_t::value_type d)
     : _u(double_t{d})
   {}
 
@@ -650,7 +651,12 @@ public:
   auto as_integer() const -> integer_t { return std::get<integer_t>(_u); }
 
   /// @brief The floating point value (double)
-  auto as_double() const -> double_t { return std::get<double_t>(_u); }
+  auto as_double() const -> double_t
+  {
+    if(gettype() == type::Integer)
+      return double_t{static_cast<double_t::value_type>(std::get<integer_t>(_u).value())};
+    return std::get<double_t>(_u);
+  }
 
   /// @brief Get the indirect value.
   auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }

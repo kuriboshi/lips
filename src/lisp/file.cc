@@ -40,7 +40,7 @@ inline void print_string(const std::string& s, file_t& file, io::escape esc)
     file.putch(c, esc);
 }
 
-inline void print_int(std::int64_t i, std::int64_t base, file_t& file)
+inline void print_int(integer_t::value_type i, integer_t::value_type base, file_t& file)
 {
   static const constexpr std::size_t buffer_size = 33;
   std::array<char, buffer_size> ss{};
@@ -51,7 +51,7 @@ inline void print_int(std::int64_t i, std::int64_t base, file_t& file)
   }
 }
 
-inline void print_float(double d, file_t& file)
+inline void print_float(double_t::value_type d, file_t& file)
 {
   auto ss = fmt::format("{:#g}", d);
   print_string(ss, file, io::escape::NO);
@@ -62,7 +62,7 @@ inline void print_pointer(const char* s, file_t& file, const lisp_t& x)
 {
   print_string(s, file, io::escape::NO);
   print_string(" ", file, io::escape::NO);
-  print_int(reinterpret_cast<std::int64_t>(&*x), 16L, file);
+  print_int(reinterpret_cast<integer_t::value_type>(&*x), 16L, file);
   print_string(">", file, io::escape::NO);
 }
 
@@ -165,7 +165,7 @@ bool loadfile(const std::string& filename)
   return false;
 }
 
-lisp_t prinbody(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printlevel)
+lisp_t prinbody(lisp_t a, file_t& file, io::escape esc, integer_t::value_type current_printlevel)
 {
   auto i = a;
   for(;;)
@@ -190,7 +190,7 @@ lisp_t prinbody(lisp_t a, file_t& file, io::escape esc, std::int64_t current_pri
   return a;
 }
 
-lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printlevel)
+lisp_t prin0(lisp_t a, file_t& file, io::escape esc, integer_t::value_type current_printlevel)
 {
   switch(type_of(a))
   {
