@@ -640,10 +640,10 @@ public:
   };
 
   /// @brief The symbol (literal atom).
-  auto as_symbol() -> symbol::ref_symbol_t { return std::get<symbol::ref_symbol_t>(_u); }
+  auto as_symbol() -> ref_symbol_t { return std::get<ref_symbol_t>(_u); }
 
   /// @brief Get and set the value of a symbol.
-  auto value() const -> lisp_t { return std::get<symbol::ref_symbol_t>(_u)->value; }
+  auto value() const -> lisp_t { return std::get<ref_symbol_t>(_u)->value; }
   void value(const lisp_t&);
 
   /// @brief The integer value.
@@ -690,7 +690,7 @@ public:
   /// @brief Get the string if the object holds a symbol or a proper string.
   const std::string& getstr() const
   {
-    return gettype() == type::String ? std::get<ref_string_t>(_u)->value() : std::get<symbol::ref_symbol_t>(_u)->pname;
+    return gettype() == type::String ? std::get<ref_string_t>(_u)->value() : std::get<ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object.
@@ -706,7 +706,7 @@ private:
   // One entry for each type.  Types that has no, or just one, value are
   // indicated by a comment.
   std::variant<std::monostate, // Nil
-    symbol::ref_symbol_t,      // Symbol
+    ref_symbol_t,              // Symbol
     integer_t,                 // Integer
     double_t,                  // Floating point (double)
     indirect_t,                // Indirect
@@ -747,7 +747,7 @@ inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? objec
 
 inline void object::value(const lisp_t& x)
 {
-  auto& var = std::get<symbol::ref_symbol_t>(_u);
+  auto& var = std::get<ref_symbol_t>(_u);
   if(type_of(var->value) == object::type::Cvariable)
   {
     auto& cvar = var->value->cvariable();

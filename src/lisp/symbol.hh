@@ -110,9 +110,10 @@ private:
   }
 };
 
-using ref_symbol_t = ref_ptr<symbol_t>;
-
 } // namespace symbol
+
+using ref_symbol_t = ref_ptr<symbol::symbol_t>;
+
 } // namespace lisp
 
 #endif
