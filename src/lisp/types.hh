@@ -593,7 +593,7 @@ public:
     : _u(double_t{d})
   {}
 
-  /// @brief Construct an object conaining a cvariable_t value.
+  /// @brief Construct an object containing a cvariable_t value.
   object(cvariable_t&& x)
     : _u(std::move(x))
   {}
