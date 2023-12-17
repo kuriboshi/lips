@@ -39,6 +39,17 @@ lisp_t getobject(T x)
   return {new object(x)};
 }
 
+template<typename T> requires std::convertible_to<T, integer_t::value_type>
+lisp_t getobject(T x)
+{
+  return {new object(x)};
+}
+
+inline lisp_t getobject(double x)
+{
+  return {new object(x)};
+}
+
 /// @brief Create a string.
 ///
 /// @param s The string.

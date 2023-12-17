@@ -211,10 +211,10 @@ lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printl
       print_string("nil", file, io::escape::NO);
       break;
     case object::type::Integer:
-      print_int(a->intval(), vm::currentbase()->intval(), file);
+      print_int(a->as_integer(), vm::currentbase()->as_integer(), file);
       break;
     case object::type::Float:
-      print_float(a->floatval(), file);
+      print_float(a->as_double(), file);
       break;
     case object::type::String:
       if(esc == io::escape::YES)
@@ -252,7 +252,7 @@ lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printl
       break;
     default:
       print_string("#<illegal type_of:", file, io::escape::NO);
-      print_int(to_underlying(type_of(a)), vm::currentbase()->intval(), file);
+      print_int(to_underlying(type_of(a)), vm::currentbase()->as_integer(), file);
       print_pointer("", file, a);
   }
   return a;
@@ -450,7 +450,7 @@ lisp_t printlevel(lisp_t newl)
   if(!is_nil(newl))
   {
     check(newl, object::type::Integer);
-    vm::printlevel(newl->intval());
+    vm::printlevel(newl->as_integer());
   }
   return mknumber(x);
 }
@@ -468,7 +468,7 @@ lisp_t spaces(lisp_t n, lisp_t file)
     check(file, object::type::File);
     f = file->file();
   }
-  for(auto i = n->intval(); i > 0; i--)
+  for(integer_t::value_type i = n->as_integer(); i > 0; i--)
     f->putch(' ');
   return nil;
 }

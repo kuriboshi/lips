@@ -35,21 +35,21 @@ TEST_CASE("map: map functions")
       (lambda (a)
        (setq cvar (cons (car a) cvar)))))");
     CHECK(type_of(cvar) == object::type::Cons);
-    CHECK(car(cvar)->intval() == 3);
-    CHECK(cadr(cvar)->intval() == 2);
-    CHECK(caddr(cvar)->intval() == 1);
+    CHECK(car(cvar)->as_integer() == 3);
+    CHECK(cadr(cvar)->as_integer() == 2);
+    CHECK(caddr(cvar)->as_integer() == 1);
 
     cvar = 0_l;
     auto f = eval("(lambda (a) (setq cvar (plus (apply plus a) cvar)))");
     map(mklist(1_l, 1_l, 1_l), f, nil);
-    CHECK(cvar->intval() == 6);
+    CHECK(cvar->as_integer() == 6);
 
     cvar = nil;
     map("(1 2 3)"_l, lambda("(a)"_l, "((setq cvar (cons (car a) cvar)))"_l), lambda("(a)"_l, "((cdr a))"_l));
     CHECK(type_of(cvar) == object::type::Cons);
-    CHECK(car(cvar)->intval() == 3);
-    CHECK(cadr(cvar)->intval() == 2);
-    CHECK(caddr(cvar)->intval() == 1);
+    CHECK(car(cvar)->as_integer() == 3);
+    CHECK(cadr(cvar)->as_integer() == 2);
+    CHECK(caddr(cvar)->as_integer() == 1);
   }
 
   SECTION("mapc")
@@ -60,20 +60,20 @@ TEST_CASE("map: map functions")
        (lambda (a)
         (setq cvar (cons a cvar)))))");
     REQUIRE(type_of(cvar) == object::type::Cons);
-    CHECK(car(cvar)->intval() == 3);
-    CHECK(cadr(cvar)->intval() == 2);
-    CHECK(caddr(cvar)->intval() == 1);
+    CHECK(car(cvar)->as_integer() == 3);
+    CHECK(cadr(cvar)->as_integer() == 2);
+    CHECK(caddr(cvar)->as_integer() == 1);
 
     cvar = 0_l;
     auto f = lambda("(a)"_l, "((setq cvar (plus a cvar)))"_l);
     mapc(mklist(1_l, 1_l, 1_l), f, nil);
     REQUIRE(type_of(cvar) == object::type::Integer);
-    CHECK(cvar->intval() == 3);
+    CHECK(cvar->as_integer() == 3);
 
     cvar = 0_l;
     mapc(mklist(1_l, 2_l, 3_l), f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(cvar) == object::type::Integer);
-    CHECK(cvar->intval() == 6);
+    CHECK(cvar->as_integer() == 6);
   }
 
   SECTION("maplist")
@@ -83,21 +83,21 @@ TEST_CASE("map: map functions")
 
     auto r0 = maplist(ls, f, nil);
     REQUIRE(type_of(r0) == object::type::Cons);
-    CHECK(car(r0)->intval() == 1);
-    CHECK(cadr(r0)->intval() == 2);
-    CHECK(caddr(r0)->intval() == 3);
+    CHECK(car(r0)->as_integer() == 1);
+    CHECK(cadr(r0)->as_integer() == 2);
+    CHECK(caddr(r0)->as_integer() == 3);
 
     auto r1 = maplist(ls, f, nil);
     REQUIRE(type_of(r1) == object::type::Cons);
-    CHECK(car(r1)->intval() == 1);
-    CHECK(cadr(r1)->intval() == 2);
-    CHECK(caddr(r1)->intval() == 3);
+    CHECK(car(r1)->as_integer() == 1);
+    CHECK(cadr(r1)->as_integer() == 2);
+    CHECK(caddr(r1)->as_integer() == 3);
 
     auto r2 = maplist(ls, f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(r2) == object::type::Cons);
-    CHECK(car(r1)->intval() == 1);
-    CHECK(cadr(r1)->intval() == 2);
-    CHECK(caddr(r1)->intval() == 3);
+    CHECK(car(r1)->as_integer() == 1);
+    CHECK(cadr(r1)->as_integer() == 2);
+    CHECK(caddr(r1)->as_integer() == 3);
   }
 
   SECTION("mapcar")
@@ -107,21 +107,21 @@ TEST_CASE("map: map functions")
 
     auto r0 = mapcar(ls, f, nil);
     REQUIRE(type_of(r0) == object::type::Cons);
-    CHECK(car(r0)->intval() == 2);
-    CHECK(cadr(r0)->intval() == 3);
-    CHECK(caddr(r0)->intval() == 4);
+    CHECK(car(r0)->as_integer() == 2);
+    CHECK(cadr(r0)->as_integer() == 3);
+    CHECK(caddr(r0)->as_integer() == 4);
 
     auto r1 = mapcar(ls, f, nil);
     REQUIRE(type_of(r1) == object::type::Cons);
-    CHECK(car(r1)->intval() == 2);
-    CHECK(cadr(r1)->intval() == 3);
-    CHECK(caddr(r1)->intval() == 4);
+    CHECK(car(r1)->as_integer() == 2);
+    CHECK(cadr(r1)->as_integer() == 3);
+    CHECK(caddr(r1)->as_integer() == 4);
 
     auto r2 = mapcar(ls, f, lambda("(a)"_l, "((cdr a))"_l));
     REQUIRE(type_of(r0) == object::type::Cons);
-    CHECK(car(r2)->intval() == 2);
-    CHECK(cadr(r2)->intval() == 3);
-    CHECK(caddr(r2)->intval() == 4);
+    CHECK(car(r2)->as_integer() == 2);
+    CHECK(cadr(r2)->as_integer() == 3);
+    CHECK(caddr(r2)->as_integer() == 4);
   }
 }
 

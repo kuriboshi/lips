@@ -69,10 +69,10 @@ TEST_CASE("logic: logic functions")
   {
     auto r0 = "(if t 0 1)"_e;
     REQUIRE(type_of(r0) == object::type::Integer);
-    CHECK(r0->intval() == 0);
+    CHECK(r0->as_integer() == 0);
     r0 = "(if nil 0 1)"_e;
     REQUIRE(type_of(r0) == object::type::Integer);
-    CHECK(r0->intval() == 1);
+    CHECK(r0->as_integer() == 1);
   }
 }
 

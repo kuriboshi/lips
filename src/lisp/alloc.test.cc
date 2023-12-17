@@ -88,14 +88,14 @@ TEST_CASE("alloc: c variables")
   CHECK(eq(cvar, 321_l));
 
   auto r0 = eval(cvar);
-  CHECK(r0->intval() == 321);
+  CHECK(r0->as_integer() == 321);
 
   auto r1 = eval("(setq cvar 444)");
-  CHECK(r1->intval() == 444);
-  CHECK(cvar->intval() == 444);
+  CHECK(r1->as_integer() == 444);
+  CHECK(cvar->as_integer() == 444);
 
   auto r2 = eval("cvar");
-  CHECK(r2->intval() == 444);
+  CHECK(r2->as_integer() == 444);
 
   cvar = mkstring("hello");
   CHECK(cvar->getstr() == "hello");
@@ -109,7 +109,7 @@ TEST_CASE("alloc: c variables")
   CHECK(yvar->getstr() == "string");
 
   auto& zvar = initcvar("zvar", 22_l);
-  CHECK(zvar->intval() == 22);
+  CHECK(zvar->as_integer() == 22);
   eval("(setq zvar \"foo\")");
   CHECK(zvar->getstr() == "foo");
 
@@ -117,10 +117,10 @@ TEST_CASE("alloc: c variables")
   {
     auto& move0 = initcvar("move0", 321_l);
     auto& move1 = initcvar("move1", 432_l);
-    CHECK(move0->intval() == 321);
-    CHECK(move1->intval() == 432);
+    CHECK(move0->as_integer() == 321);
+    CHECK(move1->as_integer() == 432);
     move0 = std::move(move1);
-    CHECK(move0->intval() == 432);
+    CHECK(move0->as_integer() == 432);
     REQUIRE(is_nil(move1));
   }
 }
@@ -128,19 +128,19 @@ TEST_CASE("alloc: c variables")
 TEST_CASE("alloc: obarray")
 {
   auto obs = obarray();
-  auto cur = length(obs)->intval();
+  auto cur = length(obs)->as_integer();
   auto a0 = mkatom("foo");
   obs = obarray();
   // The reason this is not 1 is that there are already two symbols in the
   // local symbol table: base and verbose.
-  CHECK(length(obs)->intval() == cur + 1);
+  CHECK(length(obs)->as_integer() == cur + 1);
   auto a1 = mkatom("bar");
   obs = obarray();
-  CHECK(length(obs)->intval() == cur + 2);
+  CHECK(length(obs)->as_integer() == cur + 2);
 
   // Test calling from lisp
   obs = eval("(obarray)");
-  CHECK(length(obs)->intval() == cur + 2);
+  CHECK(length(obs)->as_integer() == cur + 2);
 }
 
 TEST_CASE("alloc: freecount")

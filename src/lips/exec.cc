@@ -180,7 +180,7 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
     }
   }
   else if(type_of(arg) == object::type::Integer)
-    args.push_back(std::to_string(arg->intval()));
+    args.push_back(std::to_string(arg->as_integer()));
   else if(type_of(arg) == object::type::String)
     args.push_back(arg->getstr());
   else if(type_of(arg) == object::type::Cons)
@@ -395,7 +395,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = static_cast<int>(filed->intval());
+    oldfd = static_cast<int>(filed->as_integer());
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644); fd == -1)
@@ -431,7 +431,7 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = static_cast<int>(filed->intval());
+    oldfd = static_cast<int>(filed->as_integer());
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644); fd == -1)
@@ -467,7 +467,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   else
   {
     check(filed, object::type::Integer);
-    oldfd = static_cast<int>(filed->intval());
+    oldfd = static_cast<int>(filed->as_integer());
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_RDONLY); fd == -1)
@@ -600,7 +600,7 @@ lisp_t fg(lisp_t job)
   else
   {
     check(job, object::type::Integer);
-    current = job::findjob([&job](const auto& j) { return j.jobnum == job->intval(); });
+    current = job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
   }
   if(current != nullptr)
   {
@@ -628,7 +628,7 @@ lisp_t bg(lisp_t job)
   else
   {
     check(job, object::type::Integer);
-    current = job::findjob([&job](const auto& j) { return j.jobnum == job->intval(); });
+    current = job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
   }
   if(current != nullptr)
   {
@@ -806,5 +806,5 @@ TEST_CASE("exec.cc: make_exec")
 TEST_CASE("execute")
 {
   auto result = execute("/bin/ls", cons(mkstring("ls"), nil));
-  CHECK(result->intval() == 0);
+  CHECK(result->as_integer() == 0);
 }

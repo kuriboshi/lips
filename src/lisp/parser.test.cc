@@ -181,7 +181,7 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
   auto res = parser(lexer).parse();
   REQUIRE(type_of(res) == object::type::Cons);
   CHECK(car(res) == "greaterp"_a);
-  CHECK(cadr(res)->floatval() == 1.0);
+  CHECK(cadr(res)->as_double() == 1.0);
   CHECK(caddr(res)->string() == "b");
 }
 

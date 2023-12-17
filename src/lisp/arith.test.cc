@@ -33,27 +33,27 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = plus(mklist(1_l, 2_l, 3_l, 4_l, 5_l));
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 15);
+      CHECK(r0->as_integer() == 15);
     }
     {
       auto r0 = plus(mklist(1_l, 1.0_l, 2.0_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 4.0);
+      CHECK(r0->as_double() == 4.0);
     }
     {
       auto r0 = plus(mklist(1_l, 1_l));
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 2);
+      CHECK(r0->as_integer() == 2);
     }
     {
       auto r0 = plus(mklist(1.0_l, 1_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2);
+      CHECK(r0->as_double() == 2);
     }
     {
       auto r0 = plus(mklist(1.0_l, 1_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2);
+      CHECK(r0->as_double() == 2);
     }
     {
       CHECK_THROWS_WITH(plus(mklist(1_l, "s"_s)), "Illegal argument");
@@ -66,27 +66,27 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = difference(1_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
     {
       auto r0 = difference(1_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
     {
       auto r0 = difference(1_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1.0);
+      CHECK(r0->as_double() == -1.0);
     }
     {
       auto r0 = difference(1.0_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1.0);
+      CHECK(r0->as_double() == -1.0);
     }
     {
       auto r0 = difference(1.0_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1.0);
+      CHECK(r0->as_double() == -1.0);
     }
   }
 
@@ -94,24 +94,24 @@ TEST_CASE("arith: arithmetic functions")
   {
     {
       auto r0 = times(mklist(5_l, 7_l));
-      CHECK(r0->intval() == 35);
+      CHECK(r0->as_integer() == 35);
       r0 = times(mklist(5_l, 7_l));
-      CHECK(r0->intval() == 35);
+      CHECK(r0->as_integer() == 35);
     }
     {
       auto r0 = times(mklist(5.0_l, 7_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 35.0);
+      CHECK(r0->as_double() == 35.0);
     }
     {
       auto r0 = times(mklist(5_l, 7.0_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 35.0);
+      CHECK(r0->as_double() == 35.0);
     }
     {
       auto r0 = times(mklist(5.0_l, 7.0_l));
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 35.0);
+      CHECK(r0->as_double() == 35.0);
     }
     {
       CHECK_THROWS_WITH(times(mklist(5_l, "s"_s)), "Illegal argument");
@@ -124,32 +124,32 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = divide(4_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 2);
+      CHECK(r0->as_integer() == 2);
     }
     {
       auto r0 = divide(4_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 2);
+      CHECK(r0->as_integer() == 2);
     }
     {
       auto r0 = divide(4_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2.0);
+      CHECK(r0->as_double() == 2.0);
     }
     {
       auto r0 = divide(4_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2.0);
+      CHECK(r0->as_double() == 2.0);
     }
     {
       auto r0 = divide(4.0_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2.0);
+      CHECK(r0->as_double() == 2.0);
     }
     {
       auto r0 = divide(4.0_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == 2.0);
+      CHECK(r0->as_double() == 2.0);
     }
     {
       CHECK_THROWS_WITH(divide(1_l, 0_l), "Divide by zero");
@@ -163,11 +163,11 @@ TEST_CASE("arith: arithmetic functions")
   {
     {
       auto r0 = iplus(mklist(1_l, 2_l, 7_l));
-      CHECK(r0->intval() == 10);
+      CHECK(r0->as_integer() == 10);
     }
     {
       auto r0 = iplus(mklist(1_l, 2_l, 7_l));
-      CHECK(r0->intval() == 10);
+      CHECK(r0->as_integer() == 10);
     }
   }
 
@@ -176,12 +176,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = idifference(1_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
     {
       auto r0 = idifference(1_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
   }
 
@@ -189,11 +189,11 @@ TEST_CASE("arith: arithmetic functions")
   {
     {
       auto r0 = itimes(mklist(6_l, 8_l));
-      CHECK(r0->intval() == 48);
+      CHECK(r0->as_integer() == 48);
     }
     {
       auto r0 = itimes(mklist(6_l, 8_l));
-      CHECK(r0->intval() == 48);
+      CHECK(r0->as_integer() == 48);
     }
   }
 
@@ -202,12 +202,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = iquotient(5_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 2);
+      CHECK(r0->as_integer() == 2);
     }
     {
       auto r0 = iquotient(5_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 2);
+      CHECK(r0->as_integer() == 2);
     }
     {
       CHECK_THROWS_WITH(iquotient(1_l, 0_l), "Divide by zero");
@@ -219,12 +219,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = iremainder(5_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 1);
+      CHECK(r0->as_integer() == 1);
     }
     {
       auto r0 = iremainder(5_l, 2_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == 1);
+      CHECK(r0->as_integer() == 1);
     }
     {
       CHECK_THROWS_WITH(iremainder(5_l, 0_l), "Divide by zero");
@@ -236,17 +236,17 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = minus(1_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
     {
       auto r0 = minus(1.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1.0);
+      CHECK(r0->as_double() == -1.0);
     }
     {
       auto r0 = minus(1.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1.0);
+      CHECK(r0->as_double() == -1.0);
     }
   }
 
@@ -255,12 +255,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = iminus(1_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
     {
       auto r0 = iminus(1_l);
       REQUIRE(type_of(r0) == object::type::Integer);
-      CHECK(r0->intval() == -1);
+      CHECK(r0->as_integer() == -1);
     }
   }
 
@@ -269,12 +269,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r = add1(2_l);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 3);
+      CHECK(r->as_integer() == 3);
     }
     {
       auto r = add1(2_l);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 3);
+      CHECK(r->as_integer() == 3);
     }
   }
 
@@ -283,12 +283,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r = sub1(3_l);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 2);
+      CHECK(r->as_integer() == 2);
     }
     {
       auto r = sub1(3_l);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 2);
+      CHECK(r->as_integer() == 2);
     }
   }
 
@@ -297,17 +297,17 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r = abs(mknumber(-1));
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 1);
+      CHECK(r->as_integer() == 1);
     }
     {
       auto r = abs(mknumber(-1));
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 1);
+      CHECK(r->as_integer() == 1);
     }
     {
       auto r = abs(mknumber(1));
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 1);
+      CHECK(r->as_integer() == 1);
     }
   }
 
@@ -315,10 +315,10 @@ TEST_CASE("arith: arithmetic functions")
   {
     auto r = fplus(mklist(2.0_l, 5.0_l));
     REQUIRE(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 7.0);
+    CHECK(r->as_double() == 7.0);
     r = fplus(mklist(2.0_l, 5.0_l));
     REQUIRE(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 7.0);
+    CHECK(r->as_double() == 7.0);
   }
 
   SECTION("f-")
@@ -326,12 +326,12 @@ TEST_CASE("arith: arithmetic functions")
     {
       auto r0 = fdifference(1.0_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1);
+      CHECK(r0->as_double() == -1);
     }
     {
       auto r0 = fdifference(1.0_l, 2.0_l);
       REQUIRE(type_of(r0) == object::type::Float);
-      CHECK(r0->floatval() == -1);
+      CHECK(r0->as_double() == -1);
     }
   }
 
@@ -339,20 +339,20 @@ TEST_CASE("arith: arithmetic functions")
   {
     auto r = ftimes(mklist(5.0_l, 2.0_l));
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 10.0);
+    CHECK(r->as_double() == 10.0);
     r = ftimes(mklist(5.0_l, 2.0_l));
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 10.0);
+    CHECK(r->as_double() == 10.0);
   }
 
   SECTION("f/")
   {
     auto r = fdivide(5.0_l, 2.0_l);
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 2.5);
+    CHECK(r->as_double() == 2.5);
     r = fdivide(5.0_l, 2.0_l);
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 2.5);
+    CHECK(r->as_double() == 2.5);
     CHECK_THROWS_WITH(fdivide(1.0_l, 0.0_l), "Divide by zero");
   }
 
@@ -360,10 +360,10 @@ TEST_CASE("arith: arithmetic functions")
   {
     auto r = itof(8_l);
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 8.0);
+    CHECK(r->as_double() == 8.0);
     r = itof(9_l);
     CHECK(type_of(r) == object::type::Float);
-    CHECK(r->floatval() == 9.0);
+    CHECK(r->as_double() == 9.0);
   }
 
   SECTION("greaterp")

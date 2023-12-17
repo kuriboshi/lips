@@ -38,19 +38,19 @@ TEST_CASE("prop: property functions")
   auto value1 = mkstring("value1");
   CHECK(putprop(sym, prop1, value1) == value1);
   auto plist = getplist(sym);
-  CHECK(length(plist)->intval() == 4);
+  CHECK(length(plist)->as_integer() == 4);
 
   CHECK(putprop(sym, prop1, value0) == value0);
   plist = getplist(sym);
-  CHECK(length(plist)->intval() == 4);
+  CHECK(length(plist)->as_integer() == 4);
 
   CHECK(remprop(sym, prop0) == value0);
   // plist is changed in place
-  CHECK(length(plist)->intval() == 2);
-  CHECK(length(getplist(sym))->intval() == 2);
+  CHECK(length(plist)->as_integer() == 2);
+  CHECK(length(getplist(sym))->as_integer() == 2);
 
   setplist(sym, mklist(prop0, value0, prop1, value1));
-  CHECK(length(getplist(sym))->intval() == 4);
+  CHECK(length(getplist(sym))->as_integer() == 4);
   CHECK(getprop(sym, prop1) == value1);
   CHECK(getprop(sym, "prop2"_a) == nil);
   CHECK_THROWS(getprop(1_l, "prop3"_a));

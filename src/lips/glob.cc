@@ -402,7 +402,7 @@ TEST_CASE("expandfiles")
   SECTION("Expand all files")
   {
     auto result = expandfiles("testdir/*", true);
-    CHECK(length(result)->intval() == 3);
+    CHECK(length(result)->as_integer() == 3);
 
     int count = 3;
     for(auto d: dirs)
@@ -423,7 +423,7 @@ TEST_CASE("expandfiles")
   SECTION("Expand only one file")
   {
     auto result = expandfiles("testdir/??", true);
-    CHECK(length(result)->intval() == 1);
+    CHECK(length(result)->as_integer() == 1);
 
     int count = 1;
     for(auto d: dirs)
@@ -445,7 +445,7 @@ TEST_CASE("expandfiles")
   {
     const lisp_t wild = mkstring("testdir/*");
     auto e = expand(wild);
-    CHECK(length(e)->intval() == 3);
+    CHECK(length(e)->as_integer() == 3);
     for(auto i: e)
       for(auto d: dirs)
       {
@@ -461,7 +461,7 @@ TEST_CASE("expandfiles")
   {
     const lisp_t wild = mkstring("testd*/*");
     auto e = expand(wild);
-    CHECK(length(e)->intval() == 3);
+    CHECK(length(e)->as_integer() == 3);
     for(auto i: e)
       for(auto d: dirs)
       {
@@ -477,7 +477,7 @@ TEST_CASE("expandfiles")
   {
     const std::string s{"./testd*"};
     auto e = expandfiles(s, true);
-    REQUIRE(length(e)->intval() >= 1);
+    REQUIRE(length(e)->as_integer() >= 1);
     CHECK(e->car()->getstr() == "./testdir");
   }
 

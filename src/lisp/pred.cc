@@ -72,7 +72,7 @@ lisp_t equal(lisp_t l1, lisp_t l2)
     case object::type::Lambda:
       return user::funeq(l1, l2);
     case object::type::Integer:
-      return (l1->intval() == l2->intval() ? T : nil);
+      return (l1->as_integer() == l2->as_integer() ? T : nil);
     default:
       break;
   }

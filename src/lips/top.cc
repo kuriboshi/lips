@@ -38,7 +38,7 @@ void top::phist()
 {
   for(auto hl: variables->history())
   {
-    std::cout << fmt::format("{}.\t", hl->car()->intval());
+    std::cout << fmt::format("{}.\t", hl->car()->as_integer());
     prinbody(hl->cdr(), *vm::stdout(), io::escape::YES);
     primout()->terpri();
   }
@@ -68,7 +68,7 @@ void top::remhist()
 void top::trimhist()
 {
   lisp_t hl = variables->history();
-  for(int i = 0; i < variables->histmax()->intval() && !is_nil(hl); i++, hl = hl->cdr())
+  for(int i = 0; i < variables->histmax()->as_integer() && !is_nil(hl); i++, hl = hl->cdr())
     ;
   if(!is_nil(hl))
     rplacd(hl, nil);
@@ -90,7 +90,7 @@ lisp_t top::histget(std::int64_t num, lisp_t hlist)
   }
   if(num > 0)
   {
-    for(; type_of(hlist) == object::type::Cons && num != hlist->car()->car()->intval(); hlist = hlist->cdr())
+    for(; type_of(hlist) == object::type::Cons && num != hlist->car()->car()->as_integer(); hlist = hlist->cdr())
       ;
     if(is_nil(hlist))
       return nil;
@@ -157,7 +157,7 @@ void top::promptprint(lisp_t prompt)
   {
     if(c == '!')
     {
-      current_prompt += std::to_string(top::variables->histnum()->intval());
+      current_prompt += std::to_string(top::variables->histnum()->as_integer());
       continue;
     }
     if(c == '\\')
@@ -262,7 +262,7 @@ lisp_t top::rmexcl(lisp_t stream)
       auto at = ratom(stream->file());
       if(type_of(at) == object::type::Integer)
       {
-        tmp = histget(at->intval(), variables->history());
+        tmp = histget(at->as_integer(), variables->history());
         return tmp;
       }
       if(type_of(at) == object::type::Symbol)

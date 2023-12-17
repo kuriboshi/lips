@@ -47,53 +47,53 @@ TEST_CASE("prim: primary functions")
     // TODO: Can't do this because Catch2 goes into an infinite loop when
     // converting a lisp_t to a string.
     // CHECK(r0 == 3_l);
-    CHECK(r0->intval() == 3_l->intval());
+    CHECK(r0->as_integer() == 3_l->as_integer());
   }
 
   SECTION("CAR and CDR")
   {
     auto sample = eval("(cons 1 2)");
-    CHECK(car(sample)->intval() == 1);
-    CHECK(cdr(sample)->intval() == 2);
+    CHECK(car(sample)->as_integer() == 1);
+    CHECK(cdr(sample)->as_integer() == 2);
 
-    CHECK(car(sample)->intval() == 1);
-    CHECK(cdr(sample)->intval() == 2);
+    CHECK(car(sample)->as_integer() == 1);
+    CHECK(cdr(sample)->as_integer() == 2);
   }
 
   SECTION("C..R and C...R")
   {
     {
       auto sample = eval("(quote ((1 . 2) 3 . 4))");
-      CHECK(caar(sample)->intval() == 1);
-      CHECK(cdar(sample)->intval() == 2);
-      CHECK(cadr(sample)->intval() == 3);
-      CHECK(cddr(sample)->intval() == 4);
+      CHECK(caar(sample)->as_integer() == 1);
+      CHECK(cdar(sample)->as_integer() == 2);
+      CHECK(cadr(sample)->as_integer() == 3);
+      CHECK(cddr(sample)->as_integer() == 4);
 
-      CHECK(caar(sample)->intval() == 1);
-      CHECK(cdar(sample)->intval() == 2);
-      CHECK(cadr(sample)->intval() == 3);
-      CHECK(cddr(sample)->intval() == 4);
+      CHECK(caar(sample)->as_integer() == 1);
+      CHECK(cdar(sample)->as_integer() == 2);
+      CHECK(cadr(sample)->as_integer() == 3);
+      CHECK(cddr(sample)->as_integer() == 4);
     }
 
     {
       auto sample = eval("(quote (((1 . 2) 3 . 4) (5 . 6) 7 . 8))");
-      CHECK(caaar(sample)->intval() == 1);
-      CHECK(cdaar(sample)->intval() == 2);
-      CHECK(cadar(sample)->intval() == 3);
-      CHECK(cddar(sample)->intval() == 4);
-      CHECK(caadr(sample)->intval() == 5);
-      CHECK(cdadr(sample)->intval() == 6);
-      CHECK(caddr(sample)->intval() == 7);
-      CHECK(cdddr(sample)->intval() == 8);
+      CHECK(caaar(sample)->as_integer() == 1);
+      CHECK(cdaar(sample)->as_integer() == 2);
+      CHECK(cadar(sample)->as_integer() == 3);
+      CHECK(cddar(sample)->as_integer() == 4);
+      CHECK(caadr(sample)->as_integer() == 5);
+      CHECK(cdadr(sample)->as_integer() == 6);
+      CHECK(caddr(sample)->as_integer() == 7);
+      CHECK(cdddr(sample)->as_integer() == 8);
 
-      CHECK(caaar(sample)->intval() == 1);
-      CHECK(cdaar(sample)->intval() == 2);
-      CHECK(cadar(sample)->intval() == 3);
-      CHECK(cddar(sample)->intval() == 4);
-      CHECK(caadr(sample)->intval() == 5);
-      CHECK(cdadr(sample)->intval() == 6);
-      CHECK(caddr(sample)->intval() == 7);
-      CHECK(cdddr(sample)->intval() == 8);
+      CHECK(caaar(sample)->as_integer() == 1);
+      CHECK(cdaar(sample)->as_integer() == 2);
+      CHECK(cadar(sample)->as_integer() == 3);
+      CHECK(cddar(sample)->as_integer() == 4);
+      CHECK(caadr(sample)->as_integer() == 5);
+      CHECK(cdadr(sample)->as_integer() == 6);
+      CHECK(caddr(sample)->as_integer() == 7);
+      CHECK(cdddr(sample)->as_integer() == 8);
     }
   }
 
@@ -132,13 +132,13 @@ TEST_CASE("prim: primary functions")
     auto list = append(cons(list0, cons(list1, nil)));
     // Original list is unchanged
     auto r0 = iplus(list0);
-    CHECK(r0->intval() == 3);
+    CHECK(r0->as_integer() == 3);
     auto r1 = iplus(list);
-    CHECK(r1->intval() == 6);
+    CHECK(r1->as_integer() == 6);
     auto list2 = mklist(4_l);
     list = append(cons(list, cons(list2, nil)));
     auto r2 = iplus(list);
-    CHECK(r2->intval() == 10);
+    CHECK(r2->as_integer() == 10);
   }
 
   SECTION("nconc")
@@ -148,16 +148,16 @@ TEST_CASE("prim: primary functions")
     auto list = nconc(cons(list0, cons(list1, nil)));
     // Original list changes
     auto r0 = iplus(list0);
-    CHECK(r0->intval() == 6);
+    CHECK(r0->as_integer() == 6);
     auto r1 = iplus(list);
-    CHECK(r1->intval() == 6);
+    CHECK(r1->as_integer() == 6);
     auto list2 = mklist(4_l);
     list = nconc(cons(list, cons(list2, nil)));
     // Original list changes
     auto r2 = iplus(list0);
-    CHECK(r2->intval() == 10);
+    CHECK(r2->as_integer() == 10);
     auto r3 = iplus(list);
-    CHECK(r3->intval() == 10);
+    CHECK(r3->as_integer() == 10);
   }
 
   SECTION("tconc")
@@ -191,8 +191,8 @@ TEST_CASE("prim: primary functions")
   SECTION("length")
   {
     auto list = mklist(0_l, 1_l, 2_l, 3_l);
-    CHECK(length(list)->intval() == 4);
-    CHECK(length(list)->intval() == 4);
+    CHECK(length(list)->as_integer() == 4);
+    CHECK(length(list)->as_integer() == 4);
   }
 
   SECTION("nth")
@@ -216,7 +216,7 @@ TEST_CASE("prim: primary functions")
   {
     auto l = list(mklist(1_l, 2_l));
     CHECK(type_of(l) == object::type::Cons);
-    CHECK(length(l)->intval() == 2);
+    CHECK(length(l)->as_integer() == 2);
   }
 
   SECTION("error") { CHECK_THROWS(error("error"_s)); }

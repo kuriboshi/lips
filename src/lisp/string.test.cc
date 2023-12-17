@@ -39,13 +39,13 @@ TEST_CASE("string: strcmp")
   auto zeta = mkstring("zeta");
   auto r0 = strcmp(alpha, zeta);
   REQUIRE(type_of(r0) == object::type::Integer);
-  CHECK(r0->intval() < 0);
+  CHECK(r0->as_integer() < 0);
   auto r1 = strcmp(zeta, alpha);
   REQUIRE(type_of(r1) == object::type::Integer);
-  CHECK(r1->intval() > 0);
+  CHECK(r1->as_integer() > 0);
   auto r2 = strcmp(alpha, alpha);
   REQUIRE(type_of(r2) == object::type::Integer);
-  CHECK(r2->intval() == 0);
+  CHECK(r2->as_integer() == 0);
 }
 
 TEST_CASE("string: strequal")
@@ -83,7 +83,7 @@ TEST_CASE("string: strlen")
 {
   auto s0 = mkstring("lorem");
   auto l0 = strlen(s0);
-  CHECK(l0->intval() == 5);
+  CHECK(l0->as_integer() == 5);
 }
 
 TEST_CASE("string: substring")

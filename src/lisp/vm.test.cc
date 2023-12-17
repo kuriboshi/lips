@@ -51,14 +51,14 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
     auto b = eval("(f 10)");
     CHECK(type_of(b) == object::type::Cons);
     CHECK(type_of(b->car()) == object::type::Integer);
-    CHECK(b->car()->intval() == 10);
+    CHECK(b->car()->as_integer() == 10);
   }
   SECTION("LAMBDA - spread case")
   {
     auto a = eval("(setq f (lambda x (cadr x)))");
     auto b = eval("(f 1 2)");
     CHECK(type_of(b) == object::type::Integer);
-    CHECK(b->intval() == 2);
+    CHECK(b->as_integer() == 2);
   }
   SECTION("LAMBDA - half spread")
   {
@@ -66,9 +66,9 @@ TEST_CASE("eval: LAMBDA and NLAMBDA")
     auto b = eval("(f 0 1 2)");
     CHECK(type_of(b) == object::type::Cons);
     CHECK(type_of(b->car()) == object::type::Integer);
-    CHECK(b->car()->intval() == 0);
+    CHECK(b->car()->as_integer() == 0);
     CHECK(type_of(b->cdr()->car()) == object::type::Integer);
-    CHECK(b->cdr()->car()->intval() == 2);
+    CHECK(b->cdr()->car()->as_integer() == 2);
   }
   SECTION("NLAMBDA - basic case")
   {
@@ -87,7 +87,7 @@ TEST_CASE("eval: eval functions")
     auto val = mknumber(123);
     set(var, val);
     auto r0 = eval(var);
-    CHECK(r0->intval() == 123);
+    CHECK(r0->as_integer() == 123);
   }
 
   SECTION("Evaluate simple expression: (plus 123 1)")
@@ -97,7 +97,7 @@ TEST_CASE("eval: eval functions")
     prin0(e1, *out0.get());
     CHECK(to_string(out0->sink()) == std::string("(plus 123 1)"));
     auto r1 = eval(e1);
-    CHECK(r1->intval() == 124);
+    CHECK(r1->as_integer() == 124);
   }
 }
 
@@ -180,7 +180,7 @@ TEST_CASE("eval: autoload")
   putprop("auto"_a, "autoload"_a, "autoload.lisp"_a);
   auto result = "(auto)"_e;
   CHECK(type_of(result) == object::type::Integer);
-  CHECK(result->intval() == 123);
+  CHECK(result->as_integer() == 123);
   putprop("noauto"_a, "autoload"_a, "autoload.lisp"_a);
   CHECK_THROWS("(noauto)"_e);
   std::filesystem::remove("autoload.lisp");
@@ -205,7 +205,7 @@ TEST_CASE("eval: indirect and cvariable")
     auto& cvar = initcvar("f0", "(lambda () 99)"_l);
     auto result = "(f0)"_e;
     REQUIRE(type_of(result) == object::type::Integer);
-    CHECK(result->intval() == 99);
+    CHECK(result->as_integer() == 99);
   }
 
   SECTION("indirect variable")
@@ -213,7 +213,7 @@ TEST_CASE("eval: indirect and cvariable")
     auto& cvar = initcvar("c0", 123_l);
     auto result = "(plus c0)"_e;
     REQUIRE(type_of(result) == object::type::Integer);
-    CHECK(result->intval() == 123);
+    CHECK(result->as_integer() == 123);
   }
 }
 
@@ -309,7 +309,7 @@ TEST_CASE("vm: trace")
   } t;
   auto r = eval(R"((plus 1 2 3))");
   REQUIRE(type_of(r) == object::type::Integer);
-  CHECK(r->intval() == 6);
+  CHECK(r->as_integer() == 6);
 }
 
 template<class T>

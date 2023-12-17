@@ -19,6 +19,7 @@
 #define LISP_TYPES_HH
 
 #include <cstdint>
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <sstream>
@@ -324,15 +325,48 @@ private:
   }
 };
 
+class integer_t final
+{
+public:
+  using value_type = std::int64_t;
+
+  integer_t() : _value(0) {}
+  explicit integer_t(value_type i) : _value(i) {}
+  operator value_type() const { return _value; }
+
+  integer_t& operator=(value_type i) { _value = i; return *this; }
+
+  value_type value() const { return _value; }
+
+private:
+  value_type _value;
+};
+
+class double_t final
+{
+public:
+  using value_type = double;
+  double_t() : _value(0.0) {}
+  explicit double_t(value_type d) : _value(d) {}
+  operator value_type() const { return _value; }
+
+  double_t& operator=(value_type d) { _value = d; return *this; }
+
+  value_type value() const { return _value; }
+
+private:
+  value_type _value;
+};
+
 class string_t final: public ref_count<string_t>
 {
 public:
   string_t() = default;
   string_t(std::string s)
-    : string(std::move(s))
+    : _value(std::move(s))
   {}
 
-  std::string string;
+  const std::string& value() const { return _value; }
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return pool().allocate(); }
@@ -352,6 +386,8 @@ private:
     static pool_t _pool; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
     return _pool;
   }
+
+  std::string _value;
 };
 
 struct subr_index
@@ -538,10 +574,23 @@ public:
   object() = default;
   ~object() = default;
 
-  /// @brief Constructor for anything with a defined set function
+  /// @brief Constructor for T which is a direct member of the variant holding
+  /// the value.
   template<typename T>
   explicit object(T x)
     : _u(x)
+  {}
+
+  /// @brief Specialization for plain integer types.
+  template<typename T> requires std::convertible_to<T, integer_t::value_type>
+  explicit object(T i)
+    : _u(integer_t{i})
+  {}
+
+  /// @brief Specialization for the plain double type.
+  template<>
+  explicit object(double d)
+    : _u(double_t{d})
   {}
 
   /// @brief Construct an object conaining a cvariable_t value.
@@ -598,10 +647,10 @@ public:
   void value(const lisp_t&);
 
   /// @brief The integer value.
-  auto intval() const -> std::int64_t { return std::get<std::int64_t>(_u); }
+  auto as_integer() const -> integer_t { return std::get<integer_t>(_u); }
 
   /// @brief The floating point value (double)
-  auto floatval() const -> double { return std::get<double>(_u); }
+  auto as_double() const -> double_t { return std::get<double_t>(_u); }
 
   /// @brief Get the indirect value.
   auto indirect() const -> lisp_t { return std::get<indirect_t>(_u).value; }
@@ -618,7 +667,7 @@ public:
   void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = std::move(x); }
 
   /// @brief Character string.
-  auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->string; }
+  auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->value(); }
 
   /// @brief Compiled function (subr).
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }
@@ -641,7 +690,7 @@ public:
   /// @brief Get the string if the object holds a symbol or a proper string.
   const std::string& getstr() const
   {
-    return gettype() == type::String ? std::get<ref_string_t>(_u)->string : std::get<symbol::ref_symbol_t>(_u)->pname;
+    return gettype() == type::String ? std::get<ref_string_t>(_u)->value() : std::get<symbol::ref_symbol_t>(_u)->pname;
   }
 
   /// @brief Access the type of object.
@@ -658,8 +707,8 @@ private:
   // indicated by a comment.
   std::variant<std::monostate, // Nil
     symbol::ref_symbol_t,      // Symbol
-    std::int64_t,              // Integer
-    double,                    // Float
+    integer_t,                 // Integer
+    double_t,                  // Floating point (double)
     indirect_t,                // Indirect
     ref_cons_t,                // Cons
     ref_string_t,              // String

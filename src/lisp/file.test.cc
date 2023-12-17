@@ -102,12 +102,12 @@ TEST_CASE("file: functions")
     {
       create_test_file test("(setq a 1)\n");
       auto e0 = load(mkstring(test.file));
-      CHECK("a"_a->value()->intval() == 1);
+      CHECK("a"_a->value()->as_integer() == 1);
     }
     {
       create_test_file test("(setq a 2)\n");
       auto e0 = load(mkstring(test.file));
-      CHECK("a"_a->value()->intval() == 2);
+      CHECK("a"_a->value()->as_integer() == 2);
     }
   }
 
@@ -223,13 +223,13 @@ TEST_CASE("file: functions")
     {
       lisp_t f = getobject(ref_file_t::create(R"(test)"));
       auto ch0 = readc(f);
-      CHECK(ch0->intval() == 't');
+      CHECK(ch0->as_integer() == 't');
       auto ch1 = readc(f);
-      CHECK(ch1->intval() == 'e');
+      CHECK(ch1->as_integer() == 'e');
       auto ch2 = readc(f);
-      CHECK(ch2->intval() == 's');
+      CHECK(ch2->as_integer() == 's');
       auto ch3 = readc(f);
-      CHECK(ch3->intval() == 't');
+      CHECK(ch3->as_integer() == 't');
     }
 
     SECTION("from primin")
@@ -238,7 +238,7 @@ TEST_CASE("file: functions")
       auto old = vm::primin(in);
       auto r = readc(nil);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 'a');
+      CHECK(r->as_integer() == 'a');
       vm::primin(old);
     }
 
@@ -248,7 +248,7 @@ TEST_CASE("file: functions")
       auto* buf = std::cin.rdbuf(stream.rdbuf());
       auto r = readc(T);
       REQUIRE(type_of(r) == object::type::Integer);
-      CHECK(r->intval() == 'a');
+      CHECK(r->as_integer() == 'a');
       std::cin.rdbuf(buf);
     }
   }
@@ -391,7 +391,7 @@ TEST_CASE("file: functions")
     vm::loadpath(mklist(C_DOT));
     auto e = load(mkstring(test.file));
     REQUIRE(type_of("a"_a->value()) == object::type::Integer);
-    CHECK("a"_a->value()->intval() == 999);
+    CHECK("a"_a->value()->as_integer() == 999);
   }
 }
 
@@ -472,7 +472,7 @@ TEST_CASE("file: lispread/readline")
   SECTION("floatp")
   {
     auto f0 = lispread("-1.2345E-2");
-    CHECK(f0->floatval() == Catch::Approx(-1.2345E-2).epsilon(0.01));
+    CHECK(f0->as_double() == Catch::Approx(-1.2345E-2).epsilon(0.01));
   }
 
   SECTION("lispread & readline")

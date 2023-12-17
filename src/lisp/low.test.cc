@@ -38,7 +38,7 @@ TEST_CASE("low: low level functions")
  b)
 )";
     auto e0 = eval(set0);
-    CHECK(e0->intval() == 123);
+    CHECK(e0->as_integer() == 123);
   }
 
   SECTION("low: prohibit set on constants")
@@ -56,9 +56,9 @@ TEST_CASE("low: low level functions")
   {
     auto a = mkatom("a");
     setq(a, mknumber(100));
-    CHECK(a->value()->intval() == 100);
+    CHECK(a->value()->as_integer() == 100);
     setq(a, mknumber(200));
-    CHECK(a->value()->intval() == 200);
+    CHECK(a->value()->as_integer() == 200);
   }
 
   SECTION("low: setqq")
@@ -80,7 +80,7 @@ TEST_CASE("low: low level functions")
     xwhile(mklist("greaterp"_a, "i"_a, 0_l),
       mklist(mklist("setq"_a, "a"_a, mklist("plus"_a, "a"_a, "i"_a)),
         mklist("setq"_a, "i"_a, mklist("difference"_a, "i"_a, 1_l))));
-    CHECK("a"_a->value()->intval() == 6);
+    CHECK("a"_a->value()->as_integer() == 6);
     set("i"_a, 3_l);
     xwhile(mklist("greaterp"_a, "i"_a, 0_l),
       mklist(mklist("setq"_a, "a"_a, mklist("plus"_a, "a"_a, "i"_a)),
@@ -123,17 +123,17 @@ TEST_CASE("low: low level functions")
   SECTION("low: prog1")
   {
     auto r0 = prog1(1_l, mklist(2_l, 3_l, 4_l));
-    CHECK(r0->intval() == 1);
+    CHECK(r0->as_integer() == 1);
     auto r1 = prog1(1_l, mklist(2_l, 3_l, 4_l));
-    CHECK(r1->intval() == 1);
+    CHECK(r1->as_integer() == 1);
   }
 
   SECTION("low: progn")
   {
     auto a0 = progn(mklist(1_l, 2_l, 3_l));
-    CHECK(a0->intval() == 3);
+    CHECK(a0->as_integer() == 3);
     auto a1 = progn(mklist(1_l, 2_l, 3_l));
-    CHECK(a1->intval() == 3);
+    CHECK(a1->as_integer() == 3);
     auto a2 = progn(nil);
     CHECK(a2 == nil);
   }
@@ -151,7 +151,7 @@ TEST_CASE("low: low level functions")
   r)
 )";
     auto r0 = eval(p0);
-    CHECK(r0->intval() == 10);
+    CHECK(r0->as_integer() == 10);
   }
 }
 

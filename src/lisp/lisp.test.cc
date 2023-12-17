@@ -59,7 +59,7 @@ TEST_CASE("lisp: mkprim")
       [&result](lisp_t a) -> lisp_t {
         for(auto p: a)
         {
-          result.push_back(p->intval());
+          result.push_back(p->as_integer());
         }
         return nil;
       },
@@ -140,7 +140,7 @@ TEST_CASE("lisp: literals")
   {
     auto e = "(plus 1 2)"_e;
     REQUIRE(type_of(e) == object::type::Integer);
-    CHECK(e->intval() == 3);
+    CHECK(e->as_integer() == 3);
   }
 }
 
@@ -181,19 +181,19 @@ TEST_CASE("lisp: iter")
 TEST_CASE("lisp: new object")
 {
   lisp_t obj{new object{100}};
-  CHECK(obj->intval() == 100);
+  CHECK(obj->as_integer() == 100);
 }
 
 TEST_CASE("lisp: object move constructor")
 {
   object o{123};
   REQUIRE(type_of(o) == object::type::Integer);
-  CHECK(o.intval() == 123);
+  CHECK(o.as_integer() == 123);
   auto o1 = std::move(o);
   CHECK(type_of(o) == object::type::Nil);
   CHECK(is_nil(o));
   REQUIRE(type_of(o1) == object::type::Integer);
-  CHECK(o1.intval() == 123);
+  CHECK(o1.as_integer() == 123);
 }
 
 } // namespace lisp

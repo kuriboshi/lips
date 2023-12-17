@@ -75,7 +75,7 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   check(begin, object::type::Integer);
   check(end, object::type::Integer, object::type::Nil);
   const auto& s = str->string();
-  auto i = begin->intval();
+  auto i = begin->as_integer();
   if(i == 0)
     return nil;
   auto b = [&]() -> std::string::size_type {
@@ -86,7 +86,7 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   std::string::size_type e{0};
   if(type_of(end) == object::type::Integer)
   {
-    auto j = end->intval();
+    auto j = end->as_integer();
     if(j == 0)
       return nil;
     if(i > j)

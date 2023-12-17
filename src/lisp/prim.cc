@@ -162,7 +162,7 @@ lisp_t eq(lisp_t a, lisp_t b)
 {
   if(a == b)
     return T;
-  if(type_of(a) == object::type::Integer && type_of(b) == object::type::Integer && a->intval() == b->intval())
+  if(type_of(a) == object::type::Integer && type_of(b) == object::type::Integer && a->as_integer() == b->as_integer())
     return T;
   return nil;
 }
@@ -280,7 +280,7 @@ lisp_t closure(lisp_t fun, lisp_t vars)
   c->cfunction = fun;
   c->closed = vars;
   auto f = prim::length(vars);
-  c->count = f->intval();
+  c->count = f->as_integer();
   f = closobj(vars);
   if(f == C_ERROR)
     return f;
@@ -304,7 +304,7 @@ lisp_t nth(lisp_t x, lisp_t p)
   if(is_nil(x))
     return nil;
   check(x, object::type::Cons);
-  return _nth(x, p->intval());
+  return _nth(x, p->as_integer());
 }
 
 lisp_t error(lisp_t mess)
@@ -318,7 +318,7 @@ lisp_t exit(lisp_t status)
   if(is_nil(status))
     throw lisp_finish("exit called", 0);
   check(status, object::type::Integer);
-  throw lisp_finish("exit called", status->intval());
+  throw lisp_finish("exit called", status->as_integer());
 }
 
 namespace pn
