@@ -29,7 +29,7 @@ TEST_CASE("rtable: rmdquote")
   lisp_t in = getobject(ref_file_t::create(R"(he\"llo")"));
   auto hello = rtable::rmdquote(in);
   CHECK(type_of(hello) == object::type::String);
-  CHECK(hello->string() == "he\"llo");
+  CHECK(hello->as_string() == "he\"llo");
 }
 
 TEST_CASE("rtable: rmsquote")

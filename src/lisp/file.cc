@@ -220,11 +220,11 @@ lisp_t prin0(lisp_t a, file_t& file, io::escape esc, std::int64_t current_printl
       if(esc == io::escape::YES)
       {
         file.putch('"');
-        print_string(a->string(), file, esc);
+        print_string(a->as_string(), file, esc);
         file.putch('"');
       }
       else
-        print_string(a->string(), file, io::escape::NO);
+        print_string(a->as_string(), file, io::escape::NO);
       break;
     case object::type::Closure:
       print_pointer("#<closure", file, a);

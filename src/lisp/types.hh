@@ -667,7 +667,7 @@ public:
   void cdr(lisp_t x) { std::get<ref_cons_t>(_u)->cdr = std::move(x); }
 
   /// @brief Character string.
-  auto string() const -> const std::string& { return std::get<ref_string_t>(_u)->value(); }
+  auto as_string() const -> const std::string& { return std::get<ref_string_t>(_u)->value(); }
 
   /// @brief Compiled function (subr).
   auto subr() const -> const subr_t& { return subr_t::get(std::get<subr_index>(_u).index); }

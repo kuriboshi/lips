@@ -68,7 +68,7 @@ lisp_t equal(lisp_t l1, lisp_t l2)
         return nil;
       }
     case object::type::String:
-      return (l1->string() == l2->string()) ? T : nil;
+      return (l1->as_string() == l2->as_string()) ? T : nil;
     case object::type::Lambda:
       return user::funeq(l1, l2);
     case object::type::Integer:

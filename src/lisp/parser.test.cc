@@ -182,7 +182,7 @@ TEST_CASE("parser: (greaterp 1.0 \"b\")")
   REQUIRE(type_of(res) == object::type::Cons);
   CHECK(car(res) == "greaterp"_a);
   CHECK(cadr(res)->as_double() == 1.0);
-  CHECK(caddr(res)->string() == "b");
+  CHECK(caddr(res)->as_string() == "b");
 }
 
 TEST_CASE("parser: nil")
@@ -201,7 +201,7 @@ TEST_CASE("parser: macro")
   auto r = parser(lexer).parse();
   REQUIRE(r);
   REQUIRE(type_of(r) == object::type::String);
-  CHECK(r->string().starts_with("/"));
+  CHECK(r->as_string().starts_with("/"));
 }
 
 TEST_CASE("parser: syntax table")

@@ -31,7 +31,7 @@ lisp_t concat(lisp_t strlist)
   for(auto sl = strlist; !is_nil(sl); sl = sl->cdr())
   {
     check(sl->car(), object::type::String);
-    result += sl->car()->string();
+    result += sl->car()->as_string();
   }
   return mkstring(result);
 }
@@ -41,7 +41,7 @@ lisp_t strcmp(lisp_t s1, lisp_t s2)
 {
   check(s1, object::type::String);
   check(s2, object::type::String);
-  return mknumber(s1->string().compare(s2->string()));
+  return mknumber(s1->as_string().compare(s2->as_string()));
 }
 
 /// @brief T if both strings are equal.
@@ -49,7 +49,7 @@ lisp_t strequal(lisp_t s1, lisp_t s2)
 {
   check(s1, object::type::String);
   check(s2, object::type::String);
-  if(s1->string() == s2->string())
+  if(s1->as_string() == s2->as_string())
     return T;
   return nil;
 }
@@ -66,7 +66,7 @@ lisp_t stringp(lisp_t s)
 lisp_t strlen(lisp_t s)
 {
   check(s, object::type::String);
-  return mknumber(static_cast<int>(s->string().length()));
+  return mknumber(static_cast<int>(s->as_string().length()));
 }
 
 lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
@@ -74,7 +74,7 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   check(str, object::type::String);
   check(begin, object::type::Integer);
   check(end, object::type::Integer, object::type::Nil);
-  const auto& s = str->string();
+  const auto& s = str->as_string();
   auto i = begin->as_integer();
   if(i == 0)
     return nil;
@@ -95,9 +95,9 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   }
   else
     e = std::string::npos;
-  if(b > str->string().length())
+  if(b > str->as_string().length())
     return nil;
-  return mkstring(str->string().substr(b, e));
+  return mkstring(str->as_string().substr(b, e));
 }
 
 lisp_t symstr(lisp_t sym)

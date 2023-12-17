@@ -28,9 +28,9 @@ TEST_CASE("string: concat")
   auto s0 = mkstring("hello ");
   auto s1 = mkstring("world");
   auto s2 = concat(mklist(s0, s1));
-  CHECK(s2->string() == mkstring("hello world")->string());
+  CHECK(s2->as_string() == mkstring("hello world")->as_string());
   auto s3 = concat(mklist(s0, s1));
-  CHECK(s3->string() == mkstring("hello world")->string());
+  CHECK(s3->as_string() == mkstring("hello world")->as_string());
 }
 
 TEST_CASE("string: strcmp")
@@ -68,7 +68,7 @@ TEST_CASE("string: stringp")
     auto s = mkstring("hello");
     auto r0 = stringp(s);
     CHECK(r0 != nil);
-    CHECK(r0->string() == s->string());
+    CHECK(r0->as_string() == s->as_string());
   }
 
   SECTION("stringp(100)")
@@ -94,21 +94,21 @@ TEST_CASE("string: substring")
   {
     auto r = substring(s, mknumber(1), mknumber(5));
     REQUIRE(type_of(r) == object::type::String);
-    CHECK(r->string() == "hello");
+    CHECK(r->as_string() == "hello");
   }
 
   SECTION("substring(s, 7, 11)")
   {
     auto r = substring(s, mknumber(7), mknumber(11));
     REQUIRE(type_of(r) == object::type::String);
-    CHECK(r->string() == "world");
+    CHECK(r->as_string() == "world");
   }
 
   SECTION("substring(s, -1, 5)")
   {
     auto r = substring(s, mknumber(-1), mknumber(5));
     REQUIRE(type_of(r) == object::type::String);
-    CHECK(r->string() == "d");
+    CHECK(r->as_string() == "d");
   }
 
   SECTION("substring(s, 0, 15)")
@@ -127,7 +127,7 @@ TEST_CASE("string: substring")
   {
     auto r = substring(s, mknumber(7), nil);
     REQUIRE(type_of(r) == object::type::String);
-    CHECK(r->string() == "world");
+    CHECK(r->as_string() == "world");
   }
 
   SECTION("substring(s, 7, 6)")
@@ -150,14 +150,14 @@ TEST_CASE("string: symstr")
     auto p = intern("symbol");
     auto r = symstr(p);
     CHECK(type_of(r) == object::type::String);
-    CHECK(r->string() == p->getstr());
+    CHECK(r->as_string() == p->getstr());
   }
 
   SECTION("symstr(nil)")
   {
     auto r = symstr(nil);
     CHECK(type_of(r) == object::type::String);
-    CHECK(r->string() == "nil");
+    CHECK(r->as_string() == "nil");
   }
 }
 

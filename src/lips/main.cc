@@ -209,7 +209,7 @@ lisp_t greet(lisp_t who)
   if(is_nil(who))
     s = getenv("USER");
   else
-    s = who->string();
+    s = who->as_string();
   if(s.empty())
     return nil;
   struct passwd* pws = getpwnam(s.c_str());

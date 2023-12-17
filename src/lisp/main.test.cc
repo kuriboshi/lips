@@ -97,7 +97,7 @@ TEST_CASE("main: reset")
       "throw",
       [](lisp_t a) -> lisp_t {
         check(a, object::type::String);
-        throw std::runtime_error(a->string());
+        throw std::runtime_error(a->as_string());
       },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
     auto old = vm::primin(ref_file_t::create(R"((throw "exception"))"));
@@ -121,7 +121,7 @@ TEST_CASE("main: reset")
         CHECK(topofstack()->environ() == nil);
         // Returning at this point doesn't work so we bail out with an
         // exception.
-        throw std::runtime_error(a->string());
+        throw std::runtime_error(a->as_string());
       },
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
     // Throw inside a lambda so that we have one environment.
