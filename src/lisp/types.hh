@@ -588,8 +588,7 @@ public:
     : _u(integer_t{i})
   {}
 
-  /// @brief Specialization for the plain double type.
-  template<>
+  /// @brief Constructor for the plain double type.
   explicit object(double_t::value_type d)
     : _u(double_t{d})
   {}
