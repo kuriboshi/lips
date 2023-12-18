@@ -21,11 +21,11 @@
 
 TEST_CASE("package_test")
 {
-  auto ctx = std::make_shared<lisp::context_t>();
-  lisp::vm_t vm(ctx);
+  auto ctx = std::make_unique<lisp::context_t>();
+  lisp::vm_t vm(std::move(ctx));
   auto result = vm.eval("(plus 1 2 3)");
   REQUIRE(lisp::type_of(result) == lisp::object::type::Integer);
-  CHECK(result->intval() == 6);
+  CHECK(result->as_integer() == 6);
 }
 
 int main()
