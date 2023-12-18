@@ -307,9 +307,7 @@ inline lisp_t numcheck(lisp_t x, lisp_t y)
   switch(numtype(x, y))
   {
     case num_type::FLOATFLOAT:
-      return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::FLOATINT:
-      return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::INTFLOAT:
       return docheck(x->as_double(), y->as_double(), Comparer<double_t::value_type>());
     case num_type::INTINT:
