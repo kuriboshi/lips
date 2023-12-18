@@ -15,61 +15,86 @@
 // limitations under the License.
 //
 
+/// @file alloc.hh
+///
+/// @brief Collects various functions which are responsible for allocating
+/// objects and managing object life cycle.
+
 #ifndef LISP_ALLOC_HH
 #define LISP_ALLOC_HH
 
+#include <concepts>
 #include <limits>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "details/alloc.hh"
-#include "io.hh"
 #include "types.hh"
-#include "vm.hh"
+#include "vm.hh"                // For error functions
 
 namespace lisp
 {
 
 /// @brief Allocates an object from the list of free objects.
 ///
-/// @return A lisp_t object initialized with a typed object.
+/// The @a getobject functions allocates an @a object and initializes it with
+/// the value passed as an argument to @a getobject.
+///
+/// @tparam T The type to be stored.
+/// @param value A value of a type which can be stored in an @a object.
+///
+/// @returns A lisp_t object initialized with an object of type T.
 template<typename T>
-lisp_t getobject(T x)
+lisp_t getobject(T value)
 {
-  return {new object(x)};
+  return {new object(value)};
 }
 
+/// @brief Partial specialization when T is convertible to an integer.
+///
+/// @tparam T The integer type.
+/// @param value An integer type value convertible to a 64 bit integer.
+///
+/// @returns A lisp_t object initialised to hold an integer value.
 template<typename T> requires std::convertible_to<T, integer_t::value_type>
-lisp_t getobject(T x)
+lisp_t getobject(T value)
 {
-  return {new object(x)};
+  return {new object(value)};
 }
 
-inline lisp_t getobject(double_t::value_type x)
+/// @brief Specialization for a double which then becomes a floating point
+/// object.
+///
+/// @param value A floating point value (double).
+///
+/// @returns A lisp_t object initialized to hold a floating point value.
+template<>
+inline lisp_t getobject(double_t::value_type value)
 {
-  return {new object(x)};
+  return {new object(value)};
 }
 
 /// @brief Create a string.
 ///
-/// @param s The string.
-/// @return A LISP object of type string.
+/// @param str The string.
 ///
-inline lisp_t mkstring(const std::string& s) { return details::alloc::mkstring(s); }
+/// @returns A lisp_t object of type string.
+inline lisp_t mkstring(const std::string& str) { return details::alloc::mkstring(str); }
 
 /// @brief Create an integer number.
 ///
-/// @param number The integer number.
-/// @return An integer number as a LISP object.
+/// @param value The integer number.
 ///
-inline lisp_t mknumber(integer_t::value_type i) { return details::alloc::mknumber(i); }
+/// @returns An integer number as a lisp_t object.
+inline lisp_t mknumber(integer_t::value_type value) { return details::alloc::mknumber(value); }
 
 /// @brief Create a floating point number.
 ///
-/// @param number The floating point number.
-/// @return A floating point number as a LISP object.
+/// @param value The floating point number.
 ///
-inline lisp_t mkfloat(double_t::value_type number) { return details::alloc::mkfloat(number); }
+/// @returns A floating point number as a LISP object.
+inline lisp_t mkfloat(double_t::value_type value) { return details::alloc::mkfloat(value); }
 
 /// @brief Builds a cons cell out of the arguments.
 ///
@@ -79,20 +104,17 @@ inline lisp_t mkfloat(double_t::value_type number) { return details::alloc::mkfl
 /// @param a [in] The value to put in the head (car) of the cons cell.
 /// @param b [in] The value to put in the tail (cdr) of the cons cell.
 ///
-/// @return The cons cell.
-///
+/// @returns The cons cell.
 inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
 
 /// @brief Build a list of symbols in the local symbol table.
 ///
-/// @return Returns a list of local symbols in no particular order.
-///
+/// @returns A list of local symbols in no particular order.
 inline lisp_t obarray() { return details::alloc::obarray(); }
 
 /// @brief Number of free cell in the free cell list.
 ///
-/// @return The number of free cells.
-///
+/// @returns The number of free cells.
 inline lisp_t freecount() { return details::alloc::freecount(); }
 
 /// @brief Make interned symbol in obarray.
@@ -100,6 +122,7 @@ inline lisp_t freecount() { return details::alloc::freecount(); }
 /// Create an interned symbol in the global symbol table.
 ///
 /// @param pname The print name of the symbol.
+///
 /// @returns The symbol as a LISP object.
 inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 
@@ -108,11 +131,29 @@ inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
 /// Currently there is no difference between `intern` and `mkatom` as they both
 /// create a symbol in the global symbol table.
 ///
-/// @return The literal atom.
-///
+/// @returns The literal atom.
 inline lisp_t mkatom(std::string_view s) { return details::alloc::mkatom(s); }
 
 /// @brief Templated function which registers a primary function.
+///
+/// The function registered can have one of the following signatures.
+///
+/// @verbatim
+///   lisp_t fun()
+///   lisp_t fun(lisp_t)
+///   lisp_t fun(lisp_t, lisp_t)
+///   lisp_t fun(lisp_t, lisp_t, lisp_t)
+/// @endverbatim
+///
+/// When called from C++ the arguments are always evaluated since it's
+/// following the C++ conventions.
+///
+/// @param pname Print name.
+/// @param fun The function to register.
+/// @param subr Specifies if the function should evaluate (SUBR) or not (FSUBR)
+/// its arguments.
+/// @param spread Specifies if the function should take a specific number of
+/// arguments (SPREAD) or not (NOSPREAD).
 template<typename Fun>
 void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
@@ -123,16 +164,15 @@ void mkprim(std::string_view pname, Fun fun, enum subr_t::subr subr, enum subr_t
 ///
 /// This function links a variable in lisp with a variable in C++ so that
 /// changing the value in one domain will be reflected in the other.  The lisp
-/// variable will have the print name NAME.  In C++ the type cvariable_t will
-/// work in many contexts which expects a value of type lisp_t.  If assigned to
-/// the lisp value changes if the value is set with setq in lisp the C++ value
-/// will change.
+/// variable will have the print name @a name.  In C++ the type cvariable_t
+/// will work in many contexts which expects a value of type lisp_t.  If
+/// assigned to in C++ the lisp value will change, if the value is set with
+/// setq in lisp the C++ value will change.
 ///
 /// @param name The lisp print name.
 /// @param val The initial value.
 ///
-/// @return A reference of type cvariable which wraps the lisp_t value.
-///
+/// @returns A reference of type cvariable_t which wraps the lisp_t value.
 inline cvariable_t& initcvar(std::string_view name, lisp_t val)
 {
   return details::alloc::initcvar(name, std::move(val));
@@ -145,24 +185,31 @@ inline cvariable_t& initcvar(std::string_view name, lisp_t val)
 /// @param name The lisp print name.
 /// @param val The initial value.
 ///
-/// @return A lisp_t object containing a cvariable_t value.
-///
+/// @returns A lisp_t object containing a cvariable_t value.
 inline lisp_t makecvar(std::string_view name, lisp_t val) { return details::alloc::makecvar(name, std::move(val)); }
 
-/// @brief Terminates the list create function.
-inline lisp_t mklist(lisp_t t) { return cons(std::move(t), nil); }
-
-/// @brief Creates a list from a variadic list of items.
-template<typename... Ts>
-lisp_t mklist(lisp_t t, Ts... ts)
+/// @brief Convenience function which creates a list from a variadic list of
+/// items.
+///
+/// This function takes one or more objects of type lisp_t and creates a list.
+///
+/// @tparam Ts List of types, all of which have to be of type lisp_t.
+/// @param first First object in the list.
+/// @param rest Rest of the list of objects.
+///
+/// @returns The list.
+template<typename... Ts> requires (std::same_as<Ts, lisp_t> && ...)
+lisp_t mklist(lisp_t first, Ts... rest)
 {
-  return cons(t, mklist(ts...));
+  if constexpr(sizeof...(Ts) > 0)
+    return cons(std::move(first), mklist(rest...));
+  return cons(std::move(first), nil);
 }
 
 /// @brief Creates a lisp string.
 inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc::mkstring(s); }
 
-/// @brief Simpler way to create an atom.
+/// @brief Creates an atom.
 inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
@@ -187,9 +234,13 @@ inline lisp_t operator"" _l(long double d)
 /// @brief Evaluates a lisp expression in a string.
 inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }
 
+/// @brief Checks if the parameter is equal to the symbol "t".
 inline bool is_T(const lisp_t& x) { return x == mkatom("t"); }
+/// @brief Checks if the lisp_t value is equal to @a nil.
 inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
+/// @brief Checks if the object value is equal to @a nil.
 inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
+/// @brief Checks if the cvariable_t value is equal to @a nil.
 inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
 
 } // namespace lisp

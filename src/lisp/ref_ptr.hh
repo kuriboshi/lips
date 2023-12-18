@@ -128,7 +128,6 @@ public:
   {
     x._ptr = nullptr;
   }
-  /// @brief Create a ref_ptr<T> with a pointer to an object of type T.
   /// @brief Creates an object of type T and takes ownership of it.
   template<typename... Ts>
   static ref_ptr<T> create(Ts&&... ts)
