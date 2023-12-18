@@ -20,9 +20,10 @@
 
 #include <cstdint>
 #include <array>
+#include <limits>
 #include <numeric>
+#include <utility>
 
-#include "ref_ptr.hh"
 #include "types.hh"
 
 namespace lisp

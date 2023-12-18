@@ -22,15 +22,11 @@
 #include <memory>
 
 #include "ref_ptr.hh"
+#include "syntax.hh"
 #include "types.hh"
 
 namespace lisp
 {
-
-class syntax;
-class file_t;
-class cvariable_t;
-using ref_file_t = ref_ptr<file_t>;
 
 class context_t final
 {
