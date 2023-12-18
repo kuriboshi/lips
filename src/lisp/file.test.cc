@@ -789,4 +789,20 @@ TEST_CASE("file: open error conditions")
   SECTION("open non-existing file") { CHECK_THROWS(open(mkstring("/etc/xyzzy"), nil)); }
 }
 
+TEST_CASE("file: file move assignment")
+{
+  std::ostringstream os;
+  auto out = ref_file_t::create(os);
+  CHECK(out->has_sink());
+  CHECK(!out->has_source());
+  auto file = ref_file_t::create("input");
+  CHECK(file->has_source());
+  CHECK(!file->has_sink());
+  *file = std::move(*out);
+  CHECK(!file->has_source());
+  CHECK(file->has_sink());
+  CHECK(!out->has_source());
+  CHECK(!out->has_sink());
+}
+
 } // namespace lisp

@@ -196,4 +196,22 @@ TEST_CASE("lisp: object move constructor")
   CHECK(o1.as_integer() == 123);
 }
 
+TEST_CASE("lisp: integer_t")
+{
+  SECTION("default constructor")
+  {
+    integer_t value{};
+    CHECK(value.value() == 0);
+  }
+}
+
+TEST_CASE("lisp: double_t")
+{
+  SECTION("default constructor")
+  {
+    double_t value{};
+    CHECK(value.value() == 0.0);
+  }
+}
+
 } // namespace lisp

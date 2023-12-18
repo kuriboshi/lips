@@ -102,15 +102,7 @@ struct token_t final
   /// @brief Default copy constructor.
   token_t(const token_t& t) = default;
   /// @brief Copy and move assignment operator.
-  token_t& operator=(const token_t& t) noexcept
-  {
-    if(this != &t)
-    {
-      type = t.type;
-      token = t.token;
-    }
-    return *this;
-  }
+  token_t& operator=(const token_t& t) noexcept = delete;
   /// @brief The move constructor.
   ///
   /// The moved from token becomes an empty token.
