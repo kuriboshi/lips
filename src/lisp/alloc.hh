@@ -228,7 +228,7 @@ inline lisp_t operator"" _l(long double d)
       error(error_errc::illegal_arg, err);
     }
   }
-  return details::alloc::mkfloat(d);
+  return details::alloc::mkfloat(static_cast<double>(d));
 }
 
 /// @brief Evaluates a lisp expression in a string.

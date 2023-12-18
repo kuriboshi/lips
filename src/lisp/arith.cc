@@ -125,9 +125,8 @@ lisp_t times(lisp_t x)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer)
-        fprod *= x->car()->as_double();
-      else if(type_of(x->car()) == object::type::Float)
+      if(type_of(x->car()) == object::type::Integer
+        || type_of(x->car()) == object::type::Float)
         fprod *= x->car()->as_double();
       else
         error(error_errc::illegal_arg, x->car());

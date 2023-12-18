@@ -291,15 +291,15 @@ bool vm::eval0()
   return true;
 }
 
-lisp_t vm::apply(lisp_t f, lisp_t x)
+lisp_t vm::apply(lisp_t fun, lisp_t args)
 {
   push(_dest);
   _dest = mkdestblock(1);
   push(_fun);
-  _fun = f;
+  _fun = fun;
   push(_args);
-  _args = x;
-  _expression = cons(f, x);
+  _args = args;
+  _expression = cons(fun, args);
   push(&vm::apply0);
   _cont = &vm::eval_apply;
   try
