@@ -76,9 +76,12 @@ test-linux:
 	cmake --build --preset debug --target test-linux
 
 # Run the unit tests.
-.PHONE: test
+.PHONY: test
 test: debug
 	ctest --preset default
+
+ubuntu20 ubuntu22 ubuntu22-tidy ubuntu22-clang:
+	cmake --build --preset debug --target $@
 
 # Run the benchmark tests.
 .PHONY: benchmark
