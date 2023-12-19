@@ -37,8 +37,9 @@
         {
             "name": "xcode",
             "displayName": "XCode preset",
-            "generator": "Xcode",
+            "description": "Release build using Xcode generator",
             "binaryDir": "${sourceDir}/build/xcode",
+            "generator": "Xcode",
             "cacheVariables": {
                 "LIPS_ENABLE_TESTS": "ON"
             }
@@ -48,6 +49,7 @@
             "inherits": "debug",
             "displayName": "Makefile preset",
             "description": "Debug build using make",
+            "binaryDir": "${sourceDir}/build/make",
             "generator": "Unix Makefiles",
             "cacheVariables": {
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
@@ -83,6 +85,18 @@
                 "CMAKE_CXX_COMPILER": "clang++",
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
+        },
+        {
+            "name": "llvm",
+            "inherits": "debug",
+            "displayName": "Build with llvm clang",
+            "description": "Build with the llvm clang compiler",
+            "binaryDir": "${sourceDir}/build/llvm",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/opt/homebrew/opt/llvm/bin/clang",
+                "CMAKE_CXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++",
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
+            }
         }
     ],
     "buildPresets": [
@@ -113,6 +127,10 @@
         {
             "name": "clang",
             "configurePreset": "clang"
+        },
+        {
+            "name": "llvm",
+            "configurePreset": "llvm"
         }
     ],
     "testPresets": [
@@ -143,6 +161,11 @@
         {
             "name": "clang",
             "configurePreset": "clang",
+            "inherits": "default"
+        },
+        {
+            "name": "llvm",
+            "configurePreset": "llvm",
             "inherits": "default"
         },
         {

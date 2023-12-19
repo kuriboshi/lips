@@ -33,6 +33,16 @@ build/clang/CMakeCache.txt:
 clang: clang.config
 	cmake --build --preset clang
 
+# Build with the llvm clang compiler
+.PHONY: llvm.config
+.PHONY: llvm
+llvm.config: build/llvm/CMakeCache.txt
+
+build/llvm/CMakeCache.txt:
+	cmake --preset llvm
+
+llvm: llvm.config
+	cmake --build --preset llvm
 
 # Build using clang-tidy to analyse the code.
 .PHONY: tidy.config

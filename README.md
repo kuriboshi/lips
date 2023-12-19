@@ -6,7 +6,7 @@ Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 2.1.0
+Version 3.0.0
 
 ## What is it?
 
@@ -42,20 +42,46 @@ published in the book _Anatomy of LISP_[4].
 
 The code requires C++20 and CMake 3.21 or newer.
 
-## Platforms
+### Platforms
 
-The project is developed primarily on macOS 13 (Ventura) using the
-Apple clang version 14 compiler.  It may work on older releases of
-macOS if you install a newer compiler.  It's tested regularly on
-Ubuntu 20.04 and 22.04. Testing on Ubuntu is done using gcc 11.x, gcc
-12.x and clang 14.x.
+The project is developed primarily on macOS 14 (Sonoma) using the
+Apple clang version 15 compiler.
+
+At the time of writing `lips` has been tested on the following
+platforms and compilers. Older platforms may work as long as you
+install a new enough compiler. Older compilers may also work depending
+on their level of support for C++-20.
+
+| OS Version   | Compiler Version  |
+|--------------|-------------------|
+| macOS 14.1.2 | AppleClang 15.0.0 |
+| macOS 14.1.2 | clang 17.0.6      |
+| Ubuntu 20.04 | gcc 11.4.0        |
+| Ubuntu 22.04 | gcc 12.3.0        |
+| Ubuntu 22.04 | clang 14.0.0      |
+
+### External Dependencies
+
+`lips` depends on two external libraries which are downloaded and
+built as part of the build.
+
+| Library Name | Version |
+|--------------|---------|
+| Catch2       | 3.3.2   |
+| fmt          | 9.1.0   |
+
+System libraries dependencies.
+
+| Library Name |
+|--------------|
+| ncurses      |
 
 ## Building
 
 Configure and build using `cmake`. The `default` preset uses `ninja`
-to build.
+to build. There is a preset named `make` which uses `make` to build.
 
-```
+```sh
 cmake --preset default
 cmake --build --preset default
 ```
@@ -75,22 +101,33 @@ Turn them on by adding `-D` options to the `cmake` command.
 There is a `Makefile` in the top directory which runs `cmake` and
 `ctest` for some common scenerios.
 
-## External Dependencies
-
-Lips depends on two external libraries.
-
-- Catch2 (version 3.3.2)
-- fmt (version 9.1.0)
-
-These dependencies are downloaded and included in the build
-automatically.
+| Make Target      | Description                                |
+|------------------|--------------------------------------------|
+| `all` or `debug` | Debug build                                |
+| `release`        | Optimized build                            |
+| `clang`          | Build with `clang`                         |
+| `llvm`           | Build with `llvm` version of clang (macOS) |
+| `tidy`           | Turn on `clang-tidy` checks                |
+| `xcode`          | Create a configuration for Xcode           |
+| `coverage`       | Produce a coverage report                  |
+| `format`         | Run `clang-format` on the source files     |
+| `copyright`      | Update copyright notice                    |
+| `test-linux`     | Run all Linux tests in docker              |
+| `benchmark`      | Run benchmarks                             |
+| `package_test`   | Test using `lips` as an external library   |
 
 ## Unit Testing
 
 Native testing on the host is triggered by the `ctest` command. For example
 
-```
+```sh
 ctest --preset default
+```
+
+or
+
+```sh
+make test
 ```
 
 ### GitHub workflows
@@ -102,21 +139,24 @@ and 22.
 ### Local testing
 
 For local testing there are some docker files in the `test` directory
-which can be used for testing on various platforms. Currently there
-are files for Ubuntu 20.04 and 22.04. For 20.04 the version of gcc is
-11 and for 22.04 it's gcc 12. The 22.04 version also installs clang
-14.
+which can be used for testing on various platforms.  Runing the
+following command builds and tests on all the above operating systems
+and compiler combinations.
 
-Runing the following command builds and tests on all the above
-operating systems and compiler combinations.
-
-```
+```sh
 cmake --preset default --target test-linux
+```
+
+or
+
+```sh
+make test-linux
 ```
 
 On macOS `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
-same as for `docker`.
+same as for `docker`. However, `podman` seems a lot less stable than
+`docker` and may not work properly.
 
 ## Implementation Notes
 
@@ -137,7 +177,7 @@ using a memory pool for an optimized build. Here is an example of a
 test run on a Mac mini (2018). Benchmarks are run using `make
 benchmark.`
 
-```
+```text
 1: benchmark name           samples       iterations    estimated
 1:                          mean          low mean      high mean
 1:                          std dev       low std dev   high std dev
