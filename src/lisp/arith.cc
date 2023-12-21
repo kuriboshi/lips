@@ -39,8 +39,7 @@ lisp_t plus(lisp_t x)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer
-        || type_of(x->car()) == object::type::Float)
+      if(type_of(x->car()) == object::type::Integer || type_of(x->car()) == object::type::Float)
         fsum += x->car()->as_double();
       else
         error(error_errc::illegal_arg, x->car());
@@ -125,8 +124,7 @@ lisp_t times(lisp_t x)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer
-        || type_of(x->car()) == object::type::Float)
+      if(type_of(x->car()) == object::type::Integer || type_of(x->car()) == object::type::Float)
         fprod *= x->car()->as_double();
       else
         error(error_errc::illegal_arg, x->car());

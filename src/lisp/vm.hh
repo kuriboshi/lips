@@ -418,7 +418,6 @@ private:
 
 /// @brief The concept required by the Context parameter to vm_t.
 ///
-/// 
 template<typename T>
 concept Context = requires(T v, integer_t::value_type i, std::error_code code, const std::string& str, lisp_t exp,
   std::unique_ptr<syntax> syn, ref_file_t file) {

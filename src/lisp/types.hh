@@ -154,7 +154,7 @@ auto make_tuple(const std::vector<lisp_t>& values, std::index_sequence<Sequence.
 /// @param values A vector with zero or more lisp_t values.
 ///
 /// @returns A tuple with the values from the vector @a values.
-template<typename ...Result>
+template<typename... Result>
 std::tuple<Result...> make_tuple(const std::vector<lisp_t>& values)
 {
   return make_tuple<Result...>(values, std::make_index_sequence<sizeof...(Result)>());
@@ -180,19 +180,19 @@ public:
 /// The stored function can be called either via a variadic operator() or an
 /// operator() taking a vector of arguments.
 template<typename... Args>
-class func_t : public func_base
+class func_t: public func_base
 {
 public:
-  func_t(std::function<lisp_t(Args...)> fun) : _fun(fun) {}
-  lisp_t operator()(Args&&... args) const
-  {
-    return _fun(std::forward<Args>(args)...);
-  }
+  func_t(std::function<lisp_t(Args...)> fun)
+    : _fun(fun)
+  {}
+  lisp_t operator()(Args&&... args) const { return _fun(std::forward<Args>(args)...); }
   lisp_t operator()(const std::vector<lisp_t>& vec) const override
   {
     return std::apply(_fun, make_tuple<std::remove_cvref_t<Args>...>(vec));
   }
   std::size_t argcount() const noexcept override { return sizeof...(Args); }
+
 private:
   std::function<lisp_t(Args...)> _fun;
 };
@@ -210,7 +210,10 @@ private:
 ///
 /// @returns A pointer to @a func_base which can then be stored in a subr_t.
 template<typename... Args>
-auto make_fun(lisp_t(*fun)(Args...)) { return new func_t<Args...>(fun); }
+auto make_fun(lisp_t (*fun)(Args...))
+{
+  return new func_t<Args...>(fun);
+}
 
 /// @brief Helper function to create a func_base pointer for lambdas.
 ///
@@ -220,7 +223,7 @@ auto make_fun(lisp_t(*fun)(Args...)) { return new func_t<Args...>(fun); }
 ///
 /// @returns A pointer to @a func_base which can then be stored in a subr_t.
 template<typename Lambda, typename... Args>
-auto make_fun(Lambda fun, lisp_t(Lambda::*)(Args...) const)
+auto make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 {
   return new func_t<Args...>(fun);
 }
@@ -439,11 +442,19 @@ class integer_t final
 public:
   using value_type = std::int64_t;
 
-  integer_t() : _value(0) {}
-  explicit integer_t(value_type i) : _value(i) {}
+  integer_t()
+    : _value(0)
+  {}
+  explicit integer_t(value_type i)
+    : _value(i)
+  {}
   operator value_type() const { return _value; }
 
-  integer_t& operator=(value_type i) { _value = i; return *this; }
+  integer_t& operator=(value_type i)
+  {
+    _value = i;
+    return *this;
+  }
 
   value_type value() const { return _value; }
 
@@ -457,11 +468,19 @@ class double_t final
 public:
   using value_type = double;
 
-  double_t() : _value(0.0) {}
-  explicit double_t(value_type d) : _value(d) {}
+  double_t()
+    : _value(0.0)
+  {}
+  explicit double_t(value_type d)
+    : _value(d)
+  {}
   operator value_type() const { return _value; }
 
-  double_t& operator=(value_type d) { _value = d; return *this; }
+  double_t& operator=(value_type d)
+  {
+    _value = d;
+    return *this;
+  }
 
   value_type value() const { return _value; }
 
@@ -693,7 +712,8 @@ public:
   {}
 
   /// @brief Specialization for plain integer types.
-  template<typename T> requires std::convertible_to<T, integer_t::value_type>
+  template<typename T>
+    requires std::convertible_to<T, integer_t::value_type>
   explicit object(T i)
     : _u(integer_t{i})
   {}

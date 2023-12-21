@@ -31,7 +31,7 @@
 
 #include "details/alloc.hh"
 #include "types.hh"
-#include "vm.hh"                // For error functions
+#include "vm.hh" // For error functions
 
 namespace lisp
 {
@@ -57,7 +57,8 @@ lisp_t getobject(T value)
 /// @param value An integer type value convertible to a 64 bit integer.
 ///
 /// @returns A lisp_t object initialised to hold an integer value.
-template<typename T> requires std::convertible_to<T, integer_t::value_type>
+template<typename T>
+  requires std::convertible_to<T, integer_t::value_type>
 lisp_t getobject(T value)
 {
   return {new object(value)};
@@ -198,7 +199,8 @@ inline lisp_t makecvar(std::string_view name, lisp_t val) { return details::allo
 /// @param rest Rest of the list of objects.
 ///
 /// @returns The list.
-template<typename... Ts> requires (std::same_as<Ts, lisp_t> && ...)
+template<typename... Ts>
+  requires(std::same_as<Ts, lisp_t> && ...)
 lisp_t mklist(lisp_t first, Ts... rest)
 {
   if constexpr(sizeof...(Ts) > 0)
@@ -213,7 +215,10 @@ inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc:
 inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp_t operator"" _l(unsigned long long i) { return details::alloc::mknumber(static_cast<integer_t::value_type>(i)); }
+inline lisp_t operator"" _l(unsigned long long i)
+{
+  return details::alloc::mknumber(static_cast<integer_t::value_type>(i));
+}
 
 /// @brief Creates a floating point value.
 inline lisp_t operator"" _l(long double d)

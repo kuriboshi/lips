@@ -293,8 +293,7 @@ void top::init()
 {
   variables = std::make_unique<cvariables>();
   mkprim(
-    pn::PRINTHIST, []() -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL,
-    subr_t::spread::NOSPREAD);
+    pn::PRINTHIST, []() -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 
