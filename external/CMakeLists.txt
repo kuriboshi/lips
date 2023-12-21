@@ -33,12 +33,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR}/cmake)
 include(cmake-external)
 
 cmake_external(catch2
-  URL https://github.com/catchorg/Catch2/archive/v3.3.2.tar.gz
-  SHA256 8361907f4d9bff3ae7c1edb027f813659f793053c99b67837a0c0375f065bae2
+  URL https://github.com/catchorg/Catch2/archive/v3.5.0.tar.gz
+  SHA256 f6d4f8d78a9b59ec72a81d49f58d18eb317372ac07f8d9432710a079e69fd66a
 )
 
 cmake_external(fmt
-  URL https://github.com/fmtlib/fmt/archive/9.1.0.tar.gz
-  SHA256 5dea48d1fcddc3ec571ce2058e13910a0d4a6bab4cc09a809d8b1dd1c88ae6f2
+  URL https://github.com/fmtlib/fmt/archive/10.1.1.tar.gz
+  SHA256 78b8c0a72b1c35e4443a7e308df52498252d1cefc2b08c9a97bc9ee6cfe61f8b
   DEFINE FMT_DOC=OFF FMT_TEST=OFF
 )

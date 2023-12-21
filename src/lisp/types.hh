@@ -469,6 +469,8 @@ private:
   value_type _value;
 };
 
+inline auto format_as(integer_t value) { return value.value(); }
+
 /// @brief Wraps an floating point value.
 class double_t final
 {
@@ -494,6 +496,8 @@ public:
 private:
   value_type _value;
 };
+
+inline auto format_as(double_t value) { return value.value(); }
 
 class string_t final: public ref_count<string_t>
 {
@@ -660,9 +664,9 @@ public:
   }
 
   template<typename... Ts>
-  void format(std::string_view f, Ts&&... t)
+  void format(std::string_view f, const Ts&... t)
   {
-    auto ret = fmt::vformat(f, fmt::make_format_args(std::forward<Ts>(t)...));
+    auto ret = fmt::vformat(f, fmt::make_format_args(t...));
     _sink->puts(ret);
   }
 

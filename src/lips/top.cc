@@ -38,7 +38,7 @@ void top::phist()
 {
   for(auto hl: variables->history())
   {
-    std::cout << fmt::format("{}.\t", hl->car()->as_integer());
+    primout()->format("{}.\t", hl->car()->as_integer());
     prinbody(hl->cdr(), *vm::stdout(), io::escape::YES);
     primout()->terpri();
   }
