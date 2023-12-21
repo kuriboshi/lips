@@ -1,20 +1,31 @@
 # Release notes
 
-## 2.1.0
+## 3.0.0
 
-This release is almost exclusively for correcting problems identified
-by `clang-tidy`.
+- Turn on clang-tidy for all header files
+- Turn on many more clang-tidy warnings and fix them
+- Rename some accessor functions:
+  - intval -> as_integer
+  - floatval -> as_double
+  - symbol -> as_symbol
+  - string -> as_string
+- Rename ltimes -> times
+- The vm class now owns the Conext using unique_ptr
+- Move file_t class from io.hh to file.hh
+- Make it possible to have functions with any fixed number of
+  arguments
+- Primitives can now accept const references as arguments
+- Introduced some use of C++-20 concepts
+- Add more Doxygen style comments
 
-- Turn on some more clang-tidy warnings and fix them
-
-## 2.0.3
+## 2.0.3 (2023-08-20)
 
 - Turn on some more clang-tidy warnings and fix them
 - Upgrade cmake-external to v1.1.0
 - Build on local filesystem for the test-linux target
 - Separate job related code in exec.cc into job.[cc,hh]
 
-## 2.0.2
+## 2.0.2 (2023-07-23)
 
 Minor release to fix some build issues
 
@@ -22,13 +33,13 @@ Minor release to fix some build issues
 - tidy: Fix issues raised by clang-tidy
 - build: Fix building on gitlab
 
-## 2.0.1
+## 2.0.1 (2023-07-16)
 
 - build: Use cmake-external for external dependencies (downloaded from external repo)
 - Upgrade Catch2 to version 3.3.2
 - test: Remove the use of sshfs on macOS
 
-## 2.0.0
+## 2.0.0 (2023-02-26)
 
 Major refactoring and reorganization of the source code.
 
@@ -63,11 +74,11 @@ Major refactoring and reorganization of the source code.
 - Use `std::error_code` for error messages
 - Use `std::string_view` in more places
 
-## 1.0.4
+## 1.0.4 (2022-08-23)
 
 - Turn on CMake policy CMP0135
 
-## 1.0.3
+## 1.0.3 (2022-07-18)
 
 - Fixed how lips is used as a library
 - Prefix all read macro functions with `rm`
@@ -75,7 +86,7 @@ Major refactoring and reorganization of the source code.
 - Split some header files into `details`; this makes it possible to
   change the namespace name `Map` to `map`
 
-## 1.0.2
+## 1.0.2 (2022-07-16)
 
 - Added support for FreeBSD
 - Changed internal `eval::pop` function to take a parameter in order
@@ -84,7 +95,7 @@ Major refactoring and reorganization of the source code.
 - Renamed `absval` to `abs`
 - Use `cmake_external` when introducing external library dependencies
 
-## 1.0.1
+## 1.0.1 (2022-06-21)
 
 - Added clang-tidy rules, cmake preset, and target
 - Added cmake-format target
@@ -93,7 +104,7 @@ Major refactoring and reorganization of the source code.
 - Formatted files using cmake-format
 - Included the complete text of the Apache 2.0 license
 
-## 1.0.0
+## 1.0.0 (2022-06-15)
 
 First release of C++ version of lips. Here are a few highlights of the
 changes.
