@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 
 #include <fmt/format.h>
@@ -166,6 +167,14 @@ class func_base
 public:
   /// @brief Default constructor.
   func_base() = default;
+  /// @brief Delete copy constructor.
+  func_base(const func_base&) = delete;
+  /// @brief Delete move constructor.
+  func_base(func_base&&) = delete;
+  /// @brief Delete copy assignment.
+  func_base& operator=(const func_base&) = delete;
+  /// @brief Delete move assignment.
+  func_base& operator=(func_base&&) = delete;
   /// @brief Default virtual destructor.
   virtual ~func_base() = default;
   /// @brief Returns the number of arguments.
@@ -184,7 +193,7 @@ class func_t: public func_base
 {
 public:
   func_t(std::function<lisp_t(Args...)> fun)
-    : _fun(fun)
+    : _fun(std::move(fun))
   {}
   lisp_t operator()(Args&&... args) const { return _fun(std::forward<Args>(args)...); }
   lisp_t operator()(const std::vector<lisp_t>& vec) const override
