@@ -163,8 +163,8 @@ make test-linux
 
 On macOS `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
-same as for `docker`. However, `podman` seems a lot less stable than
-`docker` and may not work properly.
+same as for `docker`.
+**Note: `podman` support is currently not working**
 
 ## Implementation Notes
 

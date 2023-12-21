@@ -2,7 +2,7 @@
 
 ## 3.0.0
 
-- Turn on clang-tidy for all header files
+- Turn on clang-tidy for all header files (minimum version is 17)
 - Turn on many more clang-tidy warnings and fix them
 - Rename some accessor functions:
   - intval -> as_integer
@@ -10,15 +10,20 @@
   - symbol -> as_symbol
   - string -> as_string
 - Rename ltimes -> times
-- The vm class now owns the Conext using unique_ptr
+- The vm class now owns the Context using unique_ptr
 - Move file_t class from io.hh to file.hh
 - Make it possible to have functions with any fixed number of
   arguments
 - Primitives can now accept const references as arguments
 - Introduced some use of C++-20 concepts
 - Add more Doxygen style comments
+- Upgrade Catch2 to 3.5.0
+- Upgrade fmt to 10.1.1
+- 
 
 ## 2.0.3 (2023-08-20)
+
+Minor bug fix release
 
 - Turn on some more clang-tidy warnings and fix them
 - Upgrade cmake-external to v1.1.0
