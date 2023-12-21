@@ -60,6 +60,8 @@ on their level of support for C++-20.
 | Ubuntu 22.04 | gcc 12.3.0        |
 | Ubuntu 22.04 | clang 14.0.0      |
 
+The minimum version of `clang-tidy` is 17.
+
 ### External Dependencies
 
 `lips` depends on two external libraries which are downloaded and
@@ -84,6 +86,12 @@ to build. There is a preset named `make` which uses `make` to build.
 ```sh
 cmake --preset default
 cmake --build --preset default
+```
+
+or
+
+```sh
+make
 ```
 
 There are a number of options available to customize the build.
