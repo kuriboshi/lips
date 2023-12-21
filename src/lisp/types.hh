@@ -196,26 +196,32 @@ private:
 ///
 /// @returns A pointer to @a func_base which can then be stored in a subr_t.
 template<typename... Args>
-func_base* make_fun(lisp_t(*fun)(Args...)) { return new func_t<Args...>(fun); }
+auto make_fun(lisp_t(*fun)(Args...)) { return new func_t<Args...>(fun); }
 
-/// @brief Helper function to create a func_base in a more general case.
+/// @brief Helper function to create a func_base pointer for lambdas.
 ///
+/// @tparam Lambda The lambda function type.
 /// @tparam Args The zero or more function argument types.
-/// @param fun The std::function object.
+/// @param fun The lambda function.
 ///
 /// @returns A pointer to @a func_base which can then be stored in a subr_t.
-template<typename... Args>
-func_base* make_fun(std::function<lisp_t(Args...)> fun) { return new func_t<Args...>(fun); }
+template<typename Lambda, typename... Args>
+auto make_fun(Lambda fun, lisp_t(Lambda::*)(Args...) const)
+{
+  return new func_t<Args...>(fun);
+}
 
-/// @brief Create a func_base pointer for function objects other than function
-/// pointers.
+/// @brief Create a func_base pointer for lambdas.
 ///
-/// @tparam Args The zero or more function argument types.
-/// @param fun The std::function object.
+/// @tparam Lambda The lambda function type.
+/// @param fun The lambda function.
 ///
 /// @returns A pointer to @a func_base which can then be stored in a subr_t.
-template<typename F, typename... Args>
-func_base* make_fun(F&& fun) { return make_fun(std::function<lisp_t(Args...)>(fun)); }
+template<typename Lambda>
+auto make_fun(Lambda&& fun)
+{
+  return make_fun(std::forward<Lambda>(fun), &Lambda::operator());
+}
 
 /// @Brief Structure describing a built-in function.
 ///
