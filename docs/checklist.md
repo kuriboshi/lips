@@ -1,5 +1,3 @@
-[comment]: # (-*- markdown -*-)
-
 # Tasks to perform a release
 
 - Run `make format`

@@ -217,18 +217,20 @@ benchmark.`
 
 ## References
 
-[1] _Interlisp Reference Manual_, Xerox, 1983.<br>
-[2] Guy L. Steele, _Common Lisp the Language_, 2nd edition, Digital Press, 1990.<br>
-[3] H. Abelson, G. Sussman, and J. Sussman, _Structure and Interpretation of Computer Programs_, MIT Press, 1985.<br>
-[4] Allen, John, _Anatomy of LISP_, McGraw-Hill, Inc, 1978.
+- [1] _Interlisp Reference Manual_, Xerox, 1983.
+- [2] Guy L. Steele, _Common Lisp the Language_, 2nd edition, Digital
+Press, 1990.
+- [3] H. Abelson, G. Sussman, and J. Sussman, _Structure and
+Interpretation of Computer Programs_, MIT Press, 1985.
+- [4] Allen, John, _Anatomy of LISP_, McGraw-Hill, Inc, 1978.
 
-# License
+## License
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,

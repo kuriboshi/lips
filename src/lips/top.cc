@@ -116,7 +116,7 @@ lisp_t top::transform(lisp_t list)
 }
 
 /*
- * Expands aliases in expression EXP. If car of EXP is a literal atom 
+ * Expands aliases in expression EXP. If car of EXP is a literal atom
  * findalias checks for an alias substitution on property ALIAS. If
  * it is non-nil another expansion is tried until the alias property
  * is nil. Alias looping is detected by saving each expanded atom

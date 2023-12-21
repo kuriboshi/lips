@@ -1,7 +1,7 @@
 (defineq
     (pp
      (nlambda funs
-              (mapc funs 
+              (mapc funs
                     (lambda (name)
                       (pp1 (list name (getrep (eval name))) 0)))
               (terpri)
@@ -53,7 +53,7 @@
         (prin2 (car exp))
         (ppcond (cdr exp) indent))
        (t (ppfun exp indent)))))
-  
+
   (pplam
    (lambda (exp indent)
      (prin1 " ")

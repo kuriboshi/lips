@@ -224,7 +224,7 @@ int term_source::outc(int c)
   return c;
 }
 
-/* 
+/*
  * retype - If ALL is 0 then retype only current line.  If ALL is 1 then retype
  *          complete line, including prompt.  It ALL is 2 just delete all
  *          lines.  Used for ctrl-u kill.

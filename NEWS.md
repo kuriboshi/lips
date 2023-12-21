@@ -19,7 +19,6 @@
 - Add more Doxygen style comments
 - Upgrade Catch2 to 3.5.0
 - Upgrade fmt to 10.1.1
-- 
 
 ## 2.0.3 (2023-08-20)
 

@@ -163,7 +163,7 @@
         instead it returns nil if not integer or zero. New function ABS.
         ATTACH now return (cons obj) if list is nil. Lispread failed to
         check for eof everywhere. SETENV couldn't handle new environment
-        variables. 
+        variables.
 
 104	Fri Mar 10 19:47:37 1989  Krister Joas  (krijo@mina)
         print printed nothing for 0 and negative arguments.
@@ -174,7 +174,7 @@
         in eval, but a global list of names already expanded in the
         current command is kept. Cleaned up eval.c a bit. Error
         handling is a bit cleaner. Fixed a few bugs in PRETTY.
-        
+
 103     890309  krijo
         All error messages uses a constant defined in error.h
         as the error message. The constant also defines whether
@@ -379,7 +379,7 @@
 
 66      880709  krijo
         Each function that does a fork (and maybe an exec) waits for
-        its own process.      
+        its own process.
 
 65      880708  krijo
         Full implementation of internal readmacros.
