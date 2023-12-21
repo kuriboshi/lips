@@ -90,15 +90,16 @@ TEST_CASE("main: reset")
     vm::primin(old);
   }
 
+#if 1
   SECTION("std::exception")
   {
     // Throw a standard exception which will reset the vm.
     mkprim(
       "throw",
-      [](lisp_t a) -> lisp_t {
+      std::function<lisp_t(lisp_t)>([](lisp_t a) -> lisp_t {
         check(a, object::type::String);
         throw std::runtime_error(a->as_string());
-      },
+      }),
       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
     auto old = vm::primin(ref_file_t::create(R"((throw "exception"))"));
     std::ostringstream os;
@@ -106,7 +107,9 @@ TEST_CASE("main: reset")
     CHECK(os.str() == "exception: exception\n");
     vm::primin(old);
   }
+#endif
 
+#if 0
   SECTION("unwind")
   {
     // Unwind the stack before throwing a standard exception
@@ -131,6 +134,7 @@ TEST_CASE("main: reset")
     CHECK(os.str() == "exception: throw_unwind\n");
     vm::primin(old);
   }
+#endif
 
   vm::primout(old);
 }

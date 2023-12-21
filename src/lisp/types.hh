@@ -22,7 +22,9 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <ranges>
 #include <sstream>
+#include <span>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -132,7 +134,90 @@ public:
   lisp_t val() const { return std::get<var_val_pair>(u).val; }
 };
 
-/// @brief Structure describing a built-in function.
+template<typename... Result, std::size_t... Indices>
+auto make_tuple(const std::vector<lisp_t>& v, std::index_sequence<Indices...>)
+{
+  return std::make_tuple(v[Indices]...);
+}
+
+template<typename ...Result>
+std::tuple<Result...> make_tuple(const std::vector<lisp_t>& values)
+{
+  return make_tuple<Result...>(values, std::make_index_sequence<sizeof...(Result)>());
+}
+
+/// @brief Base class for type erasure of the lisp function.
+class func_base
+{
+public:
+  /// @brief Default constructor.
+  func_base() = default;
+  /// @brief Default virtual destructor.
+  virtual ~func_base() = default;
+  /// @brief Returns the number of arguments.
+  virtual std::size_t argcount() const noexcept = 0;
+  /// @brief Calls the stored function with the arguments in the vector.
+  virtual lisp_t operator()(const std::vector<lisp_t>&) const = 0;
+};
+
+/// @brief This class can store a function object with a variable number of
+/// arguments.
+///
+/// The stored function can be called either via a variadic operator() or an
+/// operator() taking a vector of arguments.
+template<typename... Args>
+class func_t : public func_base
+{
+public:
+  func_t(std::function<lisp_t(Args...)> fun) : _fun(fun) {}
+  lisp_t operator()(Args&&... args) const
+  {
+    return _fun(std::forward<Args>(args)...);
+  }
+  lisp_t operator()(const std::vector<lisp_t>& vec) const override
+  {
+    return std::apply(_fun, make_tuple<std::remove_cvref_t<Args>...>(vec));
+  }
+  std::size_t argcount() const noexcept override { return sizeof...(Args); }
+private:
+  std::function<lisp_t(Args...)> _fun;
+};
+
+/// @brief The @a make_fun set of overloads creates an object of type func_t<Args...>.
+///
+/// The object created can then be stored in the subr_t object and later called
+/// with the right number of parameters. There are three overloads taking care
+/// of different cases of functions.
+///
+/// The first one handles simple function pointers.
+///
+/// @tparam Args The zero or more function argument types.
+/// @param fun The function pointer.
+///
+/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+template<typename... Args>
+func_base* make_fun(lisp_t(*fun)(Args...)) { return new func_t<Args...>(fun); }
+
+/// @brief Helper function to create a func_base in a more general case.
+///
+/// @tparam Args The zero or more function argument types.
+/// @param fun The std::function object.
+///
+/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+template<typename... Args>
+func_base* make_fun(std::function<lisp_t(Args...)> fun) { return new func_t<Args...>(fun); }
+
+/// @brief Create a func_base pointer for function objects other than function
+/// pointers.
+///
+/// @tparam Args The zero or more function argument types.
+/// @param fun The std::function object.
+///
+/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+template<typename F, typename... Args>
+func_base* make_fun(F&& fun) { return make_fun(std::function<lisp_t(Args...)>(fun)); }
+
+/// @Brief Structure describing a built-in function.
 ///
 /// Built-in function can have zero, one, two, or three parameters.  They can
 /// either evaluate their parameters or not (special forms).  Function can be
@@ -165,13 +250,13 @@ public:
   /// an indicator to tell if the arguments are to be evaluated or not, and the
   /// spread/no spread indicator.
   ///
+  /// @tparam Args The zero or more function argument types.
   /// @param pname The print name.
-  /// @param fun The function which can take zero, one, two, or three
-  /// parameters.
+  /// @param fun A function which can take zero or more arguments.
   /// @param subr The eval/noeval indicator (subr or fsubr (special form)).
   /// @param spread Spread/no spread.
-  template<typename Fun>
-  subr_t(std::string_view pname, Fun fun, enum subr subr, enum spread spread)
+  template<typename... Args>
+  subr_t(std::string_view pname, func_base* fun, enum subr subr, enum spread spread)
     : name(pname),
       subr(subr),
       spread(spread),
@@ -193,30 +278,34 @@ public:
 
   /// @brief Number of arguments.
   ///
-  /// @returns The argument count 0 - 3.
-  constexpr std::size_t argcount() const noexcept { return _fun.index() % 4; }
+  /// @returns The argument count.
+  std::size_t argcount() const noexcept { return _fun->argcount(); }
 
   /// @brief Call the stored function. The lisp_t arguments to the function are
   /// taken from the destination block.
+  ///
+  /// @param dest A destination block.
+  ///
+  /// @returns The result of calling the function.
   lisp_t operator()(destblock_t* dest) const;
 
+  /// @brief The vector type storing the subr functions.
   using subr_vector = std::vector<subr_t>;
+  /// @brief The index type.
   using subr_index = subr_vector::size_type;
 
   /// @brief Register a primitive function (subr).
   ///
-  /// @return The index to uniquely identify the function.
-  static subr_index put(const subr_t& subr);
+  /// @returns The index which uniquely identifies the function.
+  static subr_index put(subr_t&& subr);
   /// @brief Retrieve a primitive function given its index.
+  ///
+  /// @returns A const subr_t object reference used for inspection.
   static const subr_t& get(subr_index index) { return subr_store[index]; }
 
 private:
-  using func0_t = std::function<lisp_t()>;
-  using func1_t = std::function<lisp_t(lisp_t)>;
-  using func2_t = std::function<lisp_t(lisp_t, lisp_t)>;
-  using func3_t = std::function<lisp_t(lisp_t, lisp_t, lisp_t)>;
-
-  std::variant<func0_t, func1_t, func2_t, func3_t> _fun;
+  /// @brief The subr_t object owns the pointer to the function object.
+  std::unique_ptr<func_base> _fun;
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
   /// @brief Maps a print name to the subr index.
@@ -227,32 +316,30 @@ private:
   // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 };
 
-inline subr_t::subr_index subr_t::put(const subr_t& subr)
+inline subr_t::subr_index subr_t::put(subr_t&& subr)
 {
   auto p = subr_map.find(subr.name);
   if(p != subr_map.end())
     throw lisp_error(error_errc::redefinition_of_subr, subr.name);
   auto index = subr_store.size();
-  subr_store.push_back(subr);
   subr_map.insert(std::pair(subr.name, index));
+  subr_store.push_back(std::move(subr));
   return index;
 }
 
 inline lisp_t subr_t::operator()(destblock_t* dest) const
 {
-  return std::visit(
-    [&dest, this](auto&& arg) -> lisp_t {
-      using T = std::decay_t<decltype(arg)>;
-      if constexpr(std::is_same_v<T, func0_t>)
-        return std::get<func0_t>(_fun)();
-      else if constexpr(std::is_same_v<T, func1_t>)
-        return std::get<func1_t>(_fun)(dest[1].val());
-      else if constexpr(std::is_same_v<T, func2_t>)
-        return std::get<func2_t>(_fun)(dest[2].val(), dest[1].val());
-      else if constexpr(std::is_same_v<T, func3_t>)
-        return std::get<func3_t>(_fun)(dest[3].val(), dest[2].val(), dest[1].val());
-    },
-    _fun);
+  if(argcount() != _fun->argcount())
+    throw lisp_error(error_errc::wrong_number_of_args, name);
+  if(argcount() == 0)
+    return (*_fun)({});
+  else if(argcount() == 1)
+    return (*_fun)({dest[1].val()});
+  else if(argcount() == 2)
+    return (*_fun)({dest[2].val(), dest[1].val()});
+  else if(argcount() == 3)
+    return (*_fun)({dest[3].val(), dest[2].val(), dest[1].val()});
+  return nil;
 }
 
 /// @brief Lambda representation.
@@ -260,6 +347,7 @@ inline lisp_t subr_t::operator()(destblock_t* dest) const
 class lambda_t final: public ref_count<lambda_t>
 {
 public:
+  /// @brief Default constructor.
   lambda_t() = default;
 
   /// @brief The S-expression representation of the lambda function.
@@ -276,6 +364,7 @@ public:
   static void operator delete(void* x) { pool().deallocate(x); }
   static void operator delete(lambda_t* x, std::destroying_delete_t) { pool().deallocate(x); }
 
+  /// @brief Count of the number of free lambda objects in the pool.
   static std::size_t freecount() { return pool().size(); }
 
 private:
@@ -296,6 +385,7 @@ private:
 class closure_t final: public ref_count<closure_t>
 {
 public:
+  /// @brief Default constructor.
   closure_t() = default;
 
   lisp_t cfunction;

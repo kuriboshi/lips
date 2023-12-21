@@ -292,8 +292,11 @@ inline constexpr auto RMEXCL = "rmexcl"; // History read-macro
 void top::init()
 {
   variables = std::make_unique<cvariables>();
+#if 0
   mkprim(
-    pn::PRINTHIST, []() -> lisp_t { return top::printhist(); }, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    pn::PRINTHIST, make_fun(pn::PRINTHIST, []() -> lisp_t { return top::printhist(); }), subr_t::subr::NOEVAL,
+    subr_t::spread::NOSPREAD);
+#endif
   mkprim(pn::RMEXCL, top::rmexcl, subr_t::subr::EVAL, subr_t::spread::SPREAD);
 }
 

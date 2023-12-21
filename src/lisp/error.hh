@@ -102,6 +102,7 @@ enum class error_errc
   divide_by_zero,
   illegal_arg,
   illegal_function,
+  wrong_number_of_args,
   kbd_break,
   no_message,
   stack_overflow,
@@ -138,6 +139,8 @@ public:
         return "Illegal argument";
       case error_errc::illegal_function:
         return "Illegal function";
+      case error_errc::wrong_number_of_args:
+        return "Wrong number of arguments";
       case error_errc::kbd_break:
         return "Break";
       case error_errc::no_message:
