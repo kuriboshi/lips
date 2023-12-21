@@ -416,16 +416,18 @@ private:
   int _destblockused{0};
 };
 
-/// @brief The concept required by the Context parameter to vm_t.
-///
+/// @brief Provides functions to get and set the read_table.
 template<typename T>
-concept Context = requires(T v, integer_t::value_type i, std::error_code code, const std::string& str, lisp_t exp,
-  std::unique_ptr<syntax> syn, ref_file_t file) {
+concept syntax_table = requires(T v, std::unique_ptr<syntax> syn) {
   {
     v.read_table()
   } -> std::same_as<syntax&>;
   v.read_table(std::move(syn));
+};
 
+/// @brief Provides getting and setting standard file streams.
+template<typename T>
+concept standard_streams = requires(T v, ref_file_t file) {
   {
     v.primout()
   } -> std::same_as<ref_file_t>;
@@ -453,12 +455,20 @@ concept Context = requires(T v, integer_t::value_type i, std::error_code code, c
   {
     v.stdin()
   } -> std::same_as<ref_file_t>;
+};
 
+/// @brief Privides functions to get and set the print level.
+template<typename T>
+concept print_level = requires(T v, integer_t::value_type i) {
   v.printlevel(i);
   {
     v.printlevel()
   } -> std::same_as<integer_t::value_type>;
+};
 
+/// @brief Provides access to some miscellaneous global variables.
+template<typename T>
+concept misc_globals = requires(T v, lisp_t exp) {
   {
     v.currentbase()
   } -> std::same_as<const cvariable_t&>;
@@ -471,7 +481,11 @@ concept Context = requires(T v, integer_t::value_type i, std::error_code code, c
   {
     v.loadpath(exp)
   };
+};
 
+/// @brief Provides some error reporing functions.
+template<typename T>
+concept error_functions = requires(T v, std::error_code code, const std::string& str, lisp_t exp) {
   {
     v.perror(code)
   } -> std::same_as<lisp_t>;
@@ -489,6 +503,11 @@ concept Context = requires(T v, integer_t::value_type i, std::error_code code, c
     T::fatal(code, str)
   } -> std::same_as<lisp_t>;
 };
+
+/// @brief The concept required by the Context parameter to vm_t.
+///
+template<typename T>
+concept Context = syntax_table<T> && standard_streams<T> && print_level<T> && misc_globals<T> && error_functions<T>;
 
 /// @brief Templated derived class which implements the virtual functions of
 /// vm.
