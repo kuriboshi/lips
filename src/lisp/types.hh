@@ -44,6 +44,7 @@ namespace lisp
 class object;
 using lisp_t = ref_ptr<object>;
 
+/// @brief The nil object is the same as the null pointer.
 inline constexpr auto nil = nullptr;
 
 /// @brief The cons cell.
@@ -134,12 +135,25 @@ public:
   lisp_t val() const { return std::get<var_val_pair>(u).val; }
 };
 
-template<typename... Result, std::size_t... Indices>
-auto make_tuple(const std::vector<lisp_t>& v, std::index_sequence<Indices...>)
+/// @brief The @a make_tuple overloads creates a tuple from a vector.
+///
+/// @tparam Result Parameter pack used for the tuple.
+/// @tparam Sequqnce Index sequence of result types.
+/// @param values A vector with zero or more lisp_t values.
+///
+/// @returns A tuple with the values from the vector @a values.
+template<typename... Result, std::size_t... Sequence>
+auto make_tuple(const std::vector<lisp_t>& values, std::index_sequence<Sequence...>)
 {
-  return std::make_tuple(v[Indices]...);
+  return std::make_tuple(values[Sequence]...);
 }
 
+/// @brief Makes a tuple with the values in a vector.
+///
+/// @tparam Result The pack of tuple types.
+/// @param values A vector with zero or more lisp_t values.
+///
+/// @returns A tuple with the values from the vector @a values.
 template<typename ...Result>
 std::tuple<Result...> make_tuple(const std::vector<lisp_t>& values)
 {
