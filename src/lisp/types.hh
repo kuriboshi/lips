@@ -19,12 +19,12 @@
 #define LISP_TYPES_HH
 
 #include <cstdint>
+#include <algorithm>
 #include <concepts>
 #include <functional>
 #include <memory>
 #include <ranges>
 #include <sstream>
-#include <span>
 #include <string>
 #include <string_view>
 #include <variant>
