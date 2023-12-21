@@ -354,15 +354,13 @@ inline lisp_t subr_t::operator()(destblock_t* dest) const
 {
   if(argcount() != _fun->argcount())
     throw lisp_error(error_errc::wrong_number_of_args, name);
-  if(argcount() == 0)
-    return (*_fun)({});
-  else if(argcount() == 1)
-    return (*_fun)({dest[1].val()});
-  else if(argcount() == 2)
-    return (*_fun)({dest[2].val(), dest[1].val()});
-  else if(argcount() == 3)
-    return (*_fun)({dest[3].val(), dest[2].val(), dest[1].val()});
-  return nil;
+  auto make_vector = [](destblock_t* dest, std::size_t count) -> std::vector<lisp_t> {
+    std::vector<lisp_t> result;
+    std::ranges::for_each(std::views::iota(std::size_t(1), count + 1) | std::views::reverse,
+      [&result, dest](auto arg) { result.push_back(dest[arg].val()); });
+    return result;
+  };
+  return (*_fun)(make_vector(dest, argcount()));
 }
 
 /// @brief Lambda representation.

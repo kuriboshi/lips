@@ -24,6 +24,7 @@
 #include "alloc.hh"
 #include "file.hh"
 #include "iter.hh"
+#include "pred.hh"
 #include "prim.hh"
 #include "types.hh"
 #include "util.hh"
@@ -75,6 +76,34 @@ TEST_CASE("lisp: mkprim")
     CHECK_THROWS_WITH(mkprim(
                         "plus", []() -> lisp_t { return nil; }, subr_t::subr::NOEVAL, subr_t::spread::SPREAD),
       "Redefinition of subr not allowed: plus");
+  }
+
+  SECTION("four arguments")
+  {
+    mkprim(
+      "four_arguments", [](lisp_t a, lisp_t b, lisp_t c, lisp_t d) { return mklist(a, b, c, d); }, subr_t::subr::NOEVAL,
+      subr_t::spread::SPREAD);
+    auto result = eval("(four_arguments 1 2 3 4)");
+    CHECK(is_T(equal(result, "(1 2 3 4)"_l)));
+  }
+
+  SECTION("four arguments, nospread")
+  {
+    mkprim(
+      "four_arguments_nospread", [](lisp_t a, lisp_t b, lisp_t c, lisp_t d) { return mklist(a, b, c, d); },
+      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+    auto result = eval("(four_arguments_nospread 1 2 3 4)");
+    CHECK(is_T(equal(result, "(1 2 3 (4))"_l)));
+  }
+
+  SECTION("four const arguments")
+  {
+    mkprim(
+      "four_arguments_const",
+      [](const lisp_t& a, const lisp_t& b, const lisp_t& c, const lisp_t& d) { return mklist(a, b, c, d); },
+      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+    auto result = eval("(four_arguments_const 1 2 3 4)");
+    CHECK(is_T(equal(result, "(1 2 3 4)"_l)));
   }
 }
 
