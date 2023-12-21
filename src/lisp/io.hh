@@ -39,25 +39,40 @@ enum class escape
   NO
 };
 
+/// @brief Base class for an input source.
 class source
 {
 public:
+  /// @brief Default constructor.
   source() = default;
+  /// @brief Default virtual destructor.
   virtual ~source() = default;
 
+  /// @brief Delete copy constructor.
   source(const source&) = delete;
+  /// @brief Delete move constructor.
   source(source&&) = delete;
+  /// @brief Delete copy assignment.
   source& operator=(const source&) = delete;
+  /// @brief Delete move assignment.
   source& operator=(source&&) = delete;
 
+  /// @brief Get a character from the source.
   virtual char getch() = 0;
+  /// @brief Put a character back to the source to be read by the next call to
+  /// getch.
   virtual void ungetch(char) = 0;
+  /// @brief Close the source.
   virtual void close() {}
+  /// @brief Read from a source until the next newline. Returns an empty
+  /// optional if the end of file is encountered.
   virtual std::optional<std::string> getline() = 0;
 
+  /// @brief Derived sources can use this iterator.
   using iterator = std::istreambuf_iterator<char>;
 
 protected:
+  /// @brief Default implementation of 'getch'.
   static char getch(std::istream& stream)
   {
     char ch{0};
@@ -65,6 +80,7 @@ protected:
     return ch;
   }
 
+  /// @brief Default implementation of 'getline'.
   static std::optional<std::string> getline(std::istream& stream)
   {
     std::string buf;
@@ -75,88 +91,137 @@ protected:
   }
 
 private:
+  /// @brief Returns the beginning of the internal stream.
   virtual iterator begin() = 0;
 
+  /// @brief Free function.
   friend source::iterator begin(source& src) { return src.begin(); }
-
+  /// @brief Free function.
   friend source::iterator end(source&) { return {}; }
 };
 
+/// @brief A file source.
 class file_source: public source
 {
 public:
+  /// @brief Constructor taking a file name as argument.
+  ///
+  /// The file is opened in read mode.
   file_source(const std::string& filename);
+  /// @brief Default destructor.
   ~file_source() override = default;
 
+  /// @brief Delete copy constructor.
   file_source(const file_source&) = delete;
+  /// @brief Delete move constructor.
   file_source(file_source&&) = delete;
+  /// @brief Delete copy assignment.
   file_source& operator=(const file_source&) = delete;
+  /// @brief Delete move assignment.
   file_source& operator=(file_source&&) = delete;
 
+  /// @brief Leverage the default 'getch' implementation.
   using source::getch;
+  /// @brief Leverage the default 'getline' implementation.
   using source::getline;
 
+  /// @brief Read a character from the file stream.
   char getch() override { return getch(*_file); }
+  /// @brief Put back a character on the file stream.
   void ungetch(char c) override { _file->putback(c); }
+  /// @brief Close the file stream.
   void close() override { _file->close(); }
+  /// @brief Return a line from the file, empty on end of file.
   std::optional<std::string> getline() override { return getline(*_file); }
 
 private:
+  /// @brief Returns the beginning of the file stream.
   iterator begin() override { return {*_file}; }
 
+  /// @brief The input file stream.
   std::unique_ptr<std::ifstream> _file;
 };
 
+/// @brief A source taking a std::istream as its input source.
 class stream_source: public source
 {
 public:
+  /// @brief Constructor taking an std::istream as in input source.
+  ///
+  /// This could be a file input stream or a string stream.
   stream_source(std::istream& stream)
     : _stream(&stream)
   {}
+  /// @brief Default destructor.
   ~stream_source() override = default;
 
+  /// @brief Delete copy constructor.
   stream_source(const stream_source&) = delete;
+  /// @brief Delete move constructor.
   stream_source(stream_source&&) = delete;
+  /// @brief Delete copy assignment.
   stream_source& operator=(const stream_source&) = delete;
+  /// @brief Delete move assignment.
   stream_source& operator=(stream_source&&) = delete;
 
+  /// @brief Leverage the default 'getch' implementation.
   using source::getch;
+  /// @brief Leverage the default 'getline' implementation.
   using source::getline;
 
+  /// @brief Read a character from the input stream.
   char getch() override { return getch(*_stream); }
+  /// @brief Put back a character to the input stream.
   void ungetch(char c) override { _stream->putback(c); }
+  /// @brief Read from the input stream until the next newline, empty on end of
+  /// file.
   std::optional<std::string> getline() override { return getline(*_stream); }
 
 private:
+  /// @brief Returns the beginning of the input stream.
   iterator begin() override { return {*_stream}; }
 
+  /// @brief A pointer to the input stream.
   std::istream* _stream;
 };
 
+/// @brief A source which reads from a string.
 class string_source: public source
 {
 public:
+  /// @brief Constructor taking a string as its source.
   string_source(const std::string& string)
     : _string(string)
   {}
 
+  /// @brief Leverage the default 'getch' implementation.
   using source::getch;
+  /// @brief Leverage the default 'getline' implementation.
   using source::getline;
 
+  /// @brief Read a character from the input string.
   char getch() override { return getch(_string); }
+  /// @brief Put back a character to the input string.
   void ungetch(char c) override { _string.putback(c); }
+  /// @brief Read from the input string until the next newline, empty on end of
+  /// string.
   std::optional<std::string> getline() override { return getline(_string); }
 
 private:
+  /// @brief Returns the beginning of the input stream.
   iterator begin() override { return {_string}; }
 
+  /// @brief An input string stream is used as the internal source.
   std::istringstream _string;
 };
 
+/// @brief Base class for an output sink.
 class sink
 {
 public:
+  /// @brief Default constructor.
   sink() = default;
+  /// @brief Default virtual destructor.
   virtual ~sink() = default;
 
   sink(const sink&) = delete;

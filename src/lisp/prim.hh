@@ -23,21 +23,38 @@
 
 namespace lisp
 {
+/// @brief The car of the cons cell.
 inline lisp_t car(lisp_t a) { return details::prim::car(a); }
+/// @brief The cdr of the cons cell.
 inline lisp_t cdr(lisp_t a) { return details::prim::cdr(a); }
+/// @brief Same as (car (cdr a))
 inline lisp_t cadr(lisp_t a) { return details::prim::cadr(a); }
+/// @brief Same as (cdr (car a))
 inline lisp_t cdar(lisp_t a) { return details::prim::cdar(a); }
+/// @brief Same as (car (car a))
 inline lisp_t caar(lisp_t a) { return details::prim::caar(a); }
+/// @brief Same as (cdr (cdr a))
 inline lisp_t cddr(lisp_t a) { return details::prim::cddr(a); }
+/// @brief Same as (cdr (cdr (cdr a)))
 inline lisp_t cdddr(lisp_t a) { return details::prim::cdddr(a); }
+/// @brief Same as (car (cdr (cdr a)))
 inline lisp_t caddr(lisp_t a) { return details::prim::caddr(a); }
+/// @brief Same as (cdr (car (cdr a)))
 inline lisp_t cdadr(lisp_t a) { return details::prim::cdadr(a); }
+/// @brief Same as (car (car (cdr a)))
 inline lisp_t caadr(lisp_t a) { return details::prim::caadr(a); }
+/// @brief Same as (cdr (cdr (car a)))
 inline lisp_t cddar(lisp_t a) { return details::prim::cddar(a); }
+/// @brief Same as (car (cdr (car a)))
 inline lisp_t cadar(lisp_t a) { return details::prim::cadar(a); }
+/// @brief Same as (cdr (car (car a)))
 inline lisp_t cdaar(lisp_t a) { return details::prim::cdaar(a); }
+/// @brief Same as (car (car (car a)))
 inline lisp_t caaar(lisp_t a) { return details::prim::caaar(a); }
+/// @brief T if the objects a and b are the same object. Integers are
+/// considered 'eq' if their values are the same.
 inline lisp_t eq(lisp_t a, lisp_t b) { return details::prim::eq(a, b); }
+/// @brief T if a is nil, t, a symbol, an integer, or a floating point object.
 inline lisp_t atom(lisp_t a) { return details::prim::atom(a); }
 inline lisp_t nconc(lisp_t a) { return details::prim::nconc(a); }
 inline lisp_t attach(lisp_t a, lisp_t b) { return details::prim::attach(a, b); }

@@ -24,8 +24,13 @@
 namespace lisp
 {
 
+/// @brief If any expression evaluates to nil return nil otherwise return the
+/// result of the last expression.
 inline lisp_t p_and(lisp_t x) { return details::logic::p_and(x); }
+/// @brief Returns the first expression evaluating to non-nil, otherwise return
+/// nil.
 inline lisp_t p_or(lisp_t x) { return details::logic::p_or(x); }
+/// @brief Returns t if argument is nil, nil otherwise.
 inline lisp_t p_not(lisp_t x) { return details::logic::p_not(x); }
 
 } // namespace lisp

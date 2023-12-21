@@ -75,18 +75,6 @@ inline void print_subr(const char* s, file_t& file, const lisp_t& x)
 }
 } // namespace
 
-///
-/// @brief Read an atom from FILE.
-///
-/// Reads one token from the file and creates a lisp object from that token.
-///
-/// @param l The lisp interpreter to use.
-/// @param file The source file.
-///
-/// @returns A lisp object which is either an integer, float, symbol, or
-/// string. This differs from Interlisp which will never return a
-/// string. Instead the first double quote is returned as a symbol.
-///
 lisp_t ratom(ref_file_t file)
 {
   lexer lexer{std::move(file)};
@@ -278,30 +266,6 @@ lisp::lisp_t terpri(lisp::file_t& file)
   return lisp::nil;
 }
 
-/// @brief Splice an object into a list.
-///
-/// Splices list y into x keeping cdr of x. For example:
-/// @code{.lisp}
-/// (let ((x '(a b c))
-///       (y '(x y z)))
-///  (splice x y)
-///  x)
-/// @endcode
-/// Modifies x to hold the value (x y x b c).
-///
-/// Another example:
-/// @code{.lisp}
-/// (let ((x '(a b c))
-///       (y '(x y z)))
-///  (splice (cdr x) y)
-///  x)
-/// @endcode
-/// Modifies x to hold the value (a x y z c).
-///
-/// If y is not a list put it in car of x and return x, otherwise return last
-/// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
-/// car of x.
-///
 lisp_t splice(lisp_t x, lisp_t y, bool tailp)
 {
   check(x, object::type::Cons);

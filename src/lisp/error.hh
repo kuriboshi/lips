@@ -25,6 +25,7 @@
 
 namespace lisp
 {
+/// @brief Errors used when doing type checking.
 enum class type_errc
 {
   not_nil = 1,
@@ -43,10 +44,13 @@ enum class type_errc
   not_cvariable
 };
 
+/// @brief Error category for type checking.
 class type_category final: public std::error_category
 {
 public:
+  /// @brief Returns the constant string "type".
   const char* name() const noexcept override { return "type"; }
+  /// @brief Translate error code to error message.
   std::string message(int condition) const override
   {
     switch(static_cast<type_errc>(condition))
@@ -82,6 +86,7 @@ public:
     }
     return "Not nil";
   }
+  /// @brief Returns the category.
   static const std::error_category& category()
   {
     static const type_category instance;
@@ -89,10 +94,13 @@ public:
   }
 };
 
+/// @brief Creates an std::error_code from a type_errc value.
 inline std::error_code make_error_code(type_errc e) { return {to_underlying(e), type_category::category()}; }
 
+/// @brief Creates an std::error_condition from a type_errc value.
 inline std::error_condition make_error_condition(type_errc e) { return {to_underlying(e), type_category::category()}; }
 
+/// @brief General lisp error codes.
 enum class error_errc
 {
   attempt_to_clobber = 1,
@@ -117,10 +125,13 @@ enum class error_errc
   user_error
 };
 
+/// @brief General lisp error category.
 class error_category final: public std::error_category
 {
 public:
+  /// @brief Returns the constant string "error".
   const char* name() const noexcept override { return "error"; }
+  /// @brief Translate error code to error message.
   std::string message(int condition) const override
   {
     switch(static_cast<error_errc>(condition))
@@ -168,6 +179,7 @@ public:
     }
     return "User error";
   }
+  /// @brief Returns the category.
   static const std::error_category& category()
   {
     static const error_category instance;
@@ -175,8 +187,10 @@ public:
   }
 };
 
+/// @brief Creates an std::error_code from a error_errc value.
 inline std::error_code make_error_code(error_errc e) { return {to_underlying(e), error_category::category()}; }
 
+/// @brief Creates an std::error_condition from a error_errc value.
 inline std::error_condition make_error_condition(error_errc e)
 {
   return {to_underlying(e), error_category::category()};

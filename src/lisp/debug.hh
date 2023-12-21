@@ -24,7 +24,12 @@
 
 namespace lisp
 {
-inline lisp_t evaltrace(lisp_t x) { return details::debug::evaltrace(x); }
+/// @brief Turn on/off tracing of the evaluator.
+///
+/// @param trace Turns on tracing if non-nil, off if nil
+///
+/// @returns Previous value of the trace setting.
+inline lisp_t evaltrace(lisp_t trace) { return details::debug::evaltrace(trace); }
 } // namespace lisp
 
 #endif

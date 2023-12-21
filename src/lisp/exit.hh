@@ -26,7 +26,11 @@
 
 namespace lisp
 {
-inline lisp_t exit(lisp_t a) { return details::prim::exit(a); }
+/// @brief Exit the lisp interpreter.
+///
+/// @param code An exit code. Must be of type integer.
+/// @returns Does not return.
+inline lisp_t exit(lisp_t code) { return details::prim::exit(code); }
 } // namespace lisp
 
 #endif
