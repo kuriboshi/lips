@@ -1,7 +1,12 @@
 # Release notes
 
-## 3.0.0
+## 3.0.0 (2023-12-22)
 
+Major release due to a number of API level changes
+
+- Make it possible to register functions with any fixed number of
+  arguments
+- Primitives can now accept const references as arguments
 - Turn on clang-tidy for all header files (minimum version is 17)
 - Turn on many more clang-tidy warnings and fix them
 - Rename some accessor functions:
@@ -12,14 +17,11 @@
 - Rename ltimes -> times
 - The vm class now owns the Context using unique_ptr
 - Move file_t class from io.hh to file.hh
-- Make it possible to have functions with any fixed number of
-  arguments
-- Primitives can now accept const references as arguments
 - Introduced some use of C++-20 concepts
 - Add more Doxygen style comments
+- Switch from LaTeX to Markdown for the reference manual
 - Upgrade Catch2 to 3.5.0
 - Upgrade fmt to 10.1.1
-- Switch from LaTeX to Markdown for the reference manual
 
 ## 2.0.3 (2023-08-20)
 

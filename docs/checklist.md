@@ -8,11 +8,10 @@
 - Update `README.md`
   - Update the version number
   - Check if any other updates are needed
+- Update `docs/reference.md`
+  - Update the version number
 - Update `CMakeLists.txt`
   - Update the version number
-- Regenerate `docs/lips.pdf`
-  - Update the version number in `docs/lips.tex`
-  - Update the publish date in `docs/lips.tex`
 - Update `NEWS.md`
   - Update version number
   - Add summary of the changes
