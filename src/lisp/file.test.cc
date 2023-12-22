@@ -399,14 +399,14 @@ TEST_CASE("file: ratom")
 {
   SECTION("integer")
   {
-    auto in = ref_file_t::create("124");
+    auto in = getobject(ref_file_t::create("124"));
     auto r = ratom(in);
     CHECK(type_of(r) == object::type::Integer);
   }
 
   SECTION("symbol")
   {
-    auto in = ref_file_t::create("124abc");
+    auto in = getobject(ref_file_t::create("124abc"));
     auto r = ratom(in);
     CHECK(type_of(r) == object::type::Symbol);
   }
@@ -415,7 +415,7 @@ TEST_CASE("file: ratom")
   {
     // This does not match the behaviour of Interlisp which would return the
     // symbol \".
-    auto in = ref_file_t::create(R"("hello")");
+    auto in = getobject(ref_file_t::create(R"("hello")"));
     auto r = ratom(in);
     CHECK(type_of(r) == object::type::String);
   }

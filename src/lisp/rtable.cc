@@ -59,7 +59,7 @@ lisp_t rmsquote(lisp_t stream)
 lisp_t rmgetenv(lisp_t stream)
 {
   check(stream, object::type::File);
-  auto sym = ratom(stream->file());
+  auto sym = ratom(stream);
   check(sym, object::type::Symbol, object::type::String);
   auto* val = std::getenv(sym->getstr().c_str());
   if(val == nullptr)

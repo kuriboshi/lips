@@ -73,7 +73,6 @@ inline lisp_t terpri(lisp_t a) { return details::file::terpri(a); }
 
 bool loadfile(const std::string& filename);
 
-lisp_t ratom(ref_file_t f);
 lisp_t lispread(ref_file_t f);
 inline lisp_t lispread(const std::string& s)
 {

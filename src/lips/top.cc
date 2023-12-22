@@ -259,7 +259,7 @@ lisp_t top::rmexcl(lisp_t stream)
       break;
     default:
       stream->file()->ungetch(c);
-      auto at = ratom(stream->file());
+      auto at = ratom(stream);
       if(type_of(at) == object::type::Integer)
       {
         tmp = histget(at->as_integer(), variables->history());
