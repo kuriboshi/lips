@@ -421,7 +421,7 @@ The absolute value of _n_.
 
 > `(add1 n)` (_Function_)
 
-Add `1` to $n$ and return the value.
+Add `1` to _n_ and return the value.
 
 > `(difference x y)` (_Function_)
 
@@ -434,9 +434,9 @@ Calculates the difference between _x_ and _y_.
 
 > `(divide x y)` (_Function_)
 
-Divides $x$ by $y$. The result may be an integer or a floating point
-depending on the types of $x$ and $y$. If both are integers the
-result will be an integer and if either $x$ or $y$, or both, is a
+Divides _x_ by _y_. The result may be an integer or a floating point
+depending on the types of _x_ and _y_. If both are integers the
+result will be an integer and if either _x_ or _y_, or both, is a
 floating point number the result will be a floating point number.
 
 > `(fdifference x y)` (_Function_)
