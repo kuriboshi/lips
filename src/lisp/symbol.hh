@@ -50,9 +50,11 @@ struct sv_hash
   auto operator()(std::string_view str) const noexcept { return std::hash<std::string_view>()(str); }
 };
 
+/// @brief Class representing a symbol.
 class symbol_t final: public ref_count<symbol_t>
 {
 public:
+  /// @brief Default constructor.
   symbol_t() = default;
 
   std::string pname;

@@ -38,6 +38,8 @@ stop-and-sweep garbage collector but now uses reference counting. The
 implementation was heavily influenced by the work of John Allen as
 published in the book _Anatomy of LISP_[4].
 
+For more details see [Reference Manual](docs/reference.md).
+
 ## Requirements
 
 The code requires C++20 and CMake 3.21 or newer.
@@ -164,7 +166,9 @@ make test-linux
 On macOS `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
 same as for `docker`.
-**Note: `podman` support is currently not working**
+
+> [!NOTE]
+> `podman` support is currently not working
 
 ## Implementation Notes
 
