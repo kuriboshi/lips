@@ -79,7 +79,7 @@ copyright:
 #   OS            Compiler
 #   Ubuntu 20.04  gcc-11
 #   Ubuntu 22.04  gcc-12
-#   Ubuntu 22.04  clang-14
+#   Ubuntu 22.04  clang-17
 #   Ubuntu 22.04  clang-tidy
 .PHONE: test-linux
 test-linux:

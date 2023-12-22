@@ -19,7 +19,12 @@ RUN apt-get -y update && apt-get -y install ninja-build
 RUN apt-get -y update && apt-get -y install libncurses-dev
 RUN apt-get -y update && apt-get -y install g++-12
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-12 90 --slave /usr/bin/c++ c++ /usr/bin/g++-12
-RUN apt-get -y update && apt-get -y install clang++-14
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14
+
+# For clang and clang-tidy we need to install from llvm.org
+RUN apt-get -y update && apt-get -y install wget
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh
+RUN yes | ./llvm.sh 17
+RUN apt-get -y update && apt-get -y install clang-tidy-17
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-17 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-17
 
 WORKDIR /project
