@@ -99,8 +99,8 @@ benchmark: release
 	ctest --preset benchmark
 
 # Test using lips as a package via CMake FetchContent.
-.PHONY: package_test
-package_test:
-	(cd test; cmake -G Ninja -B ../build/package_test .)
-	(cd test; cmake --build ../build/package_test)
-	(cd build/package_test; ctest)
+.PHONY: package-test
+package-test:
+	(cd test; cmake -G Ninja -B ../build/package-test .)
+	(cd test; cmake --build ../build/package-test)
+	(cd build/package-test; ctest)
