@@ -127,7 +127,7 @@ inline lisp_t freecount() { return details::alloc::freecount(); }
 /// @param pname The print name of the symbol.
 ///
 /// @returns The symbol as a LISP object.
-inline lisp_t intern(std::string_view s) { return details::alloc::intern(s); }
+inline lisp_t intern(std::string_view pname) { return details::alloc::intern(pname); }
 
 /// @brief Create a literal atom.
 ///

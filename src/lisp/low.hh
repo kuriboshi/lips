@@ -27,9 +27,8 @@
 
 namespace lisp
 {
-/// @brief `(cond ...)` (_NoSpread NLambda_)
-///
-/// The cond special form.
+/// @brief The cond special form.
+/// @lisp{(cond ...),NoSpread NLambda}
 ///
 /// The generalized conditional special form. The function takes zero or more
 /// clauses. Each clause has one test followed by zero or more expressions
@@ -57,43 +56,42 @@ namespace lisp
 ///       (t r3))
 /// ```
 inline lisp_t cond(lisp_t clauses) { return details::low::cond(clauses); }
-/// @brief `(prog1 args...)` (_NoSpread NLambda_)
-///
-/// Evaluates all arguments and returns the result of the first expression.
+/// @brief Evaluates all arguments and returns the result of the first
+/// expression.
+/// @lisp{(prog1 args...),NoSpread NLambda}
 inline lisp_t prog1(lisp_t a, lisp_t b) { return details::low::prog1(a, b); }
-/// @brief `(progn args...)` (_NoSpread NLambda_)
-///
-/// Evaluates all arguments and retuns the result of the last expression.
+/// @brief Evaluates all arguments and retuns the result of the last
+/// expression.
+/// @lisp{(progn args...),NoSpread NLambda}
 inline lisp_t progn(lisp_t a) { return details::low::progn(a); }
-/// @brief `(set var expr)` (_Function_)
+/// @brief Sets the value of the symbol to the value.
+/// @lisp{(set var expr),Function}
 ///
-/// Sets the value of the symbol to the value. Both `var` and `expr` are
-/// evaluated. Returns `val`.
+/// Both `var` and `expr` are evaluated. Returns `val`.
 ///
 /// @param var An expression which evaluates to a symbol.
 /// @param expr An expression.
 ///
 /// @returns The result of evaluating the expression `expr`.
 inline lisp_t set(lisp_t var, lisp_t expr) { return details::low::set(var, expr); }
-/// @brief `(setq var expr)` (_NLambda_)
-///
-/// Same as 'set' but the first argument is not evaluated.
+/// @brief Same as 'set' but the first argument is not evaluated.
+/// @lisp{(setq var expr),NLambda}
 ///
 /// @param var A literal symbol.
 /// @param expr An expression.
 ///
 /// @returns The result of evaluating the expression `expr`.
-inline lisp_t setq(lisp_t a, lisp_t b) { return details::low::setq(a, b); }
-/// @brief `(setqq var val)` (_NLambda_)
-///
-/// Same as 'set' but no argument is evaluated.
+inline lisp_t setq(lisp_t var, lisp_t expr) { return details::low::setq(var, expr); }
+/// @brief Same as 'set' but no argument is evaluated.
+/// @lisp{(setqq var val),NLambda}
 ///
 /// @param var A literal symbol.
 /// @param val A constant expression which is not evaluated.
 ///
 /// @returns The unevaluated `val` expression.
-inline lisp_t setqq(lisp_t a, lisp_t b) { return details::low::set(a, b); }
-/// @brief `(while first args...)` (_NoSpread NLambda_)
+inline lisp_t setqq(lisp_t var, lisp_t val) { return details::low::set(var, val); }
+/// @brief Evaluate arguments in until _first_ is false.
+/// @lisp{(while first args...),NoSpread NLambda}
 ///
 /// While the first argument is true evaluate the rest of the arguments in an
 /// implicit `progn`. Returns `nil`.

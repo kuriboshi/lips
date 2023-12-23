@@ -32,33 +32,30 @@
 namespace lisp
 {
 
-/// @brief `(open filename mode)` (_Function_)
-///
-/// Opens a file.
+/// @brief Opens a file.
+/// @lisp{(open filename mode),Function}
 ///
 /// @param filename String or symbol file name.
 /// @param mode One of `read`, `write`, or `append`.
 ///
-/// @returns A file object.
+/// @returns A file type object.
 inline lisp_t open(lisp_t filename, lisp_t mode) { return details::file::open(filename, mode); }
-/// @brief `(close file)` (_Function_)
+/// @brief Closes a file.
+/// @lisp{(close file),Function}
 ///
-/// Closes a file.
-///
-/// @param file An file type object.
+/// @param file A file type object.
 inline lisp_t close(lisp_t file) { return details::file::close(file); }
-/// @brief `(load filename)` (_Filename_)
-///
-/// Loads lisp expressions from a file.
+/// @brief Loads lisp expressions from a file.
+/// @lisp{(load filename),Filename}
 ///
 /// @param filename String or symbol file name.
 ///
 /// @returns The file name.
-inline lisp_t load(lisp_t a) { return details::file::load(a); }
-/// @brief `(prin1 expr file)`
+inline lisp_t load(lisp_t filename) { return details::file::load(filename); }
+/// @brief Prints a lisp expression without escaping special characters.
+/// @lisp{(prin1 expr file),Function}
 ///
-/// Prints a lisp expression without escaping special characters. The result
-/// may not be readable by `read`.
+/// The result may not be readable by `read`.
 ///
 /// ```lisp
 /// (prin1 "hello")
@@ -73,6 +70,7 @@ inline lisp_t load(lisp_t a) { return details::file::load(a); }
 inline lisp_t prin1(lisp_t expr, lisp_t file) { return details::file::prin1(expr, file); }
 /// @brief Prints a lisp expression escaping special characters such as double
 /// quotes.
+/// @lisp{(prin2 args...),Function}
 ///
 /// Prints a lisp expression in a way that can be read back.
 ///
@@ -89,6 +87,7 @@ inline lisp_t prin1(lisp_t expr, lisp_t file) { return details::file::prin1(expr
 inline lisp_t prin2(lisp_t expr, lisp_t file) { return details::file::prin2(expr, file); }
 /// @brief Prints a lisp expression escaping special characters and outputing a
 /// newline afterwards.
+/// @lisp{(print args...),Function}
 ///
 /// Prints a lisp expression escaping special characters and ending with a
 /// newline.
@@ -104,10 +103,9 @@ inline lisp_t prin2(lisp_t expr, lisp_t file) { return details::file::prin2(expr
 /// error, else `file` has to be of type _file_.
 ///
 /// @returns The expression.
-inline lisp_t print(lisp_t a, lisp_t b) { return details::file::print(a, b); }
-/// @brief `(spaces n file)` (_Function_)
-///
-/// Prints _n_ number of spaces.
+inline lisp_t print(lisp_t expr, lisp_t file) { return details::file::print(expr, file); }
+/// @brief Prints _n_ number of spaces.
+/// @lisp{(spaces n file),Function}
 ///
 /// @param file If `nil` print on primary output, if `t` print on primary
 /// error, else `file` has to be an open file.
@@ -115,18 +113,16 @@ inline lisp_t print(lisp_t a, lisp_t b) { return details::file::print(a, b); }
 ///
 /// @returns `nil`.
 inline lisp_t spaces(lisp_t n, lisp_t file) { return details::file::spaces(n, file); }
-/// @brief `(terpri file)` (_Function_)
-///
-/// Print a newline on the output file.
+/// @brief Print a newline on the output file.
+/// @lisp{(terpri file),Function}
 ///
 /// @param file If `nil` print on primary output, if `t` print on primary
 /// error, else `file` has to be an open file.
 ///
 /// @returns `nil`.
-inline lisp_t terpri(lisp_t a) { return details::file::terpri(a); }
-/// @brief `(printlevel level)` (_Function_)
-///
-/// Sets the print level.
+inline lisp_t terpri(lisp_t file) { return details::file::terpri(file); }
+/// @brief Sets the print level.
+/// @lisp{(printlevel level),Function}
 ///
 /// The print level determines how deep the printing of a lisp expression will
 /// go. Deep lisp expressions will be replaced by an ampersand (&). If the
@@ -146,10 +142,10 @@ inline lisp_t terpri(lisp_t a) { return details::file::terpri(a); }
 /// @param level The depth to which S-expressions are printed.
 ///
 /// @returns The previous level.
-inline lisp_t printlevel(lisp_t a) { return details::file::printlevel(a); }
-/// @brief `(ratom file)` (_Function_)
-///
-/// Reads one token from the file and creates a lisp object from that token.
+inline lisp_t printlevel(lisp_t level) { return details::file::printlevel(level); }
+/// @brief Reads one token from the file and creates a lisp object from that
+/// token.
+/// @lisp{(ratom file),Function}
 ///
 /// @param file An open file or if `nil` read from primary output, if `t` read
 /// from stdin.
@@ -158,29 +154,28 @@ inline lisp_t printlevel(lisp_t a) { return details::file::printlevel(a); }
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
 inline lisp_t ratom(lisp_t file) { return details::file::ratom(file); }
-/// @brief `(read file)` (_Function_)
+/// @brief Reads a lisp expression from an open file.
+/// @lisp{(read file),Function}
 ///
-/// Reads a lisp expression from an open file.
-///
-/// @param file An open file or if `nil` read from primary output, if `t` read
+/// @param file An open file or if `nil` read from primary input, if `t` read
 /// from stdin.
 ///
 /// @returns A lisp expression or the symbol `eof` on end of file.
 inline lisp_t read(lisp_t file) { return details::file::read(file); }
-/// @brief `(readc file)` (_Function_)
+/// @brief Reads a single character from an open file.
+/// @lisp{(readc file),Function}
 ///
-/// Reads a single character from an open file.
-///
-/// @param file An open file or if `nil` read from primary output, if `t` read
+/// @param file An open file or if `nil` read from primary input, if `t` read
 /// from stdin.
 ///
 /// @returns The character read as an integer value.
 inline lisp_t readc(lisp_t file) { return details::file::readc(file); }
-/// @brief `(readline file)` (_Filename_)
+/// @brief Reads characters from an open file until the next newline.
+/// @lisp{(readline file),Filename}
 ///
-/// Reads characters from an open file until the next newline. The line is
-/// split according to the defined break characters and the result is returned
-/// as a string. If a blank line is read the symbol `eof` is returned.
+/// The line is split according to the defined break characters and the result
+/// is returned as a string. If a blank line is read the symbol `eof` is
+/// returned.
 ///
 /// ```text
 /// hello world => (hello world)
@@ -192,9 +187,17 @@ inline lisp_t readc(lisp_t file) { return details::file::readc(file); }
 /// @param file An open file or if `nil` read from primary output, if `t` read
 /// from stdin.
 ///
-/// @returns A lisp expression. The value `nil` is returned if a blank line is read.
+/// @returns A lisp expression. The symbol `eof` is returned if a blank line is
+/// read.
 inline lisp_t readline(lisp_t file) { return details::file::readline(file); }
 
+/// @brief Loads a file from _filename_.
+///
+/// Read S-expressions from the file until end of file it reached.
+///
+/// @param filename A file name.
+///
+/// @returns True if the file was loaded successfully, false otherwise.
 bool loadfile(const std::string& filename);
 
 lisp_t lispread(ref_file_t f);
@@ -267,7 +270,6 @@ inline lisp_t operator"" _l(const char* s, std::size_t)
 /// If y is not a list put it in car of x and return x, otherwise return last
 /// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
 /// car of x.
-///
 lisp_t splice(lisp_t x, lisp_t y, bool tailp);
 
 } // namespace lisp

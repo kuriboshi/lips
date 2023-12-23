@@ -28,21 +28,20 @@
 namespace lisp
 {
 
-/// @brief `(and args...)` (_NoSpread NLambda_)
-///
-/// If any expression evaluates to nil return `nil` otherwise return the result
-/// of the last expression.
+/// @brief If any expression evaluates to nil return `nil` otherwise return the
+/// result of the last expression.
+/// @lisp{(and args...),NoSpread NLambda}
 inline lisp_t p_and(lisp_t args) { return details::logic::p_and(args); }
-/// @brief `(or args...)` (_NoSpread NLambda_)
-///
-/// Returns the first expression evaluating to non-`nil`, otherwise return
-/// `nil`.
+/// @brief Returns the first expression evaluating to non-`nil`, otherwise
+/// return `nil`.
+/// @lisp{(or args...),NoSpread NLambda}
 inline lisp_t p_or(lisp_t args) { return details::logic::p_or(args); }
-/// @brief `(not expr)` (_Function_)
-///
-/// Returns `t` if argument is `nil`, `nil` otherwise.
+/// @brief Returns `t` if argument is `nil`, `nil` otherwise.
+/// @lisp{(not expr),Function}
 inline lisp_t p_not(lisp_t expr) { return details::logic::p_not(expr); }
-/// @brief `(if p t . f)` (_NLambda_)
+/// @brief Evaluates and returns _t_ if _p_ is non-`nil`, evaluates and returns
+/// _f_ otherwise.
+/// @lisp{(if p t . f),NLambda}
 ///
 /// If the predicate _p_ evaluates to a non-`nil`\ value the expression
 /// _t_ is evaluated and returned from the function. If _p_ evaluates to

@@ -249,7 +249,7 @@ auto make_fun(Lambda&& fun)
   return make_fun(std::forward<Lambda>(fun), &Lambda::operator());
 }
 
-/// @Brief Structure describing a built-in function.
+/// @brief Structure describing a built-in function.
 ///
 /// Built-in function can have zero, one, two, or three parameters.  They can
 /// either evaluate their parameters or not (special forms).  Function can be
