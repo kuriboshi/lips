@@ -20,8 +20,7 @@
 
 /// @file pred.hh
 ///
-/// ### Predicates
-///
+/// # Predicates
 
 #include "context.hh"
 #include "types.hh"

@@ -20,7 +20,7 @@
 
 /// @file low.hh
 ///
-/// ### Low Level Functions
+/// # Low Level Functions
 
 #include "types.hh"
 #include "details/low.hh"

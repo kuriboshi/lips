@@ -17,7 +17,7 @@
 
 /// @file file.hh
 ///
-/// ### File Functions
+/// # File Functions
 ///
 /// Functions managing files.
 

@@ -17,7 +17,7 @@
 
 /// @file alloc.hh
 ///
-/// ### Memory Allocation
+/// # Memory Allocation
 ///
 /// Functions which are responsible for allocating objects and managing object
 /// life cycle.

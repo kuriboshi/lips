@@ -18,6 +18,10 @@
 #ifndef LISP_STRING_HH
 #define LISP_STRING_HH
 
+/// @file string.hh
+///
+/// # String Functions
+
 #include "types.hh"
 #include "details/string.hh"
 
@@ -25,57 +29,89 @@ namespace lisp
 {
 
 /// @brief Concatenate strings.
+/// @lisp{(concat args...),Function}
 inline lisp_t concat(lisp_t x) { return details::string::concat(x); }
 
 /// @brief Compare two strings.
+/// @lisp{(strcmp s1 s2),Function}
 ///
-/// @param x A string.
-/// @param y A string.
+/// Compares the two strings _s1_ and _s2_ lexicographically and returns a
+/// negative number, zero, or a positive number if _s1_ is less than, equal, or
+/// greater than _s2_.
+///
+/// @param s1 A string.
+/// @param s2 A string.
 ///
 /// @returns A positive number of x is lexiographically greater than y, a
 /// negative number if x is lexiographically less than y and zero if they are
 /// equal.
-inline lisp_t strcmp(lisp_t x, lisp_t y) { return details::string::strcmp(x, y); }
+inline lisp_t strcmp(lisp_t s1, lisp_t s2) { return details::string::strcmp(s1, s2); }
 
 /// @brief Compare if to strings are equal.
+/// @lisp{(strequal s1 s2),Function}
 ///
-/// @param x A string.
-/// @param y A string.
+/// Compares the strings _s1_ and _s2_ and returns `t` if the strings are equal
+/// or `nil` if they are not equal.
 ///
-/// @returns T if x is equal to y, nil otherwise.
-inline lisp_t strequal(lisp_t x, lisp_t y) { return details::string::strequal(x, y); }
+/// @param s1 A string.
+/// @param s2 A string.
+///
+/// @returns `t` if _s1_ is equal to _s2_, `nil` otherwise.
+inline lisp_t strequal(lisp_t s1, lisp_t s2) { return details::string::strequal(s1, s2); }
 
 /// @brief Check if parameter is a string.
+/// @lisp{(stringp s),Function}
 ///
-/// @param x
+/// @param s
 ///
 /// @returns Returns the string if it's a string, nil otherwise.
-inline lisp_t stringp(lisp_t x) { return details::string::stringp(x); }
+inline lisp_t stringp(lisp_t s) { return details::string::stringp(s); }
 
 /// @brief Returns the length of a string.
+/// @lisp{(strlen s),Function}
 ///
-/// @param x A string.
-///
-/// @returns Returns the length of the string.
-inline lisp_t strlen(lisp_t x) { return details::string::strlen(x); }
+/// @param s A string.
+/// @returns The length of the string.
+inline lisp_t strlen(lisp_t s) { return details::string::strlen(s); }
 
 /// @brief Extract a substring from start to end.
+/// @lisp{(substring str n m),Function}
+///
+/// Creates a new string which is a substring of _str_ starting from the _n_th
+/// character through the _m_th character. If _m_ is `nil` the substring starts
+/// from the _n_th character through to the end.
+///
+/// Negative numbers are treated as the _n_th or _m_th character from the
+/// end.
+///
+/// ```lisp
+/// (substring "hello" 2 3)
+///   => "el"
+/// (substring "hello" 2 1)
+///   => nil
+/// (substring "hello" 2 -2)
+///   => "ell"
+/// (substring "hello" -3 -1)
+///   => "llo"
+/// (substring "hello" -1 -3)
+///   => nil
+/// ```
 ///
 /// @param str
-/// @param begin
-/// @param end
+/// @param n
+/// @param m
 ///
 /// @returns Returns a substring.  If start or end is out of bounds, return
-/// nil.  If end is one less than start the zero length string is returned.
+/// `nil`.  If end is one less than start the zero length string is returned.
 /// End equal to zero if start is equal to one is accepted.
-inline lisp_t substring(lisp_t str, lisp_t begin, lisp_t end) { return details::string::substring(str, begin, end); }
+inline lisp_t substring(lisp_t str, lisp_t n, lisp_t m) { return details::string::substring(str, n, m); }
 
 /// @brief Return symbol's print name as a string.
 ///
 /// @param sym A symbol.
 ///
-/// @returns Returns the print name of a symbol as a string. If sym is nil then
-/// returns the string "nil".
+/// @returns Returns the print name of a symbol as a string. If sym is `nil`
+/// then returns the string "nil".
 inline lisp_t symstr(lisp_t sym) { return details::string::symstr(sym); }
 
 } // namespace lisp

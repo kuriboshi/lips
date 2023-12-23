@@ -18,16 +18,38 @@
 #ifndef LISP_PROP_HH
 #define LISP_PROP_HH
 
+/// @file prop.hh
+///
+/// # Property List Functions
+///
+/// `lips` supports property lists on literal atoms. A property list is a list
+/// of values stored in the _property cell_ of a literal atom. A property list
+/// is list of alternating properties and values. For example the property list
+/// `(a 1 b 2)` has two properties `a` and `b` with the values `1` and `2`
+/// respectively. `eq` is used to compare properties when manipulating the
+/// property list with the below functions.
+
 #include "types.hh"
 #include "details/prop.hh"
 
 namespace lisp
 {
+/// @brief Returns the entire property list stored in the property cell of _a_.
+/// @lisp{(getplist a),Function}
 inline lisp_t getplist(lisp_t a) { return details::prop::getplist(a); }
-inline lisp_t getprop(lisp_t a, lisp_t b) { return details::prop::getprop(a, b); }
-inline lisp_t putprop(lisp_t a, lisp_t b, lisp_t c) { return details::prop::putprop(a, b, c); }
-inline lisp_t remprop(lisp_t a, lisp_t b) { return details::prop::remprop(a, b); }
-inline lisp_t setplist(lisp_t a, lisp_t b) { return details::prop::setplist(a, b); }
+/// @brief Returns the value of property _p_ stored in the property cell of the
+/// literal atom _a_.
+/// @lisp{(getprop a p),Function}
+inline lisp_t getprop(lisp_t a, lisp_t p) { return details::prop::getprop(a, p); }
+/// @brief Puts the value _v_ in the property _p_ of _a_.
+/// @lisp{(putprop a p v),Function}
+inline lisp_t putprop(lisp_t a, lisp_t p, lisp_t v) { return details::prop::putprop(a, p, v); }
+/// @brief Removes the property _p_ from the literal atom _a_.
+/// @lisp{(remprop a p),Function}
+inline lisp_t remprop(lisp_t a, lisp_t p) { return details::prop::remprop(a, p); }
+/// @brief Sets the property list of _a_ to _pl_.
+/// @lisp{(setplist a pl),Function}
+inline lisp_t setplist(lisp_t a, lisp_t pl) { return details::prop::setplist(a, pl); }
 } // namespace lisp
 
 #endif

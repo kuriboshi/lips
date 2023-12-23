@@ -20,7 +20,7 @@
 
 /// @file map.hh
 ///
-/// ### Map Functions
+/// # Map Functions
 ///
 /// Map functions iterate over a list of items and applies a function to either
 /// each item or each tail of the list.

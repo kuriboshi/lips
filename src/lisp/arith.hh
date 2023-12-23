@@ -20,7 +20,7 @@
 
 /// @file arith.hh
 ///
-/// ### Arithmetic Functions
+/// # Arithmetic Functions
 ///
 /// `lips` supports both integer and floating point numbers. There are
 /// functions specific for either integers or floating points as well as

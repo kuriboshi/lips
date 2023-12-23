@@ -20,7 +20,7 @@
 
 /// @file logic.hh
 ///
-/// ### Logical Functions
+/// # Logical Functions
 
 #include "types.hh"
 #include "details/logic.hh"
