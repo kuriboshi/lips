@@ -1,0 +1,13 @@
+PROJECT_NAME           = "LIPS - lisp shell"
+OUTPUT_DIRECTORY       = docs
+ALIASES                = "lisp{2}=@brief `\1` (_\2_)" \
+                         ge=>= \
+                         le=<= \
+                         neq=!=
+QUIET                  = YES
+WARNINGS               = NO
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_INCOMPLETE_DOC = NO
+INPUT                  = src
+RECURSIVE              = YES
+GENERATE_LATEX         = NO
