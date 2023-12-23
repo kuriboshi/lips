@@ -91,7 +91,7 @@ lisp_t readline(ref_file_t file)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(listp(head) || head == nil)
+    if(listp(head) || head == nil || head == C_EOF)
       return head;
     lisp_t tail;
     while(true)
