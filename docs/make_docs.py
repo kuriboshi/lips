@@ -152,7 +152,7 @@ def main(dir):
         if filename.suffix == '.hh':
             output = process_file(filename)
             if output:
-                with open(Path('docs') / filename.with_suffix('.md').name, 'w', encoding='utf-8') as f:
+                with open(Path('docs/reference') / filename.with_suffix('.md').name, 'w', encoding='utf-8') as f:
                     [print(i, file=f) for i in output]
 
 main('src/lisp')

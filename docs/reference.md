@@ -744,7 +744,7 @@ list and the `cdr` is updated.  An empty _l_ should be `(nil)` but if
 _l_ is `nil` it is initialized to `((o) o)`.  All pointers to _l_
 points to the new list since the changes are destructive.
 
-### Functions to Function and Evaluate Functions
+### Functions to Define and Evaluate Functions
 
 > `(apply fn l)` (_Function_)
 
