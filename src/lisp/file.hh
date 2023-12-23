@@ -44,6 +44,8 @@ inline lisp_t open(lisp_t filename, lisp_t mode) { return details::file::open(fi
 /// @lisp{(close file),Function}
 ///
 /// @param file A file type object.
+///
+/// @returns `t`.
 inline lisp_t close(lisp_t file) { return details::file::close(file); }
 /// @brief Loads lisp expressions from a file.
 /// @lisp{(load filename),Filename}
@@ -66,7 +68,8 @@ inline lisp_t load(lisp_t filename) { return details::file::load(filename); }
 /// @param expr A lisp expression to print.
 /// @param file If `nil` print on primary output, if `t` print on primary
 /// error, else `file` has to be of type _file_.
-/// @return The expression.
+///
+/// @returns The expression.
 inline lisp_t prin1(lisp_t expr, lisp_t file) { return details::file::prin1(expr, file); }
 /// @brief Prints a lisp expression escaping special characters such as double
 /// quotes.
