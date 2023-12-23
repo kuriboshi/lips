@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-// @file This file exists only to exclude calling the 'exit' function from the
+// This file exists only to exclude calling the 'exit' function from the
 // coverage report.
 
 #ifndef LISP_EXIT_HH

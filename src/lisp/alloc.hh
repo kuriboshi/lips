@@ -17,8 +17,10 @@
 
 /// @file alloc.hh
 ///
-/// @brief Collects various functions which are responsible for allocating
-/// objects and managing object life cycle.
+/// ### Memory Allocation
+///
+/// Functions which are responsible for allocating objects and managing object
+/// life cycle.
 
 #ifndef LISP_ALLOC_HH
 #define LISP_ALLOC_HH
@@ -38,11 +40,11 @@ namespace lisp
 
 /// @brief Allocates an object from the list of free objects.
 ///
-/// The @a getobject functions allocates an @a object and initializes it with
-/// the value passed as an argument to @a getobject.
+/// The _getobject_ functions allocates an _object_ and initializes it with the
+/// value passed as an argument to _getobject_.
 ///
 /// @tparam T The type to be stored.
-/// @param value A value of a type which can be stored in an @a object.
+/// @param value A value of a type which can be stored in an _object_.
 ///
 /// @returns A lisp_t object initialized with an object of type T.
 template<typename T>
@@ -165,7 +167,7 @@ void mkprim(std::string_view pname, Fun&& fun, enum subr_t::subr subr, enum subr
 ///
 /// This function links a variable in lisp with a variable in C++ so that
 /// changing the value in one domain will be reflected in the other.  The lisp
-/// variable will have the print name @a name.  In C++ the type cvariable_t
+/// variable will have the print name _name_.  In C++ the type cvariable_t
 /// will work in many contexts which expects a value of type lisp_t.  If
 /// assigned to in C++ the lisp value will change, if the value is set with
 /// setq in lisp the C++ value will change.
@@ -241,11 +243,11 @@ inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }
 
 /// @brief Checks if the parameter is equal to the symbol "t".
 inline bool is_T(const lisp_t& x) { return x == mkatom("t"); }
-/// @brief Checks if the lisp_t value is equal to @a nil.
+/// @brief Checks if the lisp_t value is equal to `nil`.
 inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
-/// @brief Checks if the object value is equal to @a nil.
+/// @brief Checks if the object value is equal to `nil`.
 inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
-/// @brief Checks if the cvariable_t value is equal to @a nil.
+/// @brief Checks if the cvariable_t value is equal to `nil`.
 inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
 
 } // namespace lisp

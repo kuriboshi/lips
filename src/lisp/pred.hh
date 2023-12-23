@@ -18,6 +18,11 @@
 #ifndef LISP_PRED_HH
 #define LISP_PRED_HH
 
+/// @file pred.hh
+///
+/// ### Predicates
+///
+
 #include "context.hh"
 #include "types.hh"
 #include "details/pred.hh"

@@ -23,14 +23,6 @@
 namespace lisp::details::map
 {
 
-/// @brief Apply function FN1 on each tail of OBJ.
-///
-/// @param l The lisp interpreter.
-/// @param obj A list of items.
-/// @param fn1 The function to apply on each tail of obj.
-/// @param fn2 Function to apply to get the next element of the list (default is CDR).
-///
-/// @returns nil
 lisp_t map(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == object::type::Cons)
@@ -44,14 +36,6 @@ lisp_t map(lisp_t obj, lisp_t fn1, lisp_t fn2)
   return nil;
 }
 
-/// @brief Apply function on each CAR of a list.
-///
-/// @param l The lisp interpreter.
-/// @param obj A list of items. If not a list the function is a no-op.
-/// @param fn1 The function to apply on each CAR of the list.
-/// @param fn2 Function to apply to get the next element (default is CDR).
-///
-/// @returns nil
 lisp_t mapc(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   while(type_of(obj) == object::type::Cons)
@@ -65,14 +49,6 @@ lisp_t mapc(lisp_t obj, lisp_t fn1, lisp_t fn2)
   return nil;
 }
 
-/// @brief Apply FN1 on each consecutive tail of OBJ.
-///
-/// @param l The lisp interpreter.
-/// @param obj A list of items.
-/// @param fn1 The function to apply on each tail of the list.
-/// @param fn2 Function to apply to get the next element (default is CDR).
-///
-/// @returns A list of the result of applying FN1 on each element in the list.
 lisp_t maplist(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
@@ -94,14 +70,6 @@ lisp_t maplist(lisp_t obj, lisp_t fn1, lisp_t fn2)
   return rval;
 }
 
-/// @brief Apply FN1 on each element of OBJ.
-///
-/// @param l The lisp interpreter.
-/// @param obj A list of items.
-/// @param fn1 The function to apply on each element of the list.
-/// @param fn2 Function to apply to get the next element (default is CDR).
-///
-/// @returns A list of the result of applying FN1 on each element in the list.
 lisp_t mapcar(lisp_t obj, lisp_t fn1, lisp_t fn2)
 {
   lisp_t tmp = nil;
