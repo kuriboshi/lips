@@ -722,15 +722,17 @@ public:
     : _u(x)
   {}
 
-  /// @brief Specialization for plain integer types.
+  /// @brief Constructor for integeral types.
   template<typename T>
-    requires std::convertible_to<T, integer_t::value_type>
+    requires std::integral<T>
   explicit object(T i)
     : _u(integer_t{i})
   {}
 
-  /// @brief Constructor for the plain double type.
-  explicit object(double_t::value_type d)
+  /// @brief Constructor for floating point types.
+  template<typename T>
+    requires std::floating_point<T>
+  explicit object(T d)
     : _u(double_t{d})
   {}
 
