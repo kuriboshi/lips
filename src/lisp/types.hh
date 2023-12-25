@@ -741,9 +741,9 @@ public:
     : _u(std::move(x))
   {}
 
-  /// @brief Copy consructor
+  /// @brief Delete copy constructor.
   object(const object&) = delete;
-  /// @brief Assignment operator
+  /// @brief Delete assignment operator.
   object& operator=(const object& x) = delete;
 
   /// @brief Move constructor
