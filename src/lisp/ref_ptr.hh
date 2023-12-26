@@ -79,6 +79,11 @@ public:
       ref_deleter(static_cast<T*>(this));
   }
 
+  ref_count(const ref_count&) = default;
+  ref_count(ref_count&&) = default;
+  ref_count& operator=(const ref_count&) = default;
+  ref_count& operator=(ref_count&&) = default;
+
 protected:
   /// @brief Default constructor.
   ref_count() = default;
