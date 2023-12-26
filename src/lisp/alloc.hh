@@ -163,7 +163,7 @@ inline lisp_t mkatom(std::string_view s) { return details::alloc::mkatom(s); }
 template<typename Fun>
 void mkprim(std::string_view pname, Fun&& fun, enum subr_t::subr subr, enum subr_t::spread spread)
 {
-  details::alloc::mkprim(subr_t(pname, make_fun(std::forward<Fun&&>(fun)), subr, spread));
+  details::alloc::mkprim(subr_t(pname, make_fun(std::forward<Fun>(fun)), subr, spread));
 }
 
 /// @brief Initializes a lisp symbol for use in the C++ program.

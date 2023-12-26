@@ -27,11 +27,11 @@ namespace lisp
 /// @brief Iterates over a list
 ///
 /// Usage:
-/// @code{.cc}
-///   auto list{"(a b c)"_l}
-///   for(auto i: list)
-///     f(i); // Call 'f' on each element in 'list' (i.e. a, b, and c)
-/// @endcode
+/// ```cpp
+/// auto list{"(a b c)"_l}
+/// for(auto i: list)
+///   f(i); // Call 'f' on each element in 'list' (i.e. a, b, and c)
+/// ```
 class iterator
 {
 public:

@@ -136,13 +136,13 @@ public:
   lisp_t val() const { return std::get<var_val_pair>(u).val; }
 };
 
-/// @brief The @a make_tuple overloads creates a tuple from a vector.
+/// @brief The `make_tuple` overloads creates a tuple from a vector.
 ///
 /// @tparam Result Parameter pack used for the tuple.
 /// @tparam Sequqnce Index sequence of result types.
-/// @param values A vector with zero or more lisp_t values.
+/// @param values A vector with zero or more `lisp_t` values.
 ///
-/// @returns A tuple with the values from the vector @a values.
+/// @returns A tuple with the values from the vector _values_.
 template<typename... Result, std::size_t... Sequence>
 auto make_tuple(const std::vector<lisp_t>& values, std::index_sequence<Sequence...>)
 {
@@ -154,7 +154,7 @@ auto make_tuple(const std::vector<lisp_t>& values, std::index_sequence<Sequence.
 /// @tparam Result The pack of tuple types.
 /// @param values A vector with zero or more lisp_t values.
 ///
-/// @returns A tuple with the values from the vector @a values.
+/// @returns A tuple with the values from the vector _values_.
 template<typename... Result>
 std::tuple<Result...> make_tuple(const std::vector<lisp_t>& values)
 {
@@ -206,7 +206,7 @@ private:
   std::function<lisp_t(Args...)> _fun;
 };
 
-/// @brief The @a make_fun set of overloads creates an object of type func_t<Args...>.
+/// @brief The `make_fun` set of overloads creates an object of type func_t<Args...>.
 ///
 /// The object created can then be stored in the subr_t object and later called
 /// with the right number of parameters. There are three overloads taking care
@@ -217,9 +217,9 @@ private:
 /// @tparam Args The zero or more function argument types.
 /// @param fun The function pointer.
 ///
-/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+/// @returns A pointer to _func_base_ which can then be stored in a subr_t.
 template<typename... Args>
-auto make_fun(lisp_t (*fun)(Args...))
+func_base* make_fun(lisp_t (*fun)(Args...))
 {
   return new func_t<Args...>(fun);
 }
@@ -230,9 +230,9 @@ auto make_fun(lisp_t (*fun)(Args...))
 /// @tparam Args The zero or more function argument types.
 /// @param fun The lambda function.
 ///
-/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+/// @returns A pointer to `func_base` which can then be stored in a subr_t.
 template<typename Lambda, typename... Args>
-auto make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
+func_base* make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 {
   return new func_t<Args...>(fun);
 }
@@ -242,9 +242,9 @@ auto make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 /// @tparam Lambda The lambda function type.
 /// @param fun The lambda function.
 ///
-/// @returns A pointer to @a func_base which can then be stored in a subr_t.
+/// @returns A pointer to `func_base` which can then be stored in a subr_t.
 template<typename Lambda>
-auto make_fun(Lambda&& fun)
+func_base* make_fun(Lambda&& fun)
 {
   return make_fun(std::forward<Lambda>(fun), &Lambda::operator());
 }

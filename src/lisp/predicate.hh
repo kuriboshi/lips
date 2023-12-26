@@ -43,8 +43,8 @@ inline lisp_t numberp(lisp_t n) { return details::predicate::numberp(n); }
 /// @brief Returns T if the argument is a list, i.e. a cons cell.
 /// @lisp{(listp l),Function}
 inline lisp_t listp(lisp_t l) { return details::predicate::listp(l); }
-/// @brief Compares each CAR of the @a list and if @a eq returns the list at
-/// that point.
+/// @brief Compares each CAR of the _list_ and if _eq_ returns the list at that
+/// point.
 /// @lisp{(memb atom list),Function}
 ///
 /// Looks for an element _atom_ in _list_ using `eq`, returning the tail with
