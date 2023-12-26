@@ -219,9 +219,9 @@ private:
 ///
 /// @returns A pointer to _func_base_ which can then be stored in a subr_t.
 template<typename... Args>
-func_base* make_fun(lisp_t (*fun)(Args...))
+std::unique_ptr<func_base> make_fun(lisp_t (*fun)(Args...))
 {
-  return new func_t<Args...>(fun);
+  return std::make_unique<func_t<Args...>>(fun);
 }
 
 /// @brief Helper function to create a func_base pointer for lambdas.
@@ -232,9 +232,9 @@ func_base* make_fun(lisp_t (*fun)(Args...))
 ///
 /// @returns A pointer to `func_base` which can then be stored in a subr_t.
 template<typename Lambda, typename... Args>
-func_base* make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
+std::unique_ptr<func_base> make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 {
-  return new func_t<Args...>(fun);
+  return std::make_unique<func_t<Args...>>(fun);
 }
 
 /// @brief Create a func_base pointer for lambdas.
@@ -244,7 +244,7 @@ func_base* make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 ///
 /// @returns A pointer to `func_base` which can then be stored in a subr_t.
 template<typename Lambda>
-func_base* make_fun(Lambda&& fun)
+std::unique_ptr<func_base> make_fun(Lambda&& fun)
 {
   return make_fun(std::forward<Lambda>(fun), &Lambda::operator());
 }
@@ -288,11 +288,11 @@ public:
   /// @param subr The eval/noeval indicator (subr or fsubr (special form)).
   /// @param spread Spread/no spread.
   template<typename... Args>
-  subr_t(std::string_view pname, func_base* fun, enum subr subr, enum spread spread)
+  subr_t(std::string_view pname, std::unique_ptr<func_base> fun, enum subr subr, enum spread spread)
     : name(pname),
       subr(subr),
       spread(spread),
-      _fun(fun)
+      _fun(std::move(fun))
   {}
 
   /// @brief The print name.
