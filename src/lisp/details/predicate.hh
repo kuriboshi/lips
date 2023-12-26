@@ -20,7 +20,7 @@
 
 #include <lisp/types.hh>
 
-namespace lisp::details::pred
+namespace lisp::details::predicate
 {
 
 void init();
@@ -35,6 +35,6 @@ lisp_t boundp(lisp_t);
 lisp_t litatom(lisp_t);
 lisp_t xtypeof(lisp_t);
 
-} // namespace lisp::details::pred
+} // namespace lisp::details::predicate
 
 #endif

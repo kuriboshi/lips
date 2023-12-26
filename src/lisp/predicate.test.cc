@@ -20,7 +20,7 @@
 #include "alloc.hh"
 #include "file.hh"
 #include "low.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
 
 namespace lisp

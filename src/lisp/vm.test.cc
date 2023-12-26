@@ -28,9 +28,9 @@ using Catch::Matchers::Matches;
 #include "alloc.hh"
 #include "file.hh"
 #include "low.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
-#include "prop.hh"
+#include "property.hh"
 #include "vm.hh"
 
 namespace lisp

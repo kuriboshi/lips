@@ -25,7 +25,7 @@
 #include "iter.hh"
 #include "lexer.hh"
 #include "parser.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
 #include "vm.hh"
 

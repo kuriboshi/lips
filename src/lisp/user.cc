@@ -19,9 +19,9 @@
 #include "check.hh"
 #include "iter.hh"
 #include "file.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
-#include "prop.hh"
+#include "property.hh"
 #include "user.hh"
 
 namespace lisp::details::user

@@ -20,7 +20,7 @@
 
 #include <lisp/types.hh>
 
-namespace lisp::details::prop
+namespace lisp::details::property
 {
 
 void init();
@@ -31,6 +31,6 @@ lisp_t putprop(lisp_t, lisp_t, lisp_t);
 lisp_t remprop(lisp_t, lisp_t);
 lisp_t setplist(lisp_t, lisp_t);
 
-} // namespace lisp::details::prop
+} // namespace lisp::details::property
 
 #endif

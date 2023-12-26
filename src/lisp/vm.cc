@@ -26,12 +26,12 @@
 #include "details/logic.hh"
 #include "details/low.hh"
 #include "details/map.hh"
-#include "details/pred.hh"
+#include "details/predicate.hh"
 #include "details/string.hh"
 #include "details/user.hh"
 #include "file.hh"
 #include "prim.hh"
-#include "prop.hh"
+#include "property.hh"
 #include "rtable.hh"
 #include "version.hh"
 
@@ -147,9 +147,9 @@ public:
     details::logic::init();
     details::low::init();
     details::map::init();
-    details::pred::init();
+    details::predicate::init();
     details::prim::init();
-    details::prop::init();
+    details::property::init();
     details::string::init();
     details::user::init();
     details::vm::init();

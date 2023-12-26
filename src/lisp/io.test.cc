@@ -23,7 +23,7 @@
 
 #include "alloc.hh"
 #include "io.hh"
-#include "pred.hh"
+#include "predicate.hh"
 
 namespace
 {

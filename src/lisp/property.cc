@@ -18,9 +18,9 @@
 #include "alloc.hh"
 #include "check.hh"
 #include "prim.hh"
-#include "prop.hh"
+#include "property.hh"
 
-namespace lisp::details::prop
+namespace lisp::details::property
 {
 lisp_t setplist(lisp_t x, lisp_t pl)
 {
@@ -103,4 +103,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::details::prop
+} // namespace lisp::details::property

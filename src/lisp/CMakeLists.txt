@@ -32,9 +32,9 @@ target_sources(
           map.cc
           debug.cc
           parser.cc
-          pred.cc
+          predicate.cc
           prim.cc
-          prop.cc
+          property.cc
           repl.cc
           rtable.cc
           string.cc
@@ -63,9 +63,9 @@ set(_liblisp_source
           debug.hh
           parser.hh
           pool.hh
-          pred.hh
+          predicate.hh
           prim.hh
-          prop.hh
+          property.hh
           ref_ptr.hh
           repl.hh
           rtable.hh
@@ -83,9 +83,9 @@ set(_liblisp_details
           details/logic.hh
           details/low.hh
           details/map.hh
-          details/pred.hh
+          details/predicate.hh
           details/prim.hh
-          details/prop.hh
+          details/property.hh
           details/string.hh
           details/user.hh
           details/vm.hh)
@@ -126,9 +126,9 @@ if(LIPS_ENABLE_TESTS)
             main.test.cc
             parser.test.cc
             pool.test.cc
-            pred.test.cc
+            predicate.test.cc
             prim.test.cc
-            prop.test.cc
+            property.test.cc
             repl.test.cc
             rtable.test.cc
             string.test.cc

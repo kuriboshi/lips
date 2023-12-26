@@ -24,7 +24,7 @@
 #include "alloc.hh"
 #include "file.hh"
 #include "iter.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
 #include "types.hh"
 #include "util.hh"

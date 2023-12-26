@@ -16,11 +16,11 @@
 //
 
 #include "alloc.hh"
-#include "pred.hh"
+#include "predicate.hh"
 #include "prim.hh"
 #include "user.hh"
 
-namespace lisp::details::pred
+namespace lisp::details::predicate
 {
 lisp_t numberp(lisp_t a)
 {
@@ -63,8 +63,8 @@ lisp_t equal(lisp_t l1, lisp_t l2)
     case object::type::Cons:
       while(type_of(l1) == type_of(l2))
       {
-        if(pred::equal(l1->car(), l2->car()) != nil)
-          return pred::equal(l1->cdr(), l2->cdr());
+        if(predicate::equal(l1->car(), l2->car()) != nil)
+          return predicate::equal(l1->cdr(), l2->cdr());
         return nil;
       }
     case object::type::String:
@@ -181,4 +181,4 @@ void init()
   // clang-format on
 }
 
-} // namespace lisp::details::pred
+} // namespace lisp::details::predicate

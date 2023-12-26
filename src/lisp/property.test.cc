@@ -19,7 +19,7 @@
 
 #include "alloc.hh"
 #include "prim.hh"
-#include "prop.hh"
+#include "property.hh"
 
 namespace lisp
 {
