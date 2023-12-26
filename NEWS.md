@@ -1,5 +1,14 @@
 # Release notes
 
+## 3.1.0 (2023-12-26)
+
+Minor release mainly revising the documentation.
+
+- Generate external documentation from in source documentation
+- Add more in source documentaiton
+- Add Doxygen configuration file
+- Fix crash when `readline` is called without parameters
+
 ## 3.0.0 (2023-12-22)
 
 Major release due to a number of API level changes
