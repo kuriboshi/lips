@@ -20,7 +20,7 @@
 
 /// @file logic.hh
 ///
-/// # Logical Functions
+/// # Logic Functions
 
 #include "types.hh"
 #include "details/logic.hh"
@@ -30,7 +30,7 @@ namespace lisp
 
 /// @brief If any expression evaluates to nil return `nil` otherwise return the
 /// result of the last expression.
-/// @lisp{(and args...),NoSpread NLambda}
+/// @lisp{(and args...),NoSpread NLambda Function}
 inline lisp_t p_and(lisp_t args) { return details::logic::p_and(args); }
 /// @brief Returns the first expression evaluating to non-`nil`, otherwise
 /// return `nil`.

@@ -73,31 +73,37 @@ Create a floating point number.
 
 **Returns**: A floating point number as a LISP object.
 
-> ```cpp
-> inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t
-> ```
+> `(cons a b)` (_Function_)
+
+```cpp
+inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t
+```
 
 Builds a cons cell out of the arguments.
 
 The most basic of lisp functions.  Allocate a cons cell and fill in the
 cell's car and cdr parts.
 
-- _a_ [in] The value to put in the head (car) of the cons cell.
-- _b_ [in] The value to put in the tail (cdr) of the cons cell.
+- _a_ The value to put in the head (car) of the cons cell.
+- _b_ The value to put in the tail (cdr) of the cons cell.
 
 **Returns**: The cons cell.
 
-> ```cpp
-> inline lisp_t obarray()
-> ```
+> `(obarray)` (_Function_)
 
-Build a list of symbols in the local symbol table.
+```cpp
+inline lisp_t obarray()
+```
+
+Builds a list of symbols in the local symbol table.
 
 **Returns**: A list of local symbols in no particular order.
 
-> ```cpp
-> inline lisp_t freecount()
-> ```
+> `(freecount)` (_Function_)
+
+```cpp
+inline lisp_t freecount()
+```
 
 Number of free cell in the free cell list.
 

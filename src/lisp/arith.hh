@@ -22,9 +22,10 @@
 ///
 /// # Arithmetic Functions
 ///
-/// `lips` supports both integer and floating point numbers. There are
-/// functions specific for either integers or floating points as well as
-/// generic functions which can take either type.
+/// `lips` supports both integer (currently only 64 bit values are supported)
+/// and floating point numbers (double). There are functions specific for
+/// either integers or floating points as well as generic functions which can
+/// take either type.
 
 #include "types.hh"
 #include "details/arith.hh"
@@ -61,6 +62,9 @@ inline lisp_t difference(lisp_t x, lisp_t y) { return details::arith::difference
 inline lisp_t divide(lisp_t x, lisp_t y) { return details::arith::divide(x, y); }
 /// @brief Compares two integer or floating point values for equality.
 /// @lisp{(eqp x y),Function}
+///
+/// (Note: This differs from Interlisp which returns `t` if _x_ and _y_ are
+/// `eq` or if they are numbers and are equal in value.)
 inline lisp_t eqp(lisp_t x, lisp_t y) { return details::arith::eqp(x, y); }
 /// @brief Returns the floating point difference between _x_ and _y_.
 /// @lisp{(fdifference x y),Function}

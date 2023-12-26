@@ -1,6 +1,6 @@
 # String Functions
 
-> `(concat args...)` (_Function_)
+> `(concat args...)` (_NoSpread Function_)
 
 ```cpp
 inline lisp_t concat(lisp_t x)
@@ -51,7 +51,7 @@ inline lisp_t stringp(lisp_t s)
 
 Check if parameter is a string.
 
-@param s
+- _s_ A string.
 
 **Returns**: Returns the string if it's a string, nil otherwise.
 
@@ -94,9 +94,9 @@ end.
   => nil
 ```
 
-@param str
-@param n
-@param m
+- _str_ A string.
+- _n_ Start character.
+- _m_ End character.
 
 **Returns**: Returns a substring.  If start or end is out of bounds, return
 `nil`.  If end is one less than start the zero length string is returned.

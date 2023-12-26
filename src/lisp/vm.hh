@@ -18,6 +18,12 @@
 #ifndef LISP_VM_HH
 #define LISP_VM_HH
 
+/// @file vm.hh
+///
+/// # Function Evaluation
+///
+/// Functions in this section relate to the evaluation of lisp expressions.
+
 #include <array>
 #include <concepts>
 #include <cstdint>
@@ -416,7 +422,7 @@ private:
   int _destblockused{0};
 };
 
-/// @brief Provides functions to get and set the read_table.
+/// @internal Provides functions to get and set the read_table.
 template<typename T>
 concept syntax_table = requires(T v, std::unique_ptr<syntax> syn) {
   {
@@ -425,7 +431,7 @@ concept syntax_table = requires(T v, std::unique_ptr<syntax> syn) {
   v.read_table(std::move(syn));
 };
 
-/// @brief Provides getting and setting standard file streams.
+/// @internal Provides getting and setting standard file streams.
 template<typename T>
 concept standard_streams = requires(T v, ref_file_t file) {
   {
@@ -457,7 +463,7 @@ concept standard_streams = requires(T v, ref_file_t file) {
   } -> std::same_as<ref_file_t>;
 };
 
-/// @brief Privides functions to get and set the print level.
+/// @internal Provides functions to get and set the print level.
 template<typename T>
 concept print_level = requires(T v, integer_t::value_type i) {
   v.printlevel(i);
@@ -466,7 +472,7 @@ concept print_level = requires(T v, integer_t::value_type i) {
   } -> std::same_as<integer_t::value_type>;
 };
 
-/// @brief Provides access to some miscellaneous global variables.
+/// @internal Provides access to some miscellaneous global variables.
 template<typename T>
 concept misc_globals = requires(T v, lisp_t exp) {
   {
@@ -483,7 +489,7 @@ concept misc_globals = requires(T v, lisp_t exp) {
   };
 };
 
-/// @brief Provides some error reporing functions.
+/// @internal Provides some error reporing functions.
 template<typename T>
 concept error_functions = requires(T v, std::error_code code, const std::string& str, lisp_t exp) {
   {
@@ -504,8 +510,7 @@ concept error_functions = requires(T v, std::error_code code, const std::string&
   } -> std::same_as<lisp_t>;
 };
 
-/// @brief The concept required by the Context parameter to vm_t.
-///
+/// @internal The concept required by the Context parameter to vm_t.
 template<typename T>
 concept Context = syntax_table<T> && standard_streams<T> && print_level<T> && misc_globals<T> && error_functions<T>;
 
@@ -516,8 +521,10 @@ concept Context = syntax_table<T> && standard_streams<T> && print_level<T> && mi
 /// input and output file, the stdin and stdout, and some other global
 /// symbols. It also provides access to the implementation of error functions.
 ///
-/// @tparam Context The context holds the actual implementations.
-/// The Context needs to provide the following functions:
+/// The Context needs to satisfy the _Context_ concept. The type
+/// `lisp::context_t` provides a default implementation.
+///
+/// @tparam Context The _context_ holds the actual implementation.
 template<Context Context>
 class vm_t final: public vm
 {
@@ -567,15 +574,53 @@ inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefho
 inline void unwind() { vm::get().unwind(); }
 
 /// @brief Evaluate a lisp expression.
+/// @lisp{(eval fn),Function}
 ///
 /// @param expr The lisp expression to evaluate.
 ///
 /// @returns Returns the result of the evaluation.
 inline lisp_t eval(lisp_t expr) { return vm::get().eval(expr); }
+/// @brief Evaluate a lisp expression read from a string.
 inline lisp_t eval(const std::string& expr) { return vm::get().eval(expr); }
-inline lisp_t apply(lisp_t fun, lisp_t args) { return vm::get().apply(fun, args); }
+/// @brief Apply a function to a list of arguments.
+/// @lisp{(apply fn lis),Function}
+///
+/// Applies the function _fn_ to the arguments in the list _list_ as if _fn_ is
+/// called with the list as its arguments.
+///
+/// ```lisp
+/// (apply car '((a b c)))
+///   => a
+/// ```
+inline lisp_t apply(lisp_t fn, lisp_t list) { return vm::get().apply(fn, list); }
+/// @brief A nospread version of `apply`.
+/// @lisp{(apply* fn args...),NoSpread Function}
+///
+/// ```lisp
+/// (apply* car '(a b c))
+///   => a
+/// ```
+
+/// @brief Print a backtrace of the control stack.
+/// @lisp{(backtrace),Function}
+///
+/// Subject to change between any version of the interpeter.
+///
+/// @returns `nil`
 inline lisp_t backtrace() { return vm::get().backtrace(); }
+/// @brief Retrieves the most recent environment.
+/// @lisp{(topofstack),Function}
+///
+/// Subject to change between any version of the interpeter.
+///
+/// @returns An object of type environment.
 inline lisp_t topofstack() { return vm::get().topofstack(); }
+/// @brief Converts an object of type environment to a list.
+/// @lisp{(destblock),Function}
+///
+/// Subject to change between any version of the interpeter.
+///
+/// @returns A list representing a destblock.
 inline lisp_t destblock(lisp_t a) { return vm::destblock(a); }
 
 inline lisp_t perror(std::error_code code, lisp_t a) { return vm::perror(code, a); }

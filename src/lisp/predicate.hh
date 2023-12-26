@@ -30,25 +30,72 @@ namespace lisp
 {
 /// @brief Returns T if argument is a number (either an integer or a floating
 /// point value).
-inline lisp_t numberp(lisp_t a) { return details::predicate::numberp(a); }
+/// @lisp{(numberp n),Function}
+inline lisp_t numberp(lisp_t n) { return details::predicate::numberp(n); }
 /// @brief Returns T if the argument is a list, i.e. a cons cell.
-inline lisp_t listp(lisp_t a) { return details::predicate::listp(a); }
+/// @lisp{(listp l),Function}
+inline lisp_t listp(lisp_t l) { return details::predicate::listp(l); }
 /// @brief Compares each CAR of the @a list and if @a eq returns the list at
 /// that point.
+/// @lisp{(memb atom list),Function}
 ///
-/// (memb 'b '(a b c)) => (b c)
+/// Looks for an element _atom_ in _list_ using `eq`, returning the tail with
+/// that element at the head. Returns `nil` if not found.
+///
+/// ```lisp
+/// (memb 'a '(a b c))
+///   => (a b c)
+/// (memb 'b '(a b c))
+///   => (b c)
+/// (memb 'd '(a b c))
+///   => nil
+/// ```
 inline lisp_t memb(lisp_t atom, lisp_t list) { return details::predicate::memb(atom, list); }
 /// @brief Returns T if the two lisp expressions are equal.
-inline lisp_t equal(lisp_t l1, lisp_t l2) { return details::predicate::equal(l1, l2); }
+/// @lisp{(equal l1 lf2),Function}
+///
+/// Returns `t` if _x_ and _y_ are `eq`, or if _x_ and _y_ are `eqp`, or if _x_
+/// and _y_ are `strequal`, or if _x_ and _y_ are lists `(and (equal (car x)
+/// (car x)) (equal (cdr x) (cdr y)))`.
+inline lisp_t equal(lisp_t x, lisp_t y) { return details::predicate::equal(x, y); }
 /// @brief Returns T if the expression is not a cons cell.
+/// @lisp{(nlistp a),Function}
+///
+/// `t` if _x_ is not a list, otherwise `nil`. Same as `(not (listp x))`.
 inline lisp_t nlistp(lisp_t a) { return details::predicate::nlistp(a); }
 /// @brief Returns T of a and b are not the same object.
+/// @lisp{(neq a b),Function}
 inline lisp_t neq(lisp_t a, lisp_t b) { return details::predicate::neq(a, b); }
 /// @brief Returns T if the symbol is unbound.
+/// @lisp{(boundp a),Function}
 inline lisp_t boundp(lisp_t a) { return details::predicate::boundp(a); }
 /// @brief Returns T if the value is a symbol or nil.
+/// @lisp{(litatom a),Function}
+/// @lisp{(symbolp a),Function}
+///
+/// The function `symbolp` is an alias for `litatom`.
 inline lisp_t litatom(lisp_t a) { return details::predicate::litatom(a); }
 /// @brief Returns the type of an expression as a symbol.
+/// @lisp{(typeof a),Function}
+///
+/// Returns a symbol depending on the type of the argument.
+///
+/// | Symbol    | Type                     |
+/// |-----------|--------------------------|
+/// | symbol    | Symbol                   |
+/// | integer   | Integer                  |
+/// | float     | Floating point           |
+/// | indirect  | Indirect value           |
+/// | cons      | Cons cell / list         |
+/// | string    | String                   |
+/// | subr      | Compiled function        |
+/// | fsubr     | Compiled noeval function |
+/// | lambda    | Lambda function          |
+/// | nlambda   | NLambda function         |
+/// | closure   | Closure                  |
+/// | environ   | Environment              |
+/// | file      | File                     |
+/// | cvariable | C/++ Variable            |
 inline lisp_t xtypeof(lisp_t a) { return details::predicate::xtypeof(a); }
 } // namespace lisp
 

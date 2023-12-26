@@ -1,8 +1,9 @@
 # Arithmetic Functions
 
-`lips` supports both integer and floating point numbers. There are
-functions specific for either integers or floating points as well as
-generic functions which can take either type.
+`lips` supports both integer (currently only 64 bit values are supported)
+and floating point numbers (double). There are functions specific for
+either integers or floating points as well as generic functions which can
+take either type.
 
 > `(abs n)` (_Function_)
 
@@ -59,6 +60,9 @@ inline lisp_t eqp(lisp_t x, lisp_t y)
 ```
 
 Compares two integer or floating point values for equality.
+
+(Note: This differs from Interlisp which returns `t` if _x_ and _y_ are
+`eq` or if they are numbers and are equal in value.)
 
 > `(fdifference x y)` (_Function_)
 

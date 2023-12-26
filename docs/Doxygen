@@ -3,7 +3,8 @@ OUTPUT_DIRECTORY       = docs
 ALIASES                = "lisp{2}=@brief `\1` (_\2_)" \
                          ge=>= \
                          le=<= \
-                         neq=!=
+                         neq=!= \
+                         internal=@brief
 QUIET                  = YES
 WARNINGS               = NO
 WARN_IF_UNDOCUMENTED   = NO

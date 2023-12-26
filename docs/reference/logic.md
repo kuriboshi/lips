@@ -1,6 +1,6 @@
-# Logical Functions
+# Logic Functions
 
-> `(and args...)` (_NoSpread NLambda_)
+> `(and args...)` (_NoSpread NLambda Function_)
 
 ```cpp
 inline lisp_t p_and(lisp_t args)

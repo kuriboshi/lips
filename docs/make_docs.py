@@ -10,7 +10,8 @@ class State(Enum):
     NONE = 0
     PREAMBLE = 1
     HEADER = 2
-    FILE = 3
+    INTERNAL = 3
+    FILE = 4
 
 class Signature(object):
     def __init__(self):
@@ -37,14 +38,14 @@ class Signature(object):
 class Function(object):
     def __init__(self):
         self.data = []
-        self.lisp_signature = None
+        self.lisp_signature = []
         self.cpp_signature = Signature()
 
     def add(self, line):
         self.data.append(line)
 
     def lisp(self, line):
-        self.lisp_signature = line
+        self.lisp_signature.append(line)
 
     def cpp(self, line):
         self.cpp_signature.add(line)
@@ -56,7 +57,7 @@ class Function(object):
         output = []
         if self.lisp_signature:
             output.append('')
-            output.append(f'> {self.lisp_signature}')
+            [output.append(f'> {i}') for i in self.lisp_signature]
             output.extend(self.cpp_signature.print(''))
         else:
             output.extend(self.cpp_signature.print('> '))
@@ -64,7 +65,7 @@ class Function(object):
             output.append('')
             [output.append(i) for i in self.data]
         self.data = []
-        self.lisp_signature = None
+        self.lisp_signature = []
         return output
 
 def process_file(filename):
@@ -77,6 +78,12 @@ def process_file(filename):
             state = State.PREAMBLE
             continue
         if state == State.NONE:
+            continue
+
+        m = re.match('^/// @internal.*', line)
+        if m:
+            output.extend(function.print())
+            state = State.INTERNAL
             continue
 
         # A @brief command starts a new function description.

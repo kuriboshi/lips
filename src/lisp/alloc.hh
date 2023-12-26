@@ -100,22 +100,25 @@ inline lisp_t mknumber(integer_t::value_type value) { return details::alloc::mkn
 inline lisp_t mkfloat(double_t::value_type value) { return details::alloc::mkfloat(value); }
 
 /// @brief Builds a cons cell out of the arguments.
+/// @lisp{(cons a b),Function}
 ///
 /// The most basic of lisp functions.  Allocate a cons cell and fill in the
 /// cell's car and cdr parts.
 ///
-/// @param a [in] The value to put in the head (car) of the cons cell.
-/// @param b [in] The value to put in the tail (cdr) of the cons cell.
+/// @param a The value to put in the head (car) of the cons cell.
+/// @param b The value to put in the tail (cdr) of the cons cell.
 ///
 /// @returns The cons cell.
 inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
 
-/// @brief Build a list of symbols in the local symbol table.
+/// @brief Builds a list of symbols in the local symbol table.
+/// @lisp{(obarray),Function}
 ///
 /// @returns A list of local symbols in no particular order.
 inline lisp_t obarray() { return details::alloc::obarray(); }
 
 /// @brief Number of free cell in the free cell list.
+/// @lisp{(freecount),Function}
 ///
 /// @returns The number of free cells.
 inline lisp_t freecount() { return details::alloc::freecount(); }

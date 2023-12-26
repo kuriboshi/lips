@@ -29,7 +29,7 @@ namespace lisp
 {
 
 /// @brief Concatenate strings.
-/// @lisp{(concat args...),Function}
+/// @lisp{(concat args...),NoSpread Function}
 inline lisp_t concat(lisp_t x) { return details::string::concat(x); }
 
 /// @brief Compare two strings.
@@ -62,7 +62,7 @@ inline lisp_t strequal(lisp_t s1, lisp_t s2) { return details::string::strequal(
 /// @brief Check if parameter is a string.
 /// @lisp{(stringp s),Function}
 ///
-/// @param s
+/// @param s A string.
 ///
 /// @returns Returns the string if it's a string, nil otherwise.
 inline lisp_t stringp(lisp_t s) { return details::string::stringp(s); }
@@ -97,9 +97,9 @@ inline lisp_t strlen(lisp_t s) { return details::string::strlen(s); }
 ///   => nil
 /// ```
 ///
-/// @param str
-/// @param n
-/// @param m
+/// @param str A string.
+/// @param n Start character.
+/// @param m End character.
 ///
 /// @returns Returns a substring.  If start or end is out of bounds, return
 /// `nil`.  If end is one less than start the zero length string is returned.
