@@ -19,8 +19,8 @@
 
 #include "alloc.hh"
 #include "file.hh"
+#include "list.hh"
 #include "map.hh"
-#include "prim.hh"
 
 namespace lisp
 {

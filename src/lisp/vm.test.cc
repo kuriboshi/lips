@@ -29,7 +29,6 @@ using Catch::Matchers::Matches;
 #include "file.hh"
 #include "low.hh"
 #include "predicate.hh"
-#include "prim.hh"
 #include "property.hh"
 #include "vm.hh"
 
@@ -278,6 +277,32 @@ TEST_CASE("eval: backtrace, topofstack, destblock")
   CHECK(type_of(t) == object::type::Environ);
   auto d = destblock(t);
   CHECK(d == nil);
+}
+
+TEST_CASE("vm: primary functions")
+{
+  SECTION("QUOTE")
+  {
+    auto a0 = quote("a"_a);
+    CHECK(a0 == "a"_a);
+    auto a1 = quote("a"_a);
+    CHECK(a1 == "a"_a);
+  }
+
+  SECTION("LAMBDA")
+  {
+    set("a"_a, 1_l);
+    auto f0 = lambda("(a)"_l, "((plus a 1))"_l);
+    auto r0 = apply(f0, mklist(2_l));
+    CHECK(type_of(r0) == object::type::Integer);
+    CHECK(type_of(3_l) == object::type::Integer);
+    // TODO: Can't do this because Catch2 goes into an infinite loop when
+    // converting a lisp_t to a string.
+    // CHECK(r0 == 3_l);
+    CHECK(r0->as_integer() == 3_l->as_integer());
+  }
+
+  SECTION("error") { CHECK_THROWS(error("error"_s)); }
 }
 
 TEST_CASE("vm: trace")

@@ -104,3 +104,7 @@ package-test:
 	(cd test; cmake -G Ninja -B ../build/package-test .)
 	(cd test; cmake --build ../build/package-test)
 	(cd build/package-test; ctest)
+
+.PHONY: docs
+docs:
+	./docs/make_docs.py

@@ -25,6 +25,8 @@ namespace lisp::details::predicate
 
 void init();
 
+lisp_t eq(lisp_t, lisp_t);
+lisp_t atom(lisp_t);
 lisp_t numberp(lisp_t);
 lisp_t listp(lisp_t);
 lisp_t memb(lisp_t, lisp_t);

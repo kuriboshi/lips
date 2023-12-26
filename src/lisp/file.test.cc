@@ -25,8 +25,8 @@
 
 #include "alloc.hh"
 #include "file.hh"
+#include "list.hh"
 #include "predicate.hh"
-#include "prim.hh"
 
 namespace
 {

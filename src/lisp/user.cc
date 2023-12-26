@@ -20,12 +20,14 @@
 #include "iter.hh"
 #include "file.hh"
 #include "predicate.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "property.hh"
 #include "user.hh"
 
 namespace lisp::details::user
 {
+using lisp::vm;
+
 inline lisp_t getargs(lisp_t al)
 {
   if(is_nil(al->cdr()))

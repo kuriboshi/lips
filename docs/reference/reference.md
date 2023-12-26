@@ -399,15 +399,25 @@ takes any number of arguments and prints them.
 
 ## Lisp Functions
 
-- [Arithmetic Functions](./arith.md)
+This section describes functions available when programming in lisp.
+Functions are shown in their lisp forms.  In C++ the return type of
+each function is `lisp_t`.  Every function has an optional first
+argument which is the lisp interpreter.  If left out the currently
+active lisp interpreter is used.  For spread functions the number of
+arguments of type `lisp_t` are the same as their lisp counterpart.
+For nospread functions the C++ function has only one argument which
+should be a list.  There is no distinction between lambda and nlambda
+functions in C++ as the normal C++ evaluation rules apply.
+
 - [Memory Management Functions](./alloc.md)
-- [File Functions](./file.md)
-- [Logic Functions](./logic.md)
-- [Low Level Functions](./low.md)
-- [Map Functions](./map.md)
-- [Predicates](./predicate.md)
-- [Primary Functions](./prim.md)
-- [Property List Functions](./property.md)
-- [String Functions](./string.md)
-- [User Functions](./user.md)
 - [Function Evaluation](./vm.md)
+- [List Functions](./list.md)
+- [Low Level Functions](./low.md)
+- [Predicates](./predicate.md)
+- [String Functions](./string.md)
+- [Input and Output Functions](./file.md)
+- [Arithmetic Functions](./arith.md)
+- [Logic Functions](./logic.md)
+- [Map Functions](./map.md)
+- [Property List Functions](./property.md)
+- [User Functions](./user.md)

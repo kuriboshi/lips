@@ -17,7 +17,7 @@
 
 #include "alloc.hh"
 #include "map.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "vm.hh"
 
 namespace lisp::details::map

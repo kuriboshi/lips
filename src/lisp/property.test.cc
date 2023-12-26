@@ -18,7 +18,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "property.hh"
 
 namespace lisp

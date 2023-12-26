@@ -16,40 +16,21 @@
 //
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
 #include "alloc.hh"
 #include "arith.hh"
 #include "file.hh"
-#include "low.hh"
+#include "list.hh"
 #include "predicate.hh"
-#include "prim.hh"
+#include "types.hh"
+#include "util.hh"
 
 namespace lisp
 {
 
-TEST_CASE("prim: primary functions")
+TEST_CASE("list: list functions")
 {
-  SECTION("QUOTE")
-  {
-    auto a0 = quote("a"_a);
-    CHECK(a0 == "a"_a);
-    auto a1 = quote("a"_a);
-    CHECK(a1 == "a"_a);
-  }
-
-  SECTION("LAMBDA")
-  {
-    set("a"_a, 1_l);
-    auto f0 = lambda("(a)"_l, "((plus a 1))"_l);
-    auto r0 = apply(f0, mklist(2_l));
-    CHECK(type_of(r0) == object::type::Integer);
-    CHECK(type_of(3_l) == object::type::Integer);
-    // TODO: Can't do this because Catch2 goes into an infinite loop when
-    // converting a lisp_t to a string.
-    // CHECK(r0 == 3_l);
-    CHECK(r0->as_integer() == 3_l->as_integer());
-  }
-
   SECTION("CAR and CDR")
   {
     auto sample = eval("(cons 1 2)");
@@ -116,13 +97,6 @@ TEST_CASE("prim: primary functions")
     CHECK(cdadr(sym) == nil);
     CHECK(cddar(sym) == nil);
     CHECK(cdddr(sym) == nil);
-  }
-
-  SECTION("atom")
-  {
-    auto sym = mkatom("sym");
-    CHECK(!is_nil(atom(sym)));
-    CHECK(!is_nil(atom(sym)));
   }
 
   SECTION("append")
@@ -204,14 +178,6 @@ TEST_CASE("prim: primary functions")
     CHECK(equal(nth(foo, 5_l), mklist(5_l)));
   }
 
-  SECTION("null")
-  {
-    CHECK(!is_nil(null(nil)));
-    CHECK(!is_nil(null(nil)));
-    CHECK(is_nil(null(0_l)));
-    CHECK(is_nil(null(0_l)));
-  }
-
   SECTION("list")
   {
     auto l = list(mklist(1_l, 2_l));
@@ -219,7 +185,13 @@ TEST_CASE("prim: primary functions")
     CHECK(length(l)->as_integer() == 2);
   }
 
-  SECTION("error") { CHECK_THROWS(error("error"_s)); }
+  SECTION("null")
+  {
+    CHECK(!is_nil(null(nil)));
+    CHECK(!is_nil(null(nil)));
+    CHECK(is_nil(null(0_l)));
+    CHECK(is_nil(null(0_l)));
+  }
 }
 
 } // namespace lisp

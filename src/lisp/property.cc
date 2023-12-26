@@ -17,7 +17,7 @@
 
 #include "alloc.hh"
 #include "check.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "property.hh"
 
 namespace lisp::details::property

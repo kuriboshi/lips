@@ -21,13 +21,19 @@
 #include "file.hh"
 #include "low.hh"
 #include "predicate.hh"
-#include "prim.hh"
 
 namespace lisp
 {
 
 TEST_CASE("pred: predicate functions")
 {
+  SECTION("atom")
+  {
+    auto sym = mkatom("sym");
+    CHECK(!is_nil(atom(sym)));
+    CHECK(!is_nil(atom(sym)));
+  }
+
   SECTION("numberp")
   {
     CHECK(numberp(mknumber(1)) != nil);

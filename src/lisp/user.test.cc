@@ -24,7 +24,6 @@
 #include "file.hh"
 #include "low.hh"
 #include "predicate.hh"
-#include "prim.hh"
 #include "property.hh"
 #include "user.hh"
 

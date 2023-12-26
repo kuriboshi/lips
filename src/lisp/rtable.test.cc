@@ -18,7 +18,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
-#include "prim.hh"
+#include "list.hh"
+#include "predicate.hh"
 #include "rtable.hh"
 
 namespace lisp

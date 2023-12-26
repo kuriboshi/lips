@@ -23,7 +23,7 @@
 #include "file.hh"
 #include "parser.hh"
 #include "predicate.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "rtable.hh"
 
 namespace

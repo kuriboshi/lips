@@ -17,11 +17,27 @@
 
 #include "alloc.hh"
 #include "predicate.hh"
-#include "prim.hh"
 #include "user.hh"
 
 namespace lisp::details::predicate
 {
+lisp_t eq(lisp_t a, lisp_t b)
+{
+  if(a == b)
+    return T;
+  if(type_of(a) == object::type::Integer && type_of(b) == object::type::Integer && a->as_integer() == b->as_integer())
+    return T;
+  return nil;
+}
+
+lisp_t atom(lisp_t a)
+{
+  if(is_nil(a) || is_T(a) || type_of(a) == object::type::Symbol || type_of(a) == object::type::Integer
+    || type_of(a) == object::type::Float)
+    return T;
+  return nil;
+}
+
 lisp_t numberp(lisp_t a)
 {
   switch(type_of(a))
@@ -43,9 +59,9 @@ lisp_t listp(lisp_t a)
 
 lisp_t memb(lisp_t x, lisp_t ls)
 {
-  while(!eq(ls, nil))
+  while(!predicate::eq(ls, nil))
   {
-    if(eq(x, ls->car()))
+    if(predicate::eq(x, ls->car()))
       return ls;
     ls = ls->cdr();
   }
@@ -153,6 +169,8 @@ lisp_t xtypeof(lisp_t a)
 
 namespace pn
 {
+inline constexpr std::string_view ATOM = "atom";       // t if atom
+inline constexpr std::string_view EQ = "eq";           // pointer equal
 inline constexpr std::string_view LISTP = "listp";     // t if cons
 inline constexpr std::string_view NLISTP = "nlistp";   // not listp
 inline constexpr std::string_view NEQ = "neq";         // not eq
@@ -168,6 +186,8 @@ inline constexpr std::string_view TYPEOF = "typeof";   // return type as an atom
 void init()
 {
   // clang-format off
+  mkprim(pn::ATOM,    atom,    subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::EQ,      eq,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::LISTP,   listp,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::NLISTP,  nlistp,  subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::NEQ,     neq,     subr_t::subr::EVAL, subr_t::spread::SPREAD);

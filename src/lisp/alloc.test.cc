@@ -23,8 +23,9 @@
 
 #include "alloc.hh"
 #include "file.hh"
+#include "list.hh"
 #include "low.hh"
-#include "prim.hh"
+#include "predicate.hh"
 
 namespace lisp
 {

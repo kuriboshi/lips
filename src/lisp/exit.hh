@@ -22,7 +22,7 @@
 #define LISP_EXIT_HH
 
 #include "types.hh"
-#include "details/prim.hh"
+#include "details/vm.hh"
 
 namespace lisp
 {
@@ -30,7 +30,7 @@ namespace lisp
 ///
 /// @param code An exit code. Must be of type integer.
 /// @returns Does not return.
-inline lisp_t exit(lisp_t code) { return details::prim::exit(code); }
+inline lisp_t exit(lisp_t code) { return details::vm::exit(code); }
 } // namespace lisp
 
 #endif

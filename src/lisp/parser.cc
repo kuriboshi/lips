@@ -17,7 +17,7 @@
 //
 
 #include "predicate.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "parser.hh"
 
 namespace lisp

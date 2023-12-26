@@ -23,6 +23,13 @@
 namespace lisp::details::vm
 {
 void init();
+
+lisp_t quote(lisp_t);
+lisp_t lambda(lisp_t, lisp_t);
+lisp_t nlambda(lisp_t, lisp_t);
+lisp_t closure(lisp_t, lisp_t);
+lisp_t error(lisp_t);
+lisp_t exit(lisp_t);
 } // namespace lisp::details::vm
 
 #endif

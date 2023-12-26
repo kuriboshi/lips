@@ -1,4 +1,4 @@
-# File Functions
+# Input and Output Functions
 
 Functions managing files.
 

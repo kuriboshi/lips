@@ -24,7 +24,6 @@
 #include "io.hh"
 #include "parser.hh"
 #include "predicate.hh"
-#include "prim.hh"
 #include "vm.hh"
 #include "details/file.hh"
 

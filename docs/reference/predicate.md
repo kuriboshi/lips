@@ -1,5 +1,23 @@
 # Predicates
 
+> `(eq a b)` (_Function_)
+
+```cpp
+inline lisp_t eq(lisp_t a, lisp_t b)
+```
+
+`t` if the objects _a_ and _b_ are the same object. Integers are
+considered 'eq' if their values are the same.
+
+> `(atom a)` (_Function_)
+
+```cpp
+inline lisp_t atom(lisp_t a)
+```
+
+`t` if _a_ is `nil`, `t`, a symbol, an integer, or a floating point
+object.
+
 > `(numberp n)` (_Function_)
 
 ```cpp

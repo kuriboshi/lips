@@ -26,7 +26,7 @@
 #include "lexer.hh"
 #include "parser.hh"
 #include "predicate.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "vm.hh"
 
 namespace lisp
@@ -295,6 +295,8 @@ lisp_t splice(lisp_t x, lisp_t y, bool tailp)
 
 namespace lisp::details::file
 {
+using lisp::vm;
+
 lisp_t open(lisp_t filename, lisp_t mode)
 {
   check(filename, object::type::String, object::type::Symbol);

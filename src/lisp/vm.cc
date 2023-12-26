@@ -30,7 +30,7 @@
 #include "details/string.hh"
 #include "details/user.hh"
 #include "file.hh"
-#include "prim.hh"
+#include "list.hh"
 #include "property.hh"
 #include "rtable.hh"
 #include "version.hh"
@@ -64,15 +64,79 @@ lisp::lisp_t make_t()
 namespace lisp::details::vm
 {
 
+/// @brief Make an indirect pointer to the object OBJ.
+///
+lisp_t mkindirect(lisp_t obj)
+{
+  // If already an indirect type object, return it.  We want all symbols that
+  // we include in closures on the same level to refer to the same value.
+  if(type_of(obj) == object::type::Indirect)
+    return obj;
+  // If it's a new object, cons up the storage for it wasting the car part.
+  return getobject(indirect_t{obj});
+}
+
+/// @brief Builds a list of indirect pointers to the values of the symbols in
+/// the list VARS. Used to construct a closure.
+///
+lisp_t closobj(lisp_t vars)
+{
+  if(is_nil(vars))
+    return nil;
+  check(vars, object::type::Cons);
+  check(vars->car(), object::type::Symbol);
+  return cons(mkindirect(vars->car()->value()), closobj(vars->cdr()));
+}
+
+lisp_t quote(lisp_t x) { return x; }
+
+lisp_t lambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, true); }
+
+lisp_t nlambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, false); }
+
+lisp_t closure(lisp_t fun, lisp_t vars)
+{
+  auto c = ref_closure_t::create();
+  c->cfunction = fun;
+  c->closed = vars;
+  auto f = length(vars);
+  c->count = f->as_integer();
+  f = closobj(vars);
+  if(f == C_ERROR)
+    return f;
+  c->cvalues = f;
+  return getobject(c);
+}
+
+lisp_t error(lisp_t mess)
+{
+  check(mess, object::type::String);
+  return error(error_errc::user_error, mess);
+}
+
+lisp_t exit(lisp_t status)
+{
+  if(is_nil(status))
+    throw lisp_finish("exit called", 0);
+  check(status, object::type::Integer);
+  throw lisp_finish("exit called", status->as_integer());
+}
+
 namespace pn
 {
 inline constexpr std::string_view E = "e";                   // noeval version of eval
 inline constexpr std::string_view EVAL = "eval";             // evaluate exp
 inline constexpr std::string_view APPLY = "apply";           // apply function on args
 inline constexpr std::string_view APPLYSTAR = "apply*";      // apply nospread
+inline constexpr std::string_view CLOSURE = "closure";       // create static environment
+inline constexpr std::string_view LAMBDA = "lambda";         // create lambda object
+inline constexpr std::string_view NLAMBDA = "nlambda";       // make nlambda object
+inline constexpr std::string_view QUOTE = "quote";           // don't eval arg
 inline constexpr std::string_view BACKTRACE = "backtrace";   // control stack backtrace
 inline constexpr std::string_view TOPOFSTACK = "topofstack"; // return top of value stack
 inline constexpr std::string_view DESTBLOCK = "destblock";   // convert environment to list
+inline constexpr std::string_view ERROR = "error";           // error
+inline constexpr std::string_view EXIT = "exit";             // exit lips
 } // namespace pn
 
 inline lisp_t eval(lisp_t expr) { return lisp::vm::get().eval(expr); }
@@ -88,9 +152,15 @@ void init()
   mkprim(pn::EVAL,       eval,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::APPLY,      apply,      subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::APPLYSTAR,  apply,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::CLOSURE,    closure,    subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::LAMBDA,     lambda,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::NLAMBDA,    nlambda,    subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::QUOTE,      quote,      subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::BACKTRACE,  backtrace,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::TOPOFSTACK, topofstack, subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::ERROR,      error,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
+  mkprim(pn::EXIT,       exit,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   // clang-format on
 }
 
@@ -144,11 +214,11 @@ public:
     details::arith::init();
     details::debug::init();
     details::file::init();
+    details::list::init();
     details::logic::init();
     details::low::init();
     details::map::init();
     details::predicate::init();
-    details::prim::init();
     details::property::init();
     details::string::init();
     details::user::init();

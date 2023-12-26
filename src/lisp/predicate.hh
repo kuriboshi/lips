@@ -28,6 +28,14 @@
 
 namespace lisp
 {
+/// @brief `t` if the objects _a_ and _b_ are the same object. Integers are
+/// considered 'eq' if their values are the same.
+/// @lisp{(eq a b),Function}
+inline lisp_t eq(lisp_t a, lisp_t b) { return details::predicate::eq(a, b); }
+/// @brief `t` if _a_ is `nil`, `t`, a symbol, an integer, or a floating point
+/// object.
+/// @lisp{(atom a),Function}
+inline lisp_t atom(lisp_t a) { return details::predicate::atom(a); }
 /// @brief Returns T if argument is a number (either an integer or a floating
 /// point value).
 /// @lisp{(numberp n),Function}

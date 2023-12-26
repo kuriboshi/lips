@@ -27,13 +27,13 @@ target_sources(
           io.cc
           lexer.cc
           lisp.cc
+          list.cc
           logic.cc
           low.cc
           map.cc
           debug.cc
           parser.cc
           predicate.cc
-          prim.cc
           property.cc
           repl.cc
           rtable.cc
@@ -57,6 +57,7 @@ set(_liblisp_source
           iter.hh
           lexer.hh
           lisp.hh
+          list.hh
           logic.hh
           low.hh
           map.hh
@@ -64,7 +65,6 @@ set(_liblisp_source
           parser.hh
           pool.hh
           predicate.hh
-          prim.hh
           property.hh
           ref_ptr.hh
           repl.hh
@@ -80,11 +80,11 @@ set(_liblisp_details
           details/arith.hh
           details/debug.hh
           details/file.hh
+          details/list.hh
           details/logic.hh
           details/low.hh
           details/map.hh
           details/predicate.hh
-          details/prim.hh
           details/property.hh
           details/string.hh
           details/user.hh
@@ -120,6 +120,7 @@ if(LIPS_ENABLE_TESTS)
             io.test.cc
             lexer.test.cc
             lisp.test.cc
+            list.test.cc
             logic.test.cc
             low.test.cc
             map.test.cc
@@ -127,7 +128,6 @@ if(LIPS_ENABLE_TESTS)
             parser.test.cc
             pool.test.cc
             predicate.test.cc
-            prim.test.cc
             property.test.cc
             repl.test.cc
             rtable.test.cc
