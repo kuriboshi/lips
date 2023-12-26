@@ -154,12 +154,13 @@ def process_file(filename):
     return output
 
 def main(dir):
-    p = Path(dir)
-    for filename in p.iterdir():
-        if filename.suffix == '.hh':
-            output = process_file(filename)
-            if output:
-                with open(Path('docs/reference') / filename.with_suffix('.md').name, 'w', encoding='utf-8') as f:
-                    [print(i, file=f) for i in output]
+    for d in dir:
+        p = Path(d)
+        for filename in p.iterdir():
+            if filename.suffix == '.hh':
+                output = process_file(filename)
+                if output:
+                    with open(Path('docs/reference') / filename.with_suffix('.md').name, 'w', encoding='utf-8') as f:
+                        [print(i, file=f) for i in output]
 
-main('src/lisp')
+main(['src/lisp', 'src/lips'])

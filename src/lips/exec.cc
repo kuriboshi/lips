@@ -60,12 +60,10 @@ std::unordered_map<std::string, std::string> exechash;
 
 namespace
 {
-///
 /// @brief preparefork Prepares a provess after fork.
 ///
-/// @details Sets the processgroup to the group currently beeing built.  Resets
-/// signals to their default value.
-///
+/// Sets the processgroup to the group currently beeing built.  Resets signals
+/// to their default value.
 void preparefork()
 {
   signal(SIGHUP, SIG_DFL);
@@ -79,15 +77,13 @@ void preparefork()
   signal(SIGTTOU, SIG_DFL);
 }
 
-///
 /// @brief mfork Forks and initializes the child.
 ///
-/// @details Forks and initializes the child. If the process hasn't previously
-/// been forked, its pid is used as process group id. It also grabs the tty for
-/// the new process group.
+/// Forks and initializes the child. If the process hasn't previously been
+/// forked, its pid is used as process group id. It also grabs the tty for the
+/// new process group.
 ///
-/// @return The pid of the new process.
-///
+/// @returns The pid of the new process.
 int mfork()
 {
   int pid = 0;
@@ -117,19 +113,16 @@ int mfork()
   return pid;
 }
 
-///
 /// @brief check_meta Checks for meta characters.
 ///
-/// @details Checks the string S if it contains any non-quoted meta characters
-/// in which case it returns true. It also strips off all quote-characters
-/// (backslash).
+/// Checks the string S if it contains any non-quoted meta characters in which
+/// case it returns true. It also strips off all quote-characters (backslash).
 ///
 /// @param s String to check.
 ///
-/// @return Pair of bool and string. The bool is true if string contains any
+/// @returns Pair of bool and string. The bool is true if string contains any
 /// meta characters otherwise false. The string is the input string stripped of
 /// any quote characters.
-///
 std::pair<bool, std::string> check_meta(const std::string& s)
 {
   std::string result;
@@ -199,14 +192,12 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
   return args;
 }
 
-///
 /// @brief make_exec Builds a command line for execve.
 ///
-/// @details Parses command line expression and builds argument vector suitable
-/// for execve.
+/// Parses command line expression and builds argument vector suitable for
+/// execve.
 ///
-/// @return Vector with command and arguments.
-///
+/// @returns Vector with command and arguments.
 std::vector<std::string> make_exec(lisp_t command)
 {
   std::vector<std::string> args;
@@ -222,16 +213,14 @@ std::vector<std::string> make_exec(lisp_t command)
   return args;
 }
 
-///
 /// @brief waitfork Wait for a process.
 ///
-/// @details Wait for specific process or the first one if PID is zero.
+/// Wait for specific process or the first one if PID is zero.
 ///
 /// @param pid The process id to wait for. Zero mean wait for the first process
 /// to change its status.
 ///
-/// @return The status.
-///
+/// @returns The status.
 job::stat_t waitfork(pid_t pid)
 {
   job::stat_t stat{0};
@@ -257,17 +246,15 @@ job::stat_t waitfork(pid_t pid)
   return stat;
 }
 
-///
 /// @brief execute Execute a process.
 ///
-/// @details Fork a new process, if not already in a fork, and calls execve.
-/// Wait for the process to return (using waitfork).
+/// Fork a new process, if not already in a fork, and calls execve.  Wait for
+/// the process to return (using waitfork).
 ///
 /// @param name Name of the program.
 /// @param command List of command arguments.
 ///
-/// @return C_ERROR if there is an error or the exit status of the process.
-///
+/// @returns C_ERROR if there is an error or the exit status of the process.
 lisp_t execute(const std::string& name, lisp_t command)
 {
   auto args = make_exec(command);
@@ -299,14 +286,12 @@ lisp_t execute(const std::string& name, lisp_t command)
   return mknumber(WEXITSTATUS(status.stat));
 }
 
-///
 /// @brief ifexec Check if file is executable.
 ///
 /// @param dir Directory to check.
 /// @param name Name of file to check.
 ///
-/// @return True if directory DIR contains a NAME that is executable.
-///
+/// @returns True if directory DIR contains a NAME that is executable.
 bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
 {
   auto path = dir / name;
@@ -337,12 +322,10 @@ void checkfork()
 
 namespace lisp::exec
 {
-///
 /// @brief execcommand - Tries to execute the lisp expression exp as a command.
 ///
-/// @details Execcomand returns 0 if there is no executable file in the path, 1
-/// if the command was successively run and -1 if there was some error.
-///
+/// Execcomand returns 0 if there is no executable file in the path, 1 if the
+/// command was successively run and -1 if there was some error.
 int execcommand(lisp_t exp, lisp_t* res)
 {
   *res = T;
@@ -537,7 +520,7 @@ lisp_t pipecmd(lisp_t cmds)
   return mknumber(WEXITSTATUS(status.stat));
 }
 
-lisp_t back(lisp_t x)
+lisp_t back(lisp_t cmd)
 {
   int pid = 0;
 
@@ -545,7 +528,7 @@ lisp_t back(lisp_t x)
   {
     insidefork = true;
     preparefork();
-    eval(x);
+    eval(cmd);
     ::exit(0);
   }
   else if(pid < 0)

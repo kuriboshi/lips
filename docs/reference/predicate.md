@@ -41,8 +41,8 @@ Returns T if the argument is a list, i.e. a cons cell.
 inline lisp_t memb(lisp_t atom, lisp_t list)
 ```
 
-Compares each CAR of the @a list and if @a eq returns the list at
-that point.
+Compares each CAR of the _list_ and if _eq_ returns the list at that
+point.
 
 Looks for an element _atom_ in _list_ using `eq`, returning the tail with
 that element at the head. Returns `nil` if not found.

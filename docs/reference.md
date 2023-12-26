@@ -421,3 +421,53 @@ functions in C++ as the normal C++ evaluation rules apply.
 - [Map Functions](./docs/map.md)
 - [Property List Functions](./docs/property.md)
 - [User Functions](./docs/user.md)
+
+## The `lips` Shell
+
+On the top level `lips` reads expressions from standard in and
+evaluates the expressions.  Commands entered on the top level are
+always treated as functions, even if no parameters are given or if the
+expression is a single atom.  In order to print the value of a
+variable the function print must be used.
+
+All expressions typed at the top level prompt are treated as lists.
+This means that `lips` supplies an extra pair of matching parenthesis
+around all expressions.  If the first expression of a line is an atom,
+and not a list, input terminates with either a return (providing that
+parenthesis in subexpressions match), or an extra right parenthesis.
+In the first case, a matching pair of parenthesis are added
+surrounding the line, in the second case an extra left parenthesis is
+added as the first character.  Again, if a left parenthesis is missing
+a matching parenthesis is inserted.
+
+Typing the outermost parenthesis explicitly will make `lips` print out
+the return value of the expression.  This is the way normal lisp
+systems behave, but when used only as a command shell the return value
+is most often uninteresting.  The return value is also stored in the
+variable `value`.
+
+The `lips` shell extends finding the functional form in a lisp
+expression when the symbol doesn't have an `autoload` property, or
+loading the file didn't define the symbol. In that case `lips` looks
+under the property `alias`.  The atom is replaced with the expression
+stored under that property, if any, and the rest of the expression is
+appended at the end and the evaluation process continues.  When all
+else fails it is assumed the atom stands for an executable command.
+The return value of an executable command is, at present, always `t`.
+
+When `lips` reads an expression some characters are treated as
+read-macros.  A read-macro can expand or transform the input in
+different ways.  The current version of the reader in `lips` isn't
+fully developed yet and it's likely to be improved in later versions.
+
+In addition to read-macros the input is also transformed using a hook
+which is evaluated after an expression is read and before it's
+evaluated.  For example, the input `ls | wc -l` is rewritten by the
+transform hook into `(pipe-cmd (ls) (wc -l))`.  The `pipe-cmd`
+function evaluates each expression in a separate process, connecting
+the stdout from the `ls` function (i.e. the `ls` command) to the stdin
+of the `wc` function (command).
+
+Redirection of stdout and stdin is also handled by the transform hook.
+
+- [Shell Functions](./docs/exec.md)
