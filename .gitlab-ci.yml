@@ -63,7 +63,7 @@ package-test-job:
         apt-get install -y g++ libncurses-dev
         apt-get install -y git
       )
-    - make package_test
+    - make package-test
 
 deploy-job:
   stage: deploy
