@@ -424,6 +424,8 @@ functions in C++ as the normal C++ evaluation rules apply.
 
 ## The `lips` Shell
 
+This section describes the sample `lips` application, a Unix shell.
+
 On the top level `lips` reads expressions from standard in and
 evaluates the expressions.  Commands entered on the top level are
 always treated as functions, even if no parameters are given or if the
@@ -432,13 +434,24 @@ variable the function print must be used.
 
 All expressions typed at the top level prompt are treated as lists.
 This means that `lips` supplies an extra pair of matching parenthesis
-around all expressions.  If the first expression of a line is an atom,
-and not a list, input terminates with either a return (providing that
-parenthesis in subexpressions match), or an extra right parenthesis.
-In the first case, a matching pair of parenthesis are added
-surrounding the line, in the second case an extra left parenthesis is
-added as the first character.  Again, if a left parenthesis is missing
-a matching parenthesis is inserted.
+around all expressions.
+
+```lisp
+echo "hello world"
+hello world
+  =>
+(echo "hello world")
+hello world
+  => t
+```
+
+If the first expression of a line is an atom, and not a list, input
+terminates with either a return (providing that parenthesis in
+subexpressions match), or an extra right parenthesis.  In the first
+case, a matching pair of parenthesis are added surrounding the line,
+in the second case an extra left parenthesis is added as the first
+character.  Again, if a left parenthesis is missing a matching
+parenthesis is inserted.
 
 Typing the outermost parenthesis explicitly will make `lips` print out
 the return value of the expression.  This is the way normal lisp
