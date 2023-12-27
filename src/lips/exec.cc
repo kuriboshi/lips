@@ -707,7 +707,7 @@ void init()
   mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::SETENV,       setenv,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::EXEC,         doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
   do_rehash();
