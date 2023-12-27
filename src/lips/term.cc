@@ -52,13 +52,10 @@ char* getstr(const char* id, char** area)
 
 void term_source::clearlbuf()
 {
-  linepos = 0;
-  parcount = 0;
+  _linepos = 0;
+  _parcount = 0;
 }
 
-/*
- * Set up keymap.
- */
 void term_source::init_keymap()
 {
   key_tab.fill(function::T_INSERT);
@@ -76,51 +73,44 @@ void term_source::init_keymap()
   key_tab[static_cast<int>('"')] = function::T_STRING;
 }
 
-/* Init terminal to CBREAK and no ECHO.  */
 void term_source::init_term()
 {
   static bool initialized = false;
 
   if(!initialized)
   {
-    tcgetattr(0, &oldterm);
-    newterm = oldterm;
-    newterm.c_lflag &= (unsigned)~ECHO;
-    newterm.c_lflag &= (unsigned)~ICANON;
-    newterm.c_lflag |= ISIG;
-    newterm.c_cc[VMIN] = 1;
-    newterm.c_cc[VTIME] = 0;
-    curup = nullptr;
-    curfwd = nullptr;
-    char* termc = tcap.data();
+    tcgetattr(0, &_oldterm);
+    _newterm = _oldterm;
+    _newterm.c_lflag &= (unsigned)~ECHO;
+    _newterm.c_lflag &= (unsigned)~ICANON;
+    _newterm.c_lflag |= ISIG;
+    _newterm.c_cc[VMIN] = 1;
+    _newterm.c_cc[VTIME] = 0;
+    _curup = nullptr;
+    _curfwd = nullptr;
+    char* termc = _termcap.data();
     if(auto* term = getenv("TERM"); term != nullptr)
     {
-      // std::array<char, 1024> bp{};
       if(tgetent(nullptr, term) == 1)
       {
-        clear = getstr("cl", &termc);
-        curup = getstr("up", &termc);
-        curdn = "\n";
-        curfwd = getstr("nd", &termc);
-        cleol = getstr("ce", &termc);
-        nocap = (curup == nullptr || curdn == nullptr || curfwd == nullptr || cleol == nullptr);
+        _clear = getstr("cl", &termc);
+        _curup = getstr("up", &termc);
+        _curdn = "\n";
+        _curfwd = getstr("nd", &termc);
+        _cleol = getstr("ce", &termc);
+        _nocap = (_curup == nullptr || _curdn == nullptr || _curfwd == nullptr || _cleol == nullptr);
       }
     }
     init_keymap();
     initialized = true;
   }
-  tcsetattr(0, TCSANOW, &newterm);
+  tcsetattr(0, TCSANOW, &_newterm);
 }
 
 term_source::~term_source() { end_term(); }
 
-/* Reset terminal to previous value */
-void term_source::end_term() { tcsetattr(0, TCSANOW, &oldterm); }
+void term_source::end_term() { tcsetattr(0, TCSANOW, &_oldterm); }
 
-/*
- * Put a character on stdout prefixing it with a ^ if it's
- * a control character.
- */
 void term_source::pputc(char c, FILE* file)
 {
   auto is_control = [](auto c) { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; };
@@ -134,9 +124,6 @@ void term_source::pputc(char c, FILE* file)
     putc(c, file);
 }
 
-/*
- * Put a character c, on stream file, escaping enabled if esc != 0.
- */
 void term_source::putch(char c, FILE* file, bool esc)
 {
   if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
@@ -144,16 +131,12 @@ void term_source::putch(char c, FILE* file, bool esc)
   pputc(c, file);
 }
 
-/*
- * Get a character.  Buffer input with procedure getline, and get characters
- * from linebuffer.
- */
 char term_source::getch()
 {
   while(true)
   {
-    if(position < linepos)
-      return linebuffer.at(position++);
+    if(_position < _linepos)
+      return _linebuffer.at(_position++);
     auto line = getline();
     end_term();
     if(line)
@@ -162,39 +145,27 @@ char term_source::getch()
   }
 }
 
-/*
- * Unget a character.  If reading from a terminal, just push it back in the
- * buffer, if not, do an ungetc.
- */
 void term_source::ungetch(char)
 {
-  if(position > 0)
-    --position;
+  if(_position > 0)
+    --_position;
 }
 
-/*
- * Skips separators in the beginning of the line and returns true if the first
- * non-separator character is a left parenthesis, zero otherwise.
- */
 bool term_source::firstnotlp()
 {
   int i = 0;
-  for(; i < position && std::isspace(linebuffer.at(i)) != 0; i++)
+  for(; i < _position && std::isspace(_linebuffer.at(i)) != 0; ++i)
     ;
-  return linebuffer.at(i) != '(';
+  return _linebuffer.at(i) != '(';
 }
 
-/*
- * Delete one character the easy way by sending backspace - space - backspace.
- * Do it twice if it was a control character.
- */
 void term_source::delonechar()
 {
-  --linepos;
+  --_linepos;
   putc('\b', stdout);
   putc(' ', stdout);
   putc('\b', stdout);
-  if(is_control(linebuffer.at(linepos)))
+  if(is_control(_linebuffer.at(_linepos)))
   {
     putc('\b', stdout);
     putc(' ', stdout);
@@ -202,57 +173,46 @@ void term_source::delonechar()
   }
 }
 
-/*
- * Returns zero if the line contains only separators.
- */
 bool term_source::onlyblanks()
 {
-  for(int i = linepos; i > 0; --i)
+  for(int i = _linepos; i > 0; --i)
   {
-    if(std::isspace(linebuffer.at(i)) == 0)
+    if(std::isspace(_linebuffer.at(i)) == 0)
       return false;
   }
   return true;
 }
 
-/*
- * Output a character on stdout, used only in tputs.
- */
 int term_source::outc(int c)
 {
   putc(c, stdout);
   return c;
 }
 
-/*
- * retype - If ALL is 0 then retype only current line.  If ALL is 1 then retype
- *          complete line, including prompt.  It ALL is 2 just delete all
- *          lines.  Used for ctrl-u kill.
- */
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::retype(int all)
 {
   int nl = 0;
 
-  if(!nocap)
+  if(!_nocap)
   {
     int l = 0;
-    for(int i = 0; i < linepos; i++)
+    for(int i = 0; i < _linepos; ++i)
     {
-      if(linebuffer.at(i) == '\n')
+      if(_linebuffer.at(i) == '\n')
       {
         nl = i;
         ++l;
       }
     }
-    for(l = (all != 0 ? l : 1); l != 0; l--)
+    for(l = (all != 0 ? l : 1); l != 0; --l)
     {
       if(all == 2)
       {
         putc('\r', stdout);
-        tputs(cleol, 1, outc);
+        tputs(_cleol, 1, outc);
       }
-      tputs(curup, 1, outc);
+      tputs(_curup, 1, outc);
     }
     putc('\r', stdout);
     if(all != 0)
@@ -261,36 +221,36 @@ void term_source::retype(int all)
       std::cout << current_prompt;
     if(all != 2)
     {
-      for(int i = nl; i < linepos; i++)
+      for(int i = nl; i < _linepos; ++i)
       {
-        if(linebuffer.at(i) == '\n')
-          tputs(cleol, 1, outc);
+        if(_linebuffer.at(i) == '\n')
+          tputs(_cleol, 1, outc);
         else
-          pputc(linebuffer.at(i), stdout);
+          pputc(_linebuffer.at(i), stdout);
       }
     }
-    tputs(cleol, 1, outc);
+    tputs(_cleol, 1, outc);
   }
   else
   {
     if(all == 0)
     {
       putc('\r', stdout);
-      int i = linepos;
-      for(; i >= 0 && linebuffer.at(i) != '\n'; --i)
+      int i = _linepos;
+      for(; i >= 0 && _linebuffer.at(i) != '\n'; --i)
         ;
       if(i == 0)
         std::cout << current_prompt;
-      for(++i; i < linepos; i++)
-        pputc(linebuffer.at(i), stdout);
+      for(++i; i < _linepos; ++i)
+        pputc(_linebuffer.at(i), stdout);
     }
     else if(all == 1)
     {
       pputc(CRPRNT, stdout);
       pputc('\n', stdout);
       std::cout << current_prompt;
-      for(int i = 0; i < linepos; ++i)
-        pputc(linebuffer.at(i), stdout);
+      for(int i = 0; i < _linepos; ++i)
+        pputc(_linebuffer.at(i), stdout);
     }
     else
     {
@@ -301,27 +261,24 @@ void term_source::retype(int all)
   }
 }
 
-/*
- * Stuff for file name completion.
- */
 char* term_source::mkexstr()
 {
-  int i = linepos;
+  int i = _linepos;
 
-  last = word.data() + BUFSIZ - 1;
-  *last-- = '\0';
-  *last-- = '*';
-  while(std::isspace(linebuffer.at(i - 1)) == 0 && i > 0)
-    *last-- = linebuffer.at(--i);
-  return ++last;
+  _last = _word.data() + BUFSIZ - 1;
+  *_last-- = '\0';
+  *_last-- = '*';
+  while(std::isspace(_linebuffer.at(i - 1)) == 0 && i > 0)
+    *_last-- = _linebuffer.at(--i);
+  return ++_last;
 }
 
 void term_source::fillrest(const char* word)
 {
-  for(word += strlen(last) - 1; *word != 0; word++)
+  for(word += strlen(_last) - 1; *word != 0; ++word)
   {
     pputc(*word, stdout);
-    linebuffer.at(linepos++) = *word;
+    _linebuffer.at(_linepos++) = *word;
   }
 }
 
@@ -341,11 +298,11 @@ void term_source::complete(lisp_t words)
 {
   char c = 1;
 
-  auto pos = strlen(last) - 1;
+  auto pos = strlen(_last) - 1;
   while(c != '\0' && checkchar(words, pos++, &c))
   {
     pputc(c, stdout);
-    linebuffer.at(linepos++) = c;
+    _linebuffer.at(_linepos++) = c;
   }
 }
 
@@ -364,12 +321,6 @@ lisp_t term_source::strip(lisp_t files, const char* prefix, const char* suffix)
   return stripped->car();
 }
 
-/*
- * Scans backwards and try to find a matching left parenthesis skipping strings
- * and escapes.  It records its finding in parpos.  It also updates where the
- * cursor is now in currentpos, so it can find its way back.  BEGIN is the
- * position in linebuffer from where to start searching.
- */
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::scan(int begin)
 {
@@ -378,11 +329,11 @@ void term_source::scan(int begin)
   paren_blink state{paren_blink::NORMAL};
   int parcount{0};
   bool pars{false};
-  parpos = {0, 0, nullptr};
-  currentpos = {0, 0, nullptr};
+  _parpos = {0, 0, nullptr};
+  _currentpos = {0, 0, nullptr};
   for(int pos{begin}; pos >= 0; --pos)
   {
-    auto cur = linebuffer.at(pos);
+    auto cur = _linebuffer.at(pos);
     ++cpos;
     int escape{0};
     if(cur == '"' && state == paren_blink::INSTRING)
@@ -395,21 +346,21 @@ void term_source::scan(int begin)
       state = paren_blink::RIGHTPAR;
     else if(cur == '\n')
     {
-      if(parpos.line == line)
+      if(_parpos.line == line)
       {
-        parpos.cpos = cpos - parpos.cpos;
-        parpos.line_start = &linebuffer.at(pos);
+        _parpos.cpos = cpos - _parpos.cpos;
+        _parpos.line_start = &_linebuffer.at(pos);
       }
-      if(currentpos.line_start == nullptr)
-        currentpos.line_start = &linebuffer.at(pos);
+      if(_currentpos.line_start == nullptr)
+        _currentpos.line_start = &_linebuffer.at(pos);
       cpos = 0;
-      line++;
+      ++line;
     }
-    while(linebuffer.at(pos) == '\\')
+    while(_linebuffer.at(pos) == '\\')
     {
-      escape++;
-      pos--;
-      cpos++;
+      ++escape;
+      --pos;
+      ++cpos;
     }
     if((escape % 2) == 1)
     {
@@ -437,11 +388,11 @@ void term_source::scan(int begin)
           break;
         case paren_blink::LEFTPAR:
           state = paren_blink::NORMAL;
-          parcount--;
+          --parcount;
           break;
         case paren_blink::RIGHTPAR:
           state = paren_blink::NORMAL;
-          parcount++;
+          ++parcount;
           break;
         default:
           break;
@@ -449,78 +400,72 @@ void term_source::scan(int begin)
     }
     if(!pars && parcount == 0)
     {
-      parpos.line_start = &linebuffer.at(pos);
-      parpos.cpos = cpos;
-      parpos.line = line;
+      _parpos.line_start = &_linebuffer.at(pos);
+      _parpos.cpos = cpos;
+      _parpos.line = line;
       pars = true;
     }
     if(line == 0)
-      currentpos.cpos++;
+      ++_currentpos.cpos;
   }
-  currentpos.line = line;
+  _currentpos.line = line;
   if(line == 0)
   {
-    currentpos.cpos += static_cast<int>(current_prompt.length());
-    currentpos.line_start = linebuffer.data();
+    _currentpos.cpos += static_cast<int>(current_prompt.length());
+    _currentpos.line_start = _linebuffer.data();
   }
-  parpos.line = line - parpos.line;
-  if(parpos.line == 0)
-    parpos.cpos = cpos - parpos.cpos + static_cast<int>(current_prompt.length());
+  _parpos.line = line - _parpos.line;
+  if(_parpos.line == 0)
+    _parpos.cpos = cpos - _parpos.cpos + static_cast<int>(current_prompt.length());
 }
 
-/*
- * Puts the string STR on stdout NTIM times using tputs.
- */
 void term_source::nput(const char* str, int ntim)
 {
-  for(; ntim > 0; ntim--)
+  for(; ntim > 0; --ntim)
   {
     tputs(str, 1, outc);
   }
 }
 
-/*
- * Blink matching paren.
- */
 void term_source::blink()
 {
-  if(nocap)
+  if(_nocap)
     return; // Requires termcap and enough capability
-  scan(linepos - 1);
+  scan(_linepos - 1);
 
-  const auto ldiff = currentpos.line - parpos.line;
-  const auto cdiff = parpos.cpos - currentpos.cpos;
-  nput(curup, ldiff);
+  const auto ldiff = _currentpos.line - _parpos.line;
+  const auto cdiff = _parpos.cpos - _currentpos.cpos;
+  nput(_curup, ldiff);
   if(cdiff < 0)
   {
-    if(-cdiff < parpos.cpos)
+    if(-cdiff < _parpos.cpos)
       nput("\b", -cdiff);
     else
     {
       putc('\r', stdout);
-      nput(curfwd, parpos.cpos); /* This is really silly.  */
+      nput(_curfwd, _parpos.cpos);
     }
   }
   else
-    nput(curfwd, cdiff);
+    nput(_curfwd, cdiff);
   fflush(stdout);
 
   // Blink for 1s or until key pressed
   struct pollfd pfd = {1, POLLIN, 0};
   poll(&pfd, 1, blink_time);
 
-  linebuffer.at(linepos) = '\0';
+  _linebuffer.at(_linepos) = '\0';
   if(ldiff == 0)
   {
-    for(int i = 0; parpos.line_start[i] != 0; i++)
-      pputc(parpos.line_start[i], stdout);
+    for(int i = 0; _parpos.line_start[i] != 0; ++i)
+      pputc(_parpos.line_start[i], stdout);
   }
   else
   {
-    if(currentpos.line == 0)
+    if(_currentpos.line == 0)
       std::cout << current_prompt;
-    for(int i = 0; currentpos.line_start[i] != 0; i++)
-      pputc(currentpos.line_start[i], stdout);
+    for(int i = 0; _currentpos.line_start[i] != 0; ++i)
+      pputc(_currentpos.line_start[i], stdout);
   }
   fflush(stdout);
 }
@@ -532,12 +477,6 @@ void term_source::clearscr()
 #endif
 }
 
-//
-// Get a line from stdin.  Do line editing functions such as kill line, retype
-// line and delete character.  Count parethesis pairs and terminate line if
-// matching right paren.  Typing just a return puts a right paren in the buffer
-// as well as the newline.  Returns empty optional on EOF.
-//
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::optional<std::string> term_source::getline()
 {
@@ -547,19 +486,19 @@ std::optional<std::string> term_source::getline()
 
   init_term();
 
-  if(options.command)
+  if(_options.command)
   {
     std::cerr << "Unbalanced parenthesis\n";
     end_term();
     ::exit(1);
   }
-  position = 0;
-  linepos = 0;
-  const int origpar = parcount;
+  _position = 0;
+  _linepos = 0;
+  const int origpar = _parcount;
   while(true)
   {
     if(escaped != 0)
-      escaped--;
+      --escaped;
     fflush(stdout);
     if(readchar(stdin, &c) == 0)
     {
@@ -569,19 +508,19 @@ std::optional<std::string> term_source::getline()
     switch(key_tab.at(static_cast<unsigned char>(c)))
     {
       case function::T_EOF:
-        if(linepos == 0)
+        if(_linepos == 0)
         {
-          linebuffer.at(linepos++) = EOF;
+          _linebuffer.at(_linepos++) = EOF;
           end_term();
           return {};
         }
         pputc(c, stdout);
-        linebuffer.at(linepos++) = EOF;
+        _linebuffer.at(_linepos++) = EOF;
         break;
       case function::T_KILL:
         retype(2);
-        linepos = 0;
-        parcount = origpar;
+        _linepos = 0;
+        _parcount = origpar;
         escaped = 0;
         instring = false;
         break;
@@ -618,91 +557,91 @@ std::optional<std::string> term_source::getline()
       }
       case function::T_ERASE:
         escaped = 0;
-        if(linepos > 0 && linebuffer.at(linepos - 1) == '\n')
+        if(_linepos > 0 && _linebuffer.at(_linepos - 1) == '\n')
         {
-          --linepos;
+          --_linepos;
           retype(0);
         }
-        else if(linepos > 0)
+        else if(_linepos > 0)
         {
           delonechar();
-          if(linebuffer.at(linepos) == '\\')
+          if(_linebuffer.at(_linepos) == '\\')
             escaped = 2;
           else
           {
-            if(!instring && linebuffer.at(linepos) == '(')
-              parcount--;
-            if(!instring && linebuffer.at(linepos) == ')')
-              parcount++;
-            if(linebuffer.at(linepos) == '"')
+            if(!instring && _linebuffer.at(_linepos) == '(')
+              --_parcount;
+            if(!instring && _linebuffer.at(_linepos) == ')')
+              ++_parcount;
+            if(_linebuffer.at(_linepos) == '"')
               instring = !instring;
           }
         }
         break;
       case function::T_STRING:
-        linebuffer.at(linepos++) = c;
+        _linebuffer.at(_linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           instring = !instring;
         break;
       case function::T_ESCAPE:
-        linebuffer.at(linepos++) = c;
+        _linebuffer.at(_linepos++) = c;
         pputc(c, stdout);
         if(escaped == 0)
           escaped = 2;
         break;
       case function::T_LEFTPAR:
         if(!instring && escaped == 0)
-          parcount++;
+          ++_parcount;
         pputc(c, stdout);
-        linebuffer.at(linepos++) = c;
+        _linebuffer.at(_linepos++) = c;
         break;
       case function::T_RIGHTPAR:
         if((escaped != 0) || instring)
         {
           pputc(c, stdout);
-          linebuffer.at(linepos++) = c;
+          _linebuffer.at(_linepos++) = c;
           break;
         }
-        parcount--;
+        --_parcount;
         pputc(c, stdout);
-        linebuffer.at(linepos++) = c;
-        if(parcount <= 0)
+        _linebuffer.at(_linepos++) = c;
+        if(_parcount <= 0)
         {
-          if(parcount < 0)
+          if(_parcount < 0)
           {
-            linebuffer[0] = '(';
-            parcount = 0; /* in case it was negative */
+            _linebuffer[0] = '(';
+            _parcount = 0;
           }
           else if(firstnotlp())
-            break; /* paren expression not first (for readline) */
-          linebuffer.at(linepos++) = '\n';
+            break; // Paren expression not first (for readline).
+          _linebuffer.at(_linepos++) = '\n';
           pputc('\n', stdout);
           end_term();
-          linebuffer.at(linepos++) = '\0';
-          return linebuffer.data();
+          _linebuffer.at(_linepos++) = '\0';
+          return _linebuffer.data();
         }
         blink();
         break;
       case function::T_NEWLINE:
         pputc('\n', stdout);
-        if(linepos == 0 || onlyblanks())
+        if(_linepos == 0 || onlyblanks())
         {
-          linepos = 0;
-          linebuffer.at(linepos++) = '(';
-          linebuffer.at(linepos++) = ')';
+          _linepos = 0;
+          _linebuffer.at(_linepos++) = '(';
+          _linebuffer.at(_linepos++) = ')';
         }
-        linebuffer.at(linepos++) = '\n';
-        if(parcount <= 0 && !instring)
+        _linebuffer.at(_linepos++) = '\n';
+        if(_parcount <= 0 && !instring)
         {
           end_term();
-          linebuffer.at(linepos++) = '\0';
-          return linebuffer.data();
+          _linebuffer.at(_linepos++) = '\0';
+          return _linebuffer.data();
         }
         break;
       case function::T_INSERT:
         pputc(c, stdout);
-        linebuffer.at(linepos++) = c;
+        _linebuffer.at(_linepos++) = c;
         break;
     }
   }

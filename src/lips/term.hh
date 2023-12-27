@@ -26,8 +26,8 @@ class term_source: public lisp::io::source
 {
 public:
   term_source(options_t options)
-    : is(linebuffer.data()),
-      options(options)
+    : _is(_linebuffer.data()),
+      _options(options)
   {}
   ~term_source() override;
 
@@ -36,49 +36,87 @@ public:
   term_source& operator=(const term_source&) = delete;
   term_source& operator=(term_source&&) = delete;
 
-  // io::source
+  /// @brief Read a character from the terminal.
+  ///
+  /// Buffer input with procedure getline, and get characters from linebuffer.
   char getch() override;
+  /// @brief Unget a character.
+  ///
+  /// If reading from a terminal, just push it back in the buffer, if not, do
+  /// an ungetc.
   void ungetch(char) override;
+  /// @brief Get a line from stdin.
+  ///
+  /// Do line editing functions such as kill line, retype line and delete
+  /// character.  Count parethesis pairs and terminate line if matching right
+  /// paren.  Typing just a return puts a right paren in the buffer as well as
+  /// the newline.
+  ///
+  /// @returns Empty optional on EOF.
   std::optional<std::string> getline() override;
 
   void clearlbuf();
 
   iterator begin() override
   {
-    is.seekg(0);
-    return {is};
+    _is.seekg(0);
+    return {_is};
   }
 
 private:
+  /// @brief Reset terminal to the previous state.
   void end_term();
+  /// @brief Initializes the keymap.
   void init_keymap();
+  /// @brief Initializes the terminal to CBREAK and no ECHO.
   void init_term();
+  /// @brief Put a character on stdout prefixing it with a ^ if it's
+  /// a control character.
   static void pputc(char c, FILE* file);
+  /// @brief Put a character _c_ on stream _file_ escaping if _esc_ is `true`.
   static void putch(char c, FILE* file, bool esc);
+  /// @brief Skips separators in the beginning of the line and returns true if
+  // the first non-separator character is a left parenthesis, `false`
+  // otherwise.
   bool firstnotlp();
+  /// @brief Delete one character the easy way by sending backspace - space -
+  /// backspace.  Do it twice if it was a control character.
   void delonechar();
+  /// @brief Returns `true` if the line contains only separators.
   bool onlyblanks();
+  /// @brief Output a character on stdout, used only in tputs.
   static int outc(int c);
-  void retype(int);
+  /// @brief Retype a line.
+  ///
+  /// If _all_ is 0 then retype only current line.  If _all_ is 1 then retype
+  /// complete line, including prompt.  It _all_ is 2 just delete all lines.
+  /// Used for ctrl-u kill.
+  void retype(int all);
+  // Stuff for file name completion.
   char* mkexstr();
   void fillrest(const char*);
   static bool checkchar(lisp::lisp_t words, std::size_t pos, char* c);
   void complete(lisp::lisp_t words);
   static lisp::lisp_t strip(lisp::lisp_t files, const char* prefix, const char* suffix);
+  /// @brief Scans backwards and try to find a matching left parenthesis
+  /// skipping strings and escapes.
+  ///
+  /// It records its finding in parpos.  It also updates where the cursor is
+  /// now in currentpos, so it can find its way back.  _begin_ is the position
+  /// in linebuffer from where to start searching.
   void scan(int begin);
+  /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
   static void nput(const char* str, int ntim);
+  /// @brief Blink matching parenthesis.
   void blink();
   void clearscr();
 
-  std::array<char, BUFSIZ> word{};
-  char* last = nullptr;
+  bool is_control(auto c) const { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; }
 
   static constexpr int NUM_KEYS = 256;
   static constexpr char BELL = '\007';
   static constexpr int blink_time = 1000;
   static constexpr char at_char = '@';
-
-  bool is_control(auto c) const { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; }
 
   //
   // Routines for paren blinking.
@@ -120,33 +158,36 @@ private:
     T_ESCAPE
   };
 
-  struct curpos parpos;     // Saves position of matching par.
-  struct curpos currentpos; // Current position.
+  std::array<char, BUFSIZ> _word{};
+  char* _last{nullptr};
+
+  struct curpos _parpos;     // Saves position of matching par.
+  struct curpos _currentpos; // Current position.
 
   //
   // Variables for terminal characteristics, old and new.
   //
-  struct termios newterm
+  struct termios _newterm
   {};
-  struct termios oldterm
+  struct termios _oldterm
   {};
 
-  std::array<char, BUFSIZ> linebuffer{};         // Line buffer for terminal input.
-  std::istringstream is;                         // For input stream.
-  int parcount = 0;                              // Counts paranthesis.
-  int linepos = 0;                               // End of line buffer.
-  int position = 0;                              // Current position in line buffer.
+  std::array<char, BUFSIZ> _linebuffer{};        // Line buffer for terminal input.
+  std::istringstream _is;                        // For input stream.
+  int _parcount{0};                              // Counts paranthesis.
+  int _linepos{0};                               // End of line buffer.
+  int _position{0};                              // Current position in line buffer.
   std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
 
-  options_t options;
+  options_t _options;
 
-  std::array<char, 128> tcap{}; // Buffer for terminal capabilties.
-  const char* curup = nullptr;
-  const char* curfwd = nullptr; // Various term cap strings.
-  const char* cleol = nullptr;
-  const char* curdn = nullptr;
-  const char* clear = nullptr;
-  bool nocap = false; // true if insufficient term cap.
+  std::array<char, 128> _termcap{}; // Buffer for terminal capabilties.
+  const char* _curup = nullptr;
+  const char* _curfwd = nullptr; // Various term cap strings.
+  const char* _cleol = nullptr;
+  const char* _curdn = nullptr;
+  const char* _clear = nullptr;
+  bool _nocap = false; // true if insufficient term cap.
 };
 
 #endif
