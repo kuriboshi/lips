@@ -694,19 +694,18 @@ lisp_t doexec(lisp_t cmd)
 void init()
 {
   // clang-format off
-  // mkprim(pn::EXPAND, expand, subr_t::S_EVAL, subr_t::S_NOSPREAD);
-  mkprim(pn::REDIR_TO,     redir_to,     subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::REDIR_FROM,   redir_from,   subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::REDIR_APPEND, redir_append, subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::REDIR_TO,     redir_to,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::REDIR_FROM,   redir_from,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::REDIR_APPEND, redir_append, subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::PIPECMD,      pipecmd,      subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::BACK,         back,         subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::BACK,         back,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::STOP,         stop,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::CD,           cd,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::CD,           cd,           subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::REHASH,       rehash,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   mkprim(pn::JOBS,         jobs,         subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
-  mkprim(pn::SETENV,       setenv,       subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
+  mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SETENV,       setenv,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::EXEC,         doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
