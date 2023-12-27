@@ -28,13 +28,7 @@ using namespace lisp;
 
 std::string current_prompt; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-/*
- * History functions.
- */
-/*
- * Print the history list.
- */
-void top::phist()
+void top::print_history()
 {
   for(auto hl: variables->history())
   {
@@ -44,28 +38,19 @@ void top::phist()
   }
 }
 
-/*
- * Add event to history list.
- */
-void top::addhist(lisp_t what)
+void top::add_history(lisp_t what)
 {
   variables->history() = cons(cons(variables->histnum(), what), variables->history());
   variables->histnum() = add1(variables->histnum());
 }
 
-/*
- * Remove last event from history list.
- */
-void top::remhist()
+void top::remove_history()
 {
   variables->history() = variables->history()->cdr();
   variables->histnum() = sub1(variables->histnum());
 }
 
-/*
- * Trim history list to keep it shorter than histmax.
- */
-void top::trimhist()
+void top::trim_history()
 {
   lisp_t hl = variables->history();
   for(int i = 0; i < variables->histmax()->as_integer() && !is_nil(hl); i++, hl = hl->cdr())
@@ -74,11 +59,7 @@ void top::trimhist()
     rplacd(hl, nil);
 }
 
-/*
- * Return the NUM entry from history list HLIST, or nil if there is
- * no entry.
- */
-lisp_t top::histget(integer_t::value_type num, lisp_t hlist)
+lisp_t top::get_history(integer_t::value_type num, lisp_t hlist)
 {
   if(num < 0)
   {
@@ -103,8 +84,8 @@ lisp_t top::histget(integer_t::value_type num, lisp_t hlist)
 
 lisp_t top::printhist()
 {
-  remhist(); /* Removes itself from history. */
-  phist();
+  remove_history(); // Removes itself from history.
+  print_history();
   return nil;
 }
 
@@ -115,14 +96,6 @@ lisp_t top::transform(lisp_t list)
   return list;
 }
 
-/*
- * Expands aliases in expression EXP. If car of EXP is a literal atom
- * findalias checks for an alias substitution on property ALIAS. If
- * it is non-nil another expansion is tried until the alias property
- * is nil. Alias looping is detected by saving each expanded atom
- * on the list alias_expanded. One indirection is allowed in order
- * to permit 'alias ls ls -F'.
- */
 lisp_t top::findalias(lisp_t exp)
 {
   auto rval = exp;
@@ -199,7 +172,7 @@ lisp_t top::operator()(lisp_t)
       continue;
     if(is_nil(input_exp->car()))
       continue;
-    top::addhist(input_exp);
+    top::add_history(input_exp);
     if(_echoline)
     {
       prinbody(input_exp, *primout(), io::escape::YES);
@@ -218,28 +191,18 @@ lisp_t top::operator()(lisp_t)
       print(topexp, T);
     if(!_options.interactive && _options.command)
       return nil;
-    top::trimhist();
+    top::trim_history();
   }
   return nil;
 }
 
-/// @brief Redo read macro.
-///
-/// @details
-///  !!      - last command
-///  !-n     - the n'th previous command
-///  !n      - command n
-///  !s      - command with prefix s
-///  !$      - last argument
-///  !*      - all arguments
-/// others could be added easily.
 lisp_t top::rmexcl(lisp_t stream)
 {
   auto c = stream->file()->getch();
   if(std::isspace(c) != 0)
     return C_EXCL;
   _echoline = true;
-  lisp_t tmp = histget(0, variables->history());
+  lisp_t tmp = get_history(0, variables->history());
   switch(c)
   {
     case '!':
@@ -262,7 +225,7 @@ lisp_t top::rmexcl(lisp_t stream)
       auto at = ratom(stream);
       if(type_of(at) == object::type::Integer)
       {
-        tmp = histget(at->as_integer(), variables->history());
+        tmp = get_history(at->as_integer(), variables->history());
         return tmp;
       }
       if(type_of(at) == object::type::Symbol)

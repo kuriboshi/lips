@@ -44,18 +44,44 @@ public:
   lisp_t operator()(lisp_t);
 
   static lisp_t transform(lisp_t list);
+  /// @brief Expands aliases in expression EXP.
+  ///
+  /// If car of _exp_ is a literal atom `findalias` checks for an alias
+  /// substitution on property `alias`. If that is non-`nil` another expansion
+  /// is tried until the alias property is `nil`. Alias looping is detected by
+  /// saving each expanded atom on the list `alias_expanded`. One indirection
+  /// is allowed in order to permit 'alias ls ls -F'.
   static lisp_t findalias(lisp_t exp);
   static void promptprint(lisp_t prompt);
 
   // History functions
   static lisp_t printhist();
-  static lisp_t histget(integer_t::value_type num, lisp_t hlist);
-  static void phist();
-  static void addhist(lisp_t);
-  static void remhist();
-  static void trimhist();
+  /// @brief Print the history list.
+  static void print_history();
+  /// @brief Add event to the history list.
+  static void add_history(lisp_t);
+  /// @brief Remove last event from the history list.
+  static void remove_history();
+  /// @brief Trim the history list to keep it shorter than histmax.
+  static void trim_history();
+  /// @brief Return the _num_ entry from the history list _hlist_, or `nil` if
+  /// there is no entry.
+  static lisp_t get_history(integer_t::value_type num, lisp_t hlist);
 
-  // Read table functions
+  /// @brief Redo read macro.
+  ///
+  /// The following commands are recognized.
+  ///
+  /// | character | effect                    |
+  /// |-----------|---------------------------|
+  /// | !!        | last command              |
+  /// | !-n       | the n'th previous command |
+  /// | !n        | command n                 |
+  /// | !s        | command with prefix s     |
+  /// | !$        | last argument             |
+  /// | !*        | all arguments             |
+  ///
+  /// Others could be added easily.
   static lisp_t rmexcl(lisp_t);
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
@@ -88,11 +114,11 @@ private:
     cvariable_t& promptform() const { return _promptform->cvariable(); }
 
   private:
-    lisp_t _history; // Holds the history list.
-    lisp_t _histnum; // Current event number.
-    lisp_t _histmax; // Maximum number of events to save.
-    lisp_t _topprompt;
-    lisp_t _brkprompt;
+    lisp_t _history;    // Holds the history list.
+    lisp_t _histnum;    // Current event number.
+    lisp_t _histmax;    // Maximum number of events to save.
+    lisp_t _topprompt;  // The top level prompt.
+    lisp_t _brkprompt;  // The break loop prompt.
     lisp_t _promptform; // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
