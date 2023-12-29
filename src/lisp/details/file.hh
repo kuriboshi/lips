@@ -38,6 +38,7 @@ lisp_t prin2(lisp_t, lisp_t);
 lisp_t printlevel(lisp_t);
 lisp_t spaces(lisp_t, lisp_t);
 lisp_t readline(lisp_t);
+lisp_t splice(lisp_t, lisp_t, lisp_t);
 
 } // namespace lisp::details::file
 

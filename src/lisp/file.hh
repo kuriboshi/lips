@@ -193,6 +193,35 @@ inline lisp_t readc(lisp_t file) { return details::file::readc(file); }
 /// @returns A lisp expression. The symbol `eof` is returned if a blank line is
 /// read.
 inline lisp_t readline(lisp_t file) { return details::file::readline(file); }
+/// @brief Splice an object into a list.
+/// @lisp{(splice x y tailp),Function}
+///
+/// Splices list y into x keeping cdr of x. For example:
+///
+/// ```lisp
+/// (let ((x '(a b c))
+///       (y '(x y z)))
+///  (splice x y)
+///  x)
+/// ```
+///
+/// Modifies x to hold the value (x y z b c).
+///
+/// Another example:
+///
+/// ```lisp
+/// (let ((x '(a b c))
+///       (y '(x y z)))
+///  (splice (cdr x) y)
+///  x)
+/// ```
+///
+/// Modifies x to hold the value (a x y z c).
+///
+/// If y is not a list put it in car of x and return x, otherwise return last
+/// cell of y with cdr set to original (cdr x). If tailp is `t`, don't clobber
+/// car of x.
+inline lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp) { return details::file::splice(x, y, tailp); }
 
 /// @brief Loads a file from _filename_.
 ///
@@ -245,35 +274,6 @@ inline lisp_t operator"" _l(const char* s, std::size_t)
   auto e = lispread(in);
   return e;
 }
-
-/// @brief Splice an object into a list.
-///
-/// Splices list y into x keeping cdr of x. For example:
-///
-/// ```lisp
-/// (let ((x '(a b c))
-///       (y '(x y z)))
-///  (splice x y)
-///  x)
-/// ```
-///
-/// Modifies x to hold the value (x y x b c).
-///
-/// Another example:
-///
-/// ```lisp
-/// (let ((x '(a b c))
-///       (y '(x y z)))
-///  (splice (cdr x) y)
-///  x)
-/// ```
-///
-/// Modifies x to hold the value (a x y z c).
-///
-/// If y is not a list put it in car of x and return x, otherwise return last
-/// cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
-/// car of x.
-lisp_t splice(lisp_t x, lisp_t y, bool tailp);
 
 } // namespace lisp
 

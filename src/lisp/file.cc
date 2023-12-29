@@ -266,31 +266,6 @@ lisp::lisp_t terpri(lisp::file_t& file)
   return lisp::nil;
 }
 
-lisp_t splice(lisp_t x, lisp_t y, bool tailp)
-{
-  check(x, object::type::Cons);
-  if(is_nil(y))
-    return x;
-  const lisp_t t = x->cdr();
-  if(type_of(y) != object::type::Cons)
-  {
-    if(tailp)
-      rplacd(x, cons(y, t));
-    else
-      rplaca(x, y);
-    return x;
-  }
-  if(!tailp)
-  {
-    rplaca(x, y->car());
-    y = y->cdr();
-  }
-  rplacd(x, y);
-  lisp_t t2 = nil;
-  for(; type_of(y) == object::type::Cons; y = y->cdr())
-    t2 = y;
-  return rplacd(t2, t);
-}
 } // namespace lisp
 
 namespace lisp::details::file
@@ -449,6 +424,32 @@ lisp_t readline(lisp_t file)
   return readline(file->file());
 }
 
+lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp)
+{
+  check(x, object::type::Cons);
+  if(is_nil(y))
+    return x;
+  const lisp_t t = x->cdr();
+  if(type_of(y) != object::type::Cons)
+  {
+    if(is_T(tailp))
+      rplacd(x, cons(y, t));
+    else
+      rplaca(x, y);
+    return x;
+  }
+  if(is_nil(tailp))
+  {
+    rplaca(x, y->car());
+    y = y->cdr();
+  }
+  rplacd(x, y);
+  lisp_t t2 = nil;
+  for(; type_of(y) == object::type::Cons; y = y->cdr())
+    t2 = y;
+  return rplacd(t2, t);
+}
+
 namespace pn
 {
 inline constexpr std::string_view OPEN = "open";             // open file
@@ -463,6 +464,7 @@ inline constexpr std::string_view READ = "read";             // read expression
 inline constexpr std::string_view READC = "readc";           // read characte
 inline constexpr std::string_view READLINE = "readline";     // read a line
 inline constexpr std::string_view SPACES = "spaces";         // print some spaces
+inline constexpr std::string_view SPLICE = "splice";         // splice lists
 inline constexpr std::string_view TERPRI = "terpri";         // print new-line
 } // namespace pn
 
@@ -481,6 +483,7 @@ void init()
   mkprim(pn::READC,      readc,      subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::READLINE,   readline,   subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::SPACES,     spaces,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
+  mkprim(pn::SPLICE,     splice,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
   mkprim(pn::TERPRI,     terpri,     subr_t::subr::EVAL, subr_t::spread::SPREAD);
   // clang-format on
 }

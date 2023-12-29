@@ -726,41 +726,41 @@ TEST_CASE("file: splice")
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = splice(x, y, false);
+    auto r = splice(x, y, nil);
     CHECK(!is_nil(equal(x, "(x y z b c)"_l)));
     CHECK(!is_nil(equal(r, "(z b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = splice(cdr(x), y, false);
+    auto r = splice(cdr(x), y, nil);
     CHECK(!is_nil(equal(x, "(a x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "(x y z)"_l;
-    auto r = splice(cdr(x), y, true);
+    auto r = splice(cdr(x), y, T);
     CHECK(!is_nil(equal(x, "(a b x y z c)"_l)));
     CHECK(!is_nil(equal(r, "(z c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = splice(x, y, false);
+    auto r = splice(x, y, nil);
     CHECK(!is_nil(equal(x, "(x b c)"_l)));
     CHECK(!is_nil(equal(r, "(x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
     auto y = "x"_l;
-    auto r = splice(x, y, true);
+    auto r = splice(x, y, T);
     CHECK(!is_nil(equal(x, "(a x b c)"_l)));
     CHECK(!is_nil(equal(r, "(a x b c)"_l)));
   }
   {
     auto x = "(a b c)"_l;
-    auto r = splice(x, nil, true);
+    auto r = splice(x, nil, T);
     CHECK(!is_nil(equal(r, x)));
   }
 }
