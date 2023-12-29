@@ -74,8 +74,6 @@ public:
   /// is read.
   lisp::lisp_t readline(std::string prompt);
 
-  void clearlbuf();
-
   iterator begin() override
   {
     _is.seekg(0);
@@ -83,6 +81,13 @@ public:
   }
 
 private:
+  struct cursor_position
+  {
+    int cpos{0};
+    int line{0};
+    char* line_start{nullptr};
+  };
+
   /// @brief Reset terminal to the previous state.
   void end_term();
   /// @brief Initializes the keymap.
@@ -123,7 +128,10 @@ private:
   /// It records its finding in parpos.  It also updates where the cursor is
   /// now in currentpos, so it can find its way back.  _begin_ is the position
   /// in linebuffer from where to start searching.
-  void scan(int begin);
+  ///
+  /// @returns A pair of cursor_position objects. The first is the position of
+  /// the matching parenthesis, the second is the current position.
+  std::pair<cursor_position, cursor_position> scan(int begin);
   /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
   static void nput(const std::string& str, int ntim = 1);
   /// @brief Blink matching parenthesis.
@@ -150,13 +158,6 @@ private:
     RIGHTPAR
   };
 
-  struct curpos
-  {
-    int cpos{0};
-    int line{0};
-    char* line_start{nullptr};
-  };
-
   //
   // Terminal functions.  Each constant stands for a function provided by the
   // line editor.
@@ -180,9 +181,6 @@ private:
   std::array<char, BUFSIZ> _word{};
   char* _last{nullptr};
 
-  struct curpos _parpos;     // Saves position of matching par.
-  struct curpos _currentpos; // Current position.
-
   //
   // Variables for terminal characteristics, old and new.
   //
@@ -191,13 +189,12 @@ private:
   struct termios _oldterm
   {};
 
-  std::array<char, BUFSIZ> _linebuffer{};        // Line buffer for terminal input.
-  std::istringstream _is;                        // For input stream.
-  int _parcount{0};                              // Counts paranthesis.
-  int _linepos{0};                               // End of line buffer.
-  int _position{0};                              // Current position in line buffer.
-  std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
+  std::array<char, BUFSIZ> _linebuffer{}; // Line buffer for terminal input.
+  std::istringstream _is;                 // For input stream.
+  int _linepos{0};                        // End of line buffer.
+  int _position{0};                       // Current position in line buffer.
 
+  std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
   options_t _options;
 
   // Various term cap strings.

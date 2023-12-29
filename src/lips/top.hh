@@ -54,7 +54,6 @@ public:
   /// is allowed in order to permit 'alias ls ls -F'.
   static lisp_t findalias(lisp_t exp);
   void set_prompt(lisp_t prompt);
-  void clearlbuf();
 
   // History functions
   static lisp_t printhist();

@@ -52,12 +52,6 @@ char* getstr(const char* id, char** area)
 }
 } // namespace
 
-void term_source::clearlbuf()
-{
-  _linepos = 0;
-  _parcount = 0;
-}
-
 void term_source::init_keymap()
 {
   key_tab.fill(function::T_INSERT);
@@ -98,7 +92,8 @@ void term_source::init_term()
         _termcap.cleol = getstr("ce", &termc);
         _termcap.curfwd = getstr("nd", &termc);
         _termcap.curup = getstr("up", &termc);
-        _termcap.nocap = _termcap.clear.empty() || _termcap.cleol.empty() || _termcap.curfwd.empty() || _termcap.curup.empty();
+        _termcap.nocap =
+          _termcap.clear.empty() || _termcap.cleol.empty() || _termcap.curfwd.empty() || _termcap.curup.empty();
       }
     }
     init_keymap();
@@ -153,9 +148,7 @@ void term_source::ungetch(char)
 
 bool term_source::first_left_paren(const std::string& str)
 {
-  auto pos = std::ranges::find_if_not(str, [](auto c) {
-    return std::isspace(c) != 0;
-  });
+  auto pos = std::ranges::find_if_not(str, [](auto c) { return std::isspace(c) != 0; });
   if(pos == std::end(str))
     return false;
   return *pos == '(';
@@ -324,15 +317,15 @@ lisp_t term_source::strip(lisp_t files, const char* prefix, const char* suffix)
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void term_source::scan(int begin)
+std::pair<term_source::cursor_position, term_source::cursor_position> term_source::scan(int begin)
 {
   int line{0};
   int cpos{0};
   paren_blink state{paren_blink::NORMAL};
   int parcount{0};
   bool pars{false};
-  _parpos = {0, 0, nullptr};
-  _currentpos = {0, 0, nullptr};
+  cursor_position parpos{0, 0, nullptr};
+  cursor_position currentpos{0, 0, nullptr};
   for(int pos{begin}; pos >= 0; --pos)
   {
     auto cur = _linebuffer.at(pos);
@@ -348,13 +341,13 @@ void term_source::scan(int begin)
       state = paren_blink::RIGHTPAR;
     else if(cur == '\n')
     {
-      if(_parpos.line == line)
+      if(parpos.line == line)
       {
-        _parpos.cpos = cpos - _parpos.cpos;
-        _parpos.line_start = &_linebuffer.at(pos);
+        parpos.cpos = cpos - parpos.cpos;
+        parpos.line_start = &_linebuffer.at(pos);
       }
-      if(_currentpos.line_start == nullptr)
-        _currentpos.line_start = &_linebuffer.at(pos);
+      if(currentpos.line_start == nullptr)
+        currentpos.line_start = &_linebuffer.at(pos);
       cpos = 0;
       ++line;
     }
@@ -402,52 +395,51 @@ void term_source::scan(int begin)
     }
     if(!pars && parcount == 0)
     {
-      _parpos.line_start = &_linebuffer.at(pos);
-      _parpos.cpos = cpos;
-      _parpos.line = line;
+      parpos.line_start = &_linebuffer.at(pos);
+      parpos.cpos = cpos;
+      parpos.line = line;
       pars = true;
     }
     if(line == 0)
-      ++_currentpos.cpos;
+      ++currentpos.cpos;
   }
-  _currentpos.line = line;
+  currentpos.line = line;
   if(line == 0)
   {
-    _currentpos.cpos += static_cast<int>(_current_prompt.length());
-    _currentpos.line_start = _linebuffer.data();
+    currentpos.cpos += static_cast<int>(_current_prompt.length());
+    currentpos.line_start = _linebuffer.data();
   }
-  _parpos.line = line - _parpos.line;
-  if(_parpos.line == 0)
-    _parpos.cpos = cpos - _parpos.cpos + static_cast<int>(_current_prompt.length());
+  parpos.line = line - parpos.line;
+  if(parpos.line == 0)
+    parpos.cpos = cpos - parpos.cpos + static_cast<int>(_current_prompt.length());
+  return {parpos, currentpos};
 }
 
 void term_source::nput(const std::string& str, int ntim)
 {
   for(; ntim > 0; --ntim)
-  {
     tputs(str.c_str(), 1, outc);
-  }
 }
 
 void term_source::blink()
 {
   if(_termcap.nocap)
     return; // Requires termcap and enough capability
-  scan(_linepos - 1);
-  if(_parpos.line_start == nullptr)
+  auto [parpos, currentpos] = scan(_linepos - 1);
+  if(parpos.line_start == nullptr)
     return;
 
-  const auto ldiff = _currentpos.line - _parpos.line;
-  const auto cdiff = _parpos.cpos - _currentpos.cpos;
+  const auto ldiff = currentpos.line - parpos.line;
+  const auto cdiff = parpos.cpos - currentpos.cpos;
   nput(_termcap.curup, ldiff);
   if(cdiff < 0)
   {
-    if(-cdiff < _parpos.cpos)
+    if(-cdiff < parpos.cpos)
       nput("\b", -cdiff);
     else
     {
       putc('\r', stdout);
-      nput(_termcap.curfwd, _parpos.cpos);
+      nput(_termcap.curfwd, parpos.cpos);
     }
   }
   else
@@ -461,30 +453,30 @@ void term_source::blink()
   _linebuffer.at(_linepos) = '\0';
   if(ldiff == 0)
   {
-    for(int i = 0; _parpos.line_start[i] != 0; ++i)
-      pputc(_parpos.line_start[i], stdout);
+    for(int i = 0; parpos.line_start[i] != 0; ++i)
+      pputc(parpos.line_start[i], stdout);
   }
   else
   {
-    if(_currentpos.line == 0)
+    if(currentpos.line == 0)
       std::cout << _current_prompt;
-    for(int i = 0; _currentpos.line_start[i] != 0; ++i)
-      pputc(_currentpos.line_start[i], stdout);
+    for(int i = 0; currentpos.line_start[i] != 0; ++i)
+      pputc(currentpos.line_start[i], stdout);
   }
   fflush(stdout);
 }
 
-void term_source::clearscr()
-{
-  nput(_termcap.clear);
-}
+void term_source::clearscr() { nput(_termcap.clear); }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::optional<std::string> term_source::getline()
 {
-  char c = 0;
-  bool instring = false;
-  int escaped = 0;
+  char c{0};
+  bool instring{false};
+  int escaped{0};
+  int parcount{0};
+  _linepos = 0;
+  _position = 0;
 
   init_term();
 
@@ -494,9 +486,7 @@ std::optional<std::string> term_source::getline()
     end_term();
     ::exit(1);
   }
-  _position = 0;
-  _linepos = 0;
-  const int origpar = _parcount;
+  const int origpar = parcount;
   while(true)
   {
     if(escaped != 0)
@@ -522,7 +512,7 @@ std::optional<std::string> term_source::getline()
       case function::T_KILL:
         retype(2);
         _linepos = 0;
-        _parcount = origpar;
+        parcount = origpar;
         escaped = 0;
         instring = false;
         break;
@@ -572,9 +562,9 @@ std::optional<std::string> term_source::getline()
           else
           {
             if(!instring && _linebuffer.at(_linepos) == '(')
-              --_parcount;
+              --parcount;
             if(!instring && _linebuffer.at(_linepos) == ')')
-              ++_parcount;
+              ++parcount;
             if(_linebuffer.at(_linepos) == '"')
               instring = !instring;
           }
@@ -594,7 +584,7 @@ std::optional<std::string> term_source::getline()
         break;
       case function::T_LEFTPAR:
         if(!instring && escaped == 0)
-          ++_parcount;
+          ++parcount;
         pputc(c, stdout);
         _linebuffer.at(_linepos++) = c;
         break;
@@ -605,14 +595,14 @@ std::optional<std::string> term_source::getline()
           _linebuffer.at(_linepos++) = c;
           break;
         }
-        --_parcount;
+        --parcount;
         pputc(c, stdout);
         _linebuffer.at(_linepos++) = c;
-        if(_parcount <= 0)
+        if(parcount <= 0)
         {
           _linebuffer.at(_linepos) = '\0';
           std::string ret{_linebuffer.data()};
-          if(_parcount < 0)
+          if(parcount < 0)
             ret.insert(0, 1, '(');
           if(first_left_paren(ret))
           {
@@ -632,7 +622,7 @@ std::optional<std::string> term_source::getline()
           _linebuffer.at(_linepos++) = ')';
         }
         _linebuffer.at(_linepos++) = '\n';
-        if(_parcount <= 0 && !instring)
+        if(parcount <= 0 && !instring)
         {
           end_term();
           _linebuffer.at(_linepos++) = '\0';

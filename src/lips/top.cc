@@ -137,11 +137,6 @@ void top::set_prompt(lisp_t prompt)
   }
 }
 
-void top::clearlbuf()
-{
-  _terminal->clearlbuf();
-}
-
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 lisp_t top::operator()(lisp_t)
 {
