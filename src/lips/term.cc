@@ -27,10 +27,11 @@
 
 #include <iostream>
 #include <array>
+#include <cctype>
 #include <csignal>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 #include <ranges>
 #include <algorithm>
 
@@ -85,7 +86,7 @@ void termcap::init()
 void termcap::nput(const std::string& str, int n)
 {
   for(; n > 0; --n)
-    tputs(str.c_str(), 1, outc);
+    tputs(str.c_str(), 1, std::putchar);
 }
 
 void term_source::init_keymap()

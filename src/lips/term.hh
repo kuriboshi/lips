@@ -19,7 +19,6 @@
 #define LIPS_TERM_HH
 
 #include <array>
-#include <cstdio>
 #include <termios.h>
 #include <lisp/io.hh>
 
@@ -52,12 +51,6 @@ public:
 private:
   /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
   static void nput(const std::string& str, int n = 1);
-  /// @brief Output a character on stdout.
-  static int outc(int c)
-  {
-    std::putc(c, stdout);
-    return c;
-  }
 
   std::string _bell;
   std::string _clear;
