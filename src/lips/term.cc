@@ -71,7 +71,7 @@ void termcap::init()
   }
 }
 
-void termcap::nput(const std::string& str, int n) const
+void termcap::nput(const std::string& str, int n)
 {
   for(; n > 0; --n)
     tputs(str.c_str(), 1, outc);
@@ -190,76 +190,45 @@ bool term_source::onlyblanks()
   return true;
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::retype(int all)
 {
-  int nl = 0;
-
-  if(!_termcap.nocap())
+  if(_termcap.nocap())
+    return;
+  int nl{0};
+  int l{0};
+  for(int i = 0; i < _linepos; ++i)
   {
-    int l = 0;
-    for(int i = 0; i < _linepos; ++i)
+    if(_linebuffer.at(i) == '\n')
     {
-      if(_linebuffer.at(i) == '\n')
-      {
-        nl = i;
-        ++l;
-      }
+      nl = i;
+      ++l;
     }
-    for(l = (all != 0 ? l : 1); l != 0; --l)
-    {
-      if(all == 2)
-      {
-        putc('\r', stdout);
-        _termcap.clr_eol();
-      }
-      _termcap.cursor_up();
-    }
-    putc('\r', stdout);
-    if(all != 0)
-      nl = 0;
-    if(nl == 0)
-      std::cout << _current_prompt;
-    if(all != 2)
-    {
-      for(int i = nl; i < _linepos; ++i)
-      {
-        if(_linebuffer.at(i) == '\n')
-          _termcap.clr_eol();
-        else
-          pputc(_linebuffer.at(i), stdout);
-      }
-    }
-    _termcap.clr_eol();
   }
-  else
+  for(l = (all != 0 ? l : 1); l != 0; --l)
   {
-    if(all == 0)
+    if(all == 2)
     {
       putc('\r', stdout);
-      int i = _linepos;
-      for(; i >= 0 && _linebuffer.at(i) != '\n'; --i)
-        ;
-      if(i == 0)
-        std::cout << _current_prompt;
-      for(++i; i < _linepos; ++i)
-        pputc(_linebuffer.at(i), stdout);
+      _termcap.clr_eol();
     }
-    else if(all == 1)
+    _termcap.cursor_up();
+  }
+  putc('\r', stdout);
+  if(all != 0)
+    nl = 0;
+  if(nl == 0)
+    std::cout << _current_prompt;
+  if(all != 2)
+  {
+    for(int i = nl; i < _linepos; ++i)
     {
-      pputc(CRPRNT, stdout);
-      pputc('\n', stdout);
-      std::cout << _current_prompt;
-      for(int i = 0; i < _linepos; ++i)
+      if(_linebuffer.at(i) == '\n')
+        _termcap.clr_eol();
+      else
         pputc(_linebuffer.at(i), stdout);
-    }
-    else
-    {
-      pputc(CKILL, stdout);
-      pputc('\n', stdout);
-      std::cout << _current_prompt;
     }
   }
+  _termcap.clr_eol();
 }
 
 char* term_source::mkexstr()

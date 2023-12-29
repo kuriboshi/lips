@@ -90,7 +90,7 @@ lisp_t pipecmd(lisp_t cmds);
 ///
 /// @returns The process ID of the process running in the background. The
 /// symbol `error` if the fork fails.
-lisp_t back(lisp_t x);
+lisp_t back(lisp_t cmd);
 /// @brief Stop the lips shell and return to parent process.
 /// @lisp{(stop-lips),NLambda Function}
 ///

@@ -44,7 +44,8 @@ public:
   bool nocap() const { return _nocap; }
 
 private:
-  void nput(const std::string& str, int n = 1) const;
+  /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
+  static void nput(const std::string& str, int n = 1);
   /// @brief Output a character on stdout.
   static int outc(int c)
   {
@@ -140,7 +141,7 @@ private:
   /// @brief Skips separators in the beginning of the line and returns `true`
   // if the first non-separator character is a left parenthesis, `false`
   // otherwise.
-  bool first_left_paren(const std::string&);
+  static bool first_left_paren(const std::string&);
   /// @brief Delete one character the easy way by sending backspace - space -
   /// backspace.  Do it twice if it was a control character.
   void delonechar();
@@ -168,8 +169,6 @@ private:
   /// @returns A pair of cursor_position objects. The first is the position of
   /// the matching parenthesis, the second is the current position.
   std::pair<cursor_position, cursor_position> scan(int begin);
-  /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
-  static void nput(const std::string& str, int ntim = 1);
   /// @brief Blink matching parenthesis.
   void blink();
   void clearscr();
