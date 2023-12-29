@@ -541,6 +541,8 @@ bool vm::eval_func()
         _cont = &vm::eval_expr;
         break;
       case object::type::Symbol:
+        if(_fun == _fun->value())
+          xbreak(error_errc::illegal_function, _fun, &vm::eval_func);
         _fun = _fun->value();
         if(_fun == C_UNBOUND)
           do_unbound(&vm::eval_func);
