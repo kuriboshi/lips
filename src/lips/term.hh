@@ -55,6 +55,25 @@ public:
   /// @returns Empty optional on EOF.
   std::optional<std::string> getline() override;
 
+  /// @brief Reads characters from stding until the next newline.
+  ///
+  /// The line is split according to the defined break characters and the
+  /// result is returned as a string. If a blank line is read the symbol `eof`
+  /// is returned.
+  ///
+  /// ```text
+  /// hello world => (hello world)
+  /// "hello world" => ("hello world")
+  /// (hello world) => (hello world)
+  ///
+  /// ```
+  ///
+  /// @param prompt A prompt string to print before reading a line.
+  ///
+  /// @returns A lisp expression. The symbol `eof` is returned if a blank line
+  /// is read.
+  lisp::lisp_t readline(std::string prompt);
+
   void clearlbuf();
 
   iterator begin() override
@@ -89,7 +108,7 @@ private:
   /// @brief Retype a line.
   ///
   /// If _all_ is 0 then retype only current line.  If _all_ is 1 then retype
-  /// complete line, including prompt.  It _all_ is 2 just delete all lines.
+  /// complete line, including prompt.  If _all_ is 2 just delete all lines.
   /// Used for ctrl-u kill.
   void retype(int all);
   // Stuff for file name completion.
@@ -181,13 +200,14 @@ private:
 
   options_t _options;
 
-  std::array<char, 128> _termcap{}; // Buffer for terminal capabilties.
-  const char* _curup = nullptr;
-  const char* _curfwd = nullptr; // Various term cap strings.
-  const char* _cleol = nullptr;
-  const char* _curdn = nullptr;
-  const char* _clear = nullptr;
-  bool _nocap = false; // true if insufficient term cap.
+  // Various term cap strings.
+  const char* _clear{nullptr};
+  const char* _cleol{nullptr};
+  const char* _curfwd{nullptr};
+  const char* _curup{nullptr};
+  bool _nocap{false}; // true if insufficient term cap.
+
+  std::string _current_prompt;
 };
 
 #endif

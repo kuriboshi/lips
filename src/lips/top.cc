@@ -26,8 +26,6 @@
 
 using namespace lisp;
 
-std::string current_prompt; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-
 void top::print_history()
 {
   for(auto hl: variables->history())
@@ -120,9 +118,9 @@ lisp_t top::findalias(lisp_t exp)
   return transform(rval);
 }
 
-void top::promptprint(lisp_t prompt)
+void top::set_prompt(lisp_t prompt)
 {
-  current_prompt.clear();
+  _current_prompt.clear();
   if(type_of(prompt) != object::type::String)
     return;
   auto s = prompt->getstr();
@@ -130,15 +128,13 @@ void top::promptprint(lisp_t prompt)
   {
     if(c == '!')
     {
-      current_prompt += std::to_string(top::variables->histnum()->as_integer());
+      _current_prompt += std::to_string(top::variables->histnum()->as_integer());
       continue;
     }
     if(c == '\\')
       continue;
-    current_prompt.push_back(c);
+    _current_prompt.push_back(c);
   }
-  std::cout << "\r";
-  std::cout << current_prompt;
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -161,11 +157,11 @@ lisp_t top::operator()(lisp_t)
         variables->promptform() = nil;
       }
       if(_level > 1)
-        promptprint(variables->brkprompt());
+        set_prompt(variables->brkprompt());
       else
-        promptprint(variables->topprompt());
+        set_prompt(variables->topprompt());
     }
-    input_exp = readline(_file);
+    input_exp = _terminal->readline(_current_prompt);
     if(input_exp == C_EOF)
       return nil;
     if(is_nil(input_exp))

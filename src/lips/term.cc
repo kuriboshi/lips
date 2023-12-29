@@ -81,24 +81,22 @@ void term_source::init_term()
   {
     tcgetattr(0, &_oldterm);
     _newterm = _oldterm;
-    _newterm.c_lflag &= (unsigned)~ECHO;
-    _newterm.c_lflag &= (unsigned)~ICANON;
+    _newterm.c_lflag &= static_cast<unsigned>(~ECHO);
+    _newterm.c_lflag &= static_cast<unsigned>(~ICANON);
     _newterm.c_lflag |= ISIG;
     _newterm.c_cc[VMIN] = 1;
     _newterm.c_cc[VTIME] = 0;
-    _curup = nullptr;
-    _curfwd = nullptr;
-    char* termc = _termcap.data();
+    std::array<char, 128> termcap{}; // Buffer for terminal capabilties.
+    auto* termc = termcap.data();
     if(auto* term = getenv("TERM"); term != nullptr)
     {
       if(tgetent(nullptr, term) == 1)
       {
         _clear = getstr("cl", &termc);
-        _curup = getstr("up", &termc);
-        _curdn = "\n";
-        _curfwd = getstr("nd", &termc);
         _cleol = getstr("ce", &termc);
-        _nocap = (_curup == nullptr || _curdn == nullptr || _curfwd == nullptr || _cleol == nullptr);
+        _curfwd = getstr("nd", &termc);
+        _curup = getstr("up", &termc);
+        _nocap = (_clear == nullptr || _cleol == nullptr || _curfwd == nullptr || _curup == nullptr);
       }
     }
     init_keymap();
@@ -218,7 +216,7 @@ void term_source::retype(int all)
     if(all != 0)
       nl = 0;
     if(nl == 0)
-      std::cout << current_prompt;
+      std::cout << _current_prompt;
     if(all != 2)
     {
       for(int i = nl; i < _linepos; ++i)
@@ -240,7 +238,7 @@ void term_source::retype(int all)
       for(; i >= 0 && _linebuffer.at(i) != '\n'; --i)
         ;
       if(i == 0)
-        std::cout << current_prompt;
+        std::cout << _current_prompt;
       for(++i; i < _linepos; ++i)
         pputc(_linebuffer.at(i), stdout);
     }
@@ -248,7 +246,7 @@ void term_source::retype(int all)
     {
       pputc(CRPRNT, stdout);
       pputc('\n', stdout);
-      std::cout << current_prompt;
+      std::cout << _current_prompt;
       for(int i = 0; i < _linepos; ++i)
         pputc(_linebuffer.at(i), stdout);
     }
@@ -256,7 +254,7 @@ void term_source::retype(int all)
     {
       pputc(CKILL, stdout);
       pputc('\n', stdout);
-      std::cout << current_prompt;
+      std::cout << _current_prompt;
     }
   }
 }
@@ -411,12 +409,12 @@ void term_source::scan(int begin)
   _currentpos.line = line;
   if(line == 0)
   {
-    _currentpos.cpos += static_cast<int>(current_prompt.length());
+    _currentpos.cpos += static_cast<int>(_current_prompt.length());
     _currentpos.line_start = _linebuffer.data();
   }
   _parpos.line = line - _parpos.line;
   if(_parpos.line == 0)
-    _parpos.cpos = cpos - _parpos.cpos + static_cast<int>(current_prompt.length());
+    _parpos.cpos = cpos - _parpos.cpos + static_cast<int>(_current_prompt.length());
 }
 
 void term_source::nput(const char* str, int ntim)
@@ -463,7 +461,7 @@ void term_source::blink()
   else
   {
     if(_currentpos.line == 0)
-      std::cout << current_prompt;
+      std::cout << _current_prompt;
     for(int i = 0; _currentpos.line_start[i] != 0; ++i)
       pputc(_currentpos.line_start[i], stdout);
   }
@@ -645,4 +643,35 @@ std::optional<std::string> term_source::getline()
         break;
     }
   }
+}
+
+lisp_t term_source::readline(std::string prompt)
+{
+  _current_prompt = prompt;
+  std::cout << "\r";
+  std::cout << _current_prompt;
+  auto line = getline();
+  if(line)
+  {
+    lexer lexer{*line};
+    parser parser(lexer);
+    auto head = parser.parse();
+    if(listp(head) || head == nil || head == C_EOF)
+      return head;
+    lisp_t tail;
+    while(true)
+    {
+      auto o = parser.parse();
+      if(o == C_EOF)
+        break;
+      if(tail == nil)
+        tail = cdr(head = cons(head, cons(o, nil)));
+      else
+        tail = cdr(rplacd(tail, cons(o, nil)));
+    }
+    if(tail == nil)
+      return cons(head, nil);
+    return head;
+  }
+  return C_EOF;
 }

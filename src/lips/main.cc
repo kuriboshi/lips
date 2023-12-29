@@ -308,8 +308,8 @@ try
       std::cout << "Error loading rc file: " << error.what() << '\n';
     }
   }
-  ref_file_t terminal{new file_t(std::make_unique<term_source>(options))};
-  top toploop(options, terminal);
+  auto terminal = std::make_unique<term_source>(options);
+  top toploop(options, std::move(terminal));
   while(true)
   {
     try
@@ -327,7 +327,7 @@ try
     }
     catch(const lisp_error& error)
     {
-      dynamic_cast<term_source&>(terminal->source()).clearlbuf();
+      terminal->clearlbuf();
       std::cerr << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)

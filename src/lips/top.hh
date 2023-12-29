@@ -22,15 +22,16 @@
 #include <lisp/lisp.hh>
 
 #include "main.hh"
+#include "term.hh"
 
 namespace lisp
 {
 class top
 {
 public:
-  top(options_t options, ref_file_t file)
+  top(options_t options, std::unique_ptr<term_source> terminal)
     : _options(std::move(options)),
-      _file(std::move(file))
+      _terminal(std::move(terminal))
   {}
   ~top() = default;
 
@@ -52,7 +53,7 @@ public:
   /// saving each expanded atom on the list `alias_expanded`. One indirection
   /// is allowed in order to permit 'alias ls ls -F'.
   static lisp_t findalias(lisp_t exp);
-  static void promptprint(lisp_t prompt);
+  void set_prompt(lisp_t prompt);
 
   // History functions
   static lisp_t printhist();
@@ -125,12 +126,11 @@ private:
 
   static bool _echoline; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
   options_t _options;
-  ref_file_t _file;
+  std::unique_ptr<term_source> _terminal;
   int _level = 0;
+  std::string _current_prompt;
 };
 
 } // namespace lisp
-
-extern std::string current_prompt; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 #endif
