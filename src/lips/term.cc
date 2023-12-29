@@ -31,6 +31,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+#include <ranges>
+#include <algorithm>
 
 #include <lisp/lisp.hh>
 #include "main.hh"
@@ -149,12 +151,14 @@ void term_source::ungetch(char)
     --_position;
 }
 
-bool term_source::firstnotlp()
+bool term_source::first_left_paren(const std::string& str)
 {
-  int i = 0;
-  for(; i < _position && std::isspace(_linebuffer.at(i)) != 0; ++i)
-    ;
-  return _linebuffer.at(i) != '(';
+  auto pos = std::ranges::find_if_not(str, [](auto c) {
+    return std::isspace(c) != 0;
+  });
+  if(pos == std::end(str))
+    return false;
+  return *pos == '(';
 }
 
 void term_source::delonechar()
@@ -606,18 +610,16 @@ std::optional<std::string> term_source::getline()
         _linebuffer.at(_linepos++) = c;
         if(_parcount <= 0)
         {
+          _linebuffer.at(_linepos) = '\0';
+          std::string ret{_linebuffer.data()};
           if(_parcount < 0)
+            ret.insert(0, 1, '(');
+          if(first_left_paren(ret))
           {
-            _linebuffer[0] = '(';
-            _parcount = 0;
+            pputc('\n', stdout);
+            end_term();
+            return ret;
           }
-          else if(firstnotlp())
-            break; // Paren expression not first (for readline).
-          _linebuffer.at(_linepos++) = '\n';
-          pputc('\n', stdout);
-          end_term();
-          _linebuffer.at(_linepos++) = '\0';
-          return _linebuffer.data();
         }
         blink();
         break;

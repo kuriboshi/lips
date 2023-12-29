@@ -94,10 +94,10 @@ private:
   static void pputc(char c, FILE* file);
   /// @brief Put a character _c_ on stream _file_ escaping if _esc_ is `true`.
   static void putch(char c, FILE* file, bool esc);
-  /// @brief Skips separators in the beginning of the line and returns true if
-  // the first non-separator character is a left parenthesis, `false`
+  /// @brief Skips separators in the beginning of the line and returns `true`
+  // if the first non-separator character is a left parenthesis, `false`
   // otherwise.
-  bool firstnotlp();
+  bool first_left_paren(const std::string&);
   /// @brief Delete one character the easy way by sending backspace - space -
   /// backspace.  Do it twice if it was a control character.
   void delonechar();
