@@ -92,11 +92,11 @@ void term_source::init_term()
     {
       if(tgetent(nullptr, term) == 1)
       {
-        _clear = getstr("cl", &termc);
-        _cleol = getstr("ce", &termc);
-        _curfwd = getstr("nd", &termc);
-        _curup = getstr("up", &termc);
-        _nocap = (_clear == nullptr || _cleol == nullptr || _curfwd == nullptr || _curup == nullptr);
+        _termcap.clear = getstr("cl", &termc);
+        _termcap.cleol = getstr("ce", &termc);
+        _termcap.curfwd = getstr("nd", &termc);
+        _termcap.curup = getstr("up", &termc);
+        _termcap.nocap = _termcap.clear.empty() || _termcap.cleol.empty() || _termcap.curfwd.empty() || _termcap.curup.empty();
       }
     }
     init_keymap();
@@ -192,7 +192,7 @@ void term_source::retype(int all)
 {
   int nl = 0;
 
-  if(!_nocap)
+  if(!_termcap.nocap)
   {
     int l = 0;
     for(int i = 0; i < _linepos; ++i)
@@ -208,9 +208,9 @@ void term_source::retype(int all)
       if(all == 2)
       {
         putc('\r', stdout);
-        tputs(_cleol, 1, outc);
+        nput(_termcap.cleol);
       }
-      tputs(_curup, 1, outc);
+      nput(_termcap.curup);
     }
     putc('\r', stdout);
     if(all != 0)
@@ -222,12 +222,12 @@ void term_source::retype(int all)
       for(int i = nl; i < _linepos; ++i)
       {
         if(_linebuffer.at(i) == '\n')
-          tputs(_cleol, 1, outc);
+          nput(_termcap.cleol);
         else
           pputc(_linebuffer.at(i), stdout);
       }
     }
-    tputs(_cleol, 1, outc);
+    nput(_termcap.cleol);
   }
   else
   {
@@ -417,23 +417,25 @@ void term_source::scan(int begin)
     _parpos.cpos = cpos - _parpos.cpos + static_cast<int>(_current_prompt.length());
 }
 
-void term_source::nput(const char* str, int ntim)
+void term_source::nput(const std::string& str, int ntim)
 {
   for(; ntim > 0; --ntim)
   {
-    tputs(str, 1, outc);
+    tputs(str.c_str(), 1, outc);
   }
 }
 
 void term_source::blink()
 {
-  if(_nocap)
+  if(_termcap.nocap)
     return; // Requires termcap and enough capability
   scan(_linepos - 1);
+  if(_parpos.line_start == nullptr)
+    return;
 
   const auto ldiff = _currentpos.line - _parpos.line;
   const auto cdiff = _parpos.cpos - _currentpos.cpos;
-  nput(_curup, ldiff);
+  nput(_termcap.curup, ldiff);
   if(cdiff < 0)
   {
     if(-cdiff < _parpos.cpos)
@@ -441,11 +443,11 @@ void term_source::blink()
     else
     {
       putc('\r', stdout);
-      nput(_curfwd, _parpos.cpos);
+      nput(_termcap.curfwd, _parpos.cpos);
     }
   }
   else
-    nput(_curfwd, cdiff);
+    nput(_termcap.curfwd, cdiff);
   fflush(stdout);
 
   // Blink for 1s or until key pressed
@@ -470,9 +472,7 @@ void term_source::blink()
 
 void term_source::clearscr()
 {
-#ifdef HAVE_CURSES
-  tputs(clear, 1, outc);
-#endif
+  nput(_termcap.clear);
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)

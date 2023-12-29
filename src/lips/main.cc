@@ -327,7 +327,7 @@ try
     }
     catch(const lisp_error& error)
     {
-      terminal->clearlbuf();
+      toploop.clearlbuf();
       std::cerr << "error: " << error.what() << '\n';
     }
     catch(const lisp_finish& fin)

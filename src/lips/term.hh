@@ -125,7 +125,7 @@ private:
   /// in linebuffer from where to start searching.
   void scan(int begin);
   /// @brief Puts the string _str_ on stdout _ntim_ times using tputs.
-  static void nput(const char* str, int ntim);
+  static void nput(const std::string& str, int ntim = 1);
   /// @brief Blink matching parenthesis.
   void blink();
   void clearscr();
@@ -201,11 +201,14 @@ private:
   options_t _options;
 
   // Various term cap strings.
-  const char* _clear{nullptr};
-  const char* _cleol{nullptr};
-  const char* _curfwd{nullptr};
-  const char* _curup{nullptr};
-  bool _nocap{false}; // true if insufficient term cap.
+  struct termcap
+  {
+    std::string clear;
+    std::string cleol;
+    std::string curfwd;
+    std::string curup;
+    bool nocap{false}; // true if insufficient term cap.
+  } _termcap;
 
   std::string _current_prompt;
 };
