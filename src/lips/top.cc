@@ -140,7 +140,6 @@ void top::set_prompt(lisp_t prompt)
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 lisp_t top::operator()(lisp_t)
 {
-  ++_level;
   while(true)
   {
     _echoline = false;
@@ -156,10 +155,7 @@ lisp_t top::operator()(lisp_t)
         print(mkstring("Error in promptform, reset to nil"), T);
         variables->promptform() = nil;
       }
-      if(_level > 1)
-        set_prompt(variables->brkprompt());
-      else
-        set_prompt(variables->topprompt());
+      set_prompt(variables->prompt());
     }
     input_exp = _terminal->readline(_current_prompt);
     if(input_exp == C_EOF)

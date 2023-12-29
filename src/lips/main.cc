@@ -316,22 +316,22 @@ try
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      vm::get().unwind();
-      vm::get().repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
-      vm::get().repl(nil);
+      vm.repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
+      vm.repl(nil);
       return 0;
     }
     catch(const lisp_reset&)
     {
-      std::cout << "^C\n";
+      vm.unwind();
     }
     catch(const lisp_error& error)
     {
       std::cerr << "error: " << error.what() << '\n';
+      vm.unwind();
     }
     catch(const lisp_finish& fin)
     {
-      lisp::vm::primerr()->format("finish: {}\n", fin.what());
+      vm.primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }

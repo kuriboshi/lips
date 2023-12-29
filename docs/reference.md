@@ -199,8 +199,6 @@ way guides the behavior of `lips`.
 - `prompt` This variable contains the string that is printed as the
   prompt.  An exclamation mark is replaced with the current history
   number from `histnum`.  The default prompt is `!_`.
-- `brkprompt` Same as `prompt` but controls prompting in a break.  The
-  default is `!:`.
 - `promptform` This variable is evaluated before the prompt is
   printed.  If an error occurs during evaluation of promptform it is
   reset to the default prompt.

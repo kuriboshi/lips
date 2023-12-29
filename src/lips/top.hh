@@ -102,24 +102,21 @@ private:
       : _history(makecvar("history", nil)),
         _histnum(makecvar("histnum", mknumber(1L))),
         _histmax(makecvar("histmax", mknumber(100L))),
-        _topprompt(makecvar("prompt", mkstring("!_"))),
-        _brkprompt(makecvar("brkprompt", mkstring("!:"))),
+        _prompt(makecvar("prompt", mkstring("!_"))),
         _promptform(makecvar("promptform", nil))
     {}
 
     cvariable_t& history() const { return _history->cvariable(); }
     cvariable_t& histnum() const { return _histnum->cvariable(); }
     const cvariable_t& histmax() const { return _histmax->cvariable(); }
-    const cvariable_t& topprompt() const { return _topprompt->cvariable(); }
-    const cvariable_t& brkprompt() const { return _brkprompt->cvariable(); }
+    const cvariable_t& prompt() const { return _prompt->cvariable(); }
     cvariable_t& promptform() const { return _promptform->cvariable(); }
 
   private:
     lisp_t _history;    // Holds the history list.
     lisp_t _histnum;    // Current event number.
     lisp_t _histmax;    // Maximum number of events to save.
-    lisp_t _topprompt;  // The top level prompt.
-    lisp_t _brkprompt;  // The break loop prompt.
+    lisp_t _prompt;     // The top level prompt.
     lisp_t _promptform; // Evaluated before printing the prompt.
   };
   static std::unique_ptr<cvariables> variables; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -127,7 +124,6 @@ private:
   static bool _echoline; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
   options_t _options;
   std::unique_ptr<term_source> _terminal;
-  int _level = 0;
   std::string _current_prompt;
 };
 
