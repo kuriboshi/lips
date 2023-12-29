@@ -52,6 +52,31 @@ char* getstr(const char* id, char** area)
 }
 } // namespace
 
+void termcap::init()
+{
+  std::array<char, 128> terminfo{}; // Buffer for terminal capabilties.
+  if(auto* term = getenv("TERM"); term != nullptr)
+  {
+    if(tgetent(nullptr, term) == 1)
+    {
+      auto* termc = terminfo.data();
+      _clear = getstr("cl", &termc);
+      _cleol = getstr("ce", &termc);
+      _curfwd = getstr("nd", &termc);
+      _curleft = getstr("le", &termc);
+      _curup = getstr("up", &termc);
+      _nocap =
+        _clear.empty() || _cleol.empty() || _curfwd.empty() || _curleft.empty() || _curup.empty();
+    }
+  }
+}
+
+void termcap::nput(const std::string& str, int n) const
+{
+  for(; n > 0; --n)
+    tputs(str.c_str(), 1, outc);
+}
+
 void term_source::init_keymap()
 {
   key_tab.fill(function::T_INSERT);
@@ -82,20 +107,7 @@ void term_source::init_term()
     _newterm.c_lflag |= ISIG;
     _newterm.c_cc[VMIN] = 1;
     _newterm.c_cc[VTIME] = 0;
-    std::array<char, 128> termcap{}; // Buffer for terminal capabilties.
-    auto* termc = termcap.data();
-    if(auto* term = getenv("TERM"); term != nullptr)
-    {
-      if(tgetent(nullptr, term) == 1)
-      {
-        _termcap.clear = getstr("cl", &termc);
-        _termcap.cleol = getstr("ce", &termc);
-        _termcap.curfwd = getstr("nd", &termc);
-        _termcap.curup = getstr("up", &termc);
-        _termcap.nocap =
-          _termcap.clear.empty() || _termcap.cleol.empty() || _termcap.curfwd.empty() || _termcap.curup.empty();
-      }
-    }
+    _termcap.init();
     init_keymap();
     initialized = true;
   }
@@ -178,18 +190,12 @@ bool term_source::onlyblanks()
   return true;
 }
 
-int term_source::outc(int c)
-{
-  putc(c, stdout);
-  return c;
-}
-
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void term_source::retype(int all)
 {
   int nl = 0;
 
-  if(!_termcap.nocap)
+  if(!_termcap.nocap())
   {
     int l = 0;
     for(int i = 0; i < _linepos; ++i)
@@ -205,9 +211,9 @@ void term_source::retype(int all)
       if(all == 2)
       {
         putc('\r', stdout);
-        nput(_termcap.cleol);
+        _termcap.clr_eol();
       }
-      nput(_termcap.curup);
+      _termcap.cursor_up();
     }
     putc('\r', stdout);
     if(all != 0)
@@ -219,12 +225,12 @@ void term_source::retype(int all)
       for(int i = nl; i < _linepos; ++i)
       {
         if(_linebuffer.at(i) == '\n')
-          nput(_termcap.cleol);
+          _termcap.clr_eol();
         else
           pputc(_linebuffer.at(i), stdout);
       }
     }
-    nput(_termcap.cleol);
+    _termcap.clr_eol();
   }
   else
   {
@@ -415,15 +421,9 @@ std::pair<term_source::cursor_position, term_source::cursor_position> term_sourc
   return {parpos, currentpos};
 }
 
-void term_source::nput(const std::string& str, int ntim)
-{
-  for(; ntim > 0; --ntim)
-    tputs(str.c_str(), 1, outc);
-}
-
 void term_source::blink()
 {
-  if(_termcap.nocap)
+  if(_termcap.nocap())
     return; // Requires termcap and enough capability
   auto [parpos, currentpos] = scan(_linepos - 1);
   if(parpos.line_start == nullptr)
@@ -431,19 +431,19 @@ void term_source::blink()
 
   const auto ldiff = currentpos.line - parpos.line;
   const auto cdiff = parpos.cpos - currentpos.cpos;
-  nput(_termcap.curup, ldiff);
+  _termcap.cursor_up(ldiff);
   if(cdiff < 0)
   {
     if(-cdiff < parpos.cpos)
-      nput("\b", -cdiff);
+      _termcap.cursor_left(-cdiff);
     else
     {
       putc('\r', stdout);
-      nput(_termcap.curfwd, parpos.cpos);
+      _termcap.cursor_right(parpos.cpos);
     }
   }
   else
-    nput(_termcap.curfwd, cdiff);
+    _termcap.cursor_right(cdiff);
   fflush(stdout);
 
   // Blink for 1s or until key pressed
@@ -466,7 +466,7 @@ void term_source::blink()
   fflush(stdout);
 }
 
-void term_source::clearscr() { nput(_termcap.clear); }
+void term_source::clearscr() { _termcap.clear_screen(); }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::optional<std::string> term_source::getline()

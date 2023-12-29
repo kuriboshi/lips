@@ -19,8 +19,46 @@
 #define LIPS_TERM_HH
 
 #include <array>
+#include <cstdio>
 #include <termios.h>
 #include <lisp/io.hh>
+
+// Various term cap strings.
+class termcap
+{
+public:
+  void init();
+
+  // ncurses defines these
+  #undef clear_screen
+  #undef clr_eol
+  #undef cursor_right
+  #undef cursor_left
+  #undef cursor_up
+  void clear_screen() const { nput(_clear); }
+  void clr_eol() const { nput(_cleol); }
+  void cursor_right(int n = 1) const { nput(_curfwd, n); }
+  void cursor_left(int n = 1) const { nput(_curleft, n); }
+  void cursor_up(int n = 1) const {nput(_curup, n); }
+
+  bool nocap() const { return _nocap; }
+
+private:
+  void nput(const std::string& str, int n = 1) const;
+  /// @brief Output a character on stdout.
+  static int outc(int c)
+  {
+    std::putc(c, stdout);
+    return c;
+  }
+
+  std::string _clear;
+  std::string _cleol;
+  std::string _curfwd;
+  std::string _curup;
+  std::string _curleft;
+  bool _nocap{false};           // true if insufficient term cap.
+};
 
 class term_source: public lisp::io::source
 {
@@ -108,8 +146,6 @@ private:
   void delonechar();
   /// @brief Returns `true` if the line contains only separators.
   bool onlyblanks();
-  /// @brief Output a character on stdout, used only in tputs.
-  static int outc(int c);
   /// @brief Retype a line.
   ///
   /// If _all_ is 0 then retype only current line.  If _all_ is 1 then retype
@@ -196,17 +232,7 @@ private:
 
   std::array<enum function, NUM_KEYS> key_tab{}; // Table specifying key functions.
   options_t _options;
-
-  // Various term cap strings.
-  struct termcap
-  {
-    std::string clear;
-    std::string cleol;
-    std::string curfwd;
-    std::string curup;
-    bool nocap{false}; // true if insufficient term cap.
-  } _termcap;
-
+  termcap _termcap;
   std::string _current_prompt;
 };
 
