@@ -60,13 +60,24 @@ void termcap::init()
     if(tgetent(nullptr, term) == 1)
     {
       auto* termc = terminfo.data();
-      _clear = getstr("cl", &termc);
-      _cleol = getstr("ce", &termc);
-      _curfwd = getstr("nd", &termc);
-      _curleft = getstr("le", &termc);
-      _curup = getstr("up", &termc);
+      auto getcap = [&termc](const char* capstr, const char* alt = nullptr) -> const char* {
+        if(auto* cap = getstr(capstr, &termc); cap != nullptr)
+          return cap;
+        if(alt != nullptr)
+          return alt;
+        return "";
+      };
+      _bell = getcap("bl", "\a");
+      _clear = getcap("cl");
+      _cleol = getcap("ce");
+      _cr = getcap("cr", "\r");
+      _curfwd = getcap("nd");
+      _curleft = getcap("le", "\b");
+      _curup = getcap("up");
+      _newline = getcap("nw", "\n");
       _nocap =
-        _clear.empty() || _cleol.empty() || _curfwd.empty() || _curleft.empty() || _curup.empty();
+        std::ranges::any_of(std::vector<std::string>{_bell, _clear, _cleol, _cr, _curfwd, _curleft, _curup, _newline},
+          [](const auto& arg) { return arg.empty(); });
     }
   }
 }
@@ -169,14 +180,14 @@ bool term_source::first_left_paren(const std::string& str)
 void term_source::delonechar()
 {
   --_linepos;
-  putc('\b', stdout);
+  _termcap.cursor_left();
   putc(' ', stdout);
-  putc('\b', stdout);
+  _termcap.cursor_left();
   if(is_control(_linebuffer.at(_linepos)))
   {
-    putc('\b', stdout);
+    _termcap.cursor_left();
     putc(' ', stdout);
-    putc('\b', stdout);
+    _termcap.cursor_left();
   }
 }
 
@@ -208,12 +219,12 @@ void term_source::retype(int all)
   {
     if(all == 2)
     {
-      putc('\r', stdout);
+      _termcap.carriage_return();
       _termcap.clr_eol();
     }
     _termcap.cursor_up();
   }
-  putc('\r', stdout);
+  _termcap.carriage_return();
   if(all != 0)
     nl = 0;
   if(nl == 0)
@@ -407,7 +418,7 @@ void term_source::blink()
       _termcap.cursor_left(-cdiff);
     else
     {
-      putc('\r', stdout);
+      _termcap.carriage_return();
       _termcap.cursor_right(parpos.cpos);
     }
   }
@@ -498,7 +509,7 @@ std::optional<std::string> term_source::getline()
         auto t = glob::extilde(s);
         if(!t)
         {
-          putc(BELL, stdout);
+          _termcap.bell();
           break;
         }
         auto ex = glob::expandfiles(*t, true);
@@ -512,7 +523,7 @@ std::optional<std::string> term_source::getline()
         {
           if(type_of(ex) == object::type::Cons)
             complete(ex);
-          putc(BELL, stdout);
+          _termcap.bell();
         }
         break;
       }
@@ -575,7 +586,7 @@ std::optional<std::string> term_source::getline()
             ret.insert(0, 1, '(');
           if(first_left_paren(ret))
           {
-            pputc('\n', stdout);
+            _termcap.newline();
             end_term();
             return ret;
           }
@@ -583,7 +594,7 @@ std::optional<std::string> term_source::getline()
         blink();
         break;
       case function::T_NEWLINE:
-        pputc('\n', stdout);
+        _termcap.newline();
         if(_linepos == 0 || onlyblanks())
         {
           _linepos = 0;

@@ -30,16 +30,22 @@ public:
   void init();
 
   // ncurses defines these
-  #undef clear_screen
-  #undef clr_eol
-  #undef cursor_right
-  #undef cursor_left
-  #undef cursor_up
+#undef clear_screen
+#undef clr_eol
+#undef cursor_right
+#undef cursor_left
+#undef cursor_up
+#undef newline
+#undef bell
+#undef carriage_return
+  void bell() const { nput(_bell); }
+  void carriage_return() const { nput(_cr); }
   void clear_screen() const { nput(_clear); }
   void clr_eol() const { nput(_cleol); }
-  void cursor_right(int n = 1) const { nput(_curfwd, n); }
   void cursor_left(int n = 1) const { nput(_curleft, n); }
-  void cursor_up(int n = 1) const {nput(_curup, n); }
+  void cursor_right(int n = 1) const { nput(_curfwd, n); }
+  void cursor_up(int n = 1) const { nput(_curup, n); }
+  void newline() const { nput(_newline); }
 
   bool nocap() const { return _nocap; }
 
@@ -53,12 +59,15 @@ private:
     return c;
   }
 
+  std::string _bell;
   std::string _clear;
   std::string _cleol;
+  std::string _cr;
   std::string _curfwd;
-  std::string _curup;
   std::string _curleft;
-  bool _nocap{false};           // true if insufficient term cap.
+  std::string _curup;
+  std::string _newline;
+  bool _nocap{false}; // true if insufficient term cap.
 };
 
 class term_source: public lisp::io::source
