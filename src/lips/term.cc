@@ -656,7 +656,9 @@ lisp_t term_source::readline(std::string prompt)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(listp(head) || head == nil || head == C_EOF)
+    if(listp(head))
+      return cons(head, nil);
+    if(head == nil || head == C_EOF)
       return head;
     lisp_t tail;
     while(true)
