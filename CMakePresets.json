@@ -71,7 +71,8 @@
             "description": "Run clang-tidy on the source code",
             "binaryDir": "${sourceDir}/build/tidy",
             "cacheVariables": {
-                "LIPS_ENABLE_CLANG_TIDY": "ON"
+                "LIPS_ENABLE_CLANG_TIDY": "ON",
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
         },
         {
