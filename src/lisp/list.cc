@@ -27,7 +27,7 @@ inline lisp_t nth(lisp_t list, integer_t::value_type n)
     ;
   return ls;
 }
-}
+} // namespace lisp
 
 namespace lisp::details::list
 {
