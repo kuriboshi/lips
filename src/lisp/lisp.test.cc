@@ -17,6 +17,8 @@
 
 #include <memory>
 #include <vector>
+#include <sstream>
+#include <fmt/format.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -232,6 +234,14 @@ TEST_CASE("lisp: integer_t")
     integer_t value{};
     CHECK(value.value() == 0);
   }
+
+  SECTION("format_as")
+  {
+    std::ostringstream ss;
+    integer_t value{123};
+    ss << fmt::format("{}", value);
+    CHECK(ss.str() == "123");
+  }
 }
 
 TEST_CASE("lisp: double_t")
@@ -240,6 +250,14 @@ TEST_CASE("lisp: double_t")
   {
     double_t value{};
     CHECK(value.value() == 0.0);
+  }
+
+  SECTION("format_as")
+  {
+    std::ostringstream ss;
+    double_t value{321};
+    ss << fmt::format("{}", value);
+    CHECK(ss.str() == "321");
   }
 }
 
