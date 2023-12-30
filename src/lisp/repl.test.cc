@@ -66,6 +66,23 @@ a
     vm::primin(old);
   }
 
+  SECTION("Break repl (eof)")
+  {
+    std::string is = R"(((lambda () (repl_eof))))";
+    auto old = vm::primin(ref_file_t::create(is));
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    CHECK(is_nil(repl(nil)));
+    std::string expected_err = R"(Undefined function repl_eof
+(repl_eof broken)
+)";
+    std::string expected_out = R"(> 1: nil
+> )";
+    CHECK(cout.str() == expected_out);
+    CHECK(cerr.str() == expected_err);
+    vm::primin(old);
+  }
+
   SECTION("Break repl (go)")
   {
     std::string is = R"(((lambda () (repl_go)))
