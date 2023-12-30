@@ -160,6 +160,8 @@ TEST_CASE("list: list functions")
     CHECK(equal(foo, mklist(1_l, 2_l)));
     attach(0_l, foo);
     CHECK(equal(foo, mklist(0_l, 1_l, 2_l)));
+    auto r = attach(0_l, nil);
+    CHECK(equal(r, mklist(0_l)));
   }
 
   SECTION("length")
@@ -176,6 +178,7 @@ TEST_CASE("list: list functions")
     CHECK(equal(nth(foo, 3_l), mklist(3_l, 4_l, 5_l)));
     CHECK(equal(nth(foo, 4_l), mklist(4_l, 5_l)));
     CHECK(equal(nth(foo, 5_l), mklist(5_l)));
+    CHECK(is_nil(nth(nil, 1_l)));
   }
 
   SECTION("list")

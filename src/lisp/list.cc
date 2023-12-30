@@ -18,6 +18,17 @@
 #include "alloc.hh"
 #include "check.hh"
 
+namespace lisp
+{
+inline lisp_t nth(lisp_t list, integer_t::value_type n)
+{
+  lisp_t ls;
+  for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())
+    ;
+  return ls;
+}
+}
+
 namespace lisp::details::list
 {
 lisp_t car(lisp_t a)
@@ -225,23 +236,13 @@ lisp_t length(lisp_t x)
   return mknumber(i);
 }
 
-inline lisp_t _nth(lisp_t list, integer_t::value_type n)
-{
-  lisp_t ls;
-  for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())
-    ;
-  if(!is_nil(ls))
-    return ls;
-  return nil;
-}
-
 lisp_t nth(lisp_t x, lisp_t p)
 {
   check(p, object::type::Integer);
   if(is_nil(x))
     return nil;
   check(x, object::type::Cons);
-  return _nth(x, p->as_integer());
+  return nth(x, p->as_integer());
 }
 
 namespace pn
