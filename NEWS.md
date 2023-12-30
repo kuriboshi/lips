@@ -7,7 +7,10 @@ Minor release mainly revising the documentation.
 - Generate external documentation from in source documentation
 - Add more in source documentaiton
 - Add Doxygen configuration file
+- Add 'splice' function
 - Fix crash when `readline` is called without parameters
+- Fix 'test-linux' build target
+- Treat symbols evaluating to themselves as errors
 
 ## 3.0.0 (2023-12-22)
 
