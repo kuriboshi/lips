@@ -38,6 +38,10 @@ lisp_t parser::parse_object()
     return nil;
   if(_token.type == token_t::type::MACRO)
     return _lexer->macro(_token);
+  if(_token.type == token_t::type::SPLICE)
+    return _lexer->macro(_token);
+  if(_token.type == token_t::type::INFIX)
+    return _lexer->macro(_token);
   return create(_token);
 }
 

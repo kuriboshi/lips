@@ -430,7 +430,7 @@ TEST_CASE("lexer: operator==")
 TEST_CASE("lexer: macro")
 {
   lexer lexer{"$HOME"};
-  lexer.set('$', "rmgetenv"_l);
+  lexer.macro('$', "rmgetenv"_l);
   auto t = lexer.read();
   REQUIRE(t);
   CHECK(t.token == "$");
@@ -438,9 +438,9 @@ TEST_CASE("lexer: macro")
 
 TEST_CASE("lexer: splice")
 {
+  // Note: Splice read macros are not implemented.
   lexer lexer{"$HOME"};
-  lexer.set('$', "rmgetenv"_l);
-  lexer.set('$', syntax::type::INFIX);
+  lexer.splice('$', "rmgetenv"_l);
   auto t = lexer.read();
   REQUIRE(t);
   CHECK(t.token == "$");
@@ -448,9 +448,9 @@ TEST_CASE("lexer: splice")
 
 TEST_CASE("lexer: infix")
 {
+  // Note: Infix read macros are not implemented.
   lexer lexer{"$HOME"};
-  lexer.set('$', "rmgetenv"_l);
-  lexer.set('$', syntax::type::SPLICE);
+  lexer.infix('$', "rmgetenv"_l);
   auto t = lexer.read();
   REQUIRE(t);
   CHECK(t.token == "$");

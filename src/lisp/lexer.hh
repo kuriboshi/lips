@@ -188,7 +188,9 @@ public:
   // Syntax table member functions.
   static syntax::type get(std::uint8_t index) { return vm::read_table().get(index); }
   static void set(std::uint8_t index, syntax::type value) { vm::read_table().set(index, value); }
-  static void set(std::uint8_t index, lisp_t value) { vm::read_table().set(index, std::move(value)); }
+  static void macro(std::uint8_t index, lisp_t value) { vm::read_table().macro(index, std::move(value)); }
+  static void splice(std::uint8_t index, lisp_t value) { vm::read_table().splice(index, std::move(value)); }
+  static void infix(std::uint8_t index, lisp_t value) { vm::read_table().infix(index, std::move(value)); }
   lisp_t macro(token_t token) { return vm::read_table().macro(_input, token.token[0]); }
 
 private:

@@ -191,7 +191,7 @@ void init()
 
   exec::init();
 
-  vm::read_table().set('!', "rmexcl"_l);
+  vm::read_table().macro('!', "rmexcl"_l);
 }
 
 //

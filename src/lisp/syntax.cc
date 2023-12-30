@@ -23,9 +23,11 @@ namespace lisp
 lisp_t syntax::macro(ref_file_t source, std::uint8_t index)
 {
   auto fn = _macro.at(index);
-  const lisp_t f = getobject(source);
   if(fn != nil)
+  {
+    const lisp_t f = getobject(source);
     return apply(fn, cons(f, nil));
+  }
   return nil;
 }
 } // namespace lisp

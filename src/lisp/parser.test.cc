@@ -197,7 +197,7 @@ TEST_CASE("parser: nil")
 TEST_CASE("parser: macro")
 {
   lexer lexer{"$HOME"};
-  lexer.set('$', "rmgetenv"_l);
+  lexer.macro('$', "rmgetenv"_l);
   auto r = parser(lexer).parse();
   REQUIRE(r);
   REQUIRE(type_of(r) == object::type::String);

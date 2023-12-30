@@ -78,9 +78,19 @@ public:
   };
   type get(std::uint8_t index) const { return _table.at(index); }
   void set(std::uint8_t index, type value) { _table.at(index) = value; }
-  void set(std::uint8_t index, lisp_t value)
+  void macro(std::uint8_t index, lisp_t value)
   {
     set(index, type::MACRO);
+    _macro.at(index) = std::move(value);
+  }
+  void splice(std::uint8_t index, lisp_t value)
+  {
+    set(index, type::SPLICE);
+    _macro.at(index) = std::move(value);
+  }
+  void infix(std::uint8_t index, lisp_t value)
+  {
+    set(index, type::INFIX);
     _macro.at(index) = std::move(value);
   }
   lisp_t macro(ref_file_t source, std::uint8_t index);
