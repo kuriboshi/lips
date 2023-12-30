@@ -204,6 +204,26 @@ TEST_CASE("parser: macro")
   CHECK(r->as_string().starts_with("/"));
 }
 
+TEST_CASE("parser: splice")
+{
+  lexer lexer{"$HOME"};
+  lexer.splice('$', "rmgetenv"_l);
+  auto r = parser(lexer).parse();
+  REQUIRE(r);
+  REQUIRE(type_of(r) == object::type::String);
+  CHECK(r->as_string().starts_with("/"));
+}
+
+TEST_CASE("parser: infix")
+{
+  lexer lexer{"$HOME"};
+  lexer.infix('$', "rmgetenv"_l);
+  auto r = parser(lexer).parse();
+  REQUIRE(r);
+  REQUIRE(type_of(r) == object::type::String);
+  CHECK(r->as_string().starts_with("/"));
+}
+
 TEST_CASE("parser: syntax table")
 {
   lexer lexer{"[quote]"};
