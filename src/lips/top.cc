@@ -75,9 +75,9 @@ lisp_t top::get_history(integer_t::value_type num, lisp_t hlist)
       return nil;
     return hlist->car()->cdr();
   }
-  if(!is_nil(hlist))
-    return hlist->car()->cdr();
-  return nil;
+  if(is_nil(hlist))
+    return nil;
+  return hlist->car()->cdr();
 }
 
 lisp_t top::printhist()
