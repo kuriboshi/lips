@@ -331,7 +331,7 @@ try
     }
     catch(const lisp_finish& fin)
     {
-      vm.primerr()->format("finish: {}\n", fin.what());
+      vm::primerr()->format("finish: {}\n", fin.what());
       return fin.exit_code;
     }
   }
