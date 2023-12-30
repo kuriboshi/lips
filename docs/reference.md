@@ -407,18 +407,19 @@ For nospread functions the C++ function has only one argument which
 should be a list.  There is no distinction between lambda and nlambda
 functions in C++ as the normal C++ evaluation rules apply.
 
-- [Memory Management Functions](./docs/alloc.md)
-- [Function Evaluation](./docs/vm.md)
-- [List Functions](./docs/list.md)
-- [Low Level Functions](./docs/low.md)
-- [Predicates](./docs/predicate.md)
-- [String Functions](./docs/string.md)
-- [Input and Output Functions](./docs/file.md)
-- [Arithmetic Functions](./docs/arith.md)
-- [Logic Functions](./docs/logic.md)
-- [Map Functions](./docs/map.md)
-- [Property List Functions](./docs/property.md)
-- [User Functions](./docs/user.md)
+- [Data Types](./reference/types.md)
+- [Memory Management Functions](./reference/alloc.md)
+- [Function Evaluation](./reference/vm.md)
+- [List Functions](./reference/list.md)
+- [Low Level Functions](./reference/low.md)
+- [Predicates](./reference/predicate.md)
+- [String Functions](./reference/string.md)
+- [Input and Output Functions](./reference/file.md)
+- [Arithmetic Functions](./reference/arith.md)
+- [Logic Functions](./reference/logic.md)
+- [Map Functions](./reference/map.md)
+- [Property List Functions](./reference/property.md)
+- [User Functions](./reference/user.md)
 
 ## The `lips` Shell
 
@@ -481,4 +482,4 @@ of the `wc` function (command).
 
 Redirection of stdout and stdin is also handled by the transform hook.
 
-- [Shell Functions](./docs/exec.md)
+- [Shell Functions](./reference/exec.md)

@@ -18,6 +18,10 @@
 #ifndef LISP_TYPES_HH
 #define LISP_TYPES_HH
 
+/// @file types.hh
+///
+/// # Data Types
+
 #include <cstdint>
 #include <algorithm>
 #include <concepts>
@@ -52,7 +56,6 @@ inline constexpr auto nil = nullptr;
 ///
 /// A cons cell contains two pieces of data: The head (traditionally called
 /// car) and the tail (traditionally called cdr).
-///
 class cons_t final: public ref_count<cons_t>
 {
 public:
@@ -99,7 +102,6 @@ private:
 /// following pieces of information: The size of the block, the index of the
 /// variable/value pair currently being set, and a link to another destblock_t
 /// in a chain of blocks.
-///
 class destblock_t final
 {
 private:
@@ -139,7 +141,7 @@ public:
 /// @brief The `make_tuple` overloads creates a tuple from a vector.
 ///
 /// @tparam Result Parameter pack used for the tuple.
-/// @tparam Sequqnce Index sequence of result types.
+/// @tparam Sequence Index sequence of result types.
 /// @param values A vector with zero or more `lisp_t` values.
 ///
 /// @returns A tuple with the values from the vector _values_.
@@ -206,18 +208,20 @@ private:
   std::function<lisp_t(Args...)> _fun;
 };
 
-/// @brief The `make_fun` set of overloads creates an object of type func_t<Args...>.
+/// @brief The `make_fun` set of overloads creates an object of type
+/// func_t<Args...>.
 ///
-/// The object created can then be stored in the subr_t object and later called
-/// with the right number of parameters. There are three overloads taking care
-/// of different cases of functions.
+/// The object created can then be stored in the `subr_t` object and later
+/// called with the right number of parameters. There are three overloads
+/// taking care of different cases of functions.
 ///
 /// The first one handles simple function pointers.
 ///
 /// @tparam Args The zero or more function argument types.
 /// @param fun The function pointer.
 ///
-/// @returns A pointer to _func_base_ which can then be stored in a subr_t.
+/// @returns A `unique_ptr` to _func_base_ which can then be stored in a
+/// `subr_t`.
 template<typename... Args>
 std::unique_ptr<func_base> make_fun(lisp_t (*fun)(Args...))
 {
@@ -230,7 +234,8 @@ std::unique_ptr<func_base> make_fun(lisp_t (*fun)(Args...))
 /// @tparam Args The zero or more function argument types.
 /// @param fun The lambda function.
 ///
-/// @returns A pointer to `func_base` which can then be stored in a subr_t.
+/// @returns A `unique_ptr` to _func_base_ which can then be stored in a
+/// `subr_t`.
 template<typename Lambda, typename... Args>
 std::unique_ptr<func_base> make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) const)
 {
@@ -242,7 +247,8 @@ std::unique_ptr<func_base> make_fun(Lambda fun, lisp_t (Lambda::*)(Args...) cons
 /// @tparam Lambda The lambda function type.
 /// @param fun The lambda function.
 ///
-/// @returns A pointer to `func_base` which can then be stored in a subr_t.
+/// @returns A `unique_ptr` to _func_base_ which can then be stored in a
+/// `subr_t`.
 template<typename Lambda>
 std::unique_ptr<func_base> make_fun(Lambda&& fun)
 {
@@ -255,7 +261,6 @@ std::unique_ptr<func_base> make_fun(Lambda&& fun)
 /// either evaluate their parameters or not (special forms).  Function can be
 /// either spread (fixed number of arguments) or nospread (variable number of
 /// arguments).
-///
 class subr_t final
 {
 public:
@@ -371,7 +376,6 @@ inline lisp_t subr_t::operator()(destblock_t* dest) const
 }
 
 /// @brief Lambda representation.
-///
 class lambda_t final: public ref_count<lambda_t>
 {
 public:
@@ -409,7 +413,6 @@ private:
 };
 
 /// @brief A closure (static binding).
-///
 class closure_t final: public ref_count<closure_t>
 {
 public:
@@ -469,7 +472,7 @@ private:
 
 inline auto format_as(integer_t value) { return value.value(); }
 
-/// @brief Wraps an floating point value.
+/// @brief Wraps a floating point value.
 class double_t final
 {
 public:
@@ -497,6 +500,7 @@ private:
 
 inline auto format_as(double_t value) { return value.value(); }
 
+/// @brief Wraps a string value.
 class string_t final: public ref_count<string_t>
 {
 public:
@@ -539,7 +543,6 @@ struct subr_index
 /// Wraps a lisp_t value in such a way that the value can be changed from
 /// either the C++ context or the lisp context and have the value be reflected
 /// in both.
-///
 class cvariable_t final
 {
 public:
@@ -576,11 +579,13 @@ private:
   lisp_t _value;
 };
 
+/// @brief Wraps an indirect value type.
 struct indirect_t
 {
   lisp_t value;
 };
 
+/// @brief Wraps a file source or sink.
 class file_t final: public ref_count<file_t>
 {
 public:
@@ -883,7 +888,8 @@ private:
   }
 };
 
-/// @brief Return the type of the object or the object inside a lisp_t object.
+/// @brief Return the type of the object or the object inside a `lisp_t`
+/// object.
 ///
 /// Since lisp_t may be nullptr, which represents the nil value, it's not safe
 /// to call lisp_t->gettype() directly.
@@ -903,7 +909,7 @@ inline void object::value(const lisp_t& x)
     var->value = x;
 }
 
-/// @brief Symbols which are used internally
+/// @internal Symbols which are used internally.
 extern const lisp_t T;
 extern const lisp_t C_APPEND;
 extern const lisp_t C_AUTOLOAD;
@@ -937,7 +943,7 @@ extern const lisp_t C_SYMBOL;
 extern const lisp_t C_VERSION;
 extern const lisp_t C_WRITE;
 
-/// @brief Checks if the parameter is equal to the symbol "t".
+/// @brief Checks if the parameter is equal to the symbol `t`.
 inline bool is_T(const lisp_t& x) { return x == T; }
 /// @brief Checks if the lisp_t value is equal to `nil`.
 inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
