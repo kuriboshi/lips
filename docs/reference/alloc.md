@@ -235,27 +235,3 @@ Creates a floating point value.
 > ```
 
 Evaluates a lisp expression in a string.
-
-> ```cpp
-> inline bool is_T(const lisp_t& x)
-> ```
-
-Checks if the parameter is equal to the symbol "t".
-
-> ```cpp
-> inline bool is_nil(const lisp_t& x)
-> ```
-
-Checks if the lisp_t value is equal to `nil`.
-
-> ```cpp
-> inline bool is_nil(const object& x)
-> ```
-
-Checks if the object value is equal to `nil`.
-
-> ```cpp
-> inline bool is_nil(const cvariable_t& x)
-> ```
-
-Checks if the cvariable_t value is equal to `nil`.

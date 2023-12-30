@@ -76,7 +76,7 @@ is returned.
 > `(back cmd)` (_NLambda Function_)
 
 ```cpp
-lisp_t back(lisp_t x);
+lisp_t back(lisp_t cmd);
 ```
 
 Runs a command in the background.

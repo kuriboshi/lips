@@ -228,6 +228,40 @@ from stdin.
 **Returns**: A lisp expression. The symbol `eof` is returned if a blank line is
 read.
 
+> `(splice x y tailp)` (_Function_)
+
+```cpp
+inline lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp)
+```
+
+Splice an object into a list.
+
+Splices list y into x keeping cdr of x. For example:
+
+```lisp
+(let ((x '(a b c))
+      (y '(x y z)))
+ (splice x y)
+ x)
+```
+
+Modifies x to hold the value (x y z b c).
+
+Another example:
+
+```lisp
+(let ((x '(a b c))
+      (y '(x y z)))
+ (splice (cdr x) y)
+ x)
+```
+
+Modifies x to hold the value (a x y z c).
+
+If y is not a list put it in car of x and return x, otherwise return last
+cell of y with cdr set to original (cdr x). If tailp is `t`, don't clobber
+car of x.
+
 > ```cpp
 > bool loadfile(const std::string& filename);
 > ```
@@ -245,38 +279,6 @@ Read S-expressions from the file until end of file it reached.
 > ```
 
 Creates a lisp expression from a string.
-
-> ```cpp
-> lisp_t splice(lisp_t x, lisp_t y, bool tailp);
-> ```
-
-Splice an object into a list.
-
-Splices list y into x keeping cdr of x. For example:
-
-```lisp
-(let ((x '(a b c))
-      (y '(x y z)))
- (splice x y)
- x)
-```
-
-Modifies x to hold the value (x y x b c).
-
-Another example:
-
-```lisp
-(let ((x '(a b c))
-      (y '(x y z)))
- (splice (cdr x) y)
- x)
-```
-
-Modifies x to hold the value (a x y z c).
-
-If y is not a list put it in car of x and return x, otherwise return last
-cell of y with cdr set to original (cdr x). If tailp is true, don't clobber
-car of x.
 
 > ```cpp
 > inline std::ostream& operator<<(std::ostream& os, const lisp::lisp_t& obj)
