@@ -244,15 +244,6 @@ inline lisp_t operator"" _l(long double d)
 /// @brief Evaluates a lisp expression in a string.
 inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }
 
-/// @brief Checks if the parameter is equal to the symbol "t".
-inline bool is_T(const lisp_t& x) { return x == mkatom("t"); }
-/// @brief Checks if the lisp_t value is equal to `nil`.
-inline bool is_nil(const lisp_t& x) { return type_of(x) == object::type::Nil; }
-/// @brief Checks if the object value is equal to `nil`.
-inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
-/// @brief Checks if the cvariable_t value is equal to `nil`.
-inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
-
 } // namespace lisp
 
 #endif

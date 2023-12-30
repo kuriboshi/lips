@@ -66,6 +66,27 @@ a
     vm::primin(old);
   }
 
+  SECTION("Break repl (go)")
+  {
+    std::string is = R"(((lambda () (repl_go)))
+(defineq (repl_go (lambda ())))
+(go)
+)";
+    auto old = vm::primin(ref_file_t::create(is));
+    repl repl(vm::get());
+    vm::get().repl = [&repl](lisp_t) -> lisp_t { return repl(nil); };
+    CHECK(is_nil(repl(nil)));
+    std::string expected_err = R"(Undefined function repl_go
+(repl_go broken)
+)";
+    std::string expected_out = R"(> 1: (repl_go)
+1: nil
+> )";
+    CHECK(cout.str() == expected_out);
+    CHECK(cerr.str() == expected_err);
+    vm::primin(old);
+  }
+
   SECTION("Break repl (reset)")
   {
     std::string is = R"(((lambda () (xyzzy)))
