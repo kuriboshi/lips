@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+#include "main.hh"
+
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_session.hpp>
@@ -33,14 +35,15 @@
 
 #include <lisp/lisp.hh>
 #include <lisp/syntax.hh>
-#include "main.hh"
 #include "env.hh"
 #include "exec.hh"
 #include "job.hh"
-#include "top.hh"
 #include "term.hh"
+#include "top.hh"
+#include "transform.hh"
 
 using namespace lisp;
+using namespace lisp::literals;
 
 namespace
 {
@@ -61,100 +64,6 @@ void init_all_signals()
   signal(SIGINT, onsignal);
   signal(SIGHUP, SIG_DFL);
   signal(SIGTSTP, onsignal);
-}
-
-lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
-{
-  if(is_nil(list))
-  {
-    if(conc)
-      return obj;
-    return cons(obj, nil);
-  }
-  lisp_t t;
-  for(t = list; type_of(t->cdr()) == object::type::Cons; t = t->cdr())
-    ;
-  if(conc)
-    rplacd(t, obj);
-  else
-    rplacd(t, cons(obj, nil));
-  return list;
-}
-
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-lisp_t transform(lisp_t list)
-{
-  lisp_t tl = nil;
-  lisp_t res = nil;
-  bool conc = false;
-  for(auto ll = list; type_of(ll) == object::type::Cons; ll = ll->cdr())
-  {
-    if(type_of(ll->car()) == object::type::Cons)
-      tl = put_end(tl, transform(ll->car()), conc);
-    else if(ll->car() == C_BAR)
-    {
-      if(is_nil(res))
-        res = cons(C_PIPE, cons(tl, nil));
-      else
-        res = cons(C_PIPE, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = false;
-    }
-    else if(ll->car() == C_SEMI)
-    {
-      // Semicolon is considered a comment character. If progn transformation
-      // is to be effective ';' cannot be a comment character.
-      if(is_nil(res))
-        res = cons(C_PROGN, cons(tl, nil));
-      else
-        res = cons(C_PROGN, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = false;
-    }
-    else if(ll->car() == C_GT)
-    {
-      if(is_nil(res))
-        res = cons(C_REDIR_TO, cons(tl, nil));
-      else
-        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = true;
-    }
-    else if(ll->car() == C_GGT)
-    {
-      if(is_nil(res))
-        res = cons(C_REDIR_APPEND, cons(tl, nil));
-      else
-        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = true;
-    }
-    else if(ll->car() == C_LT)
-    {
-      if(is_nil(res))
-        res = cons(C_REDIR_FROM, cons(tl, nil));
-      else
-        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = true;
-    }
-    else if(ll->car() == C_AMPER)
-    {
-      if(is_nil(res))
-        res = cons(C_BACK, cons(tl, nil));
-      else
-        res = cons(C_BACK, cons(put_end(res, tl, conc), nil));
-      tl = nil;
-      conc = true;
-    }
-    else
-      tl = put_end(tl, ll->car(), false);
-  }
-  if(is_nil(res))
-    return tl;
-  if(!is_nil(tl))
-    res = put_end(res, tl, conc);
-  return res;
 }
 
 void promptfun()

@@ -25,7 +25,8 @@ target_sources(
           main.cc
           os.cc
           term.cc
-          top.cc)
+          top.cc
+          transform.cc)
 target_sources(
   lips
   PRIVATE env.hh
@@ -36,7 +37,8 @@ target_sources(
           lips_error.hh
           os.hh
           term.hh
-          top.hh)
+          top.hh
+          transform.hh)
 target_link_libraries(lips PRIVATE liblisp)
 target_link_libraries(lips PRIVATE Catch2::Catch2)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
