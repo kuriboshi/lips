@@ -25,6 +25,7 @@
 
 namespace lisp::rtable
 {
+
 //
 // Read macros.
 //

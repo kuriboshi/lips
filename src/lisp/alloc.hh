@@ -213,20 +213,22 @@ lisp_t mklist(lisp_t first, Ts... rest)
   return cons(std::move(first), nil);
 }
 
+inline namespace literals
+{
 /// @brief Creates a lisp string.
-inline lisp_t operator"" _s(const char* s, std::size_t) { return details::alloc::mkstring(s); }
+inline lisp::lisp_t operator"" _s(const char* s, std::size_t) { return lisp::details::alloc::mkstring(s); }
 
 /// @brief Creates an atom.
-inline lisp_t operator"" _a(const char* s, std::size_t) { return details::alloc::mkatom(s); }
+inline lisp::lisp_t operator"" _a(const char* s, std::size_t) { return lisp::details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp_t operator"" _l(unsigned long long i)
+inline lisp::lisp_t operator"" _l(unsigned long long i)
 {
-  return details::alloc::mknumber(static_cast<integer_t::value_type>(i));
+  return lisp::details::alloc::mknumber(static_cast<lisp::integer_t::value_type>(i));
 }
 
 /// @brief Creates a floating point value.
-inline lisp_t operator"" _l(long double d)
+inline lisp::lisp_t operator"" _l(long double d)
 {
   constexpr auto max_double{std::numeric_limits<double>::max()};
   constexpr auto max_long_double{std::numeric_limits<long double>::max()};
@@ -234,15 +236,16 @@ inline lisp_t operator"" _l(long double d)
   {
     if(d > max_double)
     {
-      const lisp_t err{mkstring(fmt::format("{} too large", d))};
-      error(error_errc::illegal_arg, err);
+      const lisp::lisp_t err{lisp::mkstring(fmt::format("{} too large", d))};
+      lisp::error(lisp::error_errc::illegal_arg, err);
     }
   }
-  return details::alloc::mkfloat(static_cast<double>(d));
+  return lisp::details::alloc::mkfloat(static_cast<double>(d));
 }
 
 /// @brief Evaluates a lisp expression in a string.
-inline lisp_t operator"" _e(const char* s, std::size_t) { return eval(s); }
+inline lisp::lisp_t operator"" _e(const char* s, std::size_t) { return lisp::eval(s); }
+}
 
 } // namespace lisp
 

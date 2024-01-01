@@ -267,12 +267,15 @@ inline lisp_t print(lisp_t a, io::output out = io::output::PRIMARY)
   return print(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
 }
 
-/// @brief Creates a lisp expression from a string.
-inline lisp_t operator"" _l(const char* s, std::size_t)
+inline namespace literals
 {
-  auto in = ref_file_t::create(s);
-  auto e = lispread(in);
+/// @brief Creates a lisp expression from a string.
+inline lisp::lisp_t operator"" _l(const char* s, std::size_t)
+{
+  auto in = lisp::ref_file_t::create(s);
+  auto e = lisp::lispread(in);
   return e;
+}
 }
 
 } // namespace lisp
