@@ -1,5 +1,5 @@
 default:
-    image: ubuntu:22.10
+    image: ubuntu:22.04
 
 stages:
   - build
@@ -29,7 +29,7 @@ unit-test-job:
         apt-get install -y make cmake ninja-build
         apt-get install -y g++ libncurses-dev
       )
-    - make test
+    - LIPS_TEST_TAGS='~[root]' make test
   dependencies:
     - build-job
   artifacts:
@@ -46,7 +46,7 @@ coverage-test-job:
         apt-get install -y g++ libncurses-dev
         apt-get install -y lcov
       )
-    - make coverage
+    - LIPS_TEST_TAGS='~[root]' make coverage
   dependencies:
     - build-job
   artifacts:

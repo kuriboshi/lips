@@ -147,14 +147,6 @@ TEST_CASE("io: sink")
     CHECK(ss.str() == "hello\n");
   }
 
-  SECTION("io:file_sink error")
-  {
-    // Catch2 doesn't detect that the following throws if the lambda is defined
-    // in the CHECK_THROWS macro.
-    auto cant_open = [&]() { io::file_sink f("/does_not_exist"); };
-    CHECK_THROWS(cant_open());
-  }
-
   SECTION("io::stream_sink")
   {
     create_test_file test("world");
@@ -177,6 +169,15 @@ TEST_CASE("io: sink")
     ss.close();
     CHECK(ss.string() == "^C\n");
   }
+}
+
+// Tagged with [root] so the test can be excluded when run as root.
+TEST_CASE("io::file_sink error", "[root]")
+{
+  // Catch2 doesn't detect that the following throws if the lambda is
+  // defined in the CHECK_THROWS macro.
+  auto cant_open = [&]() { io::file_sink f("/cannot_write"); };
+  CHECK_THROWS(cant_open());
 }
 
 } // namespace lisp

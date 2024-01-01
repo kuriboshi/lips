@@ -142,7 +142,7 @@ if(LIPS_ENABLE_TESTS)
   add_test(NAME test_lisp
            COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/../../lisp/test.lisp
                    --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-                   --loadpath ${CMAKE_CURRENT_BINARY_DIR})
+                   --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}")
 endif()
 
 if(LIPS_ENABLE_BENCHMARK)

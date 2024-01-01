@@ -37,7 +37,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         $<TARGET_FILE:${TARGET_NAME}>
         --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
         --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-        --loadpath ${CMAKE_CURRENT_BINARY_DIR}
+        --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}"
     COMMAND
       ${LLVM_PROFDATA} merge -sparse
       ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw -o
@@ -81,7 +81,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
         $<TARGET_FILE:${TARGET_NAME}>
         --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
         --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-        --loadpath ${CMAKE_CURRENT_BINARY_DIR}
+        --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}"
     DEPENDS ${TARGET_NAME})
   add_custom_target(
     lcov-capture

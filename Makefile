@@ -88,7 +88,7 @@ test-linux:
 # Run the unit tests.
 .PHONY: test
 test: debug
-	ctest --preset default
+	ctest --preset default --output-on-failure
 
 ubuntu20 ubuntu22 ubuntu22-tidy ubuntu22-clang:
 	cmake --build --preset debug --target $@
