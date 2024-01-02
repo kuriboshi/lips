@@ -475,8 +475,6 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
 
 lisp_t pipecmd(lisp_t cmds)
 {
-  print(cmds);
-
   if(is_nil(cmds))
     return nil;
   if(is_nil(cmds->cdr()))
