@@ -43,79 +43,67 @@ lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
   return list;
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-lisp_t transform(lisp_t list)
+lisp_t transform(const lisp_t& func, lisp_t res, lisp_t tail, bool conc)
 {
-  lisp_t tl = nil;
+  if(is_nil(res))
+    return cons(func, cons(tail, nil));
+  return cons(func, cons(put_end(res, tail, conc), nil));
+}
+
+lisp_t transform(const lisp_t& list)
+{
+  lisp_t tail = nil;
   lisp_t res = nil;
   bool conc = false;
   for(auto ll = list; type_of(ll) == object::type::Cons; ll = ll->cdr())
   {
     if(type_of(ll->car()) == object::type::Cons)
-      tl = put_end(tl, transform(ll->car()), conc);
+      tail = put_end(tail, transform(ll->car()), conc);
     else if(ll->car() == C_BAR)
     {
-      if(is_nil(res))
-        res = cons(C_PIPE, cons(tl, nil));
-      else
-        res = cons(C_PIPE, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_PIPE, res, tail, conc);
+      tail = nil;
       conc = false;
     }
     else if(ll->car() == C_SEMI)
     {
       // Semicolon is considered a comment character. If progn transformation
       // is to be effective ';' cannot be a comment character.
-      if(is_nil(res))
-        res = cons(C_PROGN, cons(tl, nil));
-      else
-        res = cons(C_PROGN, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_PROGN, res, tail, conc);
+      tail = nil;
       conc = false;
     }
     else if(ll->car() == C_GT)
     {
-      if(is_nil(res))
-        res = cons(C_REDIR_TO, cons(tl, nil));
-      else
-        res = cons(C_REDIR_TO, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_REDIR_TO, res, tail, conc);
+      tail = nil;
       conc = true;
     }
     else if(ll->car() == C_GGT)
     {
-      if(is_nil(res))
-        res = cons(C_REDIR_APPEND, cons(tl, nil));
-      else
-        res = cons(C_REDIR_APPEND, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_REDIR_APPEND, res, tail, conc);
+      tail = nil;
       conc = true;
     }
     else if(ll->car() == C_LT)
     {
-      if(is_nil(res))
-        res = cons(C_REDIR_FROM, cons(tl, nil));
-      else
-        res = cons(C_REDIR_FROM, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_REDIR_FROM, res, tail, conc);
+      tail = nil;
       conc = true;
     }
     else if(ll->car() == C_AMPER)
     {
-      if(is_nil(res))
-        res = cons(C_BACK, cons(tl, nil));
-      else
-        res = cons(C_BACK, cons(put_end(res, tl, conc), nil));
-      tl = nil;
+      res = transform(C_BACK, res, tail, conc);
+      tail = nil;
       conc = true;
     }
     else
-      tl = put_end(tl, ll->car(), false);
+      tail = put_end(tail, ll->car(), false);
   }
   if(is_nil(res))
-    return tl;
-  if(!is_nil(tl))
-    res = put_end(res, tl, conc);
+    return tail;
+  if(!is_nil(tail))
+    return put_end(res, tail, conc);
   return res;
 }
 
@@ -149,6 +137,18 @@ TEST_CASE("transform")
   {
     auto result = transform("(ls < foo)"_l);
     CHECK(equal(result, "(redir-from (ls) foo)"_l));
+  }
+
+  SECTION("pipe | redirect >")
+  {
+    auto result = transform("(ls | wc > foo)"_l);
+    CHECK(equal(result, "(redir-to (pipe-cmd (ls) (wc)) foo)"_l));
+  }
+
+  SECTION("pipe | | redirect >")
+  {
+    auto result = transform(R"((a | b | c))"_l);
+    CHECK(equal(result, R"((pipe-cmd (pipe-cmd (a) (b)) (c)))"_l));
   }
 
   SECTION("background &")

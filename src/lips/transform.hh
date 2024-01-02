@@ -20,7 +20,7 @@
 
 #include <lisp/lisp.hh>
 
-lisp::lisp_t transform(lisp::lisp_t list);
+lisp::lisp_t transform(const lisp::lisp_t& list);
 
 extern const lisp::lisp_t C_AMPER;
 extern const lisp::lisp_t C_BACK;
