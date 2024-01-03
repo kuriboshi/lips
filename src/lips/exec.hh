@@ -200,7 +200,7 @@ lisp_t setenv(lisp_t var, lisp_t val);
 /// @lisp{(getenv var),NLambda Function}
 ///
 /// @returns The value of the variable or `nil` if not set.
-lisp_t getenviron(lisp_t var);
+lisp_t getenv(lisp_t var);
 /// @brief Change current working directory.
 /// @lisp{(cd dir emess),NLambda Function}
 ///

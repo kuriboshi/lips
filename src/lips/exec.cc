@@ -570,10 +570,10 @@ lisp_t setenv(lisp_t var, lisp_t val)
   return var;
 }
 
-lisp_t getenviron(lisp_t var)
+lisp_t getenv(lisp_t var)
 {
   check(var, object::type::String, object::type::Symbol);
-  char* s = getenv(var->getstr().c_str());
+  char* s = ::getenv(var->getstr().c_str());
   if(s == nullptr)
     return nil;
   return mkstring(s);
@@ -641,7 +641,7 @@ void init()
   mkprim(pn::FG,           fg,           subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::BG,           bg,           subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::SETENV,       setenv,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
-  mkprim(pn::GETENV,       getenviron,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
+  mkprim(pn::GETENV,       getenv,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::EXEC,         doexec,       subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   // clang-format on
   do_rehash();
