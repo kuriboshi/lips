@@ -508,15 +508,15 @@ lisp_t jobs()
 
 lisp_t fg(lisp_t job)
 {
-  job::job_t* current = nullptr;
-
-  if(is_nil(job))
-    current = job::findjob([](const auto& j) { return WIFSTOPPED(j.status); });
-  else
-  {
-    check(job, object::type::Integer);
-    current = job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
-  }
+  auto* current = [](const lisp_t& job) {
+    if(is_nil(job))
+      return job::findjob([](const auto& j) { return WIFSTOPPED(j.status); });
+    else
+    {
+      check(job, object::type::Integer);
+      return job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
+    }
+  }(job);
   if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
@@ -537,15 +537,15 @@ lisp_t fg(lisp_t job)
 
 lisp_t bg(lisp_t job)
 {
-  job::job_t* current = nullptr;
-
-  if(is_nil(job))
-    current = job::findjob([](const auto& j) { return !j.background; });
-  else
-  {
-    check(job, object::type::Integer);
-    current = job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
-  }
+  auto* current = [](const auto& job) {
+    if(is_nil(job))
+      return job::findjob([](const auto& j) { return !j.background; });
+    else
+    {
+      check(job, object::type::Integer);
+      return job::findjob([&job](const auto& j) { return j.jobnum == job->as_integer(); });
+    }
+  }(job);
   if(current != nullptr)
   {
     auto pgrp = getpgid(current->procid);
