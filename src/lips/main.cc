@@ -17,10 +17,6 @@
 
 #include "main.hh"
 
-#define CATCH_CONFIG_RUNNER
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/catch_session.hpp>
-
 #include <sys/types.h>
 #include <sys/select.h>
 #include <pwd.h>
@@ -133,12 +129,10 @@ lisp_t greet(lisp_t who)
 int main(int argc, char* const* argv)
 try
 {
-  Catch::Session session;
-
   signal_flag = 0;
   int option = 0;
   options_t options;
-  while((option = getopt(argc, argv, "c:fvidT")) != EOF)
+  while((option = getopt(argc, argv, "c:fvid")) != EOF)
   {
     switch(option)
     {
@@ -159,9 +153,6 @@ try
       case 'd':
         options.debug = true;
         break;
-      case 'T':
-        options.test = true;
-        break;
       default:
         std::cout << "usage: -fvicT [arguments]\n";
         ::exit(1);
@@ -179,11 +170,6 @@ try
   auto context = std::make_unique<context_t>();
   lisp::vm_t vm(std::move(context));
   init();
-  if(options.test)
-  {
-    auto result = session.run();
-    return result;
-  }
   if(!options.fast)
   {
     try

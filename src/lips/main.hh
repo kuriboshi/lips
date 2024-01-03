@@ -33,7 +33,6 @@ struct options_t
   bool command = false;     // Command string
   bool version = false;     // Print version
   bool fast = false;        // Fast start, don't read init file
-  bool test = false;        // Run unit tests
 };
 
 #endif
