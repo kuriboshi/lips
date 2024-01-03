@@ -23,7 +23,6 @@
 #include <unistd.h>
 
 #include <fmt/format.h>
-#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <string>
 #include <iostream>
@@ -40,6 +39,7 @@
 #include "top.hh"
 #include "exec.hh"
 #include "env.hh"
+#include "transform.hh"
 #include "lips_error.hh"
 
 using namespace lisp;
@@ -59,13 +59,9 @@ std::unordered_map<std::string, std::string> exechash;
 }
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
-namespace
+namespace lisp::exec
 {
-/// @brief preparefork Prepares a provess after fork.
-///
-/// Sets the processgroup to the group currently beeing built.  Resets signals
-/// to their default value.
-void preparefork()
+void process::prepare()
 {
   signal(SIGHUP, SIG_DFL);
   signal(SIGINT, SIG_DFL);
@@ -78,18 +74,11 @@ void preparefork()
   signal(SIGTTOU, SIG_DFL);
 }
 
-/// @brief mfork Forks and initializes the child.
-///
-/// Forks and initializes the child. If the process hasn't previously been
-/// forked, its pid is used as process group id. It also grabs the tty for the
-/// new process group.
-///
-/// @returns The pid of the new process.
-int mfork()
+int process::fork()
 {
   int pid = 0;
 
-  if(pid = fork(); pid == 0)
+  if(pid = ::fork(); pid == 0)
   {
     auto pgrp = getpid();
     if(!insidefork)
@@ -98,7 +87,7 @@ int mfork()
       tcsetpgrp(1, pgrp);
       insidefork = true;
     }
-    preparefork();
+    prepare();
     return pid;
   }
   if(pid < 0)
@@ -114,17 +103,7 @@ int mfork()
   return pid;
 }
 
-/// @brief check_meta Checks for meta characters.
-///
-/// Checks the string S if it contains any non-quoted meta characters in which
-/// case it returns true. It also strips off all quote-characters (backslash).
-///
-/// @param s String to check.
-///
-/// @returns Pair of bool and string. The bool is true if string contains any
-/// meta characters otherwise false. The string is the input string stripped of
-/// any quote characters.
-std::pair<bool, std::string> check_meta(const std::string& s)
+std::pair<bool, std::string> process::check_meta(const std::string& s)
 {
   std::string result;
   bool meta = false;
@@ -139,15 +118,13 @@ std::pair<bool, std::string> check_meta(const std::string& s)
     if(quote)
       quote = false;
     else if("*?[]"s.find_first_of(c) != std::string::npos)
-    {
       meta = true;
-    }
     result.push_back(c);
   }
   return {meta, result};
 }
 
-std::optional<std::vector<std::string>> process_one(lisp_t arg)
+std::optional<std::vector<std::string>> process::process_one(const lisp_t& arg)
 {
   std::vector<std::string> args;
   if(type_of(arg) == object::type::Symbol)
@@ -193,13 +170,7 @@ std::optional<std::vector<std::string>> process_one(lisp_t arg)
   return args;
 }
 
-/// @brief make_exec Builds a command line for execve.
-///
-/// Parses command line expression and builds argument vector suitable for
-/// execve.
-///
-/// @returns Vector with command and arguments.
-std::vector<std::string> make_exec(lisp_t command)
+std::vector<std::string> process::make_exec(const lisp_t& command)
 {
   std::vector<std::string> args;
 
@@ -214,15 +185,7 @@ std::vector<std::string> make_exec(lisp_t command)
   return args;
 }
 
-/// @brief waitfork Wait for a process.
-///
-/// Wait for specific process or the first one if PID is zero.
-///
-/// @param pid The process id to wait for. Zero mean wait for the first process
-/// to change its status.
-///
-/// @returns The status.
-job::stat_t waitfork(pid_t pid)
+job::stat_t process::waitfork(pid_t pid)
 {
   job::stat_t stat{0};
 
@@ -247,16 +210,7 @@ job::stat_t waitfork(pid_t pid)
   return stat;
 }
 
-/// @brief execute Execute a process.
-///
-/// Fork a new process, if not already in a fork, and calls execve.  Wait for
-/// the process to return (using waitfork).
-///
-/// @param name Name of the program.
-/// @param command List of command arguments.
-///
-/// @returns C_ERROR if there is an error or the exit status of the process.
-lisp_t execute(const std::string& name, lisp_t command)
+lisp_t process::execute(const std::string& name, const lisp_t& command)
 {
   auto args = make_exec(command);
   std::vector<char*> argv;
@@ -272,7 +226,7 @@ lisp_t execute(const std::string& name, lisp_t command)
     ::exit(1);
     // No return
   }
-  auto pid = mfork();
+  auto pid = fork();
   if(pid == 0)
   {
     execve(name.c_str(), argv.data(), environ);
@@ -287,13 +241,7 @@ lisp_t execute(const std::string& name, lisp_t command)
   return mknumber(WEXITSTATUS(status.stat));
 }
 
-/// @brief ifexec Check if file is executable.
-///
-/// @param dir Directory to check.
-/// @param name Name of file to check.
-///
-/// @returns True if directory DIR contains a NAME that is executable.
-bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
+bool process::is_executable(const std::filesystem::path& dir, const std::filesystem::path& name)
 {
   auto path = dir / name;
   std::error_code ec;
@@ -306,36 +254,16 @@ bool ifexec(const std::filesystem::path& dir, const std::filesystem::path& name)
       || (status.permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none));
 }
 
-} // namespace
-
-void checkfork()
-{
-  while(true)
-  {
-    job::stat_t wstat{0};
-    auto wpid = waitpid(-1, &wstat.stat, WUNTRACED | WNOHANG);
-    if(wpid > 0)
-      job::collectjob(wpid, wstat);
-    else
-      break;
-  }
-}
-
-namespace lisp::exec
-{
-/// @brief execcommand - Tries to execute the lisp expression exp as a command.
-///
-/// Execcomand returns 0 if there is no executable file in the path, 1 if the
-/// command was successively run and -1 if there was some error.
 int execcommand(lisp_t exp, lisp_t* res)
 {
   *res = T;
   auto command = glob::extilde(exp->car()->getstr());
   if(!command || command->empty())
     return -1;
+  process proc;
   if(command->at(0) == '/' || strpbrk(command->c_str(), "/") != nullptr)
   {
-    if(execute(*command, exp) == C_ERROR)
+    if(proc.execute(*command, exp) == C_ERROR)
       return -1;
     return 1;
   }
@@ -351,11 +279,11 @@ int execcommand(lisp_t exp, lisp_t* res)
       comdir = cdir->getstr();
     else
       continue;
-    if(ifexec(comdir, *command))
+    if(proc.is_executable(comdir, *command))
     {
       comdir += "/";
       comdir += *command;
-      if(execute(comdir, exp) == C_ERROR)
+      if(proc.execute(comdir, exp) == C_ERROR)
         return -1;
       return 1;
     }
@@ -384,7 +312,8 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
-  if(pid = mfork(); pid == 0)
+  process proc;
+  if(pid = proc.fork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -396,7 +325,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  auto status = waitfork(pid);
+  auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
 }
@@ -420,7 +349,8 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
-  if(pid = mfork(); pid == 0)
+  process proc;
+  if(pid = proc.fork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -432,7 +362,7 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  auto status = waitfork(pid);
+  auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
 }
@@ -456,7 +386,8 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if(fd = ::open(file->getstr().c_str(), O_RDONLY); fd == -1)
     return error(std::error_code(errno, std::system_category()), file);
-  if(pid = mfork(); pid == 0)
+  process proc;
+  if(pid = proc.fork(); pid == 0)
   {
     if(dup2(fd, oldfd) < 0)
     {
@@ -468,7 +399,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
   }
   else if(pid < 0)
     return C_ERROR;
-  auto status = waitfork(pid);
+  auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
 }
@@ -481,7 +412,8 @@ lisp_t pipecmd(lisp_t cmds)
     return eval(cmds->car());
 
   int pid = 0;
-  if(pid = mfork(); pid == 0)
+  process proc;
+  if(pid = proc.fork(); pid == 0)
   {
     std::array<int, 2> pd{};
     if(pipe(pd.data()) == -1)
@@ -489,7 +421,7 @@ lisp_t pipecmd(lisp_t cmds)
       vm::stderr()->format("{}\n", std::error_code(errno, std::system_category()).message());
       ::exit(1);
     }
-    if(pid = mfork(); pid == 0)
+    if(pid = proc.fork(); pid == 0)
     {
       ::close(pd[0]);
       if(dup2(pd[1], 1) < 0)
@@ -510,12 +442,12 @@ lisp_t pipecmd(lisp_t cmds)
       ::exit(1);
     }
     eval(cmds->car());
-    auto status = waitfork(pid);
+    auto status = proc.waitfork(pid);
     ::exit(WEXITSTATUS(status.stat));
   }
   else if(pid < 0)
     return C_ERROR;
-  auto status = waitfork(pid);
+  auto status = proc.waitfork(pid);
   return mknumber(WEXITSTATUS(status.stat));
 }
 
@@ -526,7 +458,8 @@ lisp_t back(lisp_t cmd)
   if(pid = fork(); pid == 0)
   {
     insidefork = true;
-    preparefork();
+    process proc;
+    proc.prepare();
     eval(cmd);
     ::exit(0);
   }
@@ -595,7 +528,8 @@ lisp_t fg(lisp_t job)
         return error(std::error_code(errno, std::system_category()), mknumber(pgrp));
     current->status = 0;
     current->background = false;
-    auto status = waitfork(current->procid);
+    process proc;
+    auto status = proc.waitfork(current->procid);
     return mknumber(WEXITSTATUS(status.stat));
   }
   return error(lips_errc::no_such_job, job);
@@ -692,6 +626,8 @@ lisp_t doexec(lisp_t cmd)
 
 void init()
 {
+  environment = std::make_unique<env>();
+
   // clang-format off
   mkprim(pn::REDIR_TO,     redir_to,     subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
   mkprim(pn::REDIR_FROM,   redir_from,   subr_t::subr::NOEVAL, subr_t::spread::SPREAD);
@@ -713,79 +649,24 @@ void init()
 }
 } // namespace lisp::exec
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-TEST_CASE("exec.cc: check_meta")
+void checkfork()
 {
-  SECTION("test 1")
+  while(true)
   {
-    auto b = check_meta("hello");
-    CHECK(!b.first);
-  }
-  SECTION("test 2")
-  {
-    auto b = check_meta("hello*");
-    CHECK(b.first);
-  }
-  SECTION("test 3")
-  {
-    auto b = check_meta("hello\\*");
-    CHECK(!b.first);
-    CHECK(b.second == "hello*"s);
-  }
-  SECTION("test 4")
-  {
-    auto b = check_meta(R"(hello\*\[\])");
-    CHECK(!b.first);
-    CHECK(b.second == "hello*[]"s);
-  }
-  SECTION("test 5")
-  {
-    auto b = check_meta("hello\\*[a]\\*");
-    CHECK(b.first);
-    CHECK(b.second == "hello*[a]*"s);
+    job::stat_t wstat{0};
+    auto wpid = waitpid(-1, &wstat.stat, WUNTRACED | WNOHANG);
+    if(wpid > 0)
+      job::collectjob(wpid, wstat);
+    else
+      break;
   }
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-TEST_CASE("exec.cc: make_exec")
-{
-  SECTION("(make_exec (a b c)) -> a b c")
-  {
-    auto result = make_exec(cons(mkstring("a"), cons(mkstring("b"), cons(mkstring("c"), nil))));
-    CHECK(result.size() == 3);
-    auto i = result.begin();
-    CHECK(*i++ == "a");
-    CHECK(*i++ == "b");
-    CHECK(*i++ == "c");
-  }
-  SECTION("(make_exec (100)) -> 100")
-  {
-    auto result = make_exec(cons(mknumber(100), nil)); // NOLINT: Test code
-    CHECK(result.at(0) == "100"s);
-  }
-  SECTION("(make_exec (plus 1 2)) -> 3")
-  {
-    auto expr = lispread("((plus 1 2))");
-    auto result = make_exec(expr);
-    CHECK(result.at(0) == "3"s);
-  }
-  SECTION("(make_exec (/b*)) -> /bin")
-  {
-    auto expr = lispread("(/b*)");
-    auto result = make_exec(expr);
-    REQUIRE(!result.empty());
-    CHECK(result.at(0) == "/bin"s);
-  }
-  SECTION("(make_exec (/a*)) -> <empty>")
-  {
-    auto expr = lispread("(/a*)");
-    auto result = make_exec(expr);
-    REQUIRE(result.empty());
-  }
-}
-
-TEST_CASE("execute")
-{
-  auto result = execute("/bin/ls", cons(mkstring("ls"), nil));
-  CHECK(result->as_integer() == 0);
-}
+const lisp_t C_BACK = intern(pn::BACK);
+const lisp_t C_EXEC = intern(pn::EXEC);
+const lisp_t C_OLDVAL = intern("oldval");
+const lisp_t C_PIPE = intern(pn::PIPECMD);
+const lisp_t C_PROGN = intern("progn");
+const lisp_t C_REDIR_APPEND = intern(pn::REDIR_APPEND);
+const lisp_t C_REDIR_FROM = intern(pn::REDIR_FROM);
+const lisp_t C_REDIR_TO = intern(pn::REDIR_TO);

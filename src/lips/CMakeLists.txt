@@ -15,32 +15,44 @@
 # limitations under the License.
 #
 
-add_executable(lips)
+add_library(liblips)
 target_sources(
-  lips
+  liblips
   PRIVATE env.cc
           exec.cc
           glob.cc
           job.cc
-          main.cc
           os.cc
           term.cc
           top.cc
           transform.cc)
 target_sources(
-  lips
+  liblips
   PRIVATE env.hh
           exec.hh
           glob.hh
           job.hh
-          main.hh
           lips_error.hh
           os.hh
           term.hh
           top.hh
           transform.hh)
-target_link_libraries(lips PRIVATE liblisp)
-target_link_libraries(lips PRIVATE Catch2::Catch2)
+target_link_libraries(
+  liblips
+  PUBLIC fmt::fmt liblisp Catch2::Catch2)
+set_target_properties(liblips PROPERTIES OUTPUT_NAME lips)
+
+find_package(Curses REQUIRED)
+target_link_libraries(liblips PUBLIC ${CURSES_LIBRARIES})
+
+add_executable(lips)
+target_sources(
+  lips
+  PRIVATE main.cc)
+target_sources(
+  lips
+  PRIVATE main.hh)
+target_link_libraries(lips PRIVATE liblips)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
                                             VERSION_LESS 9.0)
   target_link_libraries(lips PRIVATE stdc++fs)
@@ -52,9 +64,15 @@ if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lips PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
 endif()
 
-find_package(Curses REQUIRED)
-target_link_libraries(lips PRIVATE ${CURSES_LIBRARIES})
+add_executable(lips_test)
+target_sources(
+  lips_test
+  PRIVATE exec.test.cc
+          lips_test.cc
+          transform.test.cc
+          glob.test.cc)
+target_link_libraries(lips_test PUBLIC liblips)
 
 if(LIPS_ENABLE_TESTS)
-  add_test(NAME test_lips COMMAND lips -T)
+  add_test(NAME test_lips COMMAND lips_test)
 endif()

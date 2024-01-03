@@ -129,4 +129,7 @@ private:
 
 } // namespace lisp
 
+extern const lisp::lisp_t C_ALIAS;
+extern const lisp::lisp_t C_EXCL;
+
 #endif

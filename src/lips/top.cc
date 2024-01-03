@@ -20,6 +20,7 @@
 #include <fmt/format.h>
 #include <iostream>
 #include <lisp/lisp.hh>
+#include "exec.hh"
 #include "main.hh"
 #include "top.hh"
 #include "lips_error.hh"
@@ -259,3 +260,6 @@ std::function<void()> top::prompt_hook;
 lisp_t top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+
+const lisp_t C_ALIAS = intern("alias");
+const lisp_t C_EXCL = intern("!");

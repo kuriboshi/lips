@@ -15,6 +15,9 @@
 // limitations under the License.
 //
 
+#ifndef LIPS_JOB_HH
+#define LIPS_JOB_HH
+
 #include <string>
 
 #include <lisp/lisp.hh>
@@ -47,3 +50,5 @@ void printjobs();
 job_t* findjob(std::function<bool(const job_t&)> f);
 
 } // namespace lisp::job
+
+#endif

@@ -15,15 +15,12 @@
 // limitations under the License.
 //
 
+#include "exec.hh"
 #include "transform.hh"
 
 #include <lisp/lisp.hh>
-#include <catch2/catch_test_macros.hpp>
 
-using lisp::lisp_t;
-using lisp::nil;
-using lisp::object;
-using namespace lisp::literals;
+using namespace lisp;
 
 lisp_t put_end(lisp_t list, lisp_t obj, bool conc)
 {
@@ -107,53 +104,9 @@ lisp_t transform(const lisp_t& list)
   return res;
 }
 
-TEST_CASE("transform")
-{
-  SECTION("pipe |")
-  {
-    auto result = transform("(ls | wc -l)"_l);
-    CHECK(equal(result, "(pipe-cmd (ls) (wc -l))"_l));
-  }
-
-  SECTION("redirect >")
-  {
-    auto result = transform("(ls > foo)"_l);
-    CHECK(equal(result, "(redir-to (ls) foo)"_l));
-  }
-
-  SECTION("redirect >")
-  {
-    auto result = transform("(ls > foo 1)"_l);
-    CHECK(equal(result, "(redir-to (ls) foo 1)"_l));
-  }
-
-  SECTION("redirect >>")
-  {
-    auto result = transform("(ls >> foo)"_l);
-    CHECK(equal(result, "(append-to (ls) foo)"_l));
-  }
-
-  SECTION("redirect <")
-  {
-    auto result = transform("(ls < foo)"_l);
-    CHECK(equal(result, "(redir-from (ls) foo)"_l));
-  }
-
-  SECTION("pipe | redirect >")
-  {
-    auto result = transform("(ls | wc > foo)"_l);
-    CHECK(equal(result, "(redir-to (pipe-cmd (ls) (wc)) foo)"_l));
-  }
-
-  SECTION("pipe | | redirect >")
-  {
-    auto result = transform(R"((a | b | c))"_l);
-    CHECK(equal(result, R"((pipe-cmd (pipe-cmd (a) (b)) (c)))"_l));
-  }
-
-  SECTION("background &")
-  {
-    auto result = transform("(ls &)"_l);
-    CHECK(equal(result, "(back (ls))"_l));
-  }
-}
+const lisp_t C_AMPER = intern("&");
+const lisp_t C_BAR = intern("|");
+const lisp_t C_GGT = intern(">>");
+const lisp_t C_GT = intern(">");
+const lisp_t C_LT = intern("<");
+const lisp_t C_SEMI = intern(";");

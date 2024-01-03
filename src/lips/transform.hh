@@ -23,16 +23,10 @@
 lisp::lisp_t transform(const lisp::lisp_t& list);
 
 extern const lisp::lisp_t C_AMPER;
-extern const lisp::lisp_t C_BACK;
 extern const lisp::lisp_t C_BAR;
 extern const lisp::lisp_t C_GGT;
 extern const lisp::lisp_t C_GT;
 extern const lisp::lisp_t C_LT;
-extern const lisp::lisp_t C_PIPE;
-extern const lisp::lisp_t C_PROGN;
-extern const lisp::lisp_t C_REDIR_APPEND;
-extern const lisp::lisp_t C_REDIR_FROM;
-extern const lisp::lisp_t C_REDIR_TO;
 extern const lisp::lisp_t C_SEMI;
 
 #endif

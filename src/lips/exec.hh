@@ -34,8 +34,78 @@
 #include <filesystem>
 #include <lisp/lisp.hh>
 
+#include "job.hh"
+
 namespace lisp::exec
 {
+class process
+{
+public:
+  /// @brief Prepares a process after fork.
+  ///
+  /// Sets the processgroup to the group currently beeing built.  Resets
+  /// signals to their default value.
+  void prepare();
+  /// @brief Forks and initializes the child.
+  ///
+  /// Forks and initializes the child. If the process hasn't previously been
+  /// forked, its pid is used as process group id. It also grabs the tty for the
+  /// new process group.
+  ///
+  /// @returns The pid of the new process.
+  int fork();
+  /// @brief Checks for meta characters.
+  ///
+  /// Checks the string S if it contains any non-quoted meta characters in which
+  /// case it returns true. It also strips off all quote-characters (backslash).
+  ///
+  /// @param s String to check.
+  ///
+  /// @returns Pair of bool and string. The bool is true if string contains any
+  /// meta characters otherwise false. The string is the input string stripped of
+  /// any quote characters.
+  std::pair<bool, std::string> check_meta(const std::string& s);
+  std::optional<std::vector<std::string>> process_one(const lisp_t& arg);
+  /// @brief Builds a command line for execve.
+  ///
+  /// Parses command line expression and builds argument vector suitable for
+  /// execve.
+  ///
+  /// @returns Vector with command and arguments.
+  std::vector<std::string> make_exec(const lisp_t& command);
+  /// @brief Wait for a process.
+  ///
+  /// Wait for specific process or the first one if PID is zero.
+  ///
+  /// @param pid The process id to wait for. Zero mean wait for the first process
+  /// to change its status.
+  ///
+  /// @returns The status.
+  job::stat_t waitfork(pid_t pid);
+  /// @brief Execute a process.
+  ///
+  /// Fork a new process, if not already in a fork, and calls execve.  Wait for
+  /// the process to return (using waitfork).
+  ///
+  /// @param name Name of the program.
+  /// @param command List of command arguments.
+  ///
+  /// @returns C_ERROR if there is an error or the exit status of the process.
+  lisp_t execute(const std::string& name, const lisp_t& command);
+  /// @brief Check if file is executable.
+  ///
+  /// @param dir Directory to check.
+  /// @param name Name of file to check.
+  ///
+  /// @returns True if directory DIR contains a NAME that is executable.
+  bool is_executable(const std::filesystem::path& dir, const std::filesystem::path& name);
+};
+
+/// @brief Tries to execute the lisp expression exp as a command.
+///
+/// Execcomand returns 0 if there is no executable file in the path, 1 if the
+/// command was successively run and -1 if there was some error.
+int execcommand(lisp_t exp, lisp_t* res);
 void init();
 
 /// @brief Redirects output of command to a file.
@@ -73,7 +143,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed);
 /// The argument _cmds_ is a list of commands which are in themselves lists. For example:
 ///
 /// ```lisp
-/// (pipe-cmd '((find . -name foo) (xargs grep bar)))
+/// (pipe-cmd (find . -name foo) (xargs grep bar))
 /// ```
 ///
 /// If the list _cmds_ only contains one command no piping of the output is done.
@@ -184,5 +254,14 @@ extern bool insidefork; // NOLINT(cppcoreguidelines-avoid-non-const-global-varia
 
 extern void printdone();
 extern void checkfork();
+
+extern const lisp::lisp_t C_BACK;
+extern const lisp::lisp_t C_EXEC;
+extern const lisp::lisp_t C_OLDVAL;
+extern const lisp::lisp_t C_PIPE;
+extern const lisp::lisp_t C_PROGN;
+extern const lisp::lisp_t C_REDIR_APPEND;
+extern const lisp::lisp_t C_REDIR_FROM;
+extern const lisp::lisp_t C_REDIR_TO;
 
 #endif

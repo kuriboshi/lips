@@ -92,8 +92,6 @@ void init()
 
   top::init();
 
-  environment = std::make_unique<env>();
-
   top::transform_hook = transform;
   top::prompt_hook = promptfun;
   breakhook(onbreak);
@@ -131,25 +129,6 @@ lisp_t greet(lisp_t who)
   return T;
 }
 } // namespace
-
-const lisp_t C_ALIAS = intern("alias");
-const lisp_t C_AMPER = intern("&");
-const lisp_t C_BACK = intern(pn::BACK);
-const lisp_t C_BAR = intern("|");
-const lisp_t C_EXCL = intern("!");
-const lisp_t C_EXEC = intern(pn::EXEC);
-const lisp_t C_GGT = intern(">>");
-const lisp_t C_GT = intern(">");
-const lisp_t C_LT = intern("<");
-const lisp_t C_OLDVAL = intern("oldval");
-const lisp_t C_PIPE = intern(pn::PIPECMD);
-const lisp_t C_PROGN = intern("progn");
-const lisp_t C_REDIR_APPEND = intern(pn::REDIR_APPEND);
-const lisp_t C_REDIR_FROM = intern(pn::REDIR_FROM);
-const lisp_t C_REDIR_TO = intern(pn::REDIR_TO);
-const lisp_t C_SEMI = intern(";");
-
-std::unique_ptr<env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 int main(int argc, char* const* argv)
 try

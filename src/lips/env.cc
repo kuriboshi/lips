@@ -27,3 +27,5 @@ env::env()
 {}
 
 } // namespace lisp
+
+std::unique_ptr<lisp::env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
