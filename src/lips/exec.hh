@@ -31,6 +31,7 @@
 /// changed.
 
 #include <unordered_map>
+#include <filesystem>
 #include <lisp/lisp.hh>
 
 namespace lisp::exec
