@@ -137,9 +137,9 @@ private:
   void init_term();
   /// @brief Put a character on stdout prefixing it with a ^ if it's
   /// a control character.
-  static void pputc(char c, FILE* file);
+  static void pputc(char c, std::ostream& file);
   /// @brief Put a character _c_ on stream _file_ escaping if _esc_ is `true`.
-  static void putch(char c, FILE* file, bool esc);
+  static void putch(char c, std::ostream& file, bool esc);
   /// @brief Skips separators in the beginning of the line and returns `true`
   // if the first non-separator character is a left parenthesis, `false`
   // otherwise.

@@ -29,7 +29,6 @@
 #include <array>
 #include <cctype>
 #include <csignal>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ranges>
@@ -86,7 +85,7 @@ void termcap::init()
 void termcap::nput(const std::string& str, int n)
 {
   for(; n > 0; --n)
-    tputs(str.c_str(), 1, std::putchar);
+    tputs(str.c_str(), 1, [](int c) -> int { std::cout << static_cast<char>(c); return c; });
 }
 
 void term_source::init_keymap()
@@ -130,20 +129,17 @@ term_source::~term_source() { end_term(); }
 
 void term_source::end_term() { tcsetattr(0, TCSANOW, &_oldterm); }
 
-void term_source::pputc(char c, FILE* file)
+void term_source::pputc(char c, std::ostream& file)
 {
   auto is_control = [](auto c) { return std::iscntrl(c) != 0 && c != '\n' && c != '\t'; };
   // if(std::iscntrl(c) != 0 && c != '\n' && c != '\t')
   if(is_control(c))
-  {
-    putc('^', file);
-    putc(c + at_char, file);
-  }
+    file << '^' << static_cast<char>(c + at_char);
   else
-    putc(c, file);
+    file << c;
 }
 
-void term_source::putch(char c, FILE* file, bool esc)
+void term_source::putch(char c, std::ostream& file, bool esc)
 {
   if((c == '(' || c == '"' || c == ')' || c == '\\') && esc)
     pputc('\\', file);
@@ -182,12 +178,12 @@ void term_source::delonechar()
 {
   --_linepos;
   _termcap.cursor_left();
-  putc(' ', stdout);
+  std::cout << ' ';
   _termcap.cursor_left();
   if(is_control(_linebuffer.at(_linepos)))
   {
     _termcap.cursor_left();
-    putc(' ', stdout);
+    std::cout << ' ';
     _termcap.cursor_left();
   }
 }
@@ -237,7 +233,7 @@ void term_source::retype(int all)
       if(_linebuffer.at(i) == '\n')
         _termcap.clr_eol();
       else
-        pputc(_linebuffer.at(i), stdout);
+        pputc(_linebuffer.at(i), std::cout);
     }
   }
   _termcap.clr_eol();
@@ -259,7 +255,7 @@ void term_source::fillrest(const char* word)
 {
   for(word += strlen(_last) - 1; *word != 0; ++word)
   {
-    pputc(*word, stdout);
+    pputc(*word, std::cout);
     _linebuffer.at(_linepos++) = *word;
   }
 }
@@ -283,7 +279,7 @@ void term_source::complete(lisp_t words)
   auto pos = strlen(_last) - 1;
   while(c != '\0' && checkchar(words, pos++, &c))
   {
-    pputc(c, stdout);
+    pputc(c, std::cout);
     _linebuffer.at(_linepos++) = c;
   }
 }
@@ -425,7 +421,7 @@ void term_source::blink()
   }
   else
     _termcap.cursor_right(cdiff);
-  fflush(stdout);
+  std::cout.flush();
 
   // Blink for 1s or until key pressed
   struct pollfd pfd = {1, POLLIN, 0};
@@ -435,16 +431,16 @@ void term_source::blink()
   if(ldiff == 0)
   {
     for(int i = 0; parpos.line_start[i] != 0; ++i)
-      pputc(parpos.line_start[i], stdout);
+      pputc(parpos.line_start[i], std::cout);
   }
   else
   {
     if(currentpos.line == 0)
       std::cout << _current_prompt;
     for(int i = 0; currentpos.line_start[i] != 0; ++i)
-      pputc(currentpos.line_start[i], stdout);
+      pputc(currentpos.line_start[i], std::cout);
   }
-  fflush(stdout);
+  std::cout.flush();
 }
 
 void term_source::clearscr() { _termcap.clear_screen(); }
@@ -472,8 +468,8 @@ std::optional<std::string> term_source::getline()
   {
     if(escaped != 0)
       --escaped;
-    fflush(stdout);
-    if(readchar(stdin, &c) == 0)
+    std::cout.flush();
+    if(!readchar(&c))
     {
       end_term();
       return {};
@@ -487,7 +483,7 @@ std::optional<std::string> term_source::getline()
           end_term();
           return {};
         }
-        pputc(c, stdout);
+        pputc(c, std::cout);
         _linebuffer.at(_linepos++) = EOF;
         break;
       case function::T_KILL:
@@ -553,31 +549,31 @@ std::optional<std::string> term_source::getline()
         break;
       case function::T_STRING:
         _linebuffer.at(_linepos++) = c;
-        pputc(c, stdout);
+        pputc(c, std::cout);
         if(escaped == 0)
           instring = !instring;
         break;
       case function::T_ESCAPE:
         _linebuffer.at(_linepos++) = c;
-        pputc(c, stdout);
+        pputc(c, std::cout);
         if(escaped == 0)
           escaped = 2;
         break;
       case function::T_LEFTPAR:
         if(!instring && escaped == 0)
           ++parcount;
-        pputc(c, stdout);
+        pputc(c, std::cout);
         _linebuffer.at(_linepos++) = c;
         break;
       case function::T_RIGHTPAR:
         if((escaped != 0) || instring)
         {
-          pputc(c, stdout);
+          pputc(c, std::cout);
           _linebuffer.at(_linepos++) = c;
           break;
         }
         --parcount;
-        pputc(c, stdout);
+        pputc(c, std::cout);
         _linebuffer.at(_linepos++) = c;
         if(parcount <= 0)
         {
@@ -611,7 +607,7 @@ std::optional<std::string> term_source::getline()
         }
         break;
       case function::T_INSERT:
-        pputc(c, stdout);
+        pputc(c, std::cout);
         _linebuffer.at(_linepos++) = c;
         break;
     }

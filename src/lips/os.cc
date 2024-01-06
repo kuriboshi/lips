@@ -15,19 +15,17 @@
 // limitations under the License.
 //
 
-#include <cstdio>
+#include "os.hh"
+
+#include <sys/types.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 namespace lisp
 {
-/*
- * Read a characters from a terminal.  Returns 0 if
- * no character was read.  The character is returned in
- * the single character buffer cp.
- */
-bool readchar(FILE* file, char* cp)
+bool readchar(char* cp)
 {
-  auto i = read(fileno(file), cp, 1);
+  auto i = read(0, cp, 1);
   return i == 1;
 }
 

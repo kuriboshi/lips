@@ -20,7 +20,14 @@
 
 namespace lisp
 {
-extern int readchar(FILE*, char*);
+/// @internal Read a character from stdin.
+///
+/// The character read is put in the single character buffer _cp_.
+///
+/// Returns true if a character was read. If no character was read then this
+/// will be interpreted as end of file and false is returned. In this case the
+/// contents pointed to by _cp_ is left unchanged.
+extern bool readchar(char* c);
 } // namespace lisp
 
 #endif
