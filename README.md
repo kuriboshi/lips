@@ -1,6 +1,6 @@
 # Lips — lisp shell
 
-Copyright 1988-1989, 1992, 2020-2023 Krister Joas <krister@joas.jp>
+Copyright 1988-1989, 1992, 2020-2024 Krister Joas <krister@joas.jp>
 
 ![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
