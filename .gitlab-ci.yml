@@ -44,6 +44,7 @@ coverage-test-job:
     - LIPS_TEST_TAGS='~[root]' make coverage
   dependencies:
     - build-job
+  coverage: '/functions..: \d+(?:\.\d+)?/'
   artifacts:
     paths:
       - build/
