@@ -100,6 +100,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
            ${CMAKE_CURRENT_BINARY_DIR}/output.info
            '/usr/include/*'
            '${CMAKE_CURRENT_BINARY_DIR}/_deps/*'
+           '${CMAKE_CURRENT_BINARY_DIR}/install/*'
            -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
     DEPENDS lcov-capture)
   add_custom_target(
