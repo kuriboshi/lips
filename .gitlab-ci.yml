@@ -10,12 +10,11 @@ build-job:
   stage: build
   script:
     - |
-      which make > /dev/null || (
-        apt-get update
-        apt-get install -y make cmake ninja-build
-        apt-get install -y g++ libncurses-dev
-      )
-    - make debug
+      apt-get update
+      apt-get install -y make cmake ninja-build
+      apt-get install -y g++ libncurses-dev
+    - rm -rf build/debug
+    - LIPS_TEST_TAGS='~[root]' make debug
   artifacts:
     paths:
       - build/
@@ -24,11 +23,9 @@ unit-test-job:
   stage: test
   script:
     - |
-      which make > /dev/null || (
-        apt-get update
-        apt-get install -y make cmake ninja-build
-        apt-get install -y g++ libncurses-dev
-      )
+      apt-get update
+      apt-get install -y make cmake ninja-build
+      apt-get install -y g++ libncurses-dev
     - LIPS_TEST_TAGS='~[root]' make test
   dependencies:
     - build-job
@@ -40,12 +37,10 @@ coverage-test-job:
   stage: test
   script:
     - |
-      which make > /dev/null || (
-        apt-get update
-        apt-get install -y make cmake ninja-build
-        apt-get install -y g++ libncurses-dev
-        apt-get install -y lcov
-      )
+      apt-get update
+      apt-get install -y make cmake ninja-build
+      apt-get install -y g++ libncurses-dev
+      apt-get install -y lcov
     - LIPS_TEST_TAGS='~[root]' make coverage
   dependencies:
     - build-job
@@ -57,21 +52,18 @@ package-test-job:
   stage: test
   script:
     - |
-      which make > /dev/null || (
-        apt-get update
-        apt-get install -y make cmake ninja-build
-        apt-get install -y g++ libncurses-dev
-        apt-get install -y git
-      )
+      apt-get update
+      apt-get install -y make cmake ninja-build
+      apt-get install -y g++ libncurses-dev
+      apt-get install -y git
     - make package-test
 
 deploy-job:
   stage: deploy
   script:
     - |
-      which make > /dev/null || (
-        apt-get update
-        apt-get install -y make cmake ninja-build
-        apt-get install -y g++ libncurses-dev
-      )
+      apt-get update
+      apt-get install -y make cmake ninja-build
+      apt-get install -y g++ libncurses-dev
+    - rm -rf build/release
     - make release
