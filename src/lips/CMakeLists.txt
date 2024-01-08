@@ -37,21 +37,15 @@ target_sources(
           term.hh
           top.hh
           transform.hh)
-target_link_libraries(
-  liblips
-  PUBLIC fmt::fmt liblisp Catch2::Catch2)
+target_link_libraries(liblips PUBLIC fmt::fmt liblisp Catch2::Catch2)
 set_target_properties(liblips PROPERTIES OUTPUT_NAME lips)
 
 find_package(Curses REQUIRED)
 target_link_libraries(liblips PUBLIC ${CURSES_LIBRARIES})
 
 add_executable(lips)
-target_sources(
-  lips
-  PRIVATE main.cc)
-target_sources(
-  lips
-  PRIVATE main.hh)
+target_sources(lips PRIVATE main.cc)
+target_sources(lips PRIVATE main.hh)
 target_link_libraries(lips PRIVATE liblips)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
                                             VERSION_LESS 9.0)
@@ -65,12 +59,8 @@ if(LIPS_ENABLE_CLANG_TIDY)
 endif()
 
 add_executable(lips_test)
-target_sources(
-  lips_test
-  PRIVATE exec.test.cc
-          lips_test.cc
-          transform.test.cc
-          glob.test.cc)
+target_sources(lips_test PRIVATE exec.test.cc lips_test.cc transform.test.cc
+                                 glob.test.cc)
 target_link_libraries(lips_test PUBLIC liblips)
 
 if(LIPS_ENABLE_TESTS)

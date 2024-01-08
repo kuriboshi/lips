@@ -26,10 +26,10 @@ if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
 
-FetchContent_Declare(lips
+FetchContent_Declare(
+  lips
   GIT_REPOSITORY "file://${CMAKE_CURRENT_SOURCE_DIR}/.."
-  GIT_TAG HEAD
-)
+  GIT_TAG HEAD)
 
 FetchContent_MakeAvailable(lips)
 find_package(Catch2 REQUIRED)

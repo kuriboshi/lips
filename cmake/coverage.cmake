@@ -34,10 +34,10 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     ccov-preprocessing
     COMMAND
       LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw
-        $<TARGET_FILE:${TARGET_NAME}>
-        --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
-        --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-        --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}"
+      $<TARGET_FILE:${TARGET_NAME}> --load
+      ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp --loadpath
+      ${CMAKE_CURRENT_SOURCE_DIR} --loadpath ${CMAKE_CURRENT_BINARY_DIR}
+      "$ENV{LIPS_TEST_TAGS}"
     COMMAND
       ${LLVM_PROFDATA} merge -sparse
       ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profraw -o
@@ -47,23 +47,20 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
     ccov-report
     COMMAND
       ${LLVM_COV} report $<TARGET_FILE:${TARGET_NAME}>
-        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
-        --format="text"
-        --ignore-filename-regex=exit.hh
-        --ignore-filename-regex='.*.test.cc'
-        ${CMAKE_CURRENT_SOURCE_DIR}/src > ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
+      --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+      --format="text" --ignore-filename-regex=exit.hh
+      --ignore-filename-regex='.*.test.cc' ${CMAKE_CURRENT_SOURCE_DIR}/src >
+      ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
     DEPENDS ccov-preprocessing)
   add_custom_target(
     ccov-show
     COMMAND
       ${LLVM_COV} show $<TARGET_FILE:${TARGET_NAME}>
-        --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
-        --show-line-counts-or-regions
-        --format="html"
-        --output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
-        --ignore-filename-regex=exit.hh
-        --ignore-filename-regex='.*.test.cc'
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+      --instr-profile=${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.profdata
+      --show-line-counts-or-regions --format="html"
+      --output-dir=${CMAKE_CURRENT_BINARY_DIR}/html
+      --ignore-filename-regex=exit.hh --ignore-filename-regex='.*.test.cc'
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
     DEPENDS ccov-report)
   add_custom_target(coverage DEPENDS ccov-report ccov-show)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
@@ -78,37 +75,33 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
     ccov-preprocessing
     COMMAND
       GCOV_PROFILE_DIR=${CMAKE_CURRENT_BINARY_DIR}/
-        $<TARGET_FILE:${TARGET_NAME}>
-        --load ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp
-        --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-        --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}"
+      $<TARGET_FILE:${TARGET_NAME}> --load
+      ${CMAKE_CURRENT_SOURCE_DIR}/lisp/test.lisp --loadpath
+      ${CMAKE_CURRENT_SOURCE_DIR} --loadpath ${CMAKE_CURRENT_BINARY_DIR}
+      "$ENV{LIPS_TEST_TAGS}"
     DEPENDS ${TARGET_NAME})
   add_custom_target(
     lcov-capture
     COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/output.info
     COMMAND
-      lcov --capture
-           --exclude='*test.cc'
-           --directory ${CMAKE_CURRENT_BINARY_DIR}/src/lisp
-           -o ${CMAKE_CURRENT_BINARY_DIR}/output.info
+      lcov --capture --exclude='*test.cc' --directory
+      ${CMAKE_CURRENT_BINARY_DIR}/src/lisp -o
+      ${CMAKE_CURRENT_BINARY_DIR}/output.info
     DEPENDS ccov-preprocessing)
   add_custom_target(
     lcov-remove
     COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
     COMMAND
-      lcov --remove
-           ${CMAKE_CURRENT_BINARY_DIR}/output.info
-           '/usr/include/*'
-           '${CMAKE_CURRENT_BINARY_DIR}/_deps/*'
-           '${CMAKE_CURRENT_BINARY_DIR}/install/*'
-           -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
+      lcov --remove ${CMAKE_CURRENT_BINARY_DIR}/output.info '/usr/include/*'
+      '${CMAKE_CURRENT_BINARY_DIR}/_deps/*'
+      '${CMAKE_CURRENT_BINARY_DIR}/install/*' -o
+      ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
     DEPENDS lcov-capture)
   add_custom_target(
     lcov-genhtml
     COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/html
-    COMMAND
-      genhtml ${CMAKE_CURRENT_BINARY_DIR}/coverage.info
-      -o ${CMAKE_CURRENT_BINARY_DIR}/html
+    COMMAND genhtml ${CMAKE_CURRENT_BINARY_DIR}/coverage.info -o
+            ${CMAKE_CURRENT_BINARY_DIR}/html
     DEPENDS lcov-remove)
   add_custom_target(coverage DEPENDS lcov-genhtml)
 else()

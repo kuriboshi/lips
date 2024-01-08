@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.cc.in ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.cc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
 
 target_sources(
   liblisp
@@ -43,8 +44,9 @@ target_sources(
           user.cc
           ${CMAKE_CURRENT_BINARY_DIR}/version.cc)
 
-set(_liblisp_source
-          alloc.hh
+target_sources(
+  liblisp
+  PRIVATE alloc.hh
           arith.hh
           check.hh
           context.hh
@@ -76,26 +78,29 @@ set(_liblisp_source
           types.hh
           user.hh
           version.hh)
+
 set(_liblisp_details
-          details/alloc.hh
-          details/arith.hh
-          details/debug.hh
-          details/file.hh
-          details/list.hh
-          details/logic.hh
-          details/low.hh
-          details/map.hh
-          details/predicate.hh
-          details/property.hh
-          details/string.hh
-          details/user.hh
-          details/vm.hh)
+    details/alloc.hh
+    details/arith.hh
+    details/debug.hh
+    details/file.hh
+    details/list.hh
+    details/logic.hh
+    details/low.hh
+    details/map.hh
+    details/predicate.hh
+    details/property.hh
+    details/string.hh
+    details/user.hh
+    details/vm.hh)
 # The reason for defining two variables with the same contents is that
 # adding the PARENT_SCOPE keyword will set the value ONLY in the
 # parent scope and not in the current scope. This is documented
 # behavior but I find it counterintuitive.
-set(_liblisp_details_parent ${_liblisp_details} PARENT_SCOPE)
-target_sources(liblisp PRIVATE ${_liblisp_source} ${_liblisp_details})
+set(_liblisp_details_parent
+    ${_liblisp_details}
+    PARENT_SCOPE)
+target_sources(liblisp PRIVATE ${_liblisp_details})
 
 add_executable(lisp)
 target_sources(lisp PRIVATE main.cc)
@@ -140,21 +145,19 @@ if(LIPS_ENABLE_TESTS)
 endif()
 
 if(LIPS_ENABLE_TESTS)
-  add_test(NAME test_lisp
-           COMMAND lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/../../lisp/test.lisp
-                   --loadpath ${CMAKE_CURRENT_SOURCE_DIR}
-                   --loadpath ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}")
+  add_test(
+    NAME test_lisp
+    COMMAND
+      lisp_test --load ${CMAKE_CURRENT_SOURCE_DIR}/../../lisp/test.lisp
+      --loadpath ${CMAKE_CURRENT_SOURCE_DIR} --loadpath
+      ${CMAKE_CURRENT_BINARY_DIR} "$ENV{LIPS_TEST_TAGS}")
 endif()
 
 if(LIPS_ENABLE_BENCHMARK)
   add_executable(lisp_benchmark)
-  target_sources(
-    lisp_benchmark
-    PRIVATE lisp_benchmark.cc
-            alloc.bench.cc
-            pool.bench.cc)
+  target_sources(lisp_benchmark PRIVATE lisp_benchmark.cc alloc.bench.cc
+                                        pool.bench.cc)
   target_link_libraries(lisp_benchmark PUBLIC lips::lisp Catch2::Catch2)
 
-  add_test(NAME benchmark
-           COMMAND lisp_benchmark)
+  add_test(NAME benchmark COMMAND lisp_benchmark)
 endif()

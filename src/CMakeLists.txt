@@ -46,17 +46,22 @@ add_subdirectory(lisp)
 # The source group for the details header files has to be added on the
 # same level as the library to which they belong. At least it seems
 # that way. Creating the source group one level down doesn't work.
-list(TRANSFORM _liblisp_details_parent PREPEND "lisp/" OUTPUT_VARIABLE _liblisp_details)
+list(TRANSFORM _liblisp_details_parent PREPEND "lisp/" OUTPUT_VARIABLE
+                                                       _liblisp_details)
 source_group("Header Files/Details" FILES ${_liblisp_details})
 
 add_subdirectory(lips)
 
-install(DIRECTORY lisp/
+install(
+  DIRECTORY lisp/
   DESTINATION include/lisp
-  FILES_MATCHING PATTERN "*.hh")
+  FILES_MATCHING
+  PATTERN "*.hh")
 
-install(TARGETS liblisp
+install(
+  TARGETS liblisp
   EXPORT ${PROJECT_NAME}-targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  INCLUDES DESTINATION include)
+  INCLUDES
+  DESTINATION include)
