@@ -30,6 +30,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <float.h>
 
 #include "details/alloc.hh"
 #include "types.hh"
@@ -230,16 +231,19 @@ inline lisp::lisp_t operator"" _l(unsigned long long i)
 /// @brief Creates a floating point value.
 inline lisp::lisp_t operator"" _l(long double d)
 {
-  constexpr auto max_double{std::numeric_limits<double>::max()};
-  constexpr auto max_long_double{std::numeric_limits<long double>::max()};
-  if constexpr(max_long_double > max_double)
+  // The if constexpr should be enough but I think the code coverage numbers
+  // are skewed when sizeof(double) == sizeof(long double).
+#if DBL_MANT_DIG < LDBL_MANT_DIG
+  if constexpr(sizeof(long double) != sizeof(double))
   {
+    constexpr auto max_double{std::numeric_limits<double>::max()};
     if(d > max_double)
     {
       const lisp::lisp_t err{lisp::mkstring(fmt::format("{} too large", d))};
       lisp::error(lisp::error_errc::illegal_arg, err);
     }
   }
+#endif
   return lisp::details::alloc::mkfloat(static_cast<double>(d));
 }
 
