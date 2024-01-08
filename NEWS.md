@@ -1,6 +1,6 @@
 # Release notes
 
-## 3.1.1 (2023-01-08)
+## 3.1.1 (2024-01-08)
 
 Minor bug fix release
 
