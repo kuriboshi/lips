@@ -15,12 +15,9 @@
 // limitations under the License.
 //
 
-#include <iostream>
-#include <memory>
-#include <system_error>
+#include <unordered_map>
 
-#include "lisp.hh"
-#include "syntax.hh"
+#include "types.hh"
 
 namespace lisp
 {
