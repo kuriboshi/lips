@@ -1,5 +1,13 @@
 # Release notes
 
+## 3.1.1 (2023-01-08)
+
+Minor bug fix release
+
+- Improve accuracy of gcc coverage
+- Fixes for gitlab CI/CD builds
+- Fix missing header files for gcc-12
+
 ## 3.1.0 (2023-12-26)
 
 Minor release mainly revising the documentation.
