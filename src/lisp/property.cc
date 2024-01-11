@@ -25,27 +25,27 @@ namespace lisp::details::property
 lisp_t setplist(lisp_t x, lisp_t pl)
 {
   check(x, object::type::Symbol);
-  x->as_symbol()->plist = pl;
+  x->as_symbol()->property_list(pl);
   return pl;
 }
 
 lisp_t getplist(lisp_t x)
 {
   check(x, object::type::Symbol);
-  return x->as_symbol()->plist;
+  return x->as_symbol()->property_list();
 }
 
 lisp_t putprop(lisp_t x, lisp_t p, lisp_t v)
 {
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
-  for(auto pl = x->as_symbol()->plist; !is_nil(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->as_symbol()->property_list(); !is_nil(pl); pl = pl->cdr()->cdr())
     if(pl->car() == p)
     {
       rplaca(pl->cdr(), v);
       return v;
     }
-  x->as_symbol()->plist = cons(p, cons(v, x->as_symbol()->plist));
+  x->as_symbol()->property_list(cons(p, cons(v, x->as_symbol()->property_list())));
   return v;
 }
 
@@ -53,7 +53,7 @@ lisp_t getprop(lisp_t x, lisp_t p)
 {
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
-  for(auto pl = x->as_symbol()->plist; !is_nil(pl); pl = pl->cdr()->cdr())
+  for(auto pl = x->as_symbol()->property_list(); !is_nil(pl); pl = pl->cdr()->cdr())
   {
     if(pl->car() == p)
       return pl->cdr()->car();
@@ -66,7 +66,7 @@ lisp_t remprop(lisp_t x, lisp_t p)
   check(x, object::type::Symbol);
   check(p, object::type::Symbol);
   lisp_t r = nil;
-  auto pl = x->as_symbol()->plist;
+  auto pl = x->as_symbol()->property_list();
   lisp_t pl2 = nil;
   for(; !is_nil(pl); pl = pl->cdr()->cdr())
   {
@@ -74,7 +74,7 @@ lisp_t remprop(lisp_t x, lisp_t p)
     {
       r = pl->cdr()->car();
       if(is_nil(pl2))
-        x->as_symbol()->plist = pl->cdr()->cdr();
+        x->as_symbol()->property_list(pl->cdr()->cdr());
       else
         rplacd(pl2, pl->cdr()->cdr());
     }

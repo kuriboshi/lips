@@ -54,7 +54,7 @@ lisp_t obarray()
 {
   lisp_t o = nil;
   for(const auto& i: symbol::symbol_t::store())
-    o = cons(i.second->self, o);
+    o = cons(i.second->self(), o);
   return o;
 }
 
@@ -81,9 +81,9 @@ lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
 lisp_t intern(std::string_view pname)
 {
   auto* sym = symbol::symbol_t::intern(pname);
-  if(sym->self == nil)
-    sym->self = getobject(sym);
-  return sym->self;
+  if(sym->self() == nil)
+    sym->self(getobject(sym));
+  return sym->self();
 }
 
 /// @brief Get an existing symbol.

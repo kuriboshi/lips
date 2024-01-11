@@ -16,16 +16,18 @@
 // limitations under the License.
 //
 
-#include "predicate.hh"
-#include "list.hh"
 #include "parser.hh"
+
+#include "atoms.hh"
+#include "list.hh"
+#include "predicate.hh"
 
 namespace lisp
 {
 lisp_t parser::parse_object()
 {
   if(!next())
-    return C_EOF;
+    return atoms::ENDOFFILE;
   if(_token.is_special('\''))
     return cons(mkatom("quote"), cons(parse_object(), nil));
   if(_token.is_special('('))

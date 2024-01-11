@@ -15,8 +15,22 @@
 // limitations under the License.
 //
 
-#include "lisp.hh"
+#include "symbol.hh"
+#include "atoms.hh"
+
+#include <string_view>
 
 namespace lisp::symbol
 {
+symbol_t* symbol_t::intern(std::string_view pname)
+{
+  auto p = store().find(pname);
+  if(p != store().end())
+    return p->second;
+  auto* sym = new symbol_t;
+  sym->pname = pname;
+  sym->value = atoms::UNBOUND;
+  auto i = store().insert(std::make_pair(pname, sym));
+  return i.first->second;
 }
+} // namespace lisp::symbol

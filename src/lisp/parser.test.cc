@@ -20,10 +20,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "atoms.hh"
 #include "file.hh"
+#include "list.hh"
 #include "parser.hh"
 #include "predicate.hh"
-#include "list.hh"
 #include "rtable.hh"
 
 namespace
@@ -232,7 +233,7 @@ TEST_CASE("parser: syntax table")
   auto t = parser(lexer).parse();
   REQUIRE(t);
   REQUIRE(type_of(t) == object::type::Cons);
-  CHECK(t->car() == C_QUOTE);
+  CHECK(t->car() == atoms::QUOTE);
 }
 
 TEST_CASE("parser: empty token")

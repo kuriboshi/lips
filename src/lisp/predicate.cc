@@ -15,8 +15,10 @@
 // limitations under the License.
 //
 
-#include "alloc.hh"
 #include "predicate.hh"
+
+#include "alloc.hh"
+#include "atoms.hh"
 #include "user.hh"
 
 namespace lisp::details::predicate
@@ -115,7 +117,7 @@ lisp_t boundp(lisp_t a)
 {
   if(type_of(a) != object::type::Symbol)
     return nil;
-  if(a->value() != C_UNBOUND)
+  if(a->value() != atoms::UNBOUND)
     return T;
   return nil;
 }
@@ -132,33 +134,33 @@ lisp_t xtypeof(lisp_t a)
   switch(type_of(a))
   {
     case object::type::Symbol:
-      return C_SYMBOL;
+      return atoms::SYMBOL;
     case object::type::Integer:
-      return C_INTEGER;
+      return atoms::INTEGER;
     case object::type::Float:
-      return C_FLOAT;
+      return atoms::FLOAT;
     case object::type::Indirect:
-      return C_INDIRECT;
+      return atoms::INDIRECT;
     case object::type::Cons:
-      return C_CONS;
+      return atoms::CONS;
     case object::type::String:
-      return C_STRING;
+      return atoms::STRING;
     case object::type::Subr:
       if(a->subr().subr == subr_t::subr::EVAL)
-        return C_SUBR;
-      return C_FSUBR;
+        return atoms::SUBR;
+      return atoms::FSUBR;
     case object::type::Lambda:
       if(a->lambda().eval)
-        return C_LAMBDA;
-      return C_NLAMBDA;
+        return atoms::LAMBDA;
+      return atoms::NLAMBDA;
     case object::type::Closure:
-      return C_CLOSURE;
+      return atoms::CLOSURE;
     case object::type::Environ:
-      return C_ENVIRON;
+      return atoms::ENVIRON;
     case object::type::File:
-      return C_FILE;
+      return atoms::FILE;
     case object::type::Cvariable:
-      return C_CVARIABLE;
+      return atoms::CVARIABLE;
     case object::type::Nil:
       break;
   }

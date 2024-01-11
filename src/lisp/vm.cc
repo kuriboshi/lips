@@ -20,6 +20,7 @@
 #include <string_view>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "check.hh"
 #include "details/arith.hh"
 #include "details/debug.hh"
@@ -34,32 +35,6 @@
 #include "property.hh"
 #include "rtable.hh"
 #include "version.hh"
-
-namespace
-{
-lisp::lisp_t make_symbol(std::string_view sym, lisp::lisp_t value = lisp::nil)
-{
-  auto symbol = lisp::details::alloc::intern(sym);
-  symbol->value(value);
-  return symbol;
-}
-
-lisp::lisp_t make_const(std::string_view sym, lisp::lisp_t value = lisp::nil)
-{
-  auto symbol = lisp::details::alloc::intern(sym);
-  symbol->value(value);
-  symbol->as_symbol()->constant = true;
-  return symbol;
-}
-
-lisp::lisp_t make_t()
-{
-  auto symbol = make_symbol("t");
-  symbol->value(symbol);
-  symbol->as_symbol()->constant = true;
-  return symbol;
-}
-} // namespace
 
 namespace lisp::details::vm
 {
@@ -102,7 +77,7 @@ lisp_t closure(lisp_t fun, lisp_t vars)
   auto f = length(vars);
   c->count = f->as_integer();
   f = closobj(vars);
-  if(f == C_ERROR)
+  if(f == atoms::ERROR)
     return f;
   c->cvalues = f;
   return getobject(c);
@@ -168,47 +143,19 @@ void init()
 
 namespace lisp
 {
-const lisp_t C_UNBOUND = make_const("unbound");
-const lisp_t T = make_t();
-const lisp_t NIL = make_const("nil");
-const lisp_t C_APPEND = make_symbol("append");
-const lisp_t C_AUTOLOAD = make_symbol("autoload");
-const lisp_t C_BROKEN = make_symbol("broken");
-const lisp_t C_BT = make_symbol("bt");
-const lisp_t C_CLOSURE = make_symbol("closure");
-const lisp_t C_CONS = make_symbol("cons");
-const lisp_t C_CVARIABLE = make_symbol("cvariable");
-const lisp_t C_DOT = make_symbol(".");
-const lisp_t C_ENDOFFILE = make_symbol("endoffile");
-const lisp_t C_ENVIRON = make_symbol("environ");
-const lisp_t C_EOF = make_symbol("eof");
-const lisp_t C_ERROR = make_symbol("error");
-const lisp_t C_FILE = make_symbol("file");
-const lisp_t C_FLOAT = make_symbol("float");
-const lisp_t C_FSUBR = make_symbol("fsubr");
-const lisp_t C_GO = make_symbol("go");
-const lisp_t C_INDIRECT = make_symbol("indirect");
-const lisp_t C_INTEGER = make_symbol("integer");
-const lisp_t C_LAMBDA = make_symbol("lambda");
-const lisp_t C_NLAMBDA = make_symbol("nlambda");
-const lisp_t C_OLDDEF = make_symbol("olddef");
-const lisp_t C_QUOTE = make_symbol("quote");
-const lisp_t C_READ = make_symbol("read");
-const lisp_t C_REDEFINED = make_symbol("redefined");
-const lisp_t C_RESET = make_symbol("reset");
-const lisp_t C_RETURN = make_symbol("return");
-const lisp_t C_STRING = make_symbol("string");
-const lisp_t C_SUBR = make_symbol("subr");
-const lisp_t C_SYMBOL = make_symbol("symbol");
-const lisp_t C_VERSION = make_symbol("version", mkstring(version()));
-const lisp_t C_WRITE = make_symbol("write");
+const lisp_t T = []() {
+  auto symbol = lisp::details::alloc::intern("t");
+  symbol->constant(symbol);
+  return symbol;
+}();
 
 class init
 {
 public:
   init()
   {
-    auto intern = [](const auto s) { return details::alloc::intern(s); };
+    // Create the _nil_ symbol as a constant with the value _nil_.
+    details::alloc::intern("nil")->constant(nil);
 
     details::alloc::init();
     details::arith::init();
@@ -286,7 +233,7 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
     _breakhook();
   if(_env == nullptr)
     throw lisp_reset();
-  print(cons(fault, cons(C_BROKEN, nil)), T);
+  print(cons(fault, cons(atoms::BROKEN, nil)), T);
   push(next);
   _cont = &vm::everr;
 }
@@ -474,7 +421,7 @@ void vm::do_unbound(continuation_t continuation)
   // definition from a file. If that doesn't succeed, then the symbol is
   // undefined.
   //
-  const lisp_t al = getprop(_expression->car(), C_AUTOLOAD);
+  const lisp_t al = getprop(_expression->car(), atoms::AUTOLOAD);
   if(!is_nil(al))
   {
     push(_expression);
@@ -484,7 +431,7 @@ void vm::do_unbound(continuation_t continuation)
     pop(_dest);
     pop(_expression);
     _fun = _expression->car()->value();
-    if(_fun == C_UNBOUND)
+    if(_fun == atoms::UNBOUND)
     {
       if(!evalhook(_expression))
         xbreak(error_errc::undef_function, _expression->car(), continuation);
@@ -544,7 +491,7 @@ bool vm::eval_func()
         if(_fun == _fun->value())
           xbreak(error_errc::illegal_function, _fun, &vm::eval_func);
         _fun = _fun->value();
-        if(_fun == C_UNBOUND)
+        if(_fun == atoms::UNBOUND)
           do_unbound(&vm::eval_func);
         else
           _cont = &vm::eval_func;
@@ -596,7 +543,7 @@ bool vm::eval_apply()
         break;
       case object::type::Symbol:
         _fun = _fun->value();
-        if(_fun == C_UNBOUND)
+        if(_fun == atoms::UNBOUND)
           do_unbound(&vm::eval_apply);
         else
           _cont = &vm::eval_apply;
@@ -634,7 +581,7 @@ void vm::bt()
 bool vm::everr()
 {
   auto b = break0(_expression);
-  if(b == C_EOF)
+  if(b == atoms::ENDOFFILE)
     throw lisp_reset();
   send(b);
   pop(_cont); // Discard one continuation.
@@ -839,6 +786,7 @@ bool vm::eval_prim()
   {
     if(!_interactive)
       throw;
+    std::cerr << ex.what();
     auto foo = printwhere();
     if(is_nil(foo))
       xbreak({}, nil, &vm::eval_func);
@@ -940,7 +888,7 @@ bool vm::eval_lookup()
       send(t->cvariable());
       break;
     default:
-      if(t == C_UNBOUND)
+      if(t == atoms::UNBOUND)
       {
         xbreak(error_errc::unbound_variable, _expression, &vm::eval_lookup);
         return false;

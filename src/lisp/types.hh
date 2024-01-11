@@ -706,6 +706,11 @@ using ref_cons_t = ref_ptr<cons_t>;
 using ref_file_t = ref_ptr<file_t>;
 using ref_lambda_t = ref_ptr<lambda_t>;
 using ref_string_t = ref_ptr<string_t>;
+namespace symbol
+{
+class symbol_t;
+}
+using ref_symbol_t = ref_ptr<symbol::symbol_t>;
 
 /// @brief A class able to hold a value of any lisp type
 ///
@@ -791,6 +796,7 @@ public:
   /// @brief Get and set the value of a symbol.
   auto value() const -> lisp_t { return std::get<ref_symbol_t>(_u)->value; }
   void value(const lisp_t&);
+  void constant(const lisp_t&);
 
   /// @brief The integer value.
   auto as_integer() const -> integer_t { return std::get<integer_t>(_u); }
@@ -899,49 +905,27 @@ inline object::type type_of(const cvariable_t& a) { return *a == nullptr ? objec
 
 inline void object::value(const lisp_t& x)
 {
-  auto& var = std::get<ref_symbol_t>(_u);
-  if(type_of(var->value) == object::type::Cvariable)
+  auto& sym = std::get<ref_symbol_t>(_u);
+  if(sym->constant)
+    throw lisp_error(error_errc::attempt_to_clobber, sym->pname);
+  if(type_of(sym->value) == object::type::Cvariable)
   {
-    auto& cvar = var->value->cvariable();
+    auto& cvar = sym->value->cvariable();
     cvar = x;
   }
   else
-    var->value = x;
+    sym->value = x;
+}
+
+inline void object::constant(const lisp_t& x)
+{
+  value(x);
+  auto& sym = std::get<ref_symbol_t>(_u);
+  sym->constant = true;
 }
 
 /// @internal Symbols which are used internally.
 extern const lisp_t T;
-extern const lisp_t C_APPEND;
-extern const lisp_t C_AUTOLOAD;
-extern const lisp_t C_BROKEN;
-extern const lisp_t C_BT;
-extern const lisp_t C_CLOSURE;
-extern const lisp_t C_CONS;
-extern const lisp_t C_CVARIABLE;
-extern const lisp_t C_DOT;
-extern const lisp_t C_ENDOFFILE;
-extern const lisp_t C_ENVIRON;
-extern const lisp_t C_EOF;
-extern const lisp_t C_ERROR;
-extern const lisp_t C_FILE;
-extern const lisp_t C_FLOAT;
-extern const lisp_t C_FSUBR;
-extern const lisp_t C_GO;
-extern const lisp_t C_INDIRECT;
-extern const lisp_t C_INTEGER;
-extern const lisp_t C_LAMBDA;
-extern const lisp_t C_NLAMBDA;
-extern const lisp_t C_OLDDEF;
-extern const lisp_t C_QUOTE;
-extern const lisp_t C_READ;
-extern const lisp_t C_REDEFINED;
-extern const lisp_t C_RESET;
-extern const lisp_t C_RETURN;
-extern const lisp_t C_STRING;
-extern const lisp_t C_SUBR;
-extern const lisp_t C_SYMBOL;
-extern const lisp_t C_VERSION;
-extern const lisp_t C_WRITE;
 
 /// @brief Checks if the parameter is equal to the symbol `t`.
 inline bool is_T(const lisp_t& x) { return x == T; }

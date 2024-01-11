@@ -22,6 +22,7 @@
 #include <fmt/format.h>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "file.hh"
 #include "list.hh"
 #include "low.hh"
@@ -42,13 +43,13 @@ TEST_CASE("alloc: create lisp objects")
   SECTION("Check constants are the same as interned strings")
   {
     auto lambda = intern("lambda");
-    CHECK(lambda == C_LAMBDA);
+    CHECK(lambda == atoms::LAMBDA);
   }
 
   SECTION("Check constants are the same as a local atom")
   {
     auto lambda = mkatom("lambda");
-    CHECK(lambda == C_LAMBDA);
+    CHECK(lambda == atoms::LAMBDA);
   }
 
   SECTION("Set variable")

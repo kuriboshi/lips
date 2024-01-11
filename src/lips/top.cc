@@ -102,7 +102,7 @@ lisp_t top::findalias(lisp_t exp)
   {
     if(type_of(rval) == object::type::Cons && type_of(rval->car()) == object::type::Symbol)
     {
-      auto alias = getprop(rval->car(), C_ALIAS);
+      auto alias = getprop(rval->car(), atoms::ALIAS);
       if(!is_nil(alias) && (is_nil(alias_expanded) || rval->car() != alias_expanded->car()))
       {
         if(!is_nil(memb(rval->car(), alias_expanded)))
@@ -151,7 +151,7 @@ lisp_t top::operator()(lisp_t)
     //
     if(_options.interactive)
     {
-      if(eval(variables->promptform()) == C_ERROR)
+      if(eval(variables->promptform()) == atoms::ERROR)
       {
         print(mkstring("Error in promptform, reset to nil"), T);
         variables->promptform() = nil;
@@ -159,7 +159,7 @@ lisp_t top::operator()(lisp_t)
       set_prompt(variables->prompt());
     }
     input_exp = _terminal->readline(_current_prompt);
-    if(input_exp == C_EOF)
+    if(input_exp == atoms::ENDOFFILE)
       return nil;
     if(is_nil(input_exp))
       continue;
@@ -193,7 +193,7 @@ lisp_t top::rmexcl(lisp_t stream)
 {
   auto c = stream->file()->getch();
   if(std::isspace(c) != 0)
-    return C_EXCL;
+    return atoms::EXCL;
   _echoline = true;
   lisp_t tmp = get_history(0, variables->history());
   switch(c)
@@ -211,7 +211,7 @@ lisp_t top::rmexcl(lisp_t stream)
       break;
     case '\n':
       _echoline = false;
-      return C_EXCL;
+      return atoms::EXCL;
       break;
     default:
       stream->file()->ungetch(c);
@@ -260,6 +260,3 @@ std::function<void()> top::prompt_hook;
 lisp_t top::alias_expanded;
 std::unique_ptr<top::cvariables> top::variables;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-
-const lisp_t C_ALIAS = intern("alias");
-const lisp_t C_EXCL = intern("!");

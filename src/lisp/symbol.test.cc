@@ -19,6 +19,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "atoms.hh"
 #include "io.hh"
 #include "types.hh"
 
@@ -29,7 +30,7 @@ TEST_CASE("symbol: new symbol store")
 {
   auto* sym0 = symbol_t::intern("hello");
   CHECK(sym0->pname == "hello");
-  CHECK(sym0->value == C_UNBOUND);
+  CHECK(sym0->self()->value() == atoms::UNBOUND);
   auto* sym1 = symbol_t::intern("hello");
   CHECK(sym0 == sym1);
 

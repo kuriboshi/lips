@@ -127,9 +127,12 @@ private:
   std::string _current_prompt;
 };
 
-} // namespace lisp
+namespace atoms
+{
+inline const lisp::lisp_t ALIAS = intern("alias");
+inline const lisp::lisp_t EXCL = intern("!");
+} // namespace atoms
 
-extern const lisp::lisp_t C_ALIAS;
-extern const lisp::lisp_t C_EXCL;
+} // namespace lisp
 
 #endif

@@ -21,6 +21,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "file.hh"
 #include "low.hh"
 #include "predicate.hh"
@@ -76,8 +77,8 @@ TEST_CASE("user: User defined functions")
 
   SECTION("Redefine function")
   {
-    remprop(mkatom("f"), C_OLDDEF);
-    set(mkatom("f"), C_UNBOUND);
+    remprop(mkatom("f"), atoms::OLDDEF);
+    set(mkatom("f"), atoms::UNBOUND);
     auto f0 = define(mkatom("f"), lambda(mklist(mkatom("a")), mklist(mkatom("a"))));
     auto redef0 = getprop(mkatom("f"), mkatom("olddef"));
     CHECK(is_nil(redef0));

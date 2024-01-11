@@ -20,6 +20,7 @@
 
 #include "alloc.hh"
 #include "arith.hh"
+#include "atoms.hh"
 #include "check.hh"
 #include "context.hh"
 #include "debug.hh"

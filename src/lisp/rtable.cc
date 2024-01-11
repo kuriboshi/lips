@@ -19,6 +19,7 @@
 #include <string>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "check.hh"
 #include "file.hh"
 #include "rtable.hh"
@@ -54,7 +55,7 @@ lisp_t rmsquote(lisp_t stream)
     return "'"_a;
   }
   stream->file()->ungetch(c);
-  return cons(C_QUOTE, cons(lispread(stream->file()), nil));
+  return cons(atoms::QUOTE, cons(lispread(stream->file()), nil));
 }
 
 lisp_t rmgetenv(lisp_t stream)

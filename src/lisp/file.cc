@@ -19,6 +19,7 @@
 #include <filesystem>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "check.hh"
 #include "file.hh"
 #include "io.hh"
@@ -91,13 +92,13 @@ lisp_t readline(ref_file_t file)
     lexer lexer{*line};
     parser parser(lexer);
     auto head = parser.parse();
-    if(listp(head) || head == nil || head == C_EOF)
+    if(listp(head) || head == nil || head == atoms::ENDOFFILE)
       return head;
     lisp_t tail;
     while(true)
     {
       auto o = parser.parse();
-      if(o == C_EOF)
+      if(o == atoms::ENDOFFILE)
         break;
       if(tail == nil)
         tail = cdr(head = cons(head, cons(o, nil)));
@@ -108,7 +109,7 @@ lisp_t readline(ref_file_t file)
       return cons(head, nil);
     return head;
   }
-  return C_EOF;
+  return atoms::ENDOFFILE;
 }
 
 //
@@ -140,7 +141,7 @@ bool loadfile(const std::string& filename)
       if(std::filesystem::exists(base) || std::filesystem::exists(base.replace_extension(".lisp")))
       {
         auto foo = ref_file_t::create(std::make_unique<io::file_source>(base));
-        for(auto rval = lispread(foo); rval != C_EOF; rval = lispread(foo))
+        for(auto rval = lispread(foo); rval != atoms::ENDOFFILE; rval = lispread(foo))
           rval = lisp::vm::get().eval(rval);
         return true;
       }
@@ -280,11 +281,11 @@ lisp_t open(lisp_t filename, lisp_t mode)
   if(!is_nil(mode))
   {
     check(mode, object::type::Symbol);
-    if(mode == C_READ)
+    if(mode == atoms::READ)
       readmode = true;
-    else if(mode == C_WRITE)
+    else if(mode == atoms::WRITE)
       readmode = false;
-    else if(mode == C_APPEND)
+    else if(mode == atoms::APPEND)
     {
       readmode = false;
       appendmode = true;

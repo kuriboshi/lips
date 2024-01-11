@@ -221,7 +221,7 @@ lisp_t expandfiles(const std::string& wild, bool sort)
     return cons(mkstring(wild), nil);
   auto files = walkfiles(wild);
   if(files.empty())
-    return C_ERROR;
+    return atoms::ERROR;
   const struct
   {
     bool operator()(const std::string& a, const std::string& b) { return b < a; }

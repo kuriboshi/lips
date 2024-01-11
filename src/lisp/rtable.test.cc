@@ -18,6 +18,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "list.hh"
 #include "predicate.hh"
 #include "rtable.hh"
@@ -40,7 +41,7 @@ TEST_CASE("rtable: rmsquote")
     auto in = getobject(ref_file_t::create(R"(1)"));
     auto q = rtable::rmsquote(in);
     CHECK(type_of(q) == object::type::Cons);
-    CHECK(car(q) == C_QUOTE);
+    CHECK(car(q) == atoms::QUOTE);
     CHECK(eq(cadr(q), 1_l) == T);
   }
 

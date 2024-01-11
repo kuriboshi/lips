@@ -24,6 +24,7 @@
 #include <catch2/catch_approx.hpp>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "file.hh"
 #include "list.hh"
 #include "predicate.hh"
@@ -51,14 +52,14 @@ TEST_CASE("file: functions")
   {
     create_test_file test("()");
     {
-      auto f = open(mkstring(test.file), C_READ);
+      auto f = open(mkstring(test.file), atoms::READ);
       auto r = read(f);
       CHECK(is_nil(r));
       CHECK(is_T(close(f)));
     }
 
     {
-      auto f = open(mkstring(test.file), C_READ);
+      auto f = open(mkstring(test.file), atoms::READ);
       auto r = read(f);
       CHECK(is_nil(r));
       CHECK(is_T(close(f)));
@@ -70,7 +71,7 @@ TEST_CASE("file: functions")
     create_test_file test("atom\n");
     SECTION("from file")
     {
-      auto in0 = open(mkstring(test.file), C_READ);
+      auto in0 = open(mkstring(test.file), atoms::READ);
       auto e0 = ratom(in0);
       REQUIRE(type_of(e0) == object::type::Symbol);
       CHECK(e0->getstr() == "atom");
@@ -98,7 +99,7 @@ TEST_CASE("file: functions")
 
   SECTION("load")
   {
-    vm::loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(atoms::DOT));
     {
       create_test_file test("(setq a 1)\n");
       auto e0 = load(mkstring(test.file));
@@ -114,11 +115,11 @@ TEST_CASE("file: functions")
   SECTION("print")
   {
     constexpr const char* test_file{"test_print.lisp"};
-    auto f0 = open(mkstring(test_file), C_WRITE);
+    auto f0 = open(mkstring(test_file), atoms::WRITE);
     print("hello"_s, f0);
     print("world"_s, f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), C_READ);
+    auto f1 = open(mkstring(test_file), atoms::READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != nil);
     CHECK(r1->getstr() == "\"hello\"");
@@ -131,13 +132,13 @@ TEST_CASE("file: functions")
   SECTION("terpri")
   {
     constexpr const char* test_file{"test_terpri.lisp"};
-    auto f0 = open(mkstring(test_file), C_WRITE);
+    auto f0 = open(mkstring(test_file), atoms::WRITE);
     prin1("\"hello"_a, f0);
     terpri(f0);
     terpri(f0);
     prin1("world\""_a, f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), C_READ);
+    auto f1 = open(mkstring(test_file), atoms::READ);
     auto r1 = read(f1);
     REQUIRE(r1 != nil);
     CHECK(type_of(r1) == object::type::String);
@@ -148,11 +149,11 @@ TEST_CASE("file: functions")
   SECTION("prin1")
   {
     constexpr const char* test_file{"test_prin1.lisp"};
-    auto f0 = open(mkstring(test_file), C_WRITE);
+    auto f0 = open(mkstring(test_file), atoms::WRITE);
     prin1(mkstring("hello "), f0);
     prin1(mkstring("\"world\""), f0);
     close(f0);
-    auto f1 = open(mkstring(test_file), C_READ);
+    auto f1 = open(mkstring(test_file), atoms::READ);
     auto r1 = getline(f1);
     REQUIRE(r1 != nil);
     CHECK(r1->getstr() == "hello \"world\"");
@@ -164,10 +165,10 @@ TEST_CASE("file: functions")
     constexpr const char* test_file = "test_prin2.lisp";
     SECTION("basic")
     {
-      auto f0 = open(mkstring(test_file), C_WRITE);
+      auto f0 = open(mkstring(test_file), atoms::WRITE);
       prin2(mkstring("hello \"world\""), f0);
       close(f0);
-      auto f1 = open(mkstring(test_file), C_READ);
+      auto f1 = open(mkstring(test_file), atoms::READ);
       auto r1 = getline(f1);
       REQUIRE(r1 != nil);
       // TODO: Is this correct?  Should replace print/prin1/prin2 with the CL
@@ -191,11 +192,11 @@ TEST_CASE("file: functions")
     constexpr const char* test_file = "test_printlevel.lisp";
     SECTION("printlevel == 1")
     {
-      auto f0 = open(mkstring(test_file), C_WRITE);
+      auto f0 = open(mkstring(test_file), atoms::WRITE);
       printlevel(1_l);
       print("(a (b (c)))"_l, f0);
       close(f0);
-      auto f1 = open(mkstring(test_file), C_READ);
+      auto f1 = open(mkstring(test_file), atoms::READ);
       auto r1 = getline(f1);
       REQUIRE(r1 != nil);
       CHECK(r1->getstr() == "(a &)");
@@ -204,11 +205,11 @@ TEST_CASE("file: functions")
 
     SECTION("printlevel == 2")
     {
-      auto f0 = open(mkstring(test_file), C_WRITE);
+      auto f0 = open(mkstring(test_file), atoms::WRITE);
       printlevel(2_l);
       print("(a (b (c)))"_l, f0);
       close(f0);
-      auto f1 = open(mkstring(test_file), C_READ);
+      auto f1 = open(mkstring(test_file), atoms::READ);
       auto r1 = getline(f1);
       REQUIRE(r1 != nil);
       CHECK(r1->getstr() == "(a (b &))");
@@ -288,7 +289,7 @@ TEST_CASE("file: functions")
     SECTION("basic")
     {
       constexpr const char* test_file{"test_spaces.txt"};
-      auto f0 = open(mkstring(test_file), C_WRITE);
+      auto f0 = open(mkstring(test_file), atoms::WRITE);
       spaces(8_l, f0);
       close(f0);
       std::ifstream in{test_file};
@@ -337,12 +338,12 @@ TEST_CASE("file: functions")
       CHECK(equal(r, expected));
     }
 
-    SECTION("eof")
+    SECTION("endoffile")
     {
       create_test_file test{""};
-      auto in = open(mkstring(test.file), C_READ);
+      auto in = open(mkstring(test.file), atoms::READ);
       auto r = readline(in);
-      CHECK(r == C_EOF);
+      CHECK(r == atoms::ENDOFFILE);
     }
 
     SECTION("from primin")
@@ -369,7 +370,7 @@ TEST_CASE("file: functions")
 
   SECTION("loadfile")
   {
-    vm::loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(atoms::DOT));
     create_test_file test("(setq a \"loadfile\")");
     {
       REQUIRE(loadfile(test.file));
@@ -384,11 +385,11 @@ TEST_CASE("file: functions")
   SECTION("append")
   {
     create_test_file test("(setq a");
-    auto f = open(mkstring(test.file), C_APPEND);
+    auto f = open(mkstring(test.file), atoms::APPEND);
     prin1(" 999)"_s, f);
     terpri(f);
     close(f);
-    vm::loadpath(mklist(C_DOT));
+    vm::loadpath(mklist(atoms::DOT));
     auto e = load(mkstring(test.file));
     REQUIRE(type_of("a"_a->value()) == object::type::Integer);
     CHECK("a"_a->value()->as_integer() == 999);
@@ -488,7 +489,7 @@ TEST_CASE("file: lispread/readline")
   SECTION("readline eof")
   {
     auto r0 = readline(ref_file_t::create(""));
-    CHECK(r0 == C_EOF);
+    CHECK(r0 == atoms::ENDOFFILE);
   }
 
   SECTION("readline expression")
@@ -686,19 +687,19 @@ TEST_CASE("file: prin0")
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(C_UNBOUND, *f);
+    prin0(atoms::UNBOUND, *f);
     CHECK(os.str() == "unbound");
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(C_EOF, *f);
-    CHECK(os.str() == "eof");
+    prin0(atoms::ENDOFFILE, *f);
+    CHECK(os.str() == "endoffile");
   }
   {
     std::ostringstream os;
     auto f = std::make_unique<file_t>(os);
-    prin0(C_ERROR, *f);
+    prin0(atoms::ERROR, *f);
     CHECK(os.str() == "error");
   }
   {
@@ -783,7 +784,7 @@ TEST_CASE("file: open error conditions")
   SECTION("open with illegal mode")
   {
     create_test_file test("");
-    CHECK_THROWS(open(mkstring(test.file), C_CONS));
+    CHECK_THROWS(open(mkstring(test.file), atoms::CONS));
   }
 
   SECTION("open non-existing file") { CHECK_THROWS(open(mkstring("/etc/xyzzy"), nil)); }

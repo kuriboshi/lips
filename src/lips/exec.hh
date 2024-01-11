@@ -90,7 +90,7 @@ public:
   /// @param name Name of the program.
   /// @param command List of command arguments.
   ///
-  /// @returns C_ERROR if there is an error or the exit status of the process.
+  /// @returns ERROR if there is an error or the exit status of the process.
   lisp_t execute(const std::string& name, const lisp_t& command);
   /// @brief Check if file is executable.
   ///
@@ -233,21 +233,21 @@ void do_rehash();
 
 namespace lisp::pn
 {
-inline constexpr auto CD = "cd";                  // change directory
-inline constexpr auto EXPAND = "expand";          // expand wildcards
-inline constexpr auto REDIR_TO = "redir-to";      // redirect to file
-inline constexpr auto REDIR_FROM = "redir-from";  // redirect from file
-inline constexpr auto REDIR_APPEND = "append-to"; // redirect appending to file
-inline constexpr auto PIPECMD = "pipe-cmd";       // pipe commands
-inline constexpr auto BACK = "back";              // run command in background
-inline constexpr auto STOP = "stop-lips";         // stop lips, return to superior
-inline constexpr auto REHASH = "rehash";          // recalculate hash table
-inline constexpr auto JOBS = "jobs";              // list jobs
-inline constexpr auto FG = "fg";                  // run job in foreground
-inline constexpr auto BG = "bg";                  // run job in background
-inline constexpr auto SETENV = "setenv";          // set environment variable
-inline constexpr auto GETENV = "getenv";          // get value of variable
-inline constexpr auto EXEC = "exec";              // overlay lips with command
+inline const std::string CD = "cd";                  // change directory
+inline const std::string EXPAND = "expand";          // expand wildcards
+inline const std::string REDIR_TO = "redir-to";      // redirect to file
+inline const std::string REDIR_FROM = "redir-from";  // redirect from file
+inline const std::string REDIR_APPEND = "append-to"; // redirect appending to file
+inline const std::string PIPECMD = "pipe-cmd";       // pipe commands
+inline const std::string BACK = "back";              // run command in background
+inline const std::string STOP = "stop-lips";         // stop lips, return to superior
+inline const std::string REHASH = "rehash";          // recalculate hash table
+inline const std::string JOBS = "jobs";              // list jobs
+inline const std::string FG = "fg";                  // run job in foreground
+inline const std::string BG = "bg";                  // run job in background
+inline const std::string SETENV = "setenv";          // set environment variable
+inline const std::string GETENV = "getenv";          // get value of variable
+inline const std::string EXEC = "exec";              // overlay lips with command
 } // namespace lisp::pn
 
 extern bool insidefork; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -255,13 +255,16 @@ extern bool insidefork; // NOLINT(cppcoreguidelines-avoid-non-const-global-varia
 extern void printdone();
 extern void checkfork();
 
-extern const lisp::lisp_t C_BACK;
-extern const lisp::lisp_t C_EXEC;
-extern const lisp::lisp_t C_OLDVAL;
-extern const lisp::lisp_t C_PIPE;
-extern const lisp::lisp_t C_PROGN;
-extern const lisp::lisp_t C_REDIR_APPEND;
-extern const lisp::lisp_t C_REDIR_FROM;
-extern const lisp::lisp_t C_REDIR_TO;
+namespace lisp::atoms
+{
+inline const lisp_t BACK = intern(pn::BACK);
+inline const lisp_t EXEC = intern(pn::EXEC);
+inline const lisp_t OLDVAL = intern("oldval");
+inline const lisp_t PIPE = intern(pn::PIPECMD);
+inline const lisp_t PROGN = intern("progn");
+inline const lisp_t REDIR_APPEND = intern(pn::REDIR_APPEND);
+inline const lisp_t REDIR_FROM = intern(pn::REDIR_FROM);
+inline const lisp_t REDIR_TO = intern(pn::REDIR_TO);
+} // namespace lisp::atoms
 
 #endif

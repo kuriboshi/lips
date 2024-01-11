@@ -18,6 +18,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "file.hh"
 #include "low.hh"
 #include "predicate.hh"
@@ -129,28 +130,28 @@ TEST_CASE("pred: predicate functions")
   SECTION("typeof")
   {
     CHECK(xtypeof(nil) == nil);
-    CHECK(xtypeof(mkatom("symbol")) == C_SYMBOL);
-    CHECK(xtypeof(mknumber(0)) == C_INTEGER);
-    CHECK(xtypeof(mkfloat(0.0)) == C_FLOAT);
-    CHECK(xtypeof(cons(nil, nil)) == C_CONS);
-    CHECK(xtypeof(mkstring("foo")) == C_STRING);
-    CHECK(xtypeof(eval("plus")) == C_SUBR);
-    CHECK(xtypeof(eval("quote")) == C_FSUBR);
-    CHECK(xtypeof(lambda(nil, nil)) == C_LAMBDA);
-    CHECK(xtypeof(nlambda(nil, nil)) == C_NLAMBDA);
-    CHECK(xtypeof(closure(nil, nil)) == C_CLOSURE);
+    CHECK(xtypeof(mkatom("symbol")) == atoms::SYMBOL);
+    CHECK(xtypeof(mknumber(0)) == atoms::INTEGER);
+    CHECK(xtypeof(mkfloat(0.0)) == atoms::FLOAT);
+    CHECK(xtypeof(cons(nil, nil)) == atoms::CONS);
+    CHECK(xtypeof(mkstring("foo")) == atoms::STRING);
+    CHECK(xtypeof(eval("plus")) == atoms::SUBR);
+    CHECK(xtypeof(eval("quote")) == atoms::FSUBR);
+    CHECK(xtypeof(lambda(nil, nil)) == atoms::LAMBDA);
+    CHECK(xtypeof(nlambda(nil, nil)) == atoms::NLAMBDA);
+    CHECK(xtypeof(closure(nil, nil)) == atoms::CLOSURE);
     auto c = closure(nil, mklist("a"_a));
-    CHECK(xtypeof(c->closure().cvalues->car()) == C_INDIRECT);
+    CHECK(xtypeof(c->closure().cvalues->car()) == atoms::INDIRECT);
     auto a = eval("((lambda () (typeof (topofstack))))");
-    CHECK(a == C_ENVIRON);
+    CHECK(a == atoms::ENVIRON);
     auto l = ""_l;
-    CHECK(l == C_EOF);
+    CHECK(l == atoms::ENDOFFILE);
     auto e = xtypeof(l);
-    CHECK(e == C_SYMBOL);
+    CHECK(e == atoms::SYMBOL);
     auto f = lisp_t::create(ref_file_t::create(""));
-    CHECK(xtypeof(f) == C_FILE);
+    CHECK(xtypeof(f) == atoms::FILE);
     auto& cvar = initcvar("typeof_test", 1_l);
-    CHECK(xtypeof("typeof_test"_a->value()) == C_CVARIABLE);
+    CHECK(xtypeof("typeof_test"_a->value()) == atoms::CVARIABLE);
   }
 }
 

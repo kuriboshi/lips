@@ -56,8 +56,6 @@ lisp_t progn(lisp_t lexp)
 lisp_t set(lisp_t var, lisp_t val)
 {
   check(var, object::type::Symbol);
-  if(var->as_symbol()->constant)
-    error(error_errc::attempt_to_clobber, var);
   var->value(val);
   return val;
 }

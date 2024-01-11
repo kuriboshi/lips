@@ -630,13 +630,13 @@ lisp_t term_source::readline(std::string prompt)
     auto head = parser.parse();
     if(listp(head))
       return cons(head, nil);
-    if(head == nil || head == C_EOF)
+    if(head == nil || head == atoms::ENDOFFILE)
       return head;
     lisp_t tail;
     while(true)
     {
       auto o = parser.parse();
-      if(o == C_EOF)
+      if(o == atoms::ENDOFFILE)
         break;
       if(tail == nil)
         tail = cdr(head = cons(head, cons(o, nil)));
@@ -647,5 +647,5 @@ lisp_t term_source::readline(std::string prompt)
       return cons(head, nil);
     return head;
   }
-  return C_EOF;
+  return atoms::ENDOFFILE;
 }

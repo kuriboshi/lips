@@ -236,7 +236,7 @@ lisp_t process::execute(const std::string& name, const lisp_t& command)
     ::exit(1);
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   auto status = waitfork(pid);
   return mknumber(WEXITSTATUS(status.stat));
 }
@@ -263,7 +263,7 @@ int execcommand(lisp_t exp, lisp_t* res)
   process proc;
   if(command->at(0) == '/' || strpbrk(command->c_str(), "/") != nullptr)
   {
-    if(proc.execute(*command, exp) == C_ERROR)
+    if(proc.execute(*command, exp) == atoms::ERROR)
       return -1;
     return 1;
   }
@@ -283,7 +283,7 @@ int execcommand(lisp_t exp, lisp_t* res)
     {
       comdir += "/";
       comdir += *command;
-      if(proc.execute(comdir, exp) == C_ERROR)
+      if(proc.execute(comdir, exp) == atoms::ERROR)
         return -1;
       return 1;
     }
@@ -324,7 +324,7 @@ lisp_t redir_to(lisp_t cmd, lisp_t file, lisp_t filed)
     ::exit(0);
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
@@ -361,7 +361,7 @@ lisp_t redir_append(lisp_t cmd, lisp_t file, lisp_t filed)
     ::exit(0);
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
@@ -398,7 +398,7 @@ lisp_t redir_from(lisp_t cmd, lisp_t file, lisp_t filed)
     ::exit(0);
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   auto status = proc.waitfork(pid);
   ::close(fd);
   return mknumber(WEXITSTATUS(status.stat));
@@ -446,7 +446,7 @@ lisp_t pipecmd(lisp_t cmds)
     ::exit(WEXITSTATUS(status.stat));
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   auto status = proc.waitfork(pid);
   return mknumber(WEXITSTATUS(status.stat));
 }
@@ -464,7 +464,7 @@ lisp_t back(lisp_t cmd)
     ::exit(0);
   }
   else if(pid < 0)
-    return C_ERROR;
+    return atoms::ERROR;
   if(!insidefork)
     job::recordjob(job::createjob(pid), true);
   if(auto* currentjob = job::findjob([](const auto&) { return true; }); currentjob != nullptr)
@@ -616,7 +616,7 @@ lisp_t doexec(lisp_t cmd)
   switch(execcommand(cmd, &res))
   {
     case -1:
-      return C_ERROR;
+      return atoms::ERROR;
       break;
     default:
       break; // Never reached
@@ -661,12 +661,3 @@ void checkfork()
       break;
   }
 }
-
-const lisp_t C_BACK = intern(pn::BACK);
-const lisp_t C_EXEC = intern(pn::EXEC);
-const lisp_t C_OLDVAL = intern("oldval");
-const lisp_t C_PIPE = intern(pn::PIPECMD);
-const lisp_t C_PROGN = intern("progn");
-const lisp_t C_REDIR_APPEND = intern(pn::REDIR_APPEND);
-const lisp_t C_REDIR_FROM = intern(pn::REDIR_FROM);
-const lisp_t C_REDIR_TO = intern(pn::REDIR_TO);

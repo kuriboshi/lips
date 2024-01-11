@@ -18,21 +18,24 @@
 #ifndef LISP_SYMBOL_HH
 #define LISP_SYMBOL_HH
 
-#include <cstdint>
+#include <cstddef>
+#include <functional>
+#include <new>
+#include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "ref_ptr.hh"
-#include "types.hh"
+#include "pool.hh"
 
 namespace lisp
 {
 class object;
 using lisp_t = ref_ptr<object>;
-extern const lisp_t C_UNBOUND;
 
 namespace symbol
 {
@@ -58,11 +61,6 @@ public:
   symbol_t() = default;
 
   std::string pname;
-  lisp_t self{};         // The lisp_t object for this symbol
-  lisp_t value{};        // Value
-  lisp_t plist{};        // The property list
-  lisp_t topval{};       // Holds top value (not used yet)
-  bool constant = false; // If true this is a constant which can't be set
 
   /// @brief The new and delete operators uses the global pool to create objects.
   static void* operator new(std::size_t) { return pool().allocate(); }
@@ -71,17 +69,7 @@ public:
 
   static std::size_t freecount() { return pool().size(); }
 
-  static symbol_t* intern(std::string_view pname)
-  {
-    auto p = store().find(pname);
-    if(p != store().end())
-      return p->second;
-    auto* sym = new symbol_t;
-    sym->pname = pname;
-    sym->value = C_UNBOUND;
-    auto i = store().insert(std::make_pair(pname, sym));
-    return i.first->second;
-  }
+  static symbol_t* intern(std::string_view pname);
 
   static void unintern(std::string_view pname)
   {
@@ -99,7 +87,22 @@ public:
     return _store;
   }
 
+  lisp_t property_list() const { return _plist; }
+  void property_list(lisp_t pl) { _plist = pl; }
+  lisp_t self() const { return _self; }
+  void self(lisp_t s) { _self = s; }
+
 private:
+  friend class lisp::object;
+
+  lisp_t value{}; // Value
+
+  lisp_t _self{};   // The lisp_t object for this symbol
+  lisp_t _plist{};  // The property list
+  lisp_t _topval{}; // Holds top value (not used yet)
+
+  bool constant{false}; // If true this is a constant which can't be set
+
   symbol_t(pool_test_t) { throw std::runtime_error("symbol_t"); }
   template<class T>
   friend void pool_test();

@@ -56,41 +56,41 @@ lisp_t transform(const lisp_t& list)
   {
     if(type_of(ll->car()) == object::type::Cons)
       tail = put_end(tail, transform(ll->car()), conc);
-    else if(ll->car() == C_BAR)
+    else if(ll->car() == atoms::BAR)
     {
-      res = transform(C_PIPE, res, tail, conc);
+      res = transform(atoms::PIPE, res, tail, conc);
       tail = nil;
       conc = false;
     }
-    else if(ll->car() == C_SEMI)
+    else if(ll->car() == atoms::SEMI)
     {
       // Semicolon is considered a comment character. If progn transformation
       // is to be effective ';' cannot be a comment character.
-      res = transform(C_PROGN, res, tail, conc);
+      res = transform(atoms::PROGN, res, tail, conc);
       tail = nil;
       conc = false;
     }
-    else if(ll->car() == C_GT)
+    else if(ll->car() == atoms::GT)
     {
-      res = transform(C_REDIR_TO, res, tail, conc);
+      res = transform(atoms::REDIR_TO, res, tail, conc);
       tail = nil;
       conc = true;
     }
-    else if(ll->car() == C_GGT)
+    else if(ll->car() == atoms::GGT)
     {
-      res = transform(C_REDIR_APPEND, res, tail, conc);
+      res = transform(atoms::REDIR_APPEND, res, tail, conc);
       tail = nil;
       conc = true;
     }
-    else if(ll->car() == C_LT)
+    else if(ll->car() == atoms::LT)
     {
-      res = transform(C_REDIR_FROM, res, tail, conc);
+      res = transform(atoms::REDIR_FROM, res, tail, conc);
       tail = nil;
       conc = true;
     }
-    else if(ll->car() == C_AMPER)
+    else if(ll->car() == atoms::AMPER)
     {
-      res = transform(C_BACK, res, tail, conc);
+      res = transform(atoms::BACK, res, tail, conc);
       tail = nil;
       conc = true;
     }
@@ -103,10 +103,3 @@ lisp_t transform(const lisp_t& list)
     return put_end(res, tail, conc);
   return res;
 }
-
-const lisp_t C_AMPER = intern("&");
-const lisp_t C_BAR = intern("|");
-const lisp_t C_GGT = intern(">>");
-const lisp_t C_GT = intern(">");
-const lisp_t C_LT = intern("<");
-const lisp_t C_SEMI = intern(";");

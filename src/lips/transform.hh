@@ -22,11 +22,14 @@
 
 lisp::lisp_t transform(const lisp::lisp_t& list);
 
-extern const lisp::lisp_t C_AMPER;
-extern const lisp::lisp_t C_BAR;
-extern const lisp::lisp_t C_GGT;
-extern const lisp::lisp_t C_GT;
-extern const lisp::lisp_t C_LT;
-extern const lisp::lisp_t C_SEMI;
+namespace lisp::atoms
+{
+inline const lisp_t AMPER = intern("&");
+inline const lisp_t BAR = intern("|");
+inline const lisp_t GGT = intern(">>");
+inline const lisp_t GT = intern(">");
+inline const lisp_t LT = intern("<");
+inline const lisp_t SEMI = intern(";");
+} // namespace lisp::atoms
 
 #endif

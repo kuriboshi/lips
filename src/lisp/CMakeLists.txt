@@ -72,6 +72,7 @@ set(_liblisp_source
           run.hh
           string.hh
           syntax.hh
+          symbol.hh
           types.hh
           user.hh
           version.hh)

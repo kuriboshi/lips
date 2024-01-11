@@ -16,6 +16,7 @@
 //
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "check.hh"
 #include "iter.hh"
 #include "file.hh"
@@ -49,8 +50,8 @@ lisp_t getrep(lisp_t fun)
   else
     args = x.args;
   if(x.eval)
-    return cons(C_LAMBDA, cons(args, x.body));
-  return cons(C_NLAMBDA, cons(args, x.body));
+    return cons(atoms::LAMBDA, cons(args, x.body));
+  return cons(atoms::NLAMBDA, cons(args, x.body));
 }
 
 lisp_t funeq(lisp_t f1, lisp_t f2)
@@ -76,15 +77,15 @@ lisp_t funeq(lisp_t f1, lisp_t f2)
 
 inline lisp_t checkfn(lisp_t name, lisp_t lam)
 {
-  if(name->value() != C_UNBOUND)
+  if(name->value() != atoms::UNBOUND)
     if(type_of(name->value()) == object::type::Lambda)
     {
       const lisp_t t = user::funeq(name->value(), lam);
       if(is_nil(t))
       {
-        putprop(name, C_OLDDEF, name->value());
+        putprop(name, atoms::OLDDEF, name->value());
         if(!is_nil(vm::verbose()))
-          print(cons(name, cons(C_REDEFINED, nil)));
+          print(cons(name, cons(atoms::REDEFINED, nil)));
       }
     }
   return nil;

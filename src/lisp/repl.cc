@@ -16,6 +16,7 @@
 //
 
 #include "alloc.hh"
+#include "atoms.hh"
 #include "file.hh"
 #include "repl.hh"
 #include "vm.hh"
@@ -35,7 +36,7 @@ void repl::main_loop()
   {
     vm::primout()->format("> ");
     auto expr = lispread(vm::primin());
-    if(expr == C_EOF)
+    if(expr == atoms::ENDOFFILE)
       break;
     auto result = eval(expr);
     print(result);
@@ -54,7 +55,7 @@ lisp_t repl::operator()(lisp_t exp)
   {
     vm::primout()->format("{}: ", _level);
     auto com = lispread(vm::primin());
-    if(com == C_EOF)
+    if(com == atoms::ENDOFFILE)
       break;
     /* OK, EVAL, ^, ... */
     if(type_of(com) == object::type::Symbol && com->as_symbol()->pname == "help")
@@ -71,16 +72,16 @@ lisp_t repl::operator()(lisp_t exp)
     }
     if(type_of(com) == object::type::Cons)
     {
-      if(com->car() == C_GO)
+      if(com->car() == atoms::GO)
         return eval(exp);
-      if(com->car() == C_RESET)
+      if(com->car() == atoms::RESET)
         throw lisp_reset();
-      if(com->car() == C_BT)
+      if(com->car() == atoms::BT)
       {
         _vm.bt();
         continue;
       }
-      if(com->car() == C_RETURN)
+      if(com->car() == atoms::RETURN)
         return is_nil(com->cdr()) ? nil : com->cdr()->car();
     }
     auto result = eval(com);
