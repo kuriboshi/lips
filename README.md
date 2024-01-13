@@ -6,7 +6,7 @@ Copyright 1988-1989, 1992, 2020-2024 Krister Joas <krister@joas.jp>
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 3.1.1
+Version 3.2.0
 
 ## What is it?
 
@@ -60,7 +60,7 @@ on their level of support for C++-20.
 | macOS 14.2.1 | clang 17.0.6      |
 | Ubuntu 20.04 | gcc 11.4.0        |
 | Ubuntu 22.04 | gcc 13.1.0        |
-| Ubuntu 22.04 | clang 14.0.0      |
+| Ubuntu 22.04 | clang 17.0.0      |
 
 The minimum version of `clang-tidy` is 17.
 
@@ -71,8 +71,8 @@ built as part of the build.
 
 | Library Name | Version |
 |--------------|---------|
-| Catch2       | 3.3.2   |
-| fmt          | 9.1.0   |
+| Catch2       | 3.5.0   |
+| fmt          | 10.1.1  |
 
 System libraries dependencies.
 

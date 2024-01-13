@@ -1,8 +1,8 @@
 # `Lips` Reference Manual
 
-Version 3.1.1, January, 2024
+Version 3.2.0, January, 2024
 
-> Copyright (c) 1988-1989, 1992, 2020-2023 Krister Joas
+> Copyright (c) 1988-1989, 1992, 2020-2024 Krister Joas
 >
 > Licensed under the Apache License, Version 2.0 (the "License"); you
 > may not use this file except in compliance with the License.  You may

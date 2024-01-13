@@ -1,5 +1,13 @@
 # Release notes
 
+## 3.2.0 (2024-01-13)
+
+Minor release with the following changes.
+
+- Upgrade compiler on Ubuntu 22.04 to g++-13
+- Replace the use of FILE* with std::streams in `lips`
+- Put user define literals in the 'inline namespace literals'
+
 ## 3.1.1 (2024-01-08)
 
 Minor bug fix release

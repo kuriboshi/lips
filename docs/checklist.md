@@ -6,6 +6,7 @@
 - Run all unit tests: `make test`
 - Run `make test-linux`
 - Run `make package-test`
+- Run `make docs`
 - Update `README.md`
   - Update the version number
   - Check if any other updates are needed
