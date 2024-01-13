@@ -4,8 +4,8 @@
 
 Minor release with the following changes.
 
-- Upgrade compiler on Ubuntu 22.04 to g++-13
-- Replace the use of FILE* with std::streams in `lips`
+- Upgrade compiler in github workflow on Ubuntu 22.04 to g++-13
+- Replace the use of FILE* with std::streams in `src/lips`
 - Put user define literals in the 'inline namespace literals'
 
 ## 3.1.1 (2024-01-08)

@@ -59,6 +59,7 @@ on their level of support for C++-20.
 | macOS 14.2.1 | AppleClang 15.0.0 |
 | macOS 14.2.1 | clang 17.0.6      |
 | Ubuntu 20.04 | gcc 11.4.0        |
+| Ubuntu 22.04 | gcc 12.3.0        |
 | Ubuntu 22.04 | gcc 13.1.0        |
 | Ubuntu 22.04 | clang 17.0.0      |
 
