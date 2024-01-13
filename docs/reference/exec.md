@@ -8,6 +8,16 @@ in a fork.  This means that redirecting I/O of a lisp function doesn't make
 permanent changes to the `lips` environment.  No global variables are
 changed.
 
+> ```cpp
+> int execcommand(lisp_t exp, lisp_t* res);
+> void init();
+> ```
+
+Tries to execute the lisp expression exp as a command.
+
+Execcomand returns 0 if there is no executable file in the path, 1 if the
+command was successively run and -1 if there was some error.
+
 > `(redir-to cmd file fd)` (_NLambda Function_)
 
 ```cpp
@@ -62,7 +72,7 @@ Connect output from one command to the input of the next.
 The argument _cmds_ is a list of commands which are in themselves lists. For example:
 
 ```lisp
-(pipe-cmd '((find . -name foo) (xargs grep bar)))
+(pipe-cmd (find . -name foo) (xargs grep bar))
 ```
 
 If the list _cmds_ only contains one command no piping of the output is done.

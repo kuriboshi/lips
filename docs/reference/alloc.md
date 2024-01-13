@@ -207,31 +207,31 @@ This function takes one or more objects of type lisp_t and creates a list.
 **Returns**: The list.
 
 > ```cpp
-> inline lisp_t operator"" _s(const char* s, std::size_t)
+> inline lisp::lisp_t operator"" _s(const char* s, std::size_t)
 > ```
 
 Creates a lisp string.
 
 > ```cpp
-> inline lisp_t operator"" _a(const char* s, std::size_t)
+> inline lisp::lisp_t operator"" _a(const char* s, std::size_t)
 > ```
 
 Creates an atom.
 
 > ```cpp
-> inline lisp_t operator"" _l(unsigned long long i)
+> inline lisp::lisp_t operator"" _l(unsigned long long i)
 > ```
 
 Creates a number.
 
 > ```cpp
-> inline lisp_t operator"" _l(long double d)
+> inline lisp::lisp_t operator"" _l(long double d)
 > ```
 
 Creates a floating point value.
 
 > ```cpp
-> inline lisp_t operator"" _e(const char* s, std::size_t)
+> inline lisp::lisp_t operator"" _e(const char* s, std::size_t)
 > ```
 
 Evaluates a lisp expression in a string.

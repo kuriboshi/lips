@@ -275,7 +275,7 @@ Read S-expressions from the file until end of file it reached.
 **Returns**: True if the file was loaded successfully, false otherwise.
 
 > ```cpp
-> inline lisp_t operator"" _l(const char* s, std::size_t)
+> inline lisp::lisp_t operator"" _l(const char* s, std::size_t)
 > ```
 
 Creates a lisp expression from a string.
