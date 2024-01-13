@@ -276,7 +276,7 @@ inline lisp::lisp_t operator"" _l(const char* s, std::size_t)
   auto e = lisp::lispread(in);
   return e;
 }
-}
+} // namespace literals
 
 } // namespace lisp
 

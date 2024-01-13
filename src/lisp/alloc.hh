@@ -245,7 +245,7 @@ inline lisp::lisp_t operator"" _l(long double d)
 
 /// @brief Evaluates a lisp expression in a string.
 inline lisp::lisp_t operator"" _e(const char* s, std::size_t) { return lisp::eval(s); }
-}
+} // namespace literals
 
 } // namespace lisp
 

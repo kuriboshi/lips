@@ -85,7 +85,10 @@ void termcap::init()
 void termcap::nput(const std::string& str, int n)
 {
   for(; n > 0; --n)
-    tputs(str.c_str(), 1, [](int c) -> int { std::cout << static_cast<char>(c); return c; });
+    tputs(str.c_str(), 1, [](int c) -> int {
+      std::cout << static_cast<char>(c);
+      return c;
+    });
 }
 
 void term_source::init_keymap()
