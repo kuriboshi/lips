@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       actions: read
       contents: read
@@ -18,15 +18,14 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install compilers
       run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install -y g++-11
-        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 90
-        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-11 90
+        sudo apt-get install -y ninja-build
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90
+        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 90
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
