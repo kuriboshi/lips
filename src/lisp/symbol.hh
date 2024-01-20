@@ -88,9 +88,9 @@ public:
   }
 
   lisp_t property_list() const { return _plist; }
-  void property_list(lisp_t pl) { _plist = pl; }
+  void property_list(const lisp_t& pl) { _plist = pl; }
   lisp_t self() const { return _self; }
-  void self(lisp_t s) { _self = s; }
+  void self(const lisp_t& s) { _self = s; }
 
 private:
   friend class lisp::object;

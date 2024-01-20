@@ -62,8 +62,8 @@ public:
   void loadpath(lisp_t);
 
   lisp_t perror(std::error_code) const;
-  lisp_t perror(std::error_code, lisp_t) const;
-  lisp_t error(std::error_code, lisp_t) const;
+  lisp_t perror(std::error_code, const lisp_t&) const;
+  lisp_t error(std::error_code, const lisp_t&) const;
   static lisp_t fatal(std::error_code error) { throw lisp_error(error); }
   static lisp_t fatal(std::error_code error, const std::string& a) { throw lisp_error(error, a); }
 

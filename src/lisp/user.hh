@@ -45,7 +45,7 @@ namespace lisp
 /// @param lambda A lambda or nlambda expression.
 ///
 /// @returns The name of the function defined.
-inline lisp_t define(lisp_t name, lisp_t lambda) { return details::user::define(name, lambda); }
+inline lisp_t define(const lisp_t& name, const lisp_t& lambda) { return details::user::define(name, lambda); }
 /// @brief Defines one or more functions.
 /// @lisp{(defineq (name lambda)...),NoSpread Function}
 ///
@@ -64,7 +64,7 @@ inline lisp_t define(lisp_t name, lisp_t lambda) { return details::user::define(
 /// expression. The lambda expression is evaluated to yield a lambda object.
 ///
 /// @returns List of function names defined.
-inline lisp_t defineq(lisp_t list) { return details::user::defineq(list); }
+inline lisp_t defineq(const lisp_t& list) { return details::user::defineq(list); }
 /// @brief Get the function representation of a lambda object.
 /// @lisp{(getrep lambda),Function}
 ///
@@ -73,7 +73,7 @@ inline lisp_t defineq(lisp_t list) { return details::user::defineq(list); }
 /// @returns The representation of a lambda function which if evaluated will
 /// yield a lambda object.  If the parameter is not of the type lambda or if
 /// it's empty then the return value is nil.
-inline lisp_t getrep(lisp_t lambda) { return details::user::getrep(lambda); }
+inline lisp_t getrep(const lisp_t& lambda) { return details::user::getrep(lambda); }
 } // namespace lisp
 
 #endif

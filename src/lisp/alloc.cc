@@ -67,12 +67,12 @@ lisp_t mknumber(integer_t::value_type number) { return getobject(number); }
 ///
 lisp_t mkfloat(double_t::value_type number) { return getobject(number); }
 
-lisp_t mklambda(lisp_t args, lisp_t def, bool eval)
+lisp_t mklambda(const lisp_t& args, const lisp_t& def, bool eval)
 {
   auto lambda = ref_lambda_t::create();
-  lambda->body = std::move(def);
+  lambda->body = def;
   std::int8_t count = 0;
-  lambda->args = mkarglist(std::move(args), count);
+  lambda->args = mkarglist(args, count);
   lambda->count = count;
   lambda->eval = eval;
   return getobject(lambda);

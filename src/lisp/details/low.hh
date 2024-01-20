@@ -25,12 +25,12 @@ namespace lisp::details::low
 
 void init();
 
-lisp_t cond(lisp_t);
-lisp_t prog1(lisp_t, lisp_t);
-lisp_t progn(lisp_t);
-lisp_t set(lisp_t, lisp_t);
-lisp_t setq(lisp_t, lisp_t);
-lisp_t xwhile(lisp_t, lisp_t);
+lisp_t cond(const lisp_t&);
+lisp_t prog1(const lisp_t&, const lisp_t&);
+lisp_t progn(const lisp_t&);
+lisp_t set(const lisp_t&, const lisp_t&);
+lisp_t setq(const lisp_t&, const lisp_t&);
+lisp_t xwhile(const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::low
 

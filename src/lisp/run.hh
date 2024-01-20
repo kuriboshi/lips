@@ -30,7 +30,7 @@ namespace lisp
 inline int run(vm& vm, std::ostream& out = std::cout)
 {
   repl repl(vm);
-  vm.repl = [&repl](lisp_t exp) -> lisp_t { return repl(exp); };
+  vm.repl = [&repl](const lisp_t& exp) -> lisp_t { return repl(exp); };
   while(true)
   {
     try
@@ -46,7 +46,7 @@ inline int run(vm& vm, std::ostream& out = std::cout)
     }
     catch(const lisp_error& ex)
     {
-      out << "lisp_error: " << ex.what() << std::endl;
+      out << "lisp_error: " << ex.what() << '\n';
       vm.unwind();
     }
     catch(const lisp_finish& ex)
@@ -56,7 +56,7 @@ inline int run(vm& vm, std::ostream& out = std::cout)
     catch(const std::exception& ex)
     {
       // Any standard exception resets the vm.
-      out << "exception: " << ex.what() << std::endl;
+      out << "exception: " << ex.what() << '\n';
       vm.unwind();
     }
   }

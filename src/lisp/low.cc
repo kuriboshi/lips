@@ -17,52 +17,49 @@
 
 #include "alloc.hh"
 #include "check.hh"
+#include "iter.hh"
 #include "low.hh"
 
 namespace lisp::details::low
 {
-lisp_t cond(lisp_t args)
+lisp_t cond(const lisp_t& args)
 {
-  while(!is_nil(args))
+  for(const auto& v: args)
   {
-    auto alt = args->car();
-    check(alt, object::type::Cons);
-    auto res = eval(alt->car());
+    check(v, object::type::Cons);
+    auto res = eval(v->car());
     if(!is_nil(res))
     {
-      if(is_nil(alt->cdr()))
+      if(is_nil(v->cdr()))
         return res;
-      return low::progn(alt->cdr());
+      return low::progn(v->cdr());
     }
-    args = args->cdr();
   }
   return nil;
 }
 
-lisp_t prog1(lisp_t a1, lisp_t) { return a1; }
+lisp_t prog1(const lisp_t& a1, const lisp_t&) { return a1; }
 
-lisp_t progn(lisp_t lexp)
+lisp_t progn(const lisp_t& lexp)
 {
   if(is_nil(lexp))
     return nil;
-  while(!is_nil(lexp->cdr()))
-  {
-    eval(lexp->car());
-    lexp = lexp->cdr();
-  }
-  return eval(lexp->car());
+  lisp_t val;
+  for(const auto& v: lexp)
+    val = eval(v);
+  return val;
 }
 
-lisp_t set(lisp_t var, lisp_t val)
+lisp_t set(const lisp_t& var, const lisp_t& val)
 {
   check(var, object::type::Symbol);
   var->value(val);
   return val;
 }
 
-lisp_t setq(lisp_t var, lisp_t val) { return low::set(var, eval(val)); }
+lisp_t setq(const lisp_t& var, const lisp_t& val) { return low::set(var, eval(val)); }
 
-lisp_t xwhile(lisp_t pred, lisp_t exp)
+lisp_t xwhile(const lisp_t& pred, const lisp_t& exp)
 {
   lisp_t res = eval(pred);
   while(!is_nil(res))

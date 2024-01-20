@@ -25,7 +25,7 @@ lisp_t syntax::macro(ref_file_t source, std::uint8_t index)
   auto fn = _macro.at(index);
   if(fn != nil)
   {
-    const lisp_t f = getobject(source);
+    const lisp_t f = getobject(std::move(source));
     return apply(fn, cons(f, nil));
   }
   return nil;

@@ -30,7 +30,7 @@ namespace lisp::rtable
 //
 // Read macros.
 //
-lisp_t rmdquote(lisp_t stream)
+lisp_t rmdquote(const lisp_t& stream)
 {
   check(stream, object::type::File);
   std::string buffer;
@@ -45,7 +45,7 @@ lisp_t rmdquote(lisp_t stream)
   return mkstring(buffer);
 }
 
-lisp_t rmsquote(lisp_t stream)
+lisp_t rmsquote(const lisp_t& stream)
 {
   check(stream, object::type::File);
   auto c = stream->file()->getch();
@@ -58,7 +58,7 @@ lisp_t rmsquote(lisp_t stream)
   return cons(atoms::QUOTE, cons(lispread(stream->file()), nil));
 }
 
-lisp_t rmgetenv(lisp_t stream)
+lisp_t rmgetenv(const lisp_t& stream)
 {
   check(stream, object::type::File);
   auto sym = ratom(stream);

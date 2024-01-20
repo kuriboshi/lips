@@ -20,24 +20,25 @@
 
 #include "alloc.hh"
 #include "check.hh"
+#include "iter.hh"
 #include "string.hh"
 
 namespace lisp::details::string
 {
 /// @brief Concatenate arbitrary many strings to one string.
-lisp_t concat(lisp_t strlist)
+lisp_t concat(const lisp_t& strlist)
 {
   std::string result;
-  for(auto sl = strlist; !is_nil(sl); sl = sl->cdr())
+  for(const auto& sl: strlist)
   {
-    check(sl->car(), object::type::String);
-    result += sl->car()->as_string();
+    check(sl, object::type::String);
+    result += sl->as_string();
   }
   return mkstring(result);
 }
 
 /// @brief Compare two strings.
-lisp_t strcmp(lisp_t s1, lisp_t s2)
+lisp_t strcmp(const lisp_t& s1, const lisp_t& s2)
 {
   check(s1, object::type::String);
   check(s2, object::type::String);
@@ -45,7 +46,7 @@ lisp_t strcmp(lisp_t s1, lisp_t s2)
 }
 
 /// @brief T if both strings are equal.
-lisp_t strequal(lisp_t s1, lisp_t s2)
+lisp_t strequal(const lisp_t& s1, const lisp_t& s2)
 {
   check(s1, object::type::String);
   check(s2, object::type::String);
@@ -55,7 +56,7 @@ lisp_t strequal(lisp_t s1, lisp_t s2)
 }
 
 /// @brief T if s is a string, nil otherwise.
-lisp_t stringp(lisp_t s)
+lisp_t stringp(const lisp_t& s)
 {
   if(type_of(s) == object::type::String)
     return s;
@@ -63,13 +64,13 @@ lisp_t stringp(lisp_t s)
 }
 
 /// @brief Return string length of s.
-lisp_t strlen(lisp_t s)
+lisp_t strlen(const lisp_t& s)
 {
   check(s, object::type::String);
   return mknumber(static_cast<int>(s->as_string().length()));
 }
 
-lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
+lisp_t substring(const lisp_t& str, const lisp_t& begin, const lisp_t& end)
 {
   check(str, object::type::String);
   check(begin, object::type::Integer);
@@ -100,7 +101,7 @@ lisp_t substring(lisp_t str, lisp_t begin, lisp_t end)
   return mkstring(str->as_string().substr(b, e));
 }
 
-lisp_t symstr(lisp_t sym)
+lisp_t symstr(const lisp_t& sym)
 {
   check(sym, object::type::Symbol, object::type::Nil);
   if(type_of(sym) == object::type::Nil)

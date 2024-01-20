@@ -3,6 +3,7 @@ Checks: "\
   bugprone-*,\
   -bugprone-exception-escape,\
   -bugprone-unused-return-value,\
+  -bugprone-easily-swappable-parameters,\
   cert-*,\
   -cert-dcl21-cpp,\
   -cert-err58-cpp,\
@@ -22,6 +23,7 @@ Checks: "\
   modernize-*,\
   -modernize-use-trailing-return-type,\
   -modernize-use-nodiscard,\
+  performance-*,\
   readability-*,\
   -readability-braces-around-statements,\
   -readability-identifier-length,\
@@ -59,7 +61,7 @@ CheckOptions:
   - key:             llvm-else-after-return.WarnOnUnfixable
     value:           'false'
   - key:             llvm-qualified-auto.AddConstToQualified
-    value:           'false'
+    value:           'true'
   - key:             modernize-loop-convert.MinConfidence
     value:           reasonable
   - key:             modernize-loop-convert.MaxCopySize

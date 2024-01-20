@@ -29,66 +29,62 @@ namespace lisp::details::arith
 // generic function results in a float.
 //
 
-lisp_t plus(lisp_t x)
+lisp_t plus(const lisp_t& x)
 {
   double_t::value_type fsum = 0.0;
   integer_t::value_type sum = 0;
   bool f = false;
 
-  while(type_of(x) == object::type::Cons)
+  for(const auto& v: x)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer || type_of(x->car()) == object::type::Float)
-        fsum += x->car()->as_double();
+      if(type_of(v) == object::type::Integer || type_of(v) == object::type::Float)
+        fsum += v->as_double();
       else
-        error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, v);
     }
     else
     {
-      if(type_of(x->car()) == object::type::Integer)
-        sum += x->car()->as_integer();
-      else if(type_of(x->car()) == object::type::Float)
+      if(type_of(v) == object::type::Integer)
+        sum += v->as_integer();
+      else if(type_of(v) == object::type::Float)
       {
         f = true;
-        fsum = x->car()->as_double() + static_cast<double_t::value_type>(sum);
+        fsum = v->as_double() + static_cast<double_t::value_type>(sum);
       }
       else
-        error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, v);
     }
-    x = x->cdr();
   }
   if(f)
     return mkfloat(fsum);
   return mknumber(sum);
 }
 
-lisp_t iplus(lisp_t x)
+lisp_t iplus(const lisp_t& x)
 {
   integer_t::value_type sum = 0;
-  for(auto i: x)
+  for(auto v: x)
   {
-    check(i, object::type::Integer);
-    sum += i->as_integer();
+    check(v, object::type::Integer);
+    sum += v->as_integer();
   }
   return mknumber(sum);
 }
 
-lisp_t fplus(lisp_t x)
+lisp_t fplus(const lisp_t& x)
 {
-  check(x->car(), object::type::Float);
-  auto fsum = x->car()->as_double();
-  x = x->cdr();
-  while(type_of(x) == object::type::Cons)
+  double_t fsum{0.0};
+  for(const auto& v: x)
   {
-    check(x->car(), object::type::Float);
-    fsum = fsum + x->car()->as_double();
-    x = x->cdr();
+    check(v, object::type::Float);
+    fsum = fsum + v->as_double();
   }
   return mkfloat(fsum);
 }
 
-lisp_t difference(lisp_t x, lisp_t y)
+lisp_t difference(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Integer, object::type::Float);
   check(y, object::type::Integer, object::type::Float);
@@ -100,80 +96,73 @@ lisp_t difference(lisp_t x, lisp_t y)
   return mkfloat(x->as_double() - y->as_double());
 }
 
-lisp_t idifference(lisp_t x, lisp_t y)
+lisp_t idifference(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Integer);
   check(y, object::type::Integer);
   return mknumber(x->as_integer() - y->as_integer());
 }
 
-lisp_t fdifference(lisp_t x, lisp_t y)
+lisp_t fdifference(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Float);
   check(y, object::type::Float);
   return mkfloat(x->as_double() - y->as_double());
 }
 
-lisp_t times(lisp_t x)
+lisp_t times(const lisp_t& x)
 {
   double_t::value_type fprod = 1.0;
   integer_t::value_type prod = 1;
   bool f = false;
 
-  while(type_of(x) == object::type::Cons)
+  for(const auto& v: x)
   {
     if(f)
     {
-      if(type_of(x->car()) == object::type::Integer || type_of(x->car()) == object::type::Float)
-        fprod *= x->car()->as_double();
+      if(type_of(v) == object::type::Integer || type_of(v) == object::type::Float)
+        fprod *= v->as_double();
       else
-        error(error_errc::illegal_arg, x->car());
+        error(error_errc::illegal_arg, v);
     }
-    else if(type_of(x->car()) == object::type::Integer)
-      prod *= x->car()->as_integer();
-    else if(type_of(x->car()) == object::type::Float)
+    else if(type_of(v) == object::type::Integer)
+      prod *= v->as_integer();
+    else if(type_of(v) == object::type::Float)
     {
       f = true;
-      fprod = x->car()->as_double() * static_cast<double_t::value_type>(prod);
+      fprod = v->as_double() * static_cast<double_t::value_type>(prod);
     }
     else
-      error(error_errc::illegal_arg, x->car());
-    x = x->cdr();
+      error(error_errc::illegal_arg, v);
   }
   if(f)
     return mkfloat(fprod);
   return mknumber(prod);
 }
 
-lisp_t itimes(lisp_t x)
+lisp_t itimes(const lisp_t& x)
 {
-  check(x->car(), object::type::Integer);
-  auto prod = x->car()->as_integer();
-  x = x->cdr();
-  while(type_of(x) == object::type::Cons)
+  integer_t prod{1};
+  for(const auto& v: x)
   {
-    check(x->car(), object::type::Integer);
-    prod = prod * x->car()->as_integer();
-    x = x->cdr();
+    check(v, object::type::Integer);
+    prod = prod * v->as_integer();
   }
   return mknumber(prod);
 }
 
-lisp_t ftimes(lisp_t x)
+lisp_t ftimes(const lisp_t& x)
 {
-  check(x->car(), object::type::Float);
-  auto prod = x->car()->as_double();
-  x = x->cdr();
-  while(type_of(x) == object::type::Cons)
+  double_t prod{1.0};
+  for(const auto& v: x)
   {
-    check(x->car(), object::type::Float);
-    prod = prod * x->car()->as_double();
-    x = x->cdr();
+    check(v, object::type::Float);
+    prod = prod * v->as_double();
   }
   return mkfloat(prod);
 }
 
-lisp_t divide(lisp_t x, lisp_t y)
+lisp_t divide(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Integer, object::type::Float);
   check(y, object::type::Integer, object::type::Float);
@@ -191,7 +180,7 @@ lisp_t divide(lisp_t x, lisp_t y)
   return mkfloat(x->as_double() / y->as_double());
 }
 
-lisp_t iquotient(lisp_t x, lisp_t y)
+lisp_t iquotient(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Integer);
   check(y, object::type::Integer);
@@ -200,7 +189,7 @@ lisp_t iquotient(lisp_t x, lisp_t y)
   return mknumber(x->as_integer() / y->as_integer());
 }
 
-lisp_t iremainder(lisp_t x, lisp_t y)
+lisp_t iremainder(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Integer);
   check(y, object::type::Integer);
@@ -209,7 +198,7 @@ lisp_t iremainder(lisp_t x, lisp_t y)
   return mknumber(x->as_integer() % y->as_integer());
 }
 
-lisp_t fdivide(lisp_t x, lisp_t y)
+lisp_t fdivide(const lisp_t& x, const lisp_t& y)
 {
   check(x, object::type::Float);
   check(y, object::type::Float);
@@ -218,7 +207,7 @@ lisp_t fdivide(lisp_t x, lisp_t y)
   return mkfloat(x->as_double() / y->as_double());
 }
 
-lisp_t minus(lisp_t x)
+lisp_t minus(const lisp_t& x)
 {
   check(x, object::type::Float, object::type::Integer);
   if(type_of(x) == object::type::Integer)
@@ -226,13 +215,13 @@ lisp_t minus(lisp_t x)
   return mkfloat(-x->as_double());
 }
 
-lisp_t iminus(lisp_t x)
+lisp_t iminus(const lisp_t& x)
 {
   check(x, object::type::Integer);
   return mknumber(-x->as_integer());
 }
 
-lisp_t abs(lisp_t x)
+lisp_t abs(const lisp_t& x)
 {
   check(x, object::type::Integer);
   if(x->as_integer() < 0)
@@ -240,19 +229,19 @@ lisp_t abs(lisp_t x)
   return mknumber(x->as_integer());
 }
 
-lisp_t itof(lisp_t x)
+lisp_t itof(const lisp_t& x)
 {
   check(x, object::type::Integer);
   return mkfloat(x->as_double());
 }
 
-lisp_t add1(lisp_t x)
+lisp_t add1(const lisp_t& x)
 {
   check(x, object::type::Integer);
   return mknumber(x->as_integer() + 1);
 }
 
-lisp_t sub1(lisp_t x)
+lisp_t sub1(const lisp_t& x)
 {
   check(x, object::type::Integer);
   return mknumber(x->as_integer() - 1);
@@ -268,7 +257,7 @@ enum class num_type
   ILLEGAL2 = 5    // Second argument is illegal
 };
 
-inline num_type numtype(lisp_t x, lisp_t y)
+inline num_type numtype(const lisp_t& x, const lisp_t& y)
 {
   if(type_of(x) == object::type::Float)
   {
@@ -297,10 +286,10 @@ inline lisp_t docheck(Type x, Type y, Comparor cmp)
   return nil;
 }
 
-inline lisp_t illegalreturn(lisp_t x) { return error(error_errc::illegal_arg, x); }
+inline lisp_t illegalreturn(const lisp_t& x) { return error(error_errc::illegal_arg, x); }
 
 template<template<typename> typename Comparer>
-inline lisp_t numcheck(lisp_t x, lisp_t y)
+inline lisp_t numcheck(const lisp_t& x, const lisp_t& y)
 {
   switch(numtype(x, y))
   {
@@ -317,26 +306,26 @@ inline lisp_t numcheck(lisp_t x, lisp_t y)
   }
 }
 
-lisp_t greaterp(lisp_t x, lisp_t y) { return numcheck<std::greater>(x, y); }
+lisp_t greaterp(const lisp_t& x, const lisp_t& y) { return numcheck<std::greater>(x, y); }
 
-lisp_t lessp(lisp_t x, lisp_t y) { return numcheck<std::less>(x, y); }
+lisp_t lessp(const lisp_t& x, const lisp_t& y) { return numcheck<std::less>(x, y); }
 
-lisp_t eqp(lisp_t x, lisp_t y) { return numcheck<std::equal_to>(x, y); }
+lisp_t eqp(const lisp_t& x, const lisp_t& y) { return numcheck<std::equal_to>(x, y); }
 
-lisp_t geq(lisp_t x, lisp_t y) { return numcheck<std::greater_equal>(x, y); }
+lisp_t geq(const lisp_t& x, const lisp_t& y) { return numcheck<std::greater_equal>(x, y); }
 
-lisp_t leq(lisp_t x, lisp_t y) { return numcheck<std::less_equal>(x, y); }
+lisp_t leq(const lisp_t& x, const lisp_t& y) { return numcheck<std::less_equal>(x, y); }
 
-lisp_t neqp(lisp_t x, lisp_t y) { return numcheck<std::not_equal_to>(x, y); }
+lisp_t neqp(const lisp_t& x, const lisp_t& y) { return numcheck<std::not_equal_to>(x, y); }
 
-lisp_t zerop(lisp_t x)
+lisp_t zerop(const lisp_t& x)
 {
   if(type_of(x) == object::type::Integer && x->as_integer() == 0)
     return T;
   return nil;
 }
 
-lisp_t minusp(lisp_t x)
+lisp_t minusp(const lisp_t& x)
 {
   if(type_of(x) == object::type::Float)
   {

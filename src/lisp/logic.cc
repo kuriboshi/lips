@@ -16,46 +16,45 @@
 //
 
 #include "alloc.hh"
+#include "iter.hh"
 #include "logic.hh"
 #include "low.hh"
 #include "details/logic.hh"
 
 namespace lisp::details::logic
 {
-lisp_t p_and(lisp_t x)
+lisp_t p_and(const lisp_t& x)
 {
-  lisp_t foo = T;
-  while(!is_nil(x))
+  lisp_t foo;
+  for(const auto& v: x)
   {
-    foo = eval(x->car());
+    foo = eval(v);
     if(is_nil(foo))
-      return foo;
-    x = x->cdr();
+      return nil;
   }
   return foo;
 }
 
-lisp_t p_or(lisp_t x)
+lisp_t p_or(const lisp_t& x)
 {
-  lisp_t foo = nil;
-  while(!is_nil(x))
+  lisp_t foo;
+  for(const auto& v: x)
   {
-    foo = eval(x->car());
+    foo = eval(v);
     if(!is_nil(foo))
       return foo;
-    x = x->cdr();
   }
-  return foo;
+  return nil;
 }
 
-lisp_t p_not(lisp_t x)
+lisp_t p_not(const lisp_t& x)
 {
   if(is_nil(x))
     return T;
   return nil;
 }
 
-lisp_t xif(lisp_t pred, lisp_t true_expr, lisp_t false_expr)
+lisp_t xif(const lisp_t& pred, const lisp_t& true_expr, const lisp_t& false_expr)
 {
   const lisp_t foo = eval(pred);
   if(is_nil(foo))

@@ -39,21 +39,21 @@ namespace lisp
 /// @param mode One of `read`, `write`, or `append`.
 ///
 /// @returns A file type object.
-inline lisp_t open(lisp_t filename, lisp_t mode) { return details::file::open(filename, mode); }
+inline lisp_t open(const lisp_t& filename, const lisp_t& mode) { return details::file::open(filename, mode); }
 /// @brief Closes a file.
 /// @lisp{(close file),Function}
 ///
 /// @param file A file type object.
 ///
 /// @returns `t`.
-inline lisp_t close(lisp_t file) { return details::file::close(file); }
+inline lisp_t close(const lisp_t& file) { return details::file::close(file); }
 /// @brief Loads lisp expressions from a file.
 /// @lisp{(load filename),Filename}
 ///
 /// @param filename String or symbol file name.
 ///
 /// @returns The file name.
-inline lisp_t load(lisp_t filename) { return details::file::load(filename); }
+inline lisp_t load(const lisp_t& filename) { return details::file::load(filename); }
 /// @brief Prints a lisp expression without escaping special characters.
 /// @lisp{(prin1 expr file),Function}
 ///
@@ -70,7 +70,7 @@ inline lisp_t load(lisp_t filename) { return details::file::load(filename); }
 /// error, else `file` has to be of type _file_.
 ///
 /// @returns The expression.
-inline lisp_t prin1(lisp_t expr, lisp_t file) { return details::file::prin1(expr, file); }
+inline lisp_t prin1(const lisp_t& expr, const lisp_t& file) { return details::file::prin1(expr, file); }
 /// @brief Prints a lisp expression escaping special characters such as double
 /// quotes.
 /// @lisp{(prin2 args...),Function}
@@ -87,7 +87,7 @@ inline lisp_t prin1(lisp_t expr, lisp_t file) { return details::file::prin1(expr
 /// error, else `file` has to be of type _file_.
 ///
 /// @returns The expression.
-inline lisp_t prin2(lisp_t expr, lisp_t file) { return details::file::prin2(expr, file); }
+inline lisp_t prin2(const lisp_t& expr, const lisp_t& file) { return details::file::prin2(expr, file); }
 /// @brief Prints a lisp expression escaping special characters and outputing a
 /// newline afterwards.
 /// @lisp{(print args...),Function}
@@ -106,7 +106,7 @@ inline lisp_t prin2(lisp_t expr, lisp_t file) { return details::file::prin2(expr
 /// error, else `file` has to be of type _file_.
 ///
 /// @returns The expression.
-inline lisp_t print(lisp_t expr, lisp_t file) { return details::file::print(expr, file); }
+inline lisp_t print(const lisp_t& expr, const lisp_t& file) { return details::file::print(expr, file); }
 /// @brief Prints _n_ number of spaces.
 /// @lisp{(spaces n file),Function}
 ///
@@ -115,7 +115,7 @@ inline lisp_t print(lisp_t expr, lisp_t file) { return details::file::print(expr
 /// @param n The number of spaces to print.
 ///
 /// @returns `nil`.
-inline lisp_t spaces(lisp_t n, lisp_t file) { return details::file::spaces(n, file); }
+inline lisp_t spaces(const lisp_t& n, const lisp_t& file) { return details::file::spaces(n, file); }
 /// @brief Print a newline on the output file.
 /// @lisp{(terpri file),Function}
 ///
@@ -123,7 +123,7 @@ inline lisp_t spaces(lisp_t n, lisp_t file) { return details::file::spaces(n, fi
 /// error, else `file` has to be an open file.
 ///
 /// @returns `nil`.
-inline lisp_t terpri(lisp_t file) { return details::file::terpri(file); }
+inline lisp_t terpri(const lisp_t& file) { return details::file::terpri(file); }
 /// @brief Sets the print level.
 /// @lisp{(printlevel level),Function}
 ///
@@ -145,7 +145,7 @@ inline lisp_t terpri(lisp_t file) { return details::file::terpri(file); }
 /// @param level The depth to which S-expressions are printed.
 ///
 /// @returns The previous level.
-inline lisp_t printlevel(lisp_t level) { return details::file::printlevel(level); }
+inline lisp_t printlevel(const lisp_t& level) { return details::file::printlevel(level); }
 /// @brief Reads one token from the file and creates a lisp object from that
 /// token.
 /// @lisp{(ratom file),Function}
@@ -156,7 +156,7 @@ inline lisp_t printlevel(lisp_t level) { return details::file::printlevel(level)
 /// @returns A lisp object which is either an integer, float, symbol, or
 /// string. This differs from Interlisp which will never return a
 /// string. Instead the first double quote is returned as a symbol.
-inline lisp_t ratom(lisp_t file) { return details::file::ratom(file); }
+inline lisp_t ratom(const lisp_t& file) { return details::file::ratom(file); }
 /// @brief Reads a lisp expression from an open file.
 /// @lisp{(read file),Function}
 ///
@@ -164,7 +164,7 @@ inline lisp_t ratom(lisp_t file) { return details::file::ratom(file); }
 /// from stdin.
 ///
 /// @returns A lisp expression or the symbol `eof` on end of file.
-inline lisp_t read(lisp_t file) { return details::file::read(file); }
+inline lisp_t read(const lisp_t& file) { return details::file::read(file); }
 /// @brief Reads a single character from an open file.
 /// @lisp{(readc file),Function}
 ///
@@ -172,7 +172,7 @@ inline lisp_t read(lisp_t file) { return details::file::read(file); }
 /// from stdin.
 ///
 /// @returns The character read as an integer value.
-inline lisp_t readc(lisp_t file) { return details::file::readc(file); }
+inline lisp_t readc(const lisp_t& file) { return details::file::readc(file); }
 /// @brief Reads characters from an open file until the next newline.
 /// @lisp{(readline file),Filename}
 ///
@@ -192,7 +192,7 @@ inline lisp_t readc(lisp_t file) { return details::file::readc(file); }
 ///
 /// @returns A lisp expression. The symbol `eof` is returned if a blank line is
 /// read.
-inline lisp_t readline(lisp_t file) { return details::file::readline(file); }
+inline lisp_t readline(const lisp_t& file) { return details::file::readline(file); }
 /// @brief Splice an object into a list.
 /// @lisp{(splice x y tailp),Function}
 ///
@@ -221,7 +221,10 @@ inline lisp_t readline(lisp_t file) { return details::file::readline(file); }
 /// If y is not a list put it in car of x and return x, otherwise return last
 /// cell of y with cdr set to original (cdr x). If tailp is `t`, don't clobber
 /// car of x.
-inline lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp) { return details::file::splice(x, y, tailp); }
+inline lisp_t splice(const lisp_t& x, const lisp_t& y, const lisp_t& tailp)
+{
+  return details::file::splice(x, y, tailp);
+}
 
 /// @brief Loads a file from _filename_.
 ///
@@ -238,13 +241,13 @@ inline lisp_t lispread(const std::string& s)
   auto f = ref_file_t::create(s);
   return lispread(f);
 }
-lisp_t readline(ref_file_t f);
-lisp_t getline(lisp_t f);
+lisp_t readline(const ref_file_t& f);
+lisp_t getline(const lisp_t& f);
 
 lisp_t patom(lisp_t a, file_t& file, io::escape esc = io::escape::NO);
 inline lisp_t patom(lisp_t a, io::output out, enum io::escape esc = io::escape::NO)
 {
-  return patom(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
+  return patom(std::move(a), out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
 lisp_t terpri(file_t& f);
 inline lisp_t terpri(io::output out = io::output::PRIMARY)
@@ -254,17 +257,17 @@ inline lisp_t terpri(io::output out = io::output::PRIMARY)
 lisp_t prinbody(lisp_t a, file_t& file, io::escape esc = io::escape::NO, integer_t::value_type = 0);
 inline lisp_t prinbody(lisp_t a, io::output out, io::escape esc = io::escape::NO)
 {
-  return prinbody(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
+  return prinbody(std::move(a), out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc);
 }
 lisp_t prin0(lisp_t a, file_t& file, io::escape esc = io::escape::NO, integer_t::value_type = 0);
 inline lisp_t prin0(lisp_t a, io::output out = io::output::PRIMARY, enum io::escape esc = io::escape::NO)
 {
-  return prin0(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc, 0);
+  return prin0(std::move(a), out == io::output::PRIMARY ? *vm::primout() : *vm::primerr(), esc, 0);
 }
 lisp_t print(lisp_t a, file_t& file);
 inline lisp_t print(lisp_t a, io::output out = io::output::PRIMARY)
 {
-  return print(a, out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
+  return print(std::move(a), out == io::output::PRIMARY ? *vm::primout() : *vm::primerr());
 }
 
 inline namespace literals

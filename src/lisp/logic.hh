@@ -31,14 +31,14 @@ namespace lisp
 /// @brief If any expression evaluates to nil return `nil` otherwise return the
 /// result of the last expression.
 /// @lisp{(and args...),NoSpread NLambda Function}
-inline lisp_t p_and(lisp_t args) { return details::logic::p_and(args); }
+inline lisp_t p_and(const lisp_t& args) { return details::logic::p_and(args); }
 /// @brief Returns the first expression evaluating to non-`nil`, otherwise
 /// return `nil`.
 /// @lisp{(or args...),NoSpread NLambda}
-inline lisp_t p_or(lisp_t args) { return details::logic::p_or(args); }
+inline lisp_t p_or(const lisp_t& args) { return details::logic::p_or(args); }
 /// @brief Returns `t` if argument is `nil`, `nil` otherwise.
 /// @lisp{(not expr),Function}
-inline lisp_t p_not(lisp_t expr) { return details::logic::p_not(expr); }
+inline lisp_t p_not(const lisp_t& expr) { return details::logic::p_not(expr); }
 /// @brief Evaluates and returns _t_ if _p_ is non-`nil`, evaluates and returns
 /// _f_ otherwise.
 /// @lisp{(if p t . f),NLambda}

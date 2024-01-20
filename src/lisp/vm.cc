@@ -54,7 +54,7 @@ lisp_t mkindirect(lisp_t obj)
 /// @brief Builds a list of indirect pointers to the values of the symbols in
 /// the list VARS. Used to construct a closure.
 ///
-lisp_t closobj(lisp_t vars)
+lisp_t closobj(const lisp_t& vars)
 {
   if(is_nil(vars))
     return nil;
@@ -63,13 +63,13 @@ lisp_t closobj(lisp_t vars)
   return cons(mkindirect(vars->car()->value()), closobj(vars->cdr()));
 }
 
-lisp_t quote(lisp_t x) { return x; }
+lisp_t quote(const lisp_t& x) { return x; }
 
-lisp_t lambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, true); }
+lisp_t lambda(const lisp_t& x, const lisp_t& f) { return alloc::mklambda(x, f, true); }
 
-lisp_t nlambda(lisp_t x, lisp_t f) { return alloc::mklambda(x, f, false); }
+lisp_t nlambda(const lisp_t& x, const lisp_t& f) { return alloc::mklambda(x, f, false); }
 
-lisp_t closure(lisp_t fun, lisp_t vars)
+lisp_t closure(const lisp_t& fun, const lisp_t& vars)
 {
   auto c = ref_closure_t::create();
   c->cfunction = fun;
@@ -83,13 +83,13 @@ lisp_t closure(lisp_t fun, lisp_t vars)
   return getobject(c);
 }
 
-lisp_t error(lisp_t mess)
+lisp_t error(const lisp_t& mess)
 {
   check(mess, object::type::String);
   return error(error_errc::user_error, mess);
 }
 
-lisp_t exit(lisp_t status)
+lisp_t exit(const lisp_t& status)
 {
   if(is_nil(status))
     throw lisp_finish("exit called", 0);
@@ -114,11 +114,11 @@ inline constexpr std::string_view ERROR = "error";           // error
 inline constexpr std::string_view EXIT = "exit";             // exit lips
 } // namespace pn
 
-inline lisp_t eval(lisp_t expr) { return lisp::vm::get().eval(expr); }
-inline lisp_t apply(lisp_t fun, lisp_t args) { return lisp::vm::get().apply(fun, args); }
+inline lisp_t eval(const lisp_t& expr) { return lisp::vm::get().eval(expr); }
+inline lisp_t apply(const lisp_t& fun, const lisp_t& args) { return lisp::vm::get().apply(fun, args); }
 inline lisp_t backtrace() { return lisp::vm::get().backtrace(); }
 inline lisp_t topofstack() { return lisp::vm::get().topofstack(); }
-inline lisp_t destblock(lisp_t a) { return lisp::vm::destblock(a); }
+inline lisp_t destblock(const lisp_t& a) { return lisp::vm::destblock(a); }
 
 void init()
 {
@@ -222,7 +222,7 @@ void vm::abort(std::error_code error)
 
 void vm::overflow() { abort(error_errc::stack_overflow); }
 
-void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
+void vm::xbreak(std::error_code code, const lisp_t& fault, continuation_t next)
 {
   if(code)
   {
@@ -238,7 +238,7 @@ void vm::xbreak(std::error_code code, lisp_t fault, continuation_t next)
   _cont = &vm::everr;
 }
 
-void vm::storevar(lisp_t v, int i) { _dest[i].var(v); }
+void vm::storevar(const lisp_t& v, int i) { _dest[i].var(v); }
 
 void vm::pop_env()
 {
@@ -246,7 +246,7 @@ void vm::pop_env()
   pop(_env);
 }
 
-void vm::send(lisp_t a)
+void vm::send(const lisp_t& a)
 {
   if(_dest[0].index() > 0)
     _dest[_dest[0].index()].val(a);
@@ -256,9 +256,9 @@ lisp_t vm::receive() { return _dest[_dest[0].index()].val(); }
 
 void vm::next() { _dest[0].decr(); }
 
-lisp_t vm::call(lisp_t fun) { return fun->subr()(_dest); }
+lisp_t vm::call(const lisp_t& fun) { return fun->subr()(_dest); }
 
-lisp_t vm::eval(lisp_t expr)
+lisp_t vm::eval(const lisp_t& expr)
 {
   //
   // Set the current expression to `expr' and push the current destination onto
@@ -308,7 +308,7 @@ bool vm::eval0()
   return true;
 }
 
-lisp_t vm::apply(lisp_t fun, lisp_t args)
+lisp_t vm::apply(const lisp_t& fun, const lisp_t& args)
 {
   push(_dest);
   _dest = mkdestblock(1);
@@ -400,7 +400,7 @@ bool vm::evalhook(lisp_t exp)
   lisp_t res;
 
   if(_undefhook)
-    switch(_undefhook(exp, &res))
+    switch(_undefhook(std::move(exp), &res))
     {
       case 1:
         send(res);
@@ -1102,7 +1102,7 @@ lisp_t vm::backtrace()
 
 lisp_t vm::topofstack() const { return getobject(environment()); }
 
-lisp_t vm::destblock(lisp_t e)
+lisp_t vm::destblock(const lisp_t& e)
 {
   check(e, object::type::Environ);
   return destblock(e->environ());
@@ -1124,6 +1124,6 @@ destblock_t* vm::mkdestblock(int size)
 
 void vm::free(destblock_t* block) { _destblockused -= block->size() + 1; }
 
-lisp_t vm::break0(lisp_t exp) const { return repl(exp); }
+lisp_t vm::break0(lisp_t exp) const { return repl(std::move(exp)); }
 
 } // namespace lisp

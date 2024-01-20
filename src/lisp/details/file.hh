@@ -25,20 +25,20 @@ namespace lisp::details::file
 
 void init();
 
-lisp_t open(lisp_t, lisp_t);
-lisp_t close(lisp_t);
-lisp_t ratom(lisp_t);
-lisp_t readc(lisp_t);
-lisp_t read(lisp_t);
-lisp_t print(lisp_t, lisp_t);
-lisp_t load(lisp_t);
-lisp_t terpri(lisp_t);
-lisp_t prin1(lisp_t, lisp_t);
-lisp_t prin2(lisp_t, lisp_t);
-lisp_t printlevel(lisp_t);
-lisp_t spaces(lisp_t, lisp_t);
-lisp_t readline(lisp_t);
-lisp_t splice(lisp_t, lisp_t, lisp_t);
+lisp_t open(const lisp_t&, const lisp_t&);
+lisp_t close(const lisp_t&);
+lisp_t ratom(const lisp_t&);
+lisp_t readc(const lisp_t&);
+lisp_t read(const lisp_t&);
+lisp_t print(const lisp_t&, const lisp_t&);
+lisp_t load(const lisp_t&);
+lisp_t terpri(const lisp_t&);
+lisp_t prin1(const lisp_t&, const lisp_t&);
+lisp_t prin2(const lisp_t&, const lisp_t&);
+lisp_t printlevel(const lisp_t&);
+lisp_t spaces(const lisp_t&, const lisp_t&);
+lisp_t readline(const lisp_t&);
+lisp_t splice(const lisp_t&, const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::file
 

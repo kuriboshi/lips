@@ -103,16 +103,16 @@ lisp_t context_t::perror(std::error_code error) const
   return nil;
 }
 
-lisp_t context_t::perror(std::error_code error, lisp_t arg) const
+lisp_t context_t::perror(std::error_code error, const lisp_t& arg) const
 {
   _pimpl->_primerr->format("{} ", error.message());
-  prin2(std::move(arg), T);
+  prin2(arg, T);
   return nil;
 }
 
-lisp_t context_t::error(std::error_code error, lisp_t arg) const
+lisp_t context_t::error(std::error_code error, const lisp_t& arg) const
 {
-  perror(error, std::move(arg));
+  perror(error, arg);
   throw lisp_error(error);
 }
 

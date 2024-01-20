@@ -29,7 +29,7 @@ namespace lisp
 /// @param trace Turns on tracing if non-nil, off if nil
 ///
 /// @returns Previous value of the trace setting.
-inline lisp_t evaltrace(lisp_t trace) { return details::debug::evaltrace(trace); }
+inline lisp_t evaltrace(const lisp_t& trace) { return details::debug::evaltrace(trace); }
 } // namespace lisp
 
 #endif

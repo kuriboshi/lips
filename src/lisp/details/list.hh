@@ -24,33 +24,30 @@ namespace lisp::details::list
 {
 void init();
 
-lisp_t car(lisp_t);
-lisp_t cdr(lisp_t);
-lisp_t cadr(lisp_t);
-lisp_t cdar(lisp_t);
-lisp_t caar(lisp_t);
-lisp_t cddr(lisp_t);
-lisp_t cdddr(lisp_t);
-lisp_t caddr(lisp_t);
-lisp_t cdadr(lisp_t);
-lisp_t caadr(lisp_t);
-lisp_t cddar(lisp_t);
-lisp_t cadar(lisp_t);
-lisp_t cdaar(lisp_t);
-lisp_t caaar(lisp_t);
-lisp_t rplaca(lisp_t, lisp_t);
-lisp_t rplacd(lisp_t, lisp_t);
+lisp_t car(const lisp_t&);
+lisp_t cdr(const lisp_t&);
+lisp_t cadr(const lisp_t&);
+lisp_t cdar(const lisp_t&);
+lisp_t caar(const lisp_t&);
+lisp_t cddr(const lisp_t&);
+lisp_t cdddr(const lisp_t&);
+lisp_t caddr(const lisp_t&);
+lisp_t cdadr(const lisp_t&);
+lisp_t caadr(const lisp_t&);
+lisp_t cddar(const lisp_t&);
+lisp_t cadar(const lisp_t&);
+lisp_t cdaar(const lisp_t&);
+lisp_t caaar(const lisp_t&);
+lisp_t rplaca(lisp_t, const lisp_t&);
+lisp_t rplacd(lisp_t, const lisp_t&);
 lisp_t nconc(lisp_t);
-lisp_t tconc(lisp_t, lisp_t);
-lisp_t attach(lisp_t, lisp_t);
-lisp_t append(lisp_t);
-lisp_t null(lisp_t);
-lisp_t list(lisp_t);
-lisp_t length(lisp_t);
-/// @brief Return the N'th element in the list LIST.  If N is greater than
-/// the length of LIST, return nil.
-///
-lisp_t nth(lisp_t, lisp_t);
+lisp_t tconc(lisp_t, const lisp_t&);
+lisp_t attach(const lisp_t&, lisp_t);
+lisp_t append(const lisp_t&);
+lisp_t null(const lisp_t&);
+lisp_t list(const lisp_t&);
+lisp_t length(const lisp_t&);
+lisp_t nth(const lisp_t&, const lisp_t&);
 } // namespace lisp::details::list
 
 #endif

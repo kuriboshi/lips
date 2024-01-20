@@ -30,7 +30,7 @@ class top
 {
 public:
   top(options_t options, std::unique_ptr<term_source> terminal)
-    : _options(std::move(options)),
+    : _options(options),
       _terminal(std::move(terminal))
   {}
   ~top() = default;
@@ -106,11 +106,11 @@ private:
         _promptform(makecvar("promptform", nil))
     {}
 
-    cvariable_t& history() const { return _history->cvariable(); }
-    cvariable_t& histnum() const { return _histnum->cvariable(); }
+    cvariable_t& history() { return _history->cvariable(); }
+    cvariable_t& histnum() { return _histnum->cvariable(); }
     const cvariable_t& histmax() const { return _histmax->cvariable(); }
     const cvariable_t& prompt() const { return _prompt->cvariable(); }
-    cvariable_t& promptform() const { return _promptform->cvariable(); }
+    cvariable_t& promptform() { return _promptform->cvariable(); }
 
   private:
     lisp_t _history;    // Holds the history list.

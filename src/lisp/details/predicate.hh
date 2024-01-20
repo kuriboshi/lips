@@ -25,17 +25,17 @@ namespace lisp::details::predicate
 
 void init();
 
-lisp_t eq(lisp_t, lisp_t);
-lisp_t atom(lisp_t);
-lisp_t numberp(lisp_t);
-lisp_t listp(lisp_t);
-lisp_t memb(lisp_t, lisp_t);
-lisp_t equal(lisp_t, lisp_t);
-lisp_t nlistp(lisp_t);
-lisp_t neq(lisp_t, lisp_t);
-lisp_t boundp(lisp_t);
-lisp_t litatom(lisp_t);
-lisp_t xtypeof(lisp_t);
+lisp_t eq(const lisp_t&, const lisp_t&);
+lisp_t atom(const lisp_t&);
+lisp_t numberp(const lisp_t&);
+lisp_t listp(const lisp_t&);
+lisp_t memb(const lisp_t&, const lisp_t&);
+lisp_t equal(const lisp_t&, const lisp_t&);
+lisp_t nlistp(const lisp_t&);
+lisp_t neq(const lisp_t&, const lisp_t&);
+lisp_t boundp(const lisp_t&);
+lisp_t litatom(const lisp_t&);
+lisp_t xtypeof(const lisp_t&);
 
 } // namespace lisp::details::predicate
 

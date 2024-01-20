@@ -23,7 +23,7 @@
 
 namespace lisp::details::predicate
 {
-lisp_t eq(lisp_t a, lisp_t b)
+lisp_t eq(const lisp_t& a, const lisp_t& b)
 {
   if(a == b)
     return T;
@@ -32,7 +32,7 @@ lisp_t eq(lisp_t a, lisp_t b)
   return nil;
 }
 
-lisp_t atom(lisp_t a)
+lisp_t atom(const lisp_t& a)
 {
   if(is_nil(a) || is_T(a) || type_of(a) == object::type::Symbol || type_of(a) == object::type::Integer
     || type_of(a) == object::type::Float)
@@ -40,7 +40,7 @@ lisp_t atom(lisp_t a)
   return nil;
 }
 
-lisp_t numberp(lisp_t a)
+lisp_t numberp(const lisp_t& a)
 {
   switch(type_of(a))
   {
@@ -52,25 +52,26 @@ lisp_t numberp(lisp_t a)
   }
 }
 
-lisp_t listp(lisp_t a)
+lisp_t listp(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return a;
   return nil;
 }
 
-lisp_t memb(lisp_t x, lisp_t ls)
+lisp_t memb(const lisp_t& x, const lisp_t& ls)
 {
-  while(!predicate::eq(ls, nil))
+  auto list = ls;
+  while(!is_nil(list))
   {
-    if(predicate::eq(x, ls->car()))
-      return ls;
-    ls = ls->cdr();
+    if(predicate::eq(x, list->car()))
+      return list;
+    list = list->cdr();
   }
   return nil;
 }
 
-lisp_t equal(lisp_t l1, lisp_t l2)
+lisp_t equal(const lisp_t& l1, const lisp_t& l2)
 {
   if(type_of(l1) != type_of(l2))
     return nil;
@@ -97,7 +98,7 @@ lisp_t equal(lisp_t l1, lisp_t l2)
   return nil;
 }
 
-lisp_t nlistp(lisp_t a)
+lisp_t nlistp(const lisp_t& a)
 {
   if(a == nil)
     return T;
@@ -106,14 +107,14 @@ lisp_t nlistp(lisp_t a)
   return nil;
 }
 
-lisp_t neq(lisp_t a, lisp_t b)
+lisp_t neq(const lisp_t& a, const lisp_t& b)
 {
   if(a != b)
     return T;
   return nil;
 }
 
-lisp_t boundp(lisp_t a)
+lisp_t boundp(const lisp_t& a)
 {
   if(type_of(a) != object::type::Symbol)
     return nil;
@@ -122,14 +123,14 @@ lisp_t boundp(lisp_t a)
   return nil;
 }
 
-lisp_t litatom(lisp_t a)
+lisp_t litatom(const lisp_t& a)
 {
   if(type_of(a) == object::type::Symbol || type_of(a) == object::type::Nil)
     return T;
   return nil;
 }
 
-lisp_t xtypeof(lisp_t a)
+lisp_t xtypeof(const lisp_t& a)
 {
   switch(type_of(a))
   {

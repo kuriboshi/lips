@@ -28,7 +28,7 @@ namespace lisp
 
 TEST_CASE("arith: arithmetic functions")
 {
-  SECTION("+")
+  SECTION("plus")
   {
     {
       auto r0 = plus(mklist(1_l, 2_l, 3_l, 4_l, 5_l));
@@ -61,7 +61,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("-")
+  SECTION("difference")
   {
     {
       auto r0 = difference(1_l, 2_l);
@@ -90,7 +90,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("*")
+  SECTION("times")
   {
     {
       auto r0 = times(mklist(5_l, 7_l));
@@ -119,7 +119,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("/")
+  SECTION("divide")
   {
     {
       auto r0 = divide(4_l, 2_l);
@@ -159,7 +159,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("i+")
+  SECTION("iplus")
   {
     {
       auto r0 = iplus(mklist(1_l, 2_l, 7_l));
@@ -171,7 +171,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("i-")
+  SECTION("idifference")
   {
     {
       auto r0 = idifference(1_l, 2_l);
@@ -185,7 +185,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("i*")
+  SECTION("itimes")
   {
     {
       auto r0 = itimes(mklist(6_l, 8_l));
@@ -197,7 +197,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("i/")
+  SECTION("iquotient")
   {
     {
       auto r0 = iquotient(5_l, 2_l);
@@ -214,7 +214,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("i%")
+  SECTION("iremainder")
   {
     {
       auto r0 = iremainder(5_l, 2_l);
@@ -311,7 +311,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("f+")
+  SECTION("fplus")
   {
     auto r = fplus(mklist(2.0_l, 5.0_l));
     REQUIRE(type_of(r) == object::type::Float);
@@ -321,7 +321,7 @@ TEST_CASE("arith: arithmetic functions")
     CHECK(r->as_double() == 7.0);
   }
 
-  SECTION("f-")
+  SECTION("fdifference")
   {
     {
       auto r0 = fdifference(1.0_l, 2.0_l);
@@ -335,7 +335,7 @@ TEST_CASE("arith: arithmetic functions")
     }
   }
 
-  SECTION("f*")
+  SECTION("ftimes")
   {
     auto r = ftimes(mklist(5.0_l, 2.0_l));
     CHECK(type_of(r) == object::type::Float);
@@ -345,7 +345,7 @@ TEST_CASE("arith: arithmetic functions")
     CHECK(r->as_double() == 10.0);
   }
 
-  SECTION("f/")
+  SECTION("fdivide")
   {
     auto r = fdivide(5.0_l, 2.0_l);
     CHECK(type_of(r) == object::type::Float);

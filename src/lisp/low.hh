@@ -55,15 +55,15 @@ namespace lisp
 ///       (e2)
 ///       (t r3))
 /// ```
-inline lisp_t cond(lisp_t clauses) { return details::low::cond(clauses); }
+inline lisp_t cond(const lisp_t& clauses) { return details::low::cond(clauses); }
 /// @brief Evaluates all arguments and returns the result of the first
 /// expression.
 /// @lisp{(prog1 args...),NoSpread NLambda}
-inline lisp_t prog1(lisp_t a, lisp_t b) { return details::low::prog1(a, b); }
+inline lisp_t prog1(const lisp_t& a, const lisp_t& b) { return details::low::prog1(a, b); }
 /// @brief Evaluates all arguments and retuns the result of the last
 /// expression.
 /// @lisp{(progn args...),NoSpread NLambda}
-inline lisp_t progn(lisp_t a) { return details::low::progn(a); }
+inline lisp_t progn(const lisp_t& a) { return details::low::progn(a); }
 /// @brief Sets the value of the symbol to the value.
 /// @lisp{(set var expr),Function}
 ///
@@ -73,7 +73,7 @@ inline lisp_t progn(lisp_t a) { return details::low::progn(a); }
 /// @param expr An expression.
 ///
 /// @returns The result of evaluating the expression `expr`.
-inline lisp_t set(lisp_t var, lisp_t expr) { return details::low::set(var, expr); }
+inline lisp_t set(const lisp_t& var, const lisp_t& expr) { return details::low::set(var, expr); }
 /// @brief Same as 'set' but the first argument is not evaluated.
 /// @lisp{(setq var expr),NLambda}
 ///
@@ -81,7 +81,7 @@ inline lisp_t set(lisp_t var, lisp_t expr) { return details::low::set(var, expr)
 /// @param expr An expression.
 ///
 /// @returns The result of evaluating the expression `expr`.
-inline lisp_t setq(lisp_t var, lisp_t expr) { return details::low::setq(var, expr); }
+inline lisp_t setq(const lisp_t& var, const lisp_t& expr) { return details::low::setq(var, expr); }
 /// @brief Same as 'set' but no argument is evaluated.
 /// @lisp{(setqq var val),NLambda}
 ///
@@ -89,13 +89,13 @@ inline lisp_t setq(lisp_t var, lisp_t expr) { return details::low::setq(var, exp
 /// @param val A constant expression which is not evaluated.
 ///
 /// @returns The unevaluated `val` expression.
-inline lisp_t setqq(lisp_t var, lisp_t val) { return details::low::set(var, val); }
+inline lisp_t setqq(const lisp_t& var, const lisp_t& val) { return details::low::set(var, val); }
 /// @brief Evaluate arguments in until _first_ is false.
 /// @lisp{(while first args...),NoSpread NLambda}
 ///
 /// While the first argument is true evaluate the rest of the arguments in an
 /// implicit `progn`. Returns `nil`.
-inline lisp_t xwhile(lisp_t first, lisp_t second) { return details::low::xwhile(first, second); }
+inline lisp_t xwhile(const lisp_t& first, const lisp_t& second) { return details::low::xwhile(first, second); }
 } // namespace lisp
 
 #endif

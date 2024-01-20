@@ -29,14 +29,14 @@ namespace lisp::details::user
 {
 using lisp::vm;
 
-inline lisp_t getargs(lisp_t al)
+inline lisp_t getargs(const lisp_t& al)
 {
   if(is_nil(al->cdr()))
     return al->car();
   return cons(al->car(), getargs(al->cdr()));
 }
 
-lisp_t getrep(lisp_t fun)
+lisp_t getrep(const lisp_t& fun)
 {
   lisp_t args;
 
@@ -54,7 +54,7 @@ lisp_t getrep(lisp_t fun)
   return cons(atoms::NLAMBDA, cons(args, x.body));
 }
 
-lisp_t funeq(lisp_t f1, lisp_t f2)
+lisp_t funeq(const lisp_t& f1, const lisp_t& f2)
 {
   if(f1 == f2)
     return T;
@@ -75,7 +75,7 @@ lisp_t funeq(lisp_t f1, lisp_t f2)
   return nil;
 }
 
-inline lisp_t checkfn(lisp_t name, lisp_t lam)
+inline lisp_t checkfn(const lisp_t& name, const lisp_t& lam)
 {
   if(name->value() != atoms::UNBOUND)
     if(type_of(name->value()) == object::type::Lambda)
@@ -91,7 +91,7 @@ inline lisp_t checkfn(lisp_t name, lisp_t lam)
   return nil;
 }
 
-lisp_t define(lisp_t name, lisp_t lam)
+lisp_t define(lisp_t name, const lisp_t& lam)
 {
   check(name, object::type::Symbol);
   check(lam, object::type::Lambda);
@@ -100,7 +100,7 @@ lisp_t define(lisp_t name, lisp_t lam)
   return name;
 }
 
-lisp_t defineq(lisp_t defs)
+lisp_t defineq(const lisp_t& defs)
 {
   if(is_nil(defs))
     return nil;

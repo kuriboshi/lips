@@ -110,7 +110,7 @@ inline lisp_t mkfloat(double_t::value_type value) { return details::alloc::mkflo
 /// @param b The value to put in the tail (cdr) of the cons cell.
 ///
 /// @returns The cons cell.
-inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{a, b}); }
+inline lisp_t cons(lisp_t a, lisp_t b) { return getobject(new cons_t{std::move(a), std::move(b)}); }
 
 /// @brief Builds a list of symbols in the local symbol table.
 /// @lisp{(obarray),Function}

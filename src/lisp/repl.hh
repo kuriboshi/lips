@@ -36,7 +36,7 @@ public:
   repl& operator=(const repl&) = delete;
   repl& operator=(repl&&) = delete;
 
-  lisp_t operator()(lisp_t);
+  lisp_t operator()(const lisp_t&);
 
 private:
   static void main_loop();

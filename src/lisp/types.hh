@@ -791,7 +791,7 @@ public:
   };
 
   /// @brief The symbol (literal atom).
-  auto as_symbol() -> ref_symbol_t { return std::get<ref_symbol_t>(_u); }
+  auto as_symbol() const -> ref_symbol_t { return std::get<ref_symbol_t>(_u); }
 
   /// @brief Get and set the value of a symbol.
   auto value() const -> lisp_t { return std::get<ref_symbol_t>(_u)->value; }
@@ -843,6 +843,9 @@ public:
 
   /// @brief Link to a c/c++ variable.
   auto cvariable() -> cvariable_t& { return std::get<cvariable_t>(_u); }
+
+  /// @brief Link to a c/c++ variable.
+  auto cvariable() const -> const cvariable_t& { return std::get<cvariable_t>(_u); }
 
   /// @brief Get the string if the object holds a symbol or a proper string.
   const std::string& getstr() const

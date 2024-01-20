@@ -17,10 +17,11 @@
 
 #include "alloc.hh"
 #include "check.hh"
+#include "iter.hh"
 
 namespace lisp
 {
-inline lisp_t nth(lisp_t list, integer_t::value_type n)
+inline lisp_t nth(const lisp_t& list, integer_t::value_type n)
 {
   lisp_t ls;
   for(ls = list; n > 1 && !is_nil(ls); n--, ls = ls->cdr())
@@ -31,112 +32,112 @@ inline lisp_t nth(lisp_t list, integer_t::value_type n)
 
 namespace lisp::details::list
 {
-lisp_t car(lisp_t a)
+lisp_t car(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return a->car();
   return nil;
 }
 
-lisp_t cdr(lisp_t a)
+lisp_t cdr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return a->cdr();
   return nil;
 }
 
-lisp_t cadr(lisp_t a)
+lisp_t cadr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(a->cdr());
   return nil;
 }
 
-lisp_t cdar(lisp_t a)
+lisp_t cdar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(a->car());
   return nil;
 }
 
-lisp_t caar(lisp_t a)
+lisp_t caar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(a->car());
   return nil;
 }
 
-lisp_t cddr(lisp_t a)
+lisp_t cddr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(a->cdr());
   return nil;
 }
 
-lisp_t cdddr(lisp_t a)
+lisp_t cdddr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(list::cdr(a->cdr()));
   return nil;
 }
 
-lisp_t caddr(lisp_t a)
+lisp_t caddr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(list::cdr(a->cdr()));
   return nil;
 }
 
-lisp_t cdadr(lisp_t a)
+lisp_t cdadr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(list::car(a->cdr()));
   return nil;
 }
 
-lisp_t caadr(lisp_t a)
+lisp_t caadr(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(list::car(a->cdr()));
   return nil;
 }
 
-lisp_t cddar(lisp_t a)
+lisp_t cddar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(list::cdr(a->car()));
   return nil;
 }
 
-lisp_t cadar(lisp_t a)
+lisp_t cadar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(list::cdr(a->car()));
   return nil;
 }
 
-lisp_t cdaar(lisp_t a)
+lisp_t cdaar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::cdr(list::car(a->car()));
   return nil;
 }
 
-lisp_t caaar(lisp_t a)
+lisp_t caaar(const lisp_t& a)
 {
   if(type_of(a) == object::type::Cons)
     return list::car(list::car(a->car()));
   return nil;
 }
 
-lisp_t rplaca(lisp_t x, lisp_t y)
+lisp_t rplaca(lisp_t x, const lisp_t& y)
 {
   check(x, object::type::Cons);
   x->car(y);
   return x;
 }
 
-lisp_t rplacd(lisp_t x, lisp_t y)
+lisp_t rplacd(lisp_t x, const lisp_t& y)
 {
   check(x, object::type::Cons);
   x->cdr(y);
@@ -169,7 +170,7 @@ lisp_t nconc(lisp_t x)
   return newl;
 }
 
-lisp_t tconc(lisp_t cell, lisp_t obj)
+lisp_t tconc(lisp_t cell, const lisp_t& obj)
 {
   if(is_nil(cell))
   {
@@ -186,29 +187,28 @@ lisp_t tconc(lisp_t cell, lisp_t obj)
   return list::rplacd(cell, cell->cdr()->cdr());
 }
 
-lisp_t attach(lisp_t obj, lisp_t list)
+lisp_t attach(const lisp_t& obj, lisp_t list)
 {
   if(is_nil(list))
     return cons(obj, nil);
   check(list, object::type::Cons);
   list::rplacd(list, cons(list->car(), list->cdr()));
-  return list::rplaca(list, obj);
+  list->car(obj);
+  return list;
 }
 
-lisp_t append(lisp_t x)
+lisp_t append(const lisp_t& x)
 {
-  lisp_t cl;
-
   const lisp_t newl = cons(nil, nil);
   lisp_t curp = newl;
-  for(; !is_nil(x); x = x->cdr())
+  for(const auto& v: x)
   {
-    if(!is_nil(x->car()))
+    if(!is_nil(v))
     {
-      check(x->car(), object::type::Cons);
-      for(cl = x->car(); !is_nil(cl); cl = cl->cdr())
+      check(v, object::type::Cons);
+      for(auto const& cl: v)
       {
-        list::rplacd(curp, cons(cl->car(), nil));
+        list::rplacd(curp, cons(cl, nil));
         curp = curp->cdr();
       }
     }
@@ -216,27 +216,24 @@ lisp_t append(lisp_t x)
   return newl->cdr();
 }
 
-lisp_t null(lisp_t a)
+lisp_t null(const lisp_t& a)
 {
   if(is_nil(a))
     return T;
   return nil;
 }
 
-lisp_t list(lisp_t x) { return x; }
+lisp_t list(const lisp_t& x) { return x; }
 
-lisp_t length(lisp_t x)
+lisp_t length(const lisp_t& x)
 {
   int i = 0;
-  while(!is_nil(x) && type_of(x) == object::type::Cons)
-  {
-    x = x->cdr();
-    i++;
-  }
+  for(const auto& v: x)
+    ++i;
   return mknumber(i);
 }
 
-lisp_t nth(lisp_t x, lisp_t p)
+lisp_t nth(const lisp_t& x, const lisp_t& p)
 {
   check(p, object::type::Integer);
   if(is_nil(x))

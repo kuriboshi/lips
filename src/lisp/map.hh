@@ -52,7 +52,10 @@ namespace lisp
 /// @param fn2 Function to apply to get the next element of the list (default is CDR).
 ///
 /// @returns nil
-inline lisp_t map(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::map(list, fn1, fn2); }
+inline lisp_t map(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
+{
+  return details::map::map(list, fn1, fn2);
+}
 /// @brief Apply _fn1_ on each _car_ of _list_.
 /// @lisp{(mapc list fn1 fn2),Function}
 ///
@@ -65,7 +68,10 @@ inline lisp_t map(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::ma
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns nil
-inline lisp_t mapc(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::mapc(list, fn1, fn2); }
+inline lisp_t mapc(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
+{
+  return details::map::mapc(list, fn1, fn2);
+}
 /// @brief Collect the result of applying _fn1_ on each tail of _list_.
 /// @lisp{(maplist list fn1 fn2),Function}
 ///
@@ -82,7 +88,10 @@ inline lisp_t mapc(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::m
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-inline lisp_t maplist(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::maplist(list, fn1, fn2); }
+inline lisp_t maplist(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
+{
+  return details::map::maplist(list, fn1, fn2);
+}
 /// @brief Collect the result of applying _fn1_ on each _car_ of _list_.
 /// @lisp{(mapcar list fn1 fn2),Function}
 ///
@@ -98,7 +107,10 @@ inline lisp_t maplist(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map
 /// @param fn2 Function to apply to get the next element (default is CDR).
 ///
 /// @returns A list of the result of applying FN1 on each element in the list.
-inline lisp_t mapcar(lisp_t list, lisp_t fn1, lisp_t fn2) { return details::map::mapcar(list, fn1, fn2); }
+inline lisp_t mapcar(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
+{
+  return details::map::mapcar(list, fn1, fn2);
+}
 } // namespace lisp
 
 #endif

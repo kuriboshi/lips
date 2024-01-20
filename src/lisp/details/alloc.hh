@@ -41,7 +41,7 @@ inline lisp_t freecount() { return mknumber(static_cast<integer_t::value_type>(o
 /// @param eval True means lambda while false means nlambda.
 ///
 /// @returns A lambda function.
-lisp_t mklambda(lisp_t args, lisp_t def, bool eval);
+lisp_t mklambda(const lisp_t& args, const lisp_t& def, bool eval);
 lisp_t intern(std::string_view pname);
 lisp_t mkatom(std::string_view);
 

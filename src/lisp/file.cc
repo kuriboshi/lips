@@ -76,15 +76,15 @@ inline void print_subr(const char* s, file_t& file, const lisp_t& x)
 }
 } // namespace
 
-lisp_t ratom(ref_file_t file)
+lisp_t ratom(const ref_file_t& file)
 {
-  lexer lexer{std::move(file)};
+  lexer lexer{file};
   auto token = lexer.read();
   const parser parser{lexer};
   return parser::create(token);
 }
 
-lisp_t readline(ref_file_t file)
+lisp_t readline(const ref_file_t& file)
 {
   auto line = file->getline();
   if(line)
@@ -121,7 +121,7 @@ lisp_t lispread(ref_file_t file)
   return parser(lexer).parse();
 }
 
-lisp_t getline(lisp_t file)
+lisp_t getline(const lisp_t& file)
 {
   check(file, object::type::File);
   auto line = file->file()->getline();
@@ -273,7 +273,7 @@ namespace lisp::details::file
 {
 using lisp::vm;
 
-lisp_t open(lisp_t filename, lisp_t mode)
+lisp_t open(const lisp_t& filename, const lisp_t& mode)
 {
   check(filename, object::type::String, object::type::Symbol);
   bool readmode = true;
@@ -301,14 +301,14 @@ lisp_t open(lisp_t filename, lisp_t mode)
   return getobject(ref_file_t(f));
 }
 
-lisp_t close(lisp_t fildes)
+lisp_t close(const lisp_t& fildes)
 {
   check(fildes, object::type::File);
   fildes->file()->close();
   return T;
 }
 
-lisp_t ratom(lisp_t file)
+lisp_t ratom(const lisp_t& file)
 {
   if(is_nil(file))
     return ratom(vm::primin());
@@ -318,7 +318,7 @@ lisp_t ratom(lisp_t file)
   return ratom(file->file());
 }
 
-lisp_t readc(lisp_t file)
+lisp_t readc(const lisp_t& file)
 {
   if(is_nil(file))
     return mknumber(vm::primin()->getch());
@@ -328,7 +328,7 @@ lisp_t readc(lisp_t file)
   return mknumber(file->file()->getch());
 }
 
-lisp_t read(lisp_t file)
+lisp_t read(const lisp_t& file)
 {
   if(is_nil(file))
     return lispread(vm::primin());
@@ -338,7 +338,7 @@ lisp_t read(lisp_t file)
   return lispread(file->file());
 }
 
-lisp_t print(lisp_t x, lisp_t file)
+lisp_t print(const lisp_t& x, const lisp_t& file)
 {
   if(is_nil(file))
     return print(x, *vm::primout());
@@ -348,7 +348,7 @@ lisp_t print(lisp_t x, lisp_t file)
   return print(x, *file->file());
 }
 
-lisp_t load(lisp_t f)
+lisp_t load(const lisp_t& f)
 {
   check(f, object::type::String, object::type::Symbol);
   if(!loadfile(f->getstr()))
@@ -356,7 +356,7 @@ lisp_t load(lisp_t f)
   return f;
 }
 
-lisp_t terpri(lisp_t file)
+lisp_t terpri(const lisp_t& file)
 {
   if(is_nil(file))
     return terpri(*vm::primout());
@@ -366,7 +366,7 @@ lisp_t terpri(lisp_t file)
   return terpri(*file->file());
 }
 
-lisp_t prin1(lisp_t x, lisp_t file)
+lisp_t prin1(const lisp_t& x, const lisp_t& file)
 {
   if(is_nil(file))
     return prin0(x, *vm::primout(), io::escape::NO, 0);
@@ -376,7 +376,7 @@ lisp_t prin1(lisp_t x, lisp_t file)
   return prin0(x, *file->file(), io::escape::NO, 0);
 }
 
-lisp_t prin2(lisp_t x, lisp_t file)
+lisp_t prin2(const lisp_t& x, const lisp_t& file)
 {
   if(is_nil(file))
     return prin0(x, *vm::primout(), io::escape::YES, 0);
@@ -386,7 +386,7 @@ lisp_t prin2(lisp_t x, lisp_t file)
   return prin0(x, *file->file(), io::escape::YES, 0);
 }
 
-lisp_t printlevel(lisp_t newl)
+lisp_t printlevel(const lisp_t& newl)
 {
   auto x = vm::printlevel();
   if(!is_nil(newl))
@@ -397,7 +397,7 @@ lisp_t printlevel(lisp_t newl)
   return mknumber(x);
 }
 
-lisp_t spaces(lisp_t n, lisp_t file)
+lisp_t spaces(const lisp_t& n, const lisp_t& file)
 {
   check(n, object::type::Integer);
   ref_file_t f;
@@ -415,7 +415,7 @@ lisp_t spaces(lisp_t n, lisp_t file)
   return nil;
 }
 
-lisp_t readline(lisp_t file)
+lisp_t readline(const lisp_t& file)
 {
   if(is_nil(file))
     return readline(vm::primin());
@@ -425,29 +425,28 @@ lisp_t readline(lisp_t file)
   return readline(file->file());
 }
 
-lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp)
+lisp_t splice(const lisp_t& x, const lisp_t& y, const lisp_t& tailp)
 {
   check(x, object::type::Cons);
   if(is_nil(y))
     return x;
-  const lisp_t t = x->cdr();
   if(type_of(y) != object::type::Cons)
   {
     if(is_T(tailp))
-      rplacd(x, cons(y, t));
-    else
-      rplaca(x, y);
-    return x;
+      return rplacd(x, cons(y, x->cdr()));
+    return rplaca(x, y);
   }
+  lisp_t y0{y};
+  const lisp_t t{x->cdr()};
   if(is_nil(tailp))
   {
-    rplaca(x, y->car());
-    y = y->cdr();
+    rplaca(x, y0->car());
+    y0 = y0->cdr();
   }
-  rplacd(x, y);
-  lisp_t t2 = nil;
-  for(; type_of(y) == object::type::Cons; y = y->cdr())
-    t2 = y;
+  rplacd(x, y0);
+  lisp_t t2;
+  for(; type_of(y0) == object::type::Cons; y0 = y0->cdr())
+    t2 = y0;
   return rplacd(t2, t);
 }
 

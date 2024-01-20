@@ -43,7 +43,7 @@ void repl::main_loop()
   }
 }
 
-lisp_t repl::operator()(lisp_t exp)
+lisp_t repl::operator()(const lisp_t& exp)
 {
   const level begin(*this);
   if(_level == 0)

@@ -106,7 +106,7 @@ void loadinit(const std::string& initfile) { loadfile(initfile); }
 // Greet user who, or if who is nil, $USER. This means loading
 // the user's init file, .lipsrc.
 //
-lisp_t greet(lisp_t who)
+lisp_t greet(const lisp_t& who)
 {
   std::string s;
   if(is_nil(who))
@@ -190,7 +190,7 @@ try
     {
       if(!options.debug && options.interactive)
         init_all_signals();
-      vm.repl = [&toploop](lisp_t exp) -> lisp_t { return toploop(exp); };
+      vm.repl = [&toploop](const lisp_t& exp) -> lisp_t { return toploop(exp); };
       vm.repl(nil);
       return 0;
     }
@@ -213,7 +213,7 @@ try
 }
 catch(const std::exception& ex)
 {
-  std::cerr << "unknown exception: " << ex.what() << std::endl;
+  std::cerr << "unknown exception: " << ex.what() << '\n';
   return 1;
 }
 catch(...)

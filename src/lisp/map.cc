@@ -23,70 +23,74 @@
 namespace lisp::details::map
 {
 
-lisp_t map(lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t map(const lisp_t& obj, const lisp_t& fn1, const lisp_t& fn2)
 {
-  while(type_of(obj) == object::type::Cons)
+  auto copy = obj;
+  while(type_of(copy) == object::type::Cons)
   {
-    apply(fn1, cons(obj, nil));
+    apply(fn1, cons(copy, nil));
     if(is_nil(fn2))
-      obj = obj->cdr();
+      copy = copy->cdr();
     else
-      obj = apply(fn2, cons(obj, nil));
+      copy = apply(fn2, cons(copy, nil));
   }
   return nil;
 }
 
-lisp_t mapc(lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t mapc(const lisp_t& obj, const lisp_t& fn1, const lisp_t& fn2)
 {
-  while(type_of(obj) == object::type::Cons)
+  auto copy = obj;
+  while(type_of(copy) == object::type::Cons)
   {
-    apply(fn1, cons(obj->car(), nil));
+    apply(fn1, cons(copy->car(), nil));
     if(is_nil(fn2))
-      obj = obj->cdr();
+      copy = copy->cdr();
     else
-      obj = apply(fn2, cons(obj, nil));
+      copy = apply(fn2, cons(copy, nil));
   }
   return nil;
 }
 
-lisp_t maplist(lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t maplist(const lisp_t& obj, const lisp_t& fn1, const lisp_t& fn2)
 {
   lisp_t tmp = nil;
-  if(type_of(obj) == object::type::Cons)
+  auto copy = obj;
+  if(type_of(copy) == object::type::Cons)
   {
-    tmp = cons(apply(fn1, cons(obj, nil)), nil);
-    obj = obj->cdr();
+    tmp = cons(apply(fn1, cons(copy, nil)), nil);
+    copy = copy->cdr();
   }
   lisp_t rval = tmp;
-  while(type_of(obj) == object::type::Cons)
+  while(type_of(copy) == object::type::Cons)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj, nil)), nil));
+    rplacd(tmp, cons(apply(fn1, cons(copy, nil)), nil));
     tmp = tmp->cdr();
     if(is_nil(fn2))
-      obj = obj->cdr();
+      copy = copy->cdr();
     else
-      obj = apply(fn2, cons(obj, nil));
+      copy = apply(fn2, cons(copy, nil));
   }
   return rval;
 }
 
-lisp_t mapcar(lisp_t obj, lisp_t fn1, lisp_t fn2)
+lisp_t mapcar(const lisp_t& obj, const lisp_t& fn1, const lisp_t& fn2)
 {
   lisp_t tmp = nil;
-  if(type_of(obj) == object::type::Cons)
+  auto copy = obj;
+  if(type_of(copy) == object::type::Cons)
   {
-    tmp = cons(apply(fn1, cons(obj->car(), nil)), nil);
-    obj = obj->cdr();
+    tmp = cons(apply(fn1, cons(copy->car(), nil)), nil);
+    copy = copy->cdr();
   }
   lisp_t rval = tmp;
-  while(type_of(obj) == object::type::Cons)
+  while(type_of(copy) == object::type::Cons)
   {
-    rplacd(tmp, cons(apply(fn1, cons(obj->car(), nil)), nil));
+    rplacd(tmp, cons(apply(fn1, cons(copy->car(), nil)), nil));
     tmp = tmp->cdr();
     if(is_nil(fn2))
-      obj = obj->cdr();
+      copy = copy->cdr();
     else
-      obj = apply(fn2, cons(obj, nil));
+      copy = apply(fn2, cons(copy, nil));
   }
   return rval;
 }

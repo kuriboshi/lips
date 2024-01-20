@@ -68,17 +68,17 @@ public:
   ///
   /// @param file Set the primary output file to this file.
   /// @returns The previous output file.
-  static ref_file_t primout(ref_file_t file) { return get().do_primout(file); }
+  static ref_file_t primout(ref_file_t file) { return get().do_primout(std::move(file)); }
   /// @brief Sets the primary output file.
   ///
   /// @param file Set the primary output file to this file.
   /// @returns The previous output file.
-  static ref_file_t primerr(ref_file_t file) { return get().do_primerr(file); }
+  static ref_file_t primerr(ref_file_t file) { return get().do_primerr(std::move(file)); }
   /// @brief Sets the primary output file.
   ///
   /// @param file Set the primary output file to this file.
   /// @returns The previous output file.
-  static ref_file_t primin(ref_file_t file) { return get().do_primin(file); }
+  static ref_file_t primin(ref_file_t file) { return get().do_primin(std::move(file)); }
   /// @brief Returns the standard output file.
   static ref_file_t stdout() { return get().do_stdout(); }
   /// @brief Returns the standard error file.
@@ -127,20 +127,20 @@ public:
   ///
   /// The vm allocates a destination slot for the result and starts munching
   /// continuations.
-  lisp_t eval(lisp_t);
+  lisp_t eval(const lisp_t&);
   /// @brief Evaluate the string as a lisp expression.
   lisp_t eval(const std::string&);
   /// @brief Apply a function to arguments.
   ///
   /// @param fun The function to apply. Can be any type of function.
   /// @param args A list of arguments.
-  lisp_t apply(lisp_t fun, lisp_t args);
+  lisp_t apply(const lisp_t& fun, const lisp_t& args);
   /// @brief Print a backtrace of the internal evaluation stack.
   lisp_t backtrace();
   /// @brief Return the current environment.
   lisp_t topofstack() const;
   /// @brief Convert an environment to a list.
-  static lisp_t destblock(lisp_t);
+  static lisp_t destblock(const lisp_t&);
 
   /// @brief Prints a backtrace of all expressions on the stack.
   void bt();
@@ -318,15 +318,15 @@ private:
 
   /// @brief This function prints an error message, and sets up a call to everr
   /// that handles breaks.
-  void xbreak(std::error_code, lisp_t fault, continuation_t next);
-  void storevar(lisp_t v, int i);
-  void send(lisp_t a);
+  void xbreak(std::error_code, const lisp_t& fault, continuation_t next);
+  void storevar(const lisp_t& v, int i);
+  void send(const lisp_t& a);
   lisp_t receive();
   void next();
   /// @brief Make a call to the function in parameter `fun'.
   ///
   /// It can handle functions with up to three arguments.
-  lisp_t call(lisp_t fun);
+  lisp_t call(const lisp_t& fun);
   bool evalhook(lisp_t exp);
   void do_unbound(continuation_t);
   void link();
@@ -570,8 +570,8 @@ private:
   std::unique_ptr<Context> _context;
 };
 
-inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(fun); }
-inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefhook(fun); }
+inline vm::breakhook_t breakhook(vm::breakhook_t fun) { return vm::get().breakhook(std::move(fun)); }
+inline vm::undefhook_t undefhook(vm::undefhook_t fun) { return vm::get().undefhook(std::move(fun)); }
 inline void unwind() { vm::get().unwind(); }
 
 /// @brief Evaluate a lisp expression.
@@ -580,7 +580,7 @@ inline void unwind() { vm::get().unwind(); }
 /// @param expr The lisp expression to evaluate.
 ///
 /// @returns Returns the result of the evaluation.
-inline lisp_t eval(lisp_t expr) { return vm::get().eval(expr); }
+inline lisp_t eval(const lisp_t& expr) { return vm::get().eval(expr); }
 /// @brief Evaluate a lisp expression read from a string.
 inline lisp_t eval(const std::string& expr) { return vm::get().eval(expr); }
 /// @brief Apply a function to a list of arguments.
@@ -593,7 +593,7 @@ inline lisp_t eval(const std::string& expr) { return vm::get().eval(expr); }
 /// (apply car '((a b c)))
 ///   => a
 /// ```
-inline lisp_t apply(lisp_t fn, lisp_t list) { return vm::get().apply(fn, list); }
+inline lisp_t apply(const lisp_t& fn, const lisp_t& list) { return vm::get().apply(fn, list); }
 /// @brief A nospread version of `apply`.
 /// @lisp{(apply* fn args...),NoSpread Function}
 ///
@@ -604,7 +604,7 @@ inline lisp_t apply(lisp_t fn, lisp_t list) { return vm::get().apply(fn, list); 
 
 /// @brief Returns _x_ unevaluated.
 /// @lisp{(quote a),NLambda Function}
-inline lisp_t quote(lisp_t a) { return details::vm::quote(a); }
+inline lisp_t quote(const lisp_t& a) { return details::vm::quote(a); }
 /// @brief Creates a lambda object.
 /// @lisp{(lambda x . y),NoSpread Function}
 ///
@@ -624,13 +624,13 @@ inline lisp_t quote(lisp_t a) { return details::vm::quote(a); }
 /// parameters are bound to each formal parameter and any excess actual
 /// parameters are bound to the formal parameter in the symbol in the `cdr` of
 /// the list of formal parameters.
-inline lisp_t lambda(lisp_t x, lisp_t y) { return details::vm::lambda(x, y); }
+inline lisp_t lambda(const lisp_t& x, const lisp_t& y) { return details::vm::lambda(x, y); }
 /// @brief Creates an nlambda function object.
 /// @lisp{(nlambda x . y)
 ///
 /// Same as `lambda` except that the function object is an nlambda function
 /// object and parameters are not evaluated when the function is called.
-inline lisp_t nlambda(lisp_t x, lisp_t y) { return details::vm::nlambda(x, y); }
+inline lisp_t nlambda(const lisp_t& x, const lisp_t& y) { return details::vm::nlambda(x, y); }
 /// @brief Eval function that forms the closure of function _f_, with variables
 /// listed in _v_ statically bound.
 /// @lisp{(closure f v),Function}
@@ -674,7 +674,7 @@ inline lisp_t nlambda(lisp_t x, lisp_t y) { return details::vm::nlambda(x, y); }
 /// binds the three symbols on line 24 in their lexical scope. It sets the
 /// symbols `withdraw` and `deposit` each to a closure over `balance` with a
 /// lambda expression which subtracts or adds an `amount` to the `balance`.
-inline lisp_t closure(lisp_t a, lisp_t b) { return details::vm::closure(a, b); }
+inline lisp_t closure(const lisp_t& a, const lisp_t& b) { return details::vm::closure(a, b); }
 
 /// @brief Print a backtrace of the control stack.
 /// @lisp{(backtrace),Function}
@@ -696,13 +696,13 @@ inline lisp_t topofstack() { return vm::get().topofstack(); }
 /// Subject to change between any version of the interpeter.
 ///
 /// @returns A list representing a destblock.
-inline lisp_t destblock(lisp_t a) { return vm::destblock(a); }
+inline lisp_t destblock(const lisp_t& a) { return vm::destblock(a); }
 /// @brief Exits with an error code.
 /// @lisp{(error code),Function}
-inline lisp_t error(lisp_t code) { return details::vm::error(code); }
+inline lisp_t error(const lisp_t& code) { return details::vm::error(code); }
 
-inline lisp_t perror(std::error_code code, lisp_t a) { return vm::perror(code, a); }
-inline lisp_t error(std::error_code code, lisp_t a) { return vm::error(code, a); }
+inline lisp_t perror(std::error_code code, const lisp_t& a) { return vm::perror(code, a); }
+inline lisp_t error(std::error_code code, const lisp_t& a) { return vm::error(code, a); }
 template<typename... Ts>
 inline void fatal(std::error_code code, const Ts&... a)
 {

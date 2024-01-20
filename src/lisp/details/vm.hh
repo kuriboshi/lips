@@ -24,12 +24,12 @@ namespace lisp::details::vm
 {
 void init();
 
-lisp_t quote(lisp_t);
-lisp_t lambda(lisp_t, lisp_t);
-lisp_t nlambda(lisp_t, lisp_t);
-lisp_t closure(lisp_t, lisp_t);
-lisp_t error(lisp_t);
-lisp_t exit(lisp_t);
+lisp_t quote(const lisp_t&);
+lisp_t lambda(const lisp_t&, const lisp_t&);
+lisp_t nlambda(const lisp_t&, const lisp_t&);
+lisp_t closure(const lisp_t&, const lisp_t&);
+lisp_t error(const lisp_t&);
+lisp_t exit(const lisp_t&);
 } // namespace lisp::details::vm
 
 #endif
