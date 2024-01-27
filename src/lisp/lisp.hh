@@ -24,6 +24,7 @@
 #include "check.hh"
 #include "context.hh"
 #include "debug.hh"
+#include "except.hh"
 #include "file.hh"
 #include "io.hh"
 #include "iter.hh"

@@ -18,11 +18,18 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_session.hpp>
 
-#include "lisp.hh"
+#include "alloc.hh"
+#include "context.hh"
+#include "except.hh"
+#include "file.hh"
+#include "io.hh"
+#include "types.hh"
+#include "vm.hh"
 
 namespace
 {

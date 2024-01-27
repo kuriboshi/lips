@@ -18,8 +18,10 @@
 #ifndef LISP_EXCEPT_HH
 #define LISP_EXCEPT_HH
 
+#include <concepts>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 namespace lisp
 {
@@ -63,7 +65,8 @@ public:
   /// @param message A message to print before exiting.
   /// @param code An exit code.
   template<typename Int>
-  lisp_finish(const std::string& message, Int code)
+    requires std::convertible_to<Int, int>
+  lisp_finish(const std::string& message, Int code = 0)
     : std::runtime_error(message),
       exit_code(static_cast<int>(code))
   {}
