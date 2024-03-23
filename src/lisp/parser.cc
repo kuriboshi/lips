@@ -1,7 +1,7 @@
 //
 // Lips, lisp shell.
 //
-// Copyright 2022-2023 Krister Joas
+// Copyright 2022-2024 Krister Joas
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
