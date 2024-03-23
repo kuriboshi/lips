@@ -688,6 +688,8 @@ private:
   template<typename S>
   void ptrcheck() const
   {
+    // The first brace is marked as not covered (maybe fixed by
+    // https://github.com/llvm/llvm-project/issues/54419).
     if constexpr(std::is_same_v<S, io::source>)
     {
       if(!_source)
