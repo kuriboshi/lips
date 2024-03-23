@@ -44,12 +44,10 @@ endif()
 include(clang-format)
 
 include(docker)
-include(cmake-format)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(LIPS_SOURCE_LOCATION
-    "${CMAKE_INSTALL_PREFIX}/src/lips"
+set(LIPS_SOURCE_LOCATION "${CMAKE_INSTALL_PREFIX}/src/lips"
     CACHE STRING "Where to install source code for cpprint")
 
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/install")
@@ -64,15 +62,11 @@ if(LIPS_ENABLE_TRACE)
   target_compile_definitions(liblisp PRIVATE LIPS_ENABLE_TRACE)
 endif()
 
-install(
-  EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-  # FILE ${PROJECT_NAME}-config.cmake
-  NAMESPACE lips::)
+install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        NAMESPACE lips::)
 
 configure_package_config_file(
-  cmake/config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+  cmake/config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
   INSTALL_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cmake/${PROJECT_NAME})
 
 write_basic_package_version_file(

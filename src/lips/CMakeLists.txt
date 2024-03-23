@@ -16,27 +16,25 @@
 #
 
 add_library(liblips)
-target_sources(
-  liblips
-  PRIVATE env.cc
-          exec.cc
-          glob.cc
-          job.cc
-          os.cc
-          term.cc
-          top.cc
-          transform.cc)
-target_sources(
-  liblips
-  PRIVATE env.hh
-          exec.hh
-          glob.hh
-          job.hh
-          lips_error.hh
-          os.hh
-          term.hh
-          top.hh
-          transform.hh)
+target_sources(liblips PRIVATE
+  env.cc
+  exec.cc
+  glob.cc
+  job.cc
+  os.cc
+  term.cc
+  top.cc
+  transform.cc)
+target_sources(liblips PRIVATE
+  env.hh
+  exec.hh
+  glob.hh
+  job.hh
+  lips_error.hh
+  os.hh
+  term.hh
+  top.hh
+  transform.hh)
 target_link_libraries(liblips PUBLIC fmt::fmt liblisp Catch2::Catch2)
 set_target_properties(liblips PROPERTIES OUTPUT_NAME lips)
 
@@ -47,20 +45,17 @@ add_executable(lips)
 target_sources(lips PRIVATE main.cc)
 target_sources(lips PRIVATE main.hh)
 target_link_libraries(lips PRIVATE liblips)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
-                                            VERSION_LESS 9.0)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
   target_link_libraries(lips PRIVATE stdc++fs)
 endif()
 target_compile_options(lips PRIVATE -Wall -Werror)
-target_compile_definitions(
-  lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/lipsrc\"")
+target_compile_definitions(lips PRIVATE "LIPSRC=\"${CMAKE_INSTALL_PREFIX}/lib/lipsrc\"")
 if(LIPS_ENABLE_CLANG_TIDY)
   set_target_properties(lips PROPERTIES CXX_CLANG_TIDY "${LLVM_CLANG_TIDY}")
 endif()
 
 add_executable(lips_test)
-target_sources(lips_test PRIVATE exec.test.cc lips_test.cc transform.test.cc
-                                 glob.test.cc)
+target_sources(lips_test PRIVATE exec.test.cc lips_test.cc transform.test.cc glob.test.cc)
 target_link_libraries(lips_test PUBLIC liblips)
 
 if(LIPS_ENABLE_TESTS)
