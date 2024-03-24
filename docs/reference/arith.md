@@ -8,7 +8,7 @@ take either type.
 > `(abs n)` (_Function_)
 
 ```cpp
-inline lisp_t abs(lisp_t n)
+inline lisp_t abs(const lisp_t& n)
 ```
 
 Returns the absolute value of _n_.
@@ -16,7 +16,7 @@ Returns the absolute value of _n_.
 > `(add1 n)` (_Function_)
 
 ```cpp
-inline lisp_t add1(lisp_t n)
+inline lisp_t add1(const lisp_t& n)
 ```
 
 Returns the argument _n_ plus 1.
@@ -26,7 +26,7 @@ Same as `(plus n 1)`.
 > `(difference x y)` (_Function_)
 
 ```cpp
-inline lisp_t difference(lisp_t x, lisp_t y)
+inline lisp_t difference(const lisp_t& x, const lisp_t& y)
 ```
 
 Calculates the difference between _x_ and _y_.
@@ -41,7 +41,7 @@ Returns the difference.
 > `(divide x y)` (_Function_)
 
 ```cpp
-inline lisp_t divide(lisp_t x, lisp_t y)
+inline lisp_t divide(const lisp_t& x, const lisp_t& y)
 ```
 
 Divides _x_ by _y_.
@@ -56,7 +56,7 @@ Returns the result of the division.
 > `(eqp x y)` (_Function_)
 
 ```cpp
-inline lisp_t eqp(lisp_t x, lisp_t y)
+inline lisp_t eqp(const lisp_t& x, const lisp_t& y)
 ```
 
 Compares two integer or floating point values for equality.
@@ -67,7 +67,7 @@ Compares two integer or floating point values for equality.
 > `(fdifference x y)` (_Function_)
 
 ```cpp
-inline lisp_t fdifference(lisp_t x, lisp_t y)
+inline lisp_t fdifference(const lisp_t& x, const lisp_t& y)
 ```
 
 Returns the floating point difference between _x_ and _y_.
@@ -75,7 +75,7 @@ Returns the floating point difference between _x_ and _y_.
 > `(fdivide a b)` (_Function_)
 
 ```cpp
-inline lisp_t fdivide(lisp_t x, lisp_t y)
+inline lisp_t fdivide(const lisp_t& x, const lisp_t& y)
 ```
 
 Floating point division of _x_ by _y_.
@@ -85,7 +85,7 @@ Returns the result of the division.
 > `(fplus args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t fplus(lisp_t args)
+inline lisp_t fplus(const lisp_t& args)
 ```
 
 Floating point addition of _args_.
@@ -95,7 +95,7 @@ Returns the sum of all the arguments.
 > `(ftimes args)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t ftimes(lisp_t args)
+inline lisp_t ftimes(const lisp_t& args)
 ```
 
 Floating point multiplication.
@@ -105,7 +105,7 @@ Returns the floating point multiplication of _args_.
 > `(geq x y)` (_Function_)
 
 ```cpp
-inline lisp_t geq(lisp_t x, lisp_t y)
+inline lisp_t geq(const lisp_t& x, const lisp_t& y)
 ```
 
 Compares if one numeric values are greater or equal to another.
@@ -115,7 +115,7 @@ Returns 't' if $x \ge y$, `nil` otherwise.
 > `(greaterp x y)` (_Function_)
 
 ```cpp
-inline lisp_t greaterp(lisp_t x, lisp_t y)
+inline lisp_t greaterp(const lisp_t& x, const lisp_t& y)
 ```
 
 Compares of one numeric value is greater than another.
@@ -125,7 +125,7 @@ Returns `t` if $x > y$, `nil` otherwise.
 > `(idifference a b)` (_Function_)
 
 ```cpp
-inline lisp_t idifference(lisp_t a, lisp_t b)
+inline lisp_t idifference(const lisp_t& a, const lisp_t& b)
 ```
 
 Integer subtraction.
@@ -133,7 +133,7 @@ Integer subtraction.
 > `(iminus a)` (_Function_)
 
 ```cpp
-inline lisp_t iminus(lisp_t a)
+inline lisp_t iminus(const lisp_t& a)
 ```
 
 Returns the _a_ with the opposite sign.
@@ -143,7 +143,7 @@ Same as `(idifference 0 a)`.
 > `(iplus args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t iplus(lisp_t args)
+inline lisp_t iplus(const lisp_t& args)
 ```
 
 Returns the sum of the arguments.
@@ -151,7 +151,7 @@ Returns the sum of the arguments.
 > `(iquotient a b)` (_Function_)
 
 ```cpp
-inline lisp_t iquotient(lisp_t a, lisp_t b)
+inline lisp_t iquotient(const lisp_t& a, const lisp_t& b)
 ```
 
 Returns the truncated result of $a / b$.
@@ -164,7 +164,7 @@ Returns the truncated result of $a / b$.
 > `(iremainder a b)` (_Function_)
 
 ```cpp
-inline lisp_t iremainder(lisp_t a, lisp_t b)
+inline lisp_t iremainder(const lisp_t& a, const lisp_t& b)
 ```
 
 Returns the remainder of $a / b$.
@@ -176,7 +176,7 @@ Returns the remainder of $a / b$.
 > `(itimes args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t itimes(lisp_t args)
+inline lisp_t itimes(const lisp_t& args)
 ```
 
 Returns the result of multiplying the arguments.
@@ -188,7 +188,7 @@ Returns the result of multiplying the arguments.
 > `(itof i)` (_Function_)
 
 ```cpp
-inline lisp_t itof(lisp_t i)
+inline lisp_t itof(const lisp_t& i)
 ```
 
 Returns the integer _i_ converted to a floating point value.
@@ -196,7 +196,7 @@ Returns the integer _i_ converted to a floating point value.
 > `(leq x y)` (_Function_)
 
 ```cpp
-inline lisp_t leq(lisp_t x, lisp_t y)
+inline lisp_t leq(const lisp_t& x, const lisp_t& y)
 ```
 
 Returns `t` if $a \le b$, `nil` otherwise.
@@ -204,7 +204,7 @@ Returns `t` if $a \le b$, `nil` otherwise.
 > `(lessp x y)` (_Function_)
 
 ```cpp
-inline lisp_t lessp(lisp_t x, lisp_t y)
+inline lisp_t lessp(const lisp_t& x, const lisp_t& y)
 ```
 
 Returns `t` if $a < b$, `nil` otherwise.
@@ -212,7 +212,7 @@ Returns `t` if $a < b$, `nil` otherwise.
 > `(times args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t times(lisp_t args)
+inline lisp_t times(const lisp_t& args)
 ```
 
 Returns the result of multiplying the arguments.
@@ -220,7 +220,7 @@ Returns the result of multiplying the arguments.
 > `(minus a)` (_Function_)
 
 ```cpp
-inline lisp_t minus(lisp_t a)
+inline lisp_t minus(const lisp_t& a)
 ```
 
 Returns _a_ with the opposite sign.
@@ -228,7 +228,7 @@ Returns _a_ with the opposite sign.
 > `(minusp x)` (_Function_)
 
 ```cpp
-inline lisp_t minusp(lisp_t x)
+inline lisp_t minusp(const lisp_t& x)
 ```
 
 Returns `t` if _x_ is a negative number, `nil` otherwise.
@@ -236,7 +236,7 @@ Returns `t` if _x_ is a negative number, `nil` otherwise.
 > `(neqp x y)` (_Function_)
 
 ```cpp
-inline lisp_t neqp(lisp_t x, lisp_t y)
+inline lisp_t neqp(const lisp_t& x, const lisp_t& y)
 ```
 
 Returns `t` if $x \neq y$, `nil` otherwise.
@@ -244,7 +244,7 @@ Returns `t` if $x \neq y$, `nil` otherwise.
 > `(plus args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t plus(lisp_t args)
+inline lisp_t plus(const lisp_t& args)
 ```
 
 Returns the sum of all _args_.
@@ -252,7 +252,7 @@ Returns the sum of all _args_.
 > `(sub1 a)` (_Function_)
 
 ```cpp
-inline lisp_t sub1(lisp_t a)
+inline lisp_t sub1(const lisp_t& a)
 ```
 
 Returns $a - 1$.
@@ -262,7 +262,7 @@ Same as `(difference a 1)`.
 > `(zerop x)` (_Function_)
 
 ```cpp
-inline lisp_t zerop(lisp_t x)
+inline lisp_t zerop(const lisp_t& x)
 ```
 
 Returns `t` if $x = 0$, `nil` otherwise.

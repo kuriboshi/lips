@@ -22,7 +22,7 @@ The Context needs to satisfy the _Context_ concept. The type
 > `(eval fn)` (_Function_)
 
 ```cpp
-inline lisp_t eval(lisp_t expr)
+inline lisp_t eval(const lisp_t& expr)
 ```
 
 Evaluate a lisp expression.
@@ -40,7 +40,7 @@ Evaluate a lisp expression read from a string.
 > `(apply fn lis)` (_Function_)
 
 ```cpp
-inline lisp_t apply(lisp_t fn, lisp_t list)
+inline lisp_t apply(const lisp_t& fn, const lisp_t& list)
 ```
 
 Apply a function to a list of arguments.
@@ -65,7 +65,7 @@ A nospread version of `apply`.
 > `(quote a)` (_NLambda Function_)
 
 ```cpp
-inline lisp_t quote(lisp_t a)
+inline lisp_t quote(const lisp_t& a)
 ```
 
 Returns _x_ unevaluated.
@@ -73,7 +73,7 @@ Returns _x_ unevaluated.
 > `(lambda x . y)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t lambda(lisp_t x, lisp_t y)
+inline lisp_t lambda(const lisp_t& x, const lisp_t& y)
 ```
 
 Creates a lambda object.
@@ -96,7 +96,7 @@ parameters are bound to the formal parameter in the symbol in the `cdr` of
 the list of formal parameters.
 
 > ```cpp
-> inline lisp_t nlambda(lisp_t x, lisp_t y)
+> inline lisp_t nlambda(const lisp_t& x, const lisp_t& y)
 > ```
 
 Creates an nlambda function object.
@@ -108,7 +108,7 @@ object and parameters are not evaluated when the function is called.
 > `(closure f v)` (_Function_)
 
 ```cpp
-inline lisp_t closure(lisp_t a, lisp_t b)
+inline lisp_t closure(const lisp_t& a, const lisp_t& b)
 ```
 
 Eval function that forms the closure of function _f_, with variables
@@ -181,7 +181,7 @@ Subject to change between any version of the interpeter.
 > `(destblock)` (_Function_)
 
 ```cpp
-inline lisp_t destblock(lisp_t a)
+inline lisp_t destblock(const lisp_t& a)
 ```
 
 Converts an object of type environment to a list.
@@ -193,7 +193,7 @@ Subject to change between any version of the interpeter.
 > `(error code)` (_Function_)
 
 ```cpp
-inline lisp_t error(lisp_t code)
+inline lisp_t error(const lisp_t& code)
 ```
 
 Exits with an error code.

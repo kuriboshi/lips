@@ -3,7 +3,7 @@
 > `(concat args...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t concat(lisp_t x)
+inline lisp_t concat(const lisp_t& x)
 ```
 
 Concatenate strings.
@@ -11,7 +11,7 @@ Concatenate strings.
 > `(strcmp s1 s2)` (_Function_)
 
 ```cpp
-inline lisp_t strcmp(lisp_t s1, lisp_t s2)
+inline lisp_t strcmp(const lisp_t& s1, const lisp_t& s2)
 ```
 
 Compare two strings.
@@ -30,7 +30,7 @@ equal.
 > `(strequal s1 s2)` (_Function_)
 
 ```cpp
-inline lisp_t strequal(lisp_t s1, lisp_t s2)
+inline lisp_t strequal(const lisp_t& s1, const lisp_t& s2)
 ```
 
 Compare if to strings are equal.
@@ -46,7 +46,7 @@ or `nil` if they are not equal.
 > `(stringp s)` (_Function_)
 
 ```cpp
-inline lisp_t stringp(lisp_t s)
+inline lisp_t stringp(const lisp_t& s)
 ```
 
 Check if parameter is a string.
@@ -58,7 +58,7 @@ Check if parameter is a string.
 > `(strlen s)` (_Function_)
 
 ```cpp
-inline lisp_t strlen(lisp_t s)
+inline lisp_t strlen(const lisp_t& s)
 ```
 
 Returns the length of a string.
@@ -69,7 +69,7 @@ Returns the length of a string.
 > `(substring str n m)` (_Function_)
 
 ```cpp
-inline lisp_t substring(lisp_t str, lisp_t n, lisp_t m)
+inline lisp_t substring(const lisp_t& str, const lisp_t& n, const lisp_t& m)
 ```
 
 Extract a substring from start to end.
@@ -103,7 +103,7 @@ end.
 End equal to zero if start is equal to one is accepted.
 
 > ```cpp
-> inline lisp_t symstr(lisp_t sym)
+> inline lisp_t symstr(const lisp_t& sym)
 > ```
 
 Return symbol's print name as a string.

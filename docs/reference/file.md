@@ -5,7 +5,7 @@ Functions managing files.
 > `(open filename mode)` (_Function_)
 
 ```cpp
-inline lisp_t open(lisp_t filename, lisp_t mode)
+inline lisp_t open(const lisp_t& filename, const lisp_t& mode)
 ```
 
 Opens a file.
@@ -18,7 +18,7 @@ Opens a file.
 > `(close file)` (_Function_)
 
 ```cpp
-inline lisp_t close(lisp_t file)
+inline lisp_t close(const lisp_t& file)
 ```
 
 Closes a file.
@@ -30,7 +30,7 @@ Closes a file.
 > `(load filename)` (_Filename_)
 
 ```cpp
-inline lisp_t load(lisp_t filename)
+inline lisp_t load(const lisp_t& filename)
 ```
 
 Loads lisp expressions from a file.
@@ -42,7 +42,7 @@ Loads lisp expressions from a file.
 > `(prin1 expr file)` (_Function_)
 
 ```cpp
-inline lisp_t prin1(lisp_t expr, lisp_t file)
+inline lisp_t prin1(const lisp_t& expr, const lisp_t& file)
 ```
 
 Prints a lisp expression without escaping special characters.
@@ -64,7 +64,7 @@ error, else `file` has to be of type _file_.
 > `(prin2 args...)` (_Function_)
 
 ```cpp
-inline lisp_t prin2(lisp_t expr, lisp_t file)
+inline lisp_t prin2(const lisp_t& expr, const lisp_t& file)
 ```
 
 Prints a lisp expression escaping special characters such as double
@@ -86,7 +86,7 @@ error, else `file` has to be of type _file_.
 > `(print args...)` (_Function_)
 
 ```cpp
-inline lisp_t print(lisp_t expr, lisp_t file)
+inline lisp_t print(const lisp_t& expr, const lisp_t& file)
 ```
 
 Prints a lisp expression escaping special characters and outputing a
@@ -110,7 +110,7 @@ error, else `file` has to be of type _file_.
 > `(spaces n file)` (_Function_)
 
 ```cpp
-inline lisp_t spaces(lisp_t n, lisp_t file)
+inline lisp_t spaces(const lisp_t& n, const lisp_t& file)
 ```
 
 Prints _n_ number of spaces.
@@ -124,7 +124,7 @@ error, else `file` has to be an open file.
 > `(terpri file)` (_Function_)
 
 ```cpp
-inline lisp_t terpri(lisp_t file)
+inline lisp_t terpri(const lisp_t& file)
 ```
 
 Print a newline on the output file.
@@ -137,7 +137,7 @@ error, else `file` has to be an open file.
 > `(printlevel level)` (_Function_)
 
 ```cpp
-inline lisp_t printlevel(lisp_t level)
+inline lisp_t printlevel(const lisp_t& level)
 ```
 
 Sets the print level.
@@ -164,7 +164,7 @@ go. Deep lisp expressions will be replaced by an ampersand (&). If the
 > `(ratom file)` (_Function_)
 
 ```cpp
-inline lisp_t ratom(lisp_t file)
+inline lisp_t ratom(const lisp_t& file)
 ```
 
 Reads one token from the file and creates a lisp object from that
@@ -180,7 +180,7 @@ string. Instead the first double quote is returned as a symbol.
 > `(read file)` (_Function_)
 
 ```cpp
-inline lisp_t read(lisp_t file)
+inline lisp_t read(const lisp_t& file)
 ```
 
 Reads a lisp expression from an open file.
@@ -193,7 +193,7 @@ from stdin.
 > `(readc file)` (_Function_)
 
 ```cpp
-inline lisp_t readc(lisp_t file)
+inline lisp_t readc(const lisp_t& file)
 ```
 
 Reads a single character from an open file.
@@ -206,7 +206,7 @@ from stdin.
 > `(readline file)` (_Filename_)
 
 ```cpp
-inline lisp_t readline(lisp_t file)
+inline lisp_t readline(const lisp_t& file)
 ```
 
 Reads characters from an open file until the next newline.
@@ -231,7 +231,7 @@ read.
 > `(splice x y tailp)` (_Function_)
 
 ```cpp
-inline lisp_t splice(lisp_t x, lisp_t y, lisp_t tailp)
+inline lisp_t splice(const lisp_t& x, const lisp_t& y, const lisp_t& tailp)
 ```
 
 Splice an object into a list.

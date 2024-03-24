@@ -157,7 +157,7 @@ be either a symbol or a string.
 > `(getenv var)` (_NLambda Function_)
 
 ```cpp
-lisp_t getenviron(lisp_t var);
+lisp_t getenv(lisp_t var);
 ```
 
 Gets the value of an environment variable.

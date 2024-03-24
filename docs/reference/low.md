@@ -3,7 +3,7 @@
 > `(cond ...)` (_NoSpread NLambda_)
 
 ```cpp
-inline lisp_t cond(lisp_t clauses)
+inline lisp_t cond(const lisp_t& clauses)
 ```
 
 The cond special form.
@@ -37,7 +37,7 @@ value of `r2`.
 > `(prog1 args...)` (_NoSpread NLambda_)
 
 ```cpp
-inline lisp_t prog1(lisp_t a, lisp_t b)
+inline lisp_t prog1(const lisp_t& a, const lisp_t& b)
 ```
 
 Evaluates all arguments and returns the result of the first
@@ -46,7 +46,7 @@ expression.
 > `(progn args...)` (_NoSpread NLambda_)
 
 ```cpp
-inline lisp_t progn(lisp_t a)
+inline lisp_t progn(const lisp_t& a)
 ```
 
 Evaluates all arguments and retuns the result of the last
@@ -55,7 +55,7 @@ expression.
 > `(set var expr)` (_Function_)
 
 ```cpp
-inline lisp_t set(lisp_t var, lisp_t expr)
+inline lisp_t set(const lisp_t& var, const lisp_t& expr)
 ```
 
 Sets the value of the symbol to the value.
@@ -70,7 +70,7 @@ Both `var` and `expr` are evaluated. Returns `val`.
 > `(setq var expr)` (_NLambda_)
 
 ```cpp
-inline lisp_t setq(lisp_t var, lisp_t expr)
+inline lisp_t setq(const lisp_t& var, const lisp_t& expr)
 ```
 
 Same as 'set' but the first argument is not evaluated.
@@ -83,7 +83,7 @@ Same as 'set' but the first argument is not evaluated.
 > `(setqq var val)` (_NLambda_)
 
 ```cpp
-inline lisp_t setqq(lisp_t var, lisp_t val)
+inline lisp_t setqq(const lisp_t& var, const lisp_t& val)
 ```
 
 Same as 'set' but no argument is evaluated.
@@ -96,7 +96,7 @@ Same as 'set' but no argument is evaluated.
 > `(while first args...)` (_NoSpread NLambda_)
 
 ```cpp
-inline lisp_t xwhile(lisp_t first, lisp_t second)
+inline lisp_t xwhile(const lisp_t& first, const lisp_t& second)
 ```
 
 Evaluate arguments in until _first_ is false.

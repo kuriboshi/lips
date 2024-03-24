@@ -6,7 +6,7 @@ each item or each tail of the list.
 > `(map list fn1 fn2)` (_Function_)
 
 ```cpp
-inline lisp_t map(lisp_t list, lisp_t fn1, lisp_t fn2)
+inline lisp_t map(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
 ```
 
 Apply _fn1_ on each tail of _list_.
@@ -34,7 +34,7 @@ of `cdr` to get the next value on which to apply _fn1_.
 > `(mapc list fn1 fn2)` (_Function_)
 
 ```cpp
-inline lisp_t mapc(lisp_t list, lisp_t fn1, lisp_t fn2)
+inline lisp_t mapc(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
 ```
 
 Apply _fn1_ on each _car_ of _list_.
@@ -52,7 +52,7 @@ list. `mapc` returns `nil`.
 > `(maplist list fn1 fn2)` (_Function_)
 
 ```cpp
-inline lisp_t maplist(lisp_t list, lisp_t fn1, lisp_t fn2)
+inline lisp_t maplist(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
 ```
 
 Collect the result of applying _fn1_ on each tail of _list_.
@@ -74,7 +74,7 @@ and returning a list of the results.
 > `(mapcar list fn1 fn2)` (_Function_)
 
 ```cpp
-inline lisp_t mapcar(lisp_t list, lisp_t fn1, lisp_t fn2)
+inline lisp_t mapcar(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
 ```
 
 Collect the result of applying _fn1_ on each _car_ of _list_.

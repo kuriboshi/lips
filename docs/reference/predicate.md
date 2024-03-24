@@ -3,7 +3,7 @@
 > `(eq a b)` (_Function_)
 
 ```cpp
-inline lisp_t eq(lisp_t a, lisp_t b)
+inline lisp_t eq(const lisp_t& a, const lisp_t& b)
 ```
 
 `t` if the objects _a_ and _b_ are the same object. Integers are
@@ -12,7 +12,7 @@ considered 'eq' if their values are the same.
 > `(atom a)` (_Function_)
 
 ```cpp
-inline lisp_t atom(lisp_t a)
+inline lisp_t atom(const lisp_t& a)
 ```
 
 `t` if _a_ is `nil`, `t`, a symbol, an integer, or a floating point
@@ -21,7 +21,7 @@ object.
 > `(numberp n)` (_Function_)
 
 ```cpp
-inline lisp_t numberp(lisp_t n)
+inline lisp_t numberp(const lisp_t& n)
 ```
 
 Returns T if argument is a number (either an integer or a floating
@@ -30,7 +30,7 @@ point value).
 > `(listp l)` (_Function_)
 
 ```cpp
-inline lisp_t listp(lisp_t l)
+inline lisp_t listp(const lisp_t& l)
 ```
 
 Returns T if the argument is a list, i.e. a cons cell.
@@ -38,7 +38,7 @@ Returns T if the argument is a list, i.e. a cons cell.
 > `(memb atom list)` (_Function_)
 
 ```cpp
-inline lisp_t memb(lisp_t atom, lisp_t list)
+inline lisp_t memb(const lisp_t& atom, const lisp_t& list)
 ```
 
 Compares each CAR of the _list_ and if _eq_ returns the list at that
@@ -59,7 +59,7 @@ that element at the head. Returns `nil` if not found.
 > `(equal l1 lf2)` (_Function_)
 
 ```cpp
-inline lisp_t equal(lisp_t x, lisp_t y)
+inline lisp_t equal(const lisp_t& x, const lisp_t& y)
 ```
 
 Returns T if the two lisp expressions are equal.
@@ -71,7 +71,7 @@ and _y_ are `strequal`, or if _x_ and _y_ are lists `(and (equal (car x)
 > `(nlistp a)` (_Function_)
 
 ```cpp
-inline lisp_t nlistp(lisp_t a)
+inline lisp_t nlistp(const lisp_t& a)
 ```
 
 Returns T if the expression is not a cons cell.
@@ -81,7 +81,7 @@ Returns T if the expression is not a cons cell.
 > `(neq a b)` (_Function_)
 
 ```cpp
-inline lisp_t neq(lisp_t a, lisp_t b)
+inline lisp_t neq(const lisp_t& a, const lisp_t& b)
 ```
 
 Returns T of a and b are not the same object.
@@ -89,7 +89,7 @@ Returns T of a and b are not the same object.
 > `(boundp a)` (_Function_)
 
 ```cpp
-inline lisp_t boundp(lisp_t a)
+inline lisp_t boundp(const lisp_t& a)
 ```
 
 Returns T if the symbol is unbound.
@@ -98,7 +98,7 @@ Returns T if the symbol is unbound.
 > `(symbolp a)` (_Function_)
 
 ```cpp
-inline lisp_t litatom(lisp_t a)
+inline lisp_t litatom(const lisp_t& a)
 ```
 
 Returns T if the value is a symbol or nil.
@@ -108,7 +108,7 @@ The function `symbolp` is an alias for `litatom`.
 > `(typeof a)` (_Function_)
 
 ```cpp
-inline lisp_t xtypeof(lisp_t a)
+inline lisp_t xtypeof(const lisp_t& a)
 ```
 
 Returns the type of an expression as a symbol.

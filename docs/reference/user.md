@@ -3,7 +3,7 @@
 > `(define name lambda)` (_Function_)
 
 ```cpp
-inline lisp_t define(lisp_t name, lisp_t lambda)
+inline lisp_t define(const lisp_t& name, const lisp_t& lambda)
 ```
 
 Defines a function.
@@ -27,7 +27,7 @@ In lisp it would look like this:
 > `(defineq (name lambda)...)` (_NoSpread Function_)
 
 ```cpp
-inline lisp_t defineq(lisp_t list)
+inline lisp_t defineq(const lisp_t& list)
 ```
 
 Defines one or more functions.
@@ -51,7 +51,7 @@ expression. The lambda expression is evaluated to yield a lambda object.
 > `(getrep lambda)` (_Function_)
 
 ```cpp
-inline lisp_t getrep(lisp_t lambda)
+inline lisp_t getrep(const lisp_t& lambda)
 ```
 
 Get the function representation of a lambda object.

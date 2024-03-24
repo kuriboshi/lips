@@ -3,7 +3,7 @@
 > `(and args...)` (_NoSpread NLambda Function_)
 
 ```cpp
-inline lisp_t p_and(lisp_t args)
+inline lisp_t p_and(const lisp_t& args)
 ```
 
 If any expression evaluates to nil return `nil` otherwise return the
@@ -12,7 +12,7 @@ result of the last expression.
 > `(or args...)` (_NoSpread NLambda_)
 
 ```cpp
-inline lisp_t p_or(lisp_t args)
+inline lisp_t p_or(const lisp_t& args)
 ```
 
 Returns the first expression evaluating to non-`nil`, otherwise
@@ -21,7 +21,7 @@ return `nil`.
 > `(not expr)` (_Function_)
 
 ```cpp
-inline lisp_t p_not(lisp_t expr)
+inline lisp_t p_not(const lisp_t& expr)
 ```
 
 Returns `t` if argument is `nil`, `nil` otherwise.
