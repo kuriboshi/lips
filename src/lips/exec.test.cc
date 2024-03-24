@@ -93,9 +93,9 @@ TEST_CASE("exec.cc: make_exec")
     CHECK(result.at(0) == "/bin"s);
   }
 
-  SECTION("(make_exec (/a*)) -> <empty>")
+  SECTION("(make_exec (/_*)) -> <empty>")
   {
-    auto expr = lispread("(/a*)");
+    auto expr = lispread("(/_*)");
     auto result = proc.make_exec(expr);
     REQUIRE(result.empty());
   }
