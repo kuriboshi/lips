@@ -1,7 +1,6 @@
 # Tasks to perform a release
 
 - Run `make format`
-- Run `make docs`
 - Run `make copyright`
 - Run `make test`
 - Run `make tidy`
