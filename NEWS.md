@@ -1,5 +1,16 @@
 # Release notes
 
+## 3.3.0 (2024-04-28)
+
+Minor release with the following changes.
+
+- Drop testing on Ubuntu 20.04
+- Add testing on Ubuntu 24.04
+- Add testing on Fedora 40
+- Change the signature of most lisp functions to take arguments as const lisp_t&
+- Breaking change: Rename getenviron to getenv
+- Move all constants to the `atoms` namespace and remove the `C_` prefix
+
 ## 3.2.0 (2024-01-13)
 
 Minor release with the following changes.
