@@ -1,0 +1,34 @@
+name: Ubuntu 22.04
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install compilers
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90
+        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 90
+
+    - name: Configure CMake
+      run: |
+        cmake --preset default
+
+    - name: Build
+      run: cmake --build --preset default
+
+    - name: Test
+      run: ctest --output-on-failure --preset default
