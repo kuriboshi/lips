@@ -38,7 +38,6 @@ target_sources(liblips PRIVATE
 target_link_libraries(liblips PUBLIC fmt::fmt liblisp Catch2::Catch2)
 set_target_properties(liblips PROPERTIES OUTPUT_NAME lips)
 
-find_package(Curses REQUIRED)
 target_link_libraries(liblips PUBLIC ${CURSES_LIBRARIES})
 
 add_executable(lips)
