@@ -426,89 +426,49 @@ private:
 /// @internal Provides functions to get and set the read_table.
 template<typename T>
 concept syntax_table = requires(T v, std::unique_ptr<syntax> syn) {
-  {
-    v.read_table()
-  } -> std::same_as<syntax&>;
+  { v.read_table() } -> std::same_as<syntax&>;
   v.read_table(std::move(syn));
 };
 
 /// @internal Provides getting and setting standard file streams.
 template<typename T>
 concept standard_streams = requires(T v, ref_file_t file) {
-  {
-    v.primout()
-  } -> std::same_as<ref_file_t>;
-  {
-    v.primerr()
-  } -> std::same_as<ref_file_t>;
-  {
-    v.primin()
-  } -> std::same_as<ref_file_t>;
-  {
-    v.primout(file)
-  } -> std::same_as<ref_file_t>;
-  {
-    v.primerr(file)
-  } -> std::same_as<ref_file_t>;
-  {
-    v.primin(file)
-  } -> std::same_as<ref_file_t>;
-  {
-    v.stdout()
-  } -> std::same_as<ref_file_t>;
-  {
-    v.stderr()
-  } -> std::same_as<ref_file_t>;
-  {
-    v.stdin()
-  } -> std::same_as<ref_file_t>;
+  { v.primout() } -> std::same_as<ref_file_t>;
+  { v.primerr() } -> std::same_as<ref_file_t>;
+  { v.primin() } -> std::same_as<ref_file_t>;
+  { v.primout(file) } -> std::same_as<ref_file_t>;
+  { v.primerr(file) } -> std::same_as<ref_file_t>;
+  { v.primin(file) } -> std::same_as<ref_file_t>;
+  { v.stdout() } -> std::same_as<ref_file_t>;
+  { v.stderr() } -> std::same_as<ref_file_t>;
+  { v.stdin() } -> std::same_as<ref_file_t>;
 };
 
 /// @internal Provides functions to get and set the print level.
 template<typename T>
 concept print_level = requires(T v, integer_t::value_type i) {
   v.printlevel(i);
-  {
-    v.printlevel()
-  } -> std::same_as<integer_t::value_type>;
+  { v.printlevel() } -> std::same_as<integer_t::value_type>;
 };
 
 /// @internal Provides access to some miscellaneous global variables.
 template<typename T>
 concept misc_globals = requires(T v, lisp_t exp) {
-  {
-    v.currentbase()
-  } -> std::same_as<const cvariable_t&>;
-  {
-    v.verbose()
-  } -> std::same_as<const cvariable_t&>;
-  {
-    v.loadpath()
-  } -> std::same_as<const cvariable_t&>;
-  {
-    v.loadpath(exp)
-  };
+  { v.currentbase() } -> std::same_as<const cvariable_t&>;
+  { v.verbose() } -> std::same_as<const cvariable_t&>;
+  { v.loadpath() } -> std::same_as<const cvariable_t&>;
+  { v.loadpath(exp) };
 };
 
 /// @internal Provides some error reporing functions.
 template<typename T>
 concept error_functions = requires(T v, std::error_code code, const std::string& str, lisp_t exp) {
-  {
-    v.perror(code)
-  } -> std::same_as<lisp_t>;
-  {
-    v.perror(code, exp)
-  } -> std::same_as<lisp_t>;
-  {
-    v.error(code, exp)
-  } -> std::same_as<lisp_t>;
+  { v.perror(code) } -> std::same_as<lisp_t>;
+  { v.perror(code, exp) } -> std::same_as<lisp_t>;
+  { v.error(code, exp) } -> std::same_as<lisp_t>;
 
-  {
-    T::fatal(code)
-  } -> std::same_as<lisp_t>;
-  {
-    T::fatal(code, str)
-  } -> std::same_as<lisp_t>;
+  { T::fatal(code) } -> std::same_as<lisp_t>;
+  { T::fatal(code, str) } -> std::same_as<lisp_t>;
 };
 
 /// @internal The concept required by the Context parameter to vm_t.
