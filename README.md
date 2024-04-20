@@ -2,11 +2,10 @@
 
 Copyright 1988-1989, 1992, 2020-2024 Krister Joas <krister@joas.jp>
 
-![Ubuntu 20.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-20.04.yml/badge.svg)
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 3.2.0
+Version 3.3.0 (2024-04-28)
 
 ## What is it?
 
@@ -56,12 +55,11 @@ on their level of support for C++-20.
 
 | OS Version   | Compiler Version  |
 |--------------|-------------------|
-| macOS 14.2.1 | AppleClang 15.0.0 |
-| macOS 14.2.1 | clang 17.0.6      |
-| Ubuntu 20.04 | gcc 11.4.0        |
-| Ubuntu 22.04 | gcc 12.3.0        |
+| macOS 14.4.0 | AppleClang 15.0.0 |
+| macOS 14.4.0 | clang 17.0.6      |
 | Ubuntu 22.04 | gcc 13.1.0        |
-| Ubuntu 22.04 | clang 17.0.0      |
+| Ubuntu 22.04 | clang 18.1.3      |
+| Fedora 39    | gcc 13.2.0
 
 The minimum version of `clang-tidy` is 17.
 
@@ -72,19 +70,27 @@ built as part of the build.
 
 | Library Name | Version |
 |--------------|---------|
-| Catch2       | 3.5.0   |
-| fmt          | 10.1.1  |
+| Catch2       | 3.5.2   |
+| fmt          | 10.2.0  |
 
-System libraries dependencies.
+System library dependencies.
 
 | Library Name |
 |--------------|
 | ncurses      |
 
+System tool dependencies.
+
+| Tool name | Remark                      |
+|-----------|-----------------------------|
+| ninja     | Optional, `make` also works |
+| cmake     | Minimum version is 3.21.0   |
+
 ## Building
 
-Configure and build using `cmake`. The `default` preset uses `ninja`
-to build. There is a preset named `make` which uses `make` to build.
+Configure and build using `cmake`. There are presets defined in
+`CMakePresets.json`. The `default` preset uses `ninja` to build. There
+is also a preset named `make` which uses `make` to build.
 
 ```sh
 cmake --preset default
@@ -144,15 +150,15 @@ make test
 ### GitHub workflows
 
 Builds and tests using GitHub actions are included in the
-`.github/workflows` directory. There are workflows for both Ubuntu 20
-and 22.
+`.github/workflows` directory. There are workflows for Ubuntu 22.04 as
+well as one for CodeQL.
 
 ### Local testing
 
 For local testing there are some docker files in the `test` directory
 which can be used for testing on various platforms.  Runing the
-following command builds and tests on all the above operating systems
-and compiler combinations.
+following command builds and tests on all the above Linux operating
+systems and compiler combinations.
 
 ```sh
 cmake --preset default --target test-linux
@@ -168,8 +174,8 @@ On macOS `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
 same as for `docker`.
 
-> [!NOTE]
-> `podman` support is currently not working
+I you use `podman` on macOS, make sure you allocate enough memory to
+the VM. I've had success with 4 CPU's and 4GB of memory.
 
 ## Implementation Notes
 

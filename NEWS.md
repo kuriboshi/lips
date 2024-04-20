@@ -7,9 +7,10 @@ Minor release with the following changes.
 - Drop testing on Ubuntu 20.04
 - Add testing on Ubuntu 24.04
 - Add testing on Fedora 40
+- Bump up the version of clang to version 18 on Linux
 - Change the signature of most lisp functions to take arguments as const lisp_t&
-- Breaking change: Rename getenviron to getenv
 - Move all constants to the `atoms` namespace and remove the `C_` prefix
+- Breaking change: Rename getenviron to getenv
 
 ## 3.2.0 (2024-01-13)
 

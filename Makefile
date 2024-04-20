@@ -77,10 +77,10 @@ copyright:
 
 # Test different Linux configurations:
 #   OS            Compiler
-#   Ubuntu 20.04  gcc-11
-#   Ubuntu 22.04  gcc-12
-#   Ubuntu 22.04  clang-17
+#   Ubuntu 22.04  gcc-13
+#   Ubuntu 22.04  clang-18
 #   Ubuntu 22.04  clang-tidy
+#   Fedora 39	  gcc-13
 .PHONE: test-linux
 test-linux:
 	cmake --build --preset debug --target test-linux
@@ -90,8 +90,13 @@ test-linux:
 test: debug
 	ctest --preset default --output-on-failure
 
-ubuntu20 ubuntu22 ubuntu22-tidy ubuntu22-clang:
+.PHONY: ubuntu22-tidy ubuntu22-clang
+ubuntu22-tidy ubuntu22-clang:
 	cmake --build --preset debug --target $@
+
+.PHONY: ubuntu22
+ubuntu22:
+	cmake --build --preset debug --target $@-docker
 
 # Run the benchmark tests.
 .PHONY: benchmark

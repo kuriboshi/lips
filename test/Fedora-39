@@ -8,3 +8,5 @@ RUN dnf -y install cmake
 RUN dnf -y install ninja-build git g++ ncurses-devel
 RUN dnf -y install clang clang-tools-extra
 RUN dnf -y install nodejs
+
+WORKDIR /project

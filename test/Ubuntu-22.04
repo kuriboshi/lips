@@ -5,26 +5,28 @@ FROM ubuntu:22.04
 # since it doesn't really matter what the time zone is.
 RUN ln -snf /usr/share/zoneinfo/UTC /etc/localtime; echo UTC > /etc/timezone
 
+ENV DEBIAN_FRONTEND="noninteractive"
+
 # Install required packages.
-RUN apt-get -y update && apt-get -y install software-properties-common
-RUN apt-get -y update && apt-get -y install ca-certificates
-RUN apt-get -y update && apt-get -y install gpg
+RUN apt-get -y update && apt-get -y install --no-install-recommends software-properties-common
+RUN apt-get -y update && apt-get -y install --no-install-recommends ca-certificates
+RUN apt-get -y update && apt-get -y install --no-install-recommends gpg gpg-agent
 
 # We can use the default version of cmake.
-RUN apt-get -y update && apt-get -y install cmake
+RUN apt-get -y update && apt-get -y install --no-install-recommends cmake
 
 # Install packages needed to build the project.
-RUN apt-get -y update && apt-get -y install clang-tidy
-RUN apt-get -y update && apt-get -y install ninja-build
-RUN apt-get -y update && apt-get -y install libncurses-dev
-RUN apt-get -y update && apt-get -y install g++-12
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-12 90 --slave /usr/bin/c++ c++ /usr/bin/g++-12
+RUN apt-get -y update && apt-get -y install --no-install-recommends ninja-build
+RUN apt-get -y update && apt-get -y install --no-install-recommends libncurses-dev
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
+RUN apt-get -y update && apt-get -y install --no-install-recommends g++-13
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90 --slave /usr/bin/c++ c++ /usr/bin/g++-13
 
 # For clang and clang-tidy we need to install from llvm.org
 RUN apt-get -y update && apt-get -y install wget
 RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh
-RUN yes | ./llvm.sh 17
-RUN apt-get -y update && apt-get -y install clang-tidy-17
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-17 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-17
+RUN yes | ./llvm.sh 18
+RUN apt-get -y update && apt-get -y install clang-tidy-18
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-18
 
 WORKDIR /project

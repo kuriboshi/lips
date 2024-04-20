@@ -51,8 +51,6 @@ function(lips_build_and_test dockerfile container_tag build_type)
     COMMAND "${LIPS_CONTAINER_APP}" run --rm --user "${USER}:${GROUP}"
             -v "${CMAKE_CURRENT_SOURCE_DIR}:/project/lips:ro"
             -v "${CMAKE_CURRENT_BINARY_DIR}/${container_tag}-${build_type}:/project/build:rw"
-            -v /etc/passwd:/etc/passwd:ro
-            -v /etc/group:/etc/group:ro
             "${container_tag}"
             /project/lips/test/build.sh "${build_type}")
   set_target_properties("${container_tag}-${build_type}" PROPERTIES FOLDER "Test")
