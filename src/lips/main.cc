@@ -162,7 +162,10 @@ try
   if(!options.interactive && !options.command)
     options.interactive = isatty(0) != 0;
   if(options.version)
+  {
     std::cout << version() << '\n';
+    return 0;
+  }
 
   //
   // Init shell and lisp interpreter.
