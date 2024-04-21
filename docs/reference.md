@@ -1,6 +1,6 @@
 # `Lips` Reference Manual
 
-Version 3.2.0, January, 2024
+Version 3.3.0, April, 2024
 
 > Copyright (c) 1988-1989, 1992, 2020-2024 Krister Joas
 >
