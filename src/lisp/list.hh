@@ -125,6 +125,15 @@ inline lisp_t append(const lisp_t& a) { return details::list::append(a); }
 /// `((o) o)`.  All pointers to _l_ points to the new list since the changes
 /// are destructive.
 inline lisp_t tconc(lisp_t l, const lisp_t& o) { return details::list::tconc(std::move(l), o); }
+
+template<typename T, typename... Ts>
+  requires std::same_as<T, lisp_t>
+lisp_t list(T t, Ts... ts)
+{
+  if constexpr(sizeof...(Ts) == 0)
+    return cons(t, nil);
+  return cons(t, list(ts...));
+}
 } // namespace lisp
 
 #endif

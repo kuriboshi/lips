@@ -188,6 +188,13 @@ TEST_CASE("list: list functions")
     CHECK(length(l)->as_integer() == 2);
   }
 
+  SECTION("variadic list")
+  {
+    auto l = list(1_l, 2_l, 3_l);
+    CHECK(type_of(l) == object::type::Cons);
+    CHECK(length(l)->as_integer() == 3);
+  }
+
   SECTION("null")
   {
     CHECK(!is_nil(null(nil)));
