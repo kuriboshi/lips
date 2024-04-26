@@ -19,12 +19,17 @@
 // version.cc -- defines the current lips version
 //
 
+#include <tuple>
+
 namespace lisp
 {
-const char* version() {
+std::tuple<unsigned, unsigned, unsigned, const char*> version() {
   static constexpr const char* VERSION{
     "lips @lips_VERSION@ Copyright 1988-1989, 1992, 2020-2024 Krister Joas"
   };
-  return VERSION;
+  static unsigned MAJOR{@PROJECT_VERSION_MAJOR@};
+  static unsigned MINOR{@PROJECT_VERSION_MINOR@};
+  static unsigned PATCH{@PROJECT_VERSION_PATCH@};
+  return {MAJOR, MINOR, PATCH, VERSION};
 }
-}
+} // namespace lisp

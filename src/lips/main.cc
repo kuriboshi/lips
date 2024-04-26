@@ -163,7 +163,7 @@ try
     options.interactive = isatty(0) != 0;
   if(options.version)
   {
-    std::cout << version() << '\n';
+    std::cout << std::get<3>(version()) << '\n';
     return 0;
   }
 

@@ -18,9 +18,11 @@
 #ifndef LISP_VERSION_HH
 #define LISP_VERSION_HH
 
+#include <tuple>
+
 namespace lisp
 {
-extern const char* version();
+extern const std::tuple<unsigned, unsigned, unsigned, const char*> version();
 }
 
 #endif

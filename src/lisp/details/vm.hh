@@ -30,6 +30,7 @@ lisp_t nlambda(const lisp_t&, const lisp_t&);
 lisp_t closure(const lisp_t&, const lisp_t&);
 lisp_t error(const lisp_t&);
 lisp_t exit(const lisp_t&);
+lisp_t version();
 } // namespace lisp::details::vm
 
 #endif

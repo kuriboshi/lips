@@ -34,7 +34,6 @@
 #include "list.hh"
 #include "property.hh"
 #include "rtable.hh"
-#include "version.hh"
 
 namespace lisp::details::vm
 {
@@ -97,6 +96,12 @@ lisp_t exit(const lisp_t& status)
   throw lisp_finish("exit called", status->as_integer());
 }
 
+lisp_t version()
+{
+  auto [major, minor, patch, string] = lisp::version();
+  return cons(mknumber(major), cons(mknumber(minor), cons(mknumber(patch), cons(mkstring(string), nil))));
+}
+
 namespace pn
 {
 inline constexpr std::string_view E = "e";                   // noeval version of eval
@@ -112,6 +117,7 @@ inline constexpr std::string_view TOPOFSTACK = "topofstack"; // return top of va
 inline constexpr std::string_view DESTBLOCK = "destblock";   // convert environment to list
 inline constexpr std::string_view ERROR = "error";           // error
 inline constexpr std::string_view EXIT = "exit";             // exit lips
+inline constexpr std::string_view VERSION = "version";       // version
 } // namespace pn
 
 inline lisp_t eval(const lisp_t& expr) { return lisp::vm::get().eval(expr); }
@@ -136,6 +142,7 @@ void init()
   mkprim(pn::DESTBLOCK,  destblock,  subr_t::subr::EVAL,   subr_t::spread::SPREAD);
   mkprim(pn::ERROR,      error,      subr_t::subr::EVAL,   subr_t::spread::NOSPREAD);
   mkprim(pn::EXIT,       exit,       subr_t::subr::EVAL,   subr_t::spread::SPREAD);
+  mkprim(pn::VERSION,    version,    subr_t::subr::NOEVAL, subr_t::spread::NOSPREAD);
   // clang-format on
 }
 

@@ -116,7 +116,7 @@ public:
   static void loadpath(lisp_t path) { get().do_loadpath(std::move(path)); }
 
   /// @brief Return the program version string.
-  static const char* version() { return lisp::version(); }
+  static const std::tuple<unsigned, unsigned, unsigned, const char*> version() { return lisp::version(); }
 
   /// @brief Return the current print level.
   static integer_t::value_type printlevel() { return get().do_printlevel(); }
