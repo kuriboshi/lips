@@ -61,6 +61,7 @@ on their level of support for C++-20.
 | Ubuntu 22.04 | clang 18.1.3      |
 | Ubuntu 24.04 | gcc 13.2.0        |
 | Fedora 39    | gcc 13.2.1        |
+| Fedora 40    | gcc 14.0.1        |
 | Fedora 40    | clang 18.1.1      |
 
 The minimum version of `clang-tidy` is 17.
