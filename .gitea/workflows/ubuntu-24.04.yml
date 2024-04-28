@@ -1,0 +1,27 @@
+name: Ubuntu 24.04
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: |
+        cmake --preset default
+
+    - name: Build
+      run: cmake --build --preset default
+
+    - name: Test
+      run: ctest --output-on-failure --preset default

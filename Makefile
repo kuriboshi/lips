@@ -90,12 +90,16 @@ test-linux:
 test: debug
 	ctest --preset default --output-on-failure
 
-.PHONY: ubuntu22-tidy ubuntu22-clang
-ubuntu22-tidy ubuntu22-clang:
+.PHONY: ubuntu22-clang fedora40-tidy fedora40-clang
+ubuntu22-clang fedora40-tidy fedora40-clang:
 	cmake --build --preset debug --target $@
 
-.PHONY: ubuntu22
-ubuntu22:
+.PHONY: ubuntu22 ubuntu24
+ubuntu22 ubuntu24:
+	cmake --build --preset debug --target $@-docker
+
+.PHONY: fedora39 fedora40
+fedora39 fedora40:
 	cmake --build --preset debug --target $@-docker
 
 # Run the benchmark tests.

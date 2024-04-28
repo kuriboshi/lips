@@ -59,7 +59,12 @@ endfunction()
 
 add_custom_target(test-linux)
 set_target_properties(test-linux PROPERTIES FOLDER "Test")
+
 lips_build_and_test(Ubuntu-22.04 ubuntu22 docker)
-lips_build_and_test(Fedora-39 fedora39 docker)
-lips_build_and_test(Ubuntu-22.04 ubuntu22 tidy)
 lips_build_and_test(Ubuntu-22.04 ubuntu22 clang)
+lips_build_and_test(Ubuntu-24.04 ubuntu24 docker)
+
+lips_build_and_test(Fedora-39 fedora39 docker)
+lips_build_and_test(Fedora-40 fedora40 docker)
+lips_build_and_test(Fedora-40 fedora40 tidy)
+lips_build_and_test(Fedora-40 fedora40 clang)

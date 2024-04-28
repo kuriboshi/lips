@@ -1,0 +1,24 @@
+# -*- dockerfile -*-
+FROM ubuntu:24.04
+
+# To avoid interactively asking for the timezone. Just set it to UTC
+# since it doesn't really matter what the time zone is.
+RUN ln -snf /usr/share/zoneinfo/UTC /etc/localtime; echo UTC > /etc/timezone
+
+ENV DEBIAN_FRONTEND="noninteractive"
+
+# Install required packages.
+RUN apt-get -y update && apt-get -y install --no-install-recommends software-properties-common
+RUN apt-get -y update && apt-get -y install --no-install-recommends ca-certificates
+RUN apt-get -y update && apt-get -y install --no-install-recommends gpg gpg-agent
+
+# We can use the default version of cmake.
+RUN apt-get -y update && apt-get -y install --no-install-recommends cmake
+
+# Install packages needed to build the project.
+RUN apt-get -y update && apt-get -y install --no-install-recommends ninja-build
+RUN apt-get -y update && apt-get -y install --no-install-recommends libncurses-dev
+RUN apt-get -y update && apt-get -y install --no-install-recommends g++-13
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90 --slave /usr/bin/c++ c++ /usr/bin/g++-13
+
+WORKDIR /project

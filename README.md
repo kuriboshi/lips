@@ -55,11 +55,13 @@ on their level of support for C++-20.
 
 | OS Version   | Compiler Version  |
 |--------------|-------------------|
-| macOS 14.4.0 | AppleClang 15.0.0 |
-| macOS 14.4.0 | clang 17.0.6      |
+| macOS 14.4.1 | AppleClang 15.0.0 |
+| macOS 14.4.1 | clang 18.1.4      |
 | Ubuntu 22.04 | gcc 13.1.0        |
 | Ubuntu 22.04 | clang 18.1.3      |
-| Fedora 39    | gcc 13.2.0
+| Ubuntu 24.04 | gcc 13.2.0        |
+| Fedora 39    | gcc 13.2.1        |
+| Fedora 40    | clang 18.1.1      |
 
 The minimum version of `clang-tidy` is 17.
 
