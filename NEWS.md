@@ -1,16 +1,19 @@
 # Release notes
 
-## 3.3.0 (2024-04-28)
+## 3.3.0 (2024-04-29)
 
 Minor release with the following changes.
 
-- Drop testing on Ubuntu 20.04
-- Add testing on Ubuntu 24.04
-- Add testing on Fedora 40
-- Bump up the version of clang to version 18 on Linux
 - Change the signature of most lisp functions to take arguments as const lisp_t&
 - Move all constants to the `atoms` namespace and remove the `C_` prefix
 - Breaking change: Rename getenviron to getenv
+- Add lisp function `version` which returns four atoms: major, minor,
+  and patch number, and a version string
+- Drop testing on Ubuntu 20.04
+- Add testing on Ubuntu 24.04
+- Add testing on Fedora 39 and 40
+- Bump up the version of clang to version 18 on Linux
+- Upgrade Catch2 to 3.5.2 and fmt to 10.2.0
 
 ## 3.2.0 (2024-01-13)
 

@@ -45,7 +45,7 @@ function(lips_build_and_test dockerfile container_tag build_type)
     "${container_tag}-${build_type}"
     USES_TERMINAL
     COMMENT "Build for ${dockerfile}/${container_tag}/${build_type}"
-    COMMAND "${LIPS_CONTAINER_APP}" build -t "${container_tag}" -f
+    COMMAND "${LIPS_CONTAINER_APP}" build -q -t "${container_tag}" -f
             "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
     COMMAND mkdir -p "${CMAKE_CURRENT_BINARY_DIR}/${container_tag}-${build_type}"
     COMMAND "${LIPS_CONTAINER_APP}" run --rm --user "${USER}:${GROUP}"
