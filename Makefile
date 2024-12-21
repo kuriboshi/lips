@@ -78,9 +78,12 @@ copyright:
 # Test different Linux configurations:
 #   OS            Compiler
 #   Ubuntu 22.04  gcc-13
-#   Ubuntu 22.04  clang-18
-#   Ubuntu 22.04  clang-tidy
-#   Fedora 39	  gcc-13
+#   Ubuntu 24.04  gcc-14
+#   Ubuntu 24.04  clang
+#   Fedora 40	  gcc-14
+#   Fedora 41	  gcc-14
+#   Fedora 41	  tidy
+#   Fedora 41	  clang
 .PHONE: test-linux
 test-linux:
 	cmake --build --preset debug --target test-linux
@@ -90,16 +93,16 @@ test-linux:
 test: debug
 	ctest --preset default --output-on-failure
 
-.PHONY: ubuntu22-clang fedora40-tidy fedora40-clang
-ubuntu22-clang fedora40-tidy fedora40-clang:
+.PHONY: ubuntu24-clang fedora41-tidy fedora41-clang
+ubuntu24-clang fedora41-tidy fedora41-clang:
 	cmake --build --preset debug --target $@
 
 .PHONY: ubuntu22 ubuntu24
 ubuntu22 ubuntu24:
 	cmake --build --preset debug --target $@-docker
 
-.PHONY: fedora39 fedora40
-fedora39 fedora40:
+.PHONY: fedora40 fedora41
+fedora40 fedora41:
 	cmake --build --preset debug --target $@-docker
 
 # Run the benchmark tests.

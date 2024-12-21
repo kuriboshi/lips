@@ -17,8 +17,8 @@
 
 cmake_minimum_required(VERSION 3.21.0)
 
-project(lips VERSION 3.3.0)
-set(CMAKE_CXX_STANDARD 20)
+project(lips VERSION 3.4.0)
+set(CMAKE_CXX_STANDARD 23)
 enable_testing()
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 

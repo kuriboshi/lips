@@ -45,7 +45,7 @@ function(lips_build_and_test dockerfile container_tag build_type)
     "${container_tag}-${build_type}"
     USES_TERMINAL
     COMMENT "Build for ${dockerfile}/${container_tag}/${build_type}"
-    COMMAND "${LIPS_CONTAINER_APP}" build -q -t "${container_tag}" -f
+    COMMAND "${LIPS_CONTAINER_APP}" build -t "${container_tag}" -f
             "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
     COMMAND mkdir -p "${CMAKE_CURRENT_BINARY_DIR}/${container_tag}-${build_type}"
     COMMAND "${LIPS_CONTAINER_APP}" run --rm --user "${USER}:${GROUP}"
@@ -61,10 +61,10 @@ add_custom_target(test-linux)
 set_target_properties(test-linux PROPERTIES FOLDER "Test")
 
 lips_build_and_test(Ubuntu-22.04 ubuntu22 docker)
-lips_build_and_test(Ubuntu-22.04 ubuntu22 clang)
 lips_build_and_test(Ubuntu-24.04 ubuntu24 docker)
+lips_build_and_test(Ubuntu-24.04 ubuntu24 clang)
 
-lips_build_and_test(Fedora-39 fedora39 docker)
 lips_build_and_test(Fedora-40 fedora40 docker)
-lips_build_and_test(Fedora-40 fedora40 tidy)
-lips_build_and_test(Fedora-40 fedora40 clang)
+lips_build_and_test(Fedora-41 fedora41 docker)
+lips_build_and_test(Fedora-41 fedora41 tidy)
+lips_build_and_test(Fedora-41 fedora41 clang)

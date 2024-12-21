@@ -18,7 +18,14 @@ RUN apt-get -y update && apt-get -y install --no-install-recommends cmake
 # Install packages needed to build the project.
 RUN apt-get -y update && apt-get -y install --no-install-recommends ninja-build
 RUN apt-get -y update && apt-get -y install --no-install-recommends libncurses-dev
-RUN apt-get -y update && apt-get -y install --no-install-recommends g++-13
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90 --slave /usr/bin/c++ c++ /usr/bin/g++-13
+RUN apt-get -y update && apt-get -y install --no-install-recommends g++-14
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 90 --slave /usr/bin/c++ c++ /usr/bin/g++-14
+
+# For clang and clang-tidy we need to install from llvm.org
+RUN apt-get -y update && apt-get -y install --no-install-recommends wget
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh
+RUN yes | ./llvm.sh 19
+RUN apt-get -y update && apt-get -y install clang-tidy-19
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-19
 
 WORKDIR /project

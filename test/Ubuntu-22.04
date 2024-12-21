@@ -22,11 +22,4 @@ RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN apt-get -y update && apt-get -y install --no-install-recommends g++-13
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 90 --slave /usr/bin/c++ c++ /usr/bin/g++-13
 
-# For clang and clang-tidy we need to install from llvm.org
-RUN apt-get -y update && apt-get -y install wget
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh
-RUN yes | ./llvm.sh 18
-RUN apt-get -y update && apt-get -y install clang-tidy-18
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 90 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-18
-
 WORKDIR /project

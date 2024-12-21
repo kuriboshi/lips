@@ -1,12 +1,20 @@
 # Release notes
 
+## 3.4.0 ()
+
+Minor release with the following changes.
+
+- Now requires C++-23
+- Use CPM.cmake for external dependencies
+- Upgrade Catch2 to 3.7.1 and fmt to 11.0.2
+
 ## 3.3.0 (2024-04-29)
 
 Minor release with the following changes.
 
-- Change the signature of most lisp functions to take arguments as const lisp_t&
+- Change the signature of most lisp functions to take arguments as `const lisp_t&`
 - Move all constants to the `atoms` namespace and remove the `C_` prefix
-- Breaking change: Rename getenviron to getenv
+- Breaking change: Rename `getenviron` to `getenv`
 - Add lisp function `version` which returns four atoms: major, minor,
   and patch number, and a version string
 - Drop testing on Ubuntu 20.04
