@@ -1,0 +1,25 @@
+Name: Fedora 41 Clang
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: fedora-41
+    name: Fedora 41 Clang
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: |
+        cmake --preset default
+
+    - name: Build
+      run: cmake --build --preset clang
+
+    - name: Test
+      run: ctest --output-on-failure --preset clang
