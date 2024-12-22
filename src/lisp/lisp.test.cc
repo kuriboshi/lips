@@ -1,6 +1,6 @@
 //
 // Lips, lisp shell.
-// Copyright 2021-2023 Krister Joas
+// Copyright 2021-2024 Krister Joas
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -126,7 +126,9 @@ TEST_CASE("lisp: type_of")
 TEST_CASE("lisp: version")
 {
   auto version = vm::version();
-  CHECK(version == lisp::version());
+  auto result{version == lisp::version()};
+  // Catch2 has a problem comparing two tuples when combiled with clang-19.
+  CHECK(result);
 }
 
 TEST_CASE("lisp: literals")
