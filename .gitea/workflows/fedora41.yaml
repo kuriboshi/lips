@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: fedora-41
+    name: Fedora 41
 
     steps:
     - uses: actions/checkout@v4
