@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    name: Ubuntu 24.04
 
     steps:
     - uses: actions/checkout@v4

@@ -12,6 +12,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    name: Package Test
 
     steps:
     - uses: actions/checkout@v4
