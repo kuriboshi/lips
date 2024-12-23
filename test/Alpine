@@ -1,0 +1,10 @@
+# -*- dockerfile -*-
+FROM alpine:3.21
+
+RUN apk add cmake
+RUN apk add ninja
+RUN apk add git
+RUN apk add g++
+RUN apk add ncurses-dev
+
+WORKDIR /project

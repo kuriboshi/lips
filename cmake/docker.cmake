@@ -68,3 +68,5 @@ lips_build_and_test(Fedora-40 fedora40 docker)
 lips_build_and_test(Fedora-41 fedora41 docker)
 lips_build_and_test(Fedora-41 fedora41 tidy)
 lips_build_and_test(Fedora-41 fedora41 clang)
+
+lips_build_and_test(Alpine alpine docker)

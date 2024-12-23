@@ -20,6 +20,7 @@
 
 #include <array>
 #include <termios.h>
+#include <sys/ttydefaults.h>
 #include <lisp/io.hh>
 
 // Various term cap strings.

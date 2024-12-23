@@ -105,6 +105,10 @@ ubuntu22 ubuntu24:
 fedora40 fedora41:
 	cmake --build --preset debug --target $@-docker
 
+.PHONY: alpine
+alpine:
+	cmake --build --preset debug --target $@-docker
+
 # Run the benchmark tests.
 .PHONY: benchmark
 benchmark: release
