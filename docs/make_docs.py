@@ -108,7 +108,7 @@ def process_file(filename):
             state = State.FILE
             continue
         # A @lisp command contains the lisp function signature.
-        m = re.match('^/// @lisp{(\(.*\)),(.*)}', line)
+        m = re.match(r'^/// @lisp{(.*),(.*)}', line)
         if m:
             function.lisp(f'`{m.group(1)}` (_{m.group(2)}_)')
             state = State.FILE

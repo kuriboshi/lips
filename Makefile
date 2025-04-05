@@ -84,6 +84,7 @@ copyright:
 #   Fedora 41	  gcc-14
 #   Fedora 41	  tidy
 #   Fedora 41	  clang
+#   Alpine 3.21   gcc
 .PHONE: test-linux
 test-linux:
 	cmake --build --preset debug --target test-linux

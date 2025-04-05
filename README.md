@@ -1,11 +1,11 @@
 # Lips — lisp shell
 
-Copyright 1988-1989, 1992, 2020-2024 Krister Joas <krister@joas.jp>
+Copyright 1988-1989, 1992, 2020-2025 Krister Joas <krister@joas.jp>
 
 ![Ubuntu 22.04](https://github.com/kuriboshi/lips/actions/workflows/ubuntu-22.04.yml/badge.svg)
 ![CodeQL Analysis](https://github.com/kuriboshi/lips/actions/workflows/codeql-analysis.yml/badge.svg)
 
-Version 3.3.0 (2024-04-29)
+Version 3.4.0 (2025-04-05)
 
 ## What is it?
 
@@ -41,28 +41,29 @@ For more details see [Reference Manual](docs/reference.md).
 
 ## Requirements
 
-The code requires C++20 and CMake 3.21 or newer.
+The code requires C++-23 and CMake 3.21 or newer.
 
 ### Platforms
 
-The project is developed primarily on macOS 14 (Sonoma) using the
-Apple clang version 15 compiler.
+The project is developed primarily on macOS 15 (Sequoia) using the
+Apple clang version 17 compiler.
 
 At the time of writing `lips` has been tested on the following
 platforms and compilers. Older platforms may work as long as you
 install a new enough compiler. Older compilers may also work depending
-on their level of support for C++-20.
+on their level of support for C++-23.
 
 | OS Version   | Compiler Version  |
 |--------------|-------------------|
-| macOS 14.4.1 | AppleClang 15.0.0 |
-| macOS 14.4.1 | clang 18.1.4      |
+| macOS 15.4   | AppleClang 17.0.0 |
+| macOS 15.4   | llvm-clang 20.1.1 |
 | Ubuntu 22.04 | gcc 13.1.0        |
-| Ubuntu 22.04 | clang 18.1.3      |
 | Ubuntu 24.04 | gcc 13.2.0        |
-| Fedora 39    | gcc 13.2.1        |
-| Fedora 40    | gcc 14.0.1        |
-| Fedora 40    | clang 18.1.1      |
+| Ubuntu 24.04 | clang 19.1.6      |
+| Fedora 40    | gcc 14.2.1        |
+| Fedora 41    | gcc 14.2.1        |
+| Fedora 41    | clang 19.1.5      |
+| Alpine 3.21  | gcc 14.2.0        |
 
 The minimum version of `clang-tidy` is 17.
 
@@ -73,8 +74,8 @@ built as part of the build.
 
 | Library Name | Version |
 |--------------|---------|
-| Catch2       | 3.5.2   |
-| fmt          | 10.2.0  |
+| Catch2       | 3.7.1   |
+| fmt          | 11.0.2  |
 
 System library dependencies.
 

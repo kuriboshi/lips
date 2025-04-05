@@ -1,8 +1,8 @@
 # `Lips` Reference Manual
 
-Version 3.3.0, April, 2024
+Version 3.4.0, April, 2025
 
-> Copyright (c) 1988-1989, 1992, 2020-2024 Krister Joas
+> Copyright (c) 1988-1989, 1992, 2020-2025 Krister Joas
 >
 > Licensed under the Apache License, Version 2.0 (the "License"); you
 > may not use this file except in compliance with the License.  You may
@@ -18,7 +18,7 @@ Version 3.3.0, April, 2024
 
 ## Introduction
 
-`lips` is an embeddable lisp interpreter written in C++-20.  `lips` is
+`lips` is an embeddable lisp interpreter written in C++-23.  `lips` is
 inspired by _Interlisp_ and functions are usually named as they are
 named in _Interlisp_.  Functions also tend to behave in the same way
 as they do in _Interlisp_.  There are exceptions and `lips` is not a
