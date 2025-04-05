@@ -1,12 +1,14 @@
 # Release notes
 
-## 3.4.0 ()
+## 3.4.0 (2025-04-05)
 
 Minor release with the following changes.
 
 - Now requires C++-23
-- Use CPM.cmake for external dependencies
 - Upgrade Catch2 to 3.7.1 and fmt to 11.0.2
+- Upgrade compilers across supported platforms
+- Add testing on Fedora 41
+- Drop testing on Fedora 39
 
 ## 3.3.0 (2024-04-29)
 
