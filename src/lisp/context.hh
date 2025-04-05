@@ -25,6 +25,13 @@
 #include "syntax.hh"
 #include "types.hh"
 
+// The C standard says these are macros and depending on the implementation
+// they may be defined as something we can't use as identifiers. Undefine them
+// since we don't need the original definitions.
+#undef stdin
+#undef stdout
+#undef stderr
+
 namespace lisp
 {
 

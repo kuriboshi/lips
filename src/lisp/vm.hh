@@ -39,13 +39,6 @@
 #include "version.hh"
 #include "details/vm.hh"
 
-// The C standard says these are macros and depending on the implementation
-// they may be defined as something we can't use as identifiers. Undefine them
-// since we don't need the original definitions.
-#undef stdout
-#undef stdin
-#undef stderr
-
 namespace lisp
 {
 class vm
