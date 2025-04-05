@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_ARITH_HH
-#define LISP_DETAILS_ARITH_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -54,5 +53,3 @@ lisp_t sub1(const lisp_t&);
 lisp_t zerop(const lisp_t&);
 
 } // namespace lisp::details::arith
-
-#endif

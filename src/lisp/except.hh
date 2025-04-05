@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_EXCEPT_HH
-#define LISP_EXCEPT_HH
+#pragma once
 
 #include <concepts>
 #include <stdexcept>
@@ -75,5 +74,3 @@ public:
 };
 
 } // namespace lisp
-
-#endif

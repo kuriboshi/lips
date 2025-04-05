@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_LIST_HH
-#define LISP_LIST_HH
+#pragma once
 
 /// @file list.hh
 ///
@@ -135,5 +134,3 @@ lisp_t list(T t, Ts... ts)
   return cons(t, list(ts...));
 }
 } // namespace lisp
-
-#endif

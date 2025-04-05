@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_REF_PTR_HH
-#define LISP_REF_PTR_HH
+#pragma once
 
 #include <atomic>
 #include <utility>
@@ -208,5 +207,3 @@ private:
   friend bool operator!=(const ref_ptr<T>& l, const ref_ptr<T>& r) { return l._ptr != r._ptr; }
 };
 } // namespace lisp
-
-#endif

@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_OS_HH
-#define LIPS_OS_HH
+#pragma once
 
 namespace lisp
 {
@@ -29,5 +28,3 @@ namespace lisp
 /// contents pointed to by _cp_ is left unchanged.
 extern bool readchar(char* c);
 } // namespace lisp
-
-#endif

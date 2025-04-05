@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_MAP_HH
-#define LISP_MAP_HH
+#pragma once
 
 /// @file map.hh
 ///
@@ -112,5 +111,3 @@ inline lisp_t mapcar(const lisp_t& list, const lisp_t& fn1, const lisp_t& fn2)
   return details::map::mapcar(list, fn1, fn2);
 }
 } // namespace lisp
-
-#endif

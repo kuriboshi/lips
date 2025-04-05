@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_ITER_HH
-#define LISP_ITER_HH
+#pragma once
 
 #include <iterator>
 
@@ -75,5 +74,3 @@ inline iterator begin(lisp_t l) { return {std::move(l)}; }
 inline iterator end(const lisp_t&) { return {nullptr}; }
 
 } // namespace lisp
-
-#endif

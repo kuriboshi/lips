@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_LIPS_ERROR_HH
-#define LIPS_LIPS_ERROR_HH
+#pragma once
 
 #include <system_error>
 #include <lisp/util.hh>
@@ -76,5 +75,3 @@ template<>
 struct is_error_code_enum<lisp::lips_errc>: public true_type
 {};
 } // namespace std
-
-#endif

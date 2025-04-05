@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_LIST_HH
-#define LISP_DETAILS_LIST_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -49,5 +48,3 @@ lisp_t list(const lisp_t&);
 lisp_t length(const lisp_t&);
 lisp_t nth(const lisp_t&, const lisp_t&);
 } // namespace lisp::details::list
-
-#endif

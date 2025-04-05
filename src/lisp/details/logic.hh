@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_LOGIC_HH
-#define LISP_DETAILS_LOGIC_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -30,5 +29,3 @@ lisp_t p_or(const lisp_t&);
 lisp_t p_not(const lisp_t&);
 
 } // namespace lisp::details::logic
-
-#endif

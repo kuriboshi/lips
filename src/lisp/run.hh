@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_RUN_HH
-#define LIPS_RUN_HH
+#pragma once
 
 #include <iostream>
 
@@ -63,5 +62,3 @@ inline int run(vm& vm, std::ostream& out = std::cout)
 }
 
 } // namespace lisp
-
-#endif

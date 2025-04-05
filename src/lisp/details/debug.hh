@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_DEBUG_HH
-#define LISP_DETAILS_DEBUG_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -27,5 +26,3 @@ lisp_t evaltrace(const lisp_t&);
 void init();
 
 } // namespace lisp::details::debug
-
-#endif

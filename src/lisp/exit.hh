@@ -18,8 +18,7 @@
 // This file exists only to exclude calling the 'exit' function from the
 // coverage report.
 
-#ifndef LISP_EXIT_HH
-#define LISP_EXIT_HH
+#pragma once
 
 #include "types.hh"
 #include "details/vm.hh"
@@ -32,5 +31,3 @@ namespace lisp
 /// @returns Does not return.
 inline lisp_t exit(lisp_t code) { return details::vm::exit(code); }
 } // namespace lisp
-
-#endif

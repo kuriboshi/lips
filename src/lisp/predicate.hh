@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_PRED_HH
-#define LISP_PRED_HH
+#pragma once
 
 /// @file predicate.hh
 ///
@@ -106,5 +105,3 @@ inline lisp_t litatom(const lisp_t& a) { return details::predicate::litatom(a); 
 /// | cvariable | C/++ Variable            |
 inline lisp_t xtypeof(const lisp_t& a) { return details::predicate::xtypeof(a); }
 } // namespace lisp
-
-#endif

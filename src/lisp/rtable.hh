@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_RTABLE_HH
-#define LISP_RTABLE_HH
+#pragma once
 
 #include "types.hh"
 
@@ -28,5 +27,3 @@ lisp_t rmdquote(const lisp_t&);
 lisp_t rmsquote(const lisp_t&);
 lisp_t rmgetenv(const lisp_t&);
 } // namespace lisp::rtable
-
-#endif

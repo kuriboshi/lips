@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_UTIL_HH
-#define LISP_UTIL_HH
+#pragma once
 
 #include <type_traits>
 
@@ -30,5 +29,3 @@ constexpr auto to_underlying(Enum e) noexcept
 }
 
 } // namespace lisp
-
-#endif

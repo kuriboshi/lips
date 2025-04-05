@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_MAIN_HH
-#define LIPS_MAIN_HH
+#pragma once
 
 #include <memory>
 #include <lisp/lisp.hh>
@@ -34,5 +33,3 @@ struct options_t
   bool version = false;     // Print version
   bool fast = false;        // Fast start, don't read init file
 };
-
-#endif

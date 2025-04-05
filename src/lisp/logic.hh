@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_LOGIC_HH
-#define LISP_LOGIC_HH
+#pragma once
 
 /// @file logic.hh
 ///
@@ -47,5 +46,3 @@ inline lisp_t p_not(const lisp_t& expr) { return details::logic::p_not(expr); }
 /// _t_ is evaluated and returned from the function. If _p_ evaluates to
 /// `nil` then the value of the expression _f_ is returned.
 } // namespace lisp
-
-#endif

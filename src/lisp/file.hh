@@ -21,8 +21,7 @@
 ///
 /// Functions managing files.
 
-#ifndef LISP_FILE_HH
-#define LISP_FILE_HH
+#pragma once
 
 #include "types.hh"
 #include "io.hh"
@@ -290,5 +289,3 @@ inline std::ostream& operator<<(std::ostream& os, const lisp::lisp_t& obj)
   lisp::prin0(obj, out, lisp::io::escape::YES);
   return os;
 }
-
-#endif

@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_PROP_HH
-#define LISP_DETAILS_PROP_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -32,5 +31,3 @@ lisp_t remprop(const lisp_t&, const lisp_t&);
 lisp_t setplist(const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::property
-
-#endif

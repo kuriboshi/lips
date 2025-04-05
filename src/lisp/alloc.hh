@@ -22,8 +22,7 @@
 /// Functions which are responsible for allocating objects and managing object
 /// life cycle.
 
-#ifndef LISP_ALLOC_HH
-#define LISP_ALLOC_HH
+#pragma once
 
 #include <concepts>
 #include <limits>
@@ -252,5 +251,3 @@ inline lisp::lisp_t operator"" _e(const char* s, std::size_t) { return lisp::eva
 } // namespace literals
 
 } // namespace lisp
-
-#endif

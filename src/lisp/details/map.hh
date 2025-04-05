@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_MAP_HH
-#define LISP_DETAILS_MAP_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -31,5 +30,3 @@ lisp_t maplist(const lisp_t&, const lisp_t&, const lisp_t&);
 lisp_t mapcar(const lisp_t&, const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::map
-
-#endif

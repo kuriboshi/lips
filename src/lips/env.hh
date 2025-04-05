@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_ENV_HH
-#define LIPS_ENV_HH
+#pragma once
 
 #include <string>
 #include <lisp/lisp.hh>
@@ -80,5 +79,3 @@ private:
 } // namespace lisp
 
 extern std::unique_ptr<lisp::env> environment; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-
-#endif

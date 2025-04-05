@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_VERSION_HH
-#define LISP_VERSION_HH
+#pragma once
 
 #include <tuple>
 
@@ -24,5 +23,3 @@ namespace lisp
 {
 extern const std::tuple<unsigned, unsigned, unsigned, const char*> version();
 }
-
-#endif

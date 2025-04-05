@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_TYPES_HH
-#define LISP_TYPES_HH
+#pragma once
 
 /// @file types.hh
 ///
@@ -942,5 +941,3 @@ inline bool is_nil(const object& x) { return type_of(x) == object::type::Nil; }
 inline bool is_nil(const cvariable_t& x) { return type_of(x) == object::type::Nil; }
 
 } // namespace lisp
-
-#endif

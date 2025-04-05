@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_STRING_HH
-#define LISP_DETAILS_STRING_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -34,5 +33,3 @@ lisp_t strlen(const lisp_t&);
 lisp_t substring(const lisp_t&, const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::string
-
-#endif

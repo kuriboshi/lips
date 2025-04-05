@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_PRED_HH
-#define LISP_DETAILS_PRED_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -38,5 +37,3 @@ lisp_t litatom(const lisp_t&);
 lisp_t xtypeof(const lisp_t&);
 
 } // namespace lisp::details::predicate
-
-#endif

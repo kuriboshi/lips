@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_ERROR_HH
-#define LISP_ERROR_HH
+#pragma once
 
 #include <string>
 #include <system_error>
@@ -205,5 +204,3 @@ template<>
 struct is_error_code_enum<lisp::error_errc>: public true_type
 {};
 } // namespace std
-
-#endif

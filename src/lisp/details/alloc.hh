@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_ALLOC_HH
-#define LISP_DETAILS_ALLOC_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -76,5 +75,3 @@ inline lisp_t makecvar(std::string_view name, lisp_t val)
 void init();
 
 } // namespace lisp::details::alloc
-
-#endif

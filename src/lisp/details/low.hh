@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_LOW_HH
-#define LISP_DETAILS_LOW_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -33,5 +32,3 @@ lisp_t setq(const lisp_t&, const lisp_t&);
 lisp_t xwhile(const lisp_t&, const lisp_t&);
 
 } // namespace lisp::details::low
-
-#endif

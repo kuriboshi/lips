@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_CONTEXT_HH
-#define LISP_CONTEXT_HH
+#pragma once
 
 #include <system_error>
 #include <memory>
@@ -83,5 +82,3 @@ private:
 };
 
 } // namespace lisp
-
-#endif

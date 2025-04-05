@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_TERM_HH
-#define LIPS_TERM_HH
+#pragma once
 
 #include <array>
 #include <termios.h>
@@ -222,10 +221,8 @@ private:
   //
   // Variables for terminal characteristics, old and new.
   //
-  struct termios _newterm
-  {};
-  struct termios _oldterm
-  {};
+  struct termios _newterm{};
+  struct termios _oldterm{};
 
   std::array<char, BUFSIZ> _linebuffer{}; // Line buffer for terminal input.
   std::istringstream _is;                 // For input stream.
@@ -237,5 +234,3 @@ private:
   termcap _termcap;
   std::string _current_prompt;
 };
-
-#endif

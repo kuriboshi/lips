@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_USER_HH
-#define LISP_USER_HH
+#pragma once
 
 /// @file user.hh
 ///
@@ -75,5 +74,3 @@ inline lisp_t defineq(const lisp_t& list) { return details::user::defineq(list);
 /// it's empty then the return value is nil.
 inline lisp_t getrep(const lisp_t& lambda) { return details::user::getrep(lambda); }
 } // namespace lisp
-
-#endif

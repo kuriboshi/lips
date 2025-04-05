@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_GLOB_HH
-#define LIPS_GLOB_HH
+#pragma once
 
 #include <optional>
 #include <string>
@@ -35,5 +34,3 @@ lisp_t expand(lisp_t wild);
 } // namespace glob
 
 inline lisp::lisp_t expand(lisp::lisp_t wild) { return glob::expand(wild); }
-
-#endif

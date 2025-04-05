@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_STRING_HH
-#define LISP_STRING_HH
+#pragma once
 
 /// @file string.hh
 ///
@@ -118,5 +117,3 @@ inline lisp_t substring(const lisp_t& str, const lisp_t& n, const lisp_t& m)
 inline lisp_t symstr(const lisp_t& sym) { return details::string::symstr(sym); }
 
 } // namespace lisp
-
-#endif

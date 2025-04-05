@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_SYMBOL_HH
-#define LISP_SYMBOL_HH
+#pragma once
 
 #include <cstddef>
 #include <functional>
@@ -120,5 +119,3 @@ private:
 using ref_symbol_t = ref_ptr<symbol::symbol_t>;
 
 } // namespace lisp
-
-#endif

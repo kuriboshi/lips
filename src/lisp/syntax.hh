@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_SYNTAX_HH
-#define LISP_SYNTAX_HH
+#pragma once
 
 #include <cstdint>
 #include <array>
@@ -135,5 +134,3 @@ private:
 };
 
 } // namespace lisp
-
-#endif

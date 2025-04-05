@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_REPL_HH
-#define LISP_REPL_HH
+#pragma once
 
 #include "types.hh"
 
@@ -65,5 +64,3 @@ private:
 };
 
 } // namespace lisp
-
-#endif

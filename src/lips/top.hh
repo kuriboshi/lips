@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_TOP_HH
-#define LIPS_TOP_HH
+#pragma once
 
 #include <functional>
 #include <lisp/lisp.hh>
@@ -134,5 +133,3 @@ inline const lisp::lisp_t EXCL = intern("!");
 } // namespace atoms
 
 } // namespace lisp
-
-#endif

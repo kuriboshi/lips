@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DETAILS_VM_HH
-#define LISP_DETAILS_VM_HH
+#pragma once
 
 #include <lisp/types.hh>
 
@@ -32,5 +31,3 @@ lisp_t error(const lisp_t&);
 lisp_t exit(const lisp_t&);
 lisp_t version();
 } // namespace lisp::details::vm
-
-#endif

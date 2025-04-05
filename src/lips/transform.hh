@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_TRANSFORM_HH
-#define LIPS_TRANSFORM_HH
+#pragma once
 
 #include <lisp/lisp.hh>
 
@@ -31,5 +30,3 @@ inline const lisp_t GT = intern(">");
 inline const lisp_t LT = intern("<");
 inline const lisp_t SEMI = intern(";");
 } // namespace lisp::atoms
-
-#endif

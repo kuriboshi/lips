@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_LOW_HH
-#define LISP_LOW_HH
+#pragma once
 
 /// @file low.hh
 ///
@@ -97,5 +96,3 @@ inline lisp_t setqq(const lisp_t& var, const lisp_t& val) { return details::low:
 /// implicit `progn`. Returns `nil`.
 inline lisp_t xwhile(const lisp_t& first, const lisp_t& second) { return details::low::xwhile(first, second); }
 } // namespace lisp
-
-#endif

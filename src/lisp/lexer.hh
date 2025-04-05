@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_LEXER_HH
-#define LISP_LEXER_HH
+#pragma once
 
 #include <cstdint>
 #include <iostream>
@@ -233,5 +232,3 @@ private:
 };
 
 } // namespace lisp
-
-#endif

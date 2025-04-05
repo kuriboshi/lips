@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_CHECK_HH
-#define LISP_CHECK_HH
+#pragma once
 
 #include "vm.hh"
 #include "error.hh"
@@ -88,5 +87,3 @@ void check(const lisp_t& arg, T type, Ts... types)
 }
 
 } // namespace lisp
-
-#endif

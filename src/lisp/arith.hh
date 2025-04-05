@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_ARITH_HH
-#define LISP_ARITH_HH
+#pragma once
 
 /// @file arith.hh
 ///
@@ -160,5 +159,3 @@ inline lisp_t sub1(const lisp_t& a) { return details::arith::sub1(a); }
 /// @lisp{(zerop x),Function}
 inline lisp_t zerop(const lisp_t& x) { return details::arith::zerop(x); }
 } // namespace lisp
-
-#endif

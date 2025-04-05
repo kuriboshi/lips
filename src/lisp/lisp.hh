@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_LISP_HH
-#define LISP_LISP_HH
+#pragma once
 
 #include "alloc.hh"
 #include "arith.hh"
@@ -41,5 +40,3 @@
 #include "string.hh"
 #include "user.hh"
 #include "vm.hh"
-
-#endif

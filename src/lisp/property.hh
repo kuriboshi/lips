@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_PROP_HH
-#define LISP_PROP_HH
+#pragma once
 
 /// @file property.hh
 ///
@@ -51,5 +50,3 @@ inline lisp_t remprop(const lisp_t& a, const lisp_t& p) { return details::proper
 /// @lisp{(setplist a pl),Function}
 inline lisp_t setplist(const lisp_t& a, const lisp_t& pl) { return details::property::setplist(a, pl); }
 } // namespace lisp
-
-#endif

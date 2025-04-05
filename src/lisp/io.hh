@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_IO_HH
-#define LISP_IO_HH
+#pragma once
 
 #include <fstream>
 #include <memory>
@@ -334,5 +333,3 @@ std::string to_string(T& sink)
 }
 
 } // namespace lisp
-
-#endif

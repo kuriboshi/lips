@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_DEBUG_HH
-#define LISP_DEBUG_HH
+#pragma once
 
 #include "context.hh"
 #include "types.hh"
@@ -31,5 +30,3 @@ namespace lisp
 /// @returns Previous value of the trace setting.
 inline lisp_t evaltrace(const lisp_t& trace) { return details::debug::evaltrace(trace); }
 } // namespace lisp
-
-#endif

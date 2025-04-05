@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_POOL_HH
-#define LISP_POOL_HH
+#pragma once
 
 #include <new>
 #include <list>
@@ -138,5 +137,3 @@ struct pool_test_t
 {};
 
 } // namespace lisp
-
-#endif

@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LIPS_EXEC_HH
-#define LIPS_EXEC_HH
+#pragma once
 
 /// @file exec.hh
 ///
@@ -266,5 +265,3 @@ inline const lisp_t REDIR_APPEND = intern(pn::REDIR_APPEND);
 inline const lisp_t REDIR_FROM = intern(pn::REDIR_FROM);
 inline const lisp_t REDIR_TO = intern(pn::REDIR_TO);
 } // namespace lisp::atoms
-
-#endif

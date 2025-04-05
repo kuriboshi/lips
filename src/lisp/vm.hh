@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_VM_HH
-#define LISP_VM_HH
+#pragma once
 
 /// @file vm.hh
 ///
@@ -670,5 +669,3 @@ inline void fatal(std::error_code code, const Ts&... a)
 }
 
 } // namespace lisp
-
-#endif

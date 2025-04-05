@@ -16,8 +16,7 @@
 // limitations under the License.
 //
 
-#ifndef LISP_PARSER_HH
-#define LISP_PARSER_HH
+#pragma once
 
 #include <string>
 
@@ -110,5 +109,3 @@ private:
 };
 
 } // namespace lisp
-
-#endif
