@@ -272,7 +272,7 @@ inline lisp_t print(lisp_t a, io::output out = io::output::PRIMARY)
 inline namespace literals
 {
 /// @brief Creates a lisp expression from a string.
-inline lisp::lisp_t operator"" _l(const char* s, std::size_t)
+inline lisp::lisp_t operator""_l(const char* s, std::size_t)
 {
   auto in = lisp::ref_file_t::create(s);
   auto e = lisp::lispread(in);

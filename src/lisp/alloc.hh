@@ -216,19 +216,19 @@ lisp_t mklist(lisp_t first, Ts... rest)
 inline namespace literals
 {
 /// @brief Creates a lisp string.
-inline lisp::lisp_t operator"" _s(const char* s, std::size_t) { return lisp::details::alloc::mkstring(s); }
+inline lisp::lisp_t operator""_s(const char* s, std::size_t) { return lisp::details::alloc::mkstring(s); }
 
 /// @brief Creates an atom.
-inline lisp::lisp_t operator"" _a(const char* s, std::size_t) { return lisp::details::alloc::mkatom(s); }
+inline lisp::lisp_t operator""_a(const char* s, std::size_t) { return lisp::details::alloc::mkatom(s); }
 
 /// @brief Creates a number.
-inline lisp::lisp_t operator"" _l(unsigned long long i)
+inline lisp::lisp_t operator""_l(unsigned long long i)
 {
   return lisp::details::alloc::mknumber(static_cast<lisp::integer_t::value_type>(i));
 }
 
 /// @brief Creates a floating point value.
-inline lisp::lisp_t operator"" _l(long double d)
+inline lisp::lisp_t operator""_l(long double d)
 {
   // The if constexpr should be enough but I think the code coverage numbers
   // are skewed when sizeof(double) == sizeof(long double).
@@ -247,7 +247,7 @@ inline lisp::lisp_t operator"" _l(long double d)
 }
 
 /// @brief Evaluates a lisp expression in a string.
-inline lisp::lisp_t operator"" _e(const char* s, std::size_t) { return lisp::eval(s); }
+inline lisp::lisp_t operator""_e(const char* s, std::size_t) { return lisp::eval(s); }
 } // namespace literals
 
 } // namespace lisp
