@@ -16,7 +16,7 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cmake --preset default
+        cmake --preset clang
 
     - name: Build
       run: cmake --build --preset clang
