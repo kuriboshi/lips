@@ -205,7 +205,7 @@ lisp_t vm::printwhere()
     if(auto* func = std::get_if<continuation_t>(&_control.at(i)); (func != nullptr) && *func == &vm::eval_end)
     {
       if(auto* lsp = std::get_if<expr_t>(&_control.at(i - 1));
-         lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
+        lsp != nullptr && (type_of(*lsp) == object::type::Cons && type_of((*lsp)->car()) != object::type::Cons))
       {
         foo = *lsp;
         primerr()->format("[in ");
