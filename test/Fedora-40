@@ -1,6 +1,9 @@
 # -*- dockerfile -*-
 FROM fedora:40
 
+# Speed up dnf install
+RUN echo 'fastestmirror=True' >> /etc/dnf/dnf.conf
+
 # We can use the default version of cmake.
 RUN dnf -y install cmake
 
