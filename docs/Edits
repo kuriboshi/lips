@@ -334,7 +334,7 @@
         print can convert (pipe x y) to their equivalent (x | y).
 
 77      880717  krijo
-        Prompting is done with the variable promptform wich is
+        Prompting is done with the variable promptform which is
         (if its a list) evaluated before reading next command.
 
 76	880715	krijo
@@ -585,7 +585,7 @@
 	Changed the printout of objects to more informative.
 
 31	880405	Krister Joas (kvack@dizzy)
-	The complete destblock area is scanned for marking, wich
+	The complete destblock area is scanned for marking, which
 	requires that dalloc() clear the car as well as cdr part of
 	the new dest block. mark() failed to mark first conscell and
 	because the sweeper only looks at the car of the conscells

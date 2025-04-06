@@ -121,7 +121,7 @@ Examples:
 |`123`  |integer       |
 |`12a`  |literal atom  |
 |`1.0`  |floating point|
-|`1e5`  |floatint point|
+|`1e5`  |floating point|
 |`1e`   |literal atom  |
 |`.e4`  |literal atom  |
 |`1.4.` |literal atom  |
@@ -129,7 +129,7 @@ Examples:
 Comments are allowed in `lips` files.  In order to allow for the
 _Unix_ "shebang" interpreter directive a `#` character in the first
 column of a line is recognized as a comment that ends with a
-newline. A `#` in any other colmn is treated as a regular character.
+newline. A `#` in any other column is treated as a regular character.
 Comments may also start with the semicolon character and the comment
 again continues until the end of the line.
 
@@ -164,22 +164,19 @@ when the reference count goes down to zero.
 
 If the expression to be evaluated is a list the first element (the
 _car_) in the list is evaluated and then applied to the arguments.  The
-car of the expression is reevalutated until either a proper functional
+car of the expression is reevaluated until either a proper functional
 form is recognized or if it's evaluated to an illegal functional form,
-in which case an error is signalled.
+in which case an error is signaled.
 
 If the functional form is an unbound atom, `lips` looks for the
 property `autoload` on the property list of the atom.  If it is
 found, and the value is a symbol or a string, the file with that name
 is loaded (if possible).  The interpreter then checks if the atom is
-no longer unbound, in wich case evaluation continues.
-
-Note that the arguments for the command are never evaluated.  If you
-want them evaluated you must use the function `apply`.
+no longer unbound, in which case evaluation continues.
 
 ## Variables
 
-What follows is a list of all user accessable variables that in some
+What follows is a list of all user accessible variables that in some
 way guides the behavior of `lips`.
 
 - `histmax` Controls the number of commands to save on the history
@@ -192,7 +189,7 @@ way guides the behavior of `lips`.
 - `home` This variable contains the home directory of the user.
 - `history` In the `history` variable the history list is built.  This
   is for internal use and proper functioning of `lips` is not
-  garantueed if history is set to funny values.
+  guaranteed if history is set to funny values.
 - `histnum` The variable `histnum` contains the number on the current
   `lips` interaction.  The same warnings apply to histnum as to
   history.
@@ -212,7 +209,7 @@ The most basic types in `lips` are the following.
 - `lisp::vm` The lisp interpreter, or virtual machine. There
     may be only one lisp interpreter in the same program.
 - `lisp::context_t` The context contains some globally
-    accessable values mostly related to I/O such as the current
+    accessible values mostly related to I/O such as the current
     primary output or primary error. Currently there can be only one
     context per program.
 - `lisp_t` This is a basic type which can contain a value
