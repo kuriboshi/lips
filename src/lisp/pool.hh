@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include <memory>
 #include <new>
 #include <list>
+#include <cstdint>
 
 namespace lisp
 {
@@ -30,40 +32,11 @@ template<typename T, std::size_t N = 64>
 class pool final
 {
 public:
-  /// @brief Stores a block of data to hold the objects of type T.
-  struct data final
-  {
-    data()
-      : _block(new std::byte[N * sizeof(T)])
-    {}
-    /// @brief Disallow copying.
-    data(const data&) = delete;
-    /// @brief Disallow assignment.
-    data& operator=(const data&) = delete;
-    /// @brief Move constuctor.
-    data(data&& d) noexcept
-      : _block(d._block),
-        _free_items(d._free_items)
-    {
-      d._block = nullptr;
-      d._free_items = 0;
-    }
-    /// @brief Disallow move assignment.
-    data& operator=(data&&) = delete;
-    /// @brief Destructor.
-    ~data() { delete[] _block; }
-
-    friend pool;
-
-  private:
-    std::byte* _block{nullptr};
-    std::size_t _free_items{N};
-  };
   /// @brief Returns the number of free items.
   std::size_t size() const
   {
     if(!_storage.empty())
-      return _free_count + _storage.front()._free_items;
+      return _free_count + _storage.front()->free_items;
     return _free_count;
   }
 
@@ -71,6 +44,28 @@ public:
   friend T;
 
 private:
+  /// @brief Stores a block of data to hold the objects of type T.
+  struct data final
+  {
+    /// @brief Default constructor.
+    data() = default;
+    /// @brief Disallow copying.
+    data(const data&) = delete;
+    /// @brief Disallow assignment.
+    data& operator=(const data&) = delete;
+    /// @brief Disallow move constuctor.
+    data(data&& d) = delete;
+    /// @brief Disallow move assignment.
+    data& operator=(data&&) = delete;
+    /// @brief Default destructor.
+    ~data() = default;
+
+    /// @brief A block of data.
+    alignas(alignof(T)) std::byte block[N * sizeof(T)];
+    /// @brief Counts the number of free items in the block.
+    std::size_t free_items{N};
+  };
+
   /// @brief Allocate memory for an object of type T.
   T* allocate()
   {
@@ -86,30 +81,41 @@ private:
     // If we have no blocks of memory already allocated we allocate one block.
     if(_storage.empty())
     {
-      data d;
-      _storage.push_front(std::move(d));
-      _current = _storage.front()._block;
+      _storage.push_front(std::make_unique<data>());
+      _current = _storage.front()->block;
     }
     // If the block we have has no more data we need to allocate a new one and
     // link it up to a double linked list.
-    if(_storage.front()._free_items == 0)
+    if(_storage.front()->free_items == 0)
     {
-      _storage.push_front(data());
-      _current = _storage.front()._block;
+      _storage.push_front(std::make_unique<data>());
+      _current = _storage.front()->block;
     }
-    // Placement new of the new object from our storage. The _current member
-    // points to the first available memory in the data block.
-    T* object = ::new(_current) T;
-    --_storage.front()._free_items;
-    _current = _current + sizeof(T);
+    // Construct an object of type T at the first available memory location in
+    // the data block.
+    T* object = std::construct_at(reinterpret_cast<T*>(_current));
+    --_storage.front()->free_items;
+    if(_storage.front()->free_items > 0)
+    {
+      // Adjust the _current pointer to point to the next available memory
+      // slot. Cast to std::uintptr_t to do the pointer arithmetic.
+      auto address = reinterpret_cast<std::uintptr_t>(_current);
+      // Ensure alignment of T objects.
+      auto offset = address % alignof(T);
+      if(offset != 0)
+        address += alignof(T) - offset;
+      _current = reinterpret_cast<std::byte*>(address + sizeof(T));
+    }
     return object;
   }
+
   /// @brief The item struct is used to link objects returned to the pool by
   /// deallocate in a linked list.
   struct item
   {
     item* _next{nullptr};
   };
+
   /// @brief Return an object to the pool.
   void deallocate(void* obj)
   {
@@ -128,7 +134,7 @@ private:
   unsigned _free_count{0};
   /// @brief Pointer to the storage block from where new objects are allocated
   /// if there are no objects available in the free list.
-  std::list<data> _storage;
+  std::list<std::unique_ptr<data>> _storage;
   /// @brief Pointer to the next available memory in the data block.
   std::byte* _current{nullptr};
 };
