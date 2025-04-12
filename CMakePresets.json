@@ -72,6 +72,11 @@
             "displayName": "Build with clang",
             "description": "Build with the clang compiler",
             "binaryDir": "${sourceDir}/build/clang",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
@@ -81,12 +86,17 @@
         {
             "name": "llvm",
             "inherits": "debug",
-            "displayName": "Build with llvm clang",
-            "description": "Build with the llvm clang compiler",
+            "displayName": "Build with llvm clang compiler",
+            "description": "Build with llvm clang compiler",
             "binaryDir": "${sourceDir}/build/llvm",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "/opt/homebrew/opt/llvm/bin/clang",
-                "CMAKE_CXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++",
+                "CMAKE_C_COMPILER": "$env{HOMEBREW_ROOT}/opt/llvm/bin/clang",
+                "CMAKE_CXX_COMPILER": "$env{HOMEBREW_ROOT}/opt/llvm/bin/clang++",
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
         },
@@ -132,6 +142,10 @@
         },
         {
             "name": "llvm",
+            "configurePreset": "llvm"
+        },
+        {
+            "name": "llvm-macos-x86_64",
             "configurePreset": "llvm"
         },
         {

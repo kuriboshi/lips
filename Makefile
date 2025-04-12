@@ -1,45 +1,46 @@
+# -*- makefile-gmake -*-
+
 all: debug
-everything: test release clang tidy test-linux ubuntu24-clang fedora41-tidy fedora41-clang
+
+TARGETS := debug release clang llvm tidy
+
+# Homebrew on mac is located in different places depending on CPU architecture.
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),arm64)
+  export HOMEBREW_ROOT := /opt/homebrew
+else
+  export HOMEBREW_ROOT := /usr/local
+endif
+
+# Runs the configure step for a target.
+$(TARGETS:%=build/%/configured):
+	cmake --preset $(@:build/%/configured=%)
+	touch $@
 
 # Default debug build.
 .PHONY: debug
 debug: build/debug/configured
 	cmake --build --preset $@
-build/debug/configured:
-	cmake --preset debug
-	touch $@
 
 # Optimized build.
 .PHONY: release
 release: build/release/configured
 	cmake --build --preset $@
-build/release/configured:
-	cmake --preset release
-	touch $@
 
 # Build with the clang compiler.
 .PHONY: clang
 clang: build/clang/configured
 	cmake --build --preset $@
-build/clang/configured:
-	cmake --preset clang
-	touch $@
 
 # Build with the llvm clang compiler (Apple only)
 .PHONY: llvm
 llvm: build/llvm/configured
 	cmake --build --preset $@
-build/llvm/configured:
-	cmake --preset llvm
-	touch $@
 
 # Build using clang-tidy to analyse the code.
 .PHONY: tidy
 tidy: build/tidy/configured
 	cmake --build --preset $@
-build/tidy/configured:
-	cmake --preset tidy
-	touch $@
 
 # Create a configuration suitable to use with Xcode.
 .PHONY: xcode
@@ -66,6 +67,23 @@ test: debug
 copyright:
 	./docs/copyright.sh
 
+# Update documentation
+.PHONY: docs
+docs:
+	./docs/make_docs.py
+
+# Run the benchmark tests.
+.PHONY: benchmark
+benchmark: release
+	ctest --preset benchmark
+
+# Test using lips as a package via CMake FetchContent.
+.PHONY: package-test
+package-test:
+	(cd test/package; cmake -G Ninja -B ../../build/package-test .)
+	(cd test/package; cmake --build ../../build/package-test)
+	(cd build/package-test; ctest)
+
 # Test different Linux configurations:
 #   OS            Compiler
 #   Ubuntu 22.04  gcc-13
@@ -87,19 +105,3 @@ test-linux: container
 .PHONY: ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang
 ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang: container
 	cmake --build build/container --target $@
-
-# Run the benchmark tests.
-.PHONY: benchmark
-benchmark: release
-	ctest --preset benchmark
-
-# Test using lips as a package via CMake FetchContent.
-.PHONY: package-test
-package-test:
-	(cd test/package; cmake -G Ninja -B ../../build/package-test .)
-	(cd test/package; cmake --build ../../build/package-test)
-	(cd build/package-test; ctest)
-
-.PHONY: docs
-docs:
-	./docs/make_docs.py
