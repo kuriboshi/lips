@@ -1,6 +1,6 @@
 #
 # Lips -- lisp shell
-# Copyright 2020-2025 Krister Joas
+# Copyright 2023-2024 Krister Joas
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,23 @@
 #
 
 cmake_minimum_required(VERSION 3.21.0)
-
-project(lips VERSION 3.4.0)
+project(package_test VERSION 0.0.0)
 set(CMAKE_CXX_STANDARD 23)
+enable_testing()
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
-include(container)
+include(FetchContent)
+
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
+FetchContent_Declare(lips GIT_REPOSITORY "file://${CMAKE_CURRENT_SOURCE_DIR}/../.." GIT_TAG HEAD)
+
+FetchContent_MakeAvailable(lips)
+find_package(Catch2 REQUIRED)
+
+add_executable(package_test)
+target_sources(package_test PRIVATE package_test.cc)
+target_link_libraries(package_test lips::lisp Catch2::Catch2)
+
+add_test(NAME package_lisp COMMAND package_test)

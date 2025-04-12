@@ -43,7 +43,6 @@ if(LIPS_ENABLE_CLANG_TIDY)
 endif()
 include(clang-format)
 
-include(docker)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 

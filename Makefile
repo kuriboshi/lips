@@ -1,59 +1,45 @@
 all: debug
+everything: test release clang tidy test-linux ubuntu24-clang fedora41-tidy fedora41-clang
 
 # Default debug build.
-.PHONY: debug.config
 .PHONY: debug
-debug.config: build/debug/CMakeCache.txt
-
-build/debug/CMakeCache.txt:
+debug: build/debug/configured
+	cmake --build --preset $@
+build/debug/configured:
 	cmake --preset debug
-
-debug: debug.config
-	cmake --build --preset debug
+	touch $@
 
 # Optimized build.
-.PHONY: release.config
 .PHONY: release
-release.config: build/release/CMakeCache.txt
-
-build/release/CMakeCache.txt:
+release: build/release/configured
+	cmake --build --preset $@
+build/release/configured:
 	cmake --preset release
-
-release: release.config
-	cmake --build --preset release
+	touch $@
 
 # Build with the clang compiler.
-.PHONY: clang.config
 .PHONY: clang
-clang.config: build/clang/CMakeCache.txt
-
-build/clang/CMakeCache.txt:
+clang: build/clang/configured
+	cmake --build --preset $@
+build/clang/configured:
 	cmake --preset clang
+	touch $@
 
-clang: clang.config
-	cmake --build --preset clang
-
-# Build with the llvm clang compiler
-.PHONY: llvm.config
+# Build with the llvm clang compiler (Apple only)
 .PHONY: llvm
-llvm.config: build/llvm/CMakeCache.txt
-
-build/llvm/CMakeCache.txt:
+llvm: build/llvm/configured
+	cmake --build --preset $@
+build/llvm/configured:
 	cmake --preset llvm
-
-llvm: llvm.config
-	cmake --build --preset llvm
+	touch $@
 
 # Build using clang-tidy to analyse the code.
-.PHONY: tidy.config
 .PHONY: tidy
-tidy.config: build/tidy/CMakeCache.txt
-
-build/tidy/CMakeCache.txt:
+tidy: build/tidy/configured
+	cmake --build --preset $@
+build/tidy/configured:
 	cmake --preset tidy
-
-tidy: tidy.config
-	cmake --build --preset tidy
+	touch $@
 
 # Create a configuration suitable to use with Xcode.
 .PHONY: xcode
@@ -62,13 +48,18 @@ xcode:
 
 # Produce a coverage report.
 .PHONY: coverage
-coverage: debug.config
+coverage: build/debug/configured
 	cmake --build --preset debug --target coverage
 
 # Format source code using clang-format
 .PHONY: format
-format: debug.config
+format: build/debug/configured
 	cmake --build --preset debug --target format
+
+# Run the unit tests.
+.PHONY: test
+test: debug
+	ctest --preset debug --output-on-failure
 
 # Update copyright notices
 .PHONY: copyright
@@ -85,30 +76,17 @@ copyright:
 #   Fedora 41	  tidy
 #   Fedora 41	  clang
 #   Alpine 3.21   gcc
-.PHONE: test-linux
-test-linux:
-	cmake --build --preset debug --target test-linux
+.PHONY: container
+container:
+	(cd test; cmake -G Ninja -B ../build/container .)
 
-# Run the unit tests.
-.PHONY: test
-test: debug
-	ctest --preset default --output-on-failure
+.PHONY: test-linux
+test-linux: container
+	cmake --build --preset container --target test-linux
 
-.PHONY: ubuntu24-clang fedora41-tidy fedora41-clang
-ubuntu24-clang fedora41-tidy fedora41-clang:
-	cmake --build --preset debug --target $@
-
-.PHONY: ubuntu22 ubuntu24
-ubuntu22 ubuntu24:
-	cmake --build --preset debug --target $@-docker
-
-.PHONY: fedora40 fedora41
-fedora40 fedora41:
-	cmake --build --preset debug --target $@-docker
-
-.PHONY: alpine
-alpine:
-	cmake --build --preset debug --target $@-docker
+.PHONY: ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang
+ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang: container
+	cmake --build build/container --target $@
 
 # Run the benchmark tests.
 .PHONY: benchmark
@@ -118,8 +96,8 @@ benchmark: release
 # Test using lips as a package via CMake FetchContent.
 .PHONY: package-test
 package-test:
-	(cd test; cmake -G Ninja -B ../build/package-test .)
-	(cd test; cmake --build ../build/package-test)
+	(cd test/package; cmake -G Ninja -B ../../build/package-test .)
+	(cd test/package; cmake --build ../../build/package-test)
 	(cd build/package-test; ctest)
 
 .PHONY: docs

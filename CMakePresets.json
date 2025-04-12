@@ -56,15 +56,6 @@
             }
         },
         {
-            "name": "docker",
-            "inherits": "debug",
-            "displayName": "Docker preset",
-            "description": "Default preset for use in docker",
-            "cacheVariables": {
-                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
-            }
-        },
-        {
             "name": "tidy",
             "inherits": "debug",
             "displayName": "Run clang-tidy",
@@ -96,6 +87,16 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "/opt/homebrew/opt/llvm/bin/clang",
                 "CMAKE_CXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++",
+                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
+            }
+        },
+        {
+            "name": "container",
+            "inherits": "debug",
+            "displayName": "Container preset",
+            "description": "Default preset for use in a container",
+            "binaryDir": "${sourceDir}/build/container",
+            "cacheVariables": {
                 "LIPS_ENABLE_CODE_COVERAGE": "OFF"
             }
         }
@@ -132,6 +133,10 @@
         {
             "name": "llvm",
             "configurePreset": "llvm"
+        },
+        {
+            "name": "container",
+            "configurePreset": "container"
         }
     ],
     "testPresets": [

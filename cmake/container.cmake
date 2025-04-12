@@ -38,35 +38,43 @@ endif()
 # @param build_type The CMake preset used to configure and build the
 #   project.
 #
-function(lips_build_and_test dockerfile container_tag build_type)
+function(lips_build_and_test dockerfile container_tag)
   execute_process(COMMAND id -u OUTPUT_VARIABLE USER OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process(COMMAND id -g OUTPUT_VARIABLE GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT ARGV2)
+    set(build_type "container")
+    set(target "${container_tag}")
+  else()
+    set(build_type "${ARGV2}")
+    set(target "${container_tag}-${build_type}")
+  endif()
+  message(STATUS "${dockerfile} ${container_tag} ${build_type} ${target}")
   add_custom_target(
-    "${container_tag}-${build_type}"
+    "${target}"
     USES_TERMINAL
-    COMMENT "Build for ${dockerfile}/${container_tag}/${build_type}"
+    COMMENT "Build for ${dockerfile}/${target}"
     COMMAND "${LIPS_CONTAINER_APP}" build -t "${container_tag}" -f
-            "${CMAKE_CURRENT_SOURCE_DIR}/test/${dockerfile}" .
-    COMMAND mkdir -p "${CMAKE_CURRENT_BINARY_DIR}/${container_tag}-${build_type}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${dockerfile}" .
+    COMMAND mkdir -p "${CMAKE_CURRENT_BINARY_DIR}/${target}"
     COMMAND "${LIPS_CONTAINER_APP}" run --rm --user "${USER}:${GROUP}"
-            -v "${CMAKE_CURRENT_SOURCE_DIR}:/project/lips:ro"
-            -v "${CMAKE_CURRENT_BINARY_DIR}/${container_tag}-${build_type}:/project/build:rw"
+            -v "${CMAKE_CURRENT_SOURCE_DIR}/..:/project/lips:ro"
+            -v "${CMAKE_CURRENT_BINARY_DIR}/${target}:/project/build:rw"
             "${container_tag}"
             /project/lips/test/build.sh "${build_type}")
-  set_target_properties("${container_tag}-${build_type}" PROPERTIES FOLDER "Test")
-  add_dependencies(test-linux "${container_tag}-${build_type}")
+  set_target_properties("${target}" PROPERTIES FOLDER "Test")
+  add_dependencies(test-linux "${target}")
 endfunction()
 
 add_custom_target(test-linux)
 set_target_properties(test-linux PROPERTIES FOLDER "Test")
 
-lips_build_and_test(Ubuntu-22.04 ubuntu22 docker)
-lips_build_and_test(Ubuntu-24.04 ubuntu24 docker)
+lips_build_and_test(Ubuntu-22.04 ubuntu22)
+lips_build_and_test(Ubuntu-24.04 ubuntu24)
 lips_build_and_test(Ubuntu-24.04 ubuntu24 clang)
 
-lips_build_and_test(Fedora-40 fedora40 docker)
-lips_build_and_test(Fedora-41 fedora41 docker)
+lips_build_and_test(Fedora-40 fedora40)
+lips_build_and_test(Fedora-41 fedora41)
 lips_build_and_test(Fedora-41 fedora41 tidy)
 lips_build_and_test(Fedora-41 fedora41 clang)
 
-lips_build_and_test(Alpine alpine docker)
+lips_build_and_test(Alpine alpine container)
