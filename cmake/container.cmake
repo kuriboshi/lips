@@ -77,4 +77,4 @@ lips_build_and_test(Fedora-41 fedora41)
 lips_build_and_test(Fedora-41 fedora41 tidy)
 lips_build_and_test(Fedora-41 fedora41 clang)
 
-lips_build_and_test(Alpine alpine container)
+lips_build_and_test(Alpine alpine)
