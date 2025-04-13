@@ -74,8 +74,8 @@ built as part of the build.
 
 | Library Name | Version |
 |--------------|---------|
-| Catch2       | 3.7.1   |
-| fmt          | 11.0.2  |
+| Catch2       | 3.8.1   |
+| fmt          | 11.1.4  |
 
 System library dependencies.
 
