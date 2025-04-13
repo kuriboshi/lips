@@ -12,35 +12,15 @@ else
   export HOMEBREW_ROOT := /usr/local
 endif
 
-# Runs the configure step for a target.
-$(TARGETS:%=build/%/configured):
-	cmake --preset $(@:build/%/configured=%)
-	touch $@
+# First stage build.
+.PHONY: build/build
+build/build:
+	cmake --preset build
 
-# Default debug build.
-.PHONY: debug
-debug: build/debug/configured
-	cmake --build --preset $@
-
-# Optimized build.
-.PHONY: release
-release: build/release/configured
-	cmake --build --preset $@
-
-# Build with the clang compiler.
-.PHONY: clang
-clang: build/clang/configured
-	cmake --build --preset $@
-
-# Build with the llvm clang compiler (Apple only)
-.PHONY: llvm
-llvm: build/llvm/configured
-	cmake --build --preset $@
-
-# Build using clang-tidy to analyse the code.
-.PHONY: tidy
-tidy: build/tidy/configured
-	cmake --build --preset $@
+# Standard build types.
+.PHONY: debug release clang llvm tidy
+debug release clang llvm tidy: build/build
+	cmake --build --preset build --target $@
 
 # Create a configuration suitable to use with Xcode.
 .PHONY: xcode
@@ -49,13 +29,13 @@ xcode:
 
 # Produce a coverage report.
 .PHONY: coverage
-coverage: build/debug/configured
+coverage: debug
 	cmake --build --preset debug --target coverage
 
 # Format source code using clang-format
 .PHONY: format
-format: build/debug/configured
-	cmake --build --preset debug --target format
+format: build/build
+	cmake --build --preset build --target format
 
 # Run the unit tests.
 .PHONY: test
@@ -102,6 +82,6 @@ container:
 test-linux: container
 	cmake --build --preset container --target test-linux
 
-.PHONY: ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang
-ubuntu22 ubuntu24 fedora40 fedora41 alpine ubuntu24-clang fedora41-tidy fedora41-clang: container
+.PHONY: ubuntu22 ubuntu24 ubuntu24-clang fedora40 fedora41 fedora41-tidy fedora41-clang alpine
+ubuntu22 ubuntu24 ubuntu24-clang fedora40 fedora41 fedora41-tidy fedora41-clang alpine: container
 	cmake --build build/container --target $@

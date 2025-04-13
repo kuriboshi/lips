@@ -7,8 +7,18 @@
     },
     "configurePresets": [
         {
+            "name": "build",
+            "displayName": "Build config",
+            "description": "Build config",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "LIPS_BUILD": "OFF"
+            }
+        },
+        {
             "name": "debug",
-            "displayName": "Debug Config",
+            "displayName": "Debug build",
             "description": "Debug build using Ninja generator",
             "binaryDir": "${sourceDir}/build/debug",
             "generator": "Ninja",
@@ -45,17 +55,6 @@
             }
         },
         {
-            "name": "make",
-            "inherits": "debug",
-            "displayName": "Makefile preset",
-            "description": "Debug build using make",
-            "binaryDir": "${sourceDir}/build/make",
-            "generator": "Unix Makefiles",
-            "cacheVariables": {
-                "LIPS_ENABLE_CODE_COVERAGE": "OFF"
-            }
-        },
-        {
             "name": "tidy",
             "inherits": "debug",
             "displayName": "Run clang-tidy",
@@ -69,7 +68,7 @@
         {
             "name": "clang",
             "inherits": "debug",
-            "displayName": "Build with clang",
+            "displayName": "Build with clang on Linux",
             "description": "Build with the clang compiler",
             "binaryDir": "${sourceDir}/build/clang",
             "condition": {
@@ -90,9 +89,19 @@
             "description": "Build with llvm clang compiler",
             "binaryDir": "${sourceDir}/build/llvm",
             "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
+                "type": "allOf",
+                "conditions": [
+                    {
+                        "type": "equals",
+                        "lhs": "${hostSystemName}",
+                        "rhs": "Darwin"
+                    },
+                    {
+                        "type": "notEquals",
+                        "lhs": "$env{HOMEBREW_ROOT}",
+                        "rhs": ""
+                    }
+                ]
             },
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "$env{HOMEBREW_ROOT}/opt/llvm/bin/clang",
@@ -113,6 +122,10 @@
     ],
     "buildPresets": [
         {
+            "name": "build",
+            "configurePreset": "build"
+        },
+        {
             "name": "default",
             "configurePreset": "default"
         },
@@ -123,10 +136,6 @@
         {
             "name": "release",
             "configurePreset": "release"
-        },
-        {
-            "name": "make",
-            "configurePreset": "make"
         },
         {
             "name": "xcode",
@@ -166,11 +175,6 @@
         {
             "name": "debug",
             "configurePreset": "debug",
-            "inherits": "default"
-        },
-        {
-            "name": "make",
-            "configurePreset": "make",
             "inherits": "default"
         },
         {

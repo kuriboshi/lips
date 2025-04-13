@@ -45,7 +45,7 @@ The code requires C++-23 and CMake 3.21 or newer.
 
 ### Platforms
 
-The project is developed primarily on macOS 15 (Sequoia) using the
+The project is developed primarily on macos 15 (Sequoia) using the
 Apple clang version 17 compiler.
 
 At the time of writing `lips` has been tested on the following
@@ -55,8 +55,8 @@ on their level of support for C++-23.
 
 | OS Version   | Compiler Version  |
 |--------------|-------------------|
-| macOS 15.4   | AppleClang 17.0.0 |
-| macOS 15.4   | llvm-clang 20.1.1 |
+| macos 15.4   | AppleClang 17.0.0 |
+| macos 15.4   | llvm-clang 20.1.1 |
 | Ubuntu 22.04 | gcc 13.1.0        |
 | Ubuntu 24.04 | gcc 13.2.0        |
 | Ubuntu 24.04 | clang 19.1.6      |
@@ -87,24 +87,54 @@ System tool dependencies.
 
 | Tool name | Remark                      |
 |-----------|-----------------------------|
-| ninja     | Optional, `make` also works |
+| ninja     |                             |
 | cmake     | Minimum version is 3.21.0   |
 
 ## Building
 
-Configure and build using `cmake`. There are presets defined in
-`CMakePresets.json`. The `default` preset uses `ninja` to build. There
-is also a preset named `make` which uses `make` to build.
+Building is done in two phases using a combination of `make` and
+`cmake` to drive the build. Using `make` is optional and is only a
+front end to `cmake`.
+
+In the first phase a minimal build environment is created. This
+environment is then used to build several different targets described
+below.
+
+There is a `Makefile` in the top directory which runs `cmake` and
+`ctest` for some scenerios.
+
+| Make Target      | Description                                 |
+|------------------|---------------------------------------------|
+| `all` or `debug` | Debug build                                 |
+| `release`        | Optimized build                             |
+| `clang`          | Build with `clang` (Linux)                  |
+| `llvm`           | Build with `llvm` version of clang (macos)  |
+| `tidy`           | Run `clang-tidy` checks                     |
+| `xcode`          | Create a configuration for Xcode (no build) |
+| `coverage`       | Produce a coverage report                   |
+| `format`         | Run `clang-format` on the source files      |
+| `benchmark`      | Run benchmarks                              |
+| `package-test`   | Test using `lips` as an external library    |
+| `test-linux`     | Run all Linux tests in docker               |
+| `copyright`      | Update copyright notices in source files    |
+| `docs`           | Update the documentation from source files  |
+| `ubuntu22`       | Build in docker on Ubuntu 22.04             |
+| `ubuntu24`       | Build in docker on Ubuntu 24.04             |
+| `ubuntu24-clang` | Build in docker on Ubuntu 24.04 with clang  |
+| `fedora40`       | Build in docker on Fedora 40                |
+| `fedora41`       | Build in docker on Fedora 41                |
+| `fedora41-tidy`  | Run clang-tidy in docker on Fedora 41       |
+| `fedora41-clang` | Build in docker on Fedora 41 with clang     |
+| `alpine`         | Build in docker on Alpine 3.21              |
+
+Using the two phase build is not strictly necessary and the project
+can be configured and built using `cmake` directly. There are several
+presets defined in `CMakePresets.json`. The one called `default`
+builds a debug version of the project.
 
 ```sh
 cmake --preset default
 cmake --build --preset default
-```
-
-or
-
-```sh
-make
 ```
 
 There are a number of options available to customize the build.
@@ -117,44 +147,28 @@ There are a number of options available to customize the build.
 | `LIPS_ENABLE_BENCHMARK`     | Enable building benchmark code  | `OFF`         |
 | `LIPS_ENABLE_CLANG_TIDY`    | Enable checking with clang-tidy | `OFF`         |
 
-Turn them on by adding `-D` options to the `cmake` command.
-
-There is a `Makefile` in the top directory which runs `cmake` and
-`ctest` for some common scenerios.
-
-| Make Target      | Description                                |
-|------------------|--------------------------------------------|
-| `all` or `debug` | Debug build                                |
-| `release`        | Optimized build                            |
-| `clang`          | Build with `clang`                         |
-| `llvm`           | Build with `llvm` version of clang (macOS) |
-| `tidy`           | Turn on `clang-tidy` checks                |
-| `xcode`          | Create a configuration for Xcode           |
-| `coverage`       | Produce a coverage report                  |
-| `format`         | Run `clang-format` on the source files     |
-| `copyright`      | Update copyright notice                    |
-| `test-linux`     | Run all Linux tests in docker              |
-| `benchmark`      | Run benchmarks                             |
-| `package_test`   | Test using `lips` as an external library   |
+Turn them on by adding `-D` options to the `cmake` command or choose
+one of the appropriate `cmake` presets.
 
 ## Unit Testing
 
-Native testing on the host is triggered by the `ctest` command. For example
-
-```sh
-ctest --preset default
-```
-
-or
+Native testing on the host is triggered by the `ctest` command, either
+using `make` or `ctest` directly.
 
 ```sh
 make test
 ```
 
+or
+
+```sh
+ctest --preset default
+```
+
 ### GitHub workflows
 
 Builds and tests using GitHub actions are included in the
-`.github/workflows` directory. There are workflows for Ubuntu 22.04 as
+`.github/workflows` directory. There are workflows for Ubuntu 24.04 as
 well as one for CodeQL.
 
 ### Local testing
@@ -162,23 +176,24 @@ well as one for CodeQL.
 For local testing there are some docker files in the `test` directory
 which can be used for testing on various platforms.  Runing the
 following command builds and tests on all the above Linux operating
-systems and compiler combinations.
-
-```sh
-cmake --preset default --target test-linux
-```
-
-or
+systems and compiler combinations. Individual Linux versions can be
+tested separately using the `make` targets listed above.
 
 ```sh
 make test-linux
 ```
 
-On macOS `podman` is used instead of `docker`. Install `podman` and
+or
+
+```sh
+cmake --preset default --target test-linux
+```
+
+On macos `podman` is used instead of `docker`. Install `podman` and
 start the VM. From then on the target `test-linux` should work the
 same as for `docker`.
 
-I you use `podman` on macOS, make sure you allocate enough memory to
+I you use `podman` on macos, make sure you allocate enough memory to
 the VM. I've had success with 4 CPU's and 4GB of memory.
 
 ## Implementation Notes
